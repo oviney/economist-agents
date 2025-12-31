@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Agent outputs
+content_queue.json
+board_decision.json
+board_report.md
+test_outputs/
+model_comparison_results.json
+output/
+
+# Secrets
+.env
+*.key
+*_API_KEY*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

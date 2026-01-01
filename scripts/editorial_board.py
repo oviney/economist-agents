@@ -41,8 +41,10 @@ Voting Process:
 
 import os
 import json
-import anthropic
 from concurrent.futures import ThreadPoolExecutor, as_completed
+
+# Import unified LLM client
+from llm_client import create_llm_client, call_llm
 
 # ═══════════════════════════════════════════════════════════════════════════
 # BOARD MEMBER PERSONAS
@@ -214,6 +216,16 @@ For each topic, score 1-10 on "would I actually read this on the train" and expl
 def get_board_vote(client, member_id: str, member_info: dict, topics: list) -> dict:
     """Get a single board member's votes on all topics."""
     
+    # Input validation
+    if not topics or not isinstance(topics, list):
+        raise ValueError(
+            f"[EDITORIAL_BOARD:{member_id}] Invalid topics. Expected non-empty list, "
+            f"got: {type(topics).__name__}"
+        )
+    
+    if len(topics) == 0:
+        raise ValueError(f"[EDITORIAL_BOARD:{member_id}] No topics to evaluate")
+    
     topics_text = "\n\n".join([
         f"TOPIC {i+1}: {t['topic']}\n"
         f"Hook: {t.get('hook', 'N/A')}\n"
@@ -240,13 +252,12 @@ Respond in JSON format:
   "top_pick_reason": "Why this is your #1 choice"
 }}"""
 
-    response = client.messages.create(
-        model="claude-sonnet-4-20250514",
-        max_tokens=1500,
-        messages=[{"role": "user", "content": prompt}]
+    response_text = call_llm(
+        client,
+        "",  # System prompt embedded in member prompt
+        prompt,
+        max_tokens=1500
     )
-    
-    response_text = response.content[0].text
     
     # Parse JSON
     try:
@@ -423,7 +434,7 @@ def format_board_report(result: dict) -> str:
 def main():
     """Run editorial board on topics from content_queue.json or environment."""
     
-    client = anthropic.Anthropic()
+    client = create_llm_client()
     
     # Load topics
     topics_json = os.environ.get('TOPICS', '')

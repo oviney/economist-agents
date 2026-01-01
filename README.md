@@ -40,15 +40,57 @@ This is **not** a blog - it's a **content generation pipeline** that produces ar
 
 ### 1. Install Dependencies
 ```bash
-pip install anthropic matplotlib numpy python-slugify
+pip install -r requirements.txt
+# Or manually:
+pip install anthropic openai matplotlib numpy python-slugify pyyaml
 ```
 
-### 2. Set API Key
+### 2. Set API Key (SECURE METHOD)
+
+**🔒 Recommended: Use .env file** ([Security Guide](.github/API_KEY_SECURITY.md))
 ```bash
-export ANTHROPIC_API_KEY='sk-ant-...'
+# One-time setup
+./scripts/setup_env.sh
+
+# Edit with your real key
+nano .env
 ```
+
+This creates a secure `.env` file with 600 permissions that's automatically ignored by git.
+
+**Option A: Use OpenAI** (recommended if you have existing credits)
+```bash
+# In .env file:
+OPENAI_API_KEY=sk-...
+OPENAI_MODEL=gpt-4o
+```
+
+**Option B: Use Anthropic Claude**
+```bash
+# In .env file:
+ANTHROPIC_API_KEY=sk-ant-...
+ANTHROPIC_MODEL=claude-sonnet-4-20250514
+```
+
+**Alternative: Environment Variables** (less secure, not persisted)
+```bash
+export OPENAI_API_KEY='sk-...'
+export LLM_PROVIDER='openai'  # Optional, auto-detected
+```
+
+**Supported Models**:
+- OpenAI: `gpt-4o` (default), `gpt-4o-mini`, `gpt-4-turbo`, `gpt-4`
+- Anthropic: `claude-sonnet-4-20250514` (default), `claude-opus-4-...`
+
+**⚠️ Security Reminders**:
+- Never commit API keys to git (`.env` is in `.gitignore`)
+- Use separate keys for dev/prod
+- Rotate keys immediately if exposed
+- See [API_KEY_SECURITY.md](.github/API_KEY_SECURITY.md) for complete guide
 
 ### 3. Run the Pipeline
+
+**Automated Mode** (default):
 ```bash
 # Stage 1: Discover topics
 python3 scripts/topic_scout.py
@@ -56,13 +98,48 @@ python3 scripts/topic_scout.py
 # Stage 2: Editorial board votes
 python3 scripts/editorial_board.py
 
-# Stage 3: Generate article
+# Stage 3: Generate article (no human input)
 python3 scripts/economist_agent.py
 ```
+
+**Interactive Mode** (with human review):
+```bash
+# Generate with approval gates between stages
+python3 scripts/economist_agent.py --interactive
+
+# All agent outputs saved to output/governance/
+# Review and approve at each stage
+```
+
+See [Governance Guide](docs/GOVERNANCE_GUIDE.md) for details on human review features.
 
 ### 4. Output
 - Article: `output/YYYY-MM-DD-article-title.md`
 - Chart: `output/charts/article-title.png`
+- Governance logs (interactive mode): `output/governance/SESSION_ID/`
+
+## Governance & Human Review
+
+**NEW**: Interactive mode with approval gates and audit trails!
+
+```bash
+# Enable human review at each stage
+python3 scripts/economist_agent.py --interactive
+```
+
+**Features**:
+- ✅ **Approval Gates**: Review and approve after research, writing, editing
+- ✅ **Saved Outputs**: Every agent's work saved as JSON for inspection
+- ✅ **Audit Trail**: Complete decision logs for compliance
+- ✅ **Governance Reports**: Human-readable summaries of each session
+
+**What Gets Saved**:
+- `research_agent.json` - Data points, sources, verification
+- `writer_agent.json` - Draft article and metadata
+- `editor_agent.json` - Quality gates and final version
+- `governance_report.md` - Complete session summary
+
+See [Governance Guide](docs/GOVERNANCE_GUIDE.md) for complete documentation.
 
 ## Integration with Your Blog
 

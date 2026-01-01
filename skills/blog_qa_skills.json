@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_updated": "2025-12-31",
+  "last_updated": "2025-12-31T23:49:59.116402",
   "skills": {
     "seo_validation": {
       "description": "Detect SEO issues that impact search rankings",
@@ -56,12 +56,202 @@
           "learned_from": "Found Google Fonts preload warning on 2025-12-31"
         }
       ]
+    },
+    "agent_architecture": {
+      "description": "",
+      "patterns": [
+        {
+          "severity": "architectural",
+          "pattern": "Agent behavior defined by large prompt constants at top of files",
+          "rationale": "Makes agent logic explicit, versionable, and reviewable",
+          "examples": [
+            "topic_scout.py: SCOUT_AGENT_PROMPT",
+            "topic_scout.py: TREND_RESEARCH_PROMPT",
+            "economist_agent.py: RESEARCH_AGENT_PROMPT"
+          ],
+          "check": "When modifying agent behavior, edit prompt constants first",
+          "learned_from": "Found 9 prompt constants across agent files",
+          "id": "prompts_as_code",
+          "learned_on": "2025-12-31T23:49:59.106049"
+        },
+        {
+          "severity": "architectural",
+          "pattern": "Editorial board uses weighted persona agents for consensus",
+          "rationale": "Simulates diverse stakeholder perspectives with different priorities",
+          "implementation": "Each persona has explicit 'what makes you click/scroll past' criteria",
+          "personas": [
+            "vp_engineering",
+            "senior_qe_lead",
+            "data_skeptic",
+            "career_climber",
+            "economist_editor",
+            "busy_reader"
+          ],
+          "check": "New personas must define weight, perspective, and decision criteria",
+          "learned_from": "Found 6 personas with weighted voting in editorial_board.py",
+          "id": "persona_based_voting",
+          "learned_on": "2025-12-31T23:49:59.106316"
+        },
+        {
+          "severity": "architectural",
+          "pattern": "Pipeline stages executed sequentially with data handoffs",
+          "stages": [
+            "run_research_agent",
+            "run_writer_agent",
+            "run_graphics_agent",
+            "run_editor_agent",
+            "run_critique_agent",
+            "run_visual_qa_agent"
+          ],
+          "rationale": "Each agent specializes in one task, outputs feed next agent",
+          "check": "Ensure each agent validates its inputs and outputs structured data",
+          "learned_from": "Found 6 specialized agents in pipeline",
+          "id": "sequential_agent_orchestration",
+          "learned_on": "2025-12-31T23:49:59.106684"
+        }
+      ]
+    },
+    "data_flow": {
+      "description": "",
+      "patterns": [
+        {
+          "severity": "architectural",
+          "pattern": "Pipeline stages communicate via JSON files on disk",
+          "files": [
+            "blog_qa_skills.json",
+            "board_decision.json",
+            "content_queue.json"
+          ],
+          "rationale": "Enables inspection between stages, supports manual intervention",
+          "governance": "Humans review JSON outputs before next stage execution",
+          "check": "Validate JSON schema compatibility between producer/consumer",
+          "learned_from": "Found 3 JSON intermediate files",
+          "id": "json_intermediate_format",
+          "learned_on": "2025-12-31T23:49:59.109345"
+        },
+        {
+          "severity": "architectural",
+          "pattern": "Output paths configurable via environment variables",
+          "rationale": "Supports multiple deployment targets (local, blog repo, CI/CD)",
+          "env_vars": [
+            "OUTPUT_DIR",
+            "ANTHROPIC_API_KEY"
+          ],
+          "check": "Provide sensible defaults when env vars not set",
+          "learned_from": "Found OUTPUT_DIR environment variable pattern",
+          "id": "configurable_output_paths",
+          "learned_on": "2025-12-31T23:49:59.110344"
+        }
+      ]
+    },
+    "prompt_engineering": {
+      "description": "",
+      "patterns": [
+        {
+          "severity": "best_practice",
+          "pattern": "Prompts explicitly define expected JSON output structure",
+          "rationale": "Reduces parsing errors and improves output consistency",
+          "implementation": "Include example JSON schema in system prompt",
+          "check": "Every agent that returns structured data must specify format",
+          "learned_from": "Found structured output specs in economist_agent.py",
+          "id": "structured_output_specification",
+          "learned_on": "2025-12-31T23:49:59.111164"
+        },
+        {
+          "severity": "best_practice",
+          "pattern": "Style constraints explicitly listed as BANNED/FORBIDDEN",
+          "rationale": "Learned from manual editing cycles - codified editorial lessons",
+          "examples": [
+            "BANNED OPENINGS",
+            "BANNED PHRASES",
+            "FORBIDDEN CLOSINGS"
+          ],
+          "check": "Update constraint lists based on editor agent rejections",
+          "learned_from": "Found 3 explicit constraint sections in economist_agent.py",
+          "id": "explicit_constraint_lists",
+          "learned_on": "2025-12-31T23:49:59.111315"
+        }
+      ]
+    },
+    "error_handling": {
+      "description": "",
+      "patterns": [
+        {
+          "severity": "best_practice",
+          "pattern": "Extract JSON from LLM responses with find/rfind before parsing",
+          "rationale": "LLMs may wrap JSON in markdown or explanatory text",
+          "implementation": "Find first '{' and last '}', parse substring",
+          "check": "Always use try/except around json.loads()",
+          "learned_from": "Found defensive parsing in 5 files",
+          "id": "defensive_json_parsing",
+          "learned_on": "2025-12-31T23:49:59.113390"
+        },
+        {
+          "severity": "architectural",
+          "pattern": "Research agent flags unverifiable claims with [UNVERIFIED]",
+          "rationale": "Maintains credibility, prevents false claims in output",
+          "enforcement": "Editor agent rejects articles with [UNVERIFIED] markers",
+          "check": "Never publish content with verification flags",
+          "learned_from": "Found [UNVERIFIED] flagging system in research/editor flow",
+          "id": "explicit_verification_flags",
+          "learned_on": "2025-12-31T23:49:59.113639"
+        }
+      ]
+    },
+    "dependencies": {
+      "description": "",
+      "patterns": [
+        {
+          "severity": "architectural",
+          "pattern": "All agents use Anthropic Claude API via shared client",
+          "rationale": "Consistent model selection, easier rate limiting, unified error handling",
+          "model": "claude-sonnet-4-20250514",
+          "check": "Create client once, pass to agents - don't create per-request",
+          "learned_from": "Found Anthropic client usage in 5 files",
+          "id": "centralized_llm_client",
+          "learned_on": "2025-12-31T23:49:59.115113"
+        }
+      ]
+    },
+    "testing_strategy": {
+      "description": "",
+      "patterns": [
+        {
+          "severity": "architectural",
+          "pattern": "Validation agents learn from each run using skills system",
+          "rationale": "Zero-config improvement, patterns persist across runs",
+          "implementation": "SkillsManager stores patterns in skills/*.json",
+          "categories": [
+            "content_quality",
+            "seo_validation",
+            "link_validation"
+          ],
+          "check": "Call skills_manager.learn_pattern() when new issues discovered",
+          "learned_from": "Found SkillsManager implementation with pattern persistence",
+          "id": "continuous_learning_validation",
+          "learned_on": "2025-12-31T23:49:59.115672"
+        },
+        {
+          "severity": "architectural",
+          "pattern": "Manual review gates between pipeline stages",
+          "checkpoints": [
+            "Review content_queue.json after discovery",
+            "Review board_decision.json after voting",
+            "Review generated article before publish"
+          ],
+          "rationale": "Prevents runaway automation, ensures quality",
+          "check": "Never auto-publish - require explicit human approval",
+          "learned_from": "Found multi-stage review pattern in pipeline",
+          "id": "human_review_checkpoints",
+          "learned_on": "2025-12-31T23:49:59.116400"
+        }
+      ]
     }
   },
   "validation_stats": {
-    "total_runs": 5,
-    "issues_found": 5,
+    "total_runs": 7,
+    "issues_found": 17,
     "issues_fixed": 3,
-    "last_run": "2025-12-31T21:05:00.570371"
+    "last_run": "2025-12-31T23:49:59.116420"
   }
 }

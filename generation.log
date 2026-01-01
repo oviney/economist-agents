@@ -1,0 +1,31 @@
+   ✓ Output directory: /Users/ouray.viney/code/economist-agents/output
+ℹ Using queued topic: Self-Healing Tests: Myth vs Reality
+
+======================================================================
+🎯 GENERATING: Self-Healing Tests: Myth vs Reality
+======================================================================
+
+🤖 LLM Provider: openai
+   Model: gpt-4o
+📊 Research Agent: Gathering verified data for 'Self-Healing Tests: Myth vs Reality...'
+   ✓ Found 3 data points (2 verified)
+   ⚠ 1 unverified claims flagged
+📈 Graphics Agent: Creating visualization 'Adoption and Impact of Self-Healing Test...'
+   ✓ Chart saved to output/charts/self-healing-tests-myth-vs-reality.png
+🎨 Visual QA Agent: Inspecting chart...
+   Visual gates: 4/4 passed
+   ✓ Chart PASSED visual QA
+✍️  Writer Agent: Drafting article on 'Self-Healing Tests: Myth vs Reality...'
+   ✓ Draft complete (667 words)
+📝 Editor Agent: Reviewing 667-word draft against quality gates...
+   Quality gates: 3 passed, 3 failed
+   ⚠ Skipping critique - 3 quality gates failed
+
+======================================================================
+✅ COMPLETE
+   Article: output/2026-01-01-self-healing-tests-myth-vs-reality.md
+   Chart:   output/charts/self-healing-tests-myth-vs-reality.png
+   Visual QA: PASSED
+   Editorial: 3/5 gates passed
+======================================================================
+

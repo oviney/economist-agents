@@ -1,0 +1,22 @@
+#!/bin/bash
+# Test OpenAI integration
+
+echo "=== Testing OpenAI Integration ==="
+echo ""
+echo "To test with OpenAI, run:"
+echo ""
+echo "export OPENAI_API_KEY='sk-your-key-here'"
+echo "export LLM_PROVIDER='openai'"
+echo "python3 scripts/llm_client.py"
+echo ""
+echo "Or to use OpenAI for the full pipeline:"
+echo ""
+echo "export OPENAI_API_KEY='sk-your-key-here'"  
+echo "export LLM_PROVIDER='openai'"
+echo "python3 scripts/economist_agent.py"
+echo ""
+echo "Supported models (set OPENAI_MODEL):"
+echo "  - gpt-4o (default)"
+echo "  - gpt-4o-mini"
+echo "  - gpt-4-turbo"
+echo "  - gpt-4"

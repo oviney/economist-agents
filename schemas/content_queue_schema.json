@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Content Queue Schema",
+  "description": "Schema for topic_scout.py output - ranked list of article topics",
+  "type": "object",
+  "required": ["updated", "topics"],
+  "properties": {
+    "updated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when queue was generated"
+    },
+    "topics": {
+      "type": "array",
+      "description": "Ranked list of topics from topic scout",
+      "items": {
+        "type": "object",
+        "required": ["topic", "hook", "thesis", "scores", "total_score"],
+        "properties": {
+          "topic": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 200,
+            "description": "Clear, specific article title"
+          },
+          "hook": {
+            "type": "string",
+            "description": "Attention-grabbing angle or stat (1 sentence)"
+          },
+          "thesis": {
+            "type": "string",
+            "description": "The main argument (1 sentence)"
+          },
+          "data_sources": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Where numbers for charts will come from"
+          },
+          "timeliness_trigger": {
+            "type": "string",
+            "description": "Why now? What happened recently?"
+          },
+          "contrarian_angle": {
+            "type": "string",
+            "description": "How we'd challenge conventional wisdom"
+          },
+          "title_ideas": {
+            "type": "array",
+            "items": {"type": "string"},
+            "minItems": 2,
+            "description": "Economist-style title options"
+          },
+          "scores": {
+            "type": "object",
+            "required": ["timeliness", "data_availability", "contrarian_potential", "audience_fit", "economist_fit"],
+            "properties": {
+              "timeliness": {"type": "integer", "minimum": 1, "maximum": 5},
+              "data_availability": {"type": "integer", "minimum": 1, "maximum": 5},
+              "contrarian_potential": {"type": "integer", "minimum": 1, "maximum": 5},
+              "audience_fit": {"type": "integer", "minimum": 1, "maximum": 5},
+              "economist_fit": {"type": "integer", "minimum": 1, "maximum": 5}
+            }
+          },
+          "total_score": {
+            "type": "integer",
+            "minimum": 5,
+            "maximum": 25,
+            "description": "Sum of all scores"
+          },
+          "talking_points": {
+            "type": "string",
+            "description": "Key points to cover"
+          }
+        }
+      }
+    }
+  }
+}

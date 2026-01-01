@@ -1,0 +1,18 @@
+# Economist Agents - Python Dependencies
+
+# Core dependencies
+anthropic>=0.40.0        # Anthropic Claude API (optional if using OpenAI)
+openai>=1.0.0            # OpenAI API (optional if using Anthropic)
+matplotlib>=3.7.0        # Chart generation
+numpy>=1.24.0            # Data manipulation for charts
+python-slugify>=8.0.0    # URL-safe filenames
+pyyaml>=6.0              # YAML parsing for config
+
+# Security (recommended)
+python-dotenv>=1.0.0     # Secure .env file loading
+
+# Optional dependencies
+jsonschema>=4.17.0       # JSON Schema validation (optional, has fallback)
+
+# Development dependencies
+pytest>=7.0.0            # Testing framework (optional)

@@ -18,8 +18,10 @@ Output: Ranked list of topics with data availability scores
 
 import os
 import json
-import anthropic
 from datetime import datetime
+
+# Import unified LLM client
+from llm_client import create_llm_client, call_llm
 
 SCOUT_AGENT_PROMPT = """You are a Topic Scout for a quality engineering blog targeting senior engineers and engineering leaders.
 
@@ -114,7 +116,8 @@ Focus on developments that would interest a senior QE leader making strategic de
 
 
 def create_client():
-    return anthropic.Anthropic()
+    """Create unified LLM client (supports Anthropic Claude and OpenAI)"""
+    return create_llm_client()
 
 
 def scout_topics(client, focus_area: str = None) -> list:
@@ -135,12 +138,12 @@ def scout_topics(client, focus_area: str = None) -> list:
         trend_prompt += f"\n\nFocus especially on: {focus_area}"
     
     print("   Researching current trends...")
-    trend_response = client.messages.create(
-        model="claude-sonnet-4-20250514",
-        max_tokens=2000,
-        messages=[{"role": "user", "content": trend_prompt}]
+    trends = call_llm(
+        client,
+        "",  # No system prompt for this call
+        trend_prompt,
+        max_tokens=2000
     )
-    trends = trend_response.content[0].text
     
     # Then, identify topics based on trends
     print("   Identifying high-value topics...")
@@ -150,13 +153,12 @@ def scout_topics(client, focus_area: str = None) -> list:
 
 {SCOUT_AGENT_PROMPT}"""
     
-    topic_response = client.messages.create(
-        model="claude-sonnet-4-20250514",
-        max_tokens=3000,
-        messages=[{"role": "user", "content": scout_prompt}]
+    response_text = call_llm(
+        client,
+        "",  # System prompt embedded in scout_prompt
+        scout_prompt,
+        max_tokens=3000
     )
-    
-    response_text = topic_response.content[0].text
     
     # Parse JSON from response
     try:

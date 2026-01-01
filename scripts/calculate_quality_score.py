@@ -11,12 +11,18 @@ Calculates project quality score based on:
 Formula: (Coverage×0.4 + Pass Rate×0.3 + Docs×0.2 + Style×0.1) × 100
 
 Target: 90%+ quality score
+
+Historical Tracking:
+- Appends each run to skills/quality_history.json
+- Tracks trend over time (improving/stable/declining)
+- Enables quality dashboard visualization
 """
 
 import subprocess
 import os
 from pathlib import Path
 import json
+from datetime import datetime
 
 
 def get_test_coverage():
@@ -194,7 +200,7 @@ def calculate_quality_score():
     print(f"   Grade: {grade}")
     print("\n" + "="*70 + "\n")
     
-    return {
+    score_data = {
         "quality_score": round(quality_score),
         "grade": grade,
         "color": color,
@@ -205,6 +211,66 @@ def calculate_quality_score():
             "code_style": round(style, 1)
         }
     }
+    
+    # Save to history
+    save_to_history(score_data)
+    
+    return score_data
+
+
+def save_to_history(score_data):
+    """Save quality score to historical log"""
+    history_file = Path(__file__).parent.parent / "skills" / "quality_history.json"
+    
+    # Load existing history
+    if history_file.exists():
+        with open(history_file, 'r') as f:
+            history = json.load(f)
+    else:
+        history = {
+            "version": "1.0",
+            "created": datetime.now().isoformat(),
+            "runs": []
+        }
+    
+    # Add current run
+    run_data = {
+        "timestamp": datetime.now().isoformat(),
+        **score_data
+    }
+    history["runs"].append(run_data)
+    
+    # Calculate trend
+    if len(history["runs"]) >= 2:
+        scores = [r["quality_score"] for r in history["runs"]]
+        trend = calculate_trend(scores)
+        history["trend"] = trend
+        print(f"\n📈 Quality Trend: {trend}")
+    
+    # Save history
+    history_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(history_file, 'w') as f:
+        json.dump(history, f, indent=2)
+    
+    print(f"   Saved to {history_file.name} (Run #{len(history['runs'])})")
+
+
+def calculate_trend(scores):
+    """Calculate trend from score history"""
+    if len(scores) < 3:
+        return "stable ➡️ (need more runs)"
+    
+    # Compare recent scores to older scores
+    recent = sum(scores[-3:]) / 3
+    older = sum(scores[:-3]) / len(scores[:-3]) if len(scores) > 3 else scores[0]
+    
+    diff = recent - older
+    if diff > 2:
+        return f"improving ⬆️ (+{diff:.1f} points)"
+    elif diff < -2:
+        return f"declining ⬇️ ({diff:.1f} points)"
+    else:
+        return "stable ➡️"
 
 
 def export_badge_json(score_data):

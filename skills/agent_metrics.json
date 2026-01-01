@@ -1,0 +1,337 @@
+{
+  "version": "1.0",
+  "created": "2025-12-02T15:39:25.391403",
+  "runs": [
+    {
+      "timestamp": "2025-12-02T15:39:25.391406",
+      "agents": {
+        "research_agent": {
+          "data_points": 10,
+          "verified": 7,
+          "unverified": 3,
+          "verification_rate": 73.2,
+          "sources": [
+            "Gartner 2024",
+            "TestGuild Survey"
+          ],
+          "prediction": "High verification rate (>80%)",
+          "actual": "Needs improvement"
+        },
+        "writer_agent": {
+          "word_count": 1259,
+          "banned_phrases": 1,
+          "validation_passed": false,
+          "regenerations": 1,
+          "chart_embedded": true,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Needs improvement"
+        },
+        "editor_agent": {
+          "gates_passed": 3,
+          "gates_failed": 2,
+          "gate_pass_rate": 60.0,
+          "edits_made": 8,
+          "quality_issues": [
+            "Style",
+            "Structure"
+          ],
+          "prediction": "All gates pass (5/5)",
+          "actual": "Failed 2 gates"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 0,
+          "visual_qa_pass_rate": 0.0,
+          "zone_violations": 1,
+          "regenerations": 1,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "1 violations"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 0,
+        "success_rate": 0.0
+      }
+    },
+    {
+      "timestamp": "2025-12-07T15:39:25.391417",
+      "agents": {
+        "research_agent": {
+          "data_points": 10,
+          "verified": 8,
+          "unverified": 2,
+          "verification_rate": 79.5,
+          "sources": [
+            "Gartner 2024",
+            "TestGuild Survey"
+          ],
+          "prediction": "High verification rate (>80%)",
+          "actual": "Needs improvement"
+        },
+        "writer_agent": {
+          "word_count": 1000,
+          "banned_phrases": 1,
+          "validation_passed": false,
+          "regenerations": 1,
+          "chart_embedded": true,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Needs improvement"
+        },
+        "editor_agent": {
+          "gates_passed": 4,
+          "gates_failed": 1,
+          "gate_pass_rate": 80.0,
+          "edits_made": 10,
+          "quality_issues": [
+            "Style",
+            "Structure"
+          ],
+          "prediction": "All gates pass (5/5)",
+          "actual": "Failed 1 gates"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 1,
+          "visual_qa_pass_rate": 100.0,
+          "zone_violations": 0,
+          "regenerations": 0,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 1,
+        "success_rate": 25.0
+      }
+    },
+    {
+      "timestamp": "2025-12-12T15:39:25.391425",
+      "agents": {
+        "research_agent": {
+          "data_points": 10,
+          "verified": 8,
+          "unverified": 2,
+          "verification_rate": 82.5,
+          "sources": [
+            "Gartner 2024",
+            "TestGuild Survey"
+          ],
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "writer_agent": {
+          "word_count": 1000,
+          "banned_phrases": 0,
+          "validation_passed": true,
+          "regenerations": 0,
+          "chart_embedded": true,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Pass"
+        },
+        "editor_agent": {
+          "gates_passed": 5,
+          "gates_failed": 0,
+          "gate_pass_rate": 100.0,
+          "edits_made": 11,
+          "quality_issues": [],
+          "prediction": "All gates pass (5/5)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 1,
+          "visual_qa_pass_rate": 100.0,
+          "zone_violations": 0,
+          "regenerations": 0,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 4,
+        "success_rate": 100.0
+      }
+    },
+    {
+      "timestamp": "2025-12-17T15:39:25.391430",
+      "agents": {
+        "research_agent": {
+          "data_points": 10,
+          "verified": 9,
+          "unverified": 1,
+          "verification_rate": 85.6,
+          "sources": [
+            "Gartner 2024",
+            "TestGuild Survey"
+          ],
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "writer_agent": {
+          "word_count": 1285,
+          "banned_phrases": 0,
+          "validation_passed": true,
+          "regenerations": 0,
+          "chart_embedded": true,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Pass"
+        },
+        "editor_agent": {
+          "gates_passed": 6,
+          "gates_failed": -1,
+          "gate_pass_rate": 120.0,
+          "edits_made": 12,
+          "quality_issues": [
+            "Style",
+            "Structure"
+          ],
+          "prediction": "All gates pass (5/5)",
+          "actual": "Failed -1 gates"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 1,
+          "visual_qa_pass_rate": 100.0,
+          "zone_violations": 0,
+          "regenerations": 0,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 3,
+        "success_rate": 75.0
+      }
+    },
+    {
+      "timestamp": "2025-12-22T15:39:25.391434",
+      "agents": {
+        "research_agent": {
+          "data_points": 10,
+          "verified": 9,
+          "unverified": 1,
+          "verification_rate": 92.4,
+          "sources": [
+            "Gartner 2024",
+            "TestGuild Survey"
+          ],
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "writer_agent": {
+          "word_count": 1066,
+          "banned_phrases": 0,
+          "validation_passed": true,
+          "regenerations": 0,
+          "chart_embedded": true,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Pass"
+        },
+        "editor_agent": {
+          "gates_passed": 7,
+          "gates_failed": -2,
+          "gate_pass_rate": 140.0,
+          "edits_made": 6,
+          "quality_issues": [
+            "Style",
+            "Structure"
+          ],
+          "prediction": "All gates pass (5/5)",
+          "actual": "Failed -2 gates"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 1,
+          "visual_qa_pass_rate": 100.0,
+          "zone_violations": 0,
+          "regenerations": 0,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 3,
+        "success_rate": 75.0
+      }
+    },
+    {
+      "timestamp": "2025-12-27T15:39:25.391437",
+      "agents": {
+        "research_agent": {
+          "data_points": 10,
+          "verified": 10,
+          "unverified": 0,
+          "verification_rate": 95.0,
+          "sources": [
+            "Gartner 2024",
+            "TestGuild Survey"
+          ],
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "writer_agent": {
+          "word_count": 1223,
+          "banned_phrases": 0,
+          "validation_passed": true,
+          "regenerations": 0,
+          "chart_embedded": true,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Pass"
+        },
+        "editor_agent": {
+          "gates_passed": 5,
+          "gates_failed": 0,
+          "gate_pass_rate": 100.0,
+          "edits_made": 12,
+          "quality_issues": [],
+          "prediction": "All gates pass (5/5)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 1,
+          "visual_qa_pass_rate": 100.0,
+          "zone_violations": 0,
+          "regenerations": 0,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 4,
+        "success_rate": 100.0
+      }
+    }
+  ],
+  "summary": {
+    "total_runs": 6,
+    "agents": {
+      "research_agent": {
+        "total_runs": 6,
+        "avg_verification_rate": 84.7,
+        "trend": "improving \u2b06\ufe0f"
+      },
+      "writer_agent": {
+        "total_runs": 6,
+        "clean_draft_rate": 66.7,
+        "avg_regenerations": 0.3
+      },
+      "editor_agent": {
+        "total_runs": 6,
+        "avg_gate_pass_rate": 100.0,
+        "trend": "improving \u2b06\ufe0f"
+      },
+      "graphics_agent": {
+        "total_runs": 6,
+        "avg_qa_pass_rate": 83.3,
+        "avg_violations": 0.2
+      }
+    }
+  }
+}

@@ -110,10 +110,24 @@ STRUCTURE (800-1200 words):
 1. OPENING: Lead with most striking fact. NO throat-clearing. NO "In today's world..."
 2. BODY: 3-4 sections, each advancing the argument. Use ## headers (noun phrases, not questions)
 3. CHART EMBEDDING (MANDATORY if chart_data provided):
-   - Insert chart markdown: ![Chart description](chart_path_provided_below)
-   - Place after the section where data is discussed
-   - Add 1-2 sentences: "As the chart shows..." or "The chart illustrates..."
-   - NEVER write "See figure 1" - reference naturally
+   ⚠️  CRITICAL VALIDATION CHECKLIST:
+   □ Chart markdown ![...](path) MUST appear in article body
+   □ Chart MUST be referenced in surrounding text ("As the chart shows...")
+   □ Chart placement: After the section discussing the data
+   □ DO NOT use "See figure 1" or "The chart below" - reference naturally
+   
+   CHART EMBEDDING PATTERN:
+   ```markdown
+   [Paragraph discussing data...]
+   
+   ![Chart title](chart_filename.png)
+   
+   As the chart shows, [insight from visualization].
+   ```
+   
+   ❌ WRONG: Writing article without embedding chart when chart_data provided
+   ✅ CORRECT: Chart embedded with natural text reference
+   
 4. CLOSE: Implication or forward look. NOT a summary. NOT "In conclusion..."
 
 VOICE:
@@ -195,6 +209,22 @@ BAD titles:
 - "Everything You Need to Know About..."
 - "X Tips for Y"
 - Questions as titles
+
+═══════════════════════════════════════════════════════════════════════════
+SELF-VALIDATION BEFORE OUTPUT
+═══════════════════════════════════════════════════════════════════════════
+
+Before submitting your article, verify:
+□ If chart_data was provided, chart markdown appears in body
+□ Chart is referenced in text (not just embedded)
+□ No banned opening phrases (check first 2 sentences)
+□ No banned closing phrases (check last 2 paragraphs)
+□ British spelling throughout (organisation, favour, analyse)
+□ No exclamation points
+□ Opening leads with data/fact (not context-setting)
+□ Closing makes prediction/implication (not summary)
+
+If ANY checkbox fails, revise before outputting.
 
 ═══════════════════════════════════════════════════════════════════════════
 YOUR RESEARCH BRIEF:

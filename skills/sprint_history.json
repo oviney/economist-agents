@@ -1,0 +1,26 @@
+{
+  "version": "1.0",
+  "created": "2026-01-01",
+  "last_updated": "2026-01-01",
+  "baseline_sprint": 5,
+  "sprints": [
+    {
+      "sprint_id": 5,
+      "start_date": "2026-01-01",
+      "end_date": "2026-01-01",
+      "duration_days": 1,
+      "status": "complete",
+      "metrics": {
+        "quality_score": 67,
+        "defect_escape_rate": 50.0,
+        "writer_clean_rate": 100.0,
+        "editor_accuracy": 85.7,
+        "avg_critical_ttd_days": 5.5,
+        "points_delivered": 14,
+        "stories_completed": 6,
+        "velocity_multiplier": 5.0
+      },
+      "notes": "Sprint 5 baseline - First complete sprint with full quality tracking"
+    }
+  ]
+}

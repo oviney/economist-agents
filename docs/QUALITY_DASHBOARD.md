@@ -1,5 +1,5 @@
 # 📊 Quality Engineering Dashboard
-**Generated**: 2026-01-01 18:08:02
+**Generated**: 2026-01-01 18:24:57
 **Quality Score**: 67/100
 
 🟠 [█████████████░░░░░░░] 67/100 - FAIR
@@ -45,7 +45,7 @@
 - **Briefs Generated**: 7
 - **Avg Data Points**: 3
 
-## 📈 Quality Trends
+## 📊 Quality Trends
 
 ⚠️ Defect escape rate stable/increasing (50.0%)
 ✅ Writer Agent meeting target (>80% clean)

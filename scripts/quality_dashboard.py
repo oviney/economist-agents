@@ -30,6 +30,7 @@ class QualityDashboard:
     def __init__(self):
         self.defect_tracker = DefectTracker()
         self.agent_metrics = AgentMetrics()
+        self.history = self._load_sprint_history()
     
     def generate_dashboard(self) -> str:
         """Generate complete quality dashboard"""
@@ -120,9 +121,18 @@ class QualityDashboard:
             "",
         ])
         
+        # Sprint trends (new section)
+        if len(self.history['sprints']) > 1:
+            dashboard.extend([
+                "## 📈 Sprint-Over-Sprint Trends",
+                "",
+                self._render_sprint_trends(),
+                "",
+            ])
+        
         # Quality trends
         dashboard.extend([
-            "## 📈 Quality Trends",
+            "## 📊 Quality Trends",
             "",
             self._render_trend_indicator(defect_metrics, agent_summary),
             "",
@@ -288,11 +298,198 @@ class QualityDashboard:
 - Status: ✅ COMPLETE - All goals achieved
 
 Progress: [{progress_bar}] {progress_pct}%"""
+    
+    def _load_sprint_history(self) -> dict:
+        """Load sprint history from file"""
+        history_file = Path(__file__).parent.parent / "skills" / "sprint_history.json"
+        
+        if history_file.exists():
+            with open(history_file, 'r') as f:
+                return json.load(f)
+        else:
+            return {
+                "version": "1.0",
+                "created": datetime.now().isoformat(),
+                "baseline_sprint": None,
+                "sprints": []
+            }
+    
+    def save_sprint_snapshot(self, sprint_id: int) -> None:
+        """Save current metrics as sprint snapshot"""
+        defect_metrics = self.defect_tracker.get_metrics()
+        agent_summary = self._build_agent_summary()
+        quality_score = self._calculate_quality_score(defect_metrics, agent_summary)
+        
+        snapshot = {
+            "sprint_id": sprint_id,
+            "end_date": datetime.now().isoformat()[:10],
+            "status": "complete",
+            "metrics": {
+                "quality_score": quality_score,
+                "defect_escape_rate": defect_metrics['defect_escape_rate'],
+                "writer_clean_rate": agent_summary['writer']['clean_rate'],
+                "editor_accuracy": agent_summary['editor']['accuracy'],
+                "avg_critical_ttd_days": defect_metrics.get('avg_critical_ttd_days', 0) or 0,
+                "points_delivered": 14 if sprint_id == 5 else 0  # Hardcoded for Sprint 5
+            }
+        }
+        
+        # Check if sprint already exists
+        existing_idx = next((i for i, s in enumerate(self.history['sprints']) 
+                           if s['sprint_id'] == sprint_id), None)
+        
+        if existing_idx is not None:
+            self.history['sprints'][existing_idx] = snapshot
+        else:
+            self.history['sprints'].append(snapshot)
+        
+        # Set baseline if first sprint
+        if self.history['baseline_sprint'] is None:
+            self.history['baseline_sprint'] = sprint_id
+        
+        # Sort by sprint_id
+        self.history['sprints'].sort(key=lambda x: x['sprint_id'])
+        self.history['last_updated'] = datetime.now().isoformat()
+        
+        # Save to file
+        history_file = Path(__file__).parent.parent / "skills" / "sprint_history.json"
+        with open(history_file, 'w') as f:
+            json.dump(self.history, f, indent=2)
+    
+    def get_sprint_trends(self, last_n: int = 3) -> list:
+        """Get last N sprints for trend analysis"""
+        return self.history['sprints'][-last_n:] if self.history['sprints'] else []
+    
+    def _render_sprint_trends(self) -> str:
+        """Render sprint-over-sprint comparison table"""
+        sprints = self.get_sprint_trends(3)
+        
+        if len(sprints) < 2:
+            return "📊 Need at least 2 sprints for trend analysis"
+        
+        lines = []
+        lines.append("### Last 3 Sprints Comparison")
+        lines.append("")
+        
+        # Table header
+        lines.append("| Metric | " + " | ".join([f"Sprint {s['sprint_id']}" for s in sprints]) + " | Trend |")
+        lines.append("|--------|" + "--------|" * len(sprints) + "--------|")
+        
+        # Define metrics to compare
+        metrics_config = [
+            ('quality_score', 'Quality Score', '/{0}'),
+            ('defect_escape_rate', 'Escape Rate', '{0:.1f}%'),
+            ('writer_clean_rate', 'Writer Clean', '{0:.0f}%'),
+            ('editor_accuracy', 'Editor Accuracy', '{0:.1f}%'),
+            ('avg_critical_ttd_days', 'Critical TTD', '{0:.1f}d'),
+            ('points_delivered', 'Points', '{0}')
+        ]
+        
+        for metric_key, metric_label, metric_format in metrics_config:
+            row = [metric_label]
+            values = []
+            
+            for sprint in sprints:
+                value = sprint['metrics'].get(metric_key, 0)
+                
+                # Special formatting
+                if metric_key == 'quality_score':
+                    formatted = f"{value}/100"
+                else:
+                    formatted = metric_format.format(value)
+                
+                row.append(formatted)
+                values.append(value)
+            
+            # Calculate trend (compare last to first)
+            if len(values) >= 2:
+                first_val = values[0]
+                last_val = values[-1]
+                
+                # For escape rate and TTD, lower is better
+                if metric_key in ['defect_escape_rate', 'avg_critical_ttd_days']:
+                    if last_val < first_val * 0.9:  # 10% improvement
+                        trend = "↑ Better"
+                    elif last_val > first_val * 1.1:  # 10% regression
+                        trend = "↓ Worse"
+                    else:
+                        trend = "→ Stable"
+                else:
+                    # For other metrics, higher is better
+                    if last_val > first_val * 1.1:  # 10% improvement
+                        trend = "↑ Better"
+                    elif last_val < first_val * 0.9:  # 10% regression
+                        trend = "↓ Worse"
+                    else:
+                        trend = "→ Stable"
+                
+                row.append(trend)
+            else:
+                row.append("—")
+            
+            lines.append("| " + " | ".join(row) + " |")
+        
+        lines.append("")
+        
+        # Trend summary
+        lines.append("### Trend Summary")
+        improving = sum(1 for _, _, _ in metrics_config 
+                       if self._is_metric_improving(sprints, _))
+        lines.append(f"- **{improving} of {len(metrics_config)}** metrics improving vs Sprint {sprints[0]['sprint_id']}")
+        lines.append(f"- **Baseline**: Sprint {self.history['baseline_sprint']} (reference point for all comparisons)")
+        
+        return "\n".join(lines)
+    
+    def _is_metric_improving(self, sprints: list, metric_key: str) -> bool:
+        """Check if metric is improving from first to last sprint"""
+        if len(sprints) < 2:
+            return False
+        
+        first_val = sprints[0]['metrics'].get(metric_key, 0)
+        last_val = sprints[-1]['metrics'].get(metric_key, 0)
+        
+        # For escape rate and TTD, lower is better
+        if metric_key in ['defect_escape_rate', 'avg_critical_ttd_days']:
+            return last_val < first_val * 0.9
+        else:
+            return last_val > first_val * 1.1
 
 
 def main():
     """Generate and display quality dashboard"""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='Quality Dashboard with sprint tracking')
+    parser.add_argument('--save-sprint', metavar='NAME', help='Save current metrics as sprint snapshot')
+    parser.add_argument('--show-history', action='store_true', help='Show sprint history')
+    args = parser.parse_args()
+    
     dashboard = QualityDashboard()
+    
+    if args.save_sprint:
+        # Save sprint snapshot
+        dashboard.save_sprint_snapshot(args.save_sprint)
+        print(f"✅ Sprint snapshot saved: {args.save_sprint}")
+    
+    if args.show_history:
+        # Show sprint history
+        print("\n" + "="*60)
+        print("SPRINT HISTORY")
+        print("="*60 + "\n")
+        
+        if dashboard.history['sprints']:
+            for sprint in dashboard.history['sprints']:
+                print(f"**{sprint['sprint']}** ({sprint['date'][:10]})")
+                print(f"  Quality Score: {sprint['quality_score']}/100")
+                print(f"  Defect Escape: {sprint['defect_escape_rate']:.1f}%")
+                print(f"  Writer Clean: {sprint['writer_clean_rate']:.0f}%")
+                print(f"  Editor Accuracy: {sprint['editor_accuracy']:.1f}%")
+                print()
+        else:
+            print("No sprint history yet. Run with --save-sprint to start tracking.")
+        print("="*60 + "\n")
+    
+    # Generate and display dashboard
     print(dashboard.generate_dashboard())
     
     # Save to file

@@ -367,11 +367,15 @@ GATE 4: STRUCTURE (Must flow logically)
 □ Could any paragraph be cut without loss? (If yes, cut it)
 □ Is the ending an implication/forward look, NOT a summary?
 
-❌ CUT THESE ENDINGS:
+❌ CUT THESE ENDINGS IMMEDIATELY - PUBLICATION BLOCKER:
+- "In conclusion" / "To conclude" / "In summary" → DELETE ENTIRE SENTENCE, start fresh
 - "will depend largely on" → Make a definitive prediction
-- "Whether [X] becomes reality" → State what WILL happen
-- "remains to be seen" → Tell us what you see
-- "The journey ahead" → Cut entirely
+- "Whether [X] becomes reality" → State what WILL happen  
+- "remains to be seen" / "only time will tell" → Tell us what you see
+- "The journey ahead" / "the road ahead" → Cut entirely
+- Any sentence that summarizes points already made → DELETE IT
+
+⚠️  ENDING MUST BE: A clear prediction, implication, or call to action. NO hedging.
 
 REWRITE to state a clear implication or prediction.
 
@@ -408,20 +412,37 @@ SPECIFIC EDITS TO MAKE
    - Or convert to flowing prose
 
 5. REWRITE WEAK ENDINGS immediately (CRITICAL - blocks publication):
-   - Search for: "remains uncertain", "will likely become", "may well", "could potentially"
-   - Replace with definitive statements
-   - "The trajectory...will depend on" → "Companies must [specific action]"
-   - "Success will belong to those who" → "Companies that [action] will [outcome]"
-   - Delete: "likely", "probably", "perhaps", "may well", "could potentially"
+   
+   FORBIDDEN ENDING PATTERNS - If you see ANY of these, DELETE and rewrite:
+   - "In conclusion" / "To conclude" / "In summary" (summative closings)
+   - "remains uncertain" / "remains to be seen" / "only time will tell"
+   - "will likely become" / "may well" / "could potentially"
+   - "will depend largely on" / "will depend on whether"
+   - "Success will belong to those who" (wishy-washy)
+   - "The future of [X]" (vague)
+   - Any recap/summary of what was already stated
+   
+   REQUIRED ENDING FORMULA:
+   → State what WILL happen (not "may" or "might")
+   → Make a specific prediction with confidence
+   → Or identify the clear winner/loser
    
    Example fixes:
-   ❌ "Flaky tests present challenges. Success will belong to those who can ensure stability."
-   ✅ "Companies that invest in robust test infrastructure will outpace competitors."
+   ❌ "In conclusion, flaky tests present challenges. Success will belong to those who ensure stability."
+   ✅ "Companies that invest in robust test infrastructure will outpace competitors. Those that don't will bleed talent."
+   
+   ❌ "The future of self-healing tests will depend largely on vendor improvements."
+   ✅ "Self-healing tests will remain niche until vendors stop overselling and start delivering."
 
 ═══════════════════════════════════════════════════════════════════════════
 DRAFT TO REVIEW:
 {draft}
 ═══════════════════════════════════════════════════════════════════════════
+
+⚠️  BEFORE YOU START: Scan the LAST 3 PARAGRAPHS of the draft for weak endings.
+If you find "In conclusion", "To conclude", "In summary", or any recap:
+  1. DELETE those paragraphs entirely
+  2. Write a NEW ending with a definitive statement
 
 First, evaluate each gate (PASS/FAIL with brief note).
 Then return the EDITED article with all fixes applied.

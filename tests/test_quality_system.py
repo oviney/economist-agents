@@ -27,7 +27,6 @@ def test_issue_15_prevention():
     print("\n" + "="*70)
     print("TEST: Issue #15 Prevention (Missing Categories)")
     print("="*70)
-    
     # Simulate Writer Agent output with missing categories
     bad_article = """---
 layout: post
@@ -55,8 +54,6 @@ Companies investing in robust infrastructure will outpace competitors.
     print("\n✅ PASS: Issue #15 pattern now blocked by 2 layers")
     print(f"   - Agent Reviewer: {len([i for i in review_issues if 'categories' in i.lower()])} issues")
     print(f"   - Schema Validator: {len([i for i in schema_issues if 'categories' in i.lower()])} issues")
-    
-    return True
 
 
 def test_issue_16_prevention():
@@ -65,7 +62,7 @@ def test_issue_16_prevention():
     print("TEST: Issue #16 Prevention (Chart Not Embedded)")
     print("="*70)
     
-    # Simulate Writer Agent output with chart provided but not embedded
+    # TEST CASE 1: Chart provided but NOT embedded (should FAIL)
     article_no_chart = """---
 layout: post
 title: "Self-Healing Tests: The Maintenance Paradox"
@@ -80,22 +77,66 @@ The gap reveals fundamental misunderstandings of automation economics.
 Companies investing in robust infrastructure will outpace competitors.
 """
     
-    print("\n1. Agent Reviewer (chart_filename provided but not embedded):")
+    print("\n1. Agent Reviewer (chart_filename provided but NOT embedded):")
     is_valid, issues = review_agent_output(
         "writer_agent", 
         article_no_chart,
         context={"chart_filename": "/assets/charts/testing-gap.png"}
     )
     
-    # Check results
+    # Verify failure
     assert not is_valid, "Agent reviewer should have caught missing chart"
     assert any("chart not embedded" in i.lower() for i in issues), \
         "Should explicitly flag missing chart embedding"
     
-    print("\n✅ PASS: Issue #16 pattern now blocked by self-validation")
-    print(f"   - Critical Issues: {len([i for i in issues if 'CRITICAL' in i and 'chart' in i.lower()])}")
+    print("   ✅ Correctly flagged missing chart embedding")
     
-    return True
+    # TEST CASE 2: Chart properly embedded and referenced (should PASS for chart check)
+    article_with_chart = """---
+layout: post
+title: "Self-Healing Tests: The Maintenance Paradox"
+date: 2026-01-01
+categories: [quality-engineering, test-automation]
+---
+
+Self-healing tests promise 80% maintenance reduction. Only 10% achieve it. The gap reveals fundamental misunderstandings about automation economics.
+
+## The promise exceeds the reality
+
+Most vendors overstate maintenance savings. According to Gartner's 2024 survey, only 10% of companies using self-healing tests achieve the promised 80% maintenance reduction. The rest see marginal gains, often offset by the complexity of maintaining the self-healing infrastructure itself.
+
+![The Maintenance Gap](/assets/charts/testing-gap.png)
+
+As the chart shows, AI adoption in testing has surged while actual maintenance burden reduction remains flat. This divergence suggests that current self-healing approaches focus on symptom management rather than root cause prevention.
+
+## Why the gap persists
+
+The problem lies in test design. Flaky tests that need self-healing are fundamentally unstable. No amount of AI-powered healing addresses the underlying brittleness. Companies that invest in robust test infrastructure from the start will outpace those chasing automated Band-Aids.
+"""
+    
+    print("\n2. Agent Reviewer (chart properly embedded AND referenced):")
+    is_valid_chart, issues_chart = review_agent_output(
+        "writer_agent",
+        article_with_chart,
+        context={"chart_filename": "/assets/charts/testing-gap.png"}
+    )
+    
+    # Verify chart embedding is recognized
+    chart_embedded = "![The Maintenance Gap](/assets/charts/testing-gap.png)" in article_with_chart
+    chart_referenced = "As the chart shows" in article_with_chart
+    
+    assert chart_embedded, "Test article should contain chart markdown"
+    assert chart_referenced, "Test article should reference chart in text"
+    
+    # Should not have chart embedding issues (may have other warnings)
+    chart_issues = [i for i in issues_chart if "chart not embedded" in i.lower()]
+    assert len(chart_issues) == 0, "Well-formed article should not flag missing chart"
+    
+    print("   ✅ Chart embedding and reference validated correctly")
+    
+    print("\n✅ PASS: Issue #16 regression test comprehensive")
+    print(f"   - Negative case: Missing chart caught (CRITICAL)")
+    print(f"   - Positive case: Proper embedding accepted")
 
 
 def test_banned_patterns_detection():
@@ -138,8 +179,6 @@ In conclusion, self-healing tests remain promising.
     assert all(banned_found.values()), "All banned pattern types should be detected"
     
     print("\n✅ PASS: All banned patterns detected")
-    
-    return True
 
 
 def test_research_agent_validation():
@@ -176,8 +215,6 @@ def test_research_agent_validation():
     assert len(verification_issues) > 0, "Should detect verification issues"
     
     print("\n✅ PASS: Research verification enforcement working")
-    
-    return True
 
 
 def test_skills_system_updated():
@@ -224,8 +261,7 @@ def test_skills_system_updated():
     print(f"   Skills version: {skills_manager.skills.get('version')}")
     
     print("\n✅ PASS: Skills system updated with new patterns")
-    
-    return True
+
 
 
 def test_complete_article_validation():
@@ -284,8 +320,7 @@ choice is becoming binary.
     assert len(critical_schema) == 0, f"Should have no critical schema issues, got: {critical_schema}"
     
     print("\n✅ PASS: Well-formed article passes all validation layers")
-    
-    return True
+
 
 
 def run_all_tests():

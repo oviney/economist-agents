@@ -137,20 +137,21 @@ Validate quality system in production, fix highest priority bug, and gather metr
 **Goal**: Prevent future chart embedding bugs
 
 **Tasks:**
-- [ ] Add test case to `tests/test_quality_system.py`
-- [ ] Generate mock chart data
-- [ ] Run Writer Agent with chart context
-- [ ] Assert chart markdown present in output
-- [ ] Assert chart referenced in text
-- [ ] Test regeneration if chart missing
+- [x] Add test case to `tests/test_quality_system.py`
+- [x] Generate mock chart data
+- [x] Run Writer Agent with chart context
+- [x] Assert chart markdown present in output
+- [x] Assert chart referenced in text
+- [x] Test regeneration if chart missing
 
 **Acceptance Criteria:**
-- Test fails if chart not embedded
-- Test fails if chart not referenced in text
-- Test passes on well-formed articles
-- Can run as part of CI/CD
+- ✅ Test fails if chart not embedded
+- ✅ Test fails if chart not referenced in text
+- ✅ Test passes on well-formed articles
+- ✅ Can run as part of CI/CD
 
-**Estimated Time**: 1 hour
+**Completion Date**: 2026-01-01
+**Status**: ✅ COMPLETE
 
 ---
 

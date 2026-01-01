@@ -6,6 +6,8 @@ A multi-agent AI system that generates publication-quality blog posts in The Eco
 
 This is **not** a blog - it's a **content generation pipeline** that produces articles for your blog. Think of it as a team of AI writers, editors, and researchers that work together to create high-quality content.
 
+**Status**: Active development | [Open Issues](https://github.com/oviney/economist-agents/issues) | [Recent Fixes](docs/CHANGELOG.md)
+
 ## Architecture
 
 ```

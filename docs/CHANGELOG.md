@@ -1,5 +1,46 @@
 # Economist Agents - Development Log
 
+## 2026-01-01: Chart Integration & Duplicate Display Bug Fixes
+
+### Summary
+Fixed two critical chart bugs discovered in production. All fixes deployed and documented as GitHub issues for audit trail.
+
+### Bugs Fixed
+
+**BUG-016: Charts Generated But Never Embedded** (GitHub Issue #16)
+- **Problem**: Graphics Agent created charts but Writer Agent didn't embed them in articles
+- **Impact**: Orphaned PNG files, invisible charts on published pages
+- **Root Cause**: Three-layer system failure (Writer prompt, Validator missing check, QA didn't catch)
+- **Fix**: Enhanced Writer Agent prompt with explicit embedding instructions + added Publication Validator Check #7 + upgraded Blog QA link validation
+- **Commits**: 469f402 (code), cf0fcb2 (production)
+- **Status**: ✅ RESOLVED
+
+**BUG-017: Duplicate Chart Display** (GitHub Issue #17)
+- **Problem**: Same chart appeared twice (featured image + embedded in body)
+- **Impact**: Poor UX, visual duplication
+- **Root Cause**: Jekyll `image:` field in front matter rendered as hero image, plus markdown embed
+- **Fix**: Removed `image:` field from front matter, kept only markdown embed
+- **Commit**: 5509dec
+- **Status**: ✅ RESOLVED
+
+**BUG-015: Missing Category Tag** (GitHub Issue #15)
+- **Problem**: Article pages missing category tag display above title
+- **Impact**: Inconsistent with The Economist style, broken navigation
+- **Status**: 🔄 OPEN - Needs Jekyll template fix
+
+### Feature Planning
+
+**GenAI Featured Images** (GitHub Issue #14)
+- Integrate DALL-E 3 for Economist-style illustrated featured images
+- Status: Documented in backlog, ready for implementation
+
+### Documentation Updates
+- Created GitHub issues #15-17 for all bugs (with audit trail)
+- Verified all fixes deployed to production
+- Screenshots captured for bug evidence
+
+---
+
 ## 2025-12-31: Major QA Agent Enhancements
 
 ### Summary

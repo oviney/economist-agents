@@ -432,9 +432,56 @@ GATE 4: STRUCTURE (Must flow logically)
 
 REWRITE to state a clear implication or prediction.
 
-GATE 5: CHART INTEGRATION
-□ Is the chart referenced naturally in the text?
+GATE 5: CHART INTEGRATION (AUTOMATED CHECK)
+□ If chart_data was provided, does article contain chart markdown?
+□ Is chart filename from research present in article body?
+□ Is the chart referenced naturally in the text (not "See figure 1")?
 □ Does the text add insight beyond what the chart shows?
+
+⚠️  CRITICAL: If chart was generated but NOT embedded:
+  1. This is a PUBLICATION BLOCKER (same as BUG-016)
+  2. Add chart markdown: ![Chart title](chart_filename.png)
+  3. Add reference sentence: "As the chart shows, [insight]..."
+  4. Place after paragraph discussing the data
+  5. NEVER proceed without chart embedding if chart exists
+
+═══════════════════════════════════════════════════════════════════════════
+AUTOMATED QUALITY CHECKS (Run these first)
+═══════════════════════════════════════════════════════════════════════════
+
+BEFORE manual editing, scan the draft for these CRITICAL issues:
+
+1. CHART EMBEDDING CHECK:
+   - Pattern search: Look for ![.*]\(.*\.png\)
+   - If chart_data exists but NO chart markdown found → FAIL GATE 5
+   - If chart found but not referenced in text → FAIL GATE 5
+
+2. BANNED OPENING CHECK:
+   - Scan first 2 sentences for patterns:
+     * "In today's", "It's no secret", "When it comes", "Amidst"
+   - If found → FAIL GATE 1, DELETE and rewrite
+
+3. BANNED CLOSING CHECK:
+   - Scan last 2 paragraphs for patterns:
+     * "In conclusion", "To conclude", "In summary"
+     * "remains to be seen", "only time will tell"
+     * "will depend largely on", "Whether [X]"
+   - If found → FAIL GATE 4, DELETE and rewrite
+
+4. UNSOURCED STATISTICS CHECK:
+   - Pattern search: \d+% (any percentage)
+   - Check for attribution in same/adjacent sentence
+   - If missing → FAIL GATE 2, add source or delete
+
+5. BANNED PHRASE CHECK:
+   - Scan for: "game-changer", "paradigm shift", "leverage" (verb)
+   - If found → FAIL GATE 3, replace with concrete description
+
+6. EXCLAMATION POINT CHECK:
+   - Search for: !
+   - If found → FAIL GATE 3, remove immediately
+
+If ANY automated check fails, note it in gate evaluation and fix in edited version.
 
 ═══════════════════════════════════════════════════════════════════════════
 SPECIFIC EDITS TO MAKE

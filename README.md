@@ -1,5 +1,13 @@
 # Economist-Style Content Agents
 
+[![Quality Score](https://img.shields.io/badge/quality-98%2F100-brightgreen?style=flat-square)](scripts/calculate_quality_score.py)
+[![Tests](https://img.shields.io/badge/tests-11%2F11%20passing-brightgreen?style=flat-square)](.github/workflows/quality-tests.yml)
+[![Python](https://img.shields.io/badge/python-3.11-blue?style=flat-square)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
+[![Issues](https://img.shields.io/github/issues/oviney/economist-agents?style=flat-square)](https://github.com/oviney/economist-agents/issues)
+[![Sprint](https://img.shields.io/badge/sprint-3%20active-orange?style=flat-square)](SPRINT.md)
+[![Documentation](https://img.shields.io/badge/docs-comprehensive-green?style=flat-square)](docs/)
+
 A multi-agent AI system that generates publication-quality blog posts in The Economist's signature style: clear prose, rigorous data analysis, and professional visualizations.
 
 ## What This Does

@@ -47,7 +47,29 @@ pip install -r requirements.txt
 pip install anthropic openai matplotlib numpy python-slugify pyyaml
 ```
 
-### 2. Set API Key (SECURE METHOD)
+### 2. Sprint Discipline (Required Before Any Work)
+
+**Before starting ANY implementation work**, validate against active sprint:
+
+```bash
+# Check if your work aligns with sprint before starting
+./scripts/pre_work_check.sh "Your work description"
+
+# Example:
+./scripts/pre_work_check.sh "Implement metrics tracking"
+```
+
+This enforces:
+- ✅ Work aligns to active sprint stories
+- ✅ Story has acceptance criteria defined
+- ✅ Story points are estimated
+- ✅ Sprint goal is clear
+
+**If blocked**: Add work to sprint backlog or wait for next sprint.
+
+See [SPRINT.md](SPRINT.md) for active sprint details.
+
+### 3. Set API Key (SECURE METHOD)
 
 **🔒 Recommended: Use .env file** ([Security Guide](.github/API_KEY_SECURITY.md))
 ```bash

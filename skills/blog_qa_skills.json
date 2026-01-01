@@ -336,6 +336,71 @@
           "learned_on": "2025-12-31T23:49:59.116400"
         }
       ]
+    },
+    "sprint_discipline": {
+      "description": "Enforce sprint planning and iteration discipline",
+      "patterns": [
+        {
+          "id": "work_without_planning",
+          "severity": "critical",
+          "pattern": "Starting implementation without sprint story",
+          "check": "Before any implementation: (1) Is there an active sprint? (2) Is this work part of a sprint story? (3) Are story points estimated?",
+          "prevention": "STOP and create sprint story first with acceptance criteria",
+          "learned_from": "Sprint 1 retrospective - jumped into Nick Tune implementation without planning",
+          "learned_on": "2026-01-01T12:00:00.000000",
+          "enforcement_rule": "Every implementation must reference a sprint story number"
+        },
+        {
+          "id": "scope_creep_mid_sprint",
+          "severity": "high",
+          "pattern": "Adding new stories during active sprint without re-planning",
+          "check": "Before adding work: (1) Will this prevent sprint goal completion? (2) Can it wait until next sprint?",
+          "prevention": "Only add mid-sprint if P0 production bug. Otherwise, add to next sprint backlog",
+          "learned_from": "Best practice from sprint framework",
+          "learned_on": "2026-01-01T12:00:00.000000",
+          "enforcement_rule": "Document reason if adding mid-sprint work"
+        },
+        {
+          "id": "missing_progress_tracking",
+          "severity": "medium",
+          "pattern": "Not updating SPRINT.md task checkboxes daily",
+          "check": "At end of each work session: (1) Update task checkboxes (2) Add blockers if stuck (3) Update sprint status",
+          "prevention": "Make SPRINT.md update part of commit checklist",
+          "learned_from": "Sprint framework requirement",
+          "learned_on": "2026-01-01T12:00:00.000000",
+          "enforcement_rule": "Include sprint progress in commit messages"
+        },
+        {
+          "id": "skipped_retrospective",
+          "severity": "high",
+          "pattern": "Completing sprint without retrospective",
+          "check": "At sprint end: (1) What went well? (2) What could improve? (3) Action items for next sprint?",
+          "prevention": "Schedule retrospective as last task of final sprint day",
+          "learned_from": "Sprint 1 retrospective identified planning gaps",
+          "learned_on": "2026-01-01T12:00:00.000000",
+          "enforcement_rule": "Sprint not complete until retrospective documented"
+        },
+        {
+          "id": "work_without_acceptance_criteria",
+          "severity": "high",
+          "pattern": "Starting story without clear definition of done",
+          "check": "Before implementation: (1) Are acceptance criteria defined? (2) How will we know it's complete? (3) What tests prove it works?",
+          "prevention": "Define acceptance criteria in sprint story before starting",
+          "learned_from": "Sprint framework best practice",
+          "learned_on": "2026-01-01T12:00:00.000000",
+          "enforcement_rule": "Acceptance criteria must be checkable (pass/fail)"
+        },
+        {
+          "id": "unestimated_work",
+          "severity": "medium",
+          "pattern": "Working on story without story point estimation",
+          "check": "Before starting story: (1) Estimated story points? (2) Fits in sprint capacity?",
+          "prevention": "Estimate using 1/2/3/5/8 scale before committing to sprint",
+          "learned_from": "Sprint 1 had no estimation, made velocity tracking impossible",
+          "learned_on": "2026-01-01T12:00:00.000000",
+          "enforcement_rule": "Every sprint story must have story point estimate"
+        }
+      ]
     }
   },
   "validation_stats": {

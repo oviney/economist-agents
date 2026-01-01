@@ -1,0 +1,275 @@
+# Sprint Planning - Economist Agents
+
+## Sprint Framework
+
+**Sprint Duration**: 1 week (5 working days)
+**Review**: End of week retrospective
+**Planning**: Monday morning
+**Daily Standups**: Track progress, unblock issues
+
+---
+
+## Sprint 1: Quality Foundation (Jan 1-7, 2026)
+
+### Sprint Goal
+Build robust quality system to prevent recurrence of Issues #15-17 and establish testing foundation.
+
+### Completed Work ✅
+- [x] Fetch and analyze Nick Tune article
+- [x] Create 3-layer quality system (RULES/REVIEWS/BLOCKS)
+- [x] Implement agent self-validation
+- [x] Create integration test suite (6 tests, all passing)
+- [x] Upgrade skills system to v2.0
+- [x] Document quality system comprehensively
+- [x] Commit and push to main (54102b8)
+
+**Total Story Points**: 8 (actual)
+**Completed**: 8/8 (100%)
+
+### Sprint 1 Retrospective
+
+**What Went Well:**
+- Clear inspiration (Nick Tune article) provided excellent framework
+- Test-driven approach validated system works
+- Self-validation integrated smoothly into agents
+- Documentation comprehensive and actionable
+
+**What Could Improve:**
+- Started without sprint planning (jumped straight to implementation)
+- No backlog prioritization upfront
+- No story point estimation
+- No daily progress tracking
+
+**Action Items for Sprint 2:**
+- ✅ Create SPRINT.md for formal sprint tracking
+- ✅ Prioritize backlog properly
+- ✅ Estimate story points before starting
+- ✅ Track daily progress
+
+---
+
+## Sprint 2: Iterate & Validate (Jan 8-14, 2026)
+
+### Sprint Goal
+Validate quality system in production, fix highest priority bug, and gather metrics for continuous improvement.
+
+### Backlog (Prioritized)
+
+#### Story 1: Validate Quality System in Production ⭐️ FIRST
+**Priority**: P0 (Must Do)
+**Story Points**: 2
+**Goal**: Prove the quality system works end-to-end
+
+**Tasks:**
+- [ ] Generate article with new self-validating agents
+- [ ] Observe self-validation logs (Research, Writer)
+- [ ] Verify regeneration triggers on critical issues
+- [ ] Document actual validation effectiveness
+- [ ] Compare vs. pre-quality-system baseline
+
+**Acceptance Criteria:**
+- Article generates without quality issues
+- Self-validation catches at least 1 issue
+- Regeneration fixes issue automatically
+- Metrics collected for effectiveness
+
+**Estimated Time**: 1-2 hours
+
+---
+
+#### Story 2: Fix Issue #15 - Missing Category Tag
+**Priority**: P1 (High)
+**Story Points**: 1
+**Goal**: Complete bug fix cycle for Issues #15-17
+
+**Tasks:**
+- [ ] Clone blog repo
+- [ ] Create fix branch: `fix-missing-category-tag`
+- [ ] Update `_layouts/post.html` with category display
+- [ ] Test locally with Jekyll serve
+- [ ] Verify on multiple articles
+- [ ] Create PR to blog repo
+- [ ] Deploy to production
+
+**Acceptance Criteria:**
+- Category tag displays on all article pages
+- Category links to category archive
+- Articles without categories degrade gracefully
+- Economist style maintained
+
+**Estimated Time**: 1-2 hours
+
+---
+
+#### Story 3: Track Visual QA Metrics (Issue #7)
+**Priority**: P2 (Medium)
+**Story Points**: 3
+**Goal**: Data-driven chart quality improvements
+
+**Tasks:**
+- [ ] Add metrics collection to `run_graphics_agent()`
+- [ ] Add metrics collection to `run_visual_qa_agent()`
+- [ ] Extend `skills_manager.py` with metrics schema
+- [ ] Define 5 key metrics to track:
+  - Charts generated count
+  - Visual QA pass rate
+  - Common failure patterns (zone violations, label collisions)
+  - Regeneration count
+  - Time per chart
+- [ ] Create `scripts/metrics_report.py` for analysis
+- [ ] Generate first metrics report
+- [ ] Document metrics in skills system
+
+**Acceptance Criteria:**
+- Metrics automatically collected on each chart generation
+- Metrics persisted in skills system
+- Report shows trends over last N runs
+- Actionable insights surfaced (e.g., "60% of failures are label collisions")
+
+**Estimated Time**: 2-3 hours
+
+---
+
+#### Story 4: Create Regression Test for Issue #16
+**Priority**: P2 (Medium)
+**Story Points**: 2
+**Goal**: Prevent future chart embedding bugs
+
+**Tasks:**
+- [ ] Add test case to `tests/test_quality_system.py`
+- [ ] Generate mock chart data
+- [ ] Run Writer Agent with chart context
+- [ ] Assert chart markdown present in output
+- [ ] Assert chart referenced in text
+- [ ] Test regeneration if chart missing
+
+**Acceptance Criteria:**
+- Test fails if chart not embedded
+- Test fails if chart not referenced in text
+- Test passes on well-formed articles
+- Can run as part of CI/CD
+
+**Estimated Time**: 1 hour
+
+---
+
+### Sprint 2 Capacity
+**Total Story Points**: 8 (2+1+3+2)
+**Estimated Time**: 5-8 hours
+**Days**: 5 working days
+**Velocity**: 8 points/week (based on Sprint 1)
+
+### Sprint 2 Schedule
+
+**Day 1 (Jan 8)**: Planning + Story 1 (Validation)
+- Morning: Sprint planning (this document)
+- Afternoon: Generate article with quality system
+- End of day: Document validation results
+
+**Day 2 (Jan 9)**: Story 2 (Issue #15 Fix)
+- Morning: Clone blog, create fix branch
+- Afternoon: Implement category display, test
+- End of day: Create PR
+
+**Day 3 (Jan 10)**: Story 3 (Metrics) - Part 1
+- Morning: Design metrics schema
+- Afternoon: Implement collection in agents
+- End of day: First metrics captured
+
+**Day 4 (Jan 11)**: Story 3 (Metrics) - Part 2 + Story 4 (Regression Test)
+- Morning: Create metrics report script
+- Afternoon: Regression test for Issue #16
+- End of day: All tests passing
+
+**Day 5 (Jan 12)**: Buffer + Sprint Review
+- Morning: Catch up on any incomplete work
+- Afternoon: Sprint retrospective
+- End of day: Plan Sprint 3
+
+---
+
+## Sprint 3: Production Hardening (Jan 15-21, 2026) [DRAFT]
+
+### Sprint Goal
+Add production monitoring and prevent issues before they reach deployment.
+
+### Proposed Stories (To Be Prioritized)
+- Production monitoring script (auto-detect blog issues)
+- Visual regression testing for charts
+- Pre-commit stronger validation
+- Issue #14: GenAI featured images (if capacity allows)
+
+**Note**: Sprint 3 details to be finalized during Sprint 2 planning.
+
+---
+
+## Sprint Metrics
+
+### Sprint 1
+- **Planned**: 0 points (no planning)
+- **Completed**: 8 points
+- **Velocity**: 8 points/week
+- **Quality**: 6/6 tests passing ✅
+
+### Sprint 2 (In Progress)
+- **Planned**: 8 points
+- **Completed**: 0 points (just started)
+- **On Track**: TBD
+
+---
+
+## Sprint Rules
+
+1. **No work without estimation**: Estimate story points before starting
+2. **Daily progress check**: Update this file each day
+3. **Stop if blocked**: Document blockers immediately
+4. **Retrospective mandatory**: Learn from each sprint
+5. **Scope discipline**: Don't add stories mid-sprint unless P0 bug
+
+## Story Point Scale
+
+- **1 point**: 1 hour or less (quick fix, small change)
+- **2 points**: 1-2 hours (straightforward feature)
+- **3 points**: 2-4 hours (moderate complexity)
+- **5 points**: 1 day (complex feature, multiple components)
+- **8 points**: 2 days (large feature, integration work)
+
+---
+
+## Current Status
+
+**Active Sprint**: Sprint 2 (Jan 8-14, 2026) ← Currently Active
+**Day**: 1 of 5
+**Completed Stories**: 0/4
+**Story Points Done**: 0/8
+**On Track**: ✅ Yes (just started)
+
+**Next Up**: Story 1 - Validate Quality System in Production
+
+---
+
+## How to Use This File
+
+### Start of Sprint
+1. Review and prioritize backlog
+2. Estimate story points
+3. Commit to stories for the week
+4. Schedule stories across days
+
+### During Sprint
+1. Update task checkboxes as you complete work
+2. Add blockers if stuck
+3. Adjust schedule if needed (with rationale)
+
+### End of Sprint
+1. Complete sprint retrospective
+2. Calculate actual velocity
+3. Plan next sprint
+4. Archive completed sprint details
+
+### Daily Standup (Solo)
+Ask yourself:
+- What did I complete yesterday?
+- What will I work on today?
+- Any blockers?
+- Am I on track for sprint goal?

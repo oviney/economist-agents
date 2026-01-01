@@ -92,6 +92,9 @@ class PublicationValidator:
         # Check 5: Placeholder text
         self._check_placeholders(article_content)
         
+        # Check 6: Weak endings (CRITICAL - blocks publication)
+        self._check_weak_endings(article_content)
+        
         # Determine if valid (no CRITICAL issues)
         critical_issues = [i for i in self.issues if i['severity'] == 'CRITICAL']
         is_valid = len(critical_issues) == 0
@@ -217,6 +220,55 @@ class PublicationValidator:
                 'message': f'Found {len(found_placeholders)} placeholder(s)',
                 'details': '\n'.join(found_placeholders),
                 'fix': 'Remove or replace all placeholder text'
+            })
+    
+    def _check_weak_endings(self, content: str):
+        """Check for weak/hedging endings that violate Economist style"""
+        # Extract last 500 characters (roughly last 2 paragraphs)
+        ending = content[-500:] if len(content) > 500 else content
+        
+        BANNED_ENDINGS = [
+            (r'\bIn conclusion\b', 'Summative closing'),
+            (r'\bremains uncertain\b', 'Hedging'),
+            (r'\bremains to be seen\b', 'Hedging'),
+            (r'\bwill likely become\b', 'Hedging'),
+            (r'\bmay well\b', 'Hedging'),
+            (r'\bcould potentially\b', 'Hedging'),
+            (r'\bwill depend largely on\b', 'Hedging'),
+            (r'\bSuccess will belong to those who\b', 'Vague prescription'),
+            (r'\bThe future (?:of|remains)\b', 'Generic forward-look'),
+            (r'\bOnly time will tell\b', 'Cliché'),
+            (r'\bThe journey ahead\b', 'Cliché'),
+            (r'\bmust evolve from\b', 'Passive construction'),
+            (r'\bThe impending question\b', 'Question-based ending'),
+        ]
+        
+        violations = []
+        for pattern, reason in BANNED_ENDINGS:
+            matches = re.finditer(pattern, ending, re.IGNORECASE)
+            for match in matches:
+                # Get context
+                start = max(0, match.start() - 30)
+                end = min(len(ending), match.end() + 30)
+                context = ending[start:end].replace('\n', ' ')
+                violations.append({
+                    'phrase': match.group(),
+                    'reason': reason,
+                    'context': f"...{context}..."
+                })
+        
+        if violations:
+            details = '\n'.join([
+                f"  • \"{v['phrase']}\" ({v['reason']}) in: {v['context']}"
+                for v in violations
+            ])
+            
+            self.issues.append({
+                'check': 'weak_endings',
+                'severity': 'CRITICAL',
+                'message': f'Weak/hedging ending detected ({len(violations)} violations)',
+                'details': details,
+                'fix': 'Rewrite ending with definitive statement or clear prediction'
             })
     
     def format_report(self, is_valid: bool, issues: List[Dict]) -> str:

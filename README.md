@@ -118,6 +118,14 @@ See [Governance Guide](docs/GOVERNANCE_GUIDE.md) for details on human review fea
 - Chart: `output/charts/article-title.png`
 - Governance logs (interactive mode): `output/governance/SESSION_ID/`
 
+**Jekyll Blog Integration**:
+```bash
+# Output directly to your blog's _posts directory
+OUTPUT_DIR="/path/to/your-blog/_posts" python3 scripts/economist_agent.py
+
+# Charts will be saved to: /path/to/your-blog/_posts/charts/
+```
+
 ## Governance & Human Review
 
 **NEW**: Interactive mode with approval gates and audit trails!

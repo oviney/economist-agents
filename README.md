@@ -174,6 +174,29 @@ OUTPUT_DIR="/path/to/your-blog/_posts" python3 scripts/economist_agent.py
 # Charts will be saved to: /path/to/your-blog/_posts/charts/
 ```
 
+## 📚 Documentation Hub
+
+### **Sprint 4 Reports** (Latest - Jan 1, 2026)
+- [**SPRINT_4_COMPLETE.md**](SPRINT_4_COMPLETE.md) - ⭐ **START HERE** - Complete delivery report with testing results
+- [**SPRINT_4_RETROSPECTIVE.md**](docs/SPRINT_4_RETROSPECTIVE.md) - Full sprint analysis, metrics, learnings
+- [**SPRINT_4_PLAN.md**](docs/SPRINT_4_PLAN.md) - Original sprint planning document
+
+### **User Guides**
+- [**METRICS_GUIDE.md**](docs/METRICS_GUIDE.md) - Dashboard usage, metrics interpretation, troubleshooting
+- [**CHART_DESIGN_SPEC.md**](docs/CHART_DESIGN_SPEC.md) - Visual design rules for Economist-style charts
+- [**JEKYLL_EXPERTISE.md**](docs/JEKYLL_EXPERTISE.md) - Jekyll integration patterns and fixes
+- [**SKILLS_LEARNING.md**](docs/SKILLS_LEARNING.md) - Self-learning validation system
+
+### **Development History**
+- [**CHANGELOG.md**](docs/CHANGELOG.md) - Bug fixes and feature history
+- [**ARCHITECTURE_PATTERNS.md**](docs/ARCHITECTURE_PATTERNS.md) - Learned architectural patterns
+- [**SPRINT.md**](SPRINT.md) - Active sprint tracking
+
+### **Quick Links**
+- [Open Issues](https://github.com/oviney/economist-agents/issues)
+- [Recent Fixes](docs/CHANGELOG.md)
+- [Sprint Status](SPRINT.md)
+
 ## Governance & Human Review
 
 **NEW**: Interactive mode with approval gates and audit trails!

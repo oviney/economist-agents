@@ -1,13 +1,34 @@
-# Sprint 5 Plan - UPDATED with Quality Metrics
+# Sprint 5 Plan - UPDATED with Enhanced Defect Schema
 
-**Sprint Goal**: Fix GitHub workflow + Improve agent accuracy + Add defect tracking  
+**Sprint Goal**: Fix GitHub workflow + Improve agent accuracy + Quality intelligence transformation  
 **Duration**: 5 days (Jan 2-6, 2026)  
-**Total Points**: 9 points (was 7, added defect tracking)  
+**Total Points**: 14 points (was 9, added enhanced defect schema)  
 **Team**: 1 developer + AI pair programming
 
 ---
 
-## 🚨 Critical Update: Defect Tracking Added
+## 🚨 Critical Update #2: Enhanced Defect Schema (QE Assessment)
+
+**Quality Engineer Feedback**: "We don't have the required defect metadata to glean value from defect data."
+
+**Assessment Results** (see [DEFECT_METADATA_ANALYSIS.md](DEFECT_METADATA_ANALYSIS.md)):
+- ❌ No root cause analysis (can't identify patterns)
+- ❌ No time metrics (can't measure TTD/TTR)
+- ❌ No test gap tracking (can't prioritize test investments)
+- ❌ No prevention effectiveness (can't validate improvements)
+- ❌ No trend analysis (can't track quality over time)
+
+**Impact**: Current schema tracks bugs but doesn't enable learning or improvement
+
+**Response**:
+1. ✅ **Quality Engineer created** comprehensive gap analysis (DEFECT_METADATA_ANALYSIS.md)
+2. 📋 **Scrum Master created** Issue #26: Enhanced Defect Schema (5 pts, P0)
+3. 📋 **Added** Story 6 to Sprint 5 (foundational, blocks Sprint 6 pattern analysis)
+4. 📋 **Sprint scope increased**: 9 → 14 points (justified by criticality)
+
+---
+
+## 🚨 Critical Update #1: Defect Tracking Added
 
 **User Feedback**: "I don't see any defect or bug metrics. We also need to report on bugs leaked to production."
 
@@ -44,7 +65,32 @@
 
 ---
 
-## Sprint 5 Stories (UPDATED)
+## Sprint 5 Stories (UPDATED - 6 Stories, 14 Points)
+
+| # | Story | Priority | Points | Status |
+|---|-------|----------|--------|--------|
+| 1 | GitHub Auto-Close Integration | P0 | 1 | Not started |
+| 2 | Writer Agent Accuracy | P1 | 3 | Not started |
+| 3 | Editor Agent Predictions | P1 | 2 | Not started |
+| 4 | Pre-Commit Validation Hook | P2 | 1 | Stretch goal |
+| 5 | Defect Dashboard Integration | P1 | 2 | Foundation complete ✅ |
+| 6 | **Enhanced Defect Schema (RCA)** | **P0** | **5** | **Analysis complete** ✅ |
+
+**Total**: 14 points (9 committed + 5 critical addition)
+
+**Justification for Scope Increase**:
+- Story 6 (Enhanced Defect Schema) identified as **P0 - Critical** by Quality Engineer
+- Blocks Sprint 6 pattern analysis and test strategy improvements
+- Foundation work complete (analysis done, clear requirements)
+- Small dataset (4 bugs) makes backfill manageable
+- **Impact**: Transforms reactive logging → proactive quality intelligence
+
+**Risk Mitigation**:
+- Story 4 (Pre-commit validation) remains stretch goal - drop if needed
+- Story 6 prioritized over Story 3 if time constrained
+- Quality Engineer available for RCA guidance
+
+---
 
 ### Story 1: Fix GitHub Auto-Close Integration (P0) - **1 point**
 
@@ -205,6 +251,100 @@
 - Current: **50%** (needs improvement)
 
 **Risk**: Low - Foundation done, straightforward integration
+
+---
+
+### Story 6: Enhanced Defect Schema with RCA & Prevention (P0) - **5 points** [NEW - QE CRITICAL]
+
+**Issue**: [#26](https://github.com/oviney/economist-agents/issues/26)  
+**Owner**: Quality Engineer + Dev team  
+**Status**: Analysis complete, implementation needed
+
+**Goal**: Transform defect tracking from reactive logging to proactive quality intelligence
+
+**Problem** (identified by Quality Engineer):
+Current schema tracks **WHAT** broke but not **WHY**, **HOW**, or **WHAT WE LEARNED**.
+
+**Critical Questions We CANNOT Answer**:
+- ❌ What are our top 3 root causes?
+- ❌ What's our average Time to Detect (TTD)?
+- ❌ Which test types have the most gaps?
+- ❌ Are prevention actions working?
+- ❌ Are we improving over time?
+
+**New Fields (Priority 1)**:
+```python
+# Root Cause Analysis
+"root_cause": "validation_gap",  # Enum: validation_gap, prompt_engineering, etc.
+"root_cause_notes": "Detailed RCA findings",
+"introduced_in_commit": "a1b2c3d",
+
+# Time Metrics
+"introduced_date": "2025-12-30",
+"time_to_detect_days": 2,
+"time_to_resolve_days": 1,
+
+# Test Gap Analysis
+"missed_by_test_type": "integration_test",
+"test_gap_description": "What test should have caught this",
+"prevention_test_added": true,
+"prevention_test_file": "tests/test_example.py",
+
+# Prevention Tracking
+"prevention_strategy": ["new_validation", "process_change"],
+"prevention_actions": ["Concrete actions taken"],
+
+# Trend Analysis
+"sprint": 5,
+"week_discovered": "2026-W01"
+```
+
+**Tasks**:
+- [ ] Update `DefectTracker` class with new fields
+- [ ] Add enum validation (ROOT_CAUSES, TEST_TYPES, PREVENTION_STRATEGIES)
+- [ ] Create migration script for existing 4 bugs
+- [ ] Backfill BUG-015: RCA, TTD, test gap, prevention
+- [ ] Backfill BUG-016: RCA, TTD, test gap, prevention
+- [ ] Backfill BUG-017: RCA, TTD, test gap, prevention
+- [ ] Backfill BUG-020: RCA (partial - still open)
+- [ ] Update `generate_report()` to include:
+  - Root cause distribution
+  - Average TTD by severity
+  - Test gap analysis
+  - Prevention action effectiveness
+- [ ] Add `get_metrics()` calculations for TTD/TTR
+- [ ] Document enum values and usage patterns
+- [ ] Update skills/blog_qa_skills.json with RCA patterns
+
+**Acceptance Criteria**:
+- ✅ Schema updated with all Priority 1 fields
+- ✅ All 4 existing bugs backfilled with RCA data
+- ✅ Report includes root cause, TTD, test gaps
+- ✅ Can answer: "Top 3 root causes are..."
+- ✅ Can answer: "Average TTD for critical bugs is X days"
+- ✅ Can answer: "Y% of bugs missed by integration tests"
+- ✅ Can answer: "Are our prevention actions reducing bugs?"
+
+**Quality Targets**:
+- All critical/high bugs: Complete RCA within 24 hours
+- TTD for critical bugs: <1 day
+- TTR for critical bugs: <4 hours
+- Test gap closure: 100% (prevention test added for every bug)
+
+**Impact**: **CRITICAL - Foundational**
+- Enables data-driven quality improvement
+- Blocks Sprint 6 pattern analysis (Issue #27)
+- Unblocks test strategy decisions
+- Transforms reactive logging → proactive learning
+
+**Risk**: Medium - Larger schema change, requires careful backfill
+- Mitigation: Start with 4 existing bugs (small dataset)
+- Mitigation: Detailed analysis already complete (DEFECT_METADATA_ANALYSIS.md)
+
+**References**:
+- [DEFECT_METADATA_ANALYSIS.md](DEFECT_METADATA_ANALYSIS.md) - Complete QE assessment
+- [scripts/defect_tracker.py](../scripts/defect_tracker.py) - Current implementation
+- [skills/defect_tracker.json](../skills/defect_tracker.json) - Current data
 
 ---
 

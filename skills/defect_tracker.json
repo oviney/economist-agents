@@ -11,7 +11,7 @@
       "github_issue": 15,
       "component": "jekyll_layout",
       "status": "fixed",
-      "fixed_date": "2026-01-01T18:28:45.840198",
+      "fixed_date": "2026-01-01T18:33:41.801201",
       "fix_commit": "5d97545",
       "is_production_escape": true,
       "fix_notes": "Added category tag to post.html layout",
@@ -43,7 +43,7 @@
       "github_issue": 16,
       "component": "writer_agent",
       "status": "fixed",
-      "fixed_date": "2026-01-01T18:28:45.840246",
+      "fixed_date": "2026-01-01T18:33:41.801238",
       "fix_commit": "469f402",
       "is_production_escape": false,
       "fix_notes": "Enhanced Writer Agent prompt + Publication Validator",
@@ -76,7 +76,7 @@
       "github_issue": 17,
       "component": "writer_agent",
       "status": "fixed",
-      "fixed_date": "2026-01-01T18:28:45.840267",
+      "fixed_date": "2026-01-01T18:33:41.801252",
       "fix_commit": "5509dec",
       "is_production_escape": true,
       "fix_notes": "Removed image: field from front matter",
@@ -150,39 +150,67 @@
         "Add CI check to verify badges are current"
       ],
       "fix_notes": "Created update_readme_badges.py script, updated README, will integrate into build process"
+    },
+    {
+      "id": "BUG-022",
+      "severity": "medium",
+      "discovered_in": "production",
+      "discovered_date": "2026-01-01T18:33:56.489947",
+      "description": "SPRINT.md shows Sprint 2-3 content but Sprint 5 is complete",
+      "github_issue": null,
+      "component": "documentation",
+      "status": "fixed",
+      "fixed_date": "2026-01-01T18:33:56.490026",
+      "fix_commit": "pending",
+      "is_production_escape": true,
+      "root_cause": "code_logic",
+      "root_cause_notes": "No automated process to update SPRINT.md from completion reports",
+      "introduced_in_commit": null,
+      "introduced_date": "2026-01-01",
+      "time_to_detect_days": 0,
+      "time_to_resolve_days": 0,
+      "missed_by_test_type": "manual_test",
+      "test_gap_description": "No validation that SPRINT.md reflects current sprint state",
+      "prevention_test_added": true,
+      "prevention_test_file": "scripts/update_sprint_docs.py",
+      "prevention_strategy": [
+        "automation",
+        "new_validation"
+      ],
+      "prevention_actions": []
     }
   ],
   "summary": {
-    "total_bugs": 5,
-    "fixed_bugs": 4,
-    "production_bugs": 3,
-    "defect_escape_rate": 60.0,
+    "total_bugs": 6,
+    "fixed_bugs": 5,
+    "production_bugs": 4,
+    "defect_escape_rate": 66.7,
     "by_severity": {
       "critical": 2,
       "high": 1,
-      "medium": 2,
+      "medium": 3,
       "low": 0
     },
     "by_stage": {
       "development": 2,
       "staging": 0,
-      "production": 3
+      "production": 4
     },
     "root_cause_distribution": {
       "validation_gap": 1,
       "prompt_engineering": 1,
       "requirements_gap": 1,
       "integration_error": 1,
-      "code_logic": 1
+      "code_logic": 2
     },
     "test_gap_distribution": {
       "visual_qa": 2,
       "integration_test": 2,
-      "manual_test": 1
+      "manual_test": 2
     },
-    "avg_time_to_detect_days": 4.0,
+    "avg_time_to_detect_days": 3.3,
     "avg_time_to_resolve_days": null,
     "avg_critical_ttd_days": 5.5,
-    "last_updated": "2026-01-01T18:30:17.140445"
+    "last_updated": "2026-01-01T18:33:56.490040"
   }
 }

@@ -13,6 +13,7 @@ python-dotenv>=1.0.0     # Secure .env file loading
 
 # Optional dependencies
 jsonschema>=4.17.0       # JSON Schema validation (optional, has fallback)
+PyGithub>=2.1.0          # GitHub API integration for sprint sync
 
 # Development dependencies
 pytest>=7.0.0            # Testing framework (optional)

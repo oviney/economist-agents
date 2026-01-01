@@ -1,0 +1,37 @@
+name: Quality System Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test-quality-system:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      
+      - name: Run quality system tests
+        run: |
+          python tests/test_quality_system.py
+      
+      - name: Validate sprint discipline
+        run: |
+          python scripts/sprint_validator.py --validate-sprint || true
+      
+      - name: Check skills system integrity
+        run: |
+          python -c "import json; json.load(open('skills/blog_qa_skills.json'))"
+          echo "✅ Skills JSON valid"

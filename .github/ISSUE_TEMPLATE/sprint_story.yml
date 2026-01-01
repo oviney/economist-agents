@@ -1,0 +1,106 @@
+name: 📋 Sprint Story
+description: Create a new sprint story with proper planning
+title: "Story: [Brief description]"
+labels: ["sprint-story", "needs-estimation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Sprint Story Template
+        Use this template to create properly planned sprint stories.
+        
+        **Required before starting work:**
+        - Priority assigned
+        - Story points estimated
+        - Acceptance criteria defined
+        - Tasks broken down
+
+  - type: dropdown
+    id: sprint
+    attributes:
+      label: Sprint
+      description: Which sprint is this for?
+      options:
+        - Sprint 2 (Jan 8-14, 2026)
+        - Sprint 3 (Jan 15-21, 2026)
+        - Sprint 4 (Jan 22-28, 2026)
+        - Backlog (Future Sprint)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How urgent is this?
+      options:
+        - P0 - Must Do (Critical/Blocking)
+        - P1 - High (Next Sprint)
+        - P2 - Medium (Quality Improvements)
+        - P3 - Nice to Have
+    validations:
+      required: true
+
+  - type: dropdown
+    id: story_points
+    attributes:
+      label: Story Points
+      description: Effort estimation (1=1hr, 2=1-2hr, 3=2-4hr, 5=1day, 8=2days)
+      options:
+        - "1"
+        - "2"
+        - "3"
+        - "5"
+        - "8"
+    validations:
+      required: true
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: Story Goal
+      description: What are we trying to achieve?
+      placeholder: "Clear, concise goal statement"
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Tasks
+      description: Break down the work into concrete tasks
+      placeholder: |
+        - [ ] Task 1
+        - [ ] Task 2
+        - [ ] Task 3
+      value: |
+        - [ ] 
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: How will we know this is complete?
+      placeholder: |
+        - [ ] Criterion 1 (testable/measurable)
+        - [ ] Criterion 2
+        - [ ] Criterion 3
+      value: |
+        - [ ] 
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Does this depend on other stories/issues?
+      placeholder: "Depends on #123, Blocks #456"
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes
+      description: Any other context, links, or references

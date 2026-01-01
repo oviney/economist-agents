@@ -1,0 +1,124 @@
+name: Sprint Discipline Validator
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+  push:
+    branches: [main]
+
+jobs:
+  validate-sprint-discipline:
+    runs-on: ubuntu-latest
+    name: Validate Sprint Discipline
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install PyGithub
+      
+      - name: Check commit messages reference sprint stories
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Get commits in this PR or push
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+            HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          else
+            BASE_SHA="${{ github.event.before }}"
+            HEAD_SHA="${{ github.sha }}"
+          fi
+          
+          echo "Checking commits from $BASE_SHA to $HEAD_SHA"
+          
+          # Get commit messages
+          COMMITS=$(git log --format=%s $BASE_SHA..$HEAD_SHA)
+          
+          # Check if any commit references a story or issue
+          VALID=false
+          while IFS= read -r commit_msg; do
+            echo "Checking: $commit_msg"
+            
+            # Allow commits that reference Story N, #N, or are docs/chore
+            if echo "$commit_msg" | grep -iE "(story [0-9]+|#[0-9]+|^(docs|chore|ci):)"; then
+              VALID=true
+              echo "✅ Valid: References sprint story or is maintenance commit"
+            else
+              echo "⚠️  Warning: No story reference in: $commit_msg"
+            fi
+          done <<< "$COMMITS"
+          
+          if [ "$VALID" = false ]; then
+            echo ""
+            echo "❌ SPRINT DISCIPLINE VIOLATION"
+            echo "Commits must reference a sprint story:"
+            echo "  - Story 1: Add feature X"
+            echo "  - Fixes #123"
+            echo "  - Or use prefix: docs:, chore:, ci:"
+            exit 1
+          fi
+      
+      - name: Check PR has story reference
+        if: github.event_name == 'pull_request'
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_BODY="${{ github.event.pull_request.body }}"
+          
+          echo "PR Title: $PR_TITLE"
+          
+          # Check if title or body references a story or issue
+          if echo "$PR_TITLE $PR_BODY" | grep -iE "(story [0-9]+|#[0-9]+|closes #[0-9]+|fixes #[0-9]+)"; then
+            echo "✅ PR references sprint story"
+          else
+            echo ""
+            echo "❌ SPRINT DISCIPLINE VIOLATION"
+            echo "PR must reference a sprint story in title or body:"
+            echo "  - 'Story 1: Feature X' in title"
+            echo "  - 'Closes #123' in body"
+            exit 1
+          fi
+      
+      - name: Validate sprint file exists
+        run: |
+          if [ ! -f "SPRINT.md" ]; then
+            echo "❌ SPRINT.md not found"
+            echo "Create sprint plan before starting work"
+            exit 1
+          fi
+          echo "✅ SPRINT.md exists"
+      
+      - name: Check for active sprint
+        run: |
+          if ! grep -q "Active Sprint" SPRINT.md; then
+            echo "⚠️  Warning: No active sprint marked in SPRINT.md"
+            echo "Update SPRINT.md to mark current sprint as active"
+          else
+            ACTIVE_SPRINT=$(grep "Active Sprint" SPRINT.md)
+            echo "✅ $ACTIVE_SPRINT"
+          fi
+      
+      - name: Summary
+        if: always()
+        run: |
+          echo ""
+          echo "================================================"
+          echo "Sprint Discipline Validation Complete"
+          echo "================================================"
+          echo ""
+          echo "All checks passed! 🎉"
+          echo ""
+          echo "Remember to:"
+          echo "  1. Update story tasks in GitHub issue"
+          echo "  2. Link PR to story with 'Closes #X'"
+          echo "  3. Update sprint progress in SPRINT.md"

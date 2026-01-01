@@ -1,0 +1,72 @@
+name: 🐛 Bug Report
+description: Report a production bug
+title: "Bug: [Brief description]"
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Bug Report
+        Help us fix issues by providing detailed information.
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - P0 - Critical (System down, data loss)
+        - P1 - High (Major feature broken)
+        - P2 - Medium (Minor feature issue)
+        - P3 - Low (Cosmetic, typo)
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: What happened?
+      placeholder: Clear description of the issue
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      placeholder: |
+        1. Run command X
+        2. See error Y
+        3. Expected Z
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should have happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs/Screenshots
+      description: Paste any error messages or attach screenshots
+      render: shell
+
+  - type: input
+    id: version
+    attributes:
+      label: Commit/Version
+      description: Which commit or version has this bug?
+      placeholder: "e.g., commit abc123 or Sprint 2"

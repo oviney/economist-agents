@@ -148,6 +148,22 @@ See [Governance Guide](docs/GOVERNANCE_GUIDE.md) for details on human review fea
 ### 4. Output
 - Article: `output/YYYY-MM-DD-article-title.md`
 - Chart: `output/charts/article-title.png`
+- Featured Image: `output/images/article-title.png` (if `OPENAI_API_KEY` set)
+- Metrics: `skills/agent_metrics.json`, `skills/quality_history.json`
+
+### 5. View Metrics
+
+Track agent performance and quality trends:
+
+```bash
+# View dashboard (quality trend + agent performance)
+python3 scripts/metrics_dashboard.py
+
+# Export report
+python3 scripts/metrics_dashboard.py --export report.md
+```
+
+See [Metrics Guide](docs/METRICS_GUIDE.md) for full documentation.
 - Governance logs (interactive mode): `output/governance/SESSION_ID/`
 
 **Jekyll Blog Integration**:

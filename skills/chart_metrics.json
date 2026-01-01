@@ -1,14 +1,14 @@
 {
   "version": "1.0",
-  "last_updated": "2026-01-01T12:39:58.818154",
+  "last_updated": "2026-01-01T16:01:56.602437",
   "summary": {
-    "total_charts_generated": 2,
+    "total_charts_generated": 3,
     "total_visual_qa_runs": 2,
     "visual_qa_pass_count": 1,
     "visual_qa_fail_count": 1,
     "total_zone_violations": 2,
     "total_regenerations": 1,
-    "total_generation_time_seconds": 0.22487187385559082
+    "total_generation_time_seconds": 9.877746820449829
   },
   "failure_patterns": {
     "zone_violation": {
@@ -97,6 +97,28 @@
               "timestamp": "2026-01-01T12:39:58.818137"
             }
           ]
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-01T16:01:56.602419",
+      "duration_seconds": 60.466525077819824,
+      "charts_generated": 1,
+      "visual_qa_runs": 0,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "Impact of Flaky Tests on Developer Productivity",
+          "timestamp": "2026-01-01T16:00:56.135897",
+          "start_time": 1767301256.1359072,
+          "chart_type": "bar",
+          "generation_success": true,
+          "generation_time_seconds": 9.652874946594238,
+          "visual_qa_run": false,
+          "visual_qa_passed": null,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
         }
       ]
     }

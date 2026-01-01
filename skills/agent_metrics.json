@@ -307,24 +307,63 @@
         "agents_successful": 4,
         "success_rate": 100.0
       }
+    },
+    {
+      "timestamp": "2026-01-01T16:00:48.343182",
+      "agents": {
+        "research_agent": {
+          "data_points": 3,
+          "verified": 3,
+          "unverified": 1,
+          "verification_rate": 100.0,
+          "sources": [],
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "writer_agent": {
+          "word_count": 436,
+          "banned_phrases": 0,
+          "validation_passed": false,
+          "regenerations": 1,
+          "chart_embedded": true,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Pass"
+        },
+        "editor_agent": {
+          "gates_passed": 6,
+          "gates_failed": 1,
+          "gate_pass_rate": 85.7,
+          "edits_made": -216,
+          "quality_issues": [
+            "1 gates failed"
+          ],
+          "prediction": "All gates pass (5/5)",
+          "actual": "Failed 1 gates"
+        }
+      },
+      "summary": {
+        "agents_tracked": 3,
+        "agents_successful": 2,
+        "success_rate": 66.7
+      }
     }
   ],
   "summary": {
-    "total_runs": 6,
+    "total_runs": 7,
     "agents": {
       "research_agent": {
-        "total_runs": 6,
-        "avg_verification_rate": 84.7,
+        "total_runs": 7,
+        "avg_verification_rate": 86.9,
         "trend": "improving \u2b06\ufe0f"
       },
       "writer_agent": {
-        "total_runs": 6,
-        "clean_draft_rate": 66.7,
-        "avg_regenerations": 0.3
+        "total_runs": 7,
+        "clean_draft_rate": 71.4,
+        "avg_regenerations": 0.4
       },
       "editor_agent": {
-        "total_runs": 6,
-        "avg_gate_pass_rate": 100.0,
+        "total_runs": 7,
+        "avg_gate_pass_rate": 98.0,
         "trend": "improving \u2b06\ufe0f"
       },
       "graphics_agent": {

@@ -44,6 +44,12 @@ from agent_reviewer import review_agent_output
 # Import chart metrics
 from chart_metrics import get_metrics_collector
 
+# Import agent metrics
+from agent_metrics import AgentMetrics
+
+# Import featured image generator
+from featured_image_agent import generate_featured_image
+
 # ═══════════════════════════════════════════════════════════════════════════
 # AGENT SYSTEM PROMPTS (v2 - with codified editorial lessons)
 # ═══════════════════════════════════════════════════════════════════════════
@@ -677,7 +683,7 @@ Find specific, VERIFIABLE data with exact sources. Flag anything you cannot veri
     return research_data
 
 
-def run_writer_agent(client, topic: str, research_brief: dict, current_date: str, chart_filename: str = None) -> str:
+def run_writer_agent(client, topic: str, research_brief: dict, current_date: str, chart_filename: str = None, featured_image: str = None) -> str:
     # Input validation
     if not topic or not isinstance(topic, str):
         raise ValueError(
@@ -724,6 +730,25 @@ Failure to include the chart will result in article rejection.
     else:
         system_prompt = system_prompt.replace("{research_brief}", json.dumps(research_brief, indent=2))
     
+    # Add featured image to front matter if available
+    if featured_image:
+        featured_image_note = f"""
+
+⚠️  FEATURED IMAGE AVAILABLE ⚠️
+Add this line to the YAML front matter:
+image: {featured_image}
+
+Example:
+---
+layout: post
+title: "Article Title"
+date: {current_date}
+author: "The Economist"
+image: {featured_image}
+---
+"""
+        system_prompt += featured_image_note
+    
     # Generate initial draft
     draft = call_llm(
         client,
@@ -742,6 +767,7 @@ Failure to include the chart will result in article rejection.
         context={"chart_filename": chart_filename}
     )
     
+    critical_issues = []
     # If validation fails and issues are critical, attempt one regeneration
     if not is_valid:
         critical_issues = [i for i in issues if "CRITICAL" in i or "BANNED" in i]
@@ -779,7 +805,12 @@ Failure to include the chart will result in article rejection.
     else:
         print("   ✅ Draft passed self-validation")
     
-    return draft
+    # Return draft with validation metadata
+    return draft, {
+        "is_valid": is_valid,
+        "regenerated": bool(not is_valid and critical_issues),
+        "critical_issues": len(critical_issues) if not is_valid else 0
+    }
 
 
 def run_graphics_agent(client, chart_spec: dict, output_path: str) -> str:
@@ -1037,10 +1068,23 @@ def generate_economist_post(topic: str, category: str = "quality-engineering",
     if governance is None and interactive:
         governance = GovernanceTracker(f"{output_dir}/governance")
     
+    # Initialize agent metrics tracking
+    agent_metrics = AgentMetrics()
+    
     skip_approvals = False  # Set by 'skip-all' response
     
     # Stage 1: Research
     research = run_research_agent(client, topic, talking_points, governance)
+    
+    # Track Research Agent metrics
+    verified = sum(1 for dp in research.get('data_points', []) if dp.get('verified', False))
+    total_points = len(research.get('data_points', []))
+    unverified = len(research.get('unverified_claims', []))
+    agent_metrics.track_research_agent(
+        data_points=total_points,
+        verified=verified,
+        unverified=unverified
+    )
     
     # Approval Gate 1: Research
     if interactive and not skip_approvals:
@@ -1096,8 +1140,32 @@ def generate_economist_post(topic: str, category: str = "quality-engineering",
                     {"chart_path": chart_path, "visual_qa": visual_qa_result},
                     metadata={"passed_qa": visual_qa_passed}
                 )
+            
+            # Track Graphics Agent metrics
+            zone_violations = len(visual_qa_result.get("critical_issues", []))
+            agent_metrics.track_graphics_agent(
+                charts_generated=1,
+                visual_qa_passed=1 if visual_qa_passed else 0,
+                zone_violations=zone_violations,
+                regenerations=0
+            )
         elif chart_path:
             print("   ℹ Visual QA skipped (requires Anthropic Claude)")
+    
+    # Stage 2c: Featured Image Generation (optional)
+    featured_image_path = None
+    if os.environ.get('OPENAI_API_KEY'):
+        featured_image_filename = str(posts_dir / "images" / f"{slug}.png")
+        featured_image_path = generate_featured_image(
+            topic=topic,
+            article_summary=research.get('trend_narrative', topic),
+            contrarian_angle=research.get('contrarian_angle', ''),
+            output_path=featured_image_filename
+        )
+        if not featured_image_path:
+            print("   ℹ Continuing without featured image")
+    else:
+        print("   ℹ OPENAI_API_KEY not set, skipping featured image generation")
     
     # Stage 3: Writing
     # Prepare chart filename if chart will be generated
@@ -1105,7 +1173,21 @@ def generate_economist_post(topic: str, category: str = "quality-engineering",
     if research.get("chart_data"):
         chart_filename = f"/assets/charts/{slug}.png"
     
-    draft = run_writer_agent(client, topic, research, date_str, chart_filename)
+    draft, writer_metadata = run_writer_agent(client, topic, research, date_str, chart_filename, featured_image_path)
+    
+    # Track Writer Agent metrics
+    word_count = len(draft.split())
+    banned_phrases = sum(1 for phrase in ['game-changer', 'paradigm shift', 'leverage', 'at the end of the day'] 
+                        if phrase.lower() in draft.lower())
+    chart_embedded = bool(chart_filename and f'![' in draft and chart_filename.split('/')[-1] in draft)
+    
+    agent_metrics.track_writer_agent(
+        word_count=word_count,
+        banned_phrases=banned_phrases,
+        validation_passed=writer_metadata['is_valid'],
+        regenerations=1 if writer_metadata['regenerated'] else 0,
+        chart_embedded=chart_embedded
+    )
     
     # Log draft to governance
     if governance:
@@ -1134,9 +1216,15 @@ def generate_economist_post(topic: str, category: str = "quality-engineering",
             return {"status": "rejected", "stage": "draft"}
     
     # Stage 4: Editing
-    
-    # Stage 4: Editing
     edited_article, gates_passed, gates_failed = run_editor_agent(client, draft)
+    
+    # Track Editor Agent metrics
+    agent_metrics.track_editor_agent(
+        gates_passed=gates_passed,
+        gates_failed=gates_failed,
+        edits_made=len(edited_article) - len(draft),  # Rough estimate
+        quality_issues=[] if gates_failed == 0 else [f"{gates_failed} gates failed"]
+    )
     
     # Stage 5: Final critique
     critique = None
@@ -1203,6 +1291,9 @@ def generate_economist_post(topic: str, category: str = "quality-engineering",
     # Finalize metrics session
     metrics = get_metrics_collector()
     metrics.end_session()
+    
+    # Save agent metrics
+    agent_metrics.save()
     
     # Print metrics summary
     print("\n" + "="*70)

@@ -1,67 +1,297 @@
 # GitHub Actions Setup Guide
 
-This guide walks you through setting up automated content generation using GitHub Actions.
+This guide walks you through setting up automated content generation that pushes directly to your blog repository.
+
+## Architecture: Cross-Repository Integration
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  economist-agents repo (this repo)                          │
+│  ┌────────────────────────────────────────────────────┐    │
+│  │ GitHub Actions Workflow                             │    │
+│  │ 1. Generate article                                 │    │
+│  │ 2. Create charts                                    │    │
+│  │ 3. Validate quality ────────────────┐              │    │
+│  └─────────────────────────────────────│──────────────┘    │
+└────────────────────────────────────────│───────────────────┘
+                                         │
+                                         │ Push via token
+                                         │
+                                         ▼
+┌─────────────────────────────────────────────────────────────┐
+│  your-blog repo                                              │
+│  ┌────────────────────────────────────────────────────┐    │
+│  │ Creates Pull Request with:                          │    │
+│  │ • _posts/YYYY-MM-DD-article.md                      │    │
+│  │ • assets/charts/article.png                         │    │
+│  │                                                     │    │
+│  │ ➜ You review and merge to publish                  │    │
+│  └─────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────┘
+```
 
 ## Prerequisites
 
-- GitHub repository with this code pushed
-- API keys for OpenAI and/or Anthropic Claude
+- economist-agents repository (this repo)
+- Your blog repository (Jekyll, Hugo, or any static site)
+- GitHub account with access to both repos
 
-## Step 1: Add API Secrets
+## Step 1: Create Personal Access Token (PAT)
 
-1. Go to your repository on GitHub
-2. Navigate to: **Settings** → **Secrets and variables** → **Actions**
-3. Click **New repository secret**
-4. Add these secrets:
+The workflow needs permission to push to your blog repo.
+
+1. Go to **GitHub.com** → Your profile icon → **Settings**
+2. Scroll to **Developer settings** (bottom left)
+3. Click **Personal access tokens** → **Tokens (classic)**
+4. Click **Generate new token (classic)**
+5. Configure:
+   - **Note**: `economist-agents-to-blog`
+   - **Expiration**: 90 days (recommended)
+   - **Scopes**: Check these boxes:
+     - ✅ `repo` (Full control of private repositories)
+     - ✅ `workflow` (Update GitHub Action workflows)
+6. Click **Generate token**
+7. **COPY THE TOKEN NOW** - you won't see it again!
+
+Example token: `ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+
+## Step 2: Add Secrets to economist-agents Repo
+
+Go to your **economist-agents** repository on GitHub:
+
+1. **Settings** → **Secrets and variables** → **Actions**
+2. Click **New repository secret**
+
+Add these secrets:
+
+Add these secrets:
 
 ### Required Secrets
 
-**OPENAI_API_KEY** (if using OpenAI):
-- Name: `OPENAI_API_KEY`
-- Value: Your OpenAI API key (starts with `sk-proj-...`)
+**API Keys** (at least one required):
 
-**ANTHROPIC_API_KEY** (if using Anthropic Claude):
-- Name: `ANTHROPIC_API_KEY`
-- Value: Your Anthropic API key (starts with `sk-ant-...`)
+1. **OPENAI_API_KEY** (if using OpenAI)
+   - Name: `OPENAI_API_KEY`
+   - Value: Your OpenAI API key (starts with `sk-proj-...`)
 
-> **Note**: You need at least one of these. The workflow will auto-detect which provider to use.
+2. **ANTHROPIC_API_KEY** (if using Anthropic Claude)
+   - Name: `ANTHROPIC_API_KEY`
+   - Value: Your Anthropic API key (starts with `sk-ant-...`)
 
-## Step 2: Verify Workflow File
+**Blog Repository Access** (required for cross-repo push):
 
-The workflow file should already exist at `.github/workflows/content-pipeline.yml`
+3. **BLOG_REPO_TOKEN**
+   - Name: `BLOG_REPO_TOKEN`
+   - Value: The Personal Access Token you created in Step 1
+   - This allows the workflow to push to your blog repo
 
-If you need to check or update it:
+## Step 3: Add Variables to economist-agents Repo
 
-```bash
-cat .github/workflows/content-pipeline.yml
+Still in your **economist-agents** repo settings:
+
+1. **Settings** → **Secrets and variables** → **Actions** → **Variables** tab
+2. Click **New repository variable**
+
+Add these variables:
+
+### Required Variables
+
+**BLOG_REPO_OWNER**
+- Name: `BLOG_REPO_OWNER`
+- Value: Your GitHub username or organization
+- Example: `oviney`
+
+**BLOG_REPO_NAME**
+- Name: `BLOG_REPO_NAME`
+- Value: Your blog repository name (not the full URL, just the name)
+- Example: `my-blog` or `oviney.github.io`
+
+> **Important**: These must match your blog repo exactly. For repo `github.com/oviney/my-blog`:
+> - BLOG_REPO_OWNER = `oviney`
+> - BLOG_REPO_NAME = `my-blog`
+
+## Step 4: Verify Blog Repository Structure
+
+Your blog repo should have this structure:
+
+```
+your-blog/
+├── _posts/              ← Articles go here
+│   └── YYYY-MM-DD-article.md
+├── assets/
+│   └── charts/          ← Charts go here
+│       └── article.png
+├── _config.yml
+└── ...
 ```
 
-## Step 3: Test Manual Trigger
+If your blog uses different paths, you'll need to adjust the workflow (see Advanced Configuration).
 
-1. Go to **Actions** tab in your GitHub repository
+## Step 5: Test the Integration
+
+## Step 5: Test the Integration
+
+1. Go to **economist-agents** repo → **Actions** tab
 2. Click **Content Generation Pipeline** in the left sidebar
 3. Click **Run workflow** dropdown (top right)
-4. Fill in the options:
-   - **Topic**: Custom topic (or leave blank to use queue)
-   - **Run Scout**: Check if you want to discover new topics
-   - **Run Board**: Check if you want editorial voting
-   - **Interactive**: Leave unchecked for automated run
-5. Click **Run workflow**
+4. Leave all options at defaults and click **Run workflow**
 
-## Step 4: Review Results
+### What Happens:
 
-The workflow will:
-1. Install dependencies
-2. Run the selected pipeline stages
-3. Generate article and chart
-4. Create a Pull Request with the content
+1. ✅ Workflow generates article and chart
+2. ✅ Clones your blog repo using BLOG_REPO_TOKEN
+3. ✅ Copies files to `_posts/` and `assets/charts/`
+4. ✅ Creates a branch like `content/article-20260101-123456`
+5. ✅ Pushes to your blog repo
+6. ✅ Opens a Pull Request in your **blog repo**
+
+### Expected Results:
+
+Check your **blog repository**:
+- **Pull Requests** tab: New PR with article
+- PR contains: Article markdown + chart image
+- Branch: `content/article-YYYYMMDD-HHMMSS`
+
+## Step 6: Review and Merge
+
+In your **blog repo** PR:
+
+1. ✅ Review article content
+2. ✅ Check chart rendering
+3. ✅ Verify YAML front matter
+4. ✅ Check for British spelling
+5. ✅ Approve and merge to `main`
+6. 🎉 Jekyll builds and publishes your new post!
+
+## Troubleshooting
+
+### "Push to Blog Repository: skipped"
+
+**Problem**: Workflow doesn't push to blog repo
+
+**Causes & Solutions**:
+1. **Missing variables**: Verify `BLOG_REPO_OWNER` and `BLOG_REPO_NAME` are set in Variables (not Secrets)
+2. **Wrong variable names**: Must be exactly `BLOG_REPO_OWNER` and `BLOG_REPO_NAME`
+3. **Case sensitivity**: Variable values are case-sensitive (`Oviney` ≠ `oviney`)
 
 Check:
-- **Actions** tab for run status
-- **Pull Requests** tab for generated PR
-- **Artifacts** section in workflow run for downloads
+```bash
+# In workflow logs, look for:
+BLOG_OWNER: your-username
+BLOG_REPO: your-blog-name
+```
 
-## Step 5: Scheduled Runs (Optional)
+### "Authentication failed"
+
+**Problem**: Can't push to blog repo
+
+**Solutions**:
+1. **Token expired**: Regenerate PAT (Step 1) and update `BLOG_REPO_TOKEN` secret
+2. **Insufficient permissions**: Token needs `repo` and `workflow` scopes
+3. **Wrong token**: Verify you copied the entire token (starts with `ghp_`)
+
+### "Remote rejected: permission denied"
+
+**Problem**: Token doesn't have write access
+
+**Solutions**:
+1. Verify you have admin/write access to blog repo
+2. If blog repo is in an organization, enable SSO for the token
+3. Check token hasn't been revoked
+
+### "Could not create pull request"
+
+**Problem**: PR creation fails in blog repo
+
+**Solutions**:
+1. Ensure blog repo allows PR creation (not archived/locked)
+2. Check if branch already exists with same name
+3. Verify token has `workflow` scope (needed for PRs)
+
+### Files go to wrong location
+
+**Problem**: Files copied to wrong directories in blog repo
+
+**Solution**: Your blog structure differs from Jekyll defaults. See Advanced Configuration below.
+
+## Advanced Configuration
+
+### Custom Blog Directory Structure
+
+If your blog uses different paths, edit the workflow:
+
+```yaml
+# In .github/workflows/content-pipeline.yml, modify:
+
+# Copy generated files
+mkdir -p content/posts public/images  # Your custom paths
+cp ../output/*.md content/posts/       # Change to your posts dir
+cp ../output/charts/*.png public/images/  # Change to your images dir
+
+# Commit
+git add content/posts/*.md public/images/*.png
+```
+
+### Hugo, Gatsby, or Other Static Site Generators
+
+**Hugo**:
+```yaml
+mkdir -p content/posts static/images
+cp ../output/*.md content/posts/
+cp ../output/charts/*.png static/images/
+```
+
+**Gatsby**:
+```yaml
+mkdir -p content/blog static/charts
+cp ../output/*.md content/blog/
+cp ../output/charts/*.png static/charts/
+```
+
+### Direct Push Instead of PR
+
+To skip PR and push directly to main:
+
+```yaml
+# Replace the PR creation section with:
+- name: Push directly to main
+  run: |
+    cd blog-repo
+    git checkout main
+    # ... copy files ...
+    git commit -m "content: Add article"
+    git push origin main
+```
+
+⚠️ **Warning**: Direct push bypasses review. Only use if you trust the validation completely.
+
+### Multiple Blog Repositories
+
+Create separate workflows for each blog:
+
+```yaml
+# .github/workflows/blog1-pipeline.yml
+env:
+  BLOG_OWNER: ${{ vars.BLOG1_OWNER }}
+  BLOG_REPO: ${{ vars.BLOG1_REPO }}
+
+# .github/workflows/blog2-pipeline.yml  
+env:
+  BLOG_OWNER: ${{ vars.BLOG2_OWNER }}
+  BLOG_REPO: ${{ vars.BLOG2_REPO }}
+```
+
+### Change PR Title/Body
+
+Customize in workflow:
+
+```yaml
+gh pr create \
+  --title "📝 [Economics] New Analysis: $(date +%Y-%m-%d)" \
+  --body "$(cat ../output/*.md | head -20)..."  # First 20 lines as preview
+```
+
+## Workflow Options (Manual Trigger)
 
 The workflow is configured to run automatically:
 - **Every Monday at 9am UTC** - Topic scout discovers new topics
@@ -81,88 +311,20 @@ Examples:
 
 ## Workflow Options
 
-### Manual Trigger Inputs
+## Workflow Options (Manual Trigger)
+
+When you click **Run workflow**, you can customize:
 
 | Input | Description | Default |
 |-------|-------------|---------|
 | topic | Custom article topic | (uses content queue) |
-| run_scout | Run topic discovery | false |
+| run_scout | Discover new topics first | false |
 | run_board | Run editorial voting | false |
 | interactive | Enable approval gates | false |
 
-### Automatic Behavior
+**Recommended first test**: Leave all defaults, just click "Run workflow"
 
-When triggered without inputs, the workflow:
-1. Uses the content queue rotation (week-based)
-2. Generates article automatically
-3. Creates PR for review
-
-## Troubleshooting
-
-### "No API key configured"
-
-**Problem**: Workflow fails with API key error
-
-**Solution**: 
-1. Verify secrets are named exactly: `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`
-2. Check secrets are set at repository level (not environment level)
-3. Re-run workflow after adding secrets
-
-### "Module not found"
-
-**Problem**: Python import errors
-
-**Solution**: 
-- Check `requirements.txt` includes all dependencies
-- Verify workflow installs dependencies: `pip install -r requirements.txt`
-
-### "Permission denied"
-
-**Problem**: Workflow can't create PR
-
-**Solution**:
-1. Go to **Settings** → **Actions** → **General**
-2. Under **Workflow permissions**, select **Read and write permissions**
-3. Save and re-run workflow
-
-### "Chart generation failed"
-
-**Problem**: matplotlib errors in workflow
-
-**Solution**:
-- Charts need headless backend (already configured in code)
-- If issues persist, check workflow uses: `matplotlib.use('Agg')`
-
-## Advanced Configuration
-
-### Change Output Directory
-
-To output articles directly to a blog repository:
-
-```yaml
-env:
-  OUTPUT_DIR: '/path/to/blog/_posts'
-```
-
-### Use Different Models
-
-Set environment variables in workflow:
-
-```yaml
-env:
-  OPENAI_MODEL: 'gpt-4o-mini'  # For cheaper runs
-  # or
-  ANTHROPIC_MODEL: 'claude-sonnet-4-20250514'
-```
-
-### Enable Interactive Mode
-
-Interactive mode requires manual approval gates, which doesn't work in GitHub Actions.
-
-For human review:
-1. Use the PR created by the workflow
-2. Review article in the PR diff
-3. Approve/request changes before merging
+## Scheduled Runs
 
 ## Security Best Practices
 

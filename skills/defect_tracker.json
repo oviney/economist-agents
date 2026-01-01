@@ -1,0 +1,79 @@
+{
+  "version": "1.0",
+  "created": "2026-01-01T16:42:39.745215",
+  "bugs": [
+    {
+      "id": "BUG-015",
+      "severity": "high",
+      "discovered_in": "production",
+      "discovered_date": "2026-01-01T16:42:39.745224",
+      "description": "Missing category tag on article page",
+      "github_issue": 15,
+      "component": "jekyll_layout",
+      "status": "fixed",
+      "fixed_date": "2026-01-01T16:42:39.745298",
+      "fix_commit": "5d97545",
+      "is_production_escape": true,
+      "fix_notes": "Added category tag to post.html layout"
+    },
+    {
+      "id": "BUG-016",
+      "severity": "critical",
+      "discovered_in": "development",
+      "discovered_date": "2026-01-01T16:42:39.745255",
+      "description": "Charts generated but never embedded in articles",
+      "github_issue": 16,
+      "component": "writer_agent",
+      "status": "fixed",
+      "fixed_date": "2026-01-01T16:42:39.745308",
+      "fix_commit": "469f402",
+      "is_production_escape": false,
+      "fix_notes": "Enhanced Writer Agent prompt + Publication Validator"
+    },
+    {
+      "id": "BUG-017",
+      "severity": "medium",
+      "discovered_in": "production",
+      "discovered_date": "2026-01-01T16:42:39.745274",
+      "description": "Duplicate chart display (featured image + embed)",
+      "github_issue": 17,
+      "component": "writer_agent",
+      "status": "fixed",
+      "fixed_date": "2026-01-01T16:42:39.745318",
+      "fix_commit": "5509dec",
+      "is_production_escape": true,
+      "fix_notes": "Removed image: field from front matter"
+    },
+    {
+      "id": "BUG-020",
+      "severity": "critical",
+      "discovered_in": "development",
+      "discovered_date": "2026-01-01T16:42:39.745287",
+      "description": "GitHub integration broken - issues not auto-closing",
+      "github_issue": 20,
+      "component": "git_workflow",
+      "status": "open",
+      "fixed_date": null,
+      "fix_commit": null,
+      "is_production_escape": false
+    }
+  ],
+  "summary": {
+    "total_bugs": 4,
+    "fixed_bugs": 3,
+    "production_bugs": 2,
+    "defect_escape_rate": 50.0,
+    "by_severity": {
+      "critical": 2,
+      "high": 1,
+      "medium": 1,
+      "low": 0
+    },
+    "by_stage": {
+      "development": 2,
+      "staging": 0,
+      "production": 2
+    },
+    "last_updated": "2026-01-01T16:42:39.745321"
+  }
+}

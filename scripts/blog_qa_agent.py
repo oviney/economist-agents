@@ -107,7 +107,17 @@ def check_broken_links(file_path):
     issues = []
     
     with open(file_path, 'r') as f:
-        lines = f.readlines()
+        content = f.read()
+        lines = content.split('\n')
+    
+    # Check for chart images that aren't referenced in text
+    chart_images = re.findall(r'!\[.*?\]\((.*?/charts/.*?\.png)\)', content)
+    if chart_images:
+        for chart_img in chart_images:
+            chart_name = chart_img.split('/')[-1].replace('.png', '').replace('-', ' ')
+            # Check if chart is mentioned in surrounding text
+            if 'chart' not in content.lower() and 'figure' not in content.lower() and 'graph' not in content.lower():
+                issues.append(f"Chart embedded but never referenced in text: {chart_img}")
     
     for i, line in enumerate(lines, 1):
         # Find markdown links

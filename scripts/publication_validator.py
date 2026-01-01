@@ -95,6 +95,9 @@ class PublicationValidator:
         # Check 6: Weak endings (CRITICAL - blocks publication)
         self._check_weak_endings(article_content)
         
+        # Check 7: Chart references
+        self._check_chart_references(article_content)
+        
         # Determine if valid (no CRITICAL issues)
         critical_issues = [i for i in self.issues if i['severity'] == 'CRITICAL']
         is_valid = len(critical_issues) == 0
@@ -270,6 +273,27 @@ class PublicationValidator:
                 'details': details,
                 'fix': 'Rewrite ending with definitive statement or clear prediction'
             })
+    
+    def _check_chart_references(self, content: str):
+        """Check for orphaned charts (embedded but never mentioned in text)"""
+        # Find all chart image references
+        chart_refs = re.findall(r'!\[.*?\]\((.*?\.png)\)', content)
+        
+        if chart_refs:
+            # Check if "chart" is mentioned in the text
+            content_lower = content.lower()
+            has_chart_mention = any(word in content_lower for word in ['chart', 'figure', 'graph', 'shows', 'illustrates'])
+            
+            if not has_chart_mention:
+                for chart_ref in chart_refs:
+                    chart_file = chart_ref.split('/')[-1]
+                    self.issues.append({
+                        'check': 'orphaned_chart',
+                        'severity': 'HIGH',
+                        'message': f'Chart embedded but never referenced: {chart_file}',
+                        'details': 'Chart should be mentioned in the article text (e.g., "As the chart shows...")',
+                        'fix': 'Add a sentence referencing the chart near where it appears'
+                    })
     
     def format_report(self, is_valid: bool, issues: List[Dict]) -> str:
         """Generate human-readable validation report"""

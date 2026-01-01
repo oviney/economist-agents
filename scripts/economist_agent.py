@@ -96,7 +96,11 @@ ECONOMIST VOICE - MANDATORY RULES
 STRUCTURE (800-1200 words):
 1. OPENING: Lead with most striking fact. NO throat-clearing. NO "In today's world..."
 2. BODY: 3-4 sections, each advancing the argument. Use ## headers (noun phrases, not questions)
-3. CHART: Reference naturally with "As the chart shows..." - never "See figure 1"
+3. CHART EMBEDDING (MANDATORY if chart_data provided):
+   - Insert chart markdown: ![Chart description](chart_path_provided_below)
+   - Place after the section where data is discussed
+   - Add 1-2 sentences: "As the chart shows..." or "The chart illustrates..."
+   - NEVER write "See figure 1" - reference naturally
 4. CLOSE: Implication or forward look. NOT a summary. NOT "In conclusion..."
 
 VOICE:
@@ -651,7 +655,7 @@ Find specific, VERIFIABLE data with exact sources. Flag anything you cannot veri
     return research_data
 
 
-def run_writer_agent(client, topic: str, research_brief: dict, current_date: str) -> str:
+def run_writer_agent(client, topic: str, research_brief: dict, current_date: str, chart_filename: str = None) -> str:
     # Input validation
     if not topic or not isinstance(topic, str):
         raise ValueError(
@@ -674,7 +678,29 @@ def run_writer_agent(client, topic: str, research_brief: dict, current_date: str
     
     # Build system prompt by replacing placeholders one at a time
     system_prompt = WRITER_AGENT_PROMPT.replace("{current_date}", current_date)
-    system_prompt = system_prompt.replace("{research_brief}", json.dumps(research_brief, indent=2))
+    
+    # Add chart information if available
+    if chart_filename and research_brief.get('chart_data'):
+        chart_title = research_brief['chart_data'].get('title', 'Chart')
+        chart_info = f"""
+
+═══════════════════════════════════════════════════════════════════════════
+⚠️  CHART EMBEDDING REQUIRED ⚠️
+═══════════════════════════════════════════════════════════════════════════
+
+A chart has been generated for this article. You MUST include it using this EXACT markdown:
+
+![{chart_title}]({chart_filename})
+
+Place this markdown in the article body after discussing the relevant data.
+Add a sentence referencing it: "As the chart shows, [observation]..."
+
+Failure to include the chart will result in article rejection.
+═══════════════════════════════════════════════════════════════════════════
+"""
+        system_prompt = system_prompt.replace("{research_brief}", json.dumps(research_brief, indent=2) + chart_info)
+    else:
+        system_prompt = system_prompt.replace("{research_brief}", json.dumps(research_brief, indent=2))
     
     draft = call_llm(
         client,
@@ -985,7 +1011,12 @@ def generate_economist_post(topic: str, category: str = "quality-engineering",
             print("   ℹ Visual QA skipped (requires Anthropic Claude)")
     
     # Stage 3: Writing
-    draft = run_writer_agent(client, topic, research, date_str)
+    # Prepare chart filename if chart will be generated
+    chart_filename = None
+    if research.get("chart_data"):
+        chart_filename = f"/assets/charts/{slug}.png"
+    
+    draft = run_writer_agent(client, topic, research, date_str, chart_filename)
     
     # Log draft to governance
     if governance:

@@ -11,7 +11,7 @@
       "github_issue": 15,
       "component": "jekyll_layout",
       "status": "fixed",
-      "fixed_date": "2026-01-01T16:42:39.745298",
+      "fixed_date": "2026-01-01T16:54:30.432160",
       "fix_commit": "5d97545",
       "is_production_escape": true,
       "fix_notes": "Added category tag to post.html layout"
@@ -25,7 +25,7 @@
       "github_issue": 16,
       "component": "writer_agent",
       "status": "fixed",
-      "fixed_date": "2026-01-01T16:42:39.745308",
+      "fixed_date": "2026-01-01T16:54:30.432181",
       "fix_commit": "469f402",
       "is_production_escape": false,
       "fix_notes": "Enhanced Writer Agent prompt + Publication Validator"
@@ -39,7 +39,7 @@
       "github_issue": 17,
       "component": "writer_agent",
       "status": "fixed",
-      "fixed_date": "2026-01-01T16:42:39.745318",
+      "fixed_date": "2026-01-01T16:54:30.432190",
       "fix_commit": "5509dec",
       "is_production_escape": true,
       "fix_notes": "Removed image: field from front matter"
@@ -74,6 +74,6 @@
       "staging": 0,
       "production": 2
     },
-    "last_updated": "2026-01-01T16:42:39.745321"
+    "last_updated": "2026-01-01T16:54:30.432193"
   }
 }

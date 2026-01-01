@@ -28,17 +28,18 @@ Sprint 4 successfully delivered metrics integration and GenAI featured images in
 **Status**: ✅ COMPLETE + TESTED
 
 **Files Modified**:
-- `scripts/economist_agent.py` (+70 lines)
-  - Line 1042: Initialize AgentMetrics
-  - Line 1050-1056: Track Research Agent
-  - Line 1176-1184: Track Writer Agent
-  - Line 1203-1208: Track Editor Agent
-  - Line 1145-1150: Track Graphics Agent
-  - Line 1268: Save metrics
+- [`scripts/economist_agent.py`](https://github.com/oviney/economist-agents/blob/main/scripts/economist_agent.py) (+70 lines)
+  - [Line 1042](https://github.com/oviney/economist-agents/blob/main/scripts/economist_agent.py#L1042): Initialize AgentMetrics
+  - [Lines 1050-1056](https://github.com/oviney/economist-agents/blob/main/scripts/economist_agent.py#L1050-L1056): Track Research Agent
+  - [Lines 1176-1184](https://github.com/oviney/economist-agents/blob/main/scripts/economist_agent.py#L1176-L1184): Track Writer Agent
+  - [Lines 1203-1208](https://github.com/oviney/economist-agents/blob/main/scripts/economist_agent.py#L1203-L1208): Track Editor Agent
+  - [Lines 1145-1150](https://github.com/oviney/economist-agents/blob/main/scripts/economist_agent.py#L1145-L1150): Track Graphics Agent
+  - [Line 1268](https://github.com/oviney/economist-agents/blob/main/scripts/economist_agent.py#L1268): Save metrics
 
 **Validation**:
 ```json
 // skills/agent_metrics.json (working)
+// View file: https://github.com/oviney/economist-agents/blob/main/skills/agent_metrics.json
 {
   "version": "1.0",
   "runs": [
@@ -76,15 +77,15 @@ Sprint 4 successfully delivered metrics integration and GenAI featured images in
 **Status**: ✅ COMPLETE + TESTED
 
 **Files Created**:
-- `scripts/featured_image_agent.py` (272 lines)
+- [`scripts/featured_image_agent.py`](https://github.com/oviney/economist-agents/blob/main/scripts/featured_image_agent.py) (272 lines)
   - DALL-E 3 integration
   - Economist style specification
   - Error handling & graceful degradation
   - Test function with 3 sample topics
 
 **Integration**:
-- `economist_agent.py` Line 1152-1165: Stage 2c
-- `economist_agent.py` Line 735-749: YAML front matter injection
+- [`economist_agent.py` Lines 1152-1165](https://github.com/oviney/economist-agents/blob/main/scripts/economist_agent.py#L1152-L1165): Stage 2c
+- [`economist_agent.py` Lines 735-749](https://github.com/oviney/economist-agents/blob/main/scripts/economist_agent.py#L735-L749): YAML front matter injection
 - Graceful skip if `OPENAI_API_KEY` not set
 
 **Test Results**:
@@ -113,7 +114,7 @@ $ ls -lh output/images/
 **Status**: ✅ COMPLETE
 
 **Files Created**:
-- `docs/METRICS_GUIDE.md` (500+ lines)
+- [`docs/METRICS_GUIDE.md`](https://github.com/oviney/economist-agents/blob/main/docs/METRICS_GUIDE.md) (500+ lines)
   - Quick start commands
   - Dashboard output examples
   - Metrics interpretation guide
@@ -121,7 +122,7 @@ $ ls -lh output/images/
   - CI/CD integration examples
   - Best practices
 
-- `docs/SPRINT_4_RETROSPECTIVE.md` (400+ lines)
+- [`docs/SPRINT_4_RETROSPECTIVE.md`](https://github.com/oviney/economist-agents/blob/main/docs/SPRINT_4_RETROSPECTIVE.md) (400+ lines)
   - Sprint summary
   - Story-by-story breakdown
   - Metrics comparison (Sprint 3 vs 4)
@@ -129,7 +130,7 @@ $ ls -lh output/images/
   - Sprint 5 recommendations
 
 **Files Modified**:
-- `README.md` (Lines 145-160)
+- [`README.md` Lines 145-160](https://github.com/oviney/economist-agents/blob/main/README.md#L145-L160)
   - Added metrics dashboard commands
   - Updated output section
   - Cross-referenced METRICS_GUIDE.md
@@ -162,7 +163,7 @@ python3 scripts/economist_agent.py
 - `output/2026-01-01-the-hidden-cost-of-flaky-tests.md` (article)
 - `output/charts/the-hidden-cost-of-flaky-tests.png` (chart)
 - `output/images/the-hidden-cost-of-flaky-tests.png` (featured image)
-- `skills/agent_metrics.json` (metrics)
+- [`skills/agent_metrics.json`](https://github.com/oviney/economist-agents/blob/main/skills/agent_metrics.json) (metrics)
 
 **Quality**:
 - Article: 535 words, Economist style maintained
@@ -174,7 +175,7 @@ python3 scripts/economist_agent.py
 
 ## Commit Details
 
-**Commit**: `b46870c`  
+**Commit**: [`b46870c`](https://github.com/oviney/economist-agents/commit/b46870c)  
 **Files Changed**: 8 files, 1712 insertions(+), 16 deletions(-)  
 **Push**: Successfully pushed to origin/main
 
@@ -285,8 +286,8 @@ Closes #19, #14
 ### Immediate (Sprint 5 Planning)
 
 1. **Close GitHub Issues**:
-   - Issue #19: Agent Performance Tracking ✅ (ready to close)
-   - Issue #14: GenAI Featured Images ✅ (ready to close)
+   - [Issue #19](https://github.com/oviney/economist-agents/issues/19): Agent Performance Tracking ✅ (ready to close)
+   - [Issue #14](https://github.com/oviney/economist-agents/issues/14): GenAI Featured Images ✅ (ready to close)
 
 2. **Sprint 5 Recommendations**:
    - Improve Writer Agent (reduce regenerations)
@@ -295,9 +296,9 @@ Closes #19, #14
    - Test suite expansion
 
 3. **Backlog Priorities**:
-   - Issue #10: Expand Skills Categories (3 pts)
-   - Issue #9: Anti-Pattern Detection (3 pts)
-   - Issue #12: CONTRIBUTING.md (1 pt)
+   - [Issue #10](https://github.com/oviney/economist-agents/issues/10): Expand Skills Categories (3 pts)
+   - [Issue #9](https://github.com/oviney/economist-agents/issues/9): Anti-Pattern Detection (3 pts)
+   - [Issue #12](https://github.com/oviney/economist-agents/issues/12): CONTRIBUTING.md (1 pt)
 
 ### Long-term
 
@@ -359,7 +360,7 @@ After metrics:
 **Testing**: ✅ All features validated  
 **Documentation**: ✅ Comprehensive  
 **Deployment**: ✅ Committed and pushed  
-**Issues Closed**: #19, #14
+**Issues Closed**: [#19](https://github.com/oviney/economist-agents/issues/19), [#14](https://github.com/oviney/economist-agents/issues/14)
 
 **Time**: 7.5 hours (est 9-13) - 42% under budget  
 **Velocity**: 9 points (highest yet)  

@@ -94,6 +94,35 @@
         }
       ]
     },
+    "sprint_report_quality": {
+      "description": "Validate sprint reports have clickable GitHub links to all artifacts",
+      "patterns": [
+        {
+          "id": "missing_artifact_links",
+          "severity": "high",
+          "pattern": "File mentioned in report but no GitHub link provided",
+          "check": "Scan for file paths without accompanying [text](https://github.com/...) links",
+          "learned_from": "Sprint 4 report - no links to generated artifacts (2026-01-01)",
+          "prevention": "Use SPRINT_REPORT_SPEC.md validation script before committing"
+        },
+        {
+          "id": "broken_commit_references",
+          "severity": "high",
+          "pattern": "Commit SHA mentioned but not linked",
+          "check": "All commit SHAs must be clickable links to GitHub commits",
+          "learned_from": "Sprint 4 report validation (2026-01-01)",
+          "prevention": "Validate with validate_sprint_report.py"
+        },
+        {
+          "id": "unlinked_issues",
+          "severity": "medium",
+          "pattern": "Issue numbers mentioned without links",
+          "check": "All #XX references must link to GitHub issues",
+          "learned_from": "Sprint 4 report validation (2026-01-01)",
+          "prevention": "Validate with validate_sprint_report.py"
+        }
+      ]
+    },
     "chart_integration": {
       "description": "NEW: Validate chart generation and embedding",
       "patterns": [

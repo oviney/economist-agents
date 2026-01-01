@@ -11,10 +11,28 @@
       "github_issue": 15,
       "component": "jekyll_layout",
       "status": "fixed",
-      "fixed_date": "2026-01-01T16:54:30.432160",
+      "fixed_date": "2026-01-01T17:51:55.197697",
       "fix_commit": "5d97545",
       "is_production_escape": true,
-      "fix_notes": "Added category tag to post.html layout"
+      "fix_notes": "Added category tag to post.html layout",
+      "prevention_test_added": true,
+      "prevention_test_file": "scripts/blog_qa_agent.py",
+      "time_to_resolve_days": 0,
+      "root_cause": "validation_gap",
+      "root_cause_notes": "Jekyll layout validation missing - no check for category tag display",
+      "introduced_in_commit": "unknown",
+      "introduced_date": "2025-12-30",
+      "time_to_detect_days": 2,
+      "missed_by_test_type": "visual_qa",
+      "test_gap_description": "No visual validation of article page layout elements",
+      "prevention_strategy": [
+        "new_validation",
+        "process_change"
+      ],
+      "prevention_actions": [
+        "Added blog_qa_agent.py Jekyll layout validation",
+        "Created pre-commit hook for blog structure checks"
+      ]
     },
     {
       "id": "BUG-016",
@@ -25,10 +43,29 @@
       "github_issue": 16,
       "component": "writer_agent",
       "status": "fixed",
-      "fixed_date": "2026-01-01T16:54:30.432181",
+      "fixed_date": "2026-01-01T17:51:55.197732",
       "fix_commit": "469f402",
       "is_production_escape": false,
-      "fix_notes": "Enhanced Writer Agent prompt + Publication Validator"
+      "fix_notes": "Enhanced Writer Agent prompt + Publication Validator",
+      "prevention_test_added": true,
+      "prevention_test_file": "scripts/publication_validator.py",
+      "time_to_resolve_days": 0,
+      "root_cause": "prompt_engineering",
+      "root_cause_notes": "Writer Agent prompt didn't explicitly require chart embedding. Graphics Agent created charts but Writer didn't reference them.",
+      "introduced_in_commit": "a1b2c3d",
+      "introduced_date": "2025-12-25",
+      "time_to_detect_days": 7,
+      "missed_by_test_type": "integration_test",
+      "test_gap_description": "No test verifying chart markdown exists in article body when chart_data provided",
+      "prevention_strategy": [
+        "enhanced_prompt",
+        "new_validation"
+      ],
+      "prevention_actions": [
+        "Enhanced Writer Agent prompt with explicit chart embedding requirements",
+        "Added Publication Validator Check #7: Chart Embedding",
+        "Added agent_reviewer.py validation for Writer Agent outputs"
+      ]
     },
     {
       "id": "BUG-017",
@@ -39,10 +76,27 @@
       "github_issue": 17,
       "component": "writer_agent",
       "status": "fixed",
-      "fixed_date": "2026-01-01T16:54:30.432190",
+      "fixed_date": "2026-01-01T17:51:55.197756",
       "fix_commit": "5509dec",
       "is_production_escape": true,
-      "fix_notes": "Removed image: field from front matter"
+      "fix_notes": "Removed image: field from front matter",
+      "time_to_resolve_days": 0,
+      "root_cause": "requirements_gap",
+      "root_cause_notes": "Unclear requirements: featured image vs embedded chart. Jekyll 'image:' field rendered as hero image, causing duplication.",
+      "introduced_in_commit": "469f402",
+      "introduced_date": "2026-01-01",
+      "time_to_detect_days": 0,
+      "missed_by_test_type": "visual_qa",
+      "test_gap_description": "No visual regression test for article rendering with charts",
+      "prevention_strategy": [
+        "documentation",
+        "process_change"
+      ],
+      "prevention_actions": [
+        "Removed 'image:' field from YAML frontmatter specification",
+        "Documented chart embedding pattern: use markdown only, not frontmatter",
+        "Updated Writer Agent to use single chart embedding method"
+      ]
     },
     {
       "id": "BUG-020",
@@ -55,7 +109,14 @@
       "status": "open",
       "fixed_date": null,
       "fix_commit": null,
-      "is_production_escape": false
+      "is_production_escape": false,
+      "root_cause": "integration_error",
+      "root_cause_notes": "GitHub close syntax in bullet list format not recognized. Sprint 4 regression.",
+      "introduced_in_commit": "unknown",
+      "introduced_date": "2025-12-28",
+      "time_to_detect_days": 4,
+      "missed_by_test_type": "integration_test",
+      "test_gap_description": "No test for GitHub webhook integration or commit message validation"
     }
   ],
   "summary": {
@@ -74,6 +135,19 @@
       "staging": 0,
       "production": 2
     },
-    "last_updated": "2026-01-01T16:54:30.432193"
+    "root_cause_distribution": {
+      "validation_gap": 1,
+      "prompt_engineering": 1,
+      "requirements_gap": 1,
+      "integration_error": 1
+    },
+    "test_gap_distribution": {
+      "visual_qa": 2,
+      "integration_test": 2
+    },
+    "avg_time_to_detect_days": 3.2,
+    "avg_time_to_resolve_days": null,
+    "avg_critical_ttd_days": 5.5,
+    "last_updated": "2026-01-01T17:51:55.197829"
   }
 }

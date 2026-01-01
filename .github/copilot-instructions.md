@@ -203,6 +203,40 @@ python3 scripts/architecture_review.py --show-skills
 
 The architecture review agent automatically updates its knowledge base and exports markdown documentation.
 
+## Defect Tracking & Quality Metrics
+
+[defect_tracker.py](../scripts/defect_tracker.py) implements comprehensive bug tracking with Root Cause Analysis (v2.0):
+
+**Enhanced Schema:**
+- **Root Cause**: `root_cause` (enum), `root_cause_notes`, `introduced_in_commit`, `introduced_date`
+- **Time Metrics**: `time_to_detect_days`, `time_to_resolve_days` (auto-calculated)
+- **Test Gaps**: `missed_by_test_type`, `test_gap_description`, `prevention_test_added`, `prevention_test_file`
+- **Prevention**: `prevention_strategy[]`, `prevention_actions[]`
+
+**Key Methods:**
+- `log_bug()` - Log new bug with optional RCA data
+- `update_bug_rca()` - Backfill RCA data for existing bugs
+- `fix_bug()` - Mark fixed and auto-calculate TTR
+- `generate_report()` - Enhanced report with root causes, TTD, test gaps
+
+**Critical Questions We Can Answer:**
+1. Top 3 root causes (validation_gap, prompt_engineering, etc.)
+2. Average TTD for critical bugs (target: <7 days, current: 5.5 days)
+3. Which test types have gaps (visual_qa: 50%, integration_test: 50%)
+4. Prevention test coverage (50% of bugs have regression tests)
+5. Quality trends (defect escape rate: 50% baseline, target: <20%)
+
+**Usage:**
+```python
+tracker = DefectTracker()
+tracker.log_bug("BUG-021", "high", "production", "Description",
+                root_cause="validation_gap",
+                missed_by_test_type="integration_test")
+tracker.fix_bug("BUG-021", "abc1234", prevention_test_added=True)
+```
+
+Run `python3 scripts/defect_tracker.py` to see full report with RCA insights.
+
 ## Additional Resources
 
 - [ARCHITECTURE_PATTERNS.md](../docs/ARCHITECTURE_PATTERNS.md): Auto-generated from architecture review

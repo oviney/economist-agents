@@ -1,0 +1,67 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-12-31",
+  "skills": {
+    "seo_validation": {
+      "description": "Detect SEO issues that impact search rankings",
+      "patterns": [
+        {
+          "id": "missing_page_title",
+          "severity": "critical",
+          "pattern": "Empty or missing <title> tag",
+          "check": "Verify page layout includes title metadata rendering",
+          "learned_from": "Found 3 pages with empty titles on 2025-12-31"
+        },
+        {
+          "id": "placeholder_urls",
+          "severity": "high",
+          "pattern": "URLs containing 'YOUR-', 'REPLACE-', 'PLACEHOLDER'",
+          "check": "Scan for template placeholder text in links",
+          "learned_from": "Found YOUR-PROFILE in LinkedIn link on 2025-12-31"
+        }
+      ]
+    },
+    "content_quality": {
+      "description": "Validate content matches editorial standards",
+      "patterns": [
+        {
+          "id": "ai_disclosure_compliance",
+          "severity": "medium",
+          "pattern": "Posts with AI-generated content must have ai_assisted: true flag",
+          "check": "Scan content for AI mentions without disclosure flag",
+          "learned_from": "Found 3 posts missing ai_assisted flag on 2025-12-31"
+        }
+      ]
+    },
+    "link_validation": {
+      "description": "Detect broken or problematic links",
+      "patterns": [
+        {
+          "id": "dead_internal_links",
+          "severity": "high",
+          "pattern": "Internal links pointing to non-existent pages",
+          "check": "Verify all internal links resolve to actual files",
+          "learned_from": "Initial skill - common blog issue"
+        }
+      ]
+    },
+    "performance": {
+      "description": "Detect performance issues",
+      "patterns": [
+        {
+          "id": "font_preload_warnings",
+          "severity": "low",
+          "pattern": "Font preload resource hints causing warnings",
+          "check": "Review preload strategy in layout templates",
+          "learned_from": "Found Google Fonts preload warning on 2025-12-31"
+        }
+      ]
+    }
+  },
+  "validation_stats": {
+    "total_runs": 4,
+    "issues_found": 5,
+    "issues_fixed": 3,
+    "last_run": "2025-12-31T20:41:29.835444"
+  }
+}

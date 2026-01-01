@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """
-Blog QA Agent
+Blog QA Agent with Self-Learning Skills
 
 Validates blog posts and site structure before publication.
-Extends the visual_qa.py agent to also check HTML, links, and content quality.
+Learns from each run to improve validation patterns over time.
 
 Usage:
     python3 blog_qa_agent.py --blog-dir /path/to/blog --post _posts/2025-12-31-article.md
+    python3 blog_qa_agent.py --blog-dir /path/to/blog --show-skills
 """
 
 import os
@@ -15,8 +16,9 @@ import re
 import subprocess
 from pathlib import Path
 import yaml
+from skills_manager import SkillsManager
 
-def validate_yaml_front_matter(file_path):
+def validate_yaml_front_matter(file_path, skills_manager=None):
     """Validate YAML front matter has required fields."""
     issues = []
     
@@ -26,6 +28,17 @@ def validate_yaml_front_matter(file_path):
     # Check for front matter
     if not content.startswith('---'):
         issues.append("Missing YAML front matter")
+        if skills_manager:
+            skills_manager.learn_pattern(
+                "content_quality",
+                "missing_frontmatter",
+                {
+                    "severity": "critical",
+                    "pattern": "Post missing YAML front matter",
+                    "check": "Verify file starts with ---",
+                    "learned_from": f"File: {Path(file_path).name}"
+                }
+            )
         return issues
     
     # Extract front matter
@@ -122,7 +135,7 @@ def check_economist_style(file_path):
     return issues
 
 
-def validate_post(file_path, blog_dir=None):
+def validate_post(file_path, blog_dir=None, skills_manager=None):
     """Run all validation checks on a blog post."""
     print(f"\n{'='*60}")
     print(f"Validating: {file_path}")
@@ -132,7 +145,7 @@ def validate_post(file_path, blog_dir=None):
     
     # 1. YAML front matter
     print("📋 Checking YAML front matter...")
-    issues = validate_yaml_front_matter(file_path)
+    issues = validate_yaml_front_matter(file_path, skills_manager)
     if issues:
         all_issues.extend(["[YAML] " + i for i in issues])
     else:
@@ -214,11 +227,23 @@ def validate_blog_structure(blog_dir):
 if __name__ == "__main__":
     import argparse
     
-    parser = argparse.ArgumentParser(description='Validate blog posts and structure')
+    parser = argparse.ArgumentParser(description='Validate blog posts with self-learning skills')
     parser.add_argument('--blog-dir', required=True, help='Path to blog directory')
     parser.add_argument('--post', help='Specific post to validate (optional)')
+    parser.add_argument('--show-skills', action='store_true', help='Show learned skills report')
+    parser.add_argument('--learn', action='store_true', default=True, help='Enable learning from this run (default: true)')
     
     args = parser.parse_args()
+    
+    # Initialize skills manager
+    skills_manager = SkillsManager()
+    
+    if args.show_skills:
+        # Show skills report
+        print(skills_manager.export_report())
+        sys.exit(0)
+    
+    total_issues = 0
     
     if args.post:
         # Validate single post
@@ -226,9 +251,59 @@ if __name__ == "__main__":
         if not post_path.is_absolute():
             post_path = Path(args.blog_dir) / args.post
         
-        success = validate_post(post_path, args.blog_dir)
+        success = validate_post(post_path, args.blog_dir, skills_manager if args.learn else None)
+        total_issues = 0 if success else 1
+        
+        if args.learn:
+            skills_manager.record_run(total_issues)
+            skills_manager.save()
+            print(f"\n💡 Skills updated. Run with --show-skills to see learned patterns.")
+        
         sys.exit(0 if success else 1)
     else:
         # Validate entire blog
-        success = validate_blog_structure(args.blog_dir)
-        sys.exit(0 if success else 1)
+        blog_dir = Path(args.blog_dir)
+        
+        # Validate structure
+        print(f"\n{'='*60}")
+        print(f"Validating blog structure: {blog_dir}")
+        print(f"{'='*60}\n")
+        
+        structure_valid = True
+        for item in ['_posts', '_layouts', 'assets', '_config.yml']:
+            path = blog_dir / item
+            if path.exists():
+                print(f"  ✅ {item}")
+            else:
+                print(f"  ❌ Missing: {item}")
+                structure_valid = False
+                total_issues += 1
+        
+        if not structure_valid:
+            print("\n❌ Blog structure validation failed!")
+            sys.exit(1)
+        
+        # Validate all posts
+        posts = sorted((blog_dir / '_posts').glob('*.md'))
+        print(f"\n📄 Validating {len(posts)} posts...\n")
+        
+        failed_posts = []
+        for post in posts:
+            if not validate_post(post, blog_dir, skills_manager if args.learn else None):
+                failed_posts.append(post.name)
+                total_issues += 1
+        
+        if failed_posts:
+            print(f"\n❌ {len(failed_posts)} posts failed validation:")
+            for post_name in failed_posts:
+                print(f"  • {post_name}")
+        else:
+            print(f"\n✅ Blog structure validation complete!")
+        
+        if args.learn:
+            skills_manager.record_run(total_issues, 0)
+            skills_manager.save()
+            print(f"\n💡 Skills updated. Total runs: {skills_manager.get_stats()['total_runs']}")
+            print(f"   Run with --show-skills to see learned patterns.")
+        
+        sys.exit(0 if not failed_posts else 1)

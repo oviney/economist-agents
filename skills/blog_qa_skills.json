@@ -1,6 +1,6 @@
 {
-  "version": "1.0",
-  "last_updated": "2025-12-31T23:49:59.116402",
+  "version": "2.0",
+  "last_updated": "2026-01-01T00:00:00.000000",
   "skills": {
     "seo_validation": {
       "description": "Detect SEO issues that impact search rankings",
@@ -30,6 +30,96 @@
           "pattern": "Posts with AI-generated content must have ai_assisted: true flag",
           "check": "Scan content for AI mentions without disclosure flag",
           "learned_from": "Found 3 posts missing ai_assisted flag on 2025-12-31"
+        },
+        {
+          "id": "banned_openings",
+          "severity": "critical",
+          "pattern": "Article starts with banned throat-clearing phrases",
+          "check": "Scan first paragraph for patterns like 'In today\\'s world', 'It\\'s no secret'",
+          "learned_from": "Codified from AGENT_QUALITY_STANDARDS.md on 2026-01-01",
+          "auto_fix": "Remove opening sentences with banned patterns"
+        },
+        {
+          "id": "banned_closings",
+          "severity": "critical",
+          "pattern": "Article ends with summary or weak closing",
+          "check": "Scan last 3 paragraphs for 'In conclusion', 'remains to be seen', summaries",
+          "learned_from": "Codified from AGENT_QUALITY_STANDARDS.md on 2026-01-01",
+          "auto_fix": "Replace with definitive prediction or implication"
+        },
+        {
+          "id": "verification_flags_present",
+          "severity": "critical",
+          "pattern": "Article contains [NEEDS SOURCE] or [UNVERIFIED] markers",
+          "check": "Grep for verification flags in article body",
+          "learned_from": "Codified from AGENT_QUALITY_STANDARDS.md on 2026-01-01",
+          "auto_fix": "Delete unsourced claims or add proper attribution"
+        }
+      ]
+    },
+    "front_matter_validation": {
+      "description": "NEW: Enforce front matter schema compliance (BLOCKS layer)",
+      "patterns": [
+        {
+          "id": "missing_categories_field",
+          "severity": "critical",
+          "pattern": "Front matter missing 'categories' field",
+          "check": "schema_validator.py enforces required field",
+          "learned_from": "Issue #15: Missing category tag on article page (2026-01-01)",
+          "prevention": "Self-validating Writer Agent now checks before returning"
+        },
+        {
+          "id": "missing_layout_field",
+          "severity": "critical",
+          "pattern": "Front matter missing 'layout' field causes page rendering failure",
+          "check": "schema_validator.py enforces required field",
+          "learned_from": "Production bug: Pages render without Jekyll layout (2025-12-31)",
+          "prevention": "Schema validation blocks publication"
+        },
+        {
+          "id": "generic_titles",
+          "severity": "high",
+          "pattern": "Titles use generic patterns like 'Myth vs Reality', 'Ultimate Guide'",
+          "check": "schema_validator.py regex patterns detect generic titles",
+          "learned_from": "Codified from AGENT_QUALITY_STANDARDS.md on 2026-01-01",
+          "prevention": "Agent prompts explicitly ban generic patterns"
+        },
+        {
+          "id": "wrong_date_in_frontmatter",
+          "severity": "high",
+          "pattern": "Date in front matter doesn't match today's date",
+          "check": "schema_validator.py compares date to expected_date",
+          "learned_from": "Writer Agent sometimes uses dates from research sources",
+          "prevention": "Writer prompt explicitly states: Use TODAY\\'s date"
+        }
+      ]
+    },
+    "chart_integration": {
+      "description": "NEW: Validate chart generation and embedding",
+      "patterns": [
+        {
+          "id": "chart_not_embedded",
+          "severity": "critical",
+          "pattern": "Chart generated but not embedded in article",
+          "check": "agent_reviewer.py checks for ![...](chart_path) in article",
+          "learned_from": "Issue #16: Charts generated but never embedded (2026-01-01)",
+          "prevention": "Self-validating Writer Agent regenerates if chart missing"
+        },
+        {
+          "id": "chart_not_referenced",
+          "severity": "medium",
+          "pattern": "Chart embedded but not referenced in text",
+          "check": "agent_reviewer.py scans for 'As the chart shows' or similar",
+          "learned_from": "Codified from AGENT_QUALITY_STANDARDS.md on 2026-01-01",
+          "prevention": "Writer prompt requires natural chart reference"
+        },
+        {
+          "id": "duplicate_chart_display",
+          "severity": "medium",
+          "pattern": "Chart appears twice (featured image + embedded)",
+          "check": "Scan for both 'image:' field and markdown embed",
+          "learned_from": "Issue #17: Duplicate chart display (2026-01-01)",
+          "prevention": "Writer Agent no longer adds 'image:' field"
         }
       ]
     },

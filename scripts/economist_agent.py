@@ -37,6 +37,9 @@ from governance import GovernanceTracker, InteractiveMode
 # Import publication validator
 from publication_validator import PublicationValidator
 
+# Import automated reviewer
+from agent_reviewer import review_agent_output
+
 # ═══════════════════════════════════════════════════════════════════════════
 # AGENT SYSTEM PROMPTS (v2 - with codified editorial lessons)
 # ═══════════════════════════════════════════════════════════════════════════
@@ -639,6 +642,19 @@ Find specific, VERIFIABLE data with exact sources. Flag anything you cannot veri
     if research_data.get('unverified_claims'):
         print(f"   ⚠ {len(research_data['unverified_claims'])} unverified claims flagged")
     
+    # SELF-VALIDATION: Review research output
+    print("   🔍 Self-validating research...")
+    is_valid, issues = review_agent_output("research_agent", research_data)
+    
+    if not is_valid:
+        print(f"   ⚠️  Research has {len(issues)} quality issues")
+        # Don't regenerate research - flag for human review
+        # Research is expensive and regeneration may not help
+        for issue in issues[:3]:  # Show first 3 issues
+            print(f"     • {issue}")
+    else:
+        print("   ✅ Research passed self-validation")
+    
     # Log to governance
     if governance:
         governance.log_agent_output(
@@ -648,7 +664,9 @@ Find specific, VERIFIABLE data with exact sources. Flag anything you cannot veri
                 "topic": topic,
                 "data_points": total,
                 "verified": verified,
-                "unverified": len(research_data.get('unverified_claims', []))
+                "unverified": len(research_data.get('unverified_claims', [])),
+                "validation_passed": is_valid,
+                "validation_issues": len(issues)
             }
         )
     
@@ -702,6 +720,7 @@ Failure to include the chart will result in article rejection.
     else:
         system_prompt = system_prompt.replace("{research_brief}", json.dumps(research_brief, indent=2))
     
+    # Generate initial draft
     draft = call_llm(
         client,
         system_prompt,
@@ -710,6 +729,52 @@ Failure to include the chart will result in article rejection.
     )
     word_count = len(draft.split())
     print(f"   ✓ Draft complete ({word_count} words)")
+    
+    # SELF-VALIDATION: Review draft before returning
+    print("   🔍 Self-validating draft...")
+    is_valid, issues = review_agent_output(
+        "writer_agent", 
+        draft, 
+        context={"chart_filename": chart_filename}
+    )
+    
+    # If validation fails and issues are critical, attempt one regeneration
+    if not is_valid:
+        critical_issues = [i for i in issues if "CRITICAL" in i or "BANNED" in i]
+        if critical_issues:
+            print(f"   ⚠️  {len(critical_issues)} critical issues found, regenerating...")
+            
+            # Create fix instructions from issues
+            fix_instructions = "\n".join([
+                "CRITICAL FIXES REQUIRED:",
+                *[f"- {issue}" for issue in critical_issues[:5]],  # Top 5 issues
+                "\nRegenerate the article with these fixes applied."
+            ])
+            
+            # Regenerate with fix instructions
+            draft = call_llm(
+                client,
+                system_prompt + "\n\n" + fix_instructions,
+                f"Fix the issues and regenerate: {topic}",
+                max_tokens=3000
+            )
+            
+            # Re-validate
+            is_valid, issues = review_agent_output(
+                "writer_agent", 
+                draft, 
+                context={"chart_filename": chart_filename}
+            )
+            
+            if not is_valid:
+                print(f"   ⚠️  Draft still has {len(issues)} issues after regeneration")
+            else:
+                print("   ✅ Regenerated draft passed validation")
+        else:
+            print(f"   ⚠️  Draft has {len(issues)} warnings (non-critical)")
+    else:
+        print("   ✅ Draft passed self-validation")
+    
     return draft
 
 

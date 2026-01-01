@@ -26,7 +26,15 @@ Fixed two critical chart bugs discovered in production. All fixes deployed and d
 **BUG-015: Missing Category Tag** (GitHub Issue #15)
 - **Problem**: Article pages missing category tag display above title
 - **Impact**: Inconsistent with The Economist style, broken navigation
-- **Status**: 🔄 OPEN - Needs Jekyll template fix
+- **Solution**: Added prominent category tag above title in post.html layout
+- **Changes**: 
+  - Added `.category-tag` div with red background (#e3120b)
+  - Category displays in uppercase white text
+  - Gracefully degrades if no categories
+  - Preserves existing breadcrumb navigation
+- **Commit**: 5d97545 in blog repo
+- **Status**: ✅ FIXED - PR ready for merge
+- **Date Fixed**: 2026-01-01
 
 ### Feature Planning
 

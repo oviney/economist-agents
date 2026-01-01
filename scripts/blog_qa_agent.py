@@ -50,10 +50,22 @@ def validate_yaml_front_matter(file_path, skills_manager=None, blog_dir=None):
         return issues
     
     # Required fields
-    required_fields = ['title', 'date']
+    required_fields = ['layout', 'title', 'date']
     for field in required_fields:
         if field not in data:
             issues.append(f"Missing required field: {field}")
+            if field == 'layout' and skills_manager:
+                skills_manager.learn_pattern(
+                    "jekyll_configuration",
+                    "missing_layout_field",
+                    {
+                        "severity": "critical",
+                        "pattern": "Post missing 'layout' field causes empty title and no header/nav",
+                        "check": "Verify layout field present in front matter",
+                        "learned_from": f"File: {Path(file_path).name}",
+                        "impact": "Page renders without Jekyll layout - no title, header, navigation"
+                    }
+                )
     
     # Validate date format
     if 'date' in data:

@@ -191,9 +191,11 @@ Write the article now. Return complete Markdown with YAML frontmatter.
 1. DATE: Use TODAY'S DATE (2026-01-01), NOT dates from research sources
 2. YAML: Use --- delimiters, NOT ```yaml code fences
 3. TITLE: Must be specific with context, NOT generic
+4. LAYOUT: MUST include "layout: post" for Jekyll rendering
 
 Correct format:
 ---
+layout: post
 title: "Self-Healing Tests: Myth vs Reality"
 date: 2026-01-01
 author: "The Economist"
@@ -205,6 +207,10 @@ WRONG formats (DO NOT USE):
 ```yaml          ← NO code fences
 title: "Myth vs Reality"  ← Too generic
 date: 2023-11-09          ← Wrong date
+---
+title: "Article"  ← MISSING layout field - page won't render properly!
+date: 2026-01-01
+---
 ```
 
 Now write the article:"""

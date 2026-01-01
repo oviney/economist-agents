@@ -27,6 +27,7 @@ import subprocess
 import sys
 import re
 import argparse
+import time
 
 # Import unified LLM client
 from llm_client import create_llm_client, call_llm
@@ -39,6 +40,9 @@ from publication_validator import PublicationValidator
 
 # Import automated reviewer
 from agent_reviewer import review_agent_output
+
+# Import chart metrics
+from chart_metrics import get_metrics_collector
 
 # ═══════════════════════════════════════════════════════════════════════════
 # AGENT SYSTEM PROMPTS (v2 - with codified editorial lessons)
@@ -805,24 +809,28 @@ def run_graphics_agent(client, chart_spec: dict, output_path: str) -> str:
     
     print(f"📈 Graphics Agent: Creating visualization '{chart_spec.get('title', 'Untitled')[:40]}...'")
     
-    code = call_llm(
-        client,
-        GRAPHICS_AGENT_PROMPT.format(chart_spec=json.dumps(chart_spec, indent=2)),
-        "Generate the matplotlib code.",
-        max_tokens=2500
-    )
-    
-    if "```python" in code:
-        code = code.split("```python")[1].split("```")[0]
-    elif "```" in code:
-        code = code.split("```")[1].split("```")[0]
-    
-    if "plt.savefig" not in code:
-        code += f"\nplt.savefig('{output_path}', dpi=300, bbox_inches='tight', facecolor='#f1f0e9')"
-    else:
-        code = re.sub(r"plt\.savefig\([^)]+\)", f"plt.savefig('{output_path}', dpi=300, bbox_inches='tight', facecolor='#f1f0e9')", code)
+    # Start metrics collection
+    metrics = get_metrics_collector()
+    chart_record = metrics.start_chart(chart_spec.get('title', 'Untitled'), chart_spec)
     
     try:
+        code = call_llm(
+            client,
+            GRAPHICS_AGENT_PROMPT.format(chart_spec=json.dumps(chart_spec, indent=2)),
+            "Generate the matplotlib code.",
+            max_tokens=2500
+        )
+        
+        if "```python" in code:
+            code = code.split("```python")[1].split("```")[0]
+        elif "```" in code:
+            code = code.split("```")[1].split("```")[0]
+        
+        if "plt.savefig" not in code:
+            code += f"\nplt.savefig('{output_path}', dpi=300, bbox_inches='tight', facecolor='#f1f0e9')"
+        else:
+            code = re.sub(r"plt\.savefig\([^)]+\)", f"plt.savefig('{output_path}', dpi=300, bbox_inches='tight', facecolor='#f1f0e9')", code)
+        
         temp_script = "/tmp/chart_gen.py"
         with open(temp_script, 'w') as f:
             f.write("import matplotlib\nmatplotlib.use('Agg')\n")
@@ -832,12 +840,17 @@ def run_graphics_agent(client, chart_spec: dict, output_path: str) -> str:
         result = subprocess.run([sys.executable, temp_script], capture_output=True, text=True)
         if result.returncode == 0:
             print(f"   ✓ Chart saved to {output_path}")
+            metrics.record_generation(chart_record, success=True)
             return output_path
         else:
-            print(f"   ⚠ Chart generation failed: {result.stderr[:200]}")
+            error_msg = result.stderr[:200]
+            print(f"   ⚠ Chart generation failed: {error_msg}")
+            metrics.record_generation(chart_record, success=False, error=error_msg)
             return None
     except Exception as e:
-        print(f"   ⚠ Chart generation error: {e}")
+        error_msg = str(e)
+        print(f"   ⚠ Chart generation error: {error_msg}")
+        metrics.record_generation(chart_record, success=False, error=error_msg)
         return None
 
 
@@ -897,7 +910,7 @@ def run_critique_agent(client, article: str) -> str:
     return critique
 
 
-def run_visual_qa_agent(client, image_path: str) -> dict:
+def run_visual_qa_agent(client, image_path: str, chart_record: dict = None) -> dict:
     """Visual QA Agent: Validates chart rendering quality."""
     print("🎨 Visual QA Agent: Inspecting chart...")
     
@@ -987,6 +1000,11 @@ def run_visual_qa_agent(client, image_path: str) -> dict:
         for issue in result.get("critical_issues", [])[:3]:
             print(f"     • {issue}")
     
+    # Record metrics if chart_record provided
+    if chart_record is not None:
+        metrics = get_metrics_collector()
+        metrics.record_visual_qa(chart_record, result)
+    
     return result
 
 
@@ -1047,15 +1065,21 @@ def generate_economist_post(topic: str, category: str = "quality-engineering",
     
     # Stage 2: Graphics
     chart_path = None
+    chart_record = None
     visual_qa_passed = True
     if research.get("chart_data"):
         chart_filename = str(charts_dir / f"{slug}.png")
         chart_path = run_graphics_agent(client, research["chart_data"], chart_filename)
         
+        # Get the chart record for metrics tracking
+        metrics = get_metrics_collector()
+        if metrics.current_session["charts"]:
+            chart_record = metrics.current_session["charts"][-1]
+        
         # Stage 2b: Visual QA (optional - only if vision supported)
         if chart_path and client.provider == 'anthropic':
             # Only Anthropic Claude has good vision support
-            visual_qa_result = run_visual_qa_agent(client, chart_path)
+            visual_qa_result = run_visual_qa_agent(client, chart_path, chart_record)
             visual_qa_passed = visual_qa_result.get("overall_pass", False)
             
             if not visual_qa_passed:
@@ -1176,13 +1200,29 @@ def generate_economist_post(topic: str, category: str = "quality-engineering",
     print(f"   Editorial: {gates_passed}/5 gates passed")
     print("="*70 + "\n")
     
+    # Finalize metrics session
+    metrics = get_metrics_collector()
+    metrics.end_session()
+    
+    # Print metrics summary
+    print("\n" + "="*70)
+    print("📊 METRICS SUMMARY")
+    print("="*70)
+    summary = metrics.get_summary()
+    print(f"   Charts Generated: {summary['total_charts_generated']}")
+    print(f"   Visual QA Pass Rate: {summary['visual_qa_pass_rate']:.1f}%")
+    if summary['total_zone_violations'] > 0:
+        print(f"   Zone Violations: {summary['total_zone_violations']}")
+    print("="*70 + "\n")
+    
     return {
         "article_path": article_path,
         "chart_path": chart_path,
         "gates_passed": gates_passed,
         "gates_failed": gates_failed,
         "visual_qa_passed": visual_qa_passed,
-        "word_count": len(edited_article.split())
+        "word_count": len(edited_article.split()),
+        "metrics_summary": summary
     }
 
 

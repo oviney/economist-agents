@@ -1,0 +1,104 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-01-01T12:39:58.818154",
+  "summary": {
+    "total_charts_generated": 2,
+    "total_visual_qa_runs": 2,
+    "visual_qa_pass_count": 1,
+    "visual_qa_fail_count": 1,
+    "total_zone_violations": 2,
+    "total_regenerations": 1,
+    "total_generation_time_seconds": 0.22487187385559082
+  },
+  "failure_patterns": {
+    "zone_violation": {
+      "title overlaps red bar": {
+        "count": 1,
+        "first_seen": "2026-01-01T12:39:58.818046",
+        "last_seen": "2026-01-01T12:39:58.818057"
+      },
+      "inline label intrudes into x-axis zone": {
+        "count": 1,
+        "first_seen": "2026-01-01T12:39:58.818060",
+        "last_seen": "2026-01-01T12:39:58.818063"
+      }
+    },
+    "critical_issue": {
+      "zone boundary violation: title/red bar overlap": {
+        "count": 1,
+        "first_seen": "2026-01-01T12:39:58.818065",
+        "last_seen": "2026-01-01T12:39:58.818067"
+      },
+      "zone boundary violation: label in x-axis zone": {
+        "count": 1,
+        "first_seen": "2026-01-01T12:39:58.818069",
+        "last_seen": "2026-01-01T12:39:58.818071"
+      }
+    }
+  },
+  "sessions": [
+    {
+      "timestamp": "2026-01-01T12:39:58.818148",
+      "duration_seconds": 0.2801799774169922,
+      "charts_generated": 2,
+      "visual_qa_runs": 2,
+      "visual_qa_passed": 1,
+      "charts": [
+        {
+          "title": "Test Chart: AI Adoption",
+          "timestamp": "2026-01-01T12:39:58.537983",
+          "start_time": 1767289198.5379899,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 0.1047520637512207,
+          "visual_qa_run": true,
+          "visual_qa_passed": true,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        },
+        {
+          "title": "Test Chart: Failed Generation",
+          "timestamp": "2026-01-01T12:39:58.642840",
+          "start_time": 1767289198.642852,
+          "chart_type": "bar",
+          "generation_success": false,
+          "generation_time_seconds": 0.05493879318237305,
+          "visual_qa_run": false,
+          "visual_qa_passed": null,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": [
+            {
+              "type": "generation_error",
+              "message": "Invalid data: empty dataset",
+              "timestamp": "2026-01-01T12:39:58.697798"
+            }
+          ]
+        },
+        {
+          "title": "Test Chart: Zone Violations",
+          "timestamp": "2026-01-01T12:39:58.697899",
+          "start_time": 1767289198.697904,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 0.12011981010437012,
+          "visual_qa_run": true,
+          "visual_qa_passed": false,
+          "zone_violations": [
+            "Title overlaps red bar",
+            "Inline label intrudes into X-axis zone"
+          ],
+          "regeneration_count": 1,
+          "errors": [
+            {
+              "type": "regeneration",
+              "reason": "Zone violations detected",
+              "timestamp": "2026-01-01T12:39:58.818137"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

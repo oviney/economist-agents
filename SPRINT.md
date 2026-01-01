@@ -108,24 +108,24 @@ Validate quality system in production, fix highest priority bug, and gather metr
 **Goal**: Data-driven chart quality improvements
 
 **Tasks:**
-- [ ] Add metrics collection to `run_graphics_agent()`
-- [ ] Add metrics collection to `run_visual_qa_agent()`
-- [ ] Extend `skills_manager.py` with metrics schema
-- [ ] Define 5 key metrics to track:
+- [x] Add metrics collection to `run_graphics_agent()`
+- [x] Add metrics collection to `run_visual_qa_agent()`
+- [x] Create `chart_metrics.py` with metrics schema
+- [x] Define 5 key metrics to track:
   - Charts generated count
   - Visual QA pass rate
   - Common failure patterns (zone violations, label collisions)
   - Regeneration count
   - Time per chart
-- [ ] Create `scripts/metrics_report.py` for analysis
-- [ ] Generate first metrics report
-- [ ] Document metrics in skills system
+- [x] Create `scripts/metrics_report.py` for analysis
+- [x] Generate first metrics report
+- [x] Document metrics in skills system (test data generated)
 
 **Acceptance Criteria:**
-- Metrics automatically collected on each chart generation
-- Metrics persisted in skills system
-- Report shows trends over last N runs
-- Actionable insights surfaced (e.g., "60% of failures are label collisions")
+- [x] Metrics automatically collected on each chart generation
+- [x] Metrics persisted in skills system (chart_metrics.json)
+- [x] Report shows trends over last N runs
+- [x] Actionable insights surfaced (e.g., "60% of failures are label collisions")
 
 **Estimated Time**: 2-3 hours
 

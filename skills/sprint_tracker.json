@@ -13,11 +13,26 @@
       "refinement_date": "2026-01-01T21:04:31.231682"
     },
     "sprint_7": {
-      "status": "active",
+      "status": "complete",
       "start_date": "2026-01-01T21:10:00",
-      "backlog_refined": true,
+      "backlog_refined": false,
       "refinement_date": "2026-01-01T21:04:31.231682",
-      "next_sprint_dor_met": true
+      "next_sprint_dor_met": false,
+      "end_date": "2026-01-01T21:31:12.792422",
+      "velocity": 10,
+      "stories_completed": [
+        "Story 1: Editor Diagnostic",
+        "Story 2: Test Gap Analysis"
+      ],
+      "stories_deferred": [
+        {
+          "story": "Story 3: Prevention Dashboard",
+          "points": 3,
+          "reason": "Insufficient data (7 bugs, need 10+)",
+          "deferred_to": "sprint_8"
+        }
+      ],
+      "retrospective_done": false
     }
   }
 }

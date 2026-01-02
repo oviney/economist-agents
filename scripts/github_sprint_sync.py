@@ -162,9 +162,42 @@ class GitHubSprintSync:
             print(f"  ❌ Failed to create issue: {e}")
             return None
 
-    def push_to_github(self, sprint_number: int = 2):
+    def validate_sprint_ready(self, sprint_number: int) -> tuple[bool, list[str]]:
+        """Check if SPRINT.md is ready for GitHub sync"""
+        issues = []
+
+        stories = self.parse_sprint_stories(sprint_number)
+
+        if not stories:
+            issues.append(f"No stories found for Sprint {sprint_number}")
+            return False, issues
+
+        for story in stories:
+            # Check story points
+            if story["points"] <= 0:
+                issues.append(f"Story {story['number']}: Missing story points")
+
+            # Check acceptance criteria
+            if not story["acceptance_criteria"]:
+                issues.append(f"Story {story['number']}: Missing acceptance criteria")
+
+            # Check priority
+            if not story["priority"]:
+                issues.append(f"Story {story['number']}: Missing priority")
+
+        return len(issues) == 0, issues
+
+    def push_to_github(self, sprint_number: int = 2, dry_run: bool = False):
         """Create GitHub issues for all sprint stories"""
         print(f"🔄 Pushing Sprint {sprint_number} stories to GitHub...\n")
+
+        # Validate first
+        is_valid, validation_issues = self.validate_sprint_ready(sprint_number)
+        if not is_valid:
+            print(f"  ❌ Sprint {sprint_number} not ready for sync:\n")
+            for issue in validation_issues:
+                print(f"     • {issue}")
+            return
 
         stories = self.parse_sprint_stories(sprint_number)
 
@@ -173,6 +206,14 @@ class GitHubSprintSync:
             return
 
         print(f"  Found {len(stories)} stories\n")
+
+        if dry_run:
+            print("  🔍 DRY RUN MODE - No issues will be created\n")
+            for story in stories:
+                print(f"  Would create: Story {story['number']}: {story['title']}")
+                print(f"    Priority: {story['priority']} | Points: {story['points']}")
+            print(f"\n  Total: {len(stories)} issues would be created")
+            return
 
         created_issues = {}
 
@@ -191,6 +232,73 @@ class GitHubSprintSync:
             for story_num, issue_num in created_issues.items():
                 print(f"   Story {story_num} → Issue #{issue_num}")
                 print(f"   https://github.com/{self.repo.full_name}/issues/{issue_num}")
+
+    def pull_from_github(self, sprint_number: int):
+        """Update SPRINT.md with GitHub issue status"""
+        print(f"🔄 Pulling Sprint {sprint_number} status from GitHub...\n")
+
+        # Get all issues with sprint label
+        sprint_label = f"sprint-{sprint_number}"
+        issues = self.repo.get_issues(labels=[sprint_label], state="all")
+
+        issue_status = {}
+        for issue in issues:
+            # Extract story number from title
+            match = re.match(r"Story (\d+):", issue.title)
+            if match:
+                story_num = int(match.group(1))
+                issue_status[story_num] = {
+                    "state": issue.state,
+                    "number": issue.number,
+                    "title": issue.title,
+                }
+
+        if not issue_status:
+            print(f"  ⚠️  No GitHub issues found for Sprint {sprint_number}")
+            return
+
+        print(f"  Found {len(issue_status)} GitHub issues\n")
+
+        # Read SPRINT.md
+        with open(self.sprint_file) as f:
+            content = f.read()
+
+        # Update story status in SPRINT.md
+        changes = 0
+        for story_num, status in issue_status.items():
+            # Find story section
+            story_pattern = rf"(#### Story {story_num}: [^\n]+\n)"
+            match = re.search(story_pattern, content)
+
+            if match:
+                story_header = match.group(1)
+
+                # Add GitHub issue link if closed
+                if status["state"] == "closed":
+                    github_link = (
+                        f"**Status**: ✅ COMPLETE (Closes #{status['number']})\n"
+                    )
+
+                    # Check if status already exists
+                    if (
+                        "**Status**:"
+                        not in content[match.start() : match.start() + 200]
+                    ):
+                        new_header = story_header + github_link
+                        content = content.replace(story_header, new_header)
+                        changes += 1
+                        print(
+                            f"  ✅ Story {story_num}: Marked complete (#{status['number']})"
+                        )
+
+        if changes > 0:
+            # Write updated content
+            with open(self.sprint_file, "w") as f:
+                f.write(content)
+
+            print(f"\n✅ Updated {changes} stories in SPRINT.md")
+        else:
+            print("\n  ℹ️  No changes needed in SPRINT.md")
 
     def show_github_status(self):
         """Show sprint status from GitHub Issues"""
@@ -270,7 +378,17 @@ def main():
         help="Show sprint status from GitHub",
     )
     parser.add_argument(
-        "--sprint", type=int, default=2, help="Sprint number (default: 2)"
+        "--sprint", type=int, default=7, help="Sprint number (default: 7)"
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show what would be created without creating (for push-to-github)",
+    )
+    parser.add_argument(
+        "--validate-sprint",
+        action="store_true",
+        help="Validate sprint is ready for GitHub sync",
     )
 
     args = parser.parse_args()
@@ -278,13 +396,21 @@ def main():
     try:
         sync = GitHubSprintSync()
 
-        if args.push_to_github:
-            sync.push_to_github(args.sprint)
+        if args.validate_sprint:
+            is_valid, issues = sync.validate_sprint_ready(args.sprint)
+            if is_valid:
+                print(f"✅ Sprint {args.sprint} is ready for GitHub sync")
+            else:
+                print(f"❌ Sprint {args.sprint} has validation issues:")
+                for issue in issues:
+                    print(f"   • {issue}")
+                sys.exit(1)
+        elif args.push_to_github:
+            sync.push_to_github(args.sprint, dry_run=args.dry_run)
         elif args.show_github_status:
             sync.show_github_status()
         elif args.pull_from_github:
-            print("Pull from GitHub - Not yet implemented")
-            print("Manually sync by checking GitHub issue status")
+            sync.pull_from_github(args.sprint)
         else:
             parser.print_help()
 

@@ -1,0 +1,60 @@
+name: Sprint Sync
+on:
+  issues:
+    types: [closed]
+
+permissions:
+  contents: write
+  issues: read
+
+jobs:
+  sync-sprint-md:
+    # Only run for sprint-story issues
+    if: contains(github.event.issue.labels.*.name, 'sprint-story')
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install PyGithub
+
+      - name: Extract sprint number
+        id: sprint
+        run: |
+          # Extract sprint number from issue labels
+          LABELS='${{ toJson(github.event.issue.labels.*.name) }}'
+          SPRINT_NUM=$(echo $LABELS | jq -r '.[] | select(startswith("sprint-"))' | sed 's/sprint-//')
+          echo "number=$SPRINT_NUM" >> $GITHUB_OUTPUT
+          echo "Found sprint number: $SPRINT_NUM"
+
+      - name: Update SPRINT.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 scripts/github_sprint_sync.py --pull-from-github --sprint ${{ steps.sprint.outputs.number }}
+
+      - name: Commit changes
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+          # Check if SPRINT.md was modified
+          if git diff --quiet SPRINT.md; then
+            echo "No changes to commit"
+          else
+            git add SPRINT.md
+            git commit -m "Auto-sync: Story ${{ github.event.issue.number }} closed in Sprint ${{ steps.sprint.outputs.number }}"
+            git push
+            echo "✅ SPRINT.md updated with issue #${{ github.event.issue.number }} status"
+          fi

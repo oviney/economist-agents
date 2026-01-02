@@ -6,8 +6,8 @@
 [![Quality Tests](https://github.com/oviney/economist-agents/actions/workflows/quality-tests.yml/badge.svg)](https://github.com/oviney/economist-agents/actions/workflows/quality-tests.yml)
 [![Sprint Discipline](https://github.com/oviney/economist-agents/actions/workflows/sprint-discipline.yml/badge.svg)](https://github.com/oviney/economist-agents/actions/workflows/sprint-discipline.yml)
 [![Quality Score](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/oviney/economist-agents/main/quality_score.json)](https://github.com/oviney/economist-agents/blob/main/docs/QUALITY_DASHBOARD.md)
-![Tests](https://img.shields.io/badge/tests-77_passing-brightgreen)
-![Sprint](https://img.shields.io/badge/sprint-9-blue)
+[![Tests](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/oviney/economist-agents/main/tests_badge.json)](https://github.com/oviney/economist-agents/actions/workflows/ci.yml)
+[![Sprint](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/oviney/economist-agents/main/sprint_badge.json)](https://github.com/oviney/economist-agents/blob/main/docs/SPRINT.md)
 ![Python](https://img.shields.io/badge/Python-3.11+-blue)
 [![License](https://img.shields.io/badge/License-Proprietary-red)](LICENSE)
 
@@ -105,7 +105,29 @@ See [docs/QUALITY_DASHBOARD.md](docs/QUALITY_DASHBOARD.md) for detailed metrics.
 - **Critical Bug TTD:** <2 days
 - **Gate Pass Rate:** 95% (Editor Agent)
 
-## � Glossary
+## 🏷️ Badge Configuration
+
+All badges use shields.io with dynamic JSON endpoints to prevent staleness (BUG-023 fix).
+
+### Badge Data Sources
+
+| Badge | Source | Update Command |
+|-------|--------|----------------|
+| **Quality Score** | `quality_dashboard.py` output | Automated via `quality_score.json` |
+| **Tests** | Actual pytest test count | `python3 scripts/generate_tests_badge.py` |
+| **Sprint** | `skills/sprint_tracker.json` | `python3 scripts/generate_sprint_badge.py` |
+| **Coverage** | pytest-cov output | `python3 scripts/generate_coverage_badge.py` |
+
+### Badge Validation
+
+Pre-commit hook automatically validates badge accuracy:
+```bash
+python3 scripts/validate_badges.py
+```
+
+All badges use shields.io endpoint format with JSON files in repo root for dynamic updates.
+
+## 📖 Glossary
 
 **Multi-Agent System:** AI architecture where specialized agents (personas) collaborate on complex tasks. Each agent has a specific role (research, writing, editing) and they communicate through structured data exchanges.
 
@@ -117,6 +139,6 @@ See [docs/QUALITY_DASHBOARD.md](docs/QUALITY_DASHBOARD.md) for detailed metrics.
 
 **Quality Gates:** Automated checkpoints that enforce coding and content standards. We have 4 layers: Pre-commit hooks, GitHub Actions CI, Agent self-validation, and Publication validator.
 
-## �📜 License
+## 📜 License
 
 Proprietary. All rights reserved.

@@ -50,10 +50,10 @@ repos:
       - id: badge-validation
         name: validate README badges
         description: Ensure badges match live data (prevents BUG-023)
-        entry: bash -c 'python3 scripts/update_badges.py --validate-only || true'
+        entry: bash -c 'python3 scripts/validate_badges.py || true'
         language: system
         pass_filenames: false
-        files: ^(README\.md|quality_score\.json|skills/sprint_tracker\.json)$
+        files: ^(README\.md|quality_score\.json|skills/sprint_tracker\.json|.*_badge\.json)$
         always_run: false
 
   # Basic file checks

@@ -14,7 +14,7 @@ A sophisticated multi-agent system that produces publication-quality blog posts 
 
 ## 🚀 Project Status
 
-**Current Phase:** Quality & Prevention (Sprint 6)
+**Current Phase:** CrewAI Migration & Quality Consolidation (Sprint 7)
 
 - **Defect Prevention:** Automated system catching 83% of historical bug patterns
 - **Green Software:** Self-validating agents reducing token waste by 30%
@@ -51,8 +51,8 @@ git checkout -b feature/my-feature
 ### 2. Run Quality Checks
 Before committing, ensure all local checks pass:
 ```bash
-make check
-# Runs: ruff, mypy, pytest, and custom validators
+make quality
+# Runs: format, lint (ruff), type-check (mypy), and test (pytest)
 ```
 
 ### 3. Commit with Convention

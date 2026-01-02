@@ -1,29 +1,29 @@
 # 📊 Quality Engineering Dashboard
-**Generated**: 2026-01-02 15:57:50
+**Generated**: 2026-01-02 18:00:33
 **Quality Score**: 67/100
 
 🟠 [█████████████░░░░░░░] 67/100 - FAIR
 
 ## 🐛 Defect Metrics
 
-**Total Bugs**: 7  |  
-**Fixed**: 7  |  
-**Escape Rate**: 71.4%
+**Total Bugs**: 8  |
+**Fixed**: 7  |
+**Escape Rate**: 75.0%
 
 ### Root Cause Analysis
-- Validation Gap: █████ 2 (29%)
-- Code Logic: █████ 2 (29%)
-- Prompt Engineering: ██ 1 (14%)
+- Validation Gap: █████ 2 (25%)
+- Requirements Gap: █████ 2 (25%)
+- Code Logic: █████ 2 (25%)
 
 ### Time Metrics
-- **Avg TTD**: 3.0 days ✅ (target: <7)
+- **Avg TTD**: 6.6 days ✅ (target: <7)
 - **Critical Bug TTD**: 5.5 days
 - **Avg TTR**: 0.7 days
 
 ### Test Gap Analysis
-- Manual Test: ████ 3 (43%)
-- Visual Qa: ██ 2 (29%)
-- Integration Test: ██ 2 (29%)
+- Manual Test: █████ 4 (50%)
+- Visual Qa: ██ 2 (25%)
+- Integration Test: ██ 2 (25%)
 
 ## 🤖 Agent Performance
 
@@ -49,7 +49,7 @@
 
 ## 📊 Quality Trends
 
-⚠️ Defect escape rate stable/increasing (71.4%)
+⚠️ Defect escape rate stable/increasing (75.0%)
 ✅ Writer Agent meeting target (>80% clean)
 ✅ Editor Agent meeting target (>60% accuracy)
 

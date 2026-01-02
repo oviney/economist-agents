@@ -60,17 +60,83 @@
                 "Create Economist-style reference formatting examples",
                 "Research Agent already collects sources - need to format for output"
             ]
+        },
+        {
+            "id": "ENHANCEMENT-002",
+            "type": "enhancement",
+            "priority": "medium",
+            "status": "backlog",
+            "title": "Reduce agent idle time via work queue system",
+            "description": "Implement a work queue system to enable parallel agent execution and reduce idle time. Currently, agents run sequentially (Research → Writer → Graphics → Editor), causing significant wait time. A queue-based approach would allow multiple articles to be processed in parallel, with agents pulling work from queues as they become available.",
+            "user_story": "As a system operator, I need agents to process multiple articles in parallel so that we can maximize throughput and reduce total processing time from hours to minutes.",
+            "acceptance_criteria": [
+                "Work queue implementation supports multiple article processing",
+                "Agents pull work from queues when available (no idle waiting)",
+                "Research Agent outputs feed Writer Agent queue automatically",
+                "Writer Agent outputs feed Graphics/Editor queues in parallel",
+                "System handles at least 5 concurrent articles without resource exhaustion",
+                "Metrics dashboard shows agent utilization rates (target: >80%)",
+                "Queue persistence allows recovery from crashes",
+                "Dead letter queue handles failed tasks with retry logic"
+            ],
+            "quality_requirements": {
+                "performance": {
+                    "throughput": "5+ articles processed simultaneously",
+                    "agent_utilization": ">80% (vs current ~20% sequential)",
+                    "queue_latency": "<5 seconds between agent stages",
+                    "resource_limits": "Memory < 2GB, CPU < 4 cores total"
+                },
+                "reliability": {
+                    "queue_persistence": "Crash-safe queue storage (Redis/SQLite)",
+                    "retry_strategy": "Exponential backoff, max 3 retries",
+                    "dead_letter_queue": "Failed tasks captured for analysis",
+                    "graceful_degradation": "Falls back to sequential on queue failure"
+                },
+                "maintainability": {
+                    "monitoring": "Queue depth, processing times, error rates",
+                    "logging": "Trace each article through pipeline stages",
+                    "test_coverage": ">90% for queue logic, retry, failure scenarios",
+                    "documentation": "Queue architecture diagram, failure recovery guide"
+                },
+                "security": {
+                    "data_isolation": "Article data not leaked across queue workers",
+                    "resource_limits": "Per-article memory/CPU caps prevent DoS"
+                }
+            },
+            "component": "orchestration",
+            "estimated_effort": "8 points",
+            "created_date": "2026-01-02T17:00:00.000000",
+            "created_by": "scrum_master",
+            "sprint": "Sprint 9 or 10 (pending capacity)",
+            "related_bugs": [],
+            "related_features": [],
+            "implementation_notes": [
+                "Evaluate queue systems: Celery (heavyweight), RQ (Redis), Python multiprocessing.Queue (lightweight)",
+                "Start with Python multiprocessing.Queue for MVP (no external dependencies)",
+                "Create QueueOrchestrator class to manage agent workers",
+                "Refactor economist_agent.py to separate orchestration from agent logic",
+                "Add queue metrics to agent_metrics.py (utilization, wait time, throughput)",
+                "Integration tests: parallel processing, crash recovery, retry logic",
+                "Performance tests: 5+ concurrent articles, measure throughput improvement",
+                "Consider future: distributed queue (Redis) for multi-machine scaling"
+            ],
+            "systems_thinking": {
+                "current_bottleneck": "Sequential agent execution wastes 80% of potential throughput (4 agents x 20% utilization = 80% idle)",
+                "systemic_impact": "Enables batch article generation (10 articles in parallel vs 10x sequential time)",
+                "capacity_implications": "5 articles in parallel = 5x throughput improvement (from 1 article/10min to 5 articles/10min)",
+                "risk_mitigation": "Start with in-process queues (multiprocessing), scale to Redis if needed"
+            }
         }
     ],
     "summary": {
-        "total_features": 1,
-        "backlog": 1,
+        "total_features": 2,
+        "backlog": 2,
         "in_progress": 0,
         "completed": 0,
         "by_priority": {
             "critical": 0,
             "high": 1,
-            "medium": 0,
+            "medium": 1,
             "low": 0
         },
         "by_component": {
@@ -78,8 +144,9 @@
             "research_agent": 0,
             "editor_agent": 0,
             "graphics_agent": 0,
+            "orchestration": 1,
             "other": 0
         },
-        "last_updated": "2026-01-02T16:30:00.000000"
+        "last_updated": "2026-01-02T17:00:00.000000"
     }
 }

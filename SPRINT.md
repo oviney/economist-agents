@@ -652,6 +652,49 @@ Transform defect tracking from reactive logging to proactive quality intelligenc
 
 ---
 
+## Sprint 9: Backlog & Planning (TBD)
+
+### Sprint Goal
+TBD - To be determined during sprint planning ceremony
+
+### Backlog (Prioritized for Sprint 9+)
+
+**High Priority (P0/P1):**
+
+1. **FEATURE-001: Add references/citations section to generated articles** (2 pts, HIGH)
+   - Component: writer_agent
+   - User Story: Enhance Writer Agent to include properly formatted references section
+   - Status: Backlog (pending sprint commitment)
+   - GitHub Issue: #40
+   - Quality Requirements: Economist-style formatting, minimum 3 sources, accessibility compliance
+   - See: `skills/feature_registry.json` for complete requirements
+
+2. **ENHANCEMENT-002: Reduce agent idle time via work queue system** (8 pts, MEDIUM)
+   - Component: orchestration
+   - User Story: Implement work queue system for parallel agent execution
+   - Status: Backlog (pending capacity analysis)
+   - Systems Thinking: Current sequential execution wastes 80% throughput potential
+   - Impact: 5x throughput improvement (5 articles in parallel vs sequential)
+   - Quality Requirements: >80% agent utilization, crash-safe queues, retry logic
+   - Implementation Options:
+     * MVP: Python multiprocessing.Queue (lightweight, no dependencies)
+     * Future: Redis/Celery for distributed scaling
+   - Performance Target: Process 5 concurrent articles, <2GB memory, <4 cores
+   - See: `skills/feature_registry.json` for complete specification
+
+**Medium Priority (P2):**
+- Issue #29: Research Spike - Agent Performance as Team Skills Gap Indicator (5 pts)
+  - **Blocked by**: Need defect RCA baseline (20+ bugs with root cause data)
+  - **Status**: Ready for pickup when RCA data sufficient
+  - See: `docs/SPIKE_SKILLS_GAP_ANALYSIS.md`
+
+**Future Enhancements:**
+- Issue #14: GenAI Featured Images (DALL-E 3 integration)
+- Issue #26: Extract Agent Definitions to YAML
+- Agent benchmarking framework
+
+---
+
 ## Backlog (Prioritized for Sprint 6+)
 
 ### Sprint 6 Candidates (TBD - To Be Planned)

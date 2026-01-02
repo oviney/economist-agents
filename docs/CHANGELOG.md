@@ -1,5 +1,88 @@
 # Economist Agents - Development Log
 
+## 2026-01-02: ENHANCEMENT-002 Logged - Work Queue System for Parallel Agent Execution
+
+### Summary
+Logged ENHANCEMENT-002 to implement work queue system enabling parallel article processing. Current sequential execution (Research → Writer → Graphics → Editor) wastes 80% of potential throughput. Queue-based approach would process 5 articles simultaneously, achieving 5x throughput improvement.
+
+### Enhancement Details
+
+**ENHANCEMENT-002: Reduce agent idle time via work queue system** (8 story points)
+- **Component**: orchestration
+- **Priority**: MEDIUM (P2)
+- **Status**: Backlog (Sprint 9 or 10, pending capacity)
+- **Created**: 2026-01-02 by Scrum Master
+
+**Systems Thinking**:
+- **Current Bottleneck**: Sequential execution = 80% idle time (4 agents x 20% utilization)
+- **Systemic Impact**: Batch generation capability (10 articles in parallel vs 10x sequential)
+- **Capacity Implications**: 5x throughput (from 1 article/10min to 5 articles/10min)
+
+**User Story**:
+As a system operator, I need agents to process multiple articles in parallel so that we can maximize throughput and reduce total processing time from hours to minutes.
+
+**Acceptance Criteria** (8 total):
+- Work queue supports 5+ concurrent articles
+- Agents pull work when available (no idle waiting)
+- Automatic stage handoffs (Research → Writer → Graphics/Editor)
+- Metrics show >80% agent utilization (vs current ~20%)
+- Queue persistence for crash recovery
+- Dead letter queue with retry logic (exponential backoff, 3 max)
+- <2GB memory, <4 cores total resource usage
+- Integration tests for parallel, crash recovery, retry scenarios
+
+**Quality Requirements**:
+- **Performance**: 5+ articles, >80% utilization, <5s queue latency
+- **Reliability**: Crash-safe storage, retry strategy, graceful degradation
+- **Maintainability**: Queue metrics, distributed tracing, >90% test coverage
+- **Security**: Data isolation, resource caps (prevent DoS)
+
+**Implementation Options**:
+1. **MVP** (Recommended): Python `multiprocessing.Queue`
+   - Lightweight, no external dependencies
+   - In-process workers
+   - Good for single-machine scaling
+
+2. **Future**: Redis/Celery for distributed scaling
+   - Multi-machine capability
+   - Advanced monitoring
+   - Production-grade reliability
+
+**Implementation Notes**:
+- Create `QueueOrchestrator` class to manage agent workers
+- Refactor `economist_agent.py` to separate orchestration from agent logic
+- Add queue metrics to `agent_metrics.py` (utilization, wait time, throughput)
+- Performance tests: 5+ concurrent articles, measure improvement
+- Integration tests: parallel processing, crash recovery, retry logic
+
+### Sprint 9 Backlog Impact
+
+**Added to Sprint 9 Backlog**:
+- Priority: P2 (after P0/P1 features)
+- Estimated effort: 8 story points
+- Sprint commitment: TBD (requires capacity analysis)
+
+**Related Features**:
+- FEATURE-001: Add references section (2 pts, HIGH) - likely Sprint 9 priority
+- ENHANCEMENT-002: Work queue system (8 pts, MEDIUM) - Sprint 9 or 10
+
+**Sprint 9 Planning Notes**:
+- If Sprint 9 capacity = 13 points: FEATURE-001 (2) + other work (11)
+- If Sprint 9 capacity = 15+ points: FEATURE-001 (2) + ENHANCEMENT-002 (8) + buffer (5)
+- Recommendation: Validate FEATURE-001 impact first, then assess queue system ROI
+
+### Files Modified
+
+- `skills/feature_registry.json` - ENHANCEMENT-002 added with complete specification
+- `SPRINT.md` - Sprint 9 backlog section created with prioritized features
+- `docs/CHANGELOG.md` - This entry
+
+### Commits
+
+**Current**: "Log ENHANCEMENT-002: Work queue system for parallel execution"
+
+---
+
 ## 2026-01-02: BUG-023 Tracked - README Badge Regression
 
 ### Summary

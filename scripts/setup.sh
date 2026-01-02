@@ -17,10 +17,23 @@ if [[ "$(printf '%s\n' "$required_version" "$python_version" | sort -V | head -n
 fi
 echo "✅ Python $python_version detected"
 
+# Check for virtual environment
+if [ -z "$VIRTUAL_ENV" ]; then
+    echo ""
+    echo "⚠️  No virtual environment detected!"
+    echo ""
+    echo "Please create and activate a virtual environment first:"
+    echo "  python3 -m venv .venv"
+    echo "  source .venv/bin/activate"
+    echo "  ./scripts/setup.sh"
+    echo ""
+    exit 1
+fi
+
 # Install dependencies
 echo "→ Installing dependencies..."
-pip install -r requirements.txt -q
-pip install -r requirements-dev.txt -q
+python3 -m pip install -r requirements.txt -q
+python3 -m pip install -r requirements-dev.txt -q
 
 # Setup pre-commit hooks
 echo "→ Setting up pre-commit hooks..."

@@ -1,6 +1,6 @@
 # Test Gap Analysis Report
 
-**Generated**: 2026-01-01 21:27:34
+**Generated**: 2026-01-02 01:23:17
 **Sprint**: Sprint 7, Story 2 (P1)
 **Goal**: Identify and close systematic test coverage gaps
 
@@ -10,14 +10,14 @@
 
 ### Test Coverage Analysis
 
-- **Total Bugs Analyzed**: 7
-- **Bugs with Test Gap Data**: 7
+- **Total Bugs Analyzed**: 6
+- **Bugs with Test Gap Data**: 6
 
 **Test Gap Distribution**:
 
-- **integration_test**: 42.9% of bugs missed
-- **visual_qa**: 28.6% of bugs missed
-- **manual_test**: 28.6% of bugs missed
+- **visual_qa**: 33.3% of bugs missed
+- **integration_test**: 33.3% of bugs missed
+- **manual_test**: 33.3% of bugs missed
 
 ### Component-Specific Gaps
 
@@ -138,5 +138,5 @@
 
 ---
 
-**Report Generated**: 2026-01-01T21:27:34.950687
+**Report Generated**: 2026-01-02T01:23:17.787147
 **Analysis Tool**: `scripts/test_gap_analyzer.py`

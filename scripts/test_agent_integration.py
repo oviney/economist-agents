@@ -28,28 +28,22 @@ Usage:
     pytest scripts/test_agent_integration.py::test_happy_path -v
 """
 
-import pytest
-import json
-import os
-import tempfile
 import shutil
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
 import sys
+import tempfile
+from pathlib import Path
+from unittest.mock import Mock, patch
+
+import pytest
 
 # Add scripts directory to path
 sys.path.insert(0, str(Path(__file__).parent))
 
 # Import components to test
 from economist_agent import (
-    run_research_agent,
-    run_writer_agent,
-    run_editor_agent,
-    run_graphics_agent,
-    generate_economist_post
+    generate_economist_post,
 )
 from publication_validator import PublicationValidator
-
 
 # ═══════════════════════════════════════════════════════════════════════════
 # MOCK LLM RESPONSES (Deterministic Testing)
@@ -184,6 +178,7 @@ Self-healing tests will remain niche until vendors stop overselling and start de
 # TEST FIXTURES
 # ═══════════════════════════════════════════════════════════════════════════
 
+
 @pytest.fixture
 def temp_output_dir():
     """Create temporary output directory for tests"""
@@ -196,13 +191,14 @@ def temp_output_dir():
 def mock_llm_client():
     """Mock LLM client that returns deterministic responses"""
     client = Mock()
-    client.provider = 'anthropic'
+    client.provider = "anthropic"
     return client
 
 
 @pytest.fixture
 def mock_call_llm():
     """Mock call_llm function"""
+
     def _mock_call(client, system_prompt, user_prompt, max_tokens=1000):
         # Return different responses based on prompts
         if "Research Analyst" in system_prompt:
@@ -213,7 +209,7 @@ def mock_call_llm():
             return MOCK_EDITOR_RESPONSE
         else:
             return '{"status": "ok"}'
-    
+
     return _mock_call
 
 
@@ -221,66 +217,73 @@ def mock_call_llm():
 # INTEGRATION TESTS
 # ═══════════════════════════════════════════════════════════════════════════
 
+
 class TestAgentPipeline:
     """Test complete agent pipeline integration"""
-    
-    def test_happy_path_end_to_end(self, mock_llm_client, mock_call_llm, temp_output_dir):
+
+    def test_happy_path_end_to_end(
+        self, mock_llm_client, mock_call_llm, temp_output_dir
+    ):
         """Test: Complete pipeline produces valid article"""
-        
-        with patch('economist_agent.call_llm', mock_call_llm), \
-             patch('economist_agent.create_llm_client', return_value=mock_llm_client):
-            
+
+        with (
+            patch("economist_agent.call_llm", mock_call_llm),
+            patch("economist_agent.create_llm_client", return_value=mock_llm_client),
+        ):
             result = generate_economist_post(
                 topic="Self-Healing Tests: Reality Check",
                 output_dir=temp_output_dir,
-                interactive=False
+                interactive=False,
             )
-            
+
             # Assertions
-            assert result['gates_passed'] == 5, "All quality gates should pass"
-            assert result['gates_failed'] == 0, "No gates should fail"
-            assert result['article_path'] is not None
-            assert Path(result['article_path']).exists()
-            
+            assert result["gates_passed"] == 5, "All quality gates should pass"
+            assert result["gates_failed"] == 0, "No gates should fail"
+            assert result["article_path"] is not None
+            assert Path(result["article_path"]).exists()
+
             # Verify article content
-            with open(result['article_path']) as f:
+            with open(result["article_path"]) as f:
                 content = f.read()
-            
-            assert '---\nlayout: post' in content, "Must have YAML frontmatter"
-            assert 'date: 2026-01-01' in content, "Must have correct date"
-            assert '![' in content, "Must have chart markdown"
-            assert 'As the chart shows' in content, "Must reference chart"
-    
-    def test_chart_integration_workflow(self, mock_llm_client, mock_call_llm, temp_output_dir):
+
+            assert "---\nlayout: post" in content, "Must have YAML frontmatter"
+            assert "date: 2026-01-01" in content, "Must have correct date"
+            assert "![" in content, "Must have chart markdown"
+            assert "As the chart shows" in content, "Must reference chart"
+
+    def test_chart_integration_workflow(
+        self, mock_llm_client, mock_call_llm, temp_output_dir
+    ):
         """Test: Chart generation → embedding → validation"""
-        
+
         # Mock chart generation
-        with patch('economist_agent.call_llm', mock_call_llm), \
-             patch('economist_agent.create_llm_client', return_value=mock_llm_client), \
-             patch('economist_agent.run_graphics_agent') as mock_graphics:
-            
+        with (
+            patch("economist_agent.call_llm", mock_call_llm),
+            patch("economist_agent.create_llm_client", return_value=mock_llm_client),
+            patch("economist_agent.run_graphics_agent") as mock_graphics,
+        ):
             # Mock graphics agent to create dummy chart
             chart_path = str(Path(temp_output_dir) / "charts" / "test-chart.png")
             Path(chart_path).parent.mkdir(parents=True, exist_ok=True)
             Path(chart_path).write_text("dummy")
             mock_graphics.return_value = chart_path
-            
+
             result = generate_economist_post(
                 topic="Test Chart Integration",
                 output_dir=temp_output_dir,
-                interactive=False
+                interactive=False,
             )
-            
+
             # Chart should be embedded
-            with open(result['article_path']) as f:
+            with open(result["article_path"]) as f:
                 content = f.read()
-            
-            assert '![' in content, "Chart must be embedded"
-            assert 'test-chart.png' in content or 'automation-gap' in content
-    
+
+            assert "![" in content, "Chart must be embedded"
+            assert "test-chart.png" in content or "automation-gap" in content
+
     def test_editor_rejects_bad_content(self, mock_llm_client):
         """Test: Editor quality gates block bad content"""
-        
+
         bad_draft = """---
 layout: post
 title: "Bad Article"
@@ -290,8 +293,8 @@ date: 2026-01-01
 In today's fast-paced world, testing is changing. Game-changer tools are revolutionary.
 
 In conclusion, the future remains to be seen!"""
-        
-        with patch('economist_agent.call_llm') as mock_call:
+
+        with patch("economist_agent.call_llm") as mock_call:
             # Mock editor to return failures for bad content
             mock_call.return_value = """## Quality Gate Results
 **GATE 1: OPENING** - FAIL
@@ -303,16 +306,17 @@ In conclusion, the future remains to be seen!"""
 
 **OVERALL GATES PASSED**: 2/5
 **PUBLICATION DECISION**: NEEDS REVISION"""
-            
+
             from economist_agent import run_editor_agent
+
             edited, passed, failed = run_editor_agent(mock_llm_client, bad_draft)
-            
+
             assert passed < 5, "Bad content should fail quality gates"
             assert failed > 0, "Should have failures"
-    
+
     def test_publication_validator_blocks_invalid(self, temp_output_dir):
         """Test: Publication validator blocks known issues"""
-        
+
         # Article missing layout field
         bad_article = """---
 title: "Test"
@@ -320,16 +324,16 @@ date: 2026-01-01
 ---
 
 Content here."""
-        
+
         validator = PublicationValidator(expected_date="2026-01-01")
         is_valid, issues = validator.validate(bad_article)
-        
+
         assert not is_valid, "Should reject article missing layout"
-        assert any('layout' in issue.lower() for issue in issues)
-    
+        assert any("layout" in issue.lower() for issue in issues)
+
     def test_chart_embedding_validation(self):
         """Test: Validator catches missing chart embedding (BUG-016 pattern)"""
-        
+
         # Article with NO chart despite chart_data existing
         article_no_chart = """---
 layout: post
@@ -338,50 +342,53 @@ date: 2026-01-01
 ---
 
 Some content about data. No chart embedded."""
-        
+
         validator = PublicationValidator()
         is_valid, issues = validator.validate(article_no_chart)
-        
+
         # Should pass baseline checks (has layout, date, etc.)
         # Chart check requires chart_data context - tested in defect_prevention_rules
-    
+
     def test_agent_data_flow(self, mock_llm_client, mock_call_llm):
         """Test: Data flows correctly between agents"""
-        
-        with patch('economist_agent.call_llm', mock_call_llm), \
-             patch('economist_agent.create_llm_client', return_value=mock_llm_client):
-            
+
+        with (
+            patch("economist_agent.call_llm", mock_call_llm),
+            patch("economist_agent.create_llm_client", return_value=mock_llm_client),
+        ):
             # Research agent output
             from economist_agent import run_research_agent
+
             research = run_research_agent(mock_llm_client, "Test Topic")
-            
-            assert 'headline_stat' in research, "Research should return structured data"
-            assert 'chart_data' in research, "Research should include chart_data"
-            
+
+            assert "headline_stat" in research, "Research should return structured data"
+            assert "chart_data" in research, "Research should include chart_data"
+
             # Chart data should flow to writer
-            assert research['chart_data']['title'] == "The automation gap"
-    
+            assert research["chart_data"]["title"] == "The automation gap"
+
     def test_error_handling_graceful_degradation(self, mock_llm_client):
         """Test: Pipeline handles errors gracefully"""
-        
-        with patch('economist_agent.call_llm') as mock_call:
+
+        with patch("economist_agent.call_llm") as mock_call:
             # Simulate LLM error
             mock_call.side_effect = Exception("API Error")
-            
+
             from economist_agent import run_research_agent
+
             with pytest.raises(Exception):
                 run_research_agent(mock_llm_client, "Test Topic")
-            
+
             # Should raise, not crash silently
 
 
 class TestDefectPrevention:
     """Test that known defect patterns are prevented"""
-    
+
     def test_bug_016_pattern_prevented(self):
         """Test: BUG-016 pattern (chart not embedded) is caught"""
         from defect_prevention_rules import DefectPrevention
-        
+
         article_missing_chart = """---
 layout: post
 title: "Test"
@@ -389,33 +396,39 @@ date: 2026-01-01
 ---
 
 Content without chart."""
-        
+
         prevention = DefectPrevention()
-        violations = prevention.check_all_patterns(article_missing_chart, has_chart=True)
-        
+        violations = prevention.check_all_patterns(
+            article_missing_chart, has_chart=True
+        )
+
         # Should detect missing chart embedding
-        assert any('chart' in v.lower() for v in violations), "Should catch missing chart"
-    
+        assert any("chart" in v.lower() for v in violations), (
+            "Should catch missing chart"
+        )
+
     def test_bug_015_pattern_prevented(self):
         """Test: BUG-015 pattern (missing category) is caught"""
         from defect_prevention_rules import DefectPrevention
-        
+
         article_no_category = """---
 layout: post
 title: "Test"
 date: 2026-01-01
 ---"""
-        
+
         prevention = DefectPrevention()
         violations = prevention.check_all_patterns(article_no_category)
-        
+
         # Should detect missing category
-        assert any('category' in v.lower() for v in violations), "Should catch missing category"
+        assert any("category" in v.lower() for v in violations), (
+            "Should catch missing category"
+        )
 
 
 # ═══════════════════════════════════════════════════════════════════════════
 # TEST RUNNER
 # ═══════════════════════════════════════════════════════════════════════════
 
-if __name__ == '__main__':
-    pytest.main([__file__, '-v', '--tb=short'])
+if __name__ == "__main__":
+    pytest.main([__file__, "-v", "--tb=short"])

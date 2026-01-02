@@ -1,17 +1,18 @@
 """Pytest configuration and shared fixtures for economist-agents tests."""
 
-import pytest
 from pathlib import Path
 from unittest.mock import Mock
+
+import pytest
 
 
 @pytest.fixture
 def temp_output_dir(tmp_path: Path) -> Path:
     """Create temporary output directory for tests.
-    
+
     Args:
         tmp_path: Pytest temporary directory fixture
-        
+
     Returns:
         Path to temporary output directory
     """
@@ -24,7 +25,7 @@ def temp_output_dir(tmp_path: Path) -> Path:
 @pytest.fixture
 def mock_anthropic_client() -> Mock:
     """Create mock Anthropic client for testing.
-    
+
     Returns:
         Mock Anthropic client with messages.create method
     """
@@ -38,7 +39,7 @@ def mock_anthropic_client() -> Mock:
 @pytest.fixture
 def mock_openai_client() -> Mock:
     """Create mock OpenAI client for testing.
-    
+
     Returns:
         Mock OpenAI client with chat.completions.create method
     """
@@ -52,7 +53,7 @@ def mock_openai_client() -> Mock:
 @pytest.fixture
 def sample_research_data() -> dict:
     """Sample research agent output for testing.
-    
+
     Returns:
         Dictionary with research data structure
     """
@@ -61,19 +62,19 @@ def sample_research_data() -> dict:
             "value": "80% of teams use AI testing",
             "source": "Gartner 2024 Survey",
             "year": "2024",
-            "verified": True
+            "verified": True,
         },
         "data_points": [
             {
                 "stat": "50% reduction in test maintenance",
                 "source": "Industry Report",
                 "year": "2024",
-                "verified": True
+                "verified": True,
             }
         ],
         "chart_data": {
             "title": "AI Adoption in Testing",
             "type": "line",
-            "data": [{"year": 2023, "value": 60}, {"year": 2024, "value": 80}]
-        }
+            "data": [{"year": 2023, "value": 60}, {"year": 2024, "value": 80}],
+        },
     }

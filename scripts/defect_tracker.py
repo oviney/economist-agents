@@ -389,6 +389,137 @@ class DefectTracker:
         # For now, just return bug count
         return agent_bugs
 
+    def validate_requirements_traceability(
+        self,
+        component: str,
+        behavior: str,
+        expected_behavior: str,
+        original_story: str = None,
+    ) -> dict[str, Any]:
+        """
+        Validate if behavior was explicitly required before logging as bug.
+        
+        Sprint 7 Day 2: Requirements traceability gate to prevent misclassification.
+        
+        Args:
+            component: Component where issue discovered (e.g., "writer_agent")
+            behavior: Current observed behavior (e.g., "articles_lack_references")
+            expected_behavior: Expected behavior (e.g., "articles_have_references_section")
+            original_story: Story ID where component was implemented (e.g., "STORY-001")
+            
+        Returns:
+            {
+                "is_defect": bool,  # True if bug, False if enhancement
+                "classification": "bug" | "enhancement" | "invalid" | "ambiguous",
+                "reason": str,
+                "original_requirement": str | None,
+                "recommendation": str,
+                "confidence": "high" | "medium" | "low"
+            }
+        """
+        # Load requirements registry if available
+        registry_path = Path(__file__).parent.parent / "docs" / "REQUIREMENTS_REGISTRY.md"
+        requirements_exist = registry_path.exists()
+        
+        # Default validation (heuristic-based when registry not available)
+        result = {
+            "is_defect": None,  # To be determined
+            "classification": "ambiguous",
+            "reason": "",
+            "original_requirement": None,
+            "recommendation": "",
+            "confidence": "low",
+            "registry_available": requirements_exist,
+        }
+        
+        # Heuristic 1: Check if behavior violates explicit prompt constraints
+        # (e.g., "MUST include chart", "NEVER use exclamation points")
+        violation_keywords = [
+            "must", "required", "mandatory", "always", "never", "forbidden", "critical"
+        ]
+        
+        # Heuristic 2: Check historical bugs for similar component issues
+        similar_bugs = [
+            b for b in self.tracker["bugs"]
+            if b.get("component") == component and b.get("root_cause") != "requirements_gap"
+        ]
+        
+        # Heuristic 3: Analyze root cause patterns
+        requirements_gaps = [
+            b for b in self.tracker["bugs"]
+            if b.get("root_cause") == "requirements_gap"
+        ]
+        
+        # Decision logic
+        if similar_bugs and len(similar_bugs) > len(requirements_gaps):
+            # More implementation defects than requirements gaps → likely bug
+            result["is_defect"] = True
+            result["classification"] = "bug"
+            result["reason"] = f"Component '{component}' has {len(similar_bugs)} historical defects vs {len(requirements_gaps)} requirements gaps. Pattern suggests implementation issue."
+            result["recommendation"] = "LOG AS BUG - But verify requirement existed in original story before final classification."
+            result["confidence"] = "medium"
+        else:
+            # More requirements gaps or no history → likely enhancement
+            result["is_defect"] = False
+            result["classification"] = "enhancement"
+            result["reason"] = f"Component '{component}' has {len(requirements_gaps)} requirements gaps vs {len(similar_bugs)} defects. Pattern suggests incomplete specification."
+            result["recommendation"] = "LOG AS FEATURE - Review original story requirements to confirm specification gap."
+            result["confidence"] = "medium"
+        
+        # If registry available, provide manual review guidance
+        if requirements_exist:
+            result["recommendation"] += f"\n\nREVIEW REQUIRED: Check REQUIREMENTS_REGISTRY.md for '{component}' to verify if '{expected_behavior}' was explicitly specified in original story '{original_story or 'unknown'}'."
+        else:
+            result["recommendation"] += "\n\nWARNING: Requirements registry not found. Create REQUIREMENTS_REGISTRY.md to enable accurate classification."
+        
+        return result
+
+    def reclassify_as_feature(
+        self,
+        bug_id: str,
+        feature_id: str,
+        reason: str,
+        original_story: str = None,
+        requirement_existed: bool = False,
+    ) -> None:
+        """
+        Reclassify a bug as a feature enhancement.
+        
+        Sprint 7 Day 2: Support for requirements gap reclassification.
+        
+        Args:
+            bug_id: Original bug ID (e.g., "BUG-024")
+            feature_id: New feature ID (e.g., "FEATURE-001")
+            reason: Reclassification justification
+            original_story: Story where component was implemented
+            requirement_existed: Was this behavior explicitly required?
+        """
+        bug = next((b for b in self.tracker["bugs"] if b["id"] == bug_id), None)
+        if not bug:
+            print(f"❌ Bug {bug_id} not found")
+            return
+        
+        # Update bug with reclassification metadata
+        bug["reclassified_as"] = feature_id
+        bug["reclassification_date"] = datetime.now().isoformat()
+        bug["reclassification_reason"] = reason
+        bug["requirements_traceability"] = {
+            "original_story": original_story,
+            "requirement_existed": requirement_existed,
+            "requirement_note": reason
+        }
+        
+        # Update status if still open
+        if bug["status"] == "open":
+            bug["status"] = "reclassified_as_feature"
+        
+        self._update_summary()
+        print(f"✅ Reclassified {bug_id} → {feature_id}")
+        print(f"   Reason: {reason[:80]}...")
+        
+        # Note: Caller should update feature_registry.json separately
+        print(f"\n⚠️  ACTION REQUIRED: Update skills/feature_registry.json with {feature_id} details")
+
     def save(self) -> None:
         """Persist tracker to disk"""
         self.tracker_file.parent.mkdir(parents=True, exist_ok=True)

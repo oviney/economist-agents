@@ -236,7 +236,7 @@
       "github_issue": 40,
       "component": "writer_agent",
       "responsible_agent": "writer_agent",
-      "status": "open",
+      "status": "reclassified_as_feature",
       "fixed_date": null,
       "fix_commit": null,
       "is_production_escape": true,
@@ -259,7 +259,15 @@
         "Add Publication Validator check for references section",
         "Update Blog QA agent to validate source attribution",
         "Create reference formatting template (Economist style)"
-      ]
+      ],
+      "reclassified_as": "FEATURE-001",
+      "reclassification_date": "2026-01-02T16:17:43.265947",
+      "reclassification_reason": "Requirements did not specify that articles must include references/citations section. Research Agent collects sources but requirement for reader-facing references was never documented. This is a specification gap, not an implementation defect - team built to incomplete requirements. Original Writer Agent story (Sprint 1) specified: Generate Economist-style articles with proper structure, voice, and data integration. References section was not explicitly required or forbidden. This is specification evolution (enhancement request), not implementation failure (bug).",
+      "requirements_traceability": {
+        "original_story": "STORY-001 (Writer Agent Implementation, Sprint 1)",
+        "requirement_existed": false,
+        "requirement_note": "Requirements did not specify that articles must include references/citations section. Research Agent collects sources but requirement for reader-facing references was never documented. This is a specification gap, not an implementation defect - team built to incomplete requirements. Original Writer Agent story (Sprint 1) specified: Generate Economist-style articles with proper structure, voice, and data integration. References section was not explicitly required or forbidden. This is specification evolution (enhancement request), not implementation failure (bug)."
+      }
     }
   ],
   "summary": {
@@ -296,6 +304,6 @@
     "avg_time_to_detect_days": 6.6,
     "avg_time_to_resolve_days": 0.7,
     "avg_critical_ttd_days": 5.5,
-    "last_updated": "2026-01-02T16:08:16.032063"
+    "last_updated": "2026-01-02T16:17:43.265981"
   }
 }

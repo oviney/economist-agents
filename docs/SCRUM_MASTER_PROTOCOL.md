@@ -17,16 +17,22 @@
 ```
 □ Story written with clear goal
 □ Acceptance criteria defined
-□ Three Amigos review complete (Dev, QA, Product perspectives)
+□ Quality requirements explicitly documented (NEW - Sprint 7 Day 2)
+  ├─ Content quality standards specified (references, citations, formatting)
+  ├─ Performance criteria defined (load time, readability)
+  ├─ Accessibility requirements stated (WCAG level, screen reader)
+  ├─ SEO requirements documented (meta tags, structured data)
+  └─ Security/privacy/maintainability requirements specified
+□ Three Amigos review complete (Dev, QA, Product perspectives + quality review)
 □ Dependencies identified
-□ Technical prerequisites validated (NEW - Sprint 7 lesson)
+□ Technical prerequisites validated (Sprint 7 lesson)
   ├─ Dependencies researched (versions, compatibility)
   ├─ Environment requirements validated (Python, OS, tools)
   ├─ Installation docs reviewed for known issues
   └─ Prerequisite check script run (if applicable)
 □ Risks documented
-□ Story points estimated
-□ Definition of Done agreed
+□ Story points estimated (includes quality work: 60% functional + 40% quality)
+□ Definition of Done agreed (includes quality gates)
 □ User/Product Owner approval obtained
 ```
 

@@ -142,7 +142,7 @@ class AgentMetrics:
     
     def track_graphics_agent(self, charts_generated: int, visual_qa_passed: int,
                             zone_violations: int, regenerations: int,
-                            token_usage: int = 0):
+                            token_usage: int = 0, validation_passed: bool = True):
         """Track Graphics Agent performance"""
         qa_pass_rate = (visual_qa_passed / charts_generated * 100) if charts_generated > 0 else 0
         
@@ -161,6 +161,7 @@ class AgentMetrics:
             "visual_qa_pass_rate": round(qa_pass_rate, 1),
             "zone_violations": zone_violations,
             "regenerations": regenerations,
+            "validation_passed": validation_passed,
             "quality_score": round(quality_score, 1),
             "token_usage": total_tokens,
             "cost_per_quality_unit": round(total_tokens / quality_score, 2) if quality_score > 0 else float('inf'),
@@ -245,11 +246,13 @@ class AgentMetrics:
             
             elif agent_name == "graphics_agent":
                 qa_rates = [r["visual_qa_pass_rate"] for r in agent_runs if "visual_qa_pass_rate" in r]
+                violations = [r.get("zone_violations", 0) for r in agent_runs]
                 self.metrics["summary"]["agents"][agent_name] = {
                     "total_runs": len(agent_runs),
                     "avg_qa_pass_rate": round(sum(qa_rates) / len(qa_rates), 1) if qa_rates else 0,
                     "avg_quality_score": round(sum(quality_scores) / len(quality_scores), 1) if quality_scores else 0,
-                    "avg_violations": round(sum(r.get("zone_violations", 0) for r in agent_runs) / len(agent_runs), 1)
+                    "avg_violations": round(sum(violations) / len(violations), 1) if violations else 0,
+                    "validation_pass_rate": validation_pass_rate
                 }
     
     def _calculate_trend(self, values: List[float]) -> str:

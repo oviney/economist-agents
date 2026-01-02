@@ -147,6 +147,7 @@ class SprintCeremonyTracker:
     def _generate_retrospective_template(self, sprint_number: int) -> Path:
         """Generate retrospective markdown template"""
         docs_dir = self.tracker_file.parent.parent / "docs"
+        docs_dir.mkdir(exist_ok=True)  # Ensure docs directory exists
         template_path = docs_dir / f"RETROSPECTIVE_S{sprint_number}.md"
         
         template = f"""# Sprint {sprint_number} Retrospective
@@ -243,6 +244,7 @@ class SprintCeremonyTracker:
     def _generate_story_template(self, sprint_number: int) -> Path:
         """Generate story template for sprint planning"""
         docs_dir = self.tracker_file.parent.parent / "docs"
+        docs_dir.mkdir(exist_ok=True)  # Ensure docs directory exists
         template_path = docs_dir / f"SPRINT_{sprint_number}_BACKLOG.md"
         
         template = f"""# Sprint {sprint_number} Backlog

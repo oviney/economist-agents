@@ -299,7 +299,7 @@ In conclusion, the future remains to be seen!"""
             mock_call.return_value = """## Quality Gate Results
 **GATE 1: OPENING** - FAIL
 - Throat-clearing: "In today's world"
-**GATE 3: VOICE** - FAIL  
+**GATE 3: VOICE** - FAIL
 - Banned phrases: "game-changer", "revolutionary"
 **GATE 4: STRUCTURE** - FAIL
 - Weak ending: "In conclusion", "remains to be seen"
@@ -376,7 +376,7 @@ Some content about data. No chart embedded."""
 
             from economist_agent import run_research_agent
 
-            with pytest.raises(Exception):
+            with pytest.raises((ValueError, RuntimeError, TypeError)):
                 run_research_agent(mock_llm_client, "Test Topic")
 
             # Should raise, not crash silently
@@ -403,9 +403,9 @@ Content without chart."""
         )
 
         # Should detect missing chart embedding
-        assert any("chart" in v.lower() for v in violations), (
-            "Should catch missing chart"
-        )
+        assert any(
+            "chart" in v.lower() for v in violations
+        ), "Should catch missing chart"
 
     def test_bug_015_pattern_prevented(self):
         """Test: BUG-015 pattern (missing category) is caught"""
@@ -421,9 +421,9 @@ date: 2026-01-01
         violations = prevention.check_all_patterns(article_no_category)
 
         # Should detect missing category
-        assert any("category" in v.lower() for v in violations), (
-            "Should catch missing category"
-        )
+        assert any(
+            "category" in v.lower() for v in violations
+        ), "Should catch missing category"
 
 
 # ═══════════════════════════════════════════════════════════════════════════

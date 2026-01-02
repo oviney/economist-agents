@@ -97,9 +97,8 @@ def validate_yaml_front_matter(file_path, skills_manager=None, blog_dir=None):
     content_lower = content.lower()
     if any(
         word in content_lower for word in ["ai", "generated", "llm", "gpt", "claude"]
-    ):
-        if not data.get("ai_assisted"):
-            issues.append("⚠️  Post mentions AI but missing 'ai_assisted: true' flag")
+    ) and not data.get("ai_assisted"):
+        issues.append("⚠️  Post mentions AI but missing 'ai_assisted: true' flag")
 
     return issues
 
@@ -116,7 +115,7 @@ def check_broken_links(file_path):
     chart_images = re.findall(r"!\[.*?\]\((.*?/charts/.*?\.png)\)", content)
     if chart_images:
         for chart_img in chart_images:
-            chart_name = chart_img.split("/")[-1].replace(".png", "").replace("-", " ")
+            chart_img.split("/")[-1].replace(".png", "").replace("-", " ")
             # Check if chart is mentioned in surrounding text
             if (
                 "chart" not in content.lower()
@@ -130,7 +129,7 @@ def check_broken_links(file_path):
     for i, line in enumerate(lines, 1):
         # Find markdown links
         links = re.findall(r"\[([^\]]+)\]\(([^\)]+)\)", line)
-        for text, url in links:
+        for _text, url in links:
             # Check internal links (not starting with http)
             if not url.startswith("http") and not url.startswith("#"):
                 # Check if it's an asset

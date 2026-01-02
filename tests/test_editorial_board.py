@@ -9,12 +9,22 @@ Current Coverage: 0% → 80%+
 """
 
 import json
+import sys
+from pathlib import Path
 from unittest.mock import Mock, mock_open, patch
 
 import pytest
 
-import scripts.editorial_board as eb
+# Add scripts directory to path
+sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
+from editorial_board import (
+    BOARD_MEMBERS,
+    format_board_report,
+    get_board_vote,
+    main,
+    run_editorial_board,
+)
 
 # ═══════════════════════════════════════════════════════════════════════════
 # FIXTURES
@@ -88,13 +98,13 @@ class TestPersonaAgents:
         self, mock_llm_client, sample_topics, sample_vote_response
     ):
         """Test VP of Engineering persona votes on topics."""
-        with patch("scripts.editorial_board.call_llm") as mock_call_llm:
+        with patch("editorial_board.call_llm") as mock_call_llm:
             mock_call_llm.return_value = sample_vote_response
 
             member_id = "vp_engineering"
-            member_info = eb.BOARD_MEMBERS[member_id]
+            member_info = BOARD_MEMBERS[member_id]
 
-            result = eb.get_board_vote(
+            result = get_board_vote(
                 mock_llm_client, member_id, member_info, sample_topics
             )
 
@@ -117,13 +127,13 @@ class TestPersonaAgents:
         self, mock_llm_client, sample_topics, sample_vote_response
     ):
         """Test Senior QE Lead persona votes on topics."""
-        with patch("scripts.editorial_board.call_llm") as mock_call_llm:
+        with patch("editorial_board.call_llm") as mock_call_llm:
             mock_call_llm.return_value = sample_vote_response
 
             member_id = "senior_qe_lead"
-            member_info = eb.BOARD_MEMBERS[member_id]
+            member_info = BOARD_MEMBERS[member_id]
 
-            result = eb.get_board_vote(
+            result = get_board_vote(
                 mock_llm_client, member_id, member_info, sample_topics
             )
 
@@ -136,13 +146,13 @@ class TestPersonaAgents:
         self, mock_llm_client, sample_topics, sample_vote_response
     ):
         """Test Data Skeptic persona votes on topics."""
-        with patch("scripts.editorial_board.call_llm") as mock_call_llm:
+        with patch("editorial_board.call_llm") as mock_call_llm:
             mock_call_llm.return_value = sample_vote_response
 
             member_id = "data_skeptic"
-            member_info = eb.BOARD_MEMBERS[member_id]
+            member_info = BOARD_MEMBERS[member_id]
 
-            result = eb.get_board_vote(
+            result = get_board_vote(
                 mock_llm_client, member_id, member_info, sample_topics
             )
 
@@ -154,13 +164,13 @@ class TestPersonaAgents:
         self, mock_llm_client, sample_topics, sample_vote_response
     ):
         """Test Career Climber persona votes on topics."""
-        with patch("scripts.editorial_board.call_llm") as mock_call_llm:
+        with patch("editorial_board.call_llm") as mock_call_llm:
             mock_call_llm.return_value = sample_vote_response
 
             member_id = "career_climber"
-            member_info = eb.BOARD_MEMBERS[member_id]
+            member_info = BOARD_MEMBERS[member_id]
 
-            result = eb.get_board_vote(
+            result = get_board_vote(
                 mock_llm_client, member_id, member_info, sample_topics
             )
 
@@ -172,13 +182,13 @@ class TestPersonaAgents:
         self, mock_llm_client, sample_topics, sample_vote_response
     ):
         """Test Economist Editor persona votes on topics."""
-        with patch("scripts.editorial_board.call_llm") as mock_call_llm:
+        with patch("editorial_board.call_llm") as mock_call_llm:
             mock_call_llm.return_value = sample_vote_response
 
             member_id = "economist_editor"
-            member_info = eb.BOARD_MEMBERS[member_id]
+            member_info = BOARD_MEMBERS[member_id]
 
-            result = eb.get_board_vote(
+            result = get_board_vote(
                 mock_llm_client, member_id, member_info, sample_topics
             )
 
@@ -190,13 +200,13 @@ class TestPersonaAgents:
         self, mock_llm_client, sample_topics, sample_vote_response
     ):
         """Test Busy Reader persona votes on topics."""
-        with patch("scripts.editorial_board.call_llm") as mock_call_llm:
+        with patch("editorial_board.call_llm") as mock_call_llm:
             mock_call_llm.return_value = sample_vote_response
 
             member_id = "busy_reader"
-            member_info = eb.BOARD_MEMBERS[member_id]
+            member_info = BOARD_MEMBERS[member_id]
 
-            result = eb.get_board_vote(
+            result = get_board_vote(
                 mock_llm_client, member_id, member_info, sample_topics
             )
 
@@ -217,13 +227,11 @@ class TestVoteCollection:
         self, mock_llm_client, sample_topics, sample_vote_response, capsys
     ):
         """Test collecting votes from all 6 board members."""
-        with patch("scripts.editorial_board.call_llm") as mock_call_llm:
+        with patch("editorial_board.call_llm") as mock_call_llm:
             # Each member returns the same vote structure
             mock_call_llm.return_value = sample_vote_response
 
-            result = eb.run_editorial_board(
-                mock_llm_client, sample_topics, parallel=False
-            )
+            result = run_editorial_board(mock_llm_client, sample_topics, parallel=False)
 
             # Verify all 6 members voted
             assert len(result["all_votes"]) == 6
@@ -250,7 +258,7 @@ class TestVoteCollection:
         self, mock_llm_client, sample_topics, sample_vote_response
     ):
         """Test handling of API failures during voting."""
-        with patch("scripts.editorial_board.call_llm") as mock_call_llm:
+        with patch("editorial_board.call_llm") as mock_call_llm:
             # First 3 succeed, rest fail
             mock_call_llm.side_effect = [
                 sample_vote_response,
@@ -261,8 +269,10 @@ class TestVoteCollection:
                 Exception("API Error"),
             ]
 
-            result = eb.run_editorial_board(
-                mock_llm_client, sample_topics, parallel=True  # Use parallel to handle errors
+            result = run_editorial_board(
+                mock_llm_client,
+                sample_topics,
+                parallel=True,  # Use parallel to handle errors
             )
 
             # Should still have some votes (the 3 that succeeded)
@@ -271,17 +281,13 @@ class TestVoteCollection:
             # Rankings should still be calculated from available votes
             assert len(result["rankings"]) == 2
 
-    def test_vote_format_validation(
-        self, mock_llm_client, sample_topics, capsys
-    ):
+    def test_vote_format_validation(self, mock_llm_client, sample_topics, capsys):
         """Test handling of invalid vote format from LLM."""
-        with patch("scripts.editorial_board.call_llm") as mock_call_llm:
+        with patch("editorial_board.call_llm") as mock_call_llm:
             # Return invalid JSON
             mock_call_llm.return_value = "This is not valid JSON"
 
-            result = eb.run_editorial_board(
-                mock_llm_client, sample_topics, parallel=False
-            )
+            result = run_editorial_board(mock_llm_client, sample_topics, parallel=False)
 
             # Should handle parse errors gracefully
             assert len(result["all_votes"]) == 6
@@ -304,7 +310,7 @@ class TestAggregation:
         self, mock_llm_client, sample_topics, sample_vote_response
     ):
         """Test weighted score calculation with different weights."""
-        with patch("scripts.editorial_board.call_llm") as mock_call_llm:
+        with patch("editorial_board.call_llm") as mock_call_llm:
             # Create different scores for each member
             def create_vote(score1, score2):
                 return json.dumps(
@@ -330,9 +336,7 @@ class TestAggregation:
                 create_vote(7, 8),  # busy_reader
             ]
 
-            result = eb.run_editorial_board(
-                mock_llm_client, sample_topics, parallel=False
-            )
+            result = run_editorial_board(mock_llm_client, sample_topics, parallel=False)
 
             # Calculate expected weighted scores
             # Topic 1: (8*1.2 + 7*1.0 + 5*1.1 + 6*0.8 + 9*1.3 + 7*0.9) / (1.2+1.0+1.1+0.8+1.3+0.9)
@@ -351,12 +355,10 @@ class TestAggregation:
         self, mock_llm_client, sample_topics, sample_vote_response
     ):
         """Test complete board decision aggregation."""
-        with patch("scripts.editorial_board.call_llm") as mock_call_llm:
+        with patch("editorial_board.call_llm") as mock_call_llm:
             mock_call_llm.return_value = sample_vote_response
 
-            result = eb.run_editorial_board(
-                mock_llm_client, sample_topics, parallel=False
-            )
+            result = run_editorial_board(mock_llm_client, sample_topics, parallel=False)
 
             # Verify result structure
             assert "rankings" in result
@@ -373,11 +375,9 @@ class TestAggregation:
             assert "weighted_score" in result["top_pick"]
             assert "votes" in result["top_pick"]
 
-    def test_consensus_determination(
-        self, mock_llm_client, sample_topics
-    ):
+    def test_consensus_determination(self, mock_llm_client, sample_topics):
         """Test consensus determination (unanimous vs split)."""
-        with patch("scripts.editorial_board.call_llm") as mock_call_llm:
+        with patch("editorial_board.call_llm") as mock_call_llm:
             # All members pick topic 1 as top pick
             unanimous_vote = json.dumps(
                 {
@@ -391,15 +391,13 @@ class TestAggregation:
             )
             mock_call_llm.return_value = unanimous_vote
 
-            result = eb.run_editorial_board(
-                mock_llm_client, sample_topics, parallel=False
-            )
+            result = run_editorial_board(mock_llm_client, sample_topics, parallel=False)
 
             # Should detect consensus
             assert result["consensus"] is True
 
         # Test split vote
-        with patch("scripts.editorial_board.call_llm") as mock_call_llm:
+        with patch("editorial_board.call_llm") as mock_call_llm:
             # Members disagree on top pick
             def create_vote(top_pick_idx):
                 return json.dumps(
@@ -422,9 +420,7 @@ class TestAggregation:
                 create_vote(1),
             ]
 
-            result = eb.run_editorial_board(
-                mock_llm_client, sample_topics, parallel=False
-            )
+            result = run_editorial_board(mock_llm_client, sample_topics, parallel=False)
 
             # Should detect split
             assert result["consensus"] is False
@@ -440,12 +436,10 @@ class TestOutput:
 
     def test_json_structure(self, mock_llm_client, sample_topics, sample_vote_response):
         """Test board decision JSON structure."""
-        with patch("scripts.editorial_board.call_llm") as mock_call_llm:
+        with patch("editorial_board.call_llm") as mock_call_llm:
             mock_call_llm.return_value = sample_vote_response
 
-            result = eb.run_editorial_board(
-                mock_llm_client, sample_topics, parallel=False
-            )
+            result = run_editorial_board(mock_llm_client, sample_topics, parallel=False)
 
             # Verify JSON serializable
             json_str = json.dumps(result, default=str)
@@ -461,13 +455,12 @@ class TestOutput:
         self, mock_llm_client, sample_topics, sample_vote_response, tmp_path, capsys
     ):
         """Test saving board decision to files."""
-        with patch("scripts.editorial_board.call_llm") as mock_call_llm, patch(
-            "scripts.editorial_board.create_llm_client"
-        ) as mock_create_client, patch(
-            "builtins.open", mock_open()
-        ) as mock_file, patch(
-            "os.path.exists"
-        ) as mock_exists:
+        with (
+            patch("editorial_board.call_llm") as mock_call_llm,
+            patch("editorial_board.create_llm_client") as mock_create_client,
+            patch("builtins.open", mock_open()),
+            patch("os.path.exists") as mock_exists,
+        ):
             mock_call_llm.return_value = sample_vote_response
             mock_create_client.return_value = mock_llm_client
             mock_exists.return_value = True
@@ -484,7 +477,7 @@ class TestOutput:
 
                 with patch("builtins.open", m):
                     # Create a proper mock that handles both read and write
-                    eb.main()
+                    main()
 
                 captured = capsys.readouterr()
                 assert "Saved decision to board_decision.json" in captured.out
@@ -502,34 +495,29 @@ class TestErrorHandling:
     def test_invalid_topics_input(self, mock_llm_client):
         """Test handling of invalid topics input."""
         member_id = "vp_engineering"
-        member_info = eb.BOARD_MEMBERS[member_id]
+        member_info = BOARD_MEMBERS[member_id]
 
         # Test empty list
         with pytest.raises(ValueError, match="Invalid topics"):
-            eb.get_board_vote(mock_llm_client, member_id, member_info, [])
+            get_board_vote(mock_llm_client, member_id, member_info, [])
 
         # Test None
         with pytest.raises(ValueError, match="Invalid topics"):
-            eb.get_board_vote(mock_llm_client, member_id, member_info, None)
+            get_board_vote(mock_llm_client, member_id, member_info, None)
 
         # Test non-list
         with pytest.raises(ValueError, match="Invalid topics"):
-            eb.get_board_vote(mock_llm_client, member_id, member_info, "not a list")
+            get_board_vote(mock_llm_client, member_id, member_info, "not a list")
 
     def test_llm_api_errors(self, mock_llm_client, sample_topics):
         """Test handling of LLM API errors."""
-        with patch("scripts.editorial_board.call_llm") as mock_call_llm:
+        with patch("editorial_board.call_llm") as mock_call_llm:
             # Simulate API error
             mock_call_llm.side_effect = Exception("API connection timeout")
 
-            member_id = "vp_engineering"
-            member_info = eb.BOARD_MEMBERS[member_id]
-
             # Sequential mode raises on first error, parallel mode handles gracefully
             with pytest.raises(Exception, match="API connection timeout"):
-                eb.run_editorial_board(
-                    mock_llm_client, sample_topics, parallel=False
-                )
+                run_editorial_board(mock_llm_client, sample_topics, parallel=False)
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -544,14 +532,12 @@ class TestIntegration:
         self, mock_llm_client, sample_topics, sample_vote_response
     ):
         """Test markdown report generation."""
-        with patch("scripts.editorial_board.call_llm") as mock_call_llm:
+        with patch("editorial_board.call_llm") as mock_call_llm:
             mock_call_llm.return_value = sample_vote_response
 
-            result = eb.run_editorial_board(
-                mock_llm_client, sample_topics, parallel=False
-            )
+            result = run_editorial_board(mock_llm_client, sample_topics, parallel=False)
 
-            report = eb.format_board_report(result)
+            report = format_board_report(result)
 
             # Verify report structure
             assert "# Editorial Board Decision" in report
@@ -565,19 +551,19 @@ class TestIntegration:
         self, mock_llm_client, sample_topics, sample_vote_response
     ):
         """Test parallel and sequential voting produce same results."""
-        with patch("scripts.editorial_board.call_llm") as mock_call_llm:
+        with patch("editorial_board.call_llm") as mock_call_llm:
             mock_call_llm.return_value = sample_vote_response
 
             # Run sequentially
-            result_seq = eb.run_editorial_board(
+            result_seq = run_editorial_board(
                 mock_llm_client, sample_topics, parallel=False
             )
 
-        with patch("scripts.editorial_board.call_llm") as mock_call_llm:
+        with patch("editorial_board.call_llm") as mock_call_llm:
             mock_call_llm.return_value = sample_vote_response
 
             # Run in parallel
-            result_par = eb.run_editorial_board(
+            result_par = run_editorial_board(
                 mock_llm_client, sample_topics, parallel=True
             )
 
@@ -601,42 +587,45 @@ class TestMainFunction:
         self, mock_llm_client, sample_topics, sample_vote_response, capsys
     ):
         """Test main() with TOPICS environment variable."""
-        with patch("scripts.editorial_board.call_llm") as mock_call_llm, patch(
-            "scripts.editorial_board.create_llm_client"
-        ) as mock_create_client, patch.dict(
-            "os.environ", {"TOPICS": json.dumps(sample_topics)}
-        ), patch(
-            "builtins.open", mock_open()
+        with (
+            patch("editorial_board.call_llm") as mock_call_llm,
+            patch("editorial_board.create_llm_client") as mock_create_client,
+            patch.dict("os.environ", {"TOPICS": json.dumps(sample_topics)}),
+            patch("builtins.open", mock_open()),
         ):
             mock_call_llm.return_value = sample_vote_response
             mock_create_client.return_value = mock_llm_client
 
-            eb.main()
+            main()
 
             captured = capsys.readouterr()
             assert "EDITORIAL BOARD CONVENING" in captured.out
 
     def test_main_with_no_topics(self, capsys):
         """Test main() when no topics available."""
-        with patch("scripts.editorial_board.create_llm_client"), patch(
-            "os.path.exists"
-        ) as mock_exists, patch.dict("os.environ", {}, clear=True):
+        with (
+            patch("editorial_board.create_llm_client"),
+            patch("os.path.exists") as mock_exists,
+            patch.dict("os.environ", {}, clear=True),
+        ):
             mock_exists.return_value = False
 
-            eb.main()
+            main()
 
             captured = capsys.readouterr()
             assert "No topics found" in captured.out
 
     def test_main_with_empty_topics(self, mock_llm_client, capsys):
         """Test main() with empty topics list."""
-        with patch("scripts.editorial_board.create_llm_client") as mock_create_client, patch(
-            "os.path.exists"
-        ) as mock_exists, patch("builtins.open", mock_open(read_data='{"topics": []}')):
+        with (
+            patch("editorial_board.create_llm_client") as mock_create_client,
+            patch("os.path.exists") as mock_exists,
+            patch("builtins.open", mock_open(read_data='{"topics": []}')),
+        ):
             mock_create_client.return_value = mock_llm_client
             mock_exists.return_value = True
 
-            eb.main()
+            main()
 
             captured = capsys.readouterr()
             assert "No topics to evaluate" in captured.out
@@ -647,18 +636,22 @@ class TestMainFunction:
         """Test main() writes to GITHUB_OUTPUT."""
         github_output = tmp_path / "github_output.txt"
 
-        with patch("scripts.editorial_board.call_llm") as mock_call_llm, patch(
-            "scripts.editorial_board.create_llm_client"
-        ) as mock_create_client, patch.dict(
-            "os.environ",
-            {"TOPICS": json.dumps(sample_topics), "GITHUB_OUTPUT": str(github_output)},
-        ), patch(
-            "builtins.open", mock_open()
+        with (
+            patch("editorial_board.call_llm") as mock_call_llm,
+            patch("editorial_board.create_llm_client") as mock_create_client,
+            patch.dict(
+                "os.environ",
+                {
+                    "TOPICS": json.dumps(sample_topics),
+                    "GITHUB_OUTPUT": str(github_output),
+                },
+            ),
+            patch("builtins.open", mock_open()),
         ):
             mock_call_llm.return_value = sample_vote_response
             mock_create_client.return_value = mock_llm_client
 
-            eb.main()
+            main()
 
             # Verify GITHUB_OUTPUT was written (mocked, but call was made)
             assert True  # If we got here, no exceptions were raised

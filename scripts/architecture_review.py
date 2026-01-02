@@ -297,10 +297,13 @@ class ArchitectureReviewer:
         for py_file in scripts_dir.glob("*.py"):
             with open(py_file) as f:
                 content = f.read()
-                if "json.loads" in content and "try:" in content:
-                    # Check for extraction pattern
-                    if ".find(" in content and ".rfind(" in content:
-                        json_parse_patterns += 1
+                if (
+                    "json.loads" in content
+                    and "try:" in content
+                    and ".find(" in content
+                    and ".rfind(" in content
+                ):
+                    json_parse_patterns += 1
 
         if json_parse_patterns > 0:
             self.skills_manager.learn_pattern(

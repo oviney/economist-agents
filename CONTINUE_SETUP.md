@@ -1,6 +1,6 @@
 # Continue.dev Setup - Personal OpenAI API Key
 
-**Date**: 2026-01-01  
+**Date**: 2026-01-01
 **Status**: ✅ ACTIVE
 
 ## Configuration Summary
@@ -156,5 +156,5 @@ If you need to switch back:
 
 ---
 
-**Last Updated**: 2026-01-01  
+**Last Updated**: 2026-01-01
 **Next Review**: When OpenAI releases GPT-5 or pricing changes

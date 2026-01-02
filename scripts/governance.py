@@ -69,7 +69,7 @@ class GovernanceTracker:
         if stage.lower().replace(" ", "_") in [a.lower() for a in self.agent_outputs]:
             agent_key = [
                 k
-                for k in self.agent_outputs.keys()
+                for k in self.agent_outputs
                 if k.lower() == stage.lower().replace(" ", "_")
             ][0]
             print(f"📄 Review file: {self.session_dir / f'{agent_key}.json'}")

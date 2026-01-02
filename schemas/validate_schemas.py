@@ -23,7 +23,6 @@ def validate_json_file(json_path: Path, schema_path: Path) -> tuple[bool, list[s
     Returns:
         (is_valid, error_messages)
     """
-    errors = []
 
     # Load JSON file
     try:
@@ -93,7 +92,7 @@ def _basic_validation(data: dict, schema: dict) -> tuple[bool, list[str]]:
                 errors.append(
                     f"Field '{key}' should be integer, got {type(value).__name__}"
                 )
-            elif expected_type == "number" and not isinstance(value, (int, float)):
+            elif expected_type == "number" and not isinstance(value, int | float):
                 errors.append(
                     f"Field '{key}' should be number, got {type(value).__name__}"
                 )

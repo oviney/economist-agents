@@ -1,6 +1,6 @@
 # GitHub Sync - Manual Execution Instructions
 
-**Status**: GitHub CLI not authenticated  
+**Status**: GitHub CLI not authenticated
 **Required**: Run `gh auth login` before executing these commands
 
 ---
@@ -437,6 +437,6 @@ gh milestone delete --title "Phase 1: Agent Framework" --repo oviney/economist-a
 
 ---
 
-**Status**: ✅ READY FOR EXECUTION  
-**Next Action**: Authenticate gh CLI, then run commands above  
+**Status**: ✅ READY FOR EXECUTION
+**Next Action**: Authenticate gh CLI, then run commands above
 **Estimated Time**: 15 minutes

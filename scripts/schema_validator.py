@@ -279,7 +279,6 @@ def validate_front_matter(
 
 
 if __name__ == "__main__":
-
     # Test the validator
 
     # Test 1: Valid front matter

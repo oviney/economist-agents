@@ -91,9 +91,9 @@ Companies investing in robust infrastructure will outpace competitors.
 
     # Verify failure
     assert not is_valid, "Agent reviewer should have caught missing chart"
-    assert any("chart not embedded" in i.lower() for i in issues), (
-        "Should explicitly flag missing chart embedding"
-    )
+    assert any(
+        "chart not embedded" in i.lower() for i in issues
+    ), "Should explicitly flag missing chart embedding"
 
     print("   ✅ Correctly flagged missing chart embedding")
 
@@ -241,7 +241,7 @@ def test_skills_system_updated():
     print("=" * 70)
 
     skills_manager = SkillsManager()
-    stats = skills_manager.get_stats()
+    skills_manager.get_stats()
 
     # Check for new pattern categories
     skills = skills_manager.skills.get("skills", {})
@@ -303,9 +303,9 @@ def test_chart_visual_bug_title_overlap():
     # Visual QA should fail
     assert not chart_metadata["red_bar_visible"], "Red bar should be hidden by title"
     assert len(chart_metadata["zone_violations"]) > 0, "Should detect zone violation"
-    assert chart_metadata["title_y_position"] >= 0.96, (
-        "Title intrudes into red bar zone"
-    )
+    assert (
+        chart_metadata["title_y_position"] >= 0.96
+    ), "Title intrudes into red bar zone"
 
     print("\n✅ PASS: Title/red bar overlap would be caught by Visual QA")
     return True
@@ -456,26 +456,26 @@ author: "The Economist"
 ai_assisted: true
 ---
 
-Self-healing tests promise an 80% cut in maintenance costs. According to 
+Self-healing tests promise an 80% cut in maintenance costs. According to
 Tricentis Research's 2024 survey, only 10% of companies achieve it.
 
-The gap reveals a fundamental misunderstanding of what "self-healing" means. 
-Teams expect magic; vendors deliver incremental improvements. The economics 
+The gap reveals a fundamental misunderstanding of what "self-healing" means.
+Teams expect magic; vendors deliver incremental improvements. The economics
 don't lie: maintenance burden fell by just 18% while adoption reached 78%.
 
-As the chart shows, the gap between hype and reality is widening. Companies 
-that invested early now face the costs of retraining and replacing brittle 
+As the chart shows, the gap between hype and reality is widening. Companies
+that invested early now face the costs of retraining and replacing brittle
 systems.
 
 ![Testing Gap](/ /charts/testing-gap.png)
 
-The shrewdest leaders are abandoning the pursuit of fully autonomous tests. 
-They're investing in robust infrastructure that makes tests predictable and 
-maintainable by humans. This pragmatic approach cuts maintenance by 40-50%, 
+The shrewdest leaders are abandoning the pursuit of fully autonomous tests.
+They're investing in robust infrastructure that makes tests predictable and
+maintainable by humans. This pragmatic approach cuts maintenance by 40-50%,
 far exceeding the AI promises.
 
-Companies that invest in robust test infrastructure will outpace competitors. 
-Those that chase AI magic bullets will bleed talent and ship slower. The 
+Companies that invest in robust test infrastructure will outpace competitors.
+Those that chase AI magic bullets will bleed talent and ship slower. The
 choice is becoming binary.
 """
 
@@ -493,12 +493,12 @@ choice is becoming binary.
     print(f"   Schema Validator: {len(critical_schema)} critical issues")
 
     # Should have no critical issues
-    assert len(critical_review) == 0, (
-        f"Should have no critical review issues, got: {critical_review}"
-    )
-    assert len(critical_schema) == 0, (
-        f"Should have no critical schema issues, got: {critical_schema}"
-    )
+    assert (
+        len(critical_review) == 0
+    ), f"Should have no critical review issues, got: {critical_review}"
+    assert (
+        len(critical_schema) == 0
+    ), f"Should have no critical schema issues, got: {critical_schema}"
 
     print("\n✅ PASS: Well-formed article passes all validation layers")
     return True

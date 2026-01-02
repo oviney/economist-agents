@@ -74,9 +74,9 @@ class GitHubIntegrationTests:
         # Check Story 1 structure
         story1 = stories[0]
         assert story1["number"] == 1, "Story 1 not found"
-        assert story1["points"] == 2, (
-            f"Story 1 should be 2 points, got {story1['points']}"
-        )
+        assert (
+            story1["points"] == 2
+        ), f"Story 1 should be 2 points, got {story1['points']}"
         assert len(story1["tasks"]) > 0, "Story 1 has no tasks"
         print(f"      Found {len(stories)} stories with correct structure")
 
@@ -96,7 +96,7 @@ class GitHubIntegrationTests:
                     yaml.safe_load(f)
                     print(f"      ✓ {workflow}")
                 except yaml.YAMLError as e:
-                    raise AssertionError(f"Invalid YAML in {workflow}: {e}")
+                    raise AssertionError(f"Invalid YAML in {workflow}: {e}") from e
 
     # TEST 4: Issue Templates Valid YAML
     def test_issue_templates_valid(self):
@@ -117,7 +117,7 @@ class GitHubIntegrationTests:
                     assert "body" in data, f"{template} missing 'body'"
                     print(f"      ✓ {template}")
                 except yaml.YAMLError as e:
-                    raise AssertionError(f"Invalid YAML in {template}: {e}")
+                    raise AssertionError(f"Invalid YAML in {template}: {e}") from e
 
     # TEST 5: Pre-Work Check Script Exists
     def test_pre_work_check_exists(self):
@@ -132,13 +132,13 @@ class GitHubIntegrationTests:
     def test_sprint_sync_imports(self):
         """Verify sprint sync script can be imported"""
         try:
-            from github_sprint_sync import GitHubSprintSync
+            import github_sprint_sync  # noqa: F401
 
             print("      ✓ GitHubSprintSync class importable")
         except ImportError as e:
             # PyGithub might not be installed, but script should still import
             if "github" not in str(e).lower():
-                raise AssertionError(f"Import error: {e}")
+                raise AssertionError(f"Import error: {e}") from e
             print("      ⚠ PyGithub not installed (optional)")
 
     # TEST 7: Documentation Files Exist
@@ -195,9 +195,9 @@ class GitHubIntegrationTests:
         with open("skills/blog_qa_skills.json") as f:
             skills = json.load(f)
 
-        assert "sprint_discipline" in skills["skills"], (
-            "sprint_discipline category missing"
-        )
+        assert (
+            "sprint_discipline" in skills["skills"]
+        ), "sprint_discipline category missing"
 
         sprint_skills = skills["skills"]["sprint_discipline"]
         assert "patterns" in sprint_skills, "No patterns in sprint_discipline"

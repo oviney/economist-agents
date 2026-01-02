@@ -9,7 +9,7 @@ echo "✅ Check 1: OPENAI_API_KEY Environment Variable"
 if [[ -n "$OPENAI_API_KEY" ]]; then
     KEY_PREFIX="${OPENAI_API_KEY:0:10}"
     echo "   ✓ Set: $KEY_PREFIX..."
-    
+
     # Verify it's not a placeholder
     if [[ "$OPENAI_API_KEY" == *"your-openai-key"* ]]; then
         echo "   ⚠️  WARNING: API key appears to be a placeholder"
@@ -42,7 +42,7 @@ fi
 
 if [[ -f ".vscode/continue-config.json" ]]; then
     echo "   ✓ continue-config.json exists"
-    
+
     # Verify it references OPENAI_API_KEY
     if grep -q "\${OPENAI_API_KEY}" ".vscode/continue-config.json"; then
         echo "   ✓ Configured to use \$OPENAI_API_KEY"
@@ -68,16 +68,16 @@ echo ""
 echo "✅ Check 5: API Key Validation (Optional)"
 if command -v curl &> /dev/null && [[ -n "$OPENAI_API_KEY" ]]; then
     echo "   Testing API key with OpenAI..."
-    
+
     RESPONSE=$(curl -s -w "%{http_code}" -o /tmp/openai_test.json \
         https://api.openai.com/v1/models \
         -H "Authorization: Bearer $OPENAI_API_KEY" \
         -H "Content-Type: application/json" \
         --max-time 5)
-    
+
     if [[ "$RESPONSE" == "200" ]]; then
         echo "   ✓ API key is VALID"
-        
+
         # Show available models
         if command -v jq &> /dev/null; then
             echo "   Available models:"
@@ -88,7 +88,7 @@ if command -v curl &> /dev/null && [[ -n "$OPENAI_API_KEY" ]]; then
     else
         echo "   ⚠️  Could not validate (HTTP $RESPONSE)"
     fi
-    
+
     rm -f /tmp/openai_test.json
 else
     echo "   ⊘ Skipped (curl not available or API key not set)"

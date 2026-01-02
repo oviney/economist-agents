@@ -80,9 +80,12 @@ class BacklogParser:
             elif line.startswith("**Problem**:"):
                 in_body = True
                 body_lines.append(line)
-            elif line.strip() and not line.startswith("---"):
-                if in_body or line.startswith("**"):
-                    body_lines.append(line)
+            elif (
+                line.strip()
+                and not line.startswith("---")
+                and (in_body or line.startswith("**"))
+            ):
+                body_lines.append(line)
 
         body = "\n".join(body_lines).strip()
 
@@ -123,12 +126,12 @@ class GitHubIssueCreator:
             )
             if result.returncode != 0:
                 raise RuntimeError("GitHub CLI not authenticated. Run: gh auth login")
-        except FileNotFoundError:
+        except FileNotFoundError as err:
             raise RuntimeError(
                 "GitHub CLI (gh) not installed.\n"
                 "Install: brew install gh\n"
                 "Then authenticate: gh auth login"
-            )
+            ) from err
 
     def create_issue(self, item: dict[str, Any], dry_run: bool = False) -> str:
         """Create a single GitHub issue"""

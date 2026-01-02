@@ -287,11 +287,8 @@ class AgentReviewer:
         # Check 3: Data points
         if "data" in chart_spec:
             data = chart_spec["data"]
-            if isinstance(data, list):
-                if len(data) < 3:
-                    issues.append(
-                        "WARNING: Chart has <3 data points (may not be useful)"
-                    )
+            if isinstance(data, list) and len(data) < 3:
+                issues.append("WARNING: Chart has <3 data points (may not be useful)")
 
         # Check 4: Source line present
         if "source_line" not in chart_spec:
@@ -315,7 +312,7 @@ class AgentReviewer:
 
         if issues:
             report.append("\nISSUES:")
-            for i, issue in enumerate(issues, 1):
+            for _i, issue in enumerate(issues, 1):
                 severity = (
                     "CRITICAL"
                     if "CRITICAL" in issue
@@ -412,13 +409,13 @@ date: 2026-01-01
 categories: [quality-engineering, test-automation]
 ---
 
-Self-healing tests promise an 80% cut in maintenance costs. According to 
+Self-healing tests promise an 80% cut in maintenance costs. According to
 Tricentis Research, only 10% of companies achieve it.
 
-The gap reveals a fundamental misunderstanding of what "self-healing" means. 
+The gap reveals a fundamental misunderstanding of what "self-healing" means.
 Teams expect magic; vendors deliver incremental improvements.
 
-Companies that invest in robust test infrastructure will outpace competitors. 
+Companies that invest in robust test infrastructure will outpace competitors.
 Those that chase AI magic bullets will bleed talent and ship slower.
 """
     review_agent_output("writer_agent", writer_output_good)

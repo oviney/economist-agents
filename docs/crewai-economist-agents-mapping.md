@@ -63,7 +63,7 @@ research_task = Task(
 ### Your Current Architecture
 ```
 Stage 1: topic_scout.py    → content_queue.json
-Stage 2: editorial_board.py → board_decision.json  
+Stage 2: editorial_board.py → board_decision.json
 Stage 3: economist_agent.py → Markdown + PNG
 ```
 
@@ -79,22 +79,22 @@ from crewai.flow.flow import Flow, listen, start, router
 from crewai import Crew, Agent, Task
 
 class EconomistContentFlow(Flow):
-    
+
     @start()
     def discover_topics(self):
         # Stage 1: Topic Scout (could be single agent or small crew)
         return topic_scout_crew.kickoff()
-    
+
     @listen(discover_topics)
     def editorial_review(self, topics):
         # Stage 2: 6-persona voting crew
         return editorial_board_crew.kickoff(inputs={'topics': topics})
-    
+
     @listen(editorial_review)
     def generate_content(self, selected_topic):
         # Stage 3: Research → Graphics → Writer → Editor crew
         return content_generation_crew.kickoff(inputs={'topic': selected_topic})
-    
+
     @router(generate_content)
     def quality_gate(self, article):
         # Route based on quality score

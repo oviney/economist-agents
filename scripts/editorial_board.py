@@ -44,7 +44,7 @@ import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Import unified LLM client
-from scripts.llm_client import call_llm, create_llm_client
+from llm_client import call_llm, create_llm_client
 
 # ═══════════════════════════════════════════════════════════════════════════
 # BOARD MEMBER PERSONAS

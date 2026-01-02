@@ -204,7 +204,12 @@ class GitHubSprintSync:
         for issue in issues:
             # Extract sprint number from labels
             sprint_label = next(
-                (l.name for l in issue.labels if l.name.startswith("sprint-")), None
+                (
+                    label.name
+                    for label in issue.labels
+                    if label.name.startswith("sprint-")
+                ),
+                None,
             )
             if not sprint_label:
                 continue
@@ -216,7 +221,7 @@ class GitHubSprintSync:
 
             # Extract story points
             points_label = next(
-                (l.name for l in issue.labels if "-points" in l.name), None
+                (label.name for label in issue.labels if "-points" in label.name), None
             )
             points = int(points_label.replace("-points", "")) if points_label else 0
 

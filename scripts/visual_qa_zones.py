@@ -93,7 +93,7 @@ class ZoneBoundaryValidator:
 
         # Check 3: Pixel-based validation (if PIL available)
         try:
-            from PIL import Image
+            import PIL.Image  # noqa: F401
 
             pixel_issues = self._validate_pixels(chart_path)
             self.issues.extend(pixel_issues)
@@ -116,10 +116,7 @@ class ZoneBoundaryValidator:
             return False
 
         # Must not start or end with hyphen
-        if name.startswith("-") or name.endswith("-"):
-            return False
-
-        return True
+        return not (name.startswith("-") or name.endswith("-"))
 
     def _validate_matplotlib_code(self, script_path: Path) -> list[str]:
         """Validate matplotlib code for zone boundary violations"""

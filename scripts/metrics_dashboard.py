@@ -53,7 +53,7 @@ class MetricsDashboard:
         print("Recent History:")
         print("-" * 70)
 
-        for i, run in enumerate(recent_runs, 1):
+        for _i, run in enumerate(recent_runs, 1):
             timestamp = run["timestamp"][:10]  # Just date
             score = run["quality_score"]
             grade = run["grade"]

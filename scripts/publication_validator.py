@@ -366,7 +366,7 @@ class PublicationValidator:
             # Look for matching chart file
             article_name = Path(article_path).stem
             # Remove date prefix (YYYY-MM-DD-)
-            article_slug = re.sub(r"^\d{4}-\d{2}-\d{2}-", "", article_name)
+            re.sub(r"^\d{4}-\d{2}-\d{2}-", "", article_name)
 
             # Check if chart_data metadata passed or if chart markdown exists
             has_chart = bool(re.search(r"!\[.*?\]\(.*?\.png\)", content))

@@ -358,7 +358,7 @@ class EditorAgentDiagnostic:
         print("💡 REMEDIATION OPTIONS")
         print("=" * 70)
 
-        root_causes = self.findings.get("root_causes", {}).get("root_causes", [])
+        self.findings.get("root_causes", {}).get("root_causes", [])
 
         options = []
 

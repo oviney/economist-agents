@@ -33,7 +33,7 @@ def get_test_coverage():
     scripts_dir = Path(__file__).parent
 
     test_files = list(test_dir.glob("*.py"))
-    script_files = list(scripts_dir.glob("*.py"))
+    list(scripts_dir.glob("*.py"))
 
     # Count test assertions as proxy for coverage
     test_count = 0

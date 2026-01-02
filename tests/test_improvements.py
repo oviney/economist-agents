@@ -127,7 +127,7 @@ def test_input_validation():
     # Empty string should fail
     try:
         run_research_agent(client, "", "")
-        assert False, "Empty topic should raise ValueError"
+        raise AssertionError("Empty topic should raise ValueError")
     except ValueError as e:
         assert "Invalid topic" in str(e)
         print("   ✅ run_research_agent rejects empty topic")
@@ -135,7 +135,7 @@ def test_input_validation():
     # Short string should fail
     try:
         run_research_agent(client, "Hi", "")
-        assert False, "Short topic should raise ValueError"
+        raise AssertionError("Short topic should raise ValueError")
     except ValueError as e:
         assert "too short" in str(e)
         print("   ✅ run_research_agent rejects short topic")
@@ -143,7 +143,7 @@ def test_input_validation():
     # Non-string should fail
     try:
         run_research_agent(client, 123, "")
-        assert False, "Non-string topic should raise ValueError"
+        raise AssertionError("Non-string topic should raise ValueError")
     except ValueError as e:
         assert "Invalid topic" in str(e)
         print("   ✅ run_research_agent rejects non-string topic")
@@ -154,7 +154,7 @@ def test_input_validation():
     # Empty research brief should fail
     try:
         run_writer_agent(client, "Valid Topic", {}, "2024-01-15")
-        assert False, "Empty research_brief should raise ValueError"
+        raise AssertionError("Empty research_brief should raise ValueError")
     except ValueError as e:
         assert "Empty research_brief" in str(e)
         print("   ✅ run_writer_agent rejects empty research brief")
@@ -162,7 +162,7 @@ def test_input_validation():
     # Non-dict research brief should fail
     try:
         run_writer_agent(client, "Valid Topic", "not a dict", "2024-01-15")
-        assert False, "Non-dict research_brief should raise ValueError"
+        raise AssertionError("Non-dict research_brief should raise ValueError")
     except ValueError as e:
         assert "Invalid research_brief" in str(e)
         print("   ✅ run_writer_agent rejects non-dict research brief")
@@ -173,7 +173,7 @@ def test_input_validation():
     # Short draft should fail
     try:
         run_editor_agent(client, "Too short")
-        assert False, "Short draft should raise ValueError"
+        raise AssertionError("Short draft should raise ValueError")
     except ValueError as e:
         assert "too short" in str(e)
         print("   ✅ run_editor_agent rejects short draft")
@@ -181,7 +181,7 @@ def test_input_validation():
     # Empty draft should fail
     try:
         run_editor_agent(client, "")
-        assert False, "Empty draft should raise ValueError"
+        raise AssertionError("Empty draft should raise ValueError")
     except ValueError as e:
         assert "Invalid draft" in str(e)
         print("   ✅ run_editor_agent rejects empty draft")
@@ -192,7 +192,7 @@ def test_input_validation():
     # Missing required fields
     try:
         run_graphics_agent(client, {"title": "Test"}, "/tmp/test.png")
-        assert False, "Chart spec without 'data' should raise ValueError"
+        raise AssertionError("Chart spec without 'data' should raise ValueError")
     except ValueError as e:
         assert "missing required fields" in str(e)
         print("   ✅ run_graphics_agent rejects incomplete chart spec")
@@ -200,7 +200,7 @@ def test_input_validation():
     # Non-dict chart spec
     try:
         run_graphics_agent(client, "not a dict", "/tmp/test.png")
-        assert False, "Non-dict chart_spec should raise ValueError"
+        raise AssertionError("Non-dict chart_spec should raise ValueError")
     except ValueError as e:
         assert "Invalid chart_spec" in str(e)
         print("   ✅ run_graphics_agent rejects non-dict chart spec")
@@ -208,7 +208,7 @@ def test_input_validation():
     # Invalid output path
     try:
         run_graphics_agent(client, {"title": "Test", "data": []}, "")
-        assert False, "Empty output_path should raise ValueError"
+        raise AssertionError("Empty output_path should raise ValueError")
     except ValueError as e:
         assert "Invalid output_path" in str(e)
         print("   ✅ run_graphics_agent rejects empty output path")
@@ -315,7 +315,7 @@ def test_rate_limiting():
 
     import importlib.util
 
-    spec = importlib.util.spec_from_file_location(
+    importlib.util.spec_from_file_location(
         "economist_agent",
         Path(__file__).parent.parent / "scripts" / "economist_agent.py",
     )

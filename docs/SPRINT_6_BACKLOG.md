@@ -1,7 +1,7 @@
 # Sprint 6 Backlog - Quality Improvements & Prevention
 
-**Sprint Goal**: Build systematic quality improvements on Sprint 5 RCA foundation  
-**Capacity**: 14 story points (aggressive scope, Option B approved)  
+**Sprint Goal**: Build systematic quality improvements on Sprint 5 RCA foundation
+**Capacity**: 14 story points (aggressive scope, Option B approved)
 **Sprint Duration**: 2 weeks (Jan 2-15, 2026)
 
 ---

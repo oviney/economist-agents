@@ -105,11 +105,11 @@ def _create_anthropic_client(max_retries: int, base_delay: int) -> LLMClient:
 
     try:
         import anthropic
-    except ImportError:
+    except ImportError as err:
         raise ImportError(
             "[LLM_CLIENT] anthropic package not installed. "
             "Install it: pip install anthropic"
-        )
+        ) from err
 
     # Retry logic for rate limits
     for attempt in range(max_retries):
@@ -128,9 +128,11 @@ def _create_anthropic_client(max_retries: int, base_delay: int) -> LLMClient:
             else:
                 raise ValueError(
                     f"[LLM_CLIENT] Rate limit exceeded after {max_retries} retries: {e}"
-                )
+                ) from e
         except Exception as e:
-            raise ValueError(f"[LLM_CLIENT] Failed to create Anthropic client: {e}")
+            raise ValueError(
+                f"[LLM_CLIENT] Failed to create Anthropic client: {e}"
+            ) from e
 
 
 def _create_openai_client(max_retries: int, base_delay: int) -> LLMClient:
@@ -144,10 +146,10 @@ def _create_openai_client(max_retries: int, base_delay: int) -> LLMClient:
 
     try:
         from openai import OpenAI, RateLimitError
-    except ImportError:
+    except ImportError as err:
         raise ImportError(
             "[LLM_CLIENT] openai package not installed. Install it: pip install openai"
-        )
+        ) from err
 
     # Retry logic for rate limits
     for attempt in range(max_retries):
@@ -166,9 +168,9 @@ def _create_openai_client(max_retries: int, base_delay: int) -> LLMClient:
             else:
                 raise ValueError(
                     f"[LLM_CLIENT] Rate limit exceeded after {max_retries} retries: {e}"
-                )
+                ) from e
         except Exception as e:
-            raise ValueError(f"[LLM_CLIENT] Failed to create OpenAI client: {e}")
+            raise ValueError(f"[LLM_CLIENT] Failed to create OpenAI client: {e}") from e
 
 
 def call_llm(

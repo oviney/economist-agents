@@ -1,8 +1,8 @@
 # Sprint 9 Backlog
 
-**Sprint Goal**: Validate Sprint 8 Quality Improvements & Measure Impact  
-**Duration**: 2 weeks  
-**Capacity**: 13 story points  
+**Sprint Goal**: Validate Sprint 8 Quality Improvements & Measure Impact
+**Duration**: 2 weeks
+**Capacity**: 13 story points
 **Focus**: Measurement & validation (shift from build to validate)
 
 ---
@@ -186,10 +186,10 @@
 
 ## Sprint 9 Summary
 
-**Total Story Points**: 13 (5 + 3 + 2 + 3)  
-**Total Stories**: 4  
-**P0 Stories**: 3 (Stories 1-3)  
-**P1 Stories**: 1 (Story 4)  
+**Total Story Points**: 13 (5 + 3 + 2 + 3)
+**Total Stories**: 4
+**P0 Stories**: 3 (Stories 1-3)
+**P1 Stories**: 1 (Story 4)
 
 **Sprint Capacity**: 13 points (same as Sprint 7-8 velocity)
 
@@ -212,5 +212,5 @@
 
 ---
 
-**Backlog Refined**: 2026-01-01  
+**Backlog Refined**: 2026-01-01
 **Next Step**: Validate Definition of Ready (--validate-dor 9)

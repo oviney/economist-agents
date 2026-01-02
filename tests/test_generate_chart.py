@@ -16,12 +16,9 @@ The script runs once on first import, so we test the results of that execution.
 
 import sys
 from pathlib import Path
-from unittest.mock import MagicMock, patch, call
-from io import StringIO
+from unittest.mock import MagicMock, patch
 
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-import pytest
 
 # Add scripts directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
@@ -31,8 +28,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 _mock_savefig = MagicMock()
 _mock_close = MagicMock()
 
-with patch('matplotlib.pyplot.savefig', _mock_savefig), \
-     patch('matplotlib.pyplot.close', _mock_close):
+with (
+    patch("matplotlib.pyplot.savefig", _mock_savefig),
+    patch("matplotlib.pyplot.close", _mock_close),
+):
     # Import with coverage tracking enabled
     import generate_chart  # This will execute the script safely
 
@@ -59,12 +58,12 @@ def test_data_arrays_defined():
     assert hasattr(generate_chart, "years")
     assert hasattr(generate_chart, "ai_adoption")
     assert hasattr(generate_chart, "maintenance_reduction")
-    
+
     # Verify data structure
     assert isinstance(generate_chart.years, list)
     assert isinstance(generate_chart.ai_adoption, list)
     assert isinstance(generate_chart.maintenance_reduction, list)
-    
+
     # Verify data lengths match
     assert len(generate_chart.years) == len(generate_chart.ai_adoption)
     assert len(generate_chart.years) == len(generate_chart.maintenance_reduction)
@@ -78,13 +77,13 @@ def test_data_arrays_content():
     assert years[0] == 2018
     assert years[-1] == 2025
     assert len(years) == 8
-    
+
     # Verify ai_adoption values are reasonable percentages
     ai_adoption = generate_chart.ai_adoption
     assert all(0 <= val <= 100 for val in ai_adoption)
     assert ai_adoption[-1] > ai_adoption[0]  # Overall trend upward
     assert ai_adoption == [12, 18, 28, 42, 55, 68, 78, 81]
-    
+
     # Verify maintenance_reduction values
     maintenance = generate_chart.maintenance_reduction
     assert all(val >= 0 for val in maintenance)
@@ -94,9 +93,11 @@ def test_data_arrays_content():
 def test_data_integrity():
     """Test that data maintains referential integrity."""
     # AI adoption should be higher than maintenance reduction
-    for ai, maint in zip(generate_chart.ai_adoption, generate_chart.maintenance_reduction):
+    for ai, maint in zip(
+        generate_chart.ai_adoption, generate_chart.maintenance_reduction, strict=False
+    ):
         assert ai >= maint  # AI adoption always higher or equal
-    
+
     # Last year should show the gap (the automation gap theme)
     assert generate_chart.ai_adoption[-1] > generate_chart.maintenance_reduction[-1]
     gap = generate_chart.ai_adoption[-1] - generate_chart.maintenance_reduction[-1]
@@ -154,7 +155,9 @@ def test_chart_saved_with_correct_parameters():
     """Test that chart would be saved with correct parameters."""
     # The script already ran during import with our mock
     # We're testing that the expected path format exists
-    expected_path = "/home/claude/blog-automation/assets/charts/testing-times-ai-gap.png"
+    expected_path = (
+        "/home/claude/blog-automation/assets/charts/testing-times-ai-gap.png"
+    )
     assert generate_chart.output_path == expected_path
 
 
@@ -163,14 +166,14 @@ def test_economist_style_colors_used():
     # Verify all Economist colors are defined and valid hex colors
     colors = [
         generate_chart.NAVY,
-        generate_chart.BURGUNDY, 
+        generate_chart.BURGUNDY,
         generate_chart.RED_BAR,
         generate_chart.BG_COLOR,
         generate_chart.GRAY_TEXT,
         generate_chart.GRAY_LIGHT,
         generate_chart.GRID_COLOR,
     ]
-    
+
     for color in colors:
         assert color.startswith("#")
         assert len(color) == 7  # #RRGGBB format
@@ -192,12 +195,19 @@ def test_module_has_no_syntax_errors():
 def test_all_constants_accessible():
     """Test that all expected constants are accessible."""
     required_constants = [
-        "NAVY", "BURGUNDY", "RED_BAR", "BG_COLOR",
-        "GRAY_TEXT", "GRAY_LIGHT", "GRID_COLOR",
-        "years", "ai_adoption", "maintenance_reduction",
-        "output_path"
+        "NAVY",
+        "BURGUNDY",
+        "RED_BAR",
+        "BG_COLOR",
+        "GRAY_TEXT",
+        "GRAY_LIGHT",
+        "GRID_COLOR",
+        "years",
+        "ai_adoption",
+        "maintenance_reduction",
+        "output_path",
     ]
-    
+
     for const in required_constants:
         assert hasattr(generate_chart, const), f"Missing constant: {const}"
 
@@ -219,56 +229,60 @@ def test_automation_gap_exists():
     # The chart's theme is the gap between AI adoption and maintenance reduction
     ai_final = generate_chart.ai_adoption[-1]
     maint_final = generate_chart.maintenance_reduction[-1]
-    
+
     gap = ai_final - maint_final
-    
+
     # Gap should be significant (this is the chart's main point)
     assert gap > 50, f"Gap ({gap}) should be significant to show automation paradox"
-    
+
     # AI adoption should be much higher
-    assert ai_final > maint_final * 3, "AI adoption should be multiple of maintenance reduction"
+    assert (
+        ai_final > maint_final * 3
+    ), "AI adoption should be multiple of maintenance reduction"
 
 
 def test_trend_directions():
     """Test that both trends move in expected directions."""
     ai = generate_chart.ai_adoption
     maint = generate_chart.maintenance_reduction
-    
+
     # Both should trend upward
     assert ai[-1] > ai[0], "AI adoption should increase over time"
     assert maint[-1] > maint[0], "Maintenance reduction should increase over time"
-    
+
     # AI should grow faster (that's the gap)
     ai_growth = ai[-1] - ai[0]
     maint_growth = maint[-1] - maint[0]
-    assert ai_growth > maint_growth * 3, "AI growth should far exceed maintenance reduction growth"
+    assert (
+        ai_growth > maint_growth * 3
+    ), "AI growth should far exceed maintenance reduction growth"
 
 
 def test_year_range_reasonable():
     """Test that year range makes sense for the data."""
     years = generate_chart.years
-    
+
     # Should span reasonable period (8 years)
     assert len(years) == 8
-    
+
     # Should be recent years (2018-2025)
     assert years[0] >= 2015
     assert years[-1] <= 2030
-    
+
     # Should be consecutive
     for i in range(len(years) - 1):
-        assert years[i+1] == years[i] + 1
+        assert years[i + 1] == years[i] + 1
 
 
 def test_percentage_values_valid():
     """Test that all percentage values are valid."""
     ai = generate_chart.ai_adoption
     maint = generate_chart.maintenance_reduction
-    
+
     # All values should be valid percentages (0-100)
     for val in ai + maint:
         assert 0 <= val <= 100, f"Value {val} outside valid percentage range"
-        assert isinstance(val, (int, float)), f"Value {val} not numeric"
+        assert isinstance(val, int | float), f"Value {val} not numeric"
 
 
 # ============================================================================
@@ -287,10 +301,10 @@ def test_color_palette_complete():
         "text_secondary": generate_chart.GRAY_LIGHT,
         "grid": generate_chart.GRID_COLOR,
     }
-    
+
     # All colors should be distinct
     assert len(set(palette.values())) == len(palette)
-    
+
     # All should be valid hex colors
     for name, color in palette.items():
         assert color.startswith("#"), f"{name} color doesn't start with #"
@@ -336,9 +350,10 @@ def test_no_missing_data():
     """Test that there are no None or NaN values."""
     all_values = generate_chart.ai_adoption + generate_chart.maintenance_reduction
     assert all(val is not None for val in all_values)
-    
+
     # Check for NaN (if using numpy/pandas)
     import math
+
     assert all(not (isinstance(val, float) and math.isnan(val)) for val in all_values)
 
 
@@ -369,7 +384,7 @@ def test_success_message_would_print():
     # The script prints a success message - test the path format
     output_path = generate_chart.output_path
     assert "testing-times-ai-gap.png" in output_path
-    
+
     # Expected print format
     expected_print = f"Chart saved to {output_path}"
     assert expected_print  # Path is valid for print statement

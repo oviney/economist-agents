@@ -165,7 +165,7 @@ class SprintCeremonyTracker:
 
         template = f"""# Sprint {sprint_number} Retrospective
 
-**Date**: {datetime.now().strftime("%Y-%m-%d")}  
+**Date**: {datetime.now().strftime("%Y-%m-%d")}
 **Participants**: Team
 
 ---
@@ -392,13 +392,10 @@ Total Estimate: [Sum of tasks]
         # Check if previous sprint retro done
         if sprint_number > 1:
             prev_sprint_key = f"sprint_{sprint_number - 1}"
-            if prev_sprint_key in self.tracker["sprints"]:
-                if not self.tracker["sprints"][prev_sprint_key].get(
-                    "retrospective_done", False
-                ):
-                    missing.append(
-                        f"Sprint {sprint_number - 1} retrospective not complete"
-                    )
+            if prev_sprint_key in self.tracker["sprints"] and not self.tracker[
+                "sprints"
+            ][prev_sprint_key].get("retrospective_done", False):
+                missing.append(f"Sprint {sprint_number - 1} retrospective not complete")
 
         # If all checks pass
         if not missing:
@@ -520,19 +517,19 @@ def main():
 Examples:
   # End sprint
   python3 sprint_ceremony_tracker.py --end-sprint 6
-  
+
   # Check if can start new sprint
   python3 sprint_ceremony_tracker.py --can-start 7
-  
+
   # Complete retrospective
   python3 sprint_ceremony_tracker.py --retrospective 6
-  
+
   # Refine backlog
   python3 sprint_ceremony_tracker.py --refine-backlog 7
-  
+
   # Validate DoR
   python3 sprint_ceremony_tracker.py --validate-dor 7
-  
+
   # Status report
   python3 sprint_ceremony_tracker.py --report
         """,
@@ -648,7 +645,7 @@ def run_self_tests():
         docs_dir.mkdir()
 
         # Mock the docs directory
-        original_docs = tracker.tracker_file.parent.parent / "docs"
+        tracker.tracker_file.parent.parent / "docs"
         tracker.tracker_file = tracker_file
 
         # Complete retrospective

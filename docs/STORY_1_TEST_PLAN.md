@@ -32,7 +32,7 @@ Prove the quality system (self-validating agents, automated reviewers, publicati
 
 #### Scenario A: Generate Article with Quality System
 **Input**: Topic from content queue
-**Expected**: 
+**Expected**:
 - Research agent validates output structure
 - Writer agent self-validates against banned patterns
 - Editor agent checks for weak endings
@@ -109,7 +109,7 @@ Prove the quality system (self-validating agents, automated reviewers, publicati
    - Research agent: Validates output structure? (Y/N)
    - Writer agent: Checks banned patterns? (Y/N)
    - Editor agent: Detects weak endings? (Y/N)
-   
+
 2. **Issue Detection**
    - Number of issues flagged by self-validation
    - Types of issues (critical vs. warning)

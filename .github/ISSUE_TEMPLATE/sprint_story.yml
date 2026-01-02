@@ -8,7 +8,7 @@ body:
       value: |
         ## Sprint Story Template
         Use this template to create properly planned sprint stories.
-        
+
         **Required before starting work:**
         - Priority assigned
         - Story points estimated
@@ -74,7 +74,7 @@ body:
         - [ ] Task 2
         - [ ] Task 3
       value: |
-        - [ ] 
+        - [ ]
     validations:
       required: true
 
@@ -88,7 +88,7 @@ body:
         - [ ] Criterion 2
         - [ ] Criterion 3
       value: |
-        - [ ] 
+        - [ ]
     validations:
       required: true
 

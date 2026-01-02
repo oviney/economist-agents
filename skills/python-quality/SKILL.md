@@ -80,7 +80,7 @@ def invoke_agent(
     Raises:
         APIError: If API call fails after retries
         ValueError: If model is not supported
-        
+
     Example:
         >>> result = invoke_agent("researcher", "Find QE trends", "gpt-4o")
         >>> print(result['content'])
@@ -229,10 +229,10 @@ def test_discover_topics_returns_valid_json(mock_openai_client):
     """Test that discover_topics returns valid JSON structure."""
     # Arrange
     expected_keys = {"topics"}
-    
+
     # Act
     result = discover_topics(client=mock_openai_client)
-    
+
     # Assert
     assert isinstance(result, dict)
     assert expected_keys.issubset(result.keys())
@@ -243,11 +243,11 @@ def test_discover_topics_handles_api_error(mock_openai_client, caplog):
     # Arrange
     from openai import APIError
     mock_openai_client.chat.completions.create.side_effect = APIError("API down")
-    
+
     # Act & Assert
     with pytest.raises(APIError):
         discover_topics(client=mock_openai_client)
-    
+
     assert "OpenAI API call failed" in caplog.text
 ```
 
@@ -431,13 +431,13 @@ def run_research_stage(
 ) -> dict[str, Any]:
     """Run research stage with governance."""
     research_output = call_openai_agent(client, RESEARCH_PROMPT)
-    
+
     # Save to governance
     save_agent_output(
         research_output,
         session_dir / "research_agent.json"
     )
-    
+
     return research_output
 
 def generate_article(
@@ -448,15 +448,15 @@ def generate_article(
     session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
     session_dir = Path(f"output/governance/{session_id}")
     session_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # Stage 1: Research
     research = run_research_stage(client, topic, session_dir)
     if interactive and not approve_stage("research"):
         return None
-    
+
     # Stage 2-4: Graphics, Writing, Editing
     # ... similar pattern
-    
+
     return article_path
 ```
 

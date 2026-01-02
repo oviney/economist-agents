@@ -65,7 +65,7 @@ repos:
       - id: ruff-format
         name: ruff format
         description: Format Python code with ruff
-        
+
       # Lint code (fails on errors)
       - id: ruff
         name: ruff check
@@ -104,25 +104,25 @@ repos:
       - id: trailing-whitespace
         name: trim trailing whitespace
         description: Remove trailing whitespace
-        
+
       - id: end-of-file-fixer
         name: fix end of files
         description: Ensure files end with newline
-        
+
       - id: check-yaml
         name: check yaml
         description: Validate YAML files
-        
+
       - id: check-json
         name: check json
         description: Validate JSON files
         exclude: ^tests/fixtures/
-        
+
       - id: check-added-large-files
         name: check for large files
         description: Prevent large files from being committed
         args: [--maxkb=1000]
-        
+
       - id: check-merge-conflict
         name: check for merge conflicts
         description: Check for merge conflict markers
@@ -204,37 +204,37 @@ jobs:
   quality-checks:
     name: Code Quality Checks
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          
+
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt', 'requirements-dev.txt') }}
-          
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
-          
+
       - name: Run ruff format check
         run: ruff format --check .
-        
+
       - name: Run ruff linter
         run: ruff check .
-        
+
       - name: Run mypy type checker
         run: mypy scripts/
-        
+
       - name: Upload quality check results
         if: always()
         uses: actions/upload-artifact@v4
@@ -250,28 +250,28 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.11', '3.12']
-        
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          
+
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt', 'requirements-dev.txt') }}
-          
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
-          
+
       - name: Run tests with coverage
         run: |
           pytest tests/ -v \
@@ -279,7 +279,7 @@ jobs:
             --cov-report=term-missing \
             --cov-report=xml \
             --cov-fail-under=80
-            
+
       - name: Upload coverage reports
         if: matrix.python-version == '3.11'
         uses: codecov/codecov-action@v4
@@ -290,26 +290,26 @@ jobs:
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          
+
       - name: Install bandit
         run: pip install bandit[toml]
-        
+
       - name: Run security scan
         run: |
           bandit -r scripts/ \
             -f json \
             -o bandit-report.json \
             --severity-level medium
-            
+
       - name: Upload security scan results
         if: always()
         uses: actions/upload-artifact@v4
@@ -569,7 +569,7 @@ Navigate to: `https://github.com/oviney/economist-agents/settings/branches`
    - ✅ Require a pull request before merging
      - ✅ Require approvals: 1
      - ✅ Dismiss stale pull request approvals when new commits are pushed
-   
+
    - ✅ Require status checks to pass before merging
      - ✅ Require branches to be up to date before merging
      - Required status checks:
@@ -577,9 +577,9 @@ Navigate to: `https://github.com/oviney/economist-agents/settings/branches`
        - `tests (3.11)`
        - `tests (3.12)`
        - `security-scan`
-   
+
    - ✅ Require conversation resolution before merging
-   
+
    - ✅ Do not allow bypassing the above settings
      - ✅ Include administrators
 
@@ -604,10 +604,10 @@ Track quality over time in `docs/QUALITY_METRICS.md`:
 
 ## Quality Gates
 
-✅ Pre-commit hooks installed  
-✅ Pre-push coverage check enabled  
-✅ CI/CD pipeline running  
-✅ Branch protection enforced  
+✅ Pre-commit hooks installed
+✅ Pre-push coverage check enabled
+✅ CI/CD pipeline running
+✅ Branch protection enforced
 
 ## Recent Improvements
 

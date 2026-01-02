@@ -24,10 +24,10 @@ python3 scripts/economist_agent.py
 
 ## What Just Happened?
 
-✅ Created `.env` file with your API key  
-✅ Set 600 permissions (only you can read it)  
-✅ Added to `.gitignore` (won't be committed)  
-✅ Auto-loaded by all scripts  
+✅ Created `.env` file with your API key
+✅ Set 600 permissions (only you can read it)
+✅ Added to `.gitignore` (won't be committed)
+✅ Auto-loaded by all scripts
 
 ---
 
@@ -76,10 +76,10 @@ python3 scripts/test_setup.py
 
 ## Get Your API Key
 
-**OpenAI** (recommended):  
+**OpenAI** (recommended):
 https://platform.openai.com/api-keys
 
-**Anthropic**:  
+**Anthropic**:
 https://console.anthropic.com/settings/keys
 
 ---

@@ -73,7 +73,7 @@
       "sprint_rating_rationale": "Implementation excellence (3/3 stories delivered), but measurement gap noted (baselines established, effectiveness not yet measured). Test pass rate 56% baseline lower than expected.",
       "objectives_achieved": {
         "objective_1": "BASELINE_ESTABLISHED",
-        "objective_2": "BASELINE_ESTABLISHED", 
+        "objective_2": "BASELINE_ESTABLISHED",
         "objective_3": "PARTIALLY_ACHIEVED"
       },
       "status": "not_started",

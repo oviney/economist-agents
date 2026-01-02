@@ -275,7 +275,7 @@ env:
   BLOG_OWNER: ${{ vars.BLOG1_OWNER }}
   BLOG_REPO: ${{ vars.BLOG1_REPO }}
 
-# .github/workflows/blog2-pipeline.yml  
+# .github/workflows/blog2-pipeline.yml
 env:
   BLOG_OWNER: ${{ vars.BLOG2_OWNER }}
   BLOG_REPO: ${{ vars.BLOG2_REPO }}
@@ -368,4 +368,3 @@ Issues with the workflow?
 1. Check workflow run logs in Actions tab
 2. Review this project's documentation
 3. Open an issue on GitHub with logs
-

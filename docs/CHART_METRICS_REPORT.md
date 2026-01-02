@@ -1,6 +1,6 @@
 # Chart Quality Metrics Report
 
-**Generated:** 2026-01-01 12:40:31  
+**Generated:** 2026-01-01 12:40:31
 **Last Updated:** 2026-01-01T12:39:58.818154
 
 ## Summary Metrics

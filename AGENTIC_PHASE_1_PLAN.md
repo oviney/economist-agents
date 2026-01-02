@@ -1,18 +1,18 @@
 # Agentic Architecture Evolution - Phase 1: Foundation
 
-**Initiative:** Agentic Architecture Evolution (24 weeks, Phases 1-7)  
-**Phase 1 Duration:** 2 weeks (January 2-15, 2026)  
-**Phase Goal:** Establish modular agent configuration system by extracting all agents to YAML  
-**Runs During:** Sprint 4 (or next available sprint)  
-**Total Story Points:** 8 points  
+**Initiative:** Agentic Architecture Evolution (24 weeks, Phases 1-7)
+**Phase 1 Duration:** 2 weeks (January 2-15, 2026)
+**Phase Goal:** Establish modular agent configuration system by extracting all agents to YAML
+**Runs During:** Sprint 4 (or next available sprint)
+**Total Story Points:** 8 points
 **Team Capacity:** 8-10 points (1 developer, full-time)
 
 ---
 
 ## Context: Epic vs Sprint
 
-**Epic/Initiative:** Agentic Architecture Evolution (Phases 1-7)  
-**Sprint:** Your existing sprint cadence (currently Sprint 3)  
+**Epic/Initiative:** Agentic Architecture Evolution (Phases 1-7)
+**Sprint:** Your existing sprint cadence (currently Sprint 3)
 **Integration:** Phase 1 work will be executed in your next sprint (Sprint 4 or 5)
 
 **Key Distinction:**
@@ -283,9 +283,9 @@
 
 ---
 
-**Initiative Owner:** Ouray Viney  
-**Product Owner:** Ouray Viney  
-**Team Size:** 1 developer  
-**Phase 1 Commitment:** 8 story points  
-**Phase Status:** Ready to add to next sprint ✅  
+**Initiative Owner:** Ouray Viney
+**Product Owner:** Ouray Viney
+**Team Size:** 1 developer
+**Phase 1 Commitment:** 8 story points
+**Phase Status:** Ready to add to next sprint ✅
 **Integration Note:** Schedule Phase 1 work in Sprint 4 or next available sprint slot

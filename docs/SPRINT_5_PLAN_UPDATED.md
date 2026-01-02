@@ -1,8 +1,8 @@
 # Sprint 5 Plan - UPDATED with Enhanced Defect Schema
 
-**Sprint Goal**: Fix GitHub workflow + Improve agent accuracy + Quality intelligence transformation  
-**Duration**: 5 days (Jan 2-6, 2026)  
-**Total Points**: 14 points (was 9, added enhanced defect schema)  
+**Sprint Goal**: Fix GitHub workflow + Improve agent accuracy + Quality intelligence transformation
+**Duration**: 5 days (Jan 2-6, 2026)
+**Total Points**: 14 points (was 9, added enhanced defect schema)
 **Team**: 1 developer + AI pair programming
 
 ---
@@ -94,8 +94,8 @@
 
 ### Story 1: Fix GitHub Auto-Close Integration (P0) - **1 point**
 
-**Issue**: [#21](https://github.com/oviney/economist-agents/issues/21)  
-**Owner**: Dev team  
+**Issue**: [#21](https://github.com/oviney/economist-agents/issues/21)
+**Owner**: Dev team
 **Status**: Not started
 
 **Goal**: Restore GitHub auto-close functionality with validation
@@ -120,8 +120,8 @@
 
 ### Story 2: Improve Writer Agent Accuracy (P1) - **3 points**
 
-**Issue**: [#22](https://github.com/oviney/economist-agents/issues/22)  
-**Owner**: Dev team  
+**Issue**: [#22](https://github.com/oviney/economist-agents/issues/22)
+**Owner**: Dev team
 **Status**: Not started
 
 **Goal**: Reduce regenerations and improve clean draft rate
@@ -157,8 +157,8 @@
 
 ### Story 3: Improve Editor Agent Prediction Accuracy (P1) - **2 points**
 
-**Issue**: [#23](https://github.com/oviney/economist-agents/issues/23)  
-**Owner**: Dev team  
+**Issue**: [#23](https://github.com/oviney/economist-agents/issues/23)
+**Owner**: Dev team
 **Status**: Not started
 
 **Goal**: Improve prediction accuracy from 33% to >60%
@@ -190,8 +190,8 @@
 
 ### Story 4: Pre-Commit Validation (P2) - **1 point** [STRETCH GOAL]
 
-**Issue**: TBD (create if time allows)  
-**Owner**: Dev team  
+**Issue**: TBD (create if time allows)
+**Owner**: Dev team
 **Status**: Not started
 
 **Goal**: Extend pre-commit hook with comprehensive checks
@@ -214,8 +214,8 @@
 
 ### Story 5: Add Defect Tracking to Dashboard (P1) - **2 points** [NEW]
 
-**Issue**: [#25](https://github.com/oviney/economist-agents/issues/25)  
-**Owner**: Dev team  
+**Issue**: [#25](https://github.com/oviney/economist-agents/issues/25)
+**Owner**: Dev team
 **Status**: Foundation complete, dashboard integration needed
 
 **Goal**: Make defect metrics visible and actionable
@@ -256,8 +256,8 @@
 
 ### Story 6: Enhanced Defect Schema with RCA & Prevention (P0) - **5 points** [NEW - QE CRITICAL]
 
-**Issue**: [#26](https://github.com/oviney/economist-agents/issues/26)  
-**Owner**: Quality Engineer + Dev team  
+**Issue**: [#26](https://github.com/oviney/economist-agents/issues/26)
+**Owner**: Quality Engineer + Dev team
 **Status**: Analysis complete, implementation needed
 
 **Goal**: Transform defect tracking from reactive logging to proactive quality intelligence
@@ -559,8 +559,8 @@ Based on Sprint 4 post-mortem:
 
 ## Communication Plan
 
-**Sprint Start**: This document (SPRINT_5_PLAN.md)  
-**Daily Updates**: Update SPRINT.md with progress  
+**Sprint Start**: This document (SPRINT_5_PLAN.md)
+**Daily Updates**: Update SPRINT.md with progress
 **Sprint End**: SPRINT_5_RETROSPECTIVE.md with:
 - Metrics comparison (before/after)
 - Defect escape rate analysis
@@ -597,7 +597,6 @@ Based on Sprint 4 post-mortem:
 
 ---
 
-**Sprint 5 Status**: Ready to begin  
-**Updated**: January 1, 2026 (defect tracking added)  
+**Sprint 5 Status**: Ready to begin
+**Updated**: January 1, 2026 (defect tracking added)
 **Next Review**: Day 3 (mid-sprint check)
-

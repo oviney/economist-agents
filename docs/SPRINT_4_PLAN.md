@@ -1,6 +1,6 @@
 # Sprint 4 Planning - Quality Metrics & GenAI Features
 
-**Sprint Duration:** Jan 2-8, 2026 (5 working days)  
+**Sprint Duration:** Jan 2-8, 2026 (5 working days)
 **Sprint Goal:** Integrate metrics tracking into production pipeline and add GenAI featured images
 
 ---
@@ -30,8 +30,8 @@
 ### High Priority Stories
 
 #### Story 1: **Integrate Metrics into Production Pipeline** (Issue #19)
-**Priority:** P0 (Must Do - addresses user feedback)  
-**Story Points:** 3  
+**Priority:** P0 (Must Do - addresses user feedback)
+**Story Points:** 3
 **Estimated Time:** 3-4 hours
 
 **Why This Story:**
@@ -61,8 +61,8 @@
 ---
 
 #### Story 2: **GenAI Featured Images** (Issue #14)
-**Priority:** P1 (High Value Feature)  
-**Story Points:** 5  
+**Priority:** P1 (High Value Feature)
+**Story Points:** 5
 **Estimated Time:** 5-7 hours
 
 **Why This Story:**
@@ -104,8 +104,8 @@ Requirements:
 ---
 
 #### Story 3: **Metrics Documentation** (Part of Issue #19)
-**Priority:** P2 (Medium)  
-**Story Points:** 1  
+**Priority:** P2 (Medium)
+**Story Points:** 1
 **Estimated Time:** 1-2 hours
 
 **Tasks:**
@@ -126,11 +126,11 @@ Requirements:
 
 ### Deferred Stories (Not in Sprint 4)
 
-**Issue #12:** CONTRIBUTING.md (P4, 1 pt) - Defer to Sprint 5  
-**Issue #11:** Pre-commit Architecture Review (P4, 1 pt) - Defer to Sprint 5  
-**Issue #10:** Expand Skills Categories (P3, 2 pts) - Defer to Sprint 5  
-**Issue #9:** Anti-Pattern Detection (P3, 3 pts) - Defer to Sprint 5  
-**Issue #8:** Integration Tests (P3, 5 pts) - Defer to Sprint 5  
+**Issue #12:** CONTRIBUTING.md (P4, 1 pt) - Defer to Sprint 5
+**Issue #11:** Pre-commit Architecture Review (P4, 1 pt) - Defer to Sprint 5
+**Issue #10:** Expand Skills Categories (P3, 2 pts) - Defer to Sprint 5
+**Issue #9:** Anti-Pattern Detection (P3, 3 pts) - Defer to Sprint 5
+**Issue #8:** Integration Tests (P3, 5 pts) - Defer to Sprint 5
 
 **Rationale:** Focus Sprint 4 on completing user-requested metrics + high-value GenAI feature
 
@@ -138,9 +138,9 @@ Requirements:
 
 ## Sprint 4 Capacity Planning
 
-**Total Story Points:** 9 (3 + 5 + 1)  
-**Estimated Time:** 9-13 hours  
-**Days:** 5 working days  
+**Total Story Points:** 9 (3 + 5 + 1)
+**Estimated Time:** 9-13 hours
+**Days:** 5 working days
 **Velocity:** 8-10 points/week (historical average)
 
 **Assessment:** ⚠️ Slightly over capacity (9 pts vs 8-10 target)

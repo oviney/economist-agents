@@ -19,6 +19,11 @@
 □ Acceptance criteria defined
 □ Three Amigos review complete (Dev, QA, Product perspectives)
 □ Dependencies identified
+□ Technical prerequisites validated (NEW - Sprint 7 lesson)
+  ├─ Dependencies researched (versions, compatibility)
+  ├─ Environment requirements validated (Python, OS, tools)
+  ├─ Installation docs reviewed for known issues
+  └─ Prerequisite check script run (if applicable)
 □ Risks documented
 □ Story points estimated
 □ Definition of Done agreed
@@ -26,6 +31,17 @@
 ```
 
 **If ANY checkbox is empty → STOP. Cannot proceed.**
+
+**CRITICAL ADDITION (Sprint 7 Lesson Learned)**:
+For stories involving new dependencies or frameworks:
+- **Task 0: Validate Prerequisites** (30 min, MANDATORY)
+  * Read installation documentation thoroughly
+  * Check version compatibility matrix
+  * Run dependency validation script
+  * Document environment constraints
+  * Test critical imports/functionality
+- **GATE**: DoR re-validation after prerequisite research
+- **If blockers found**: Update story estimate BEFORE coding begins
 
 ---
 
@@ -156,10 +172,10 @@ Scrum Master: "Here's my task breakdown..."
   - Subtasks: a, b, c
   - DoD: [specific criteria]
   - Risks: [identified issues]
-  
+
 - Task 2: [Description] (Y min, Priority)
   ...
-  
+
 Total Estimate: Z minutes
 Decisions Needed: [list questions for user]
 ```
@@ -240,7 +256,7 @@ Step 1: Requirements Gathering ✅
 - Done: All docs updated, validated, committed
 
 Step 2: Story Written ✅
-User Story: As Documentation Lead, I need unified documentation 
+User Story: As Documentation Lead, I need unified documentation
 automation so that README/SPRINT.md/CHANGELOG stay current.
 
 Acceptance Criteria:
@@ -448,7 +464,7 @@ python3 scripts/sprint_ceremony_tracker.py --can-start 7
 ### Benefits
 
 **Prevents This Exact Violation**:
-- User: "Are we missing a DoR here?" 
+- User: "Are we missing a DoR here?"
 - System: Would have blocked automatically
 - Scrum Master: Can't bypass ceremony sequence
 

@@ -6,9 +6,9 @@ This file contains all GitHub issues ready to be created in the economist-agents
 
 ## Issue #29: Research Spike - Agent Performance as Team Skills Gap Indicator
 
-**Labels:** `P2-medium`, `type:research`, `effort:medium`, `quality`  
-**Milestone:** Sprint 7+ (After defect RCA foundation)  
-**Assignee:** TBD (Team)  
+**Labels:** `P2-medium`, `type:research`, `effort:medium`, `quality`
+**Milestone:** Sprint 7+ (After defect RCA foundation)
+**Assignee:** TBD (Team)
 **Projects:** Quality Improvement
 
 ### Description
@@ -19,7 +19,7 @@ Research and design framework to translate AI agent bugs into human role skills 
 
 Current system logs agent bugs but doesn't translate these to actionable team development insights:
 - **Writer Agent bugs** (2/4 total) → Content Writer skills gap
-- **Editor Agent misses** → Senior Editor/QE skills gap  
+- **Editor Agent misses** → Senior Editor/QE skills gap
 - **Research Agent issues** → Research Analyst skills gap
 - **Graphics Agent failures** → Data Viz Designer skills gap
 
@@ -65,7 +65,7 @@ Current system logs agent bugs but doesn't translate these to actionable team de
 **Skill Level**: Junior (40/100)
 **Evidence**: 2 bugs - charts not embedded, duplicate display
 **Top Gaps**:
-- Requirements adherence 
+- Requirements adherence
 - CMS/Jekyll knowledge
 - Style guide compliance
 
@@ -74,7 +74,7 @@ Current system logs agent bugs but doesn't translate these to actionable team de
 - Prompt Engineering: Add explicit checklist
 - Hiring: Consider senior technical writer for review
 
-### Research Analyst (Research Agent proxy)  
+### Research Analyst (Research Agent proxy)
 **Skill Level**: Mid-level (73/100)
 **Evidence**: 73% verification rate vs 80% target
 **Top Gaps**: Source verification, data quality checks
@@ -107,7 +107,7 @@ Current system logs agent bugs but doesn't translate these to actionable team de
 
 **Enables (if implemented):**
 - Better hiring decisions (know which skills are weakest)
-- Targeted prompt engineering improvements  
+- Targeted prompt engineering improvements
 - Strategic workforce planning
 - Training program prioritization
 
@@ -123,7 +123,7 @@ Current system logs agent bugs but doesn't translate these to actionable team de
 
 **Spike (Research + Design)**: **5 points** (3-4 days)
 - Discovery/interviews: 1 day
-- Framework design: 1.5 days  
+- Framework design: 1.5 days
 - Validation/refinement: 1 day
 - Documentation: 0.5 day
 
@@ -131,18 +131,18 @@ Current system logs agent bugs but doesn't translate these to actionable team de
 
 ### Priority & Sprint Placement
 
-**Priority**: P2 - Medium (Strategic value, not urgent)  
-**Earliest Sprint**: Sprint 7 (need defect RCA complete first)  
+**Priority**: P2 - Medium (Strategic value, not urgent)
+**Earliest Sprint**: Sprint 7 (need defect RCA complete first)
 **Recommended**: Sprint 8+ (after defect patterns stabilize)
 
 ### Impact Assessment
 
-**Value**: 
+**Value**:
 - Strategic planning for hiring/training
 - Improved agent prompt engineering priorities
 - Data-driven workforce development
 
-**Risk**: Low (pure research, no production impact)  
+**Risk**: Low (pure research, no production impact)
 **Effort**: Medium (research only, implementation optional)
 
 ### Related Issues
@@ -168,9 +168,9 @@ Current system logs agent bugs but doesn't translate these to actionable team de
 
 ## Issue #26: Extract Agent Definitions to YAML Configuration
 
-**Labels:** `P1-high`, `type:refactor`, `effort:medium`  
-**Milestone:** Phase 1 - Foundation (Q1 2026)  
-**Assignee:** @oviney  
+**Labels:** `P1-high`, `type:refactor`, `effort:medium`
+**Milestone:** Phase 1 - Foundation (Q1 2026)
+**Assignee:** @oviney
 **Projects:** Agentic Architecture Evolution
 
 ### Description
@@ -214,7 +214,7 @@ This creates technical debt and limits our ability to iterate on agent behavior 
 
 **Week 2:**
 1. Extract editorial board agents (6 files)
-2. Extract content generation agents (4 files)  
+2. Extract content generation agents (4 files)
 3. Extract topic scout (1 file)
 4. Add pre-commit validation hook
 5. Verify output equivalence
@@ -291,9 +291,9 @@ metadata:
 
 ## Issue #27: Implement Agent Registry Pattern
 
-**Labels:** `P1-high`, `type:architecture`, `effort:medium`  
-**Milestone:** Phase 2 - Agent Registry (Q1 2026)  
-**Assignee:** @oviney  
+**Labels:** `P1-high`, `type:architecture`, `effort:medium`
+**Milestone:** Phase 2 - Agent Registry (Q1 2026)
+**Assignee:** @oviney
 **Projects:** Agentic Architecture Evolution
 
 ### Description
@@ -361,15 +361,15 @@ class AgentRegistry:
         self.llm_factory = llm_factory
         self._agents: Dict[str, AgentConfig] = {}
         self._load_agents()
-    
+
     def get_agent(self, name: str, model: str = "gpt-4o") -> Agent:
         """Factory method: Create agent instance"""
         ...
-    
+
     def list_agents(self, category: str = None) -> List[str]:
         """Discover available agents"""
         ...
-    
+
     def get_config(self, name: str) -> AgentConfig:
         """Get raw configuration for inspection"""
         ...
@@ -410,10 +410,10 @@ def test_provider_swapping():
     """Can swap providers per agent"""
     openai_reg = AgentRegistry(Path("agents/"), OpenAIProvider())
     anthropic_reg = AgentRegistry(Path("agents/"), AnthropicProvider())
-    
+
     agent1 = openai_reg.get_agent("writer")
     agent2 = anthropic_reg.get_agent("writer")
-    
+
     assert type(agent1.llm_client) != type(agent2.llm_client)
 ```
 
@@ -434,9 +434,9 @@ def test_provider_swapping():
 
 ## Issue #28: Create Public Skills Library
 
-**Labels:** `P2-medium`, `type:enhancement`, `effort:large`  
-**Milestone:** Phase 5 - Community (Q2 2026)  
-**Assignee:** @oviney  
+**Labels:** `P2-medium`, `type:enhancement`, `effort:large`
+**Milestone:** Phase 5 - Community (Q2 2026)
+**Assignee:** @oviney
 **Projects:** Agentic Architecture Evolution
 
 ### Description
@@ -581,9 +581,9 @@ parameters:
 
 ## Issue #29: Integrate MCP Tools for Research Agents
 
-**Labels:** `P2-medium`, `type:enhancement`, `effort:medium`  
-**Milestone:** Phase 3 - Tool Integration (Q1 2026)  
-**Assignee:** @oviney  
+**Labels:** `P2-medium`, `type:enhancement`, `effort:medium`
+**Milestone:** Phase 3 - Tool Integration (Q1 2026)
+**Assignee:** @oviney
 **Projects:** Agentic Architecture Evolution
 
 ### Description
@@ -648,7 +648,7 @@ class WebSearchTool:
     """MCP-powered web search"""
     def __init__(self, provider: str = "tavily"):
         self.client = MCPClient(f"{provider}-search")
-    
+
     def search(self, query: str, max_results: int = 10) -> List[SearchResult]:
         """Execute web search and return results"""
         results = self.client.query(query, limit=max_results)
@@ -658,7 +658,7 @@ class ArxivSearchTool:
     """Academic paper search via ArXiv API"""
     def __init__(self):
         self.client = MCPClient("arxiv-search")
-    
+
     def find_papers(self, topic: str, max_age_years: int = 2) -> List[Paper]:
         """Find recent papers on topic"""
         results = self.client.query(
@@ -691,7 +691,7 @@ class SourceVerifier:
     "serper-search": {
       "url": "https://api.serper.dev/search",
       "auth": {
-        "type": "api_key", 
+        "type": "api_key",
         "key": "${SERPER_API_KEY}"
       }
     },
@@ -725,7 +725,7 @@ def test_web_search_tool():
     """Web search returns valid results"""
     tool = WebSearchTool("tavily")
     results = tool.search("quality engineering trends 2026")
-    
+
     assert len(results) > 0
     assert all(r.url.startswith("http") for r in results)
     assert all(r.title for r in results)
@@ -734,9 +734,9 @@ def test_researcher_uses_tools():
     """Research agent invokes web search"""
     registry = AgentRegistry(Path("agents/"), OpenAIProvider())
     researcher = registry.get_agent("researcher")
-    
+
     result = researcher.research_topic("test-driven development")
-    
+
     assert "sources" in result
     assert len(result["sources"]) > 0
     assert all("url" in s for s in result["sources"])
@@ -744,10 +744,10 @@ def test_researcher_uses_tools():
 def test_source_verification():
     """Editor verifies all claims have sources"""
     verifier = SourceVerifier()
-    
+
     claim = "Test-driven development reduces bugs by 40%"
     context = "According to Microsoft Research..."
-    
+
     result = verifier.verify_claim(claim, context)
     assert result.has_source == True
 ```
@@ -802,9 +802,9 @@ SERPER_API_KEY=...
 
 ## Issue #30: Research Hierarchical Agent Patterns
 
-**Labels:** `P3-low`, `type:research`, `effort:small`  
-**Milestone:** Phase 7 - Advanced Features (Q3 2026)  
-**Assignee:** @oviney  
+**Labels:** `P3-low`, `type:research`, `effort:small`
+**Milestone:** Phase 7 - Advanced Features (Q3 2026)
+**Assignee:** @oviney
 **Projects:** Agentic Architecture Evolution
 
 ### Description
@@ -924,8 +924,8 @@ If hierarchy not needed yet:
 ```markdown
 ## Decision: Hierarchy Not Needed (Yet)
 
-**Date:** 2026-XX-XX  
-**Current State:** 11 agents, flat structure working well  
+**Date:** 2026-XX-XX
+**Current State:** 11 agents, flat structure working well
 **Decision:** Keep flat structure, revisit when triggers hit
 
 **Triggers to Revisit:**
@@ -968,9 +968,9 @@ If hierarchy not needed yet:
 
 ## Issue #31: Build Agent Performance Metrics Dashboard
 
-**Labels:** `P3-low`, `type:enhancement`, `effort:medium`  
-**Milestone:** Phase 6 - Optimization (Q2 2026)  
-**Assignee:** @oviney  
+**Labels:** `P3-low`, `type:enhancement`, `effort:medium`
+**Milestone:** Phase 6 - Optimization (Q2 2026)
+**Assignee:** @oviney
 **Projects:** Agentic Architecture Evolution
 
 ### Description
@@ -1119,7 +1119,7 @@ CREATE TABLE engagement_metrics (
 class MetricsCollector:
     def __init__(self, db_path: Path):
         self.db = sqlite3.connect(db_path)
-    
+
     def start_run(self, topic: str) -> int:
         """Start a new metrics run"""
         cursor = self.db.execute(
@@ -1127,8 +1127,8 @@ class MetricsCollector:
             (datetime.now(), topic, "running")
         )
         return cursor.lastrowid
-    
-    def log_agent_metrics(self, run_id: int, agent_name: str, 
+
+    def log_agent_metrics(self, run_id: int, agent_name: str,
                          tokens: int, cost: float, time: float):
         """Log per-agent metrics"""
         self.db.execute(
@@ -1136,8 +1136,8 @@ class MetricsCollector:
             (None, run_id, agent_name, tokens, cost, time)
         )
         self.db.commit()
-    
-    def log_quality_metrics(self, run_id: int, hemingway: float, 
+
+    def log_quality_metrics(self, run_id: int, hemingway: float,
                            style: float, sources: float):
         """Log quality metrics"""
         self.db.execute(
@@ -1213,19 +1213,19 @@ jobs:
 # scripts/check_regressions.py
 def check_regressions(current_metrics, baseline_metrics):
     alerts = []
-    
+
     # Quality regression
     if current_metrics.hemingway > baseline_metrics.hemingway * 1.1:
         alerts.append("⚠️ Hemingway score degraded >10%")
-    
+
     # Cost regression
     if current_metrics.cost > baseline_metrics.cost * 1.25:
         alerts.append("⚠️ Cost increased >25%")
-    
-    # Performance regression  
+
+    # Performance regression
     if current_metrics.time > baseline_metrics.time * 1.5:
         alerts.append("⚠️ Pipeline time increased >50%")
-    
+
     return alerts
 ```
 

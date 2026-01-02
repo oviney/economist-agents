@@ -15,5 +15,9 @@ python-dotenv>=1.0.0     # Secure .env file loading
 jsonschema>=4.17.0       # JSON Schema validation (optional, has fallback)
 PyGithub>=2.1.0          # GitHub API integration for sprint sync
 
+# CrewAI framework (Phase 1 migration - ADR-003)
+crewai>=0.28.0           # Multi-agent orchestration framework
+crewai-tools>=0.2.0      # CrewAI tool integrations
+
 # Development dependencies
 pytest>=7.0.0            # Testing framework (optional)

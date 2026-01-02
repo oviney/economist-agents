@@ -69,7 +69,7 @@ ax.annotate('Series Name',
             textcoords='offset points',
             va='bottom')                  # Align bottom of text to offset point
 
-# Label BELOW a line (for lower series)  
+# Label BELOW a line (for lower series)
 ax.annotate('Series Name',
             xy=(x_anchor, y_anchor),
             xytext=(0, -20),              # Offset DOWN in points
@@ -118,21 +118,21 @@ ax.annotate('Series Name',
 def find_safe_label_position(line_y_values, x_position, label_height_pts=30):
     """
     Find a y-position for a label that doesn't overlap the line.
-    
+
     Args:
         line_y_values: Array of y-values for the line
         x_position: X-coordinate where label will be placed
         label_height_pts: Approximate height of label in points
-    
+
     Returns:
         (y_position, vertical_alignment)
     """
     y_at_x = interpolate_y_at_x(line_y_values, x_position)
-    
+
     # Check space above vs below
     space_above = 100 - y_at_x  # Assuming y-axis 0-100
     space_below = y_at_x - 0
-    
+
     if space_above > space_below:
         # Place above
         return (y_at_x, 20, 'bottom')  # offset up 20 points
@@ -266,37 +266,37 @@ ax.plot(years, series1, color='#17648d', linewidth=2.5, marker='o', markersize=6
 ax.plot(years, series2, color='#843844', linewidth=2.5, marker='s', markersize=6)
 
 # === END-OF-LINE VALUES (preferred label style) ===
-ax.annotate(f'{series1[-1]}%', 
-            xy=(years[-1], series1[-1]), 
+ax.annotate(f'{series1[-1]}%',
+            xy=(years[-1], series1[-1]),
             xytext=(10, 0),
-            textcoords='offset points', 
-            fontsize=11, fontweight='bold', 
+            textcoords='offset points',
+            fontsize=11, fontweight='bold',
             color='#17648d', va='center')
 
-ax.annotate(f'{series2[-1]}%', 
-            xy=(years[-1], series2[-1]), 
+ax.annotate(f'{series2[-1]}%',
+            xy=(years[-1], series2[-1]),
             xytext=(10, 0),
-            textcoords='offset points', 
-            fontsize=11, fontweight='bold', 
+            textcoords='offset points',
+            fontsize=11, fontweight='bold',
             color='#843844', va='center')
 
 # === INLINE LABELS (in clear space, offset from lines) ===
 # Upper series: label ABOVE the line
-ax.annotate('AI adoption\nin testing', 
+ax.annotate('AI adoption\nin testing',
             xy=(2023, 68),
             xytext=(0, 20),          # 20 points ABOVE
             textcoords='offset points',
-            fontsize=9, color='#17648d', 
+            fontsize=9, color='#17648d',
             ha='center', va='bottom',
             linespacing=1.2)
 
 # Lower series: position carefully to avoid X-axis zone
 # Since series2 is low (14 at 2023), place label to the RIGHT at endpoint
-ax.annotate('Maintenance\nburden reduction', 
+ax.annotate('Maintenance\nburden reduction',
             xy=(2021, 8),            # Earlier x to avoid crowding end
             xytext=(0, -25),         # Below, but check it doesn't hit x-axis
             textcoords='offset points',
-            fontsize=9, color='#843844', 
+            fontsize=9, color='#843844',
             ha='center', va='top',
             linespacing=1.2)
 
@@ -329,15 +329,15 @@ plt.subplots_adjust(top=0.78, bottom=0.15, left=0.10, right=0.88)
 
 # === FIGURE ELEMENTS (after layout) ===
 # Red bar
-rect = mpatches.Rectangle((0, 0.96), 1, 0.04, 
+rect = mpatches.Rectangle((0, 0.96), 1, 0.04,
                             transform=fig.transFigure,
-                            facecolor='#e3120b', 
-                            edgecolor='none', 
+                            facecolor='#e3120b',
+                            edgecolor='none',
                             clip_on=False)
 fig.patches.append(rect)
 
 # Title (y=0.90, safely below red bar)
-fig.text(0.10, 0.90, 'The automation gap', 
+fig.text(0.10, 0.90, 'The automation gap',
          fontsize=16, fontweight='bold', color='#1a1a1a',
          transform=fig.transFigure, ha='left')
 

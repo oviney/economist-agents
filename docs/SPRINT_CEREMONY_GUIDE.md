@@ -315,7 +315,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      
+
       - name: Check Sprint Readiness
         run: |
           SPRINT_NUM=$(grep -oP 'Sprint \K\d+' CHANGELOG.md | head -1)
@@ -521,6 +521,6 @@ class CustomSprintTracker(SprintCeremonyTracker):
 
 ---
 
-**Version**: 1.0  
-**Last Updated**: 2026-01-01  
+**Version**: 1.0
+**Last Updated**: 2026-01-01
 **Status**: ✅ Production-ready

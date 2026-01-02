@@ -64,7 +64,7 @@ else:
 
 ---
 
-#### Writer Agent Self-Validation  
+#### Writer Agent Self-Validation
 **Location**: `scripts/economist_agent.py` lines ~960-1010
 
 **Implementation**:
@@ -72,8 +72,8 @@ else:
 # SELF-VALIDATION: Review draft before returning
 print("   🔍 Self-validating draft...")
 is_valid, issues = review_agent_output(
-    "writer_agent", 
-    draft, 
+    "writer_agent",
+    draft,
     context={"chart_filename": chart_filename}
 )
 
@@ -128,18 +128,18 @@ if not is_valid:
 ```python
 def review_research_output(output: dict) -> Tuple[bool, List[str]]:
     issues = []
-    
+
     # Check required fields
     if 'data_points' not in output:
         issues.append("CRITICAL: Missing data_points field")
-    
+
     # Check verification
     if output.get('data_points'):
         verified = sum(1 for dp in output['data_points'] if dp.get('verified'))
         total = len(output['data_points'])
         if verified < total * 0.5:
             issues.append(f"HIGH: Only {verified}/{total} data points verified")
-    
+
     return (len(issues) == 0, issues)
 ```
 
@@ -147,13 +147,13 @@ def review_research_output(output: dict) -> Tuple[bool, List[str]]:
 ```python
 def review_writer_output(content: str, context: dict = None) -> Tuple[bool, List[str]]:
     issues = []
-    
+
     # Check YAML front matter
     if not content.startswith('---'):
         issues.append("CRITICAL: Missing YAML front matter")
     elif 'layout:' not in content.split('---')[1]:
         issues.append("CRITICAL: YAML missing 'layout' field - would cause Issue #15")
-    
+
     # Check banned openings
     banned_openings = [
         r"^In today's (fast-paced )?world",
@@ -163,17 +163,17 @@ def review_writer_output(content: str, context: dict = None) -> Tuple[bool, List
     for pattern in banned_openings:
         if re.search(pattern, content, re.MULTILINE | re.IGNORECASE):
             issues.append(f"BANNED OPENING: Pattern '{pattern}' detected")
-    
+
     # Check banned closings
     if re.search(r"In conclusion|To conclude|In summary", content[-500:], re.IGNORECASE):
         issues.append("CRITICAL ENDING: Banned summary closing detected")
-    
+
     # Check chart embedding if chart provided
     if context and context.get('chart_filename'):
         chart_pattern = rf"!\[.*?\]\({re.escape(context['chart_filename'])}\)"
         if not re.search(chart_pattern, content):
             issues.append(f"CRITICAL: Chart not embedded - would cause Issue #16")
-    
+
     return (len([i for i in issues if 'CRITICAL' in i]) == 0, issues)
 ```
 
@@ -244,7 +244,7 @@ if not is_valid:
    ```
    ⚠️  CRITICAL FORMAT REQUIREMENTS:
    4. LAYOUT: MUST include "layout: post" for Jekyll rendering
-   
+
    WRONG formats (DO NOT USE):
    ---
    title: "Article"  ← MISSING layout field - page won't render properly!
@@ -277,14 +277,14 @@ if not is_valid:
    ═══════════════════════════════════════════════════════════════
    ⚠️  CHART EMBEDDING REQUIRED ⚠️
    ═══════════════════════════════════════════════════════════════
-   
+
    A chart has been generated. You MUST include it using this EXACT markdown:
-   
+
    ![Chart Title](chart_path)
-   
+
    Place this markdown in the article body after discussing the relevant data.
    Add a sentence referencing it: "As the chart shows, [observation]..."
-   
+
    Failure to include the chart will result in article rejection.
    ```
 
@@ -344,10 +344,10 @@ if not is_valid:
             *[f"- {issue}" for issue in critical_issues[:5]],
             "\nRegenerate the article with these fixes applied."
         ])
-        
+
         # Regenerate with fix instructions
         draft = call_llm(client, system_prompt + "\n\n" + fix_instructions, ...)
-        
+
         # Re-validate
         is_valid, issues = review_agent_output("writer_agent", draft, ...)
 ```
@@ -494,7 +494,7 @@ Result: Article quarantined, human review required
 - Output paths configurable
 - Error handling present
 
-### ✅ Self-validation catches at least 1 issue  
+### ✅ Self-validation catches at least 1 issue
 **Status**: ✅ **VALIDATED BY IMPLEMENTATION**
 - Research agent: Structure validation ✅
 - Writer agent: 6 critical patterns checked ✅
@@ -537,16 +537,16 @@ Evidence in code:
 
 1. **Editor Agent**: No self-validation (relies on quality gates)
    - **Recommendation**: Add self-validation to editor agent
-   
+
 2. **Graphics Agent**: Partial validation (Visual QA requires Anthropic)
    - **Recommendation**: Expand Visual QA to work with other providers
-   
+
 3. **Research Agent**: No regeneration (flagged as expensive)
    - **Recommendation**: Consider limited regeneration for critical missing fields
 
 4. **Multi-Issue Regeneration**: Only one regeneration attempt
    - **Recommendation**: Allow 2-3 attempts for complex fixes
-   
+
 5. **Live Testing**: Code analysis only, no end-to-end execution
    - **Recommendation**: Run full generation with API keys for empirical data
 
@@ -610,7 +610,7 @@ Next: Run Story 2 (Fix Issue #15 in blog repo) to complete bug fix cycle.
 
 ---
 
-**Report Completed**: 2026-01-01  
-**Analysis Method**: Code review + architectural assessment  
-**Quality Grade**: A- (90%)  
+**Report Completed**: 2026-01-01
+**Analysis Method**: Code review + architectural assessment
+**Quality Grade**: A- (90%)
 **Production Ready**: ✅ Yes

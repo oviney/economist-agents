@@ -1,7 +1,7 @@
 # Sprint Report Specification
 
-**Version**: 1.0  
-**Created**: January 1, 2026  
+**Version**: 1.0
+**Created**: January 1, 2026
 **Purpose**: Define quality standards for sprint completion reports
 
 ---
@@ -251,16 +251,16 @@ def validate_sprint_report(report_path):
     """Check if sprint report meets specification"""
     with open(report_path) as f:
         content = f.read()
-    
+
     issues = []
-    
+
     # Check for file mentions without links
     file_patterns = [
         r'scripts/\w+\.py',
         r'docs/\w+\.md',
         r'skills/\w+\.json',
     ]
-    
+
     for pattern in file_patterns:
         matches = re.findall(pattern, content)
         for match in matches:
@@ -268,21 +268,21 @@ def validate_sprint_report(report_path):
             link_pattern = rf'\[.*{re.escape(match)}.*\]\(https://github\.com'
             if not re.search(link_pattern, content):
                 issues.append(f"File mentioned without link: {match}")
-    
+
     # Check for commit SHAs without links
     commit_shas = re.findall(r'Commit[:\s]+`?([a-f0-9]{7})`?', content, re.IGNORECASE)
     for sha in commit_shas:
         link_pattern = rf'\[`?{sha}`?\]\(https://github\.com.*commit/{sha}\)'
         if not re.search(link_pattern, content):
             issues.append(f"Commit SHA without link: {sha}")
-    
+
     # Check for issue numbers without links
     issue_nums = re.findall(r'#(\d+)', content)
     for num in issue_nums:
         link_pattern = rf'\[#?{num}\]\(https://github\.com.*issues/{num}\)'
         if not re.search(link_pattern, content):
             issues.append(f"Issue number without link: #{num}")
-    
+
     # Check required sections
     required_sections = [
         'Executive Summary',
@@ -293,18 +293,18 @@ def validate_sprint_report(report_path):
         'Known Issues',
         'Next Steps',
     ]
-    
+
     for section in required_sections:
         if section not in content:
             issues.append(f"Missing required section: {section}")
-    
+
     return issues
 
 if __name__ == '__main__':
     import sys
     report = sys.argv[1] if len(sys.argv) > 1 else 'SPRINT_4_COMPLETE.md'
     issues = validate_sprint_report(report)
-    
+
     if issues:
         print(f"❌ {len(issues)} issues found:")
         for issue in issues:

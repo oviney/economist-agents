@@ -23,18 +23,30 @@ A sophisticated multi-agent system (6 AI personas collaborate) that produces pub
 
 ## 🛠️ Installation
 
+**Python Version Requirement:** Python **≤3.13** (tested with 3.13.11)
+
+CrewAI requires Python 3.13 or lower. Python 3.14+ is not currently supported.
+
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/your-org/economist-agents.git
    cd economist-agents
    ```
 
-2. **Run setup script:**
+2. **Create virtual environment with Python 3.13:**
    ```bash
-   ./scripts/setup.sh
+   python3.13 -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   pip install --upgrade pip
    ```
 
-3. **Configure environment:**
+3. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   pip install -r requirements-dev.txt
+   ```
+
+4. **Configure environment:**
    ```bash
    cp .env.example .env
    # Edit .env with your ANTHROPIC_API_KEY

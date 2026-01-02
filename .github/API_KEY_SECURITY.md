@@ -199,22 +199,22 @@ When contributing:
 
 ## ❓ FAQ
 
-**Q: Can I use multiple keys for different environments?**  
+**Q: Can I use multiple keys for different environments?**
 A: Yes! Use .env.dev, .env.prod and load the right one:
 ```bash
 python3 scripts/llm_client.py --env prod
 ```
 
-**Q: What if I don't have python-dotenv installed?**  
+**Q: What if I don't have python-dotenv installed?**
 A: Scripts fall back to system environment variables automatically.
 
-**Q: Are keys encrypted in .env?**  
+**Q: Are keys encrypted in .env?**
 A: No, .env files store keys in plain text. Security comes from:
 - File permissions (600)
 - .gitignore (not committed)
 - Access control (who can read the file)
 
-**Q: Should I use a password manager for API keys?**  
+**Q: Should I use a password manager for API keys?**
 A: Yes! Store backup copies in 1Password, LastPass, etc.
 
 ---

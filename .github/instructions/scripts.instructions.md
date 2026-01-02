@@ -22,14 +22,14 @@ def run_research_agent(client: Client, topic: str, talking_points: str = "") -> 
 ```python
 def generate_economist_post(topic: str, category: str = "quality-engineering") -> dict:
     """Generate Economist-style blog post.
-    
+
     Args:
         topic: Article topic
         category: Content category (default: "quality-engineering")
-        
+
     Returns:
         Dictionary with article_path, chart_path, metrics
-        
+
     Raises:
         ValueError: If topic is invalid
         APIError: If LLM API call fails
@@ -102,7 +102,7 @@ def test_research_agent():
     mock_client.messages.create.return_value = Mock(
         content=[Mock(text='{"data": "test"}')]
     )
-    
+
     result = run_research_agent(mock_client, "Testing")
     assert result["data"] == "test"
 ```

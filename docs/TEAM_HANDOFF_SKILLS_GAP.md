@@ -1,8 +1,8 @@
 # Team Handoff: Skills Gap Analysis (Issue #29)
 
-**From**: Scrum Master  
-**To**: Development Team  
-**Date**: 2026-01-01  
+**From**: Scrum Master
+**To**: Development Team
+**Date**: 2026-01-01
 **Subject**: New research spike ready for pickup (Sprint 7+)
 
 ---
@@ -76,7 +76,7 @@ Based on quality dashboard analysis showing agent bugs represent human skills ga
 **3. Execution (3-4 days)**
 ```
 Phase 1: Role mapping (1 day)
-Phase 2: Gap analysis (1 day)  
+Phase 2: Gap analysis (1 day)
 Phase 3: Framework design (1.5 days)
 Phase 4: Validation & decision (0.5 day)
 ```
@@ -187,9 +187,9 @@ See `SPIKE_SKILLS_GAP_ANALYSIS.md` for:
 
 ## Timeline
 
-**Now (Sprint 5)**: Backlog item ready, waiting for RCA baseline  
-**Sprint 6**: Continue building RCA data (target 20+ bugs)  
-**Sprint 7+**: Team picks up spike when ready  
+**Now (Sprint 5)**: Backlog item ready, waiting for RCA baseline
+**Sprint 6**: Continue building RCA data (target 20+ bugs)
+**Sprint 7+**: Team picks up spike when ready
 **Sprint 8 (if approved)**: Implementation stories (8-13 pts)
 
 ---
@@ -224,6 +224,6 @@ If team needs clarification on anything:
 
 ---
 
-**Status**: 📋 Handoff Complete - Team owns next steps  
-**Next Action**: Team decides when to pull from backlog  
+**Status**: 📋 Handoff Complete - Team owns next steps
+**Next Action**: Team decides when to pull from backlog
 **Scrum Master**: Available for facilitation if requested

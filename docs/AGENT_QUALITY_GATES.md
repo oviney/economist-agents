@@ -172,22 +172,22 @@ def check_writer_quality_gates(output: dict) -> tuple[bool, float]:
     """
     gates_passed = True
     quality_score = 100
-    
+
     # Gate 1: Banned phrases
     if output['banned_phrases'] > 0:
         gates_passed = False
         quality_score -= (output['banned_phrases'] * 10)
-    
+
     # Gate 2: Chart embedding
     if not output['chart_embedded']:
         gates_passed = False
         quality_score -= 20
-    
+
     # Gate 3: Validation
     if not output['validation_passed']:
         gates_passed = False
         quality_score -= 30
-    
+
     quality_score = max(0, quality_score)
     return (gates_passed, quality_score)
 ```
@@ -342,4 +342,3 @@ Visual QA Agent   |  10  |  100%     | 100/100 |   0%   |  15
 **Maintained By**: Quality Engineering Team
 **Review Frequency**: After every 10 agent runs
 **Update Trigger**: New gate failures discovered, baseline shifts
-

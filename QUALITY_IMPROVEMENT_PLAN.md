@@ -1,6 +1,6 @@
 # Quality Improvement Plan - Post-Mortem Analysis
 
-**Date**: 2026-01-01  
+**Date**: 2026-01-01
 **Context**: Analysis of bugs found during production deployment
 
 ## Bugs Found Today
@@ -83,24 +83,24 @@ Writer Agent → Publication Validator → Blog QA → Production
 def run_writer_agent(client, topic, research_brief, chart_filename=None):
     # Generate article
     draft = call_llm(...)
-    
+
     # SELF-VALIDATION
     validation_errors = []
-    
+
     # Check 1: If chart_filename provided, verify it's embedded
     if chart_filename:
         if f"![" not in draft or chart_filename not in draft:
             validation_errors.append("CRITICAL: Chart not embedded")
-    
+
     # Check 2: Front matter has required fields
     if not has_required_front_matter(draft, ['layout', 'title', 'date', 'categories']):
         validation_errors.append("CRITICAL: Missing required front matter")
-    
+
     # If validation fails, regenerate with corrections
     if validation_errors:
         print("⚠️  Writer self-validation failed, regenerating...")
         draft = regenerate_with_fixes(client, draft, validation_errors)
-    
+
     return draft
 ```
 
@@ -132,12 +132,12 @@ REQUIRED_FRONT_MATTER = {
 def validate_front_matter_schema(article_text):
     """Enforce complete front matter schema"""
     front_matter = extract_front_matter(article_text)
-    
+
     errors = []
     for field, spec in REQUIRED_FRONT_MATTER.items():
         if spec['required'] and field not in front_matter:
             errors.append(f"Missing required field: {field}")
-    
+
     return errors
 ```
 
@@ -163,7 +163,7 @@ def test_chart_embedded_when_generated():
     # Generate article with chart data
     research = {"chart_data": {"title": "Test Chart", ...}}
     article = run_writer_agent(client, "Test Topic", research, "test.png")
-    
+
     # Verify chart is embedded
     assert "![" in article, "Chart not embedded"
     assert "test.png" in article, "Chart filename not in article"
@@ -172,14 +172,14 @@ def test_no_orphaned_charts():
     """Publication validator catches orphaned charts"""
     article_without_chart = "---\ntitle: Test\n---\nContent"
     chart_file = "test.png"
-    
+
     # Create chart file
     Path(f"output/charts/{chart_file}").touch()
-    
+
     # Should fail validation
     validator = PublicationValidator()
     valid, issues = validator.validate(article_without_chart)
-    
+
     assert not valid
     assert any("orphaned" in str(i).lower() for i in issues)
 ```
@@ -205,10 +205,10 @@ def scan_live_articles():
     """Check deployed articles for common issues"""
     blog_url = "https://www.viney.ca"
     issues_found = []
-    
+
     for article_url in get_recent_articles(blog_url):
         html = fetch_article(article_url)
-        
+
         # Check 1: Category tag displayed?
         if not has_category_tag(html):
             issues_found.append({
@@ -216,7 +216,7 @@ def scan_live_articles():
                 'issue': 'missing_category_tag',
                 'severity': 'medium'
             })
-        
+
         # Check 2: Chart images load?
         for chart_url in extract_chart_urls(html):
             if not image_exists(chart_url):
@@ -225,7 +225,7 @@ def scan_live_articles():
                     'issue': 'broken_chart',
                     'severity': 'high'
                 })
-        
+
         # Check 3: Duplicate content?
         if has_duplicate_images(html):
             issues_found.append({
@@ -233,7 +233,7 @@ def scan_live_articles():
                 'issue': 'duplicate_chart',
                 'severity': 'medium'
             })
-    
+
     if issues_found:
         create_github_issues(issues_found)
         alert_team(issues_found)
@@ -265,15 +265,15 @@ class PromptEffectivenessTracker:
             'outcome': outcome,  # 'success' | 'validation_failed' | 'production_bug'
             'timestamp': datetime.now()
         })
-    
+
     def get_effectiveness(self, agent_name, time_window='7d'):
         """Calculate success rate for agent"""
         recent = filter_by_time_window(self.metrics, time_window)
         agent_runs = [m for m in recent if m['agent'] == agent_name]
-        
+
         if not agent_runs:
             return None
-        
+
         success_rate = len([r for r in agent_runs if r['outcome'] == 'success']) / len(agent_runs)
         return {
             'agent': agent_name,
@@ -303,16 +303,16 @@ class PromptEffectivenessTracker:
 def test_chart_layout_regression():
     """Ensure chart layouts don't regress"""
     chart_spec = {"title": "Test", "data": [...]}
-    
+
     # Generate chart
     chart_path = run_graphics_agent(client, chart_spec, "test.png")
-    
+
     # Compare to baseline
     baseline_path = "tests/fixtures/charts/baseline-chart.png"
     diff = compare_images(chart_path, baseline_path, threshold=0.95)
-    
+
     assert diff < 0.05, f"Chart differs by {diff*100}%"
-    
+
     # Visual QA validation
     qa_result = run_visual_qa_agent(client, chart_path)
     assert qa_result['overall_pass'], f"Visual QA failed: {qa_result['critical_issues']}"
@@ -338,14 +338,14 @@ def test_chart_layout_regression():
 def learn_from_production_bug(bug_issue_number):
     """Extract lessons from GitHub issue and update agent prompts"""
     issue = fetch_github_issue(bug_issue_number)
-    
+
     # Parse issue for agent failures
     affected_agent = identify_agent(issue)
     failure_pattern = extract_failure_pattern(issue)
-    
+
     # Generate prompt enhancement
     enhancement = generate_prompt_fix(affected_agent, failure_pattern)
-    
+
     # Create PR with prompt update
     create_prompt_update_pr(
         agent=affected_agent,

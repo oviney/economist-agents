@@ -29,10 +29,10 @@ def test_function_name():
     # Arrange - Set up test data and mocks
     mock_client = Mock()
     expected_result = {"key": "value"}
-    
+
     # Act - Call the function being tested
     result = function_under_test(mock_client)
-    
+
     # Assert - Verify the results
     assert result == expected_result
 ```
@@ -50,7 +50,7 @@ def mock_openai_client():
     """Mock OpenAI client for testing."""
     with patch('openai.OpenAI') as mock:
         mock_instance = Mock()
-        
+
         # Mock successful response
         mock_response = Mock()
         mock_response.choices = [
@@ -62,10 +62,10 @@ def mock_openai_client():
             total_tokens=150
         )
         mock_response.model = "gpt-4o"
-        
+
         mock_instance.chat.completions.create.return_value = mock_response
         mock.return_value = mock_instance
-        
+
         yield mock_instance
 
 def test_with_openai_mock(mock_openai_client):
@@ -82,7 +82,7 @@ def mock_anthropic_client():
     """Mock Anthropic client for testing."""
     with patch('anthropic.Anthropic') as mock:
         mock_instance = Mock()
-        
+
         # Mock successful response
         mock_response = Mock()
         mock_response.content = [
@@ -93,10 +93,10 @@ def mock_anthropic_client():
             output_tokens=50
         )
         mock_response.model = "claude-sonnet-4-20250514"
-        
+
         mock_instance.messages.create.return_value = mock_response
         mock.return_value = mock_instance
-        
+
         yield mock_instance
 ```
 
@@ -111,11 +111,11 @@ def test_api_error_handling(mock_openai_client, caplog):
     mock_openai_client.chat.completions.create.side_effect = APIError(
         "Rate limit exceeded"
     )
-    
+
     # Act & Assert
     with pytest.raises(APIError):
         my_function(mock_openai_client)
-    
+
     # Verify error was logged
     assert "API call failed" in caplog.text
 ```
@@ -155,10 +155,10 @@ def test_discover_topics_success(mock_openai_client, sample_topics_response):
     mock_openai_client.chat.completions.create.return_value.choices[0].message.content = (
         orjson.dumps(sample_topics_response).decode()
     )
-    
+
     # Act
     result = discover_topics(mock_openai_client)
-    
+
     # Assert
     assert "topics" in result
     assert len(result["topics"]) == 2
@@ -170,10 +170,10 @@ def test_discover_topics_empty_result(mock_openai_client):
     mock_openai_client.chat.completions.create.return_value.choices[0].message.content = (
         '{"topics": []}'
     )
-    
+
     # Act
     result = discover_topics(mock_openai_client)
-    
+
     # Assert
     assert "topics" in result
     assert len(result["topics"]) == 0
@@ -186,10 +186,10 @@ def test_validate_topics_schema_valid():
             {"title": "Test", "description": "Desc", "relevance_score": 5}
         ]
     }
-    
+
     # Act
     result = validate_topics_schema(topics)
-    
+
     # Assert
     assert result is True
 
@@ -201,7 +201,7 @@ def test_validate_topics_schema_missing_field():
             {"title": "Test", "description": "Desc"}  # Missing score
         ]
     }
-    
+
     # Act & Assert
     with pytest.raises(ValueError, match="Missing required field"):
         validate_topics_schema(topics)
@@ -228,10 +228,10 @@ def test_collect_votes_all_personas(mock_openai_client, sample_topic):
     """Test that all 6 personas vote."""
     # Arrange
     mock_openai_client.chat.completions.create.return_value.choices[0].message.content = "8"
-    
+
     # Act
     votes = collect_votes(mock_openai_client, sample_topic)
-    
+
     # Assert
     assert len(votes) == 6
     assert all(persona in votes for persona in PERSONA_PROMPTS.keys())
@@ -248,10 +248,10 @@ def test_aggregate_scores_weighted():
         "skeptic": 5,
         "visionary": 10
     }
-    
+
     # Act
     final_score = aggregate_scores(votes)
-    
+
     # Assert
     assert isinstance(final_score, float)
     assert 5.0 <= final_score <= 10.0
@@ -260,10 +260,10 @@ def test_validate_vote_score_valid():
     """Test vote score validation with valid score."""
     # Arrange
     vote = 8
-    
+
     # Act
     result = validate_vote_score(vote)
-    
+
     # Assert
     assert result == 8
 
@@ -271,7 +271,7 @@ def test_validate_vote_score_out_of_range():
     """Test vote score validation with invalid score."""
     # Arrange
     vote = 15  # Out of 0-10 range
-    
+
     # Act & Assert
     with pytest.raises(ValueError, match="Vote score must be between 0 and 10"):
         validate_vote_score(vote)
@@ -318,14 +318,14 @@ def test_run_research_stage(mock_openai_client, sample_topic, temp_session_dir):
     mock_openai_client.chat.completions.create.return_value.choices[0].message.content = (
         orjson.dumps(expected_research).decode()
     )
-    
+
     # Act
     result = run_research_stage(mock_openai_client, sample_topic, temp_session_dir)
-    
+
     # Assert
     assert "data_points" in result
     assert len(result["data_points"]) == 2
-    
+
     # Verify output was saved
     output_file = temp_session_dir / "research_agent.json"
     assert output_file.exists()
@@ -342,10 +342,10 @@ def test_generate_article_full_pipeline(
         mock_openai_client.chat.completions.create.return_value.choices[0].message.content = (
             '{"result": "success"}'
         )
-        
+
         # Act
         article_path = generate_article(sample_topic, interactive=False)
-        
+
         # Assert
         assert article_path is not None
         assert article_path.exists()
@@ -362,7 +362,7 @@ def test_generate_article_interactive_rejection(
         with patch('scripts.economist_agent.approve_stage', return_value=False):
             # Act
             article_path = generate_article(sample_topic, interactive=True)
-            
+
             # Assert
             assert article_path is None  # Generation stopped by user
 ```
@@ -389,13 +389,13 @@ def test_save_agent_output(temp_output_dir):
     # Arrange
     output_data = {"key": "value", "list": [1, 2, 3]}
     output_file = temp_output_dir / "test_output.json"
-    
+
     # Act
     save_agent_output(output_data, output_file)
-    
+
     # Assert
     assert output_file.exists()
-    
+
     # Verify content
     with open(output_file, "rb") as f:
         loaded_data = orjson.loads(f.read())
@@ -413,13 +413,13 @@ def test_error_logging(caplog):
     """Test that errors are properly logged."""
     # Arrange
     caplog.set_level(logging.ERROR)
-    
+
     # Act
     try:
         raise ValueError("Test error")
     except ValueError as e:
         logger.error(f"Caught error: {e}")
-    
+
     # Assert
     assert "Caught error: Test error" in caplog.text
     assert caplog.records[0].levelname == "ERROR"
@@ -435,7 +435,7 @@ def test_missing_api_key(monkeypatch):
     """Test handling of missing API key."""
     # Arrange
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
-    
+
     # Act & Assert
     with pytest.raises(ValueError, match="OPENAI_API_KEY environment variable not set"):
         initialize_client()
@@ -444,10 +444,10 @@ def test_with_api_key(monkeypatch):
     """Test with API key present."""
     # Arrange
     monkeypatch.setenv("OPENAI_API_KEY", "test-key-123")
-    
+
     # Act
     client = initialize_client()
-    
+
     # Assert
     assert client is not None
 ```

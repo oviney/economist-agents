@@ -64,15 +64,15 @@ def validate_plugin_config(config_path, layouts_dir):
         if '{% seo %}' in layout_file.read_text():
             seo_tag_used = True
             break
-    
+
     # Check if jekyll-seo-tag is configured
     with open(config_path) as f:
         config = yaml.safe_load(f)
         plugins = config.get('plugins', [])
-        
+
     if seo_tag_used and 'jekyll-seo-tag' not in plugins:
         return False, "Layout uses {% seo %} but jekyll-seo-tag not in plugins"
-    
+
     return True, "Plugin configuration valid"
 ```
 
@@ -138,18 +138,18 @@ title: About
 def validate_layout_exists(post_path, layouts_dir):
     with open(post_path) as f:
         content = f.read()
-    
+
     # Extract front matter
     match = re.match(r'^---\n(.*?)\n---', content, re.DOTALL)
     if match:
         front_matter = yaml.safe_load(match.group(1))
         layout = front_matter.get('layout')
-        
+
         if layout:
             layout_path = Path(layouts_dir) / f"{layout}.html"
             if not layout_path.exists():
                 return False, f"Layout '{layout}' not found at {layout_path}"
-    
+
     return True, "Layout valid"
 ```
 
@@ -268,17 +268,17 @@ REQUIRED_FIELDS = ['layout', 'title', 'date']
 def validate_front_matter(post_path):
     with open(post_path) as f:
         content = f.read()
-    
+
     match = re.match(r'^---\n(.*?)\n---', content, re.DOTALL)
     if not match:
         return False, "No front matter found"
-    
+
     front_matter = yaml.safe_load(match.group(1))
-    
+
     for field in REQUIRED_FIELDS:
         if field not in front_matter:
             return False, f"Missing required field: {field}"
-    
+
     return True, "Front matter valid"
 ```
 
@@ -415,18 +415,18 @@ class JekyllValidator:
     def __init__(self, blog_dir):
         self.blog_dir = Path(blog_dir)
         self.errors = []
-    
+
     def validate_all(self):
         """Run all validation checks"""
         self.check_config()
         self.check_layouts()
         self.check_posts()
         return len(self.errors) == 0
-    
+
     def check_config(self):
         """Validate _config.yml"""
         config_path = self.blog_dir / '_config.yml'
-        
+
         # Check for multi-document YAML
         with open(config_path) as f:
             docs = list(yaml.safe_load_all(f))
@@ -434,7 +434,7 @@ class JekyllValidator:
                 self.errors.append(
                     f"Config has {len(docs)} YAML documents, should be 1"
                 )
-        
+
         # Check required plugins
         config = docs[0]
         if '{% seo %}' in self.find_in_layouts():
@@ -443,11 +443,11 @@ class JekyllValidator:
                 self.errors.append(
                     "Layout uses {% seo %} but jekyll-seo-tag not configured"
                 )
-    
+
     def check_layouts(self):
         """Validate layout files"""
         layouts_dir = self.blog_dir / '_layouts'
-        
+
         # Find all layout references
         referenced_layouts = set()
         for post in self.blog_dir.glob('_posts/*.md'):
@@ -457,39 +457,39 @@ class JekyllValidator:
                     fm = yaml.safe_load(match.group(1))
                     if 'layout' in fm:
                         referenced_layouts.add(fm['layout'])
-        
+
         # Check if layout files exist
         for layout in referenced_layouts:
             layout_path = layouts_dir / f"{layout}.html"
             if not layout_path.exists():
                 self.errors.append(f"Layout '{layout}' not found")
-    
+
     def check_posts(self):
         """Validate blog posts"""
         for post in self.blog_dir.glob('_posts/*.md'):
             self.validate_post(post)
-    
+
     def validate_post(self, post_path):
         """Validate single post"""
         with open(post_path) as f:
             content = f.read()
-        
+
         # Check front matter exists
         match = re.match(r'^---\n(.*?)\n---', content, re.DOTALL)
         if not match:
             self.errors.append(f"{post_path.name}: No front matter")
             return
-        
+
         # Parse front matter
         fm = yaml.safe_load(match.group(1))
-        
+
         # Check required fields
         for field in ['layout', 'title', 'date']:
             if field not in fm:
                 self.errors.append(
                     f"{post_path.name}: Missing {field}"
                 )
-        
+
         # Check for placeholders
         placeholders = [
             'YOUR-', 'REPLACE-', 'TODO:', 'FIXME:', 'XXX'
@@ -564,5 +564,5 @@ This document reflects expertise gained through:
 - 3-tier validation system deployment
 - Self-learning skills system integration
 
-**Last Updated:** 2025-12-31  
+**Last Updated:** 2025-12-31
 **Experience Base:** economist-blog-v5 validation runs

@@ -1,9 +1,9 @@
 # Research Spike: Agent Performance as Team Skills Gap Indicator
 
-**Issue**: #29  
-**Type**: Research Spike  
-**Story Points**: 5  
-**Status**: Ready for Pickup (blocked by defect RCA foundation)  
+**Issue**: #29
+**Type**: Research Spike
+**Story Points**: 5
+**Status**: Ready for Pickup (blocked by defect RCA foundation)
 **Owner**: Team (self-organized)
 
 ---
@@ -12,7 +12,7 @@
 
 When AI agents produce bugs, this indicates skills gaps in the human roles they simulate. This spike researches how to translate agent performance metrics into actionable hiring/training insights.
 
-**Current State**: We track agent bugs but can't answer "which roles need development?"  
+**Current State**: We track agent bugs but can't answer "which roles need development?"
 **Desired State**: Dashboard shows skills gaps by role with hiring/training recommendations
 
 ---
@@ -303,7 +303,7 @@ For each agent bug:
 
 ---
 
-**Status**: 📋 Ready for Team Pickup (Sprint 7+)  
-**Blocked By**: Defect RCA foundation  
-**Owner**: Team (self-organized)  
+**Status**: 📋 Ready for Team Pickup (Sprint 7+)
+**Blocked By**: Defect RCA foundation
+**Owner**: Team (self-organized)
 **Escalation Needed**: No (team has autonomy)

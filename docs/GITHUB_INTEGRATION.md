@@ -15,7 +15,7 @@
 
 **Associated Issues**:
 - #15 - Missing category tag on article page ✅ CLOSED
-- #16 - Charts generated but never embedded ✅ CLOSED  
+- #16 - Charts generated but never embedded ✅ CLOSED
 - #17 - Duplicate chart display ✅ CLOSED
 - #7 - Visual QA Metrics Tracking ✅ CLOSED
 
@@ -187,4 +187,3 @@ Sprint 3: Feature Enhancements (OPEN)
 **Sprint 2 Issues**: 4/4 closed (100%)
 **Sprint 3 Issues**: 2 planned
 **Total Time**: ~15 minutes
-

@@ -14,7 +14,6 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, List
 
 
 class BadgeValidator:
@@ -26,7 +25,7 @@ class BadgeValidator:
         self.readme_path = self.repo_root / "README.md"
         self.quality_json_path = self.repo_root / "quality_score.json"
         self.sprint_tracker_path = self.repo_root / "skills" / "sprint_tracker.json"
-        self.issues: List[str] = []
+        self.issues: list[str] = []
 
     def validate_quality_badge(self) -> bool:
         """Validate quality score badge"""
@@ -171,7 +170,7 @@ class BadgeValidator:
             self.issues.append(f"Badge URL validation error: {e}")
             return False
 
-    def validate_all(self) -> Dict[str, bool]:
+    def validate_all(self) -> dict[str, bool]:
         """Run all badge validations"""
         print("\n🔍 Badge Validation Report")
         print("=" * 60)

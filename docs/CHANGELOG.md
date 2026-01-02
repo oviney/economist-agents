@@ -1,5 +1,58 @@
 # Economist Agents - Development Log
 
+## 2026-01-02: BUG-023 Tracked - README Badge Regression
+
+### Summary
+Identified and tracked README badge regression as BUG-023 (GitHub Issue #38). Badges display stale/incorrect data, undermining documentation trust. Tracked as high-severity defect with full RCA.
+
+### Issue Details
+
+**BUG-023: README badges show stale data** (Issue #38)
+- **Severity**: HIGH
+- **Discovered**: Production (documentation review)
+- **Impact**: New developers, stakeholders see incorrect metrics
+- **Root Cause**: Hardcoded badge values instead of dynamic data sources
+- **Test Gap**: No validation of badge accuracy (manual_test)
+
+**Current Badge Issues** (needs verification):
+- Quality score badge: May link to stale data
+- Coverage badge: May not reflect 52% actual
+- Tests badge: May not reflect 166 passing
+- Sprint badge: May not reflect Sprint 7
+
+**Expected Behavior**:
+- Quality: Link to latest quality_dashboard.py output or GitHub Action
+- Coverage: Link to pytest coverage report or CI artifact
+- Tests: Link to CI test results
+- Sprint: Link to SPRINT.md or sync from sprint_tracker.json
+
+**Prevention Strategy**:
+- Add badge validation to validate_sprint_report.py
+- Configure shields.io dynamic badges from GitHub Actions
+- Add pre-commit hook to verify badge links valid
+
+### Sprint 7 Impact
+
+**Unplanned Work**: +2 story points
+- Story: Fix README badge regression
+- Priority: P0 (blocks documentation credibility)
+- Estimated effort: 1-2 hours (badge configuration + validation)
+
+**Updated Metrics**:
+- Defect escape rate: 50.0% → 57.1% (5/7 bugs to production)
+- Open bugs: 2 (BUG-020, BUG-023)
+- Sprint 7 capacity adjustment: 15 → 17 points
+
+### Files Modified
+- `skills/defect_tracker.json` - BUG-023 logged with full RCA
+- `SPRINT.md` - Unplanned work tracked, defect escape rate updated
+- `docs/CHANGELOG.md` - This entry
+
+### Commits
+**Current**: "Track #38: README badge regression as BUG-023"
+
+---
+
 ## 2026-01-02: Sprint 6 Story 1 - BUG-020 Fixed ✅
 
 ### Summary
@@ -100,7 +153,7 @@ Completed Sprint 8 (13 story points) implementing Sprint 7 diagnostic findings. 
   - Criterion 1: [assessment]
   - Criterion 2: [YES/NO]
   **Decision**: [PASS or FAIL with reason]
-  
+
   **OVERALL GATES PASSED**: [X/5]
   **PUBLICATION DECISION**: [READY/NEEDS REVISION]
   ```
@@ -153,7 +206,7 @@ Completed Sprint 8 (13 story points) implementing Sprint 7 diagnostic findings. 
   from visual_qa_zones import ZoneBoundaryValidator
   zone_validator = ZoneBoundaryValidator()
   zones_valid, zone_issues = zone_validator.validate_chart(image_path)
-  
+
   # Combine with LLM results
   result["zone_validation"] = {"pass": zones_valid, "issues": zone_issues}
   if not zones_valid:
@@ -637,12 +690,12 @@ Completed Sprint 7 (13 story points) focused on investigating Editor Agent quali
    - Effort: LOW (2-4 hours)
    - Impact: HIGH
    - Add explicit validation checklist with pass/fail criteria
-   
+
 2. **Option 2**: Deploy Pre-Editor Automated Validator
    - Effort: MEDIUM (1-2 days)
    - Impact: HIGH
    - Shift-left validation before Editor Agent runs
-   
+
 3. **Option 3**: Decompose Editor into Multi-Agent Pipeline
    - Effort: HIGH (3-5 days)
    - Impact: VERY HIGH (long-term)
@@ -676,15 +729,15 @@ Completed Sprint 7 (13 story points) focused on investigating Editor Agent quali
 1. **P0**: Enhance Visual QA Coverage for Chart Zone Violations
    - Effort: MEDIUM (2-3 days)
    - Impact: Catch 80% of chart layout bugs before publication
-   
+
 2. **P0**: Add Integration Tests for Agent Pipeline
    - Effort: HIGH (3-5 days)
    - Impact: Catch agent coordination bugs before deployment
-   
+
 3. **P2**: Automate Manual Testing Scenarios
    - Effort: MEDIUM (2-3 days)
    - Impact: Eliminate 60% of manual testing burden
-   
+
 4. **P1**: Auto-Generate Prevention Rules from Test Gaps
    - Effort: MEDIUM (2-3 days)
    - Impact: Prevent 70% of historically-missed bug patterns
@@ -1000,7 +1053,7 @@ Sprint Ready Gate
 - Developer: "Most authentic use case is right now"
 - Data Skeptic: "Lower risk - validate tool before committing"
 
-**Rationale**: 
+**Rationale**:
 - Quality-first culture (proven by prevention system)
 - Real-world testing before Sprint 7 commitment
 - 2h delay acceptable for systematic prevention
@@ -1167,7 +1220,7 @@ Completed Sprint 6 (green token optimization) after prevention system deployment
 **Prevention System Effectiveness**:
 - Test run caught 3 issues:
   1. Missing 'categories' field (BUG-015 pattern) → CAUGHT by Writer self-validation
-  2. Generic title pattern → CAUGHT by Writer self-validation  
+  2. Generic title pattern → CAUGHT by Writer self-validation
   3. Article too short → CAUGHT by Writer self-validation
 - All issues corrected via regeneration before reaching publication
 - **Shift-left success**: Issues caught at write-time, not publication-time
@@ -1466,7 +1519,7 @@ Fixed two critical chart bugs discovered in production. All fixes deployed and d
 - **Problem**: Article pages missing category tag display above title
 - **Impact**: Inconsistent with The Economist style, broken navigation
 - **Solution**: Added prominent category tag above title in post.html layout
-- **Changes**: 
+- **Changes**:
   - Added `.category-tag` div with red background (#e3120b)
   - Category displays in uppercase white text
   - Gracefully degrades if no categories

@@ -10,7 +10,7 @@
 
 **What We Built**: Comprehensive regression test that validates chart embedding in articles, preventing recurrence of Issue #16.
 
-**Key Achievement**: 
+**Key Achievement**:
 - ✅ Test catches missing chart embeddings (CRITICAL validation)
 - ✅ Test validates proper embedding and text references (positive case)
 - ✅ All 6 quality system tests passing (100% pass rate)
@@ -51,7 +51,7 @@
    - Article lacks chart markdown
    - Context includes `chart_filename`
    - Expected: CRITICAL error flagged
-   
+
 2. **Positive Case**: Chart properly embedded AND referenced
    - Article includes chart markdown: `![Title](/assets/charts/file.png)`
    - Article references chart in text: "As the chart shows..."
@@ -62,32 +62,32 @@
 ```python
 def test_issue_16_prevention():
     """Test that missing chart embedding is caught by self-validation"""
-    
+
     # TEST CASE 1: Missing chart (should FAIL)
     article_no_chart = """..."""  # No chart markdown
-    
+
     is_valid, issues = review_agent_output(
-        "writer_agent", 
+        "writer_agent",
         article_no_chart,
         context={"chart_filename": "/assets/charts/testing-gap.png"}
     )
-    
+
     assert not is_valid, "Should catch missing chart"
     assert any("chart not embedded" in i.lower() for i in issues)
-    
+
     # TEST CASE 2: Properly embedded (should PASS)
     article_with_chart = """...
     ![The Maintenance Gap](/assets/charts/testing-gap.png)
-    
+
     As the chart shows, AI adoption has surged...
     """
-    
+
     is_valid_chart, issues_chart = review_agent_output(
         "writer_agent",
         article_with_chart,
         context={"chart_filename": "/assets/charts/testing-gap.png"}
     )
-    
+
     # Verify chart embedding recognized
     chart_issues = [i for i in issues_chart if "chart not embedded" in i.lower()]
     assert len(chart_issues) == 0, "Should accept proper embedding"
@@ -170,7 +170,7 @@ ISSUES:
 
 **Problem**: All test functions had `return True` statements causing pytest warnings:
 ```
-PytestReturnNotNoneWarning: Test functions should return None, 
+PytestReturnNotNoneWarning: Test functions should return None,
 but test_function returned <class 'bool'>
 ```
 
@@ -250,7 +250,7 @@ Blog QA (final check)
 - name: Run Quality System Tests
   run: |
     pytest tests/test_quality_system.py -v
-    
+
 - name: Check for Regressions
   run: |
     pytest tests/test_quality_system.py::test_issue_16_prevention -v
@@ -429,4 +429,3 @@ Story 4 successfully delivers comprehensive regression test for Issue #16, compl
 **Story Status**: ✅ COMPLETE
 **Sprint 2 Status**: ✅ COMPLETE (8/8 points)
 **Next Sprint**: Sprint 3 (to be planned)
-

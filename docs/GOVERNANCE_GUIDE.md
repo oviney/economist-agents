@@ -4,10 +4,10 @@
 
 The economist-agents pipeline now includes **governance and human review** features:
 
-✅ **Visibility**: All agent outputs saved for inspection  
-✅ **Control**: Approval gates between pipeline stages  
-✅ **Auditability**: Complete decision logs and reports  
-✅ **Collaboration**: Review and edit agent outputs before proceeding  
+✅ **Visibility**: All agent outputs saved for inspection
+✅ **Control**: Approval gates between pipeline stages
+✅ **Auditability**: Complete decision logs and reports
+✅ **Collaboration**: Review and edit agent outputs before proceeding
 
 ## Usage
 
@@ -41,7 +41,7 @@ Details:
 
 📄 Review file: output/governance/20260101_123456/research_agent.json
 
-Approve and continue? [Y/n/skip-all]: 
+Approve and continue? [Y/n/skip-all]:
 ```
 
 **Options:**

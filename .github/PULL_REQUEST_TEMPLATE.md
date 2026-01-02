@@ -22,9 +22,9 @@ Closes #<!-- issue number -->
 
 <!-- Steps to verify this works -->
 
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
 ### Checklist
 

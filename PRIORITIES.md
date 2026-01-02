@@ -12,7 +12,7 @@
 - **Type**: Bug
 - **Impact**: UX inconsistency, navigation broken
 - **Effort**: Small (1-2 hours)
-- **Next Action**: 
+- **Next Action**:
   1. Investigate Jekyll template (_layouts/post.html)
   2. Check if front matter has categories field
   3. Add category rendering to template
@@ -27,7 +27,7 @@
 - **Effort**: Medium (5 points spike)
 - **Sprint**: 7+ (after defect RCA complete)
 - **Dependencies**: Defect RCA schema enhancement (Issue TBD)
-- **Next Action**: 
+- **Next Action**:
   1. Wait for defect RCA foundation (20+ bugs with root cause data)
   2. Team picks up when ready (no dependencies on leadership)
   3. Research: Map agents → human roles → skills gaps

@@ -1,8 +1,8 @@
 # Sprint 5 Plan - GitHub Integration & Quality Improvements
 
-**Sprint Goal**: Fix GitHub workflow integration and improve agent accuracy  
-**Duration**: 5 days (Jan 2-6, 2026)  
-**Total Points**: 7 points (conservative after Sprint 4's 9-point stretch)  
+**Sprint Goal**: Fix GitHub workflow integration and improve agent accuracy
+**Duration**: 5 days (Jan 2-6, 2026)
+**Total Points**: 7 points (conservative after Sprint 4's 9-point stretch)
 **Team**: 1 developer + AI pair programming
 
 ---
@@ -38,8 +38,8 @@
 
 ### Story 1: Fix GitHub Auto-Close Integration (P0) - **1 point**
 
-**Issue**: #21  
-**Owner**: Dev team  
+**Issue**: #21
+**Owner**: Dev team
 **Status**: Not started
 
 **Goal**: Restore GitHub auto-close functionality with validation
@@ -64,8 +64,8 @@
 
 ### Story 2: Improve Writer Agent Accuracy (P1) - **3 points**
 
-**Issue**: TBD (to be created)  
-**Owner**: Dev team  
+**Issue**: TBD (to be created)
+**Owner**: Dev team
 **Status**: Not started
 
 **Goal**: Reduce Writer Agent regenerations from 1 per article to 0
@@ -95,8 +95,8 @@
 
 ### Story 3: Improve Editor Agent Prediction Accuracy (P1) - **2 points**
 
-**Issue**: TBD  
-**Owner**: Dev team  
+**Issue**: TBD
+**Owner**: Dev team
 **Status**: Not started
 
 **Goal**: Improve Editor Agent prediction accuracy from 33% to >60%
@@ -124,8 +124,8 @@
 
 ### Story 4: Add Git Pre-Commit Validation (P2) - **1 point**
 
-**Issue**: TBD  
-**Owner**: Dev team  
+**Issue**: TBD
+**Owner**: Dev team
 **Status**: Not started (stretch goal)
 
 **Goal**: Prevent common git mistakes
@@ -184,20 +184,20 @@ Sprint 5 Target: 7 points (conservative)
 
 ### High Risk
 
-**Risk**: GitHub integration fix doesn't work  
-**Mitigation**: Test immediately with dummy issue, iterate if needed  
+**Risk**: GitHub integration fix doesn't work
+**Mitigation**: Test immediately with dummy issue, iterate if needed
 **Contingency**: Manual closures with Issue #20 tracking the tech debt
 
 ### Medium Risk
 
-**Risk**: Agent improvements don't show metrics gains  
-**Mitigation**: Have fallback prompts ready, test incrementally  
+**Risk**: Agent improvements don't show metrics gains
+**Mitigation**: Have fallback prompts ready, test incrementally
 **Contingency**: Revert changes, analyze failure, defer to Sprint 6
 
 ### Low Risk
 
-**Risk**: Pre-commit hook breaks existing workflow  
-**Mitigation**: Thoroughly test before enforcing  
+**Risk**: Pre-commit hook breaks existing workflow
+**Mitigation**: Thoroughly test before enforcing
 **Contingency**: Disable hook, fix issues, re-enable
 
 ---
@@ -314,8 +314,7 @@ Sprint 5 Target: 7 points (conservative)
 
 ---
 
-**Sprint 5 Planning Complete**  
-**Next Action**: Create Story 2 and 3 GitHub issues  
-**Team Capacity**: 7 points over 5 days  
+**Sprint 5 Planning Complete**
+**Next Action**: Create Story 2 and 3 GitHub issues
+**Team Capacity**: 7 points over 5 days
 **Confidence**: Medium (rebuilding after Sprint 4 issues)
-

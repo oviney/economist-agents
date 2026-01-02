@@ -3,7 +3,7 @@
 ## Available Custom Agents
 
 - @quality-enforcer - Enforce Python standards
-- @test-writer - Write comprehensive tests  
+- @test-writer - Write comprehensive tests
 - @refactor-specialist - Refactor to quality standards
 
 ## Skills

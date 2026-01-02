@@ -175,19 +175,19 @@ Create GitHub Action to generate BACKLOG.md from issues (advanced).
 
 ## FAQ
 
-**Q: Will this delete BACKLOG.md?**  
+**Q: Will this delete BACKLOG.md?**
 A: No, the script only reads it. You decide what to do with the file after.
 
-**Q: Can I undo this?**  
+**Q: Can I undo this?**
 A: Yes, you can bulk-close issues or delete the project board. But there's no automated "undo" script.
 
-**Q: What about completed items?**  
+**Q: What about completed items?**
 A: By default they're skipped. Use `--include-completed` to migrate them too (good for historical record).
 
-**Q: Can I migrate to a different repo?**  
+**Q: Can I migrate to a different repo?**
 A: Yes, use `--repo owner/repo` flag.
 
-**Q: Do I need to close issues manually?**  
+**Q: Do I need to close issues manually?**
 A: No, issues will have `status:complete` label. You can filter them out or close them in bulk.
 
 ## Recommended Workflow
@@ -198,11 +198,11 @@ After migration:
    - Create GitHub Issue directly
    - Apply priority label (P0-P4)
    - Add to project board
-   
+
 2. **Work in progress**:
    - Move card to "In Progress" column
    - Update issue with progress comments
-   
+
 3. **Complete work**:
    - Close issue with PR reference
    - Card auto-moves to "Done"

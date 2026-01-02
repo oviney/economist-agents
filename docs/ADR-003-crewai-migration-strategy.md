@@ -1,8 +1,8 @@
 # ADR-003: Phased CrewAI Migration Strategy
 
-**Status:** Proposed  
-**Date:** 2026-01-01  
-**Deciders:** Ouray Viney (Agentic AI Architect)  
+**Status:** Proposed
+**Date:** 2026-01-01
+**Deciders:** Ouray Viney (Agentic AI Architect)
 **Dependencies:** ADR-001, ADR-002
 
 ## Context
@@ -223,28 +223,28 @@ If CrewAI migration fails:
 ## Alternative Approaches Considered
 
 ### 1. Full Pipeline Migration to CrewAI
-**Pros:** Unified framework, simpler architecture  
-**Cons:** Lose our competitive advantage (custom editorial board)  
+**Pros:** Unified framework, simpler architecture
+**Cons:** Lose our competitive advantage (custom editorial board)
 **Verdict:** Rejected - editorial board is our IP
 
 ### 2. AutoGen Instead of CrewAI
-**Pros:** More flexible, research-backed  
-**Cons:** Steeper learning curve, more verbose  
+**Pros:** More flexible, research-backed
+**Cons:** Steeper learning curve, more verbose
 **Verdict:** Deferred - CrewAI better for role-based agents
 
 ### 3. LangGraph for State Machine
-**Pros:** Precise control over workflows  
-**Cons:** Requires LangChain expertise, complexity overhead  
+**Pros:** Precise control over workflows
+**Cons:** Requires LangChain expertise, complexity overhead
 **Verdict:** Rejected - overkill for sequential tasks
 
 ### 4. Build Our Own Framework
-**Pros:** Total control, no dependencies  
-**Cons:** Massive engineering effort, reinventing wheel  
+**Pros:** Total control, no dependencies
+**Cons:** Massive engineering effort, reinventing wheel
 **Verdict:** Rejected - not core competency
 
 ### 5. No Migration (Status Quo)
-**Pros:** No risk, no work  
-**Cons:** Technical debt grows, can't leverage community tools  
+**Pros:** No risk, no work
+**Cons:** Technical debt grows, can't leverage community tools
 **Verdict:** Rejected - need to evolve architecture
 
 ## Success Metrics
@@ -315,13 +315,13 @@ editor:
 research_task:
   description: >
     Research the topic: {topic}
-    
+
     Find:
     - Latest industry trends and statistics
     - Recent research papers (last 2 years)
     - Expert opinions and case studies
     - Relevant data for visualization
-    
+
     Output must include source URLs for all claims.
   expected_output: >
     JSON with research findings:
@@ -334,14 +334,14 @@ research_task:
 write_task:
   description: >
     Write an Economist-style article based on the research.
-    
+
     Requirements:
     - 800-1200 words
     - British spelling
     - Hemingway readability score < 10
     - No throat-clearing (jump straight in)
     - All claims sourced
-    
+
     Use research from: {research_output}
   expected_output: >
     Markdown article with:
@@ -356,14 +356,14 @@ write_task:
 edit_task:
   description: >
     Edit the article for style, clarity, and accuracy.
-    
+
     Check:
     - Economist style guide compliance
     - All claims have sources
     - Readability (Hemingway < 10)
     - British spelling
     - No [UNVERIFIED] tags
-    
+
     Article to edit: {article_draft}
   expected_output: >
     Final article in Markdown format, ready for publication

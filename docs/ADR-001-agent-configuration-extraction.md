@@ -1,8 +1,8 @@
 # ADR-001: Extract Agent Definitions to YAML Configuration
 
-**Status:** Proposed  
-**Date:** 2026-01-01  
-**Deciders:** Ouray Viney (Agentic AI Architect)  
+**Status:** Proposed
+**Date:** 2026-01-01
+**Deciders:** Ouray Viney (Agentic AI Architect)
 **Context:** Architecture review following discovery of multi-agent frameworks (CrewAI, AutoGen)
 
 ## Context
@@ -110,23 +110,23 @@ metadata:
 ## Alternatives Considered
 
 ### 1. Keep Python Constants
-**Pros:** Simple, no new dependencies  
-**Cons:** Technical debt, not reusable  
+**Pros:** Simple, no new dependencies
+**Cons:** Technical debt, not reusable
 **Verdict:** Rejected - doesn't address root problems
 
 ### 2. Use JSON Instead of YAML
-**Pros:** Easier to parse, more structured  
-**Cons:** Less human-readable, can't use multi-line strings easily  
+**Pros:** Easier to parse, more structured
+**Cons:** Less human-readable, can't use multi-line strings easily
 **Verdict:** Rejected - YAML better for prose-heavy agent prompts
 
 ### 3. Use Framework's Native Format (CrewAI YAML)
-**Pros:** Direct compatibility if we migrate  
-**Cons:** Framework lock-in, may not support our custom fields  
+**Pros:** Direct compatibility if we migrate
+**Cons:** Framework lock-in, may not support our custom fields
 **Verdict:** Deferred - design our schema first, migrate later if needed
 
 ### 4. Database Storage
-**Pros:** Queryable, supports versioning  
-**Cons:** Overkill for ~10 agents, adds infrastructure  
+**Pros:** Queryable, supports versioning
+**Cons:** Overkill for ~10 agents, adds infrastructure
 **Verdict:** Rejected - YAML files sufficient for current scale
 
 ## Success Metrics

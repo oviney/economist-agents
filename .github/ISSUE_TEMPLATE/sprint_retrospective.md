@@ -8,29 +8,29 @@ assignees: ''
 
 ## Sprint X Retrospective
 
-**Sprint Dates:** 
-**Sprint Goal:** 
+**Sprint Dates:**
+**Sprint Goal:**
 **Velocity:** X points
 
 ---
 
 ### ✅ What Went Well
 
-- 
-- 
-- 
+-
+-
+-
 
 ### 🔄 What Could Improve
 
-- 
-- 
-- 
+-
+-
+-
 
 ### 🚀 Action Items for Next Sprint
 
-- [ ] 
-- [ ] 
-- [ ] 
+- [ ]
+- [ ]
+- [ ]
 
 ---
 

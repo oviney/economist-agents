@@ -173,24 +173,24 @@ def validate_own_output(agent_output, agent_type):
     """
     if agent_type == "writer":
         issues = []
-        
+
         # Check 1: Required front matter
         if not has_required_front_matter(agent_output):
             issues.append("CRITICAL: Missing required front matter fields")
-        
+
         # Check 2: Chart embedding (if chart provided)
         if chart_filename and not chart_embedded(agent_output, chart_filename):
             issues.append("CRITICAL: Chart not embedded")
-        
+
         # Check 3: Banned patterns
         banned = detect_banned_patterns(agent_output)
         if banned:
             issues.append(f"BANNED: {banned}")
-        
+
         # Check 4: Verification flags
         if "[NEEDS SOURCE]" in agent_output or "[UNVERIFIED]" in agent_output:
             issues.append("CRITICAL: Verification flags present")
-        
+
         return len(issues) == 0, issues
 ```
 
@@ -322,8 +322,8 @@ required_elements:
 [Striking statistic]. [Contrasting observation/fact]. [Implication].
 
 Example:
-"Self-healing tests promise an 80% cut in maintenance costs. Only 10% of 
-companies achieve it. The gap reveals a fundamental misunderstanding of 
+"Self-healing tests promise an 80% cut in maintenance costs. Only 10% of
+companies achieve it. The gap reveals a fundamental misunderstanding of
 what 'self-healing' means."
 ```
 
@@ -332,7 +332,7 @@ what 'self-healing' means."
 According to [Organization], [specific finding]. [Chart reference].
 
 Example:
-"According to Tricentis's 2024 survey, AI test generation adoption reached 
+"According to Tricentis's 2024 survey, AI test generation adoption reached
 78% last year. As the chart shows, maintenance burden fell by only 18%."
 ```
 
@@ -341,8 +341,8 @@ Example:
 [Clear prediction or implication]. [Who wins/loses]. [Why it matters].
 
 Example:
-"Companies that invest in robust test infrastructure will outpace competitors. 
-Those that chase AI magic bullets will bleed talent and ship slower. The 
+"Companies that invest in robust test infrastructure will outpace competitors.
+Those that chase AI magic bullets will bleed talent and ship slower. The
 choice is becoming binary."
 ```
 
@@ -460,10 +460,10 @@ def test_publication_validator_completeness():
         'orphaned_charts',
         'missing_categories'  # NEW from Issue #15
     ]
-    
+
     validator = PublicationValidator()
     actual_checks = validator.get_check_names()
-    
+
     assert set(required_checks).issubset(set(actual_checks)), \
         f"Missing checks: {set(required_checks) - set(actual_checks)}"
 ```
@@ -499,6 +499,6 @@ git commit -m "Strengthen: Front matter validation (caught Issue #15 pattern)"
 
 ---
 
-**Last Updated**: 2026-01-01  
-**Version**: 1.0  
+**Last Updated**: 2026-01-01
+**Version**: 1.0
 **Status**: Active - Enforced via automated reviews and git hooks

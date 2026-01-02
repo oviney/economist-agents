@@ -5,49 +5,49 @@ omit =
     # Diagnostic and analysis tools
     scripts/*_diagnostic.py
     scripts/editor_agent_diagnostic.py
-    
+
     # Sprint and project management tools
     scripts/*_tracker.py
     scripts/sprint_ceremony_tracker.py
     scripts/defect_tracker.py
     scripts/github_sprint_sync.py
     scripts/migrate_backlog_to_github.py
-    
+
     # Quality and metrics dashboards
     scripts/*_dashboard.py
     scripts/quality_dashboard.py
     scripts/metrics_dashboard.py
     scripts/calculate_quality_score.py
-    
+
     # Architecture and test analysis tools
     scripts/architecture_review.py
     scripts/test_gap_analyzer.py
     scripts/agent_reviewer.py
-    
+
     # Validation and QA scripts
     scripts/blog_qa_agent.py
     scripts/visual_qa_zones.py
-    
+
     # Metrics and reporting (not core functionality)
     scripts/agent_metrics.py
     scripts/chart_metrics.py
     scripts/metrics_report.py
     scripts/generate_sample_metrics.py
-    
+
     # Test and validation utilities
     scripts/test_agent_integration.py
     scripts/test_metrics.py
     scripts/test_setup.py
     scripts/sprint_validator.py
-    
+
     # Documentation and reporting
     scripts/update_readme_badges.py
     scripts/update_sprint_docs.py
-    
+
     # Optional/advanced features
     scripts/featured_image_agent.py
     scripts/defect_prevention_rules.py
-    
+
     # Validation tools
     scripts/publication_validator.py
 

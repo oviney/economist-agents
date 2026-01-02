@@ -78,7 +78,7 @@ Learned Skills:
   SEO Validation:
     - missing_page_title (critical)
     - placeholder_urls (high)
-  
+
   Content Quality:
     - ai_disclosure_compliance (medium)
 ```

@@ -1,8 +1,8 @@
 # ADR-002: Implement Agent Registry Pattern
 
-**Status:** Proposed  
-**Date:** 2026-01-01  
-**Deciders:** Ouray Viney (Agentic AI Architect)  
+**Status:** Proposed
+**Date:** 2026-01-01
+**Deciders:** Ouray Viney (Agentic AI Architect)
 **Dependencies:** ADR-001 (Agent Configuration Extraction)
 
 ## Context
@@ -48,13 +48,13 @@ class LLMProvider(Protocol):
 
 class AgentRegistry:
     """Central registry for agent discovery and creation"""
-    
+
     def __init__(self, config_dir: Path, llm_factory: LLMProvider):
         self.config_dir = config_dir
         self.llm_factory = llm_factory
         self._agents: Dict[str, AgentConfig] = {}
         self._load_agents()
-    
+
     def _load_agents(self):
         """Load all YAML files from config directory"""
         for yaml_file in self.config_dir.rglob("*.yaml"):
@@ -62,15 +62,15 @@ class AgentRegistry:
                 config = yaml.safe_load(f)
                 agent_config = AgentConfig(**config)
                 self._agents[agent_config.name] = agent_config
-    
+
     def get_agent(self, name: str, model: str = "gpt-4o") -> Agent:
         """Factory method: Create agent instance"""
         if name not in self._agents:
             raise ValueError(f"Agent '{name}' not found in registry")
-        
+
         config = self._agents[name]
         llm_client = self.llm_factory.create_client(model)
-        
+
         return Agent(
             role=config.role,
             goal=config.goal,
@@ -79,7 +79,7 @@ class AgentRegistry:
             llm_client=llm_client,
             tools=self._load_tools(config.tools)
         )
-    
+
     def list_agents(self, category: str = None) -> List[str]:
         """Discover available agents"""
         if category:
@@ -88,11 +88,11 @@ class AgentRegistry:
                 if cfg.metadata.get('category') == category
             ]
         return list(self._agents.keys())
-    
+
     def get_config(self, name: str) -> AgentConfig:
         """Get raw configuration for inspection/testing"""
         return self._agents[name]
-    
+
     def _load_tools(self, tool_names: List[str]) -> List[Tool]:
         """Load tool instances by name"""
         # Implementation depends on MCP integration (ADR-004)
@@ -109,7 +109,7 @@ vp_eng = registry.get_agent("vp_engineering", model="gpt-4o")
 
 # List agents by category
 board_agents = [
-    registry.get_agent(name) 
+    registry.get_agent(name)
     for name in registry.list_agents(category="editorial_board")
 ]
 ```
@@ -205,7 +205,7 @@ def test_load_agents_from_yaml(tmp_path):
     metadata:
       category: testing
     """)
-    
+
     registry = AgentRegistry(tmp_path, MockLLMProvider())
     assert "test_agent" in registry.list_agents()
 
@@ -213,7 +213,7 @@ def test_get_agent_creates_instance(mock_llm_factory):
     """Factory method creates proper agent instance"""
     registry = AgentRegistry(Path("agents/"), mock_llm_factory)
     agent = registry.get_agent("vp_engineering")
-    
+
     assert agent.role == "VP of Engineering perspective on QE"
     assert agent.llm_client is not None
 
@@ -221,7 +221,7 @@ def test_list_agents_filters_by_category():
     """Can filter agents by category"""
     registry = AgentRegistry(Path("agents/"), MockLLMProvider())
     board_agents = registry.list_agents(category="editorial_board")
-    
+
     assert len(board_agents) == 6
     assert "vp_engineering" in board_agents
 ```
@@ -229,23 +229,23 @@ def test_list_agents_filters_by_category():
 ## Alternatives Considered
 
 ### 1. Global Singleton Registry
-**Pros:** Simple access from anywhere  
-**Cons:** Hard to test, hidden dependencies  
+**Pros:** Simple access from anywhere
+**Cons:** Hard to test, hidden dependencies
 **Verdict:** Rejected - prefer explicit dependency injection
 
 ### 2. Service Locator Pattern
-**Pros:** Widely known pattern  
-**Cons:** Anti-pattern in modern Python, hard to test  
+**Pros:** Widely known pattern
+**Cons:** Anti-pattern in modern Python, hard to test
 **Verdict:** Rejected - dependency injection clearer
 
 ### 3. Direct YAML Loading in Each Script
-**Pros:** Simple, no abstraction  
-**Cons:** Duplicate loading logic, no discovery, hard to test  
+**Pros:** Simple, no abstraction
+**Cons:** Duplicate loading logic, no discovery, hard to test
 **Verdict:** Rejected - doesn't solve core problems
 
 ### 4. Use CrewAI's Built-in Agent Loading
-**Pros:** Framework-native approach  
-**Cons:** Framework lock-in before we're ready  
+**Pros:** Framework-native approach
+**Cons:** Framework lock-in before we're ready
 **Verdict:** Deferred - keep option open for ADR-003
 
 ## Success Metrics

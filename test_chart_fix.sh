@@ -23,7 +23,7 @@ if [ -f "$LATEST_ARTICLE" ]; then
     echo "==========================================="
     echo "Latest article: $LATEST_ARTICLE"
     echo ""
-    
+
     if grep -q 'assets/charts' "$LATEST_ARTICLE"; then
         echo "✅ SUCCESS: Chart reference found in article!"
         echo ""

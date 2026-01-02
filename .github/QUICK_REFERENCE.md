@@ -1,6 +1,6 @@
 # Quick Reference: Architecture Improvements
 
-**Last Updated**: 2025-12-31  
+**Last Updated**: 2025-12-31
 **Status**: All high-priority improvements COMPLETE ✅
 
 ---
@@ -9,9 +9,9 @@
 
 ### 1. Pipeline Now Auto-Retries API Calls 🔄
 
-**What**: Exponential backoff for Anthropic API rate limits  
-**Where**: All agent scripts (`economist_agent.py`, `topic_scout.py`, `editorial_board.py`)  
-**Why**: Prevents pipeline failures from temporary rate limits  
+**What**: Exponential backoff for Anthropic API rate limits
+**Where**: All agent scripts (`economist_agent.py`, `topic_scout.py`, `editorial_board.py`)
+**Why**: Prevents pipeline failures from temporary rate limits
 **How It Works**: 3 retries with 1s → 2s → 4s delays
 
 **You Don't Need To Do Anything** - it just works!
@@ -107,29 +107,29 @@ python3 schemas/validate_schemas.py --board-decision
 ## Quick Troubleshooting
 
 ### "Rate limit exceeded"
-**Status**: ✅ AUTO-FIXED  
-**What Happens**: Pipeline retries 3 times automatically  
+**Status**: ✅ AUTO-FIXED
+**What Happens**: Pipeline retries 3 times automatically
 **If Still Failing**: Wait a few minutes, you've hit sustained rate limits
 
 ---
 
 ### "OUTPUT_DIR not set"
-**Status**: ✅ AUTO-FIXED  
-**What Happens**: Uses `output/` directory by default  
+**Status**: ✅ AUTO-FIXED
+**What Happens**: Uses `output/` directory by default
 **To Customize**: `export OUTPUT_DIR="/your/path"`
 
 ---
 
 ### "Invalid topic"
-**Status**: ✅ BETTER ERRORS  
-**What It Means**: Input validation caught bad data early  
+**Status**: ✅ BETTER ERRORS
+**What It Means**: Input validation caught bad data early
 **How To Fix**: Check the error message - it tells you exactly what's wrong
 
 ---
 
 ### "ANTHROPIC_API_KEY not set"
-**Status**: Still required!  
-**How To Fix**: 
+**Status**: Still required!
+**How To Fix**:
 ```bash
 export ANTHROPIC_API_KEY='sk-ant-your-key-here'
 ```

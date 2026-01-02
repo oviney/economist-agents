@@ -416,6 +416,6 @@ Add metrics checks to your pipeline:
 
 ---
 
-**Last Updated**: 2026-01-01  
-**Version**: 1.0  
+**Last Updated**: 2026-01-01
+**Version**: 1.0
 **Maintainer**: Economist Agents Team

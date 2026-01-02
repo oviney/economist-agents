@@ -86,23 +86,23 @@ logger = logging.getLogger(__name__)
 
 def get_topics() -> dict[str, Any]:
     """Retrieve topics from content queue.
-    
+
     Returns:
         Dictionary with 'topics' key containing list of topics
-        
+
     Raises:
         FileNotFoundError: If content_queue.json doesn't exist
         JSONDecodeError: If content_queue.json is malformed
     """
     queue_file = Path("output/content_queue.json")
-    
+
     try:
         with open(queue_file, "rb") as f:
             data = orjson.loads(f.read())
-        
+
         logger.info(f"Loaded {len(data.get('topics', []))} topics from queue")
         return data
-        
+
     except FileNotFoundError:
         logger.error(f"Content queue not found: {queue_file}")
         raise

@@ -7,12 +7,12 @@ Multi-agent content generation pipeline that produces publication-quality blog p
 
 **3-Stage Pipeline:**
 1. **Discovery** ([topic_scout.py](../scripts/topic_scout.py)) → Scans QE landscape, outputs ranked topics
-2. **Editorial Board** ([editorial_board.py](../scripts/editorial_board.py)) → 6 persona agents vote on topics  
+2. **Editorial Board** ([editorial_board.py](../scripts/editorial_board.py)) → 6 persona agents vote on topics
 3. **Content Generation** ([economist_agent.py](../scripts/economist_agent.py)) → Research → Write → Edit → Output markdown + charts
 
 **Critical Data Flow:**
 - Scout writes `content_queue.json` with scored topics
-- Board writes `board_decision.json` with voting results  
+- Board writes `board_decision.json` with voting results
 - Generator writes markdown files to `output/` or `_posts/` for Jekyll
 - Charts saved as PNG to `assets/charts/` or `output/charts/`
 
@@ -53,9 +53,9 @@ Never violate zone boundaries—labels below y=20 in data coordinates risk X-axi
 
 The Writer agent has **explicit banned patterns** (see [economist_agent.py](../scripts/economist_agent.py#L94-L137)):
 
-**Forbidden openings:** "In today's world...", "It's no secret that...", "In recent years..."  
-**Banned phrases:** "game-changer", "paradigm shift", "leverage" (as verb), "at the end of the day"  
-**Forbidden closings:** "Only time will tell...", "In conclusion..."  
+**Forbidden openings:** "In today's world...", "It's no secret that...", "In recent years..."
+**Banned phrases:** "game-changer", "paradigm shift", "leverage" (as verb), "at the end of the day"
+**Forbidden closings:** "Only time will tell...", "In conclusion..."
 **Tone violations:** Exclamation points, rhetorical questions as headers, listicle structure
 
 When writing prompts or editing agent behavior, preserve these constraints. British spelling (organisation, favour, analyse) is mandatory.
@@ -145,9 +145,9 @@ Alternatively, configure in code (see [economist_agent.py](../scripts/economist_
 
 ## File Naming Conventions
 
-**Generated posts:** `YYYY-MM-DD-article-title.md` (Jekyll date-slug format)  
-**Charts:** `article-title.png` (matches post slug, no date prefix)  
-**Data files:** `content_queue.json`, `board_decision.json` (singular, snake_case)  
+**Generated posts:** `YYYY-MM-DD-article-title.md` (Jekyll date-slug format)
+**Charts:** `article-title.png` (matches post slug, no date prefix)
+**Data files:** `content_queue.json`, `board_decision.json` (singular, snake_case)
 **Skills:** `blog_qa_skills.json` (versioned JSON with timestamps)
 
 ## Key Gotchas
@@ -260,19 +260,19 @@ Run `python3 scripts/defect_tracker.py` to see full report with RCA insights.
 
 ### BANNED BEHAVIORS (Process Violations):
 
-❌ **"Executing now..."** - without showing plan first  
-❌ **"Team executing..."** - without user approval  
-❌ **"Let me start by..."** - without task breakdown  
-❌ **"Quick fix..."** - still needs planning (no exceptions)  
-❌ **"Just need to..."** - "just" is a red flag  
+❌ **"Executing now..."** - without showing plan first
+❌ **"Team executing..."** - without user approval
+❌ **"Let me start by..."** - without task breakdown
+❌ **"Quick fix..."** - still needs planning (no exceptions)
+❌ **"Just need to..."** - "just" is a red flag
 ❌ **"This is simple..."** - simple work still needs DoD
 
 ### ALWAYS Say Instead:
 
-✅ **"Let me plan this out first..."**  
-✅ **"Here's my task breakdown: Task 1 (X min), Task 2 (Y min)..."**  
-✅ **"Definition of Done: [specific criteria]"**  
-✅ **"Risks I've identified: [list]"**  
+✅ **"Let me plan this out first..."**
+✅ **"Here's my task breakdown: Task 1 (X min), Task 2 (Y min)..."**
+✅ **"Definition of Done: [specific criteria]"**
+✅ **"Risks I've identified: [list]"**
 ✅ **"Is this plan approved?"** (explicit question, wait for clear answer)
 
 ### Execution Sequence (Mandatory):
@@ -292,8 +292,8 @@ Run `python3 scripts/defect_tracker.py` to see full report with RCA insights.
 - Violation 2: Said "team executing" on doc automation (caught by user)
 - Violation 3: Jumped to protocol creation (caught by user)
 
-**Root Cause**: Implicit process knowledge vs explicit constraints  
-**Fix**: Codified as NEVER/ALWAYS rules (similar to Writer Agent BANNED_PHRASES)  
+**Root Cause**: Implicit process knowledge vs explicit constraints
+**Fix**: Codified as NEVER/ALWAYS rules (similar to Writer Agent BANNED_PHRASES)
 **Test**: Protocol would have prevented all 3 violations (100% effectiveness)
 
 ### Quality Over Speed

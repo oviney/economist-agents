@@ -10,23 +10,23 @@ jobs:
   validate-sprint-discipline:
     runs-on: ubuntu-latest
     name: Validate Sprint Discipline
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install PyGithub
-      
+
       - name: Check commit messages reference sprint stories
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -39,17 +39,17 @@ jobs:
             BASE_SHA="${{ github.event.before }}"
             HEAD_SHA="${{ github.sha }}"
           fi
-          
+
           echo "Checking commits from $BASE_SHA to $HEAD_SHA"
-          
+
           # Get commit messages
           COMMITS=$(git log --format=%s $BASE_SHA..$HEAD_SHA)
-          
+
           # Check if any commit references a story or issue
           VALID=false
           while IFS= read -r commit_msg; do
             echo "Checking: $commit_msg"
-            
+
             # Allow commits that reference Story N, #N, or are docs/chore
             if echo "$commit_msg" | grep -iE "(story [0-9]+|#[0-9]+|^(docs|chore|ci):)"; then
               VALID=true
@@ -58,7 +58,7 @@ jobs:
               echo "⚠️  Warning: No story reference in: $commit_msg"
             fi
           done <<< "$COMMITS"
-          
+
           if [ "$VALID" = false ]; then
             echo ""
             echo "❌ SPRINT DISCIPLINE VIOLATION"
@@ -68,15 +68,15 @@ jobs:
             echo "  - Or use prefix: docs:, chore:, ci:"
             exit 1
           fi
-      
+
       - name: Check PR has story reference
         if: github.event_name == 'pull_request'
         run: |
           PR_TITLE="${{ github.event.pull_request.title }}"
           PR_BODY="${{ github.event.pull_request.body }}"
-          
+
           echo "PR Title: $PR_TITLE"
-          
+
           # Check if title or body references a story or issue
           if echo "$PR_TITLE $PR_BODY" | grep -iE "(story [0-9]+|#[0-9]+|closes #[0-9]+|fixes #[0-9]+)"; then
             echo "✅ PR references sprint story"
@@ -88,7 +88,7 @@ jobs:
             echo "  - 'Closes #123' in body"
             exit 1
           fi
-      
+
       - name: Validate sprint file exists
         run: |
           if [ ! -f "SPRINT.md" ]; then
@@ -97,7 +97,7 @@ jobs:
             exit 1
           fi
           echo "✅ SPRINT.md exists"
-      
+
       - name: Check for active sprint
         run: |
           if ! grep -q "Active Sprint" SPRINT.md; then
@@ -107,7 +107,7 @@ jobs:
             ACTIVE_SPRINT=$(grep "Active Sprint" SPRINT.md)
             echo "✅ $ACTIVE_SPRINT"
           fi
-      
+
       - name: Summary
         if: always()
         run: |

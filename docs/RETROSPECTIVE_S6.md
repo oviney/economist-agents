@@ -1,6 +1,6 @@
 # Sprint 6 Retrospective
 
-**Date**: 2026-01-01  
+**Date**: 2026-01-01
 **Participants**: Team
 
 ---

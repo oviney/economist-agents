@@ -17,26 +17,18 @@ Key improvements (v2):
 - Added self-critique loop before final output
 """
 
-import os
-import json
+import argparse
 import base64
-from datetime import datetime
-from slugify import slugify
-from pathlib import Path
+import json
+import os
+import re
 import subprocess
 import sys
-import re
-import argparse
-import time
+from datetime import datetime
+from pathlib import Path
 
-# Import unified LLM client
-from llm_client import create_llm_client, call_llm
-
-# Import governance system
-from governance import GovernanceTracker, InteractiveMode
-
-# Import publication validator
-from publication_validator import PublicationValidator
+# Import agent metrics
+from agent_metrics import AgentMetrics
 
 # Import automated reviewer
 from agent_reviewer import review_agent_output
@@ -44,11 +36,18 @@ from agent_reviewer import review_agent_output
 # Import chart metrics
 from chart_metrics import get_metrics_collector
 
-# Import agent metrics
-from agent_metrics import AgentMetrics
-
 # Import featured image generator
 from featured_image_agent import generate_featured_image
+
+# Import governance system
+from governance import GovernanceTracker
+
+# Import unified LLM client
+from llm_client import call_llm, create_llm_client
+
+# Import publication validator
+from publication_validator import PublicationValidator
+from slugify import slugify
 
 # ═══════════════════════════════════════════════════════════════════════════
 # AGENT SYSTEM PROMPTS (v2 - with codified editorial lessons)
@@ -61,7 +60,7 @@ Given a topic, produce a comprehensive research brief with VERIFIED data.
 
 CRITICAL RULES:
 1. Every statistic MUST have a named source (organization, report, date)
-2. If you cannot verify a claim, mark it as [UNVERIFIED] 
+2. If you cannot verify a claim, mark it as [UNVERIFIED]
 3. Prefer primary sources (surveys, reports) over secondary (blog posts, articles)
 4. Flag any numbers that appear in multiple sources with different values
 
@@ -115,20 +114,18 @@ STRUCTURE (800-1200 words):
    □ Chart MUST be referenced in surrounding text ("As the chart shows...")
    □ Chart placement: After the section discussing the data
    □ DO NOT use "See figure 1" or "The chart below" - reference naturally
-   
+
    CHART EMBEDDING PATTERN:
    ```markdown
    [Paragraph discussing data...]
-   
+
    ![Chart title](chart_filename.png)
-   
+
    As the chart shows, [insight from visualization].
    ```
-   
+
    ❌ WRONG: Writing article without embedding chart when chart_data provided
    ✅ CORRECT: Chart embedded with natural text reference
-   
-4. CLOSE: Implication or forward look. NOT a summary. NOT "In conclusion..."
 
 VOICE:
 - Confident and direct. State views, don't hedge.
@@ -356,14 +353,13 @@ ax.plot(x, y_low, color='#843844', linewidth=2.5, marker='s', markersize=6)
 
 # End-of-line value labels
 ax.annotate(f'{{y_high[-1]}}%', xy=(x[-1], y_high[-1]), xytext=(10, 0),
-            textcoords='offset points', fontsize=11, fontweight='bold', 
+            textcoords='offset points', fontsize=11, fontweight='bold',
             color='#17648d', va='center')
 
 # Inline labels - ABOVE their lines, in clear space
 ax.annotate('High Series', xy=(x[-2], y_high[-2]), xytext=(-50, 15),
             textcoords='offset points', fontsize=9, color='#17648d',
             ha='center', va='bottom')
-            
 # Even for LOW series - put label ABOVE to avoid X-axis zone
 ax.annotate('Low Series', xy=(x[3], y_low[3]), xytext=(0, 18),
             textcoords='offset points', fontsize=9, color='#843844',
@@ -395,7 +391,7 @@ CHART SPECIFICATION:
 
 Generate complete Python code following this template exactly."""
 
-EDITOR_AGENT_PROMPT = """You are the chief editor at The Economist reviewing a draft article.
+EDITOR_AGENT_PROMPT = r"""You are the chief editor at The Economist reviewing a draft article.
 
 ═══════════════════════════════════════════════════════════════════════════
 QUALITY GATES - Each must PASS or article needs revision
@@ -421,7 +417,7 @@ GATE 2: EVIDENCE (Every claim must be backed)
 ⚠️  CRITICAL: You must REMOVE all [NEEDS SOURCE] and [UNVERIFIED] flags.
 
 Your options:
-  a) Add proper source: "according to Gartner's 2024 survey" 
+  a) Add proper source: "according to Gartner's 2024 survey"
   b) Delete the unsourced claim entirely
   c) Rewrite to avoid specific numbers: "many companies" instead of "50% of companies"
 
@@ -448,7 +444,7 @@ GATE 4: STRUCTURE (Must flow logically)
 ❌ CUT THESE ENDINGS IMMEDIATELY - PUBLICATION BLOCKER:
 - "In conclusion" / "To conclude" / "In summary" → DELETE ENTIRE SENTENCE, start fresh
 - "will depend largely on" → Make a definitive prediction
-- "Whether [X] becomes reality" → State what WILL happen  
+- "Whether [X] becomes reality" → State what WILL happen
 - "remains to be seen" / "only time will tell" → Tell us what you see
 - "The journey ahead" / "the road ahead" → Cut entirely
 - Any sentence that summarizes points already made → DELETE IT
@@ -537,7 +533,7 @@ SPECIFIC EDITS TO MAKE
    - Or convert to flowing prose
 
 5. REWRITE WEAK ENDINGS immediately (CRITICAL - blocks publication):
-   
+
    FORBIDDEN ENDING PATTERNS - If you see ANY of these, DELETE and rewrite:
    - "In conclusion" / "To conclude" / "In summary" (summative closings)
    - "remains uncertain" / "remains to be seen" / "only time will tell"
@@ -546,16 +542,16 @@ SPECIFIC EDITS TO MAKE
    - "Success will belong to those who" (wishy-washy)
    - "The future of [X]" (vague)
    - Any recap/summary of what was already stated
-   
+
    REQUIRED ENDING FORMULA:
    → State what WILL happen (not "may" or "might")
    → Make a specific prediction with confidence
    → Or identify the clear winner/loser
-   
+
    Example fixes:
    ❌ "In conclusion, flaky tests present challenges. Success will belong to those who ensure stability."
    ✅ "Companies that invest in robust test infrastructure will outpace competitors. Those that don't will bleed talent."
-   
+
    ❌ "The future of self-healing tests will depend largely on vendor improvements."
    ✅ "Self-healing tests will remain niche until vendors stop overselling and start delivering."
 
@@ -684,7 +680,7 @@ The chart has 5 distinct zones. NO element should cross zone boundaries:
 
 ```
 RED BAR ZONE (top 4%)      - Only the red bar
-TITLE ZONE                 - Title and subtitle only  
+TITLE ZONE                 - Title and subtitle only
 CHART ZONE                 - Data lines, gridlines, inline labels
 X-AXIS ZONE                - ONLY x-axis tick labels (years, etc.)
 SOURCE ZONE (bottom)       - Source attribution only
@@ -701,7 +697,7 @@ GATE 1: ZONE INTEGRITY
 □ NO labels overlapping X-axis tick labels (years)?
 □ Source line visible at bottom, not overlapping anything?
 
-GATE 2: LABEL POSITIONING  
+GATE 2: LABEL POSITIONING
 □ Inline labels NOT directly on data lines (must have offset)?
 □ For LOW series near bottom: is label ABOVE the line (in clear space)?
 □ No label-to-label collision?
@@ -724,7 +720,7 @@ SPECIFIC BUGS TO CHECK
 
 BUG #1: Title/red bar overlap
 BUG #2: Inline label ON the data line (not offset)
-BUG #3: Inline label in X-axis zone (overlapping year labels) 
+BUG #3: Inline label in X-axis zone (overlapping year labels)
         → For LOW series, label must go ABOVE line, not below
 BUG #4: Label-to-label overlap
 BUG #5: Clipped elements at edges
@@ -752,62 +748,66 @@ Zone boundary violations are CRITICAL failures."""
 # AGENT FUNCTIONS
 # ═══════════════════════════════════════════════════════════════════════════
 
+
 def create_client():
     """Create unified LLM client (supports Anthropic Claude and OpenAI)"""
     return create_llm_client()
 
 
-def run_research_agent(client, topic: str, talking_points: str = "", governance: GovernanceTracker = None) -> dict:
+def run_research_agent(
+    client, topic: str, talking_points: str = "", governance: GovernanceTracker = None
+) -> dict:
     # Input validation
     if not topic or not isinstance(topic, str):
         raise ValueError(
             "[RESEARCH_AGENT] Invalid topic. Expected non-empty string, "
             f"got: {type(topic).__name__}"
         )
-    
+
     if len(topic.strip()) < 5:
         raise ValueError(
             f"[RESEARCH_AGENT] Topic too short: '{topic}'. "
             "Must be at least 5 characters."
         )
-    
+
     print(f"📊 Research Agent: Gathering verified data for '{topic[:50]}...'")
-    
+
     user_prompt = f"""Research this topic for an Economist-style article:
 
 TOPIC: {topic}
-FOCUS AREAS: {talking_points if talking_points else 'General coverage'}
+FOCUS AREAS: {talking_points if talking_points else "General coverage"}
 
 Find specific, VERIFIABLE data with exact sources. Flag anything you cannot verify."""
 
     response_text = call_llm(
-        client,
-        RESEARCH_AGENT_PROMPT,
-        user_prompt,
-        max_tokens=2500
+        client, RESEARCH_AGENT_PROMPT, user_prompt, max_tokens=2500
     )
-    
+
     try:
-        start = response_text.find('{')
-        end = response_text.rfind('}') + 1
+        start = response_text.find("{")
+        end = response_text.rfind("}") + 1
         if start != -1 and end > start:
             research_data = json.loads(response_text[start:end])
         else:
             research_data = {"raw_research": response_text, "chart_data": None}
     except json.JSONDecodeError:
         research_data = {"raw_research": response_text, "chart_data": None}
-    
-    verified = sum(1 for dp in research_data.get('data_points', []) if dp.get('verified', False))
-    total = len(research_data.get('data_points', []))
+
+    verified = sum(
+        1 for dp in research_data.get("data_points", []) if dp.get("verified", False)
+    )
+    total = len(research_data.get("data_points", []))
     print(f"   ✓ Found {total} data points ({verified} verified)")
-    
-    if research_data.get('unverified_claims'):
-        print(f"   ⚠ {len(research_data['unverified_claims'])} unverified claims flagged")
-    
+
+    if research_data.get("unverified_claims"):
+        print(
+            f"   ⚠ {len(research_data['unverified_claims'])} unverified claims flagged"
+        )
+
     # SELF-VALIDATION: Review research output
     print("   🔍 Self-validating research...")
     is_valid, issues = review_agent_output("research_agent", research_data)
-    
+
     if not is_valid:
         print(f"   ⚠️  Research has {len(issues)} quality issues")
         # Don't regenerate research - flag for human review
@@ -816,7 +816,7 @@ Find specific, VERIFIABLE data with exact sources. Flag anything you cannot veri
             print(f"     • {issue}")
     else:
         print("   ✅ Research passed self-validation")
-    
+
     # Log to governance
     if governance:
         governance.log_agent_output(
@@ -826,42 +826,49 @@ Find specific, VERIFIABLE data with exact sources. Flag anything you cannot veri
                 "topic": topic,
                 "data_points": total,
                 "verified": verified,
-                "unverified": len(research_data.get('unverified_claims', [])),
+                "unverified": len(research_data.get("unverified_claims", [])),
                 "validation_passed": is_valid,
-                "validation_issues": len(issues)
-            }
+                "validation_issues": len(issues),
+            },
         )
-    
+
     return research_data
 
 
-def run_writer_agent(client, topic: str, research_brief: dict, current_date: str, chart_filename: str = None, featured_image: str = None) -> str:
+def run_writer_agent(
+    client,
+    topic: str,
+    research_brief: dict,
+    current_date: str,
+    chart_filename: str = None,
+    featured_image: str = None,
+) -> str:
     # Input validation
     if not topic or not isinstance(topic, str):
         raise ValueError(
             "[WRITER_AGENT] Invalid topic. Expected non-empty string, "
             f"got: {type(topic).__name__}"
         )
-    
+
     if not isinstance(research_brief, dict):
         raise ValueError(
             "[WRITER_AGENT] Invalid research_brief. Expected dict, "
             f"got: {type(research_brief).__name__}"
         )
-    
+
     if not research_brief:
         raise ValueError(
             "[WRITER_AGENT] Empty research_brief. Cannot write without research data."
         )
-    
+
     print(f"✍️  Writer Agent: Drafting article on '{topic[:50]}...'")
-    
+
     # Build system prompt by replacing placeholders one at a time
     system_prompt = WRITER_AGENT_PROMPT.replace("{current_date}", current_date)
-    
+
     # Add chart information if available
-    if chart_filename and research_brief.get('chart_data'):
-        chart_title = research_brief['chart_data'].get('title', 'Chart')
+    if chart_filename and research_brief.get("chart_data"):
+        chart_title = research_brief["chart_data"].get("title", "Chart")
         chart_info = f"""
 
 ═══════════════════════════════════════════════════════════════════════════
@@ -878,10 +885,14 @@ Add a sentence referencing it: "As the chart shows, [observation]..."
 Failure to include the chart will result in article rejection.
 ═══════════════════════════════════════════════════════════════════════════
 """
-        system_prompt = system_prompt.replace("{research_brief}", json.dumps(research_brief, indent=2) + chart_info)
+        system_prompt = system_prompt.replace(
+            "{research_brief}", json.dumps(research_brief, indent=2) + chart_info
+        )
     else:
-        system_prompt = system_prompt.replace("{research_brief}", json.dumps(research_brief, indent=2))
-    
+        system_prompt = system_prompt.replace(
+            "{research_brief}", json.dumps(research_brief, indent=2)
+        )
+
     # Add featured image to front matter if available
     if featured_image:
         featured_image_note = f"""
@@ -900,54 +911,54 @@ image: {featured_image}
 ---
 """
         system_prompt += featured_image_note
-    
+
     # Generate initial draft
     draft = call_llm(
         client,
         system_prompt,
         f"⚠️  REMEMBER: Use date: {current_date} in YAML front matter.\n\nWrite an Economist-style article on: {topic}",
-        max_tokens=3000
+        max_tokens=3000,
     )
     word_count = len(draft.split())
     print(f"   ✓ Draft complete ({word_count} words)")
-    
+
     # SELF-VALIDATION: Review draft before returning
     print("   🔍 Self-validating draft...")
     is_valid, issues = review_agent_output(
-        "writer_agent", 
-        draft, 
-        context={"chart_filename": chart_filename}
+        "writer_agent", draft, context={"chart_filename": chart_filename}
     )
-    
+
     critical_issues = []
     # If validation fails and issues are critical, attempt one regeneration
     if not is_valid:
         critical_issues = [i for i in issues if "CRITICAL" in i or "BANNED" in i]
         if critical_issues:
-            print(f"   ⚠️  {len(critical_issues)} critical issues found, regenerating...")
-            
+            print(
+                f"   ⚠️  {len(critical_issues)} critical issues found, regenerating..."
+            )
+
             # Create fix instructions from issues
-            fix_instructions = "\n".join([
-                "CRITICAL FIXES REQUIRED:",
-                *[f"- {issue}" for issue in critical_issues[:5]],  # Top 5 issues
-                "\nRegenerate the article with these fixes applied."
-            ])
-            
+            fix_instructions = "\n".join(
+                [
+                    "CRITICAL FIXES REQUIRED:",
+                    *[f"- {issue}" for issue in critical_issues[:5]],  # Top 5 issues
+                    "\nRegenerate the article with these fixes applied.",
+                ]
+            )
+
             # Regenerate with fix instructions
             draft = call_llm(
                 client,
                 system_prompt + "\n\n" + fix_instructions,
                 f"Fix the issues and regenerate: {topic}",
-                max_tokens=3000
+                max_tokens=3000,
             )
-            
+
             # Re-validate
             is_valid, issues = review_agent_output(
-                "writer_agent", 
-                draft, 
-                context={"chart_filename": chart_filename}
+                "writer_agent", draft, context={"chart_filename": chart_filename}
             )
-            
+
             if not is_valid:
                 print(f"   ⚠️  Draft still has {len(issues)} issues after regeneration")
             else:
@@ -956,12 +967,12 @@ image: {featured_image}
             print(f"   ⚠️  Draft has {len(issues)} warnings (non-critical)")
     else:
         print("   ✅ Draft passed self-validation")
-    
+
     # Return draft with validation metadata
     return draft, {
         "is_valid": is_valid,
         "regenerated": bool(not is_valid and critical_issues),
-        "critical_issues": len(critical_issues) if not is_valid else 0
+        "critical_issues": len(critical_issues) if not is_valid else 0,
     }
 
 
@@ -969,58 +980,68 @@ def run_graphics_agent(client, chart_spec: dict, output_path: str) -> str:
     if not chart_spec:
         print("📈 Graphics Agent: No chart data provided, skipping...")
         return None
-    
+
     # Input validation
     if not isinstance(chart_spec, dict):
         raise ValueError(
             "[GRAPHICS_AGENT] Invalid chart_spec. Expected dict, "
             f"got: {type(chart_spec).__name__}"
         )
-    
-    required_fields = ['title', 'data']
+
+    required_fields = ["title", "data"]
     missing = [f for f in required_fields if f not in chart_spec]
     if missing:
         raise ValueError(
             f"[GRAPHICS_AGENT] Chart spec missing required fields: {missing}"
         )
-    
+
     if not output_path or not isinstance(output_path, str):
         raise ValueError(
             "[GRAPHICS_AGENT] Invalid output_path. Expected non-empty string, "
             f"got: {type(output_path).__name__}"
         )
-    
-    print(f"📈 Graphics Agent: Creating visualization '{chart_spec.get('title', 'Untitled')[:40]}...'")
-    
+
+    print(
+        f"📈 Graphics Agent: Creating visualization '{chart_spec.get('title', 'Untitled')[:40]}...'"
+    )
+
     # Start metrics collection
     metrics = get_metrics_collector()
-    chart_record = metrics.start_chart(chart_spec.get('title', 'Untitled'), chart_spec)
-    
+    chart_record = metrics.start_chart(chart_spec.get("title", "Untitled"), chart_spec)
+
     try:
         code = call_llm(
             client,
             GRAPHICS_AGENT_PROMPT.format(chart_spec=json.dumps(chart_spec, indent=2)),
             "Generate the matplotlib code.",
-            max_tokens=2500
+            max_tokens=2500,
         )
-        
+
         if "```python" in code:
             code = code.split("```python")[1].split("```")[0]
         elif "```" in code:
             code = code.split("```")[1].split("```")[0]
-        
+
         if "plt.savefig" not in code:
             code += f"\nplt.savefig('{output_path}', dpi=300, bbox_inches='tight', facecolor='#f1f0e9')"
         else:
-            code = re.sub(r"plt\.savefig\([^)]+\)", f"plt.savefig('{output_path}', dpi=300, bbox_inches='tight', facecolor='#f1f0e9')", code)
-        
+            code = re.sub(
+                r"plt\.savefig\([^)]+\)",
+                f"plt.savefig('{output_path}', dpi=300, bbox_inches='tight', facecolor='#f1f0e9')",
+                code,
+            )
+
         temp_script = "/tmp/chart_gen.py"
-        with open(temp_script, 'w') as f:
+        with open(temp_script, "w") as f:
             f.write("import matplotlib\nmatplotlib.use('Agg')\n")
-            f.write("import matplotlib.pyplot as plt\nimport matplotlib.patches as mpatches\nimport numpy as np\n")
+            f.write(
+                "import matplotlib.pyplot as plt\nimport matplotlib.patches as mpatches\nimport numpy as np\n"
+            )
             f.write(code)
-        
-        result = subprocess.run([sys.executable, temp_script], capture_output=True, text=True)
+
+        result = subprocess.run(
+            [sys.executable, temp_script], capture_output=True, text=True
+        )
         if result.returncode == 0:
             print(f"   ✓ Chart saved to {output_path}")
             metrics.record_generation(chart_record, success=True)
@@ -1044,191 +1065,199 @@ def run_editor_agent(client, draft: str) -> tuple:
             "[EDITOR_AGENT] Invalid draft. Expected non-empty string, "
             f"got: {type(draft).__name__}"
         )
-    
+
     if len(draft.strip()) < 100:
         raise ValueError(
             f"[EDITOR_AGENT] Draft too short ({len(draft)} chars). "
             "Expected substantial article content (>100 chars)."
         )
-    
+
     word_count = len(draft.split())
-    print(f"📝 Editor Agent: Reviewing {word_count}-word draft against quality gates...")
-    
+    print(
+        f"📝 Editor Agent: Reviewing {word_count}-word draft against quality gates..."
+    )
+
     response = call_llm(
         client,
         EDITOR_AGENT_PROMPT.format(draft=draft),
         "Review and edit this article.",
-        max_tokens=4000
+        max_tokens=4000,
     )
-    
+
     gates_passed = response.upper().count("PASS")
     gates_failed = response.upper().count("FAIL")
-    
+
     print(f"   Quality gates: {gates_passed} passed, {gates_failed} failed")
-    
+
     if "## Edited Article" in response:
         edited = response.split("## Edited Article")[1].strip()
     else:
         edited = response
-    
+
     return edited, gates_passed, gates_failed
 
 
 def run_critique_agent(client, article: str) -> str:
     print("🔍 Critique Agent: Final hostile review...")
-    
+
     critique = call_llm(
         client,
         CRITIQUE_AGENT_PROMPT.format(article=article),
         "Find any remaining flaws.",
-        max_tokens=1500
+        max_tokens=1500,
     )
-    issues_found = critique.lower().count("issue") + critique.lower().count("problem") + critique.lower().count("flag")
-    
+    issues_found = (
+        critique.lower().count("issue")
+        + critique.lower().count("problem")
+        + critique.lower().count("flag")
+    )
+
     if issues_found > 0:
         print(f"   ⚠ {issues_found} potential issues flagged for review")
     else:
         print("   ✓ No major issues found")
-    
+
     return critique
 
 
 def run_visual_qa_agent(client, image_path: str, chart_record: dict = None) -> dict:
     """Visual QA Agent: Validates chart rendering quality.
-    
+
     Sprint 8 Enhancement: Two-stage validation
     1. Programmatic zone boundary checks (fast, deterministic)
     2. LLM vision analysis (comprehensive, subjective)
     """
     print("🎨 Visual QA Agent: Inspecting chart...")
-    
+
     if not os.path.exists(image_path):
         print(f"   ⚠ Chart not found: {image_path}")
         return {"overall_pass": False, "critical_issues": ["Chart file not found"]}
-    
+
     # STAGE 1: Programmatic zone boundary validation (Sprint 8 Story 2)
     try:
         from visual_qa_zones import ZoneBoundaryValidator
-        
+
         zone_validator = ZoneBoundaryValidator()
         zones_valid, zone_issues = zone_validator.validate_chart(image_path)
-        
+
         if not zones_valid:
             print(f"   ❌ Zone validation: {len(zone_issues)} boundary violations")
             for issue in zone_issues[:3]:
                 print(f"      • {issue}")
         else:
-            print(f"   ✅ Zone validation: All boundaries correct")
+            print("   ✅ Zone validation: All boundaries correct")
     except ImportError:
-        print(f"   ℹ  Zone validator unavailable (continuing with LLM-only validation)")
+        print("   ℹ  Zone validator unavailable (continuing with LLM-only validation)")
         zones_valid = True
         zone_issues = []
-    
+
     # STAGE 2: LLM vision analysis
     # Load image as base64
     with open(image_path, "rb") as f:
         image_data = base64.standard_b64encode(f.read()).decode("utf-8")
-    
+
     # Visual QA requires provider-specific handling for images
-    if client.provider == 'anthropic':
-        response_text = client.client.messages.create(
-            model=client.model,
-            max_tokens=2000,
-            system=VISUAL_QA_PROMPT,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image",
-                            "source": {
-                                "type": "base64",
-                                "media_type": "image/png",
-                                "data": image_data
-                            }
-                        },
-                        {
-                            "type": "text",
-                            "text": "Review this chart for visual quality issues."
-                        }
-                    ]
-                }
-            ]
-        ).content[0].text
-    elif client.provider == 'openai':
-        response_text = client.client.chat.completions.create(
-            model=client.model,
-            max_tokens=2000,
-            messages=[
-                {
-                    "role": "system",
-                    "content": VISUAL_QA_PROMPT
-                },
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": "Review this chart for visual quality issues."
-                        },
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": f"data:image/png;base64,{image_data}"
-                            }
-                        }
-                    ]
-                }
-            ]
-        ).choices[0].message.content
+    if client.provider == "anthropic":
+        response_text = (
+            client.client.messages.create(
+                model=client.model,
+                max_tokens=2000,
+                system=VISUAL_QA_PROMPT,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "image",
+                                "source": {
+                                    "type": "base64",
+                                    "media_type": "image/png",
+                                    "data": image_data,
+                                },
+                            },
+                            {
+                                "type": "text",
+                                "text": "Review this chart for visual quality issues.",
+                            },
+                        ],
+                    }
+                ],
+            )
+            .content[0]
+            .text
+        )
+    elif client.provider == "openai":
+        response_text = (
+            client.client.chat.completions.create(
+                model=client.model,
+                max_tokens=2000,
+                messages=[
+                    {"role": "system", "content": VISUAL_QA_PROMPT},
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "Review this chart for visual quality issues.",
+                            },
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": f"data:image/png;base64,{image_data}"
+                                },
+                            },
+                        ],
+                    },
+                ],
+            )
+            .choices[0]
+            .message.content
+        )
     else:
-        response_text = "{\"overall_pass\": false, \"critical_issues\": [\"Provider does not support image analysis\"]}"
-    
+        response_text = '{"overall_pass": false, "critical_issues": ["Provider does not support image analysis"]}'
+
     try:
-        start = response_text.find('{')
-        end = response_text.rfind('}') + 1
+        start = response_text.find("{")
+        end = response_text.rfind("}") + 1
         if start != -1 and end > start:
             result = json.loads(response_text[start:end])
         else:
-            result = {"overall_pass": False, "critical_issues": ["Failed to parse QA response"]}
+            result = {
+                "overall_pass": False,
+                "critical_issues": ["Failed to parse QA response"],
+            }
     except json.JSONDecodeError:
         result = {"overall_pass": False, "critical_issues": ["JSON parse error"]}
-    
+
     gates = result.get("gates", {})
     passed = sum(1 for g in gates.values() if g.get("pass", False))
     total = len(gates) if gates else 5
-    
+
     # Combine zone validation with LLM results
     if not zones_valid:
-        result["zone_validation"] = {
-            "pass": False,
-            "issues": zone_issues
-        }
+        result["zone_validation"] = {"pass": False, "issues": zone_issues}
         result["overall_pass"] = False
         if "critical_issues" not in result:
             result["critical_issues"] = []
         result["critical_issues"].extend(zone_issues)
     else:
-        result["zone_validation"] = {
-            "pass": True,
-            "issues": []
-        }
-    
+        result["zone_validation"] = {"pass": True, "issues": []}
+
     print(f"   Visual gates: {passed}/{total} passed")
     print(f"   Zone boundaries: {'✓ PASS' if zones_valid else '✗ FAIL'}")
-    
+
     if result.get("overall_pass"):
         print("   ✓ Chart PASSED visual QA")
     else:
         print("   ✗ Chart FAILED visual QA")
         for issue in result.get("critical_issues", [])[:3]:
             print(f"     • {issue}")
-    
+
     # Record metrics if chart_record provided
     if chart_record is not None:
         metrics = get_metrics_collector()
         metrics.record_visual_qa(chart_record, result)
-    
+
     return result
 
 
@@ -1236,70 +1265,82 @@ def run_visual_qa_agent(client, image_path: str, chart_record: dict = None) -> d
 # ORCHESTRATOR (v3 - with governance)
 # ═══════════════════════════════════════════════════════════════════════════
 
-def generate_economist_post(topic: str, category: str = "quality-engineering", 
-                            talking_points: str = "", output_dir: str = "output",
-                            interactive: bool = False, governance: GovernanceTracker = None) -> dict:
+
+def generate_economist_post(
+    topic: str,
+    category: str = "quality-engineering",
+    talking_points: str = "",
+    output_dir: str = "output",
+    interactive: bool = False,
+    governance: GovernanceTracker = None,
+) -> dict:
     """Generate Economist-style blog post with optional human review gates"""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print(f"🎯 GENERATING: {topic}")
     if interactive:
         print("🚦 INTERACTIVE MODE: Approval gates enabled")
-    print("="*70 + "\n")
-    
+    print("=" * 70 + "\n")
+
     client = create_client()
-    date_str = datetime.now().strftime('%Y-%m-%d')
+    date_str = datetime.now().strftime("%Y-%m-%d")
     slug = slugify(topic, max_length=50)
-    
+
     # Use provided output_dir
     posts_dir = Path(output_dir)
     charts_dir = posts_dir / "charts"
-    
+
     posts_dir.mkdir(parents=True, exist_ok=True)
     charts_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # Create governance tracker if not provided
     if governance is None and interactive:
         governance = GovernanceTracker(f"{output_dir}/governance")
-    
+
     # Initialize agent metrics tracking
     agent_metrics = AgentMetrics()
-    
+
     skip_approvals = False  # Set by 'skip-all' response
-    
+
     # Stage 1: Research
     research = run_research_agent(client, topic, talking_points, governance)
-    
+
     # Track Research Agent metrics
-    verified = sum(1 for dp in research.get('data_points', []) if dp.get('verified', False))
-    total_points = len(research.get('data_points', []))
-    unverified = len(research.get('unverified_claims', []))
-    agent_metrics.track_research_agent(
-        data_points=total_points,
-        verified=verified,
-        unverified=unverified
+    verified = sum(
+        1 for dp in research.get("data_points", []) if dp.get("verified", False)
     )
-    
+    total_points = len(research.get("data_points", []))
+    unverified = len(research.get("unverified_claims", []))
+    agent_metrics.track_research_agent(
+        data_points=total_points, verified=verified, unverified=unverified
+    )
+
     # Approval Gate 1: Research
     if interactive and not skip_approvals:
-        verified = sum(1 for dp in research.get('data_points', []) if dp.get('verified', False))
-        total = len(research.get('data_points', []))
-        
+        verified = sum(
+            1 for dp in research.get("data_points", []) if dp.get("verified", False)
+        )
+        total = len(research.get("data_points", []))
+
         response = governance.request_approval(
             "Research Complete",
             f"Research agent gathered {total} data points ({verified} verified)",
             {
-                "Unverified claims": len(research.get('unverified_claims', [])),
-                "Has chart data": bool(research.get('chart_data')),
-                "Review file": f"{governance.session_dir}/research_agent.json"
-            }
+                "Unverified claims": len(research.get("unverified_claims", [])),
+                "Has chart data": bool(research.get("chart_data")),
+                "Review file": f"{governance.session_dir}/research_agent.json",
+            },
         )
-        
-        if response and hasattr(governance, 'decisions') and governance.decisions[-1].get('skip_all'):
+
+        if (
+            response
+            and hasattr(governance, "decisions")
+            and governance.decisions[-1].get("skip_all")
+        ):
             skip_approvals = True
         elif not response:
             print("❌ Research rejected. Exiting.")
             return {"status": "rejected", "stage": "research"}
-    
+
     # Stage 2: Graphics
     chart_path = None
     chart_record = None
@@ -1307,33 +1348,33 @@ def generate_economist_post(topic: str, category: str = "quality-engineering",
     if research.get("chart_data"):
         chart_filename = str(charts_dir / f"{slug}.png")
         chart_path = run_graphics_agent(client, research["chart_data"], chart_filename)
-        
+
         # Get the chart record for metrics tracking
         metrics = get_metrics_collector()
         if metrics.current_session["charts"]:
             chart_record = metrics.current_session["charts"][-1]
-        
+
         # Stage 2b: Visual QA (optional - only if vision supported)
-        if chart_path and client.provider == 'anthropic':
+        if chart_path and client.provider == "anthropic":
             # Only Anthropic Claude has good vision support
             visual_qa_result = run_visual_qa_agent(client, chart_path, chart_record)
             visual_qa_passed = visual_qa_result.get("overall_pass", False)
-            
+
             if not visual_qa_passed:
                 print("   ⚠ Chart failed Visual QA - flagging for manual review")
                 # Save QA report for debugging
-                qa_report_path = chart_path.replace('.png', '-qa-report.json')
-                with open(qa_report_path, 'w') as f:
+                qa_report_path = chart_path.replace(".png", "-qa-report.json")
+                with open(qa_report_path, "w") as f:
                     json.dump(visual_qa_result, f, indent=2)
-            
+
             # Log to governance
             if governance:
                 governance.log_agent_output(
                     "graphics_agent",
                     {"chart_path": chart_path, "visual_qa": visual_qa_result},
-                    metadata={"passed_qa": visual_qa_passed}
+                    metadata={"passed_qa": visual_qa_passed},
                 )
-            
+
             # Track Graphics Agent metrics
             zone_violations = len(visual_qa_result.get("critical_issues", []))
             agent_metrics.track_graphics_agent(
@@ -1341,7 +1382,7 @@ def generate_economist_post(topic: str, category: str = "quality-engineering",
                 visual_qa_passed=1 if visual_qa_passed else 0,
                 zone_violations=zone_violations,
                 regenerations=0,
-                validation_passed=visual_qa_passed
+                validation_passed=visual_qa_passed,
             )
         elif chart_path:
             # Track Graphics Agent even without Visual QA
@@ -1351,54 +1392,66 @@ def generate_economist_post(topic: str, category: str = "quality-engineering",
                 visual_qa_passed=1,  # Assume pass if no QA available
                 zone_violations=0,
                 regenerations=0,
-                validation_passed=True  # Chart generated successfully
+                validation_passed=True,  # Chart generated successfully
             )
-    
+
     # Stage 2c: Featured Image Generation (optional)
     featured_image_path = None
-    if os.environ.get('OPENAI_API_KEY'):
+    if os.environ.get("OPENAI_API_KEY"):
         featured_image_filename = str(posts_dir / "images" / f"{slug}.png")
         featured_image_path = generate_featured_image(
             topic=topic,
-            article_summary=research.get('trend_narrative', topic),
-            contrarian_angle=research.get('contrarian_angle', ''),
-            output_path=featured_image_filename
+            article_summary=research.get("trend_narrative", topic),
+            contrarian_angle=research.get("contrarian_angle", ""),
+            output_path=featured_image_filename,
         )
         if not featured_image_path:
             print("   ℹ Continuing without featured image")
     else:
         print("   ℹ OPENAI_API_KEY not set, skipping featured image generation")
-    
+
     # Stage 3: Writing
     # Prepare chart filename if chart will be generated
     chart_filename = None
     if research.get("chart_data"):
         chart_filename = f"/assets/charts/{slug}.png"
-    
-    draft, writer_metadata = run_writer_agent(client, topic, research, date_str, chart_filename, featured_image_path)
-    
+
+    draft, writer_metadata = run_writer_agent(
+        client, topic, research, date_str, chart_filename, featured_image_path
+    )
+
     # Track Writer Agent metrics
     word_count = len(draft.split())
-    banned_phrases = sum(1 for phrase in ['game-changer', 'paradigm shift', 'leverage', 'at the end of the day'] 
-                        if phrase.lower() in draft.lower())
-    chart_embedded = bool(chart_filename and f'![' in draft and chart_filename.split('/')[-1] in draft)
-    
+    banned_phrases = sum(
+        1
+        for phrase in [
+            "game-changer",
+            "paradigm shift",
+            "leverage",
+            "at the end of the day",
+        ]
+        if phrase.lower() in draft.lower()
+    )
+    chart_embedded = bool(
+        chart_filename and "![" in draft and chart_filename.split("/")[-1] in draft
+    )
+
     agent_metrics.track_writer_agent(
         word_count=word_count,
         banned_phrases=banned_phrases,
-        validation_passed=writer_metadata['is_valid'],
-        regenerations=1 if writer_metadata['regenerated'] else 0,
-        chart_embedded=chart_embedded
+        validation_passed=writer_metadata["is_valid"],
+        regenerations=1 if writer_metadata["regenerated"] else 0,
+        chart_embedded=chart_embedded,
     )
-    
+
     # Log draft to governance
     if governance:
         governance.log_agent_output(
             "writer_agent",
             {"draft": draft, "word_count": len(draft.split())},
-            metadata={"topic": topic, "length": len(draft)}
+            metadata={"topic": topic, "length": len(draft)},
         )
-    
+
     # Approval Gate 2: Draft Review
     if interactive and not skip_approvals:
         response = governance.request_approval(
@@ -1407,107 +1460,113 @@ def generate_economist_post(topic: str, category: str = "quality-engineering",
             {
                 "Topic": topic,
                 "Preview": draft[:200] + "...",
-                "Review file": f"{governance.session_dir}/writer_agent.json"
-            }
+                "Review file": f"{governance.session_dir}/writer_agent.json",
+            },
         )
-        
-        if response and hasattr(governance, 'decisions') and governance.decisions[-1].get('skip_all'):
+
+        if (
+            response
+            and hasattr(governance, "decisions")
+            and governance.decisions[-1].get("skip_all")
+        ):
             skip_approvals = True
         elif not response:
             print("❌ Draft rejected. Exiting.")
             return {"status": "rejected", "stage": "draft"}
-    
+
     # Stage 4: Editing
     edited_article, gates_passed, gates_failed = run_editor_agent(client, draft)
-    
+
     # Track Editor Agent metrics
     agent_metrics.track_editor_agent(
         gates_passed=gates_passed,
         gates_failed=gates_failed,
         edits_made=len(edited_article) - len(draft),  # Rough estimate
-        quality_issues=[] if gates_failed == 0 else [f"{gates_failed} gates failed"]
+        quality_issues=[] if gates_failed == 0 else [f"{gates_failed} gates failed"],
     )
-    
+
     # Stage 5: Final critique
     critique = None
     if gates_failed == 0:
         critique = run_critique_agent(client, edited_article)
     else:
         print(f"   ⚠ Skipping critique - {gates_failed} quality gates failed")
-    
+
     # Stage 6: Publication Validation (CRITICAL - blocks bad articles)
     print("🔒 Publication Validator: Final quality gate...")
     validator = PublicationValidator(expected_date=date_str)
     is_valid, validation_issues = validator.validate(edited_article)
-    
+
     if not is_valid:
         print("\n" + validator.format_report(is_valid, validation_issues))
         print("\n❌ PUBLICATION BLOCKED: Article failed validation")
         print("\n💡 These issues indicate agent prompts need strengthening.")
         print("   The agents should have prevented these issues.")
-        
+
         # Save to quarantine directory
         quarantine_dir = posts_dir / "quarantine"
         quarantine_dir.mkdir(exist_ok=True)
         quarantine_path = quarantine_dir / f"{date_str}-{slug}.md"
-        with open(quarantine_path, 'w') as f:
+        with open(quarantine_path, "w") as f:
             f.write(edited_article)
-        
+
         # Save validation report
         report_path = quarantine_dir / f"{date_str}-{slug}-VALIDATION-FAILED.txt"
-        with open(report_path, 'w') as f:
+        with open(report_path, "w") as f:
             f.write(validator.format_report(is_valid, validation_issues))
-        
+
         print(f"   Quarantined to: {quarantine_path}")
         print(f"   Report saved: {report_path}")
-        
+
         return {
             "status": "rejected",
             "reason": "validation_failed",
             "article_path": str(quarantine_path),
             "validation_report": str(report_path),
-            "issues": validation_issues
+            "issues": validation_issues,
         }
     else:
         print(f"   ✓ Validation PASSED ({len(validation_issues)} advisory notes)")
-    
+
     # Save article (only if validated)
     article_path = str(posts_dir / f"{date_str}-{slug}.md")
-    with open(article_path, 'w') as f:
+    with open(article_path, "w") as f:
         f.write(edited_article)
-    
+
     if critique:
         review_path = str(posts_dir / f"{date_str}-{slug}-review.md")
-        with open(review_path, 'w') as f:
+        with open(review_path, "w") as f:
             f.write(f"# Editorial Review: {topic}\n\n{critique}")
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print("✅ COMPLETE")
     print(f"   Article: {article_path}")
     if chart_path:
         print(f"   Chart:   {chart_path}")
-        print(f"   Visual QA: {'PASSED' if visual_qa_passed else 'FAILED - needs review'}")
+        print(
+            f"   Visual QA: {'PASSED' if visual_qa_passed else 'FAILED - needs review'}"
+        )
     print(f"   Editorial: {gates_passed}/5 gates passed")
-    print("="*70 + "\n")
-    
+    print("=" * 70 + "\n")
+
     # Finalize metrics session
     metrics = get_metrics_collector()
     metrics.end_session()
-    
+
     # Save agent metrics
     agent_metrics.save()
-    
+
     # Print metrics summary
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("📊 METRICS SUMMARY")
-    print("="*70)
+    print("=" * 70)
     summary = metrics.get_summary()
     print(f"   Charts Generated: {summary['total_charts_generated']}")
     print(f"   Visual QA Pass Rate: {summary['visual_qa_pass_rate']:.1f}%")
-    if summary['total_zone_violations'] > 0:
+    if summary["total_zone_violations"] > 0:
         print(f"   Zone Violations: {summary['total_zone_violations']}")
-    print("="*70 + "\n")
-    
+    print("=" * 70 + "\n")
+
     return {
         "article_path": article_path,
         "chart_path": chart_path,
@@ -1515,7 +1574,7 @@ def generate_economist_post(topic: str, category: str = "quality-engineering",
         "gates_failed": gates_failed,
         "visual_qa_passed": visual_qa_passed,
         "word_count": len(edited_article.split()),
-        "metrics_summary": summary
+        "metrics_summary": summary,
     }
 
 
@@ -1524,91 +1583,127 @@ def generate_economist_post(topic: str, category: str = "quality-engineering",
 # ═══════════════════════════════════════════════════════════════════════════
 
 CONTENT_QUEUE = [
-    {"topic": "The Agentic AI Testing Paradox", "category": "quality-engineering", "talking_points": "adoption rates vs productivity gains, maintenance costs, vendor claims vs reality"},
-    {"topic": "Self-Healing Tests: Myth vs Reality", "category": "test-automation", "talking_points": "vendor promises, actual maintenance reduction, limitations"},
-    {"topic": "The Economics of Flaky Tests", "category": "quality-engineering", "talking_points": "developer time costs, CI delays, trust erosion"},
-    {"topic": "Quality Metrics Executives Actually Use", "category": "quality-engineering", "talking_points": "defect escape rate, cost of quality, vanity metrics"},
-    {"topic": "The Death of the QA Department", "category": "quality-engineering", "talking_points": "embedded QE, job growth despite automation"},
-    {"topic": "Technical Debt's Compound Interest", "category": "software-engineering", "talking_points": "velocity degradation, refactoring ROI"},
-    {"topic": "Shift-Right: The Trend Nobody Budgeted For", "category": "quality-engineering", "talking_points": "production testing costs, observability spend"},
-    {"topic": "No-Code Testing's Hidden Costs", "category": "test-automation", "talking_points": "creation vs maintenance, 2am debugging"},
+    {
+        "topic": "The Agentic AI Testing Paradox",
+        "category": "quality-engineering",
+        "talking_points": "adoption rates vs productivity gains, maintenance costs, vendor claims vs reality",
+    },
+    {
+        "topic": "Self-Healing Tests: Myth vs Reality",
+        "category": "test-automation",
+        "talking_points": "vendor promises, actual maintenance reduction, limitations",
+    },
+    {
+        "topic": "The Economics of Flaky Tests",
+        "category": "quality-engineering",
+        "talking_points": "developer time costs, CI delays, trust erosion",
+    },
+    {
+        "topic": "Quality Metrics Executives Actually Use",
+        "category": "quality-engineering",
+        "talking_points": "defect escape rate, cost of quality, vanity metrics",
+    },
+    {
+        "topic": "The Death of the QA Department",
+        "category": "quality-engineering",
+        "talking_points": "embedded QE, job growth despite automation",
+    },
+    {
+        "topic": "Technical Debt's Compound Interest",
+        "category": "software-engineering",
+        "talking_points": "velocity degradation, refactoring ROI",
+    },
+    {
+        "topic": "Shift-Right: The Trend Nobody Budgeted For",
+        "category": "quality-engineering",
+        "talking_points": "production testing costs, observability spend",
+    },
+    {
+        "topic": "No-Code Testing's Hidden Costs",
+        "category": "test-automation",
+        "talking_points": "creation vs maintenance, 2am debugging",
+    },
 ]
 
 
 def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(
-        description='Generate Economist-style articles with AI agents',
+        description="Generate Economist-style articles with AI agents",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog='''
+        epilog="""
 Examples:
   # Non-interactive (automated)
   python economist_agent.py
-  
+
   # Interactive with human review gates
   python economist_agent.py --interactive
-  
+
   # Custom topic
   export TOPIC="The Rise of AI Testing"
   python economist_agent.py --interactive
-        '''
+        """,
     )
     parser.add_argument(
-        '--interactive', '-i',
-        action='store_true',
-        help='Enable interactive mode with approval gates between stages'
+        "--interactive",
+        "-i",
+        action="store_true",
+        help="Enable interactive mode with approval gates between stages",
     )
     parser.add_argument(
-        '--governance-dir',
+        "--governance-dir",
         default=None,
-        help='Directory for governance logs (default: output/governance)'
+        help="Directory for governance logs (default: output/governance)",
     )
-    
+
     args = parser.parse_args()
-    
+
     # Get environment variables with defaults
-    topic = os.environ.get('TOPIC', '').strip()
-    talking_points = os.environ.get('TALKING_POINTS', '').strip()
-    category = os.environ.get('CATEGORY', 'quality-engineering').strip()
-    
+    topic = os.environ.get("TOPIC", "").strip()
+    talking_points = os.environ.get("TALKING_POINTS", "").strip()
+    category = os.environ.get("CATEGORY", "quality-engineering").strip()
+
     # Set default output directory if not specified
-    output_dir = os.environ.get('OUTPUT_DIR', '').strip()
+    output_dir = os.environ.get("OUTPUT_DIR", "").strip()
     if not output_dir:
-        output_dir = 'output'
+        output_dir = "output"
         print(f"   ℹ OUTPUT_DIR not set, using default: {output_dir}/")
-    
+
     # Create output directories
     Path(output_dir).mkdir(parents=True, exist_ok=True)
-    Path(output_dir).joinpath('charts').mkdir(parents=True, exist_ok=True)
+    Path(output_dir).joinpath("charts").mkdir(parents=True, exist_ok=True)
     print(f"   ✓ Output directory: {Path(output_dir).absolute()}")
-    
+
     if not topic:
         week_num = datetime.now().isocalendar()[1]
         queued = CONTENT_QUEUE[week_num % len(CONTENT_QUEUE)]
-        topic = queued['topic']
-        category = queued['category']
-        talking_points = queued.get('talking_points', '')
+        topic = queued["topic"]
+        category = queued["category"]
+        talking_points = queued.get("talking_points", "")
         print(f"ℹ Using queued topic: {topic}")
-    
+
     # Create governance tracker if interactive mode
     governance = None
     if args.interactive:
         governance_dir = args.governance_dir or f"{output_dir}/governance"
         governance = GovernanceTracker(governance_dir)
         print(f"   📋 Governance tracking enabled: {governance.session_dir}")
-    
+
     result = generate_economist_post(
-        topic, category, talking_points, output_dir,
+        topic,
+        category,
+        talking_points,
+        output_dir,
         interactive=args.interactive,
-        governance=governance
+        governance=governance,
     )
-    
+
     # Generate governance report if interactive
-    if governance and result.get('status') != 'rejected':
+    if governance and result.get("status") != "rejected":
         governance.generate_report()
-    
-    if os.environ.get('GITHUB_OUTPUT'):
-        with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+
+    if os.environ.get("GITHUB_OUTPUT"):
+        with open(os.environ["GITHUB_OUTPUT"], "a") as f:
             f.write(f"article_path={result.get('article_path', '')}\n")
             f.write(f"quality_score={result.get('gates_passed', 0)}/5\n")
 

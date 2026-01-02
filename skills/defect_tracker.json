@@ -226,27 +226,61 @@
         "Updated pre-commit hook to validate badge accuracy on every commit"
       ],
       "fix_notes": "Implemented complete badge automation system per Track 2 Brief: separate generators for each badge type, dedicated validation script, shields.io endpoints for all dynamic badges, pre-commit hook integration"
+    },
+    {
+      "id": "BUG-024",
+      "severity": "high",
+      "discovered_in": "production",
+      "discovered_date": "2026-01-02T16:00:54.584584",
+      "description": "Generated blog posts lack references/citations section",
+      "github_issue": 40,
+      "component": "writer_agent",
+      "responsible_agent": "writer_agent",
+      "status": "open",
+      "fixed_date": null,
+      "fix_commit": null,
+      "is_production_escape": true,
+      "root_cause": "prompt_engineering",
+      "root_cause_notes": "Writer Agent prompt does not explicitly require references section. Research Agent collects sources but Writer doesn't output them in article.",
+      "introduced_in_commit": "initial",
+      "introduced_date": "2025-12-01",
+      "time_to_detect_days": 32,
+      "time_to_resolve_days": null,
+      "missed_by_test_type": "manual_test",
+      "test_gap_description": "No validation that published articles include source attribution or references section",
+      "prevention_test_added": false,
+      "prevention_test_file": null,
+      "prevention_strategy": [
+        "enhanced_prompt",
+        "new_validation"
+      ],
+      "prevention_actions": [
+        "Add explicit 'References' section requirement to WRITER_AGENT_PROMPT",
+        "Add Publication Validator check for references section",
+        "Update Blog QA agent to validate source attribution",
+        "Create reference formatting template (Economist style)"
+      ]
     }
   ],
   "summary": {
-    "total_bugs": 7,
+    "total_bugs": 8,
     "fixed_bugs": 7,
-    "production_bugs": 5,
-    "defect_escape_rate": 71.4,
+    "production_bugs": 6,
+    "defect_escape_rate": 75.0,
     "by_severity": {
       "critical": 2,
-      "high": 2,
+      "high": 3,
       "medium": 3,
       "low": 0
     },
     "by_stage": {
       "development": 2,
       "staging": 0,
-      "production": 5
+      "production": 6
     },
     "root_cause_distribution": {
       "validation_gap": 2,
-      "prompt_engineering": 1,
+      "prompt_engineering": 2,
       "requirements_gap": 1,
       "integration_error": 1,
       "code_logic": 2
@@ -254,12 +288,14 @@
     "test_gap_distribution": {
       "visual_qa": 2,
       "integration_test": 2,
-      "manual_test": 3
+      "manual_test": 4
     },
-    "agent_defect_distribution": {},
-    "avg_time_to_detect_days": 3.0,
+    "agent_defect_distribution": {
+      "writer_agent": 1
+    },
+    "avg_time_to_detect_days": 6.6,
     "avg_time_to_resolve_days": 0.7,
     "avg_critical_ttd_days": 5.5,
-    "last_updated": "2026-01-02T15:14:16.343361"
+    "last_updated": "2026-01-02T16:00:54.584613"
   }
 }

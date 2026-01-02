@@ -21,6 +21,20 @@
 
 ## 🟡 P2: Medium Priority (Quality Improvements)
 
+### #29: Research Spike - Agent Performance as Team Skills Gap Indicator
+- **Type**: Research Spike
+- **Impact**: Strategic - Hiring/training insights from agent bugs
+- **Effort**: Medium (5 points spike)
+- **Sprint**: 7+ (after defect RCA complete)
+- **Dependencies**: Defect RCA schema enhancement (Issue TBD)
+- **Next Action**: 
+  1. Wait for defect RCA foundation (20+ bugs with root cause data)
+  2. Team picks up when ready (no dependencies on leadership)
+  3. Research: Map agents → human roles → skills gaps
+  4. Decision gate: Implement or archive based on findings
+- **Owner**: Team (self-organized)
+- **Status**: Ready for pickup when defect baseline stable
+
 ### #7: Visual QA Metrics Tracking
 - **Type**: Enhancement
 - **Impact**: Better chart quality monitoring

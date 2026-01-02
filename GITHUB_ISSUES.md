@@ -4,6 +4,168 @@ This file contains all GitHub issues ready to be created in the economist-agents
 
 ---
 
+## Issue #29: Research Spike - Agent Performance as Team Skills Gap Indicator
+
+**Labels:** `P2-medium`, `type:research`, `effort:medium`, `quality`  
+**Milestone:** Sprint 7+ (After defect RCA foundation)  
+**Assignee:** TBD (Team)  
+**Projects:** Quality Improvement
+
+### Description
+
+Research and design framework to translate AI agent bugs into human role skills gap indicators. When agents produce bugs, this reveals training/hiring needs for equivalent human roles.
+
+### Problem Statement
+
+Current system logs agent bugs but doesn't translate these to actionable team development insights:
+- **Writer Agent bugs** (2/4 total) → Content Writer skills gap
+- **Editor Agent misses** → Senior Editor/QE skills gap  
+- **Research Agent issues** → Research Analyst skills gap
+- **Graphics Agent failures** → Data Viz Designer skills gap
+
+**Critical Questions We CANNOT Answer:**
+1. Which roles have the biggest skills gaps? (Dev? QE? Content? Scrum Master?)
+2. Should we hire specialists or train existing team?
+3. What training programs would address these agent bugs?
+4. Are agents performing at "junior", "mid", or "senior" level per role?
+5. How do skills gaps correlate with team velocity/quality?
+
+### Research Questions (Spike Scope)
+
+**Phase 1: Role Mapping** (1 day)
+- Map each agent to human role(s) they simulate
+- Define skill matrix for each role (junior → mid → senior)
+- Benchmark agent performance against human expectations
+- Document: "Which human would we hire to do this agent's job?"
+
+**Phase 2: Gap Analysis** (1 day)
+- Analyze bug patterns by agent/role through "skills" lens
+- Score current agents on skills matrix (40/100, 73/100, etc.)
+- Identify training intervention points
+- Calculate ROI: Prompt engineering vs hiring vs training
+
+**Phase 3: Framework Design** (1.5 days)
+- Create "Team Skills Dashboard" mockup
+- Design reporting: Agent bugs → Role gaps → Hiring/training recommendations
+- Integration approach with existing defect/agent metrics
+- Define scoring algorithm (bugs → skill level)
+
+**Phase 4: Validation** (0.5 day)
+- Present framework to team for feedback
+- Refine based on input
+- Estimate implementation effort
+- Create follow-on implementation stories
+
+### Example Output (Conceptual)
+
+```markdown
+## 👥 Team Skills Assessment (Based on Agent Performance)
+
+### Content Writer (Writer Agent proxy)
+**Skill Level**: Junior (40/100)
+**Evidence**: 2 bugs - charts not embedded, duplicate display
+**Top Gaps**:
+- Requirements adherence 
+- CMS/Jekyll knowledge
+- Style guide compliance
+
+**Recommendations**:
+- Training: Jekyll best practices workshop
+- Prompt Engineering: Add explicit checklist
+- Hiring: Consider senior technical writer for review
+
+### Research Analyst (Research Agent proxy)  
+**Skill Level**: Mid-level (73/100)
+**Evidence**: 73% verification rate vs 80% target
+**Top Gaps**: Source verification, data quality checks
+
+**Recommendations**:
+- Prompt: Strengthen source validation
+- Process: Add pre-publish fact-check gate
+```
+
+### Acceptance Criteria
+
+**Research Deliverables:**
+- [ ] Agent → Human role mapping documented
+- [ ] Skills matrix created (junior/mid/senior per role)
+- [ ] Current 4 bugs analyzed through "skills gap" lens
+- [ ] Team Skills Dashboard mockup designed
+- [ ] Scoring algorithm defined (bugs → skill level)
+- [ ] Implementation effort estimated
+
+**Decision Point:**
+- [ ] Team consensus: Is this valuable enough to implement?
+- [ ] If YES: Create implementation stories (estimated 8-13 points)
+- [ ] If NO: Document learnings and archive
+
+### Dependencies
+
+**Blockers:**
+- ⚠️ Defect RCA schema must be complete first (need root cause data)
+- ⚠️ Need stable baseline (20+ bugs with RCA for pattern analysis)
+
+**Enables (if implemented):**
+- Better hiring decisions (know which skills are weakest)
+- Targeted prompt engineering improvements  
+- Strategic workforce planning
+- Training program prioritization
+
+### Technical Approach
+
+**If Approved After Spike:**
+1. Enhance `defect_tracker.py` with "simulated_role" field
+2. Create `skills_gap_analyzer.py` module
+3. Add "Team Skills" section to quality dashboard
+4. Generate hiring/training recommendation reports
+
+### Story Points
+
+**Spike (Research + Design)**: **5 points** (3-4 days)
+- Discovery/interviews: 1 day
+- Framework design: 1.5 days  
+- Validation/refinement: 1 day
+- Documentation: 0.5 day
+
+**Implementation** (If approved): 8-13 points (separate stories)
+
+### Priority & Sprint Placement
+
+**Priority**: P2 - Medium (Strategic value, not urgent)  
+**Earliest Sprint**: Sprint 7 (need defect RCA complete first)  
+**Recommended**: Sprint 8+ (after defect patterns stabilize)
+
+### Impact Assessment
+
+**Value**: 
+- Strategic planning for hiring/training
+- Improved agent prompt engineering priorities
+- Data-driven workforce development
+
+**Risk**: Low (pure research, no production impact)  
+**Effort**: Medium (research only, implementation optional)
+
+### Related Issues
+
+**Depends On:**
+- Issue #[TBD]: Defect RCA schema enhancement (must complete first)
+- Current: Root cause analysis framework establishment
+
+**Enables:**
+- Future: AI agent benchmarking against human performance
+- Future: Automated training recommendation engine
+- Future: Dynamic prompt tuning based on skills gaps
+
+### Next Actions (When Team Picks Up)
+
+1. **Kick-off meeting**: Define "good" for each role (stakeholder input)
+2. **Research sprint**: Execute Phase 1-4 work
+3. **Demo findings**: Present to team/leadership
+4. **Decision gate**: Implement or archive based on value
+5. **If approved**: Break down into implementation stories
+
+---
+
 ## Issue #26: Extract Agent Definitions to YAML Configuration
 
 **Labels:** `P1-high`, `type:refactor`, `effort:medium`  

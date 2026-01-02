@@ -387,6 +387,30 @@ Transform defect tracking from reactive logging to proactive quality intelligenc
 
 ---
 
+## Backlog (Prioritized for Sprint 6+)
+
+### Sprint 6 Candidates (TBD - To Be Planned)
+
+**High Priority:**
+- Defect pattern analysis (enables proactive quality improvement)
+- Test gap detection automation
+- Target: <30% defect escape rate
+
+**Medium Priority (Sprint 7+):**
+- Issue #29: Research Spike - Agent Performance as Team Skills Gap Indicator (5 pts)
+  - **Blocked by**: Need defect RCA baseline (20+ bugs with root cause data)
+  - **Team-driven**: Self-organized research spike
+  - **Decision gate**: Implement or archive based on findings
+  - **Status**: Ready for pickup when RCA data sufficient
+  - See: `docs/SPIKE_SKILLS_GAP_ANALYSIS.md` for full research plan
+
+**Future Enhancements:**
+- Issue #14: GenAI Featured Images (DALL-E 3 integration)
+- Issue #26: Extract Agent Definitions to YAML
+- Agent benchmarking framework
+
+---
+
 ## Current Status
 
 **Active Sprint**: Sprint 6 - Planning Phase

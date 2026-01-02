@@ -9,7 +9,7 @@
 [![Tests](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/oviney/economist-agents/main/tests_badge.json)](https://github.com/oviney/economist-agents/actions/workflows/ci.yml)
 [![Sprint](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/oviney/economist-agents/main/sprint_badge.json)](https://github.com/oviney/economist-agents/blob/main/docs/SPRINT.md)
 ![Python](https://img.shields.io/badge/Python-3.11+-blue)
-[![License](https://img.shields.io/badge/License-Proprietary-red)](LICENSE)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 A sophisticated multi-agent system (6 AI personas collaborate) that produces publication-quality blog posts in The Economist's signature style. This project orchestrates specialized AI agents for topic discovery, editorial voting, research, writing, editing, and chart generation.
 

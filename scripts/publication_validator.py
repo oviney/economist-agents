@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Publication Validator - Final Quality Gate
+Publication Validator - Final Quality Gate (v2 with Defect Prevention)
 
 Blocks publication of articles that don't meet minimum quality standards.
 This is the LAST line of defense before an article goes live.
@@ -11,6 +11,9 @@ CRITICAL CHECKS (any failure = REJECT):
 - Date matches publication date
 - Title is specific, not generic
 - No placeholder text (TODO, FIXME, XXX)
+- Historical defect patterns (learned from 6 bugs with RCA)
+
+NEW in v2: Integrated DefectPrevention rules from defect_tracker.py RCA
 """
 
 import re
@@ -18,6 +21,13 @@ import yaml
 from datetime import datetime
 from typing import Dict, List, Tuple
 from pathlib import Path
+
+# Import defect prevention rules (learned from historical bugs)
+try:
+    from defect_prevention_rules import DefectPrevention
+    DEFECT_PREVENTION_AVAILABLE = True
+except ImportError:
+    DEFECT_PREVENTION_AVAILABLE = False
 
 
 class PublicationValidator:
@@ -63,6 +73,12 @@ class PublicationValidator:
         self.expected_date = expected_date or datetime.now().strftime('%Y-%m-%d')
         self.issues = []
         
+        # Initialize defect prevention checker
+        if DEFECT_PREVENTION_AVAILABLE:
+            self.defect_checker = DefectPrevention()
+        else:
+            self.defect_checker = None
+        
     def validate(self, article_content: str, article_path: str = None) -> Tuple[bool, List[Dict]]:
         """
         Validate article for publication.
@@ -97,6 +113,10 @@ class PublicationValidator:
         
         # Check 7: Chart references
         self._check_chart_references(article_content)
+        
+        # Check 8: Historical defect patterns (NEW v2)
+        if self.defect_checker:
+            self._check_defect_patterns(article_content, article_path)
         
         # Determine if valid (no CRITICAL issues)
         critical_issues = [i for i in self.issues if i['severity'] == 'CRITICAL']
@@ -294,6 +314,56 @@ class PublicationValidator:
                         'details': 'Chart should be mentioned in the article text (e.g., "As the chart shows...")',
                         'fix': 'Add a sentence referencing the chart near where it appears'
                     })
+    
+    def _check_defect_patterns(self, content: str, article_path: str = None):
+        """
+        Check for historical defect patterns (learned from RCA)
+        
+        NEW in v2: Integrates DefectPrevention rules from 6 documented bugs
+        Prevents: BUG-016 (chart not embedded), BUG-015 (missing category), etc.
+        """
+        if not self.defect_checker:
+            return
+        
+        # Extract chart metadata if available (for BUG-016 pattern check)
+        metadata = {}
+        
+        # Check if article path suggests chart should exist
+        if article_path:
+            # Look for matching chart file
+            article_name = Path(article_path).stem
+            # Remove date prefix (YYYY-MM-DD-)
+            article_slug = re.sub(r'^\d{4}-\d{2}-\d{2}-', '', article_name)
+            
+            # Check if chart_data metadata passed or if chart markdown exists
+            has_chart = bool(re.search(r'!\[.*?\]\(.*?\.png\)', content))
+            if has_chart:
+                metadata['chart_data'] = True  # Signal that chart exists
+        
+        # Run defect prevention checks
+        violations = self.defect_checker.check_all(content, metadata)
+        
+        # Convert violations to issue format
+        for violation in violations:
+            # Parse severity from violation message
+            severity_match = re.match(r'\[(\w+)\]', violation)
+            severity = severity_match.group(1) if severity_match else 'HIGH'
+            
+            # Extract pattern ID
+            pattern_match = re.search(r'\(Pattern: (BUG-\d+-pattern)\)', violation)
+            pattern_id = pattern_match.group(1) if pattern_match else 'unknown'
+            
+            # Clean message
+            clean_message = re.sub(r'^\[\w+\]\s*', '', violation)
+            clean_message = re.sub(r'\s*\(Pattern: BUG-\d+-pattern\)\s*$', '', clean_message)
+            
+            self.issues.append({
+                'check': f'defect_pattern_{pattern_id}',
+                'severity': severity,
+                'message': clean_message,
+                'details': f'Historical pattern from {pattern_id}',
+                'fix': 'See message for specific remediation'
+            })
     
     def format_report(self, is_valid: bool, issues: List[Dict]) -> str:
         """Generate human-readable validation report"""

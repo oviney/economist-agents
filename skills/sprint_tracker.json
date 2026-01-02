@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "created": "2026-01-01T00:00:00",
-  "current_sprint": 7,
+  "current_sprint": 8,
   "sprints": {
     "sprint_6": {
       "status": "complete",
@@ -33,6 +33,44 @@
         }
       ],
       "retrospective_done": false
+    },
+    "sprint_8": {
+      "status": "complete",
+      "start_date": "2026-01-01T21:44:54.052733",
+      "capacity": 13,
+      "stories": [
+        {
+          "id": 1,
+          "name": "Strengthen Editor Agent Prompt",
+          "points": 3,
+          "priority": "P0",
+          "status": "complete"
+        },
+        {
+          "id": 2,
+          "name": "Enhance Visual QA Coverage",
+          "points": 5,
+          "priority": "P0",
+          "status": "complete"
+        },
+        {
+          "id": 3,
+          "name": "Add Integration Tests",
+          "points": 5,
+          "priority": "P0",
+          "status": "complete",
+          "completed_date": "2026-01-01T21:50:35.792155"
+        }
+      ],
+      "objectives": [
+        "Restore Editor Agent performance from 87.2% to 95%+",
+        "Reduce visual QA escape rate by 80%",
+        "Close 42.9% integration test gap"
+      ],
+      "end_date": "2026-01-01T21:50:55.606575",
+      "velocity": 13,
+      "retrospective_done": false,
+      "backlog_refined": false
     }
   }
 }

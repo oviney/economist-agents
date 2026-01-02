@@ -589,17 +589,67 @@ title: "Self-Healing Tests: Myth vs Reality"
 date: 2026-01-01
 ---
 
-Format:
+═══════════════════════════════════════════════════════════════════════════
+REQUIRED OUTPUT FORMAT (CRITICAL - Sprint 8 Enhancement)
+═══════════════════════════════════════════════════════════════════════════
+
+You MUST output in this EXACT format with explicit PASS/FAIL for each gate:
+
 ## Quality Gate Results
-[Gate evaluations]
+
+**GATE 1: OPENING** - [PASS/FAIL]
+- First sentence hook: [Brief assessment]
+- Throat-clearing present: [YES/NO]
+- Reader engagement: [Assessment]
+**Decision**: [PASS or FAIL with reason]
+
+**GATE 2: EVIDENCE** - [PASS/FAIL]
+- Statistics sourced: [X/Y statistics have sources]
+- [NEEDS SOURCE] flags removed: [YES/NO]
+- Weasel phrases present: [YES/NO]
+**Decision**: [PASS or FAIL with reason]
+
+**GATE 3: VOICE** - [PASS/FAIL]
+- British spelling: [YES/NO]
+- Active voice: [YES/NO]
+- Banned phrases found: [List any found or "NONE"]
+- Exclamation points: [Count or "NONE"]
+**Decision**: [PASS or FAIL with reason]
+
+**GATE 4: STRUCTURE** - [PASS/FAIL]
+- Logical flow: [Assessment]
+- Weak ending: [YES/NO - if yes, what pattern]
+- Redundant paragraphs: [Count or "NONE"]
+**Decision**: [PASS or FAIL with reason]
+
+**GATE 5: CHART INTEGRATION** - [PASS/FAIL]
+- Chart markdown present: [YES/NO]
+- Chart referenced in text: [YES/NO]
+- Natural integration: [Assessment]
+**Decision**: [PASS or FAIL with reason if chart_data provided, otherwise N/A]
+
+**OVERALL GATES PASSED**: [X/5]
+**PUBLICATION DECISION**: [READY/NEEDS REVISION]
+
+---
 
 ## Edited Article
+
+[If ALL gates PASS, include edited article with YAML frontmatter]
+[If ANY gate FAILS, explain what needs fixing before returning edited version]
+
 ---
+layout: post
 title: "Specific Title with Context"
 date: 2026-01-01
 ---
 
-[Full article content]"""
+[Full article content]
+
+---
+
+⚠️  CRITICAL: The explicit PASS/FAIL format is MANDATORY (Sprint 8 improvement).
+This format enables automated quality tracking and prevents vague assessments."""
 
 
 CRITIQUE_AGENT_PROMPT = """You are a hostile reviewer looking for ANY flaw in this Economist-style article.
@@ -1044,13 +1094,37 @@ def run_critique_agent(client, article: str) -> str:
 
 
 def run_visual_qa_agent(client, image_path: str, chart_record: dict = None) -> dict:
-    """Visual QA Agent: Validates chart rendering quality."""
+    """Visual QA Agent: Validates chart rendering quality.
+    
+    Sprint 8 Enhancement: Two-stage validation
+    1. Programmatic zone boundary checks (fast, deterministic)
+    2. LLM vision analysis (comprehensive, subjective)
+    """
     print("🎨 Visual QA Agent: Inspecting chart...")
     
     if not os.path.exists(image_path):
         print(f"   ⚠ Chart not found: {image_path}")
         return {"overall_pass": False, "critical_issues": ["Chart file not found"]}
     
+    # STAGE 1: Programmatic zone boundary validation (Sprint 8 Story 2)
+    try:
+        from visual_qa_zones import ZoneBoundaryValidator
+        
+        zone_validator = ZoneBoundaryValidator()
+        zones_valid, zone_issues = zone_validator.validate_chart(image_path)
+        
+        if not zones_valid:
+            print(f"   ❌ Zone validation: {len(zone_issues)} boundary violations")
+            for issue in zone_issues[:3]:
+                print(f"      • {issue}")
+        else:
+            print(f"   ✅ Zone validation: All boundaries correct")
+    except ImportError:
+        print(f"   ℹ  Zone validator unavailable (continuing with LLM-only validation)")
+        zones_valid = True
+        zone_issues = []
+    
+    # STAGE 2: LLM vision analysis
     # Load image as base64
     with open(image_path, "rb") as f:
         image_data = base64.standard_b64encode(f.read()).decode("utf-8")
@@ -1124,7 +1198,24 @@ def run_visual_qa_agent(client, image_path: str, chart_record: dict = None) -> d
     passed = sum(1 for g in gates.values() if g.get("pass", False))
     total = len(gates) if gates else 5
     
+    # Combine zone validation with LLM results
+    if not zones_valid:
+        result["zone_validation"] = {
+            "pass": False,
+            "issues": zone_issues
+        }
+        result["overall_pass"] = False
+        if "critical_issues" not in result:
+            result["critical_issues"] = []
+        result["critical_issues"].extend(zone_issues)
+    else:
+        result["zone_validation"] = {
+            "pass": True,
+            "issues": []
+        }
+    
     print(f"   Visual gates: {passed}/{total} passed")
+    print(f"   Zone boundaries: {'✓ PASS' if zones_valid else '✗ FAIL'}")
     
     if result.get("overall_pass"):
         print("   ✓ Chart PASSED visual QA")

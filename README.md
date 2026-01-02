@@ -6,7 +6,8 @@
 [![Quality Tests](https://github.com/oviney/economist-agents/actions/workflows/quality-tests.yml/badge.svg)](https://github.com/oviney/economist-agents/actions/workflows/quality-tests.yml)
 [![Sprint Discipline](https://github.com/oviney/economist-agents/actions/workflows/sprint-discipline.yml/badge.svg)](https://github.com/oviney/economist-agents/actions/workflows/sprint-discipline.yml)
 [![Quality Score](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/oviney/economist-agents/main/quality_score.json)](https://github.com/oviney/economist-agents/blob/main/docs/QUALITY_DASHBOARD.md)
-![Sprint](https://img.shields.io/badge/Sprint-7-blue)
+![Tests](https://img.shields.io/badge/tests-77_passing-brightgreen)
+![Sprint](https://img.shields.io/badge/sprint-9-blue)
 ![Python](https://img.shields.io/badge/Python-3.11+-blue)
 [![License](https://img.shields.io/badge/License-Proprietary-red)](LICENSE)
 

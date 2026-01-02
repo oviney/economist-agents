@@ -46,6 +46,16 @@ repos:
         pass_filenames: false
         always_run: true
 
+      # Badge validation - Prevent stale badges (BUG-023)
+      - id: badge-validation
+        name: validate README badges
+        description: Ensure badges match live data (prevents BUG-023)
+        entry: bash -c 'python3 scripts/update_badges.py --validate-only || true'
+        language: system
+        pass_filenames: false
+        files: ^(README\.md|quality_score\.json|skills/sprint_tracker\.json)$
+        always_run: false
+
   # Basic file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0

@@ -1,0 +1,14 @@
+{
+  "version": "1.0",
+  "created": "2026-01-01T00:00:00",
+  "current_sprint": 6,
+  "sprints": {
+    "sprint_6": {
+      "status": "complete",
+      "end_date": "2026-01-01T00:00:00",
+      "retrospective_done": false,
+      "backlog_refined": false,
+      "next_sprint_dor_met": false
+    }
+  }
+}

@@ -376,3 +376,139 @@ If ANY checkbox is empty → STOP, complete it first
 🛑 Risks not documented
 
 **Quality over speed. Every. Single. Time.**
+---
+
+## AUTOMATED ENFORCEMENT (Sprint Ceremony Tracker)
+
+**System**: `scripts/sprint_ceremony_tracker.py`
+
+**Purpose**: Prevents DoR violations through automated blocking.
+
+### How It Works
+
+**State Tracking** (`skills/sprint_tracker.json`):
+```json
+{
+  "current_sprint": 6,
+  "sprint_6": {
+    "status": "complete",
+    "retrospective_done": false,  ← BLOCKER
+    "backlog_refined": false,      ← BLOCKER
+    "next_sprint_dor_met": false   ← GATE
+  }
+}
+```
+
+**Enforcement Points**:
+1. **can_start_sprint(N)** - Blocks if ceremonies incomplete
+2. **validate_dor(N)** - 8-point checklist validation
+3. **Pre-commit hook** - Blocks commits mentioning Sprint N without DoR
+
+### Integration with Protocol
+
+**Before ANY sprint discussion:**
+```bash
+python3 scripts/sprint_ceremony_tracker.py --can-start 7
+```
+
+**If blocked:**
+```
+❌ BLOCKED: Sprint 6 retrospective not complete
+   Run: python3 sprint_ceremony_tracker.py --retrospective 6
+```
+
+**Scrum Master MUST:**
+1. Run `--report` to check ceremony status
+2. Complete blocked ceremonies before presenting options
+3. Never discuss sprint objectives without DoR met
+4. Use tracker output as decision gate
+
+### End-of-Sprint Workflow (Automated)
+
+```bash
+# 1. Mark sprint complete
+python3 scripts/sprint_ceremony_tracker.py --end-sprint 6
+
+# 2. Complete retrospective (generates template)
+python3 scripts/sprint_ceremony_tracker.py --retrospective 6
+# Edit: docs/RETROSPECTIVE_S6.md
+
+# 3. Refine backlog (generates story template)
+python3 scripts/sprint_ceremony_tracker.py --refine-backlog 7
+# Edit: docs/SPRINT_7_BACKLOG.md
+
+# 4. Validate DoR
+python3 scripts/sprint_ceremony_tracker.py --validate-dor 7
+
+# 5. Check if ready (blocking operation)
+python3 scripts/sprint_ceremony_tracker.py --can-start 7
+# ✅ Sprint 7 ready to start - all ceremonies complete
+```
+
+### Benefits
+
+**Prevents This Exact Violation**:
+- User: "Are we missing a DoR here?" 
+- System: Would have blocked automatically
+- Scrum Master: Can't bypass ceremony sequence
+
+**Quality Culture**:
+- Same pattern as defect prevention (automated gates)
+- Zero manual discipline required
+- Transparent state (anyone can check status)
+- Audit trail (timestamped ceremony completion)
+
+### Documentation
+
+Complete guide: [SPRINT_CEREMONY_GUIDE.md](SPRINT_CEREMONY_GUIDE.md)
+
+---
+
+## VERSION HISTORY
+
+**v1.1 (2026-01-01)**:
+- Added Sprint Ceremony Tracker automation
+- Integrated automated DoR enforcement
+- End-of-sprint workflow codified
+
+**v1.0 (2026-01-01)**:
+- Initial protocol created after 3 process violations
+- Codifies NEVER/ALWAYS rules for execution discipline
+- Adds SAFe-specific elements (PI planning, built-in quality)
+- Includes test cases and real violation examples
+
+**Maintained By**: Scrum Master (with SAFe Agile Expert review)
+**Review Frequency**: After each sprint retrospective
+**Update Trigger**: Any new process violation pattern detected
+
+---
+
+## SUMMARY: ONE-PAGE QUICK REFERENCE
+
+**NEVER START WITHOUT**:
+✅ Story written + acceptance criteria
+✅ Three Amigos review complete
+✅ Task breakdown + effort estimates
+✅ Risks identified + DoD defined
+✅ User approval explicit and clear
+✅ **Sprint Ceremony Tracker: `--can-start N` passes** ← NEW
+
+**BANNED BEHAVIORS**:
+❌ "Executing now..." (no plan shown)
+❌ "Quick fix..." (still needs planning)
+❌ "Just need to..." (red flag)
+
+**ALWAYS ASK**:
+✅ "Is this plan approved?"
+✅ "Have I covered all DoD criteria?"
+✅ "Are there risks I haven't documented?"
+✅ **"Does `--can-start` pass?"** ← NEW
+
+**STOP THE LINE IF**:
+🛑 Plan incomplete
+🛑 Approval unclear
+🛑 DoD missing
+🛑 Risks not documented
+🛑 **Ceremony tracker blocks sprint start** ← NEW
+
+**Quality over speed. Every. Single. Time.**

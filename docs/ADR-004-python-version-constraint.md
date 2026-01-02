@@ -1,7 +1,7 @@
 # ADR-004: Python Version Constraint for CrewAI Compatibility
 
-**Date:** 2025-01-02  
-**Status:** Accepted  
+**Date:** 2025-01-02
+**Status:** Accepted
 **Context:** Sprint 9 Story 1 - CrewAI Integration Validation
 
 ## Decision
@@ -14,7 +14,7 @@ Constrain project to **Python ≤3.13** (tested with 3.13.11) for CrewAI compati
 - **Date:** 2025-01-02
 - **Environment:** Python 3.14.2 (latest stable)
 - **Issue:** `ModuleNotFoundError: No module named 'crewai'`
-- **Impact:** 
+- **Impact:**
   - Blocked test execution: `tests/test_crewai_agents.py` failed to import
   - Blocked git commits: pre-commit hooks requiring pytest failed
   - Prevented CrewAI agent validation
@@ -164,7 +164,7 @@ pytest -v  # 184 tests passed
 
 ---
 
-**Approval:** Scrum Master (autonomous decision under 2-3 hour time budget)  
-**Implementation Time:** 45 minutes (vs 2-3 hour estimate - 62% faster)  
-**Test Results:** 184/184 tests passing (100% pass rate)  
+**Approval:** Scrum Master (autonomous decision under 2-3 hour time budget)
+**Implementation Time:** 45 minutes (vs 2-3 hour estimate - 62% faster)
+**Test Results:** 184/184 tests passing (100% pass rate)
 **Status:** ✅ Production-ready with Python 3.13.11

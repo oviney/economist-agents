@@ -49,9 +49,7 @@ agents:
 @pytest.fixture
 def temp_agents_file():
     """Create temporary agents.yaml for testing"""
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
         f.write(SAMPLE_AGENTS_YAML)
         temp_path = f.name
     yield temp_path
@@ -61,9 +59,7 @@ def temp_agents_file():
 @pytest.fixture
 def temp_invalid_file():
     """Create temporary invalid agents.yaml"""
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
         f.write(INVALID_AGENTS_YAML)
         temp_path = f.name
     yield temp_path
@@ -73,9 +69,7 @@ def temp_invalid_file():
 @pytest.fixture
 def temp_malformed_file():
     """Create temporary malformed YAML"""
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", delete=False
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
         f.write(MALFORMED_YAML)
         temp_path = f.name
     yield temp_path
@@ -106,9 +100,7 @@ class TestAgentFactoryInit:
 
     def test_init_with_missing_agents_key(self):
         """Should raise ValueError if 'agents' key missing"""
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yaml", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
             f.write("not_agents:\n  test: value")
             temp_path = f.name
 
@@ -157,7 +149,7 @@ class TestCreateAgent:
         mock_agent_class.return_value = mock_agent
 
         factory = AgentFactory(config_path=temp_agents_file)
-        agent = factory.create_agent("test_agent", verbose=False, goal="New goal")
+        _ = factory.create_agent("test_agent", verbose=False, goal="New goal")
 
         # Verify overrides were applied
         call_kwargs = mock_agent_class.call_args[1]
@@ -166,13 +158,15 @@ class TestCreateAgent:
         assert call_kwargs["role"] == "Test Agent"  # Not overridden
 
     @patch("scripts.crewai_agents.Agent")
-    def test_create_agent_with_optional_params(self, mock_agent_class, temp_agents_file):
+    def test_create_agent_with_optional_params(
+        self, mock_agent_class, temp_agents_file
+    ):
         """Should include optional parameters when present"""
         mock_agent = MagicMock()
         mock_agent_class.return_value = mock_agent
 
         factory = AgentFactory(config_path=temp_agents_file)
-        agent = factory.create_agent("another_agent")
+        _ = factory.create_agent("another_agent")
 
         call_kwargs = mock_agent_class.call_args[1]
         assert "max_iter" in call_kwargs

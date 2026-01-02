@@ -482,6 +482,12 @@ Complete guide: [SPRINT_CEREMONY_GUIDE.md](SPRINT_CEREMONY_GUIDE.md)
 
 ## VERSION HISTORY
 
+**v1.2 (2026-01-02)**:
+- Enhanced DoR with Technical Prerequisites validation (Sprint 7 lesson)
+- Added mandatory Task 0: Validate Prerequisites for dependency work
+- Created scripts/validate_environment.py for automated validation
+- Added GATE: DoR re-validation after prerequisite research
+
 **v1.1 (2026-01-01)**:
 - Added Sprint Ceremony Tracker automation
 - Integrated automated DoR enforcement

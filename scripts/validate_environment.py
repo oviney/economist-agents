@@ -20,7 +20,6 @@ import platform
 import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 
 class EnvironmentValidator:
@@ -28,8 +27,8 @@ class EnvironmentValidator:
 
     def __init__(self, strict: bool = False):
         self.strict = strict
-        self.issues: List[Dict[str, str]] = []
-        self.warnings: List[Dict[str, str]] = []
+        self.issues: list[dict[str, str]] = []
+        self.warnings: list[dict[str, str]] = []
 
     def validate_all(self) -> bool:
         """Run all validation checks"""
@@ -59,7 +58,7 @@ class EnvironmentValidator:
             with open(requirements_file) as f:
                 content = f.read()
                 if "python_requires" in content or "Python >=" in content:
-                    print(f"   ℹ️  Check requirements.txt for version constraints")
+                    print("   ℹ️  Check requirements.txt for version constraints")
 
         # Known version constraints (Sprint 7 lesson)
         if version.major == 3 and version.minor >= 14:
@@ -101,7 +100,15 @@ class EnvironmentValidator:
         try:
             # Try dry-run install
             result = subprocess.run(
-                [sys.executable, "-m", "pip", "install", "--dry-run", "-r", str(requirements_file)],
+                [
+                    sys.executable,
+                    "-m",
+                    "pip",
+                    "install",
+                    "--dry-run",
+                    "-r",
+                    str(requirements_file),
+                ],
                 capture_output=True,
                 text=True,
                 timeout=30,
@@ -120,7 +127,7 @@ class EnvironmentValidator:
                         "fix": "Review requirements.txt for version conflicts",
                     }
                 )
-                print(f"   ❌ Dependency installation issues")
+                print("   ❌ Dependency installation issues")
                 print(f"      {error[:100]}")
 
         except subprocess.TimeoutExpired:
@@ -256,7 +263,9 @@ class EnvironmentValidator:
             return True
         elif not self.issues and self.warnings:
             if self.strict:
-                print("❌ VALIDATION FAILED (strict mode, warnings treated as errors)\n")
+                print(
+                    "❌ VALIDATION FAILED (strict mode, warnings treated as errors)\n"
+                )
                 return False
             else:
                 print("✅ VALIDATION PASSED (with warnings)\n")

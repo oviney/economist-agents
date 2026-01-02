@@ -55,9 +55,7 @@ class AgentFactory:
         """
         if config_path is None:
             # Default: schemas/agents.yaml relative to this script
-            self.config_path = (
-                Path(__file__).parent.parent / "schemas" / "agents.yaml"
-            )
+            self.config_path = Path(__file__).parent.parent / "schemas" / "agents.yaml"
         else:
             self.config_path = Path(config_path)
 

@@ -1,0 +1,92 @@
+# Pre-commit hooks for economist-agents
+# Install: pre-commit install --install-hooks
+# Run manually: pre-commit run --all-files
+
+repos:
+  # Ruff - Python linter and formatter
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
+    hooks:
+      # Format code (auto-fixes)
+      - id: ruff-format
+        name: ruff format
+        description: Format Python code with ruff
+        
+      # Lint code (fails on errors)
+      - id: ruff
+        name: ruff check
+        description: Lint Python code with ruff
+        args: [--fix, --exit-non-zero-on-fix]
+
+  # Mypy - Static type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.2
+    hooks:
+      - id: mypy
+        name: mypy type check
+        description: Static type checking with mypy
+        files: ^scripts/
+        args: [--config-file=mypy.ini]
+        additional_dependencies:
+          - types-PyYAML
+          - types-requests
+
+  # Pytest - Run test suite
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        description: Run test suite with pytest
+        entry: pytest
+        args: [tests/, -v, --tb=short]
+        language: system
+        pass_filenames: false
+        always_run: true
+
+  # Basic file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+        name: trim trailing whitespace
+        description: Remove trailing whitespace
+        
+      - id: end-of-file-fixer
+        name: fix end of files
+        description: Ensure files end with newline
+        
+      - id: check-yaml
+        name: check yaml
+        description: Validate YAML files
+        
+      - id: check-json
+        name: check json
+        description: Validate JSON files
+        exclude: ^tests/fixtures/
+        
+      - id: check-added-large-files
+        name: check for large files
+        description: Prevent large files from being committed
+        args: [--maxkb=1000]
+        
+      - id: check-merge-conflict
+        name: check for merge conflicts
+        description: Check for merge conflict markers
+
+  # Pre-push hook for coverage check
+  - repo: local
+    hooks:
+      - id: pytest-coverage
+        name: pytest with coverage
+        description: Run tests with coverage check (>80%)
+        entry: pytest
+        args:
+          - tests/
+          - --cov=scripts
+          - --cov-report=term-missing
+          - --cov-fail-under=80
+          - -v
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]

@@ -109,6 +109,50 @@ framework analysis (CrewAI, AutoGen, LangGraph)."
 git push origin main
 ```
 
+## Quality Gates
+
+This repository enforces quality standards at 4 layers:
+
+### Layer 1: Pre-commit Hooks (Local)
+Runs before every commit:
+```bash
+# One-time setup
+./scripts/setup.sh
+```
+
+Automatically checks:
+- ✅ Code formatting (ruff format)
+- ✅ Linting (ruff check)
+- ✅ Type checking (mypy)
+- ✅ Tests (pytest)
+
+### Layer 2: Pre-push Hooks (Local)
+Runs before every push:
+- ✅ Full test suite with coverage (>80% required)
+
+### Layer 3: GitHub Actions CI (Remote)
+Runs on every PR:
+- ✅ Quality checks (ruff, mypy)
+- ✅ Tests on Python 3.11 & 3.12
+- ✅ Security scan (bandit)
+
+### Layer 4: Branch Protection (GitHub)
+Before merge to main:
+- ✅ Require PR approval
+- ✅ Require CI to pass
+- ✅ Require branch up-to-date
+
+### Using Custom Copilot Agents
+
+This repo includes specialized agents:
+- `@quality-enforcer` - Fix all ruff/mypy violations in scripts/
+- `@test-writer` - Create tests for scripts/editorial_board.py with >80% coverage
+- `@refactor-specialist` - Add type hints and docstrings to scripts/topic_scout.py
+
+See [AGENTS.md](AGENTS.md) for complete documentation on multi-agent orchestration.
+
+---
+
 ### Step 4: Create GitHub Issues
 
 Use the content in `GITHUB_ISSUES.md` to create issues in your repository:

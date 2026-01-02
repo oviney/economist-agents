@@ -1,14 +1,14 @@
 {
   "version": "1.0",
-  "last_updated": "2026-01-01T16:01:56.602437",
+  "last_updated": "2026-01-01T20:24:16.517973",
   "summary": {
-    "total_charts_generated": 3,
+    "total_charts_generated": 4,
     "total_visual_qa_runs": 2,
     "visual_qa_pass_count": 1,
     "visual_qa_fail_count": 1,
     "total_zone_violations": 2,
     "total_regenerations": 1,
-    "total_generation_time_seconds": 9.877746820449829
+    "total_generation_time_seconds": 16.226873874664307
   },
   "failure_patterns": {
     "zone_violation": {
@@ -114,6 +114,28 @@
           "chart_type": "bar",
           "generation_success": true,
           "generation_time_seconds": 9.652874946594238,
+          "visual_qa_run": false,
+          "visual_qa_passed": null,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-01T20:24:16.517936",
+      "duration_seconds": 47.15429091453552,
+      "charts_generated": 1,
+      "visual_qa_runs": 0,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "Impact of Self-Healing Tests on Maintenance Efforts",
+          "timestamp": "2026-01-01T20:23:29.363644",
+          "start_time": 1767317009.363654,
+          "chart_type": "bar",
+          "generation_success": true,
+          "generation_time_seconds": 6.3491270542144775,
           "visual_qa_run": false,
           "visual_qa_passed": null,
           "zone_violations": [],

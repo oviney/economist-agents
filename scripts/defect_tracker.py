@@ -113,6 +113,7 @@ class DefectTracker:
     def log_bug(self, bug_id: str, severity: str, discovered_in: str,
                 description: str, github_issue: int = None,
                 component: str = None,
+                responsible_agent: str = None,
                 root_cause: str = None,
                 root_cause_notes: str = None,
                 introduced_in_commit: str = None,
@@ -121,7 +122,12 @@ class DefectTracker:
                 test_gap_description: str = None,
                 prevention_strategy: List[str] = None,
                 prevention_actions: List[str] = None) -> None:
-        """Log a new bug with optional RCA and prevention data"""
+        """Log a new bug with optional RCA and prevention data
+        
+        Args:
+            responsible_agent: Which agent produced buggy output 
+                             (research_agent, writer_agent, graphics_agent, editor_agent)
+        """
         if severity not in self.SEVERITIES:
             raise ValueError(f"Severity must be one of {self.SEVERITIES}")
         if discovered_in not in self.STAGES:
@@ -145,6 +151,7 @@ class DefectTracker:
             "description": description,
             "github_issue": github_issue,
             "component": component,
+            "responsible_agent": responsible_agent,  # NEW: Track which agent caused bug
             "status": "open",
             "fixed_date": None,
             "fix_commit": None,
@@ -302,6 +309,13 @@ class DefectTracker:
                        if b["severity"] == "critical"]
         avg_critical_ttd = (sum(critical_ttd) / len(critical_ttd)) if critical_ttd else None
         
+        # NEW: Agent-specific defect distribution
+        agent_defects = {}
+        for bug in self.tracker["bugs"]:
+            agent = bug.get("responsible_agent")
+            if agent:
+                agent_defects[agent] = agent_defects.get(agent, 0) + 1
+        
         self.tracker["summary"] = {
             "total_bugs": total,
             "fixed_bugs": fixed,
@@ -311,6 +325,7 @@ class DefectTracker:
             "by_stage": by_stage,
             "root_cause_distribution": root_causes,
             "test_gap_distribution": test_gaps,
+            "agent_defect_distribution": agent_defects,
             "avg_time_to_detect_days": round(avg_ttd, 1) if avg_ttd else None,
             "avg_time_to_resolve_days": round(avg_ttr, 1) if avg_ttr else None,
             "avg_critical_ttd_days": round(avg_critical_ttd, 1) if avg_critical_ttd else None,
@@ -328,6 +343,17 @@ class DefectTracker:
     def get_open_bugs(self) -> List[Dict[str, Any]]:
         """Get all open bugs"""
         return [b for b in self.tracker["bugs"] if b["status"] == "open"]
+    
+    def get_bugs_by_agent(self, agent_name: str) -> List[Dict[str, Any]]:
+        """Get all bugs attributed to a specific agent"""
+        return [b for b in self.tracker["bugs"] if b.get("responsible_agent") == agent_name]
+    
+    def get_agent_defect_rate(self, agent_name: str) -> float:
+        """Calculate defect rate for specific agent (bugs per run)"""
+        agent_bugs = len(self.get_bugs_by_agent(agent_name))
+        # Note: This requires agent metrics to calculate actual rate
+        # For now, just return bug count
+        return agent_bugs
     
     def save(self) -> None:
         """Persist tracker to disk"""

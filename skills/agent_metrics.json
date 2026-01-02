@@ -346,30 +346,99 @@
         "agents_successful": 2,
         "success_rate": 66.7
       }
+    },
+    {
+      "timestamp": "2026-01-01T19:33:54.724931",
+      "agents": {
+        "research_agent": {
+          "data_points": 10,
+          "verified": 9,
+          "unverified": 1,
+          "verification_rate": 90.0,
+          "sources": [
+            "Gartner 2024",
+            "TestGuild Survey"
+          ],
+          "validation_passed": true,
+          "quality_score": 90.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "writer_agent": {
+          "word_count": 1200,
+          "banned_phrases": 0,
+          "validation_passed": true,
+          "regenerations": 0,
+          "chart_embedded": true,
+          "quality_score": 100,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Pass"
+        },
+        "editor_agent": {
+          "gates_passed": 5,
+          "gates_failed": 0,
+          "gate_pass_rate": 100.0,
+          "edits_made": 12,
+          "quality_issues": [],
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "All gates pass (5/5)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 1,
+          "visual_qa_pass_rate": 100.0,
+          "zone_violations": 0,
+          "regenerations": 0,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 4,
+        "success_rate": 100.0
+      }
     }
   ],
   "summary": {
-    "total_runs": 7,
+    "total_runs": 8,
     "agents": {
       "research_agent": {
-        "total_runs": 7,
-        "avg_verification_rate": 86.9,
+        "total_runs": 8,
+        "avg_verification_rate": 87.3,
+        "avg_quality_score": 90.0,
+        "validation_pass_rate": 100.0,
         "trend": "improving \u2b06\ufe0f"
       },
       "writer_agent": {
-        "total_runs": 7,
-        "clean_draft_rate": 71.4,
-        "avg_regenerations": 0.4
+        "total_runs": 8,
+        "clean_draft_rate": 75.0,
+        "avg_regenerations": 0.4,
+        "avg_quality_score": 100.0,
+        "validation_pass_rate": 62.5,
+        "rework_rate": 37.5
       },
       "editor_agent": {
-        "total_runs": 7,
-        "avg_gate_pass_rate": 98.0,
+        "total_runs": 8,
+        "avg_gate_pass_rate": 98.2,
+        "avg_quality_score": 100.0,
         "trend": "improving \u2b06\ufe0f"
       },
       "graphics_agent": {
-        "total_runs": 6,
-        "avg_qa_pass_rate": 83.3,
-        "avg_violations": 0.2
+        "total_runs": 7,
+        "avg_qa_pass_rate": 85.7,
+        "avg_quality_score": 100.0,
+        "avg_violations": 0.1
       }
     }
   }

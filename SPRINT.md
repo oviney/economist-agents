@@ -9,6 +9,16 @@
 **Planning**: Monday morning
 **Daily Standups**: Track progress, unblock issues
 
+**Capacity Model** (Updated 2026-01-02):
+- **Target Capacity**: 13 story points per 1-week sprint
+- **Story Size Cap**: 3 points max (prevents 6+ hour marathons)
+- **Execution Model**: Parallel (2-3 independent tracks)
+- **Hours per Point**: 2.8h average (includes testing + docs + quality)
+- **Quality Buffer**: 50% (included in estimates)
+- **Checkpoint Rule**: 4-hour max without status check
+
+See [AGENT_VELOCITY_ANALYSIS.md](docs/AGENT_VELOCITY_ANALYSIS.md) for full research.
+
 ---
 
 ## Current Sprint Status
@@ -17,7 +27,7 @@
 **Previous Sprint**: Sprint 6 - CLOSED EARLY ⚠️ (6/14 pts, 43% - Strategic pivot to CrewAI)
 **Quality Score**: 67/100 (FAIR - Sprint 5 baseline)
 **Defect Escape Rate**: 66.7% TRUE RATE (was 75% - corrected by requirements gap classification)
-**Sprint 7 Progress**: 10/20 points complete (50%) 🟢 AHEAD OF SCHEDULE + Quality Framework Deployed
+**Sprint 7 Progress**: 15.5/20 points complete (78%) 🟢🟢 WAY AHEAD OF SCHEDULE - Day 3 Parallel Execution Success
 **Unplanned Work**: ✅ COMPLETE - BUG-023 fixed (2 pts, 90 min) + Requirements Quality Framework (60 min) + Requirements Traceability Gate (3 pts, 90 min)
 
 **Day 1 Results** (2026-01-02) - ALL TRACKS COMPLETE:
@@ -359,11 +369,13 @@ Token optimization and defect prevention (closed early for strategic pivot to Cr
 
 ---
 
-### Story 2: Shared Context System
+### Story 2: Shared Context System ✅ COMPLETE
 
 **Priority**: P0 (Eliminates 40% coordination overhead)
 **Story Points**: 5
-**Status**: PENDING (Story 1 must complete first)
+**Status**: ✅ COMPLETE (Day 2-3, all 10 tasks done)
+**Owner**: @refactor-specialist
+**Completion Date**: 2026-01-02
 
 **Goal**: Implement `crew.context` for shared memory, eliminating 40% context duplication from Sprint 6.
 
@@ -379,11 +391,12 @@ Token optimization and defect prevention (closed early for strategic pivot to Cr
 
 ---
 
-### Story 3: Agent-to-Agent Messaging & Status Signals
+### Story 3: Agent-to-Agent Messaging & Status Signals 🎯 READY TO START
 
 **Priority**: P0 (Automates 25% coordination overhead)
 **Story Points**: 5
-**Status**: PENDING (Stories 1-2 must complete first)
+**Owner**: @refactor-specialist ⬅️ ASSIGNED
+**Status**: Prerequisites complete, ready for immediate execution
 
 **Goal**: Automated agent-to-agent messaging so status signals (Developer→QE "Code ready", QE→Scrum Master "Validation complete") trigger next tasks without manual coordination.
 

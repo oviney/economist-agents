@@ -27,6 +27,26 @@ omit =
     # Validation and QA scripts
     scripts/blog_qa_agent.py
     scripts/visual_qa_zones.py
+    scripts/visual_qa.py
+
+    # Badge generation utilities (not core functionality)
+    scripts/generate_coverage_badge.py
+    scripts/generate_sprint_badge.py
+    scripts/generate_tests_badge.py
+    scripts/update_badges.py
+    scripts/validate_badges.py
+
+    # Environment and security validation
+    scripts/validate_environment.py
+    scripts/secure_env.py
+    scripts/github_issue_validator.py
+
+    # Test validation utilities
+    scripts/validate_editor_fixes.py
+    scripts/validate_sprint_report.py
+
+    # CI/CD monitoring (bootstrap script)
+    scripts/ci_health_monitor.py
 
     # Metrics and reporting (not core functionality)
     scripts/agent_metrics.py

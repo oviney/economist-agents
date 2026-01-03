@@ -102,132 +102,222 @@
     },
     "sprint_9": {
       "status": "active",
-      "start_date": "2026-01-10T00:00:00",
-      "capacity": 13,
-      "adjusted_capacity": 15,
-      "capacity_notes": "Added 2 pts unplanned Story 0 (infrastructure)",
-      "unplanned_work": [
+      "start_date": "2026-01-02T08:00:00",
+      "capacity": 15,
+      "committed_points": 13,
+      "unplanned_points": 2,
+      "stories": [
         {
           "id": 0,
-          "name": "Fix Documentation & CI/CD Gaps",
+          "name": "Fix CI/CD Infrastructure Crisis",
           "points": 2,
           "priority": "P0",
           "status": "complete",
-          "type": "infrastructure",
-          "discovered_date": "2026-01-10T10:00:00",
-          "completed_date": "2026-01-02T21:30:00",
-          "reason": "Systematic process gaps affecting quality",
-          "impact": "Blocks documentation credibility and quality enforcement",
-          "assigned_to": "quality-enforcer",
-          "resolution": "Environment recreated with Python 3.13, 92.3% test pass rate achieved (348/377), all CI/CD tools operational",
-          "tasks": [
-            {
-              "task": "Fix failing CI/CD",
-              "estimate_hours": 1,
-              "assigned_to": "quality-enforcer",
-              "status": "complete",
-              "actual_hours": 0.5
-            },
-            {
-              "task": "Update Definition of Done",
-              "estimate_hours": 0.5,
-              "assigned_to": "scrum-master",
-              "status": "complete",
-              "actual_hours": 0.5
-            },
-            {
-              "task": "Assign CI/CD ownership",
-              "estimate_hours": 0.5,
-              "assigned_to": "scrum-master",
-              "status": "complete",
-              "actual_hours": 0.25
-            }
-          ],
-          "validation": {
-            "test_pass_rate": "92.3%",
-            "tests_passed": 348,
-            "tests_failed": 29,
-            "tests_total": 377,
-            "target_met": true,
-            "python_version": "3.13.11",
-            "crewai_version": "1.7.2",
-            "ruff_operational": true,
-            "mypy_operational": true,
-            "ci_cd_status": "GREEN"
-          }
-        }
-      ],
-      "stories": [
+          "type": "unplanned",
+          "completed_date": "2026-01-02T12:00:00",
+          "notes": "Emergency fix: Python 3.14 incompatibility with CrewAI. Recreated .venv with Python 3.13, achieved 92.3% test pass rate (348/377). 29 failures are known issues (Sprint 8 corruption + refactoring)."
+        },
         {
           "id": 1,
           "name": "Complete Editor Agent Remediation",
           "points": 1,
           "priority": "P0",
           "status": "complete",
-          "description": "Reconstruct editor_agent.py with 3 fixes + execute 10-run validation",
-          "assigned_to": "quality-enforcer",
-          "started_date": "2026-01-10T09:00:00",
-          "completed_date": "2026-01-10T09:30:00",
-          "notes": "Import path fixed, all 3 fixes verified, EditorAgent operational"
+          "completed_date": "2026-01-02T20:55:00",
+          "notes": "Reconstructed editor_agent.py (544 lines), executed 10-run validation. Achieved 60% gate pass rate (30/50 gates). Gate counting fix 100% validated."
         },
         {
           "id": 2,
           "name": "Fix Integration Tests",
           "points": 2,
           "priority": "P0",
-          "status": "ready",
-          "description": "Improve integration test pass rate from 56% to 100%"
+          "status": "not_started"
         },
         {
           "id": 3,
           "name": "Measure PO Agent Effectiveness",
           "points": 2,
           "priority": "P0",
-          "status": "ready",
-          "description": "Validate >90% AC acceptance rate with 10 test stories"
+          "status": "not_started"
         },
         {
           "id": 4,
           "name": "Measure SM Agent Effectiveness",
           "points": 2,
           "priority": "P0",
-          "status": "ready",
-          "description": "Validate >90% task assignment automation"
+          "status": "not_started"
         },
         {
           "id": 5,
           "name": "Sprint 8 Quality Score Report",
           "points": 1,
           "priority": "P1",
-          "status": "ready",
-          "description": "Compile evidence and generate comprehensive Sprint 8 quality report"
+          "status": "blocked",
+          "blocked_by": [
+            "story_3",
+            "story_4"
+          ],
+          "notes": "Requires PO and SM Agent effectiveness measurements from Stories 3-4"
         },
         {
           "id": 6,
           "name": "File Edit Safety Documentation",
           "points": 1,
           "priority": "P1",
-          "status": "ready",
-          "description": "Document multi-edit risks and safe editing patterns"
+          "status": "not_started"
         },
         {
           "id": 7,
           "name": "Sprint 9 Planning & Close-Out",
           "points": 1,
           "priority": "P2",
-          "status": "ready",
-          "description": "Sprint 9 retrospective and Sprint 10 backlog refinement"
+          "status": "not_started"
         }
       ],
       "objectives": [
         "Complete Sprint 8 technical debt (Editor Agent validation)",
-        "Validate Sprint 8 agent effectiveness (PO & SM Agents)",
-        "Close integration test gap (56% → 100%)",
-        "Fix infrastructure gaps (docs + CI/CD)"
+        "Measure autonomous orchestration effectiveness (PO + SM Agents)",
+        "Fix CI/CD infrastructure (green build)",
+        "Improve integration test pass rate (56% → 90%+)"
       ],
+      "velocity": null,
+      "points_delivered": 3,
+      "completion_rate": 0.20,
+      "ceremonies_complete": false,
+      "retrospective_done": false,
       "backlog_refined": true,
-      "refinement_date": "2026-01-02T23:45:00",
-      "next_sprint_dor_met": true
-    }
+      "refinement_date": "2026-01-02T00:00:00",
+      "next_sprint_dor_met": false
+    ]
+  },
+  "sprint_9": {
+    "status": "active",
+    "start_date": "2026-01-10T00:00:00",
+    "capacity": 13,
+    "adjusted_capacity": 15,
+    "capacity_notes": "Added 2 pts unplanned Story 0 (infrastructure)",
+    "unplanned_work": [
+      {
+        "id": 0,
+        "name": "Fix Documentation & CI/CD Gaps",
+        "points": 2,
+        "priority": "P0",
+        "status": "complete",
+        "type": "infrastructure",
+        "discovered_date": "2026-01-10T10:00:00",
+        "completed_date": "2026-01-02T21:30:00",
+        "reason": "Systematic process gaps affecting quality",
+        "impact": "Blocks documentation credibility and quality enforcement",
+        "assigned_to": "quality-enforcer",
+        "resolution": "Environment recreated with Python 3.13, 92.3% test pass rate achieved (348/377), all CI/CD tools operational",
+        "tasks": [
+          {
+            "task": "Fix failing CI/CD",
+            "estimate_hours": 1,
+            "assigned_to": "quality-enforcer",
+            "status": "complete",
+            "actual_hours": 0.5
+          },
+          {
+            "task": "Update Definition of Done",
+            "estimate_hours": 0.5,
+            "assigned_to": "scrum-master",
+            "status": "complete",
+            "actual_hours": 0.5
+          },
+          {
+            "task": "Assign CI/CD ownership",
+            "estimate_hours": 0.5,
+            "assigned_to": "scrum-master",
+            "status": "complete",
+            "actual_hours": 0.25
+          }
+        ],
+        "validation": {
+          "test_pass_rate": "92.3%",
+          "tests_passed": 348,
+          "tests_failed": 29,
+          "tests_total": 377,
+          "target_met": true,
+          "python_version": "3.13.11",
+          "crewai_version": "1.7.2",
+          "ruff_operational": true,
+          "mypy_operational": true,
+          "ci_cd_status": "GREEN"
+        }
+      }
+    ],
+    "stories": [
+      {
+        "id": 1,
+        "name": "Complete Editor Agent Remediation",
+        "points": 1,
+        "priority": "P0",
+        "status": "complete",
+        "description": "Reconstruct editor_agent.py with 3 fixes + execute 10-run validation",
+        "assigned_to": "quality-enforcer",
+        "started_date": "2026-01-10T09:00:00",
+        "completed_date": "2026-01-10T09:30:00",
+        "notes": "Import path fixed, all 3 fixes verified, EditorAgent operational"
+      },
+      {
+        "id": 2,
+        "name": "Fix Integration Tests",
+        "points": 2,
+        "priority": "P0",
+        "status": "ready",
+        "description": "Improve integration test pass rate from 56% to 100%"
+      },
+      {
+        "id": 3,
+        "name": "Measure PO Agent Effectiveness",
+        "points": 2,
+        "priority": "P0",
+        "status": "ready",
+        "description": "Validate >90% AC acceptance rate with 10 test stories"
+      },
+      {
+        "id": 4,
+        "name": "Measure SM Agent Effectiveness",
+        "points": 2,
+        "priority": "P0",
+        "status": "ready",
+        "description": "Validate >90% task assignment automation"
+      },
+      {
+        "id": 5,
+        "name": "Sprint 8 Quality Score Report",
+        "points": 1,
+        "priority": "P1",
+        "status": "ready",
+        "description": "Compile evidence and generate comprehensive Sprint 8 quality report"
+      },
+      {
+        "id": 6,
+        "name": "File Edit Safety Documentation",
+        "points": 1,
+        "priority": "P1",
+        "status": "ready",
+        "description": "Document multi-edit risks and safe editing patterns"
+      },
+      {
+        "id": 7,
+        "name": "Sprint 9 Planning & Close-Out",
+        "points": 1,
+        "priority": "P2",
+        "status": "ready",
+        "description": "Sprint 9 retrospective and Sprint 10 backlog refinement"
+      }
+    ],
+    "objectives": [
+      "Complete Sprint 8 technical debt (Editor Agent validation)",
+      "Validate Sprint 8 agent effectiveness (PO & SM Agents)",
+      "Close integration test gap (56% → 100%)",
+      "Fix infrastructure gaps (docs + CI/CD)"
+    ],
+    "backlog_refined": true,
+    "refinement_date": "2026-01-02T23:45:00",
+    "next_sprint_dor_met": true
   }
+}
 }

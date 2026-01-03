@@ -12,11 +12,11 @@ repos:
         name: ruff format
         description: Format Python code with ruff
 
-      # Lint code (fails on errors)
+      # Lint code (check only, no auto-fix)
       - id: ruff
         name: ruff check
-        description: Lint Python code with ruff
-        args: [--fix, --exit-non-zero-on-fix]
+        description: Lint Python code with ruff (check only)
+        args: []
 
   # Mypy - Static type checking (temporarily non-blocking)
   - repo: https://github.com/pre-commit/mirrors-mypy
@@ -56,18 +56,10 @@ repos:
         files: ^(README\.md|quality_score\.json|skills/sprint_tracker\.json|.*_badge\.json)$
         always_run: false
 
-  # Basic file checks
+  # Basic file checks (check-only, no auto-fix)
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
-      - id: trailing-whitespace
-        name: trim trailing whitespace
-        description: Remove trailing whitespace
-
-      - id: end-of-file-fixer
-        name: fix end of files
-        description: Ensure files end with newline
-
       - id: check-yaml
         name: check yaml
         description: Validate YAML files

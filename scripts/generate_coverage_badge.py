@@ -56,7 +56,9 @@ def generate_coverage_badge(output_path: Path = None) -> dict:
         print("❌ Error: Could not determine coverage percentage")
         # Use a placeholder for now
         coverage = 0
-        print("ℹ️  Using 0% as placeholder - run pytest with --cov to get actual coverage")
+        print(
+            "ℹ️  Using 0% as placeholder - run pytest with --cov to get actual coverage"
+        )
 
     # Determine color based on coverage
     if coverage >= 80:

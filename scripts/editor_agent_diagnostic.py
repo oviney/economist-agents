@@ -85,7 +85,9 @@ class EditorAgentDiagnostic:
         # Extract Editor Agent specific metrics
         editor_metrics = []
         for run in runs:
-            editor_data = run.get("editor_agent", {})
+            # Fix: Editor data is nested under run["agents"]["editor_agent"]
+            agents_data = run.get("agents", {})
+            editor_data = agents_data.get("editor_agent", {})
             if editor_data:
                 editor_metrics.append(
                     {

@@ -47,6 +47,19 @@ def mock_llm_client():
     client = Mock()
     client.provider = "anthropic"
     client.model = "claude-3-opus-20240229"
+
+    # Mock the Anthropic response structure: response.content[0].text
+    mock_text_obj = Mock()
+    mock_text_obj.text = "test response"
+
+    mock_response = Mock()
+    mock_response.content = [mock_text_obj]  # Make it a list so [0] works
+
+    # Mock the client.messages.create call
+    client.client = Mock()
+    client.client.messages = Mock()
+    client.client.messages.create = Mock(return_value=mock_response)
+
     return client
 
 
@@ -174,10 +187,15 @@ class TestRunResearchAgent:
         self, mock_llm_client, sample_research_output
     ):
         """Test research agent with successful LLM response."""
+        # Mock the response at the message content level (Anthropic API structure)
+        mock_response = Mock()
+        mock_response.content = [Mock(text=json.dumps(sample_research_output))]
+
         with (
-            patch("economist_agent.call_llm") as mock_call_llm,
-            patch("economist_agent.review_agent_output") as mock_review,
+            patch("agents.research_agent.call_llm") as mock_call_llm,
+            patch("agents.research_agent.review_agent_output") as mock_review,
         ):
+            # Return the properly structured mock response
             mock_call_llm.return_value = json.dumps(sample_research_output)
             mock_review.return_value = (True, [])
 
@@ -205,8 +223,8 @@ class TestRunResearchAgent:
     def test_research_agent_with_invalid_json_response(self, mock_llm_client):
         """Test research agent handles invalid JSON from LLM."""
         with (
-            patch("economist_agent.call_llm") as mock_call_llm,
-            patch("economist_agent.review_agent_output") as mock_review,
+            patch("agents.research_agent.call_llm") as mock_call_llm,
+            patch("agents.research_agent.review_agent_output") as mock_review,
         ):
             mock_call_llm.return_value = "This is not valid JSON"
             mock_review.return_value = (True, [])
@@ -228,8 +246,8 @@ class TestRunResearchAgent:
         ]
 
         with (
-            patch("economist_agent.call_llm") as mock_call_llm,
-            patch("economist_agent.review_agent_output") as mock_review,
+            patch("agents.research_agent.call_llm") as mock_call_llm,
+            patch("agents.research_agent.review_agent_output") as mock_review,
         ):
             mock_call_llm.return_value = json.dumps(sample_research_output)
             mock_review.return_value = (True, [])
@@ -243,8 +261,8 @@ class TestRunResearchAgent:
     ):
         """Test research agent logs to governance tracker."""
         with (
-            patch("economist_agent.call_llm") as mock_call_llm,
-            patch("economist_agent.review_agent_output") as mock_review,
+            patch("agents.research_agent.call_llm") as mock_call_llm,
+            patch("agents.research_agent.review_agent_output") as mock_review,
         ):
             mock_call_llm.return_value = json.dumps(sample_research_output)
             mock_review.return_value = (True, [])
@@ -263,8 +281,8 @@ class TestRunResearchAgent:
     ):
         """Test research agent handles validation failures."""
         with (
-            patch("economist_agent.call_llm") as mock_call_llm,
-            patch("economist_agent.review_agent_output") as mock_review,
+            patch("agents.research_agent.call_llm") as mock_call_llm,
+            patch("agents.research_agent.review_agent_output") as mock_review,
         ):
             mock_call_llm.return_value = json.dumps(sample_research_output)
             mock_review.return_value = (
@@ -291,8 +309,8 @@ class TestRunWriterAgent:
     ):
         """Test writer agent with successful article generation."""
         with (
-            patch("economist_agent.call_llm") as mock_call_llm,
-            patch("economist_agent.review_agent_output") as mock_review,
+            patch("agents.writer_agent.call_llm") as mock_call_llm,
+            patch("agents.writer_agent.review_agent_output") as mock_review,
         ):
             mock_call_llm.return_value = sample_article_draft
             mock_review.return_value = (True, [])
@@ -335,8 +353,8 @@ class TestRunWriterAgent:
     ):
         """Test writer agent includes chart embedding instructions."""
         with (
-            patch("economist_agent.call_llm") as mock_call_llm,
-            patch("economist_agent.review_agent_output") as mock_review,
+            patch("agents.writer_agent.call_llm") as mock_call_llm,
+            patch("agents.writer_agent.review_agent_output") as mock_review,
         ):
             mock_call_llm.return_value = sample_article_draft
             mock_review.return_value = (True, [])
@@ -359,8 +377,8 @@ class TestRunWriterAgent:
     ):
         """Test writer agent includes featured image instructions."""
         with (
-            patch("economist_agent.call_llm") as mock_call_llm,
-            patch("economist_agent.review_agent_output") as mock_review,
+            patch("agents.writer_agent.call_llm") as mock_call_llm,
+            patch("agents.writer_agent.review_agent_output") as mock_review,
         ):
             mock_call_llm.return_value = sample_article_draft
             mock_review.return_value = (True, [])
@@ -382,8 +400,8 @@ class TestRunWriterAgent:
     ):
         """Test writer agent regenerates on critical issues."""
         with (
-            patch("economist_agent.call_llm") as mock_call_llm,
-            patch("economist_agent.review_agent_output") as mock_review,
+            patch("agents.writer_agent.call_llm") as mock_call_llm,
+            patch("agents.writer_agent.review_agent_output") as mock_review,
         ):
             # First call has critical issues, second call is clean
             mock_call_llm.side_effect = [
@@ -412,8 +430,8 @@ class TestRunWriterAgent:
     ):
         """Test writer agent doesn't regenerate on non-critical issues."""
         with (
-            patch("economist_agent.call_llm") as mock_call_llm,
-            patch("economist_agent.review_agent_output") as mock_review,
+            patch("agents.writer_agent.call_llm") as mock_call_llm,
+            patch("agents.writer_agent.review_agent_output") as mock_review,
         ):
             mock_call_llm.return_value = sample_article_draft
             mock_review.return_value = (False, ["Minor style issue", "Small typo"])
@@ -445,8 +463,8 @@ class TestRunGraphicsAgent:
         }
 
         with (
-            patch("economist_agent.call_llm") as mock_call_llm,
-            patch("economist_agent.get_metrics_collector") as mock_metrics,
+            patch("agents.research_agent.call_llm") as mock_call_llm,
+            patch("scripts.chart_metrics.get_metrics_collector") as mock_metrics,
             patch("subprocess.run") as mock_subprocess,
             patch("builtins.open", mock_open()),
         ):
@@ -494,8 +512,8 @@ class TestRunGraphicsAgent:
         chart_spec = {"title": "Test Chart", "data": []}
 
         with (
-            patch("economist_agent.call_llm") as mock_call_llm,
-            patch("economist_agent.get_metrics_collector") as mock_metrics,
+            patch("agents.research_agent.call_llm") as mock_call_llm,
+            patch("scripts.chart_metrics.get_metrics_collector") as mock_metrics,
             patch("subprocess.run") as mock_subprocess,
             patch("builtins.open", mock_open()),
         ):
@@ -515,8 +533,8 @@ class TestRunGraphicsAgent:
         chart_spec = {"title": "Test Chart", "data": []}
 
         with (
-            patch("economist_agent.call_llm") as mock_call_llm,
-            patch("economist_agent.get_metrics_collector") as mock_metrics,
+            patch("agents.research_agent.call_llm") as mock_call_llm,
+            patch("scripts.chart_metrics.get_metrics_collector") as mock_metrics,
             patch("subprocess.run") as mock_subprocess,
             patch("builtins.open", mock_open()),
         ):
@@ -543,7 +561,7 @@ class TestRunEditorAgent:
 
     def test_successful_editing(self, mock_llm_client, sample_edited_article):
         """Test editor agent with successful editing."""
-        with patch("economist_agent.call_llm") as mock_call_llm:
+        with patch("agents.editor_agent.call_llm") as mock_call_llm:
             mock_call_llm.return_value = sample_edited_article
 
             # Draft must be >100 chars
@@ -581,7 +599,7 @@ class TestRunEditorAgent:
 ## Edited Article
 Content here...
 """
-        with patch("economist_agent.call_llm") as mock_call_llm:
+        with patch("agents.editor_agent.call_llm") as mock_call_llm:
             mock_call_llm.return_value = response_with_gates
 
             edited, gates_passed, gates_failed = ea.run_editor_agent(
@@ -600,7 +618,7 @@ Some preamble...
 
 This is the actual edited content.
 """
-        with patch("economist_agent.call_llm") as mock_call_llm:
+        with patch("agents.editor_agent.call_llm") as mock_call_llm:
             mock_call_llm.return_value = response
 
             edited, _, _ = ea.run_editor_agent(mock_llm_client, "Draft content..." * 50)
@@ -621,7 +639,7 @@ class TestMain:
         """Test main function with default arguments."""
         with (
             patch("sys.argv", ["economist_agent.py"]),
-            patch("economist_agent.generate_economist_post") as mock_generate,
+            patch("scripts.economist_agent.generate_economist_post") as mock_generate,
             patch.dict(os.environ, {}, clear=True),
         ):
             mock_generate.return_value = {"article_path": "/tmp/article.md"}
@@ -634,8 +652,8 @@ class TestMain:
         """Test main function with interactive mode enabled."""
         with (
             patch("sys.argv", ["economist_agent.py", "--interactive"]),
-            patch("economist_agent.generate_economist_post") as mock_generate,
-            patch("economist_agent.GovernanceTracker") as mock_governance,
+            patch("scripts.economist_agent.generate_economist_post") as mock_generate,
+            patch("scripts.governance.GovernanceTracker") as mock_governance,
             patch.dict(os.environ, {"TOPIC": "Test Topic"}, clear=True),
         ):
             mock_generate.return_value = {"article_path": "/tmp/article.md"}
@@ -657,8 +675,8 @@ class TestMain:
                     "/custom/dir",
                 ],
             ),
-            patch("economist_agent.generate_economist_post") as mock_generate,
-            patch("economist_agent.GovernanceTracker") as mock_governance,
+            patch("scripts.economist_agent.generate_economist_post") as mock_generate,
+            patch("scripts.governance.GovernanceTracker") as mock_governance,
             patch.dict(os.environ, {"TOPIC": "Test Topic"}, clear=True),
         ):
             mock_generate.return_value = {"article_path": "/tmp/article.md"}
@@ -680,7 +698,7 @@ class TestMain:
 
         with (
             patch("sys.argv", ["economist_agent.py"]),
-            patch("economist_agent.generate_economist_post") as mock_generate,
+            patch("scripts.economist_agent.generate_economist_post") as mock_generate,
             patch.dict(os.environ, env_vars),
         ):
             mock_generate.return_value = {
@@ -698,7 +716,7 @@ class TestMain:
         """Test main function writes to GITHUB_OUTPUT."""
         with (
             patch("sys.argv", ["economist_agent.py"]),
-            patch("economist_agent.generate_economist_post") as mock_generate,
+            patch("scripts.economist_agent.generate_economist_post") as mock_generate,
             patch("builtins.open", mock_open()) as mock_file,
             patch.dict(
                 os.environ,
@@ -734,9 +752,9 @@ class TestIntegration:
     ):
         """Test full pipeline from research to publication."""
         with (
-            patch("economist_agent.call_llm") as mock_call_llm,
-            patch("economist_agent.review_agent_output") as mock_review,
-            patch("economist_agent.get_metrics_collector") as mock_metrics,
+            patch("agents.research_agent.call_llm") as mock_call_llm,
+            patch("agents.writer_agent.review_agent_output") as mock_review,
+            patch("scripts.chart_metrics.get_metrics_collector") as mock_metrics,
             patch("subprocess.run") as mock_subprocess,
             patch("builtins.open", mock_open()),
         ):
@@ -780,7 +798,7 @@ class TestIntegration:
 
     def test_pipeline_handles_api_failures_gracefully(self, mock_llm_client):
         """Test pipeline handles API failures at each stage."""
-        with patch("economist_agent.call_llm") as mock_call_llm:
+        with patch("agents.research_agent.call_llm") as mock_call_llm:
             # Simulate API failure
             mock_call_llm.side_effect = Exception("API Error")
 
@@ -797,8 +815,8 @@ class TestIntegration:
     ):
         """Test pipeline with governance approval gates."""
         with (
-            patch("economist_agent.call_llm") as mock_call_llm,
-            patch("economist_agent.review_agent_output") as mock_review,
+            patch("agents.research_agent.call_llm") as mock_call_llm,
+            patch("agents.writer_agent.review_agent_output") as mock_review,
         ):
             mock_call_llm.side_effect = [
                 json.dumps(sample_research_output),

@@ -193,7 +193,7 @@ class ContextManager:
             content = self.file_path.read_text(encoding="utf-8")
         except Exception as e:
             raise ContextParseError(
-                f"Failed to read context file: {e}\n" f"File: {self.file_path}"
+                f"Failed to read context file: {e}\nFile: {self.file_path}"
             ) from e
 
         # Extract story ID from filename or content

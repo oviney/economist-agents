@@ -1,8 +1,8 @@
 # 📊 Quality Engineering Dashboard
-**Generated**: 2026-01-02 18:00:33
-**Quality Score**: 67/100
+**Generated**: 2026-01-02 21:40:10
+**Quality Score**: 60/100
 
-🟠 [█████████████░░░░░░░] 67/100 - FAIR
+🟠 [████████████░░░░░░░░] 60/100 - FAIR
 
 ## 🐛 Defect Metrics
 
@@ -29,29 +29,29 @@
 
 ### Writer Agent
 - **Clean Rate**: 100% (target: >80%)
-- **Articles**: 10
-- **Avg Word Count**: 545
+- **Articles**: 11
+- **Avg Word Count**: 557
 
 ### Editor Agent
-- **Accuracy**: 66.7% (target: >60%)
-- **Reviews**: 10
-- **Avg Gates Passed**: 4/5
+- **Accuracy**: 45.5% (target: >60%)
+- **Reviews**: 11
+- **Avg Gates Passed**: 5/5
 
 ### Graphics Agent
 - **Visual QA Pass Rate**: 75%
-- **Charts Generated**: 10
+- **Charts Generated**: 11
 - **Zone Violations**: 0
 
 ### Research Agent
-- **Verification Rate**: 75.0%
-- **Briefs Generated**: 10
-- **Avg Data Points**: 4
+- **Verification Rate**: 100.0%
+- **Briefs Generated**: 11
+- **Avg Data Points**: 3
 
 ## 📊 Quality Trends
 
 ⚠️ Defect escape rate stable/increasing (75.0%)
 ✅ Writer Agent meeting target (>80% clean)
-✅ Editor Agent meeting target (>60% accuracy)
+🔄 Editor Agent improving (current: 45.5%)
 
 ## 🏃 Sprint Progress
 

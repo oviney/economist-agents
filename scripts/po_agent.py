@@ -12,7 +12,6 @@ Usage:
 
 import argparse
 import json
-import re
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -147,7 +146,7 @@ class ProductOwnerAgent:
 
     def parse_user_request(self, request: str) -> dict[str, Any]:
         """Parse user request into structured user story with AC"""
-        print(f"🔄 PO Agent: Parsing user request...")
+        print("🔄 PO Agent: Parsing user request...")
         print(f"   Request: {request[:80]}{'...' if len(request) > 80 else ''}")
 
         prompt = f"""User Request:
@@ -193,7 +192,9 @@ Consider historical context from similar stories in this quality engineering pro
         print(f"   ✓ Story points: {story.get('story_points', '?')}")
 
         if story.get("escalations"):
-            print(f"   ⚠ Escalations: {len(story['escalations'])} questions for human PO")
+            print(
+                f"   ⚠ Escalations: {len(story['escalations'])} questions for human PO"
+            )
 
         return story
 
@@ -239,7 +240,7 @@ Consider historical context from similar stories in this quality engineering pro
         self, user_story: str, additional_context: str = ""
     ) -> list[str]:
         """Generate acceptance criteria for existing user story"""
-        print(f"📋 PO Agent: Generating acceptance criteria...")
+        print("📋 PO Agent: Generating acceptance criteria...")
 
         prompt = f"""User Story:
 {user_story}
@@ -253,9 +254,7 @@ Include quality requirements.
 Return JSON array of strings:
 ["[ ] Given X, When Y, Then Z", "[ ] Quality: ..."]"""
 
-        response_text = call_llm(
-            self.client, PO_AGENT_PROMPT, prompt, max_tokens=1000
-        )
+        response_text = call_llm(self.client, PO_AGENT_PROMPT, prompt, max_tokens=1000)
 
         try:
             start = response_text.find("[")
@@ -266,9 +265,7 @@ Return JSON array of strings:
                 return criteria
             else:
                 print("   ⚠ Could not parse AC JSON")
-                return [
-                    "[ ] Manual acceptance criteria required - generation failed"
-                ]
+                return ["[ ] Manual acceptance criteria required - generation failed"]
         except json.JSONDecodeError as e:
             print(f"   ⚠ JSON parse error: {e}")
             return ["[ ] Manual acceptance criteria required - JSON parse error"]
@@ -277,7 +274,7 @@ Return JSON array of strings:
         self, user_story: str, acceptance_criteria: list[str]
     ) -> tuple[int, str]:
         """Estimate story points using historical velocity"""
-        print(f"📊 PO Agent: Estimating story points...")
+        print("📊 PO Agent: Estimating story points...")
 
         # Count AC complexity indicators
         ac_text = " ".join(acceptance_criteria)
@@ -394,17 +391,13 @@ def main():
     parser = argparse.ArgumentParser(
         description="Product Owner Agent - Autonomous Backlog Refinement"
     )
-    parser.add_argument(
-        "--request", help="User request to convert into user story"
-    )
+    parser.add_argument("--request", help="User request to convert into user story")
     parser.add_argument(
         "--backlog",
         default="skills/backlog.json",
         help="Backlog file path (default: skills/backlog.json)",
     )
-    parser.add_argument(
-        "--summary", action="store_true", help="Show backlog summary"
-    )
+    parser.add_argument("--summary", action="store_true", help="Show backlog summary")
 
     args = parser.parse_args()
 

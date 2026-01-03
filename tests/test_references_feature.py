@@ -22,8 +22,8 @@ _scripts_dir = Path(__file__).parent.parent / "scripts"
 if str(_scripts_dir) not in sys.path:
     sys.path.insert(0, str(_scripts_dir))
 
-from writer_agent import WriterAgent
 from publication_validator import PublicationValidator
+from writer_agent import WriterAgent
 
 
 class TestWriterAgentReferences:
@@ -141,7 +141,13 @@ class TestWriterAgentReferences:
         guidance = agent._format_references_guidance(research_brief)
 
         # Should have max 5 numbered items
-        numbered_items = [line for line in guidance.split("\n") if line.strip().startswith(("1.", "2.", "3.", "4.", "5.", "6.", "7.", "8.", "9."))]
+        numbered_items = [
+            line
+            for line in guidance.split("\n")
+            if line.strip().startswith(
+                ("1.", "2.", "3.", "4.", "5.", "6.", "7.", "8.", "9.")
+            )
+        ]
         assert len(numbered_items) <= 5
 
 

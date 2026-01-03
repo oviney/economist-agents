@@ -29,14 +29,12 @@ from typing import Any
 
 import yaml
 
+# CrewAI is optional - delay import to avoid breaking pytest collection
+Agent = None
 try:
     from crewai import Agent
 except ImportError:
-    print(
-        "ERROR: CrewAI not installed. Install with: pip install crewai crewai-tools",
-        file=sys.stderr,
-    )
-    sys.exit(1)
+    pass  # CrewAI not installed - will error if AgentFactory is actually used
 
 
 class AgentFactory:
@@ -50,9 +48,15 @@ class AgentFactory:
             config_path: Path to agents.yaml (default: schemas/agents.yaml)
 
         Raises:
+            ImportError: If CrewAI is not installed
             FileNotFoundError: If agents.yaml not found
             yaml.YAMLError: If agents.yaml is malformed
         """
+        if Agent is None:
+            raise ImportError(
+                "CrewAI not installed. Install with: pip install crewai crewai-tools"
+            )
+
         if config_path is None:
             # Default: schemas/agents.yaml relative to this script
             self.config_path = Path(__file__).parent.parent / "schemas" / "agents.yaml"

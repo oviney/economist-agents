@@ -8,13 +8,13 @@ for improved modularity and testability.
 
 import sys
 from pathlib import Path
-from typing import Any, Optional, Tuple
+from typing import Any
 
 try:
     import orjson
+
     HAS_ORJSON = True
 except ImportError:
-    import json
     HAS_ORJSON = False
 
 import json as json_stdlib  # Always have standard json for formatting
@@ -27,7 +27,6 @@ if str(_scripts_dir) not in sys.path:
 from agent_reviewer import review_agent_output  # type: ignore
 from governance import GovernanceTracker  # type: ignore
 from llm_client import call_llm  # type: ignore
-
 
 # ═══════════════════════════════════════════════════════════════════════════
 # WRITER AGENT PROMPT
@@ -259,17 +258,17 @@ Now write the article:"""
 
 class WriterAgent:
     """Writer agent for drafting Economist-style articles.
-    
+
     This agent focuses on:
     - Writing engaging, data-driven articles
     - Following Economist style guidelines
     - Embedding charts naturally
     - Self-validation before returning drafts
-    
+
     Args:
         client: LLM client instance (from llm_client.create_llm_client())
         governance: Optional governance tracker for audit logging
-        
+
     Example:
         >>> from llm_client import create_llm_client
         >>> client = create_llm_client()
@@ -280,38 +279,34 @@ class WriterAgent:
         ...     current_date="2026-01-02"
         ... )
     """
-    
-    def __init__(
-        self,
-        client: Any,
-        governance: Optional[GovernanceTracker] = None
-    ):
+
+    def __init__(self, client: Any, governance: GovernanceTracker | None = None):
         """Initialize the writer agent.
-        
+
         Args:
             client: LLM client for generating articles
             governance: Optional governance tracker for logging
         """
         self.client = client
         self.governance = governance
-    
+
     def write(
         self,
         topic: str,
         research_brief: dict[str, Any],
         current_date: str,
-        chart_filename: Optional[str] = None,
-        featured_image: Optional[str] = None,
-    ) -> Tuple[str, dict[str, Any]]:
+        chart_filename: str | None = None,
+        featured_image: str | None = None,
+    ) -> tuple[str, dict[str, Any]]:
         """Write an Economist-style article based on research brief.
-        
+
         Args:
             topic: Article topic
             research_brief: Research data from research agent
             current_date: Date to use in YAML frontmatter (YYYY-MM-DD)
             chart_filename: Optional chart filename to embed
             featured_image: Optional featured image path
-            
+
         Returns:
             Tuple of (article_text, metadata_dict)
             - article_text: Complete markdown with YAML frontmatter
@@ -319,10 +314,10 @@ class WriterAgent:
                 * is_valid: Whether draft passed validation
                 * regenerated: Whether draft was regenerated
                 * critical_issues: Count of critical issues found
-                
+
         Raises:
             ValueError: If inputs are invalid
-            
+
         Example:
             >>> draft, metadata = agent.write(
             ...     topic="Self-Healing Tests",
@@ -376,7 +371,8 @@ Failure to include the chart will result in article rejection.
 ═══════════════════════════════════════════════════════════════════════════
 """
             system_prompt = system_prompt.replace(
-                "{research_brief}", json_stdlib.dumps(research_brief, indent=2) + chart_info
+                "{research_brief}",
+                json_stdlib.dumps(research_brief, indent=2) + chart_info,
             )
         else:
             system_prompt = system_prompt.replace(
@@ -436,7 +432,9 @@ image: {featured_image}
                 fix_instructions = "\n".join(
                     [
                         "CRITICAL FIXES REQUIRED:",
-                        *[f"- {issue}" for issue in critical_issues[:5]],  # Top 5 issues
+                        *[
+                            f"- {issue}" for issue in critical_issues[:5]
+                        ],  # Top 5 issues
                         "\nRegenerate the article with these fixes applied.",
                     ]
                 )
@@ -455,7 +453,9 @@ image: {featured_image}
                 )
 
                 if not is_valid:
-                    print(f"   ⚠️  Draft still has {len(issues)} issues after regeneration")
+                    print(
+                        f"   ⚠️  Draft still has {len(issues)} issues after regeneration"
+                    )
                 else:
                     print("   ✅ Regenerated draft passed validation")
             else:
@@ -482,33 +482,33 @@ image: {featured_image}
             "regenerated": bool(not is_valid and critical_issues),
             "critical_issues": len(critical_issues) if not is_valid else 0,
         }
-    
+
     def _format_references_guidance(self, research_brief: dict[str, Any]) -> str:
         """Format references guidance from research data sources.
-        
+
         Extracts sources from research brief and formats them as
         reference examples for the Writer Agent to follow.
-        
+
         Args:
             research_brief: Research data with data_points containing sources
-            
+
         Returns:
             Formatted guidance string or empty string if no sources
         """
         sources = []
-        
+
         # Extract sources from data_points
         for dp in research_brief.get("data_points", []):
             if dp.get("source") and dp.get("verified", False):
                 source_entry = {
                     "source": dp["source"],
                     "year": dp.get("year", "2024"),
-                    "url": dp.get("url", "")
+                    "url": dp.get("url", ""),
                 }
                 # Avoid duplicates
                 if source_entry not in sources:
                     sources.append(source_entry)
-        
+
         # Extract source from headline_stat
         if research_brief.get("headline_stat"):
             hs = research_brief["headline_stat"]
@@ -516,14 +516,14 @@ image: {featured_image}
                 source_entry = {
                     "source": hs["source"],
                     "year": hs.get("year", "2024"),
-                    "url": ""
+                    "url": "",
                 }
                 if source_entry not in sources:
                     sources.insert(0, source_entry)  # Headline source first
-        
+
         if not sources:
             return ""
-        
+
         # Format references guidance
         guidance = [
             "\n",
@@ -532,14 +532,14 @@ image: {featured_image}
             "═══════════════════════════════════════════════════════════════════════════",
             "",
             "The Research Agent has verified these sources. Include them in your References section:",
-            ""
+            "",
         ]
-        
+
         for i, src in enumerate(sources[:5], 1):  # Max 5 sources
             source_name = src["source"]
             year = src["year"]
             url = src.get("url", "")
-            
+
             if url:
                 guidance.append(
                     f"{i}. {source_name}, [source title/report name], *Publication*, {year}"
@@ -549,14 +549,16 @@ image: {featured_image}
                 guidance.append(
                     f"{i}. {source_name}, [report/study name], *Publication*, {year}"
                 )
-        
-        guidance.extend([
-            "",
-            "Format these as proper references in your '## References' section.",
-            "Use descriptive link text, not generic 'click here'.",
-            "═══════════════════════════════════════════════════════════════════════════",
-        ])
-        
+
+        guidance.extend(
+            [
+                "",
+                "Format these as proper references in your '## References' section.",
+                "Use descriptive link text, not generic 'click here'.",
+                "═══════════════════════════════════════════════════════════════════════════",
+            ]
+        )
+
         return "\n".join(guidance)
 
 
@@ -570,15 +572,15 @@ def run_writer_agent(
     topic: str,
     research_brief: dict[str, Any],
     current_date: str,
-    chart_filename: Optional[str] = None,
-    featured_image: Optional[str] = None,
-    governance: Optional[GovernanceTracker] = None,
-) -> Tuple[str, dict[str, Any]]:
+    chart_filename: str | None = None,
+    featured_image: str | None = None,
+    governance: GovernanceTracker | None = None,
+) -> tuple[str, dict[str, Any]]:
     """Run the writer agent (backward compatibility wrapper).
-    
+
     This function maintains 100% backward compatibility with the original
     economist_agent.py implementation.
-    
+
     Args:
         client: LLM client instance
         topic: Article topic
@@ -587,10 +589,10 @@ def run_writer_agent(
         chart_filename: Optional chart filename to embed
         featured_image: Optional featured image path
         governance: Optional governance tracker
-        
+
     Returns:
         Tuple of (article_text, metadata_dict)
-        
+
     Example:
         >>> from llm_client import create_llm_client
         >>> client = create_llm_client()

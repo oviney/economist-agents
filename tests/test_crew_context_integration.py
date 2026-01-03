@@ -310,7 +310,7 @@ class TestBriefingTimeReduction:
         assert "agent1_status" in full_context
         assert "agent2_status" in full_context
 
-        print(f"\n✅ Context load time: {load_time*1000:.2f}ms (vs 3 min target)")
+        print(f"\n✅ Context load time: {load_time * 1000:.2f}ms (vs 3 min target)")
         print("✅ Briefing time reduction: ~97% (100ms vs 3 min)")
 
     def test_context_duplication_eliminated(self, story_context_file):

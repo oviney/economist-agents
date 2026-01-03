@@ -12,7 +12,7 @@ Tests autonomous coordination capabilities:
 import json
 import sys
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -102,9 +102,7 @@ class TestTaskQueueManager:
         manager.update_queue("TASK-1", "complete")
 
         # TASK-2 should be unblocked
-        task2 = next(
-            t for t in manager.queue["tasks"] if t["task_id"] == "TASK-2"
-        )
+        task2 = next(t for t in manager.queue["tasks"] if t["task_id"] == "TASK-2")
         assert task2["status"] == "pending"
 
     def test_get_next_task(self, temp_queue):
@@ -260,9 +258,7 @@ class TestQualityGateValidator:
         assert decision == "ESCALATE"
 
         # >2 issues → REJECT
-        decision = validator.make_gate_decision(
-            (False, ["issue1", "issue2", "issue3"])
-        )
+        decision = validator.make_gate_decision((False, ["issue1", "issue2", "issue3"]))
         assert decision == "REJECT"
 
 
@@ -349,9 +345,7 @@ class TestScrumMasterAgent:
     @patch("sm_agent.TaskQueueManager")
     @patch("sm_agent.AgentStatusMonitor")
     @patch("sm_agent.EscalationManager")
-    def test_agent_initialization(
-        self, mock_esc, mock_monitor, mock_queue
-    ):
+    def test_agent_initialization(self, mock_esc, mock_monitor, mock_queue):
         """Test SM Agent initialization"""
         agent = ScrumMasterAgent()
 

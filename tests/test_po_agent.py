@@ -23,12 +23,15 @@ from po_agent import ProductOwnerAgent
 @pytest.fixture
 def temp_backlog():
     """Create temporary backlog file for testing"""
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".json", delete=False
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
         f.write(
             json.dumps(
-                {"version": "1.0", "created": "2026-01-02", "stories": [], "escalations": []}
+                {
+                    "version": "1.0",
+                    "created": "2026-01-02",
+                    "stories": [],
+                    "escalations": [],
+                }
             )
         )
         temp_path = f.name
@@ -85,9 +88,7 @@ class TestProductOwnerAgent:
         with patch("po_agent.call_llm") as mock_call:
             mock_call.return_value = json.dumps(mock_response)
             agent = ProductOwnerAgent(backlog_file=temp_backlog)
-            story = agent.parse_user_request(
-                "We need automated test coverage analysis"
-            )
+            story = agent.parse_user_request("We need automated test coverage analysis")
 
         # Validate story structure
         assert "user_story" in story

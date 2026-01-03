@@ -11,17 +11,16 @@ Enhanced for Sprint 8 with:
 Usage:
     # Autonomous sprint execution
     python3 scripts/sm_agent.py --run-sprint 8
-    
+
     # Check orchestration status
     python3 scripts/sm_agent.py --status
-    
+
     # Process specific story
     python3 scripts/sm_agent.py --story STORY-042
 """
 
 import argparse
 import json
-import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -51,9 +50,7 @@ class TaskQueueManager:
     def parse_backlog(self, backlog_file: str = None) -> list[dict[str, Any]]:
         """Convert stories from backlog.json → executable tasks"""
         if backlog_file is None:
-            backlog_file = (
-                Path(__file__).parent.parent / "skills" / "backlog.json"
-            )
+            backlog_file = Path(__file__).parent.parent / "skills" / "backlog.json"
 
         with open(backlog_file) as f:
             backlog = json.load(f)
@@ -215,9 +212,7 @@ class AgentStatusMonitor:
 
     def __init__(self, status_file: str = None):
         if status_file is None:
-            status_file = (
-                Path(__file__).parent.parent / "skills" / "agent_status.json"
-            )
+            status_file = Path(__file__).parent.parent / "skills" / "agent_status.json"
         self.status_file = Path(status_file)
         self.status = self._load_status()
 
@@ -260,9 +255,7 @@ class AgentStatusMonitor:
 
         return blocked_agents
 
-    def update_agent_status(
-        self, agent_id: str, status: str, **kwargs
-    ):
+    def update_agent_status(self, agent_id: str, status: str, **kwargs):
         """Update specific agent status"""
         found = False
         for agent in self.status.get("agents", []):
@@ -316,9 +309,10 @@ class QualityGateValidator:
         if not story.get("user_story"):
             missing.append("story_written")
 
-        if not story.get("acceptance_criteria") or len(
-            story.get("acceptance_criteria", [])
-        ) < 3:
+        if (
+            not story.get("acceptance_criteria")
+            or len(story.get("acceptance_criteria", [])) < 3
+        ):
             missing.append("acceptance_criteria")
 
         if not story.get("quality_requirements"):
@@ -348,17 +342,13 @@ class QualityGateValidator:
         ac_results = deliverable.get("acceptance_criteria_results", [])
         failed_ac = [ac for ac in ac_results if not ac.get("passed")]
         if failed_ac:
-            issues.append(
-                f"{len(failed_ac)} acceptance criteria failed"
-            )
+            issues.append(f"{len(failed_ac)} acceptance criteria failed")
 
         passed = len(issues) == 0
 
         return passed, issues
 
-    def make_gate_decision(
-        self, validation_result: tuple[bool, list[str]]
-    ) -> str:
+    def make_gate_decision(self, validation_result: tuple[bool, list[str]]) -> str:
         """Approve, Reject, or Escalate based on validation"""
         passed, issues = validation_result
 
@@ -408,7 +398,9 @@ class EscalationManager:
         recommendation: str = None,
     ) -> str:
         """Generate escalation with question for human PO"""
-        escalation_id = f"ESC-{len(self.escalations.get('pending_escalations', [])) + 1}"
+        escalation_id = (
+            f"ESC-{len(self.escalations.get('pending_escalations', [])) + 1}"
+        )
 
         escalation = {
             "escalation_id": escalation_id,
@@ -424,9 +416,7 @@ class EscalationManager:
             "resolution": None,
         }
 
-        self.escalations.setdefault("pending_escalations", []).append(
-            escalation
-        )
+        self.escalations.setdefault("pending_escalations", []).append(escalation)
         self.save()
 
         return escalation_id
@@ -434,24 +424,17 @@ class EscalationManager:
     def check_for_resolution(self, escalation_id: str) -> bool:
         """Check if human PO has responded"""
         for esc in self.escalations.get("pending_escalations", []):
-            if (
-                esc["escalation_id"] == escalation_id
-                and esc.get("resolved")
-            ):
+            if esc["escalation_id"] == escalation_id and esc.get("resolved"):
                 return True
         return False
 
     def apply_resolution(self, escalation_id: str) -> dict[str, Any] | None:
         """Get resolution from human PO and move to answered"""
-        for i, esc in enumerate(
-            self.escalations.get("pending_escalations", [])
-        ):
+        for i, esc in enumerate(self.escalations.get("pending_escalations", [])):
             if esc["escalation_id"] == escalation_id and esc.get("resolved"):
                 # Move to answered
                 self.escalations["pending_escalations"].pop(i)
-                self.escalations.setdefault(
-                    "answered_escalations", []
-                ).append(esc)
+                self.escalations.setdefault("answered_escalations", []).append(esc)
                 self.save()
                 return esc
         return None
@@ -493,9 +476,7 @@ class ScrumMasterAgent:
 
         # 2. Orchestration loop (simplified for Sprint 8)
         print("\n⚙️  Orchestration loop active...")
-        print(
-            "   (In Sprint 8, this monitors status. Full autonomy in Sprint 9)\n"
-        )
+        print("   (In Sprint 8, this monitors status. Full autonomy in Sprint 9)\n")
 
         # Show task queue status
         self._show_queue_status()
@@ -507,15 +488,11 @@ class ScrumMasterAgent:
             for esc in unresolved:
                 print(f"   - {esc['escalation_id']}: {esc['question']}")
 
-        print(
-            f"\n✅ Sprint {sprint_id} orchestration initialized"
-        )
+        print(f"\n✅ Sprint {sprint_id} orchestration initialized")
 
     def _validate_dor_for_all_stories(self):
         """Validate Definition of Ready for backlog stories"""
-        backlog_file = (
-            Path(__file__).parent.parent / "skills" / "backlog.json"
-        )
+        backlog_file = Path(__file__).parent.parent / "skills" / "backlog.json"
 
         if not backlog_file.exists():
             print("   ⚠️  No backlog.json found - skipping DoR validation")
@@ -534,9 +511,7 @@ class ScrumMasterAgent:
             if passed:
                 print(f"   ✅ {story_id}: DoR complete")
             else:
-                print(
-                    f"   ⚠️  {story_id}: Missing {', '.join(missing)}"
-                )
+                print(f"   ⚠️  {story_id}: Missing {', '.join(missing)}")
                 # Escalate to PO Agent for refinement
                 self.escalation_mgr.create_escalation(
                     story_id=story_id,
@@ -581,9 +556,7 @@ class ScrumMasterAgent:
         # Agent status
         print("\n🤖 Agent Status:")
         for agent in self.monitor.status.get("agents", []):
-            print(
-                f"   {agent['agent_id']}: {agent.get('status', 'unknown')}"
-            )
+            print(f"   {agent['agent_id']}: {agent.get('status', 'unknown')}")
 
         # Escalations
         unresolved = self.escalation_mgr.get_unresolved()

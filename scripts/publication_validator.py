@@ -354,7 +354,7 @@ class PublicationValidator:
     def _check_references_section(self, content: str):
         """
         Check for References section (FEATURE-001)
-        
+
         Validates:
         - References section present (## References header)
         - Minimum 3 references
@@ -362,85 +362,98 @@ class PublicationValidator:
         - Descriptive link text (not "click here")
         """
         # Check if References section exists
-        has_references_header = bool(re.search(r'^## References', content, re.MULTILINE))
-        
+        has_references_header = bool(
+            re.search(r"^## References", content, re.MULTILINE)
+        )
+
         if not has_references_header:
-            self.issues.append({
-                "check": "missing_references",
-                "severity": "CRITICAL",
-                "message": "Article missing References section",
-                "details": "All articles must include '## References' section before closing paragraph",
-                "fix": "Add '## References' section with minimum 3 authoritative sources",
-            })
+            self.issues.append(
+                {
+                    "check": "missing_references",
+                    "severity": "CRITICAL",
+                    "message": "Article missing References section",
+                    "details": "All articles must include '## References' section before closing paragraph",
+                    "fix": "Add '## References' section with minimum 3 authoritative sources",
+                }
+            )
             return
-        
+
         # Extract references section (match content after header until next section or end)
-        refs_match = re.search(r'## References\s*\n(.*?)(?=^##|\Z)', content, re.DOTALL | re.MULTILINE)
+        refs_match = re.search(
+            r"## References\s*\n(.*?)(?=^##|\Z)", content, re.DOTALL | re.MULTILINE
+        )
         if not refs_match:
             # Check if header exists but with no content before next section
             if has_references_header:
-                self.issues.append({
+                self.issues.append(
+                    {
+                        "check": "empty_references",
+                        "severity": "CRITICAL",
+                        "message": "References section header exists but is empty",
+                        "details": "References section must contain at least 3 sources",
+                        "fix": "Add authoritative sources with proper formatting",
+                    }
+                )
+            return
+
+        references_text = refs_match.group(1).strip()
+
+        # Check if references text is effectively empty
+        if not references_text or len(references_text.strip()) < 10:
+            self.issues.append(
+                {
                     "check": "empty_references",
                     "severity": "CRITICAL",
                     "message": "References section header exists but is empty",
                     "details": "References section must contain at least 3 sources",
                     "fix": "Add authoritative sources with proper formatting",
-                })
+                }
+            )
             return
-        
-        references_text = refs_match.group(1).strip()
-        
-        # Check if references text is effectively empty
-        if not references_text or len(references_text.strip()) < 10:
-            self.issues.append({
-                "check": "empty_references",
-                "severity": "CRITICAL",
-                "message": "References section header exists but is empty",
-                "details": "References section must contain at least 3 sources",
-                "fix": "Add authoritative sources with proper formatting",
-            })
-            return
-        
+
         # Count references (look for numbered list items)
-        reference_items = re.findall(r'^\d+\.', references_text, re.MULTILINE)
+        reference_items = re.findall(r"^\d+\.", references_text, re.MULTILINE)
         reference_count = len(reference_items)
-        
+
         if reference_count < 3:
-            self.issues.append({
-                "check": "insufficient_references",
-                "severity": "CRITICAL",
-                "message": f"Only {reference_count} reference(s) found, minimum 3 required",
-                "details": "Articles must cite at least 3 authoritative sources",
-                "fix": "Add additional authoritative sources (academic, government, industry reports)",
-            })
-        
+            self.issues.append(
+                {
+                    "check": "insufficient_references",
+                    "severity": "CRITICAL",
+                    "message": f"Only {reference_count} reference(s) found, minimum 3 required",
+                    "details": "Articles must cite at least 3 authoritative sources",
+                    "fix": "Add additional authoritative sources (academic, government, industry reports)",
+                }
+            )
+
         # Check for bad link text patterns
         bad_link_patterns = [
-            (r'\[click here\]', 'Generic "click here" link text'),
-            (r'\[here\]', 'Generic "here" link text'),
-            (r'\[link\]', 'Generic "link" text'),
-            (r'\[source\]', 'Generic "source" text'),
-            (r'\[(https?://[^\]]+)\]', 'Bare URL as link text'),
+            (r"\[click here\]", 'Generic "click here" link text'),
+            (r"\[here\]", 'Generic "here" link text'),
+            (r"\[link\]", 'Generic "link" text'),
+            (r"\[source\]", 'Generic "source" text'),
+            (r"\[(https?://[^\]]+)\]", "Bare URL as link text"),
         ]
-        
+
         violations = []
         for pattern, reason in bad_link_patterns:
             matches = re.finditer(pattern, references_text, re.IGNORECASE)
             for match in matches:
-                violations.append({
-                    "text": match.group(),
-                    "reason": reason
-                })
-        
+                violations.append({"text": match.group(), "reason": reason})
+
         if violations:
-            details = "\n".join([f"  • {v['text']} - {v['reason']}" for v in violations])
-            self.issues.append({
-                "check": "bad_reference_links",
-                "severity": "HIGH",
-                "message": f"Found {len(violations)} reference(s) with poor link text",
-                "details": details,
-                "fix": "Use descriptive anchor text (e.g., 'World Quality Report 2024')",
-            })
+            details = "\n".join(
+                [f"  • {v['text']} - {v['reason']}" for v in violations]
+            )
+            self.issues.append(
+                {
+                    "check": "bad_reference_links",
+                    "severity": "HIGH",
+                    "message": f"Found {len(violations)} reference(s) with poor link text",
+                    "details": details,
+                    "fix": "Use descriptive anchor text (e.g., 'World Quality Report 2024')",
+                }
+            )
 
     def _check_defect_patterns(self, content: str, article_path: str = None):
         """

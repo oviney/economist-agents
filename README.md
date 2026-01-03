@@ -252,8 +252,10 @@ gh project list --owner oviney --web
 
 ### Documentation
 
-- **Complete Web UI Guide**: [skills/github-features/SKILL.md](skills/github-features/SKILL.md)
-- **Step-by-Step Tutorial**: [docs/GITHUB_FEATURES_TUTORIAL.md](docs/GITHUB_FEATURES_TUTORIAL.md)
+**For AI Agents** (primary learning method):
+- **GitHub Features Skill**: [skills/github-features/SKILL.md](skills/github-features/SKILL.md) - Complete reference for GitHub's web UI, live dashboards, and reporting capabilities
+
+**Additional References**:
 - **Quick Reference URLs**: [docs/GITHUB_REPORTING_QUICK_REFERENCE.md](docs/GITHUB_REPORTING_QUICK_REFERENCE.md)
 - **Sprint Integration**: [docs/GITHUB_WORKFLOW_GUIDE.md](docs/GITHUB_WORKFLOW_GUIDE.md)
 

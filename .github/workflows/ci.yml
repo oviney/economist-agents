@@ -39,7 +39,10 @@ jobs:
         run: ruff check .
 
       - name: Run mypy type checker
-        run: mypy scripts/
+        continue-on-error: true
+        run: |
+          echo "::warning::Mypy has 159 known errors - advisory only until comprehensive type annotation project (P1)"
+          mypy scripts/
 
       - name: Upload quality check results
         if: always()

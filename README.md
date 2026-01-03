@@ -206,6 +206,59 @@ python3 scripts/validate_badges.py
 
 All badges use shields.io endpoint format with JSON files in repo root for dynamic updates.
 
+## 📊 GitHub Native Project Tracking
+
+**No external tools or local files needed!** All reporting done through GitHub's **live web interface**:
+
+- **📋 GitHub Projects** - Live Kanban boards that update automatically
+- **📈 Insights & Analytics** - Real-time contributor graphs and code frequency
+- **🎯 Issues & Milestones** - Live progress bars showing sprint completion
+- **💻 GitHub CLI** - Quick commands to open dashboards in browser
+
+### Essential Dashboard URLs
+
+```bash
+# My work (bookmark this!)
+https://github.com/issues/assigned/@me
+
+# Current sprint progress (live progress bar)
+https://github.com/oviney/economist-agents/milestone/9
+
+# Team activity (updates automatically)
+https://github.com/oviney/economist-agents/pulse
+
+# Sprint board (drag-and-drop cards)
+https://github.com/users/oviney/projects/1
+
+# Team velocity (live charts)
+https://github.com/oviney/economist-agents/graphs/contributors
+```
+
+### Quick Commands (Open in Browser)
+
+```bash
+# Install GitHub CLI
+brew install gh && gh auth login
+
+# Open sprint milestone in browser
+gh milestone view "Sprint 9" --web
+
+# Open my assigned issues in browser
+gh issue list --assignee @me --web
+
+# Open sprint project board
+gh project list --owner oviney --web
+```
+
+### Documentation
+
+- **Complete Web UI Guide**: [skills/github-features/SKILL.md](skills/github-features/SKILL.md)
+- **Step-by-Step Tutorial**: [docs/GITHUB_FEATURES_TUTORIAL.md](docs/GITHUB_FEATURES_TUTORIAL.md)
+- **Quick Reference URLs**: [docs/GITHUB_REPORTING_QUICK_REFERENCE.md](docs/GITHUB_REPORTING_QUICK_REFERENCE.md)
+- **Sprint Integration**: [docs/GITHUB_WORKFLOW_GUIDE.md](docs/GITHUB_WORKFLOW_GUIDE.md)
+
+**Everything is live, nothing is static!** 🎉
+
 ## 📖 Glossary
 
 **Multi-Agent System:** AI architecture where specialized agents (personas) collaborate on complex tasks. Each agent has a specific role (research, writing, editing) and they communicate through structured data exchanges.

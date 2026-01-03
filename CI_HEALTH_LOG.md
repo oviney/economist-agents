@@ -18,14 +18,14 @@
 
 **Expected Test Failures**: 29 failures (categorized)
 - Mock setup issues (18): test_economist_agent.py
-- Research Agent interface (8): test_research_agent.py  
+- Research Agent interface (8): test_research_agent.py
 - Environment/API (3): test_editor_agent.py
 
 **GitHub Actions Status**: ⚠️ MANUAL VERIFICATION REQUIRED
 
 **Reason**: Push blocked by BUG-025 (pre-commit hook infinite loop). GitHub Issue #41 tracks this blocker.
 
-**Workaround Applied**: 
+**Workaround Applied**:
 - Commit succeeded with --no-verify flag (bypassing hooks)
 - Push attempted but hooks triggered again on push
 - Need to retry push or check Actions UI directly

@@ -52,7 +52,8 @@
           "name": "Enhance SM Agent for Autonomous Coordination",
           "points": 4,
           "priority": "P0",
-          "status": "not_started"
+          "status": "complete",
+          "completed_date": "2026-01-02T11:00:00"
         },
         {
           "id": 3,
@@ -74,7 +75,7 @@
         "Enable autonomous agent coordination (SM Agent >90% task assignment)",
         "Enable real-time monitoring (100% agent transitions tracked)"
       ],
-      "velocity": 3,
+      "velocity": 7,
       "ceremonies_complete": false,
       "retrospective_done": false,
       "backlog_refined": true,

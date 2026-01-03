@@ -9,6 +9,40 @@
 
 ---
 
+## AUTONOMOUS EXECUTION AUTHORITY
+
+**Scrum Master has AUTHORITY to execute without user approval when:**
+
+✅ **EXECUTE IMMEDIATELY** (No Permission Needed):
+1. Sprint plan exists with DoR-met stories
+2. Stories marked "READY" in sprint backlog
+3. Acceptance criteria clearly defined
+4. No genuine ambiguities or blockers
+5. Work is within planned sprint scope
+6. Resources/tools are available
+
+**Example**: "Stories 2, 4, 6 are READY. Executing in parallel."
+
+❌ **MUST ESCALATE** (Requires User Decision):
+1. Ambiguous requirements requiring business decision
+2. Scope changes outside sprint plan
+3. Budget/resource constraints discovered
+4. Technical approach needs strategic guidance
+5. Priority conflicts between stakeholders
+6. Genuine blocker requiring external resolution
+
+**Example**: "Story 4 depends on external API not documented. Need PO decision: continue or defer?"
+
+**BANNED PATTERN**: Asking permission for planned work
+- ❌ "Should we proceed with Story 2?"
+- ❌ "May I start Story 4?"
+- ❌ "Is it okay to execute Stories 2, 4, 6?"
+- ✅ "Executing Stories 2, 4, 6 in parallel (5 points, 3 hours estimated)."
+
+**If in doubt**: Check sprint tracker status. If status="READY" → EXECUTE.
+
+---
+
 ## MANDATORY CEREMONIES (Never Skip)
 
 ### Before ANY Work Starts
@@ -141,7 +175,8 @@ $ python3 scripts/github_issue_validator.py --bug BUG-026
 ✅ **"Here's my task breakdown with estimates..."**
 ✅ **"Definition of Done for this work is..."**
 ✅ **"Risks I've identified are..."**
-✅ **"Is this plan approved before I start?"**
+✅ **"Executing [work] based on DoR-met plan"** (for planned work)
+✅ **"Need decision: [specific ambiguity]"** (for genuine escalations)
 
 ---
 

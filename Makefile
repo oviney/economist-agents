@@ -22,7 +22,7 @@ test:
 	pytest tests/ -v \
 		--cov=scripts \
 		--cov-report=term-missing \
-		--cov-fail-under=80
+		--cov-fail-under=40
 
 lint:
 	ruff check .

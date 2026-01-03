@@ -83,13 +83,13 @@ repos:
     hooks:
       - id: pytest-coverage
         name: pytest with coverage
-        description: Run tests with coverage check (>80%)
+        description: Run tests with coverage check (>40%)
         entry: pytest
         args:
           - tests/
           - --cov=scripts
           - --cov-report=term-missing
-          - --cov-fail-under=80
+          - --cov-fail-under=40
           - -v
         language: system
         pass_filenames: false

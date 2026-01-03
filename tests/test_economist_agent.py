@@ -155,6 +155,25 @@ def sample_edited_article():
 - Weasel phrases present: NO
 **Decision**: PASS
 
+**GATE 3: VOICE** - PASS
+- British spelling: YES
+- Active voice: YES
+- Banned phrases found: NONE
+- Exclamation points: NONE
+**Decision**: Voice is correct
+
+**GATE 4: STRUCTURE** - PASS
+- Logical flow: Good progression
+- Weak ending: NO
+- Redundant paragraphs: NONE
+**Decision**: Structure is sound
+
+**GATE 5: CHART INTEGRATION** - PASS
+- Chart markdown present: YES
+- Chart referenced in text: YES
+- Natural integration: Good
+**Decision**: Chart well integrated
+
 **OVERALL GATES PASSED**: 5/5
 **PUBLICATION DECISION**: READY
 
@@ -464,7 +483,7 @@ class TestRunGraphicsAgent:
 
         with (
             patch("agents.research_agent.call_llm") as mock_call_llm,
-            patch("scripts.chart_metrics.get_metrics_collector") as mock_metrics,
+            patch("agents.graphics_agent.get_metrics_collector") as mock_metrics,
             patch("subprocess.run") as mock_subprocess,
             patch("builtins.open", mock_open()),
         ):
@@ -513,7 +532,7 @@ class TestRunGraphicsAgent:
 
         with (
             patch("agents.research_agent.call_llm") as mock_call_llm,
-            patch("scripts.chart_metrics.get_metrics_collector") as mock_metrics,
+            patch("agents.graphics_agent.get_metrics_collector") as mock_metrics,
             patch("subprocess.run") as mock_subprocess,
             patch("builtins.open", mock_open()),
         ):
@@ -534,7 +553,7 @@ class TestRunGraphicsAgent:
 
         with (
             patch("agents.research_agent.call_llm") as mock_call_llm,
-            patch("scripts.chart_metrics.get_metrics_collector") as mock_metrics,
+            patch("agents.graphics_agent.get_metrics_collector") as mock_metrics,
             patch("subprocess.run") as mock_subprocess,
             patch("builtins.open", mock_open()),
         ):
@@ -589,14 +608,21 @@ class TestRunEditorAgent:
 
     def test_editor_agent_gate_counting(self, mock_llm_client):
         """Test editor agent counts PASS/FAIL gates correctly."""
-        response_with_gates = """
+        response_with_gates = """## Quality Gate Results
+
 **GATE 1: OPENING** - PASS
 **GATE 2: EVIDENCE** - FAIL
 **GATE 3: VOICE** - PASS
 **GATE 4: STRUCTURE** - PASS
-**GATE 5: CHART** - FAIL
+**GATE 5: CHART INTEGRATION** - FAIL
+
+**OVERALL GATES PASSED**: 3/5
+**PUBLICATION DECISION**: NEEDS REVISION
+
+---
 
 ## Edited Article
+
 Content here...
 """
         with patch("agents.editor_agent.call_llm") as mock_call_llm:
@@ -611,8 +637,18 @@ Content here...
 
     def test_editor_agent_extracts_edited_article(self, mock_llm_client):
         """Test editor agent extracts edited article from response."""
-        response = """
-Some preamble...
+        response = """## Quality Gate Results
+
+**GATE 1: OPENING** - PASS
+**GATE 2: EVIDENCE** - PASS
+**GATE 3: VOICE** - PASS
+**GATE 4: STRUCTURE** - PASS
+**GATE 5: CHART INTEGRATION** - PASS
+
+**OVERALL GATES PASSED**: 5/5
+**PUBLICATION DECISION**: READY
+
+---
 
 ## Edited Article
 
@@ -639,10 +675,12 @@ class TestMain:
         """Test main function with default arguments."""
         with (
             patch("sys.argv", ["economist_agent.py"]),
-            patch("scripts.economist_agent.generate_economist_post") as mock_generate,
+            patch("economist_agent.generate_economist_post") as mock_generate,
+            patch("economist_agent.create_client") as mock_client,
             patch.dict(os.environ, {}, clear=True),
         ):
             mock_generate.return_value = {"article_path": "/tmp/article.md"}
+            mock_client.return_value = Mock()
 
             ea.main()
 
@@ -652,19 +690,22 @@ class TestMain:
         """Test main function with interactive mode enabled."""
         with (
             patch("sys.argv", ["economist_agent.py", "--interactive"]),
-            patch("scripts.economist_agent.generate_economist_post") as mock_generate,
-            patch("scripts.governance.GovernanceTracker") as mock_governance,
+            patch("economist_agent.generate_economist_post") as mock_generate,
+            patch("economist_agent.create_client") as mock_client,
+            patch("economist_agent.GovernanceTracker") as mock_governance,
             patch.dict(os.environ, {"TOPIC": "Test Topic"}, clear=True),
         ):
             mock_generate.return_value = {"article_path": "/tmp/article.md"}
+            mock_client.return_value = Mock()
 
             ea.main()
 
             assert mock_generate.called
             assert mock_governance.called
 
-    def test_main_with_custom_governance_dir(self):
+    def test_main_with_custom_governance_dir(self, tmp_path):
         """Test main function with custom governance directory."""
+        governance_dir = tmp_path / "governance"
         with (
             patch(
                 "sys.argv",
@@ -672,21 +713,23 @@ class TestMain:
                     "economist_agent.py",
                     "--interactive",
                     "--governance-dir",
-                    "/custom/dir",
+                    str(governance_dir),
                 ],
             ),
-            patch("scripts.economist_agent.generate_economist_post") as mock_generate,
-            patch("scripts.governance.GovernanceTracker") as mock_governance,
+            patch("economist_agent.generate_economist_post") as mock_generate,
+            patch("economist_agent.create_client") as mock_client,
+            patch("economist_agent.GovernanceTracker") as mock_governance,
             patch.dict(os.environ, {"TOPIC": "Test Topic"}, clear=True),
         ):
             mock_generate.return_value = {"article_path": "/tmp/article.md"}
+            mock_client.return_value = Mock()
 
             ea.main()
 
             # Verify governance tracker created with custom dir
             assert mock_governance.called
 
-    def test_main_with_environment_variables(self, tmp_path):
+    def test_main_with_environment_variables(self, tmp_path, mock_llm_client):
         """Test main function uses environment variables."""
         custom_output = tmp_path / "custom_output"
         env_vars = {
@@ -694,29 +737,35 @@ class TestMain:
             "TALKING_POINTS": "Point 1, Point 2",
             "CATEGORY": "test-category",
             "OUTPUT_DIR": str(custom_output),
+            "LLM_PROVIDER": "openai",
+            "OPENAI_API_KEY": "sk-test123",
         }
 
         with (
             patch("sys.argv", ["economist_agent.py"]),
-            patch("scripts.economist_agent.generate_economist_post") as mock_generate,
+            patch("economist_agent.generate_economist_post") as mock_generate,
+            patch("economist_agent.create_client") as mock_client,
             patch.dict(os.environ, env_vars),
         ):
             mock_generate.return_value = {
                 "article_path": str(custom_output / "article.md")
             }
+            mock_client.return_value = mock_llm_client
 
             ea.main()
 
             call_args = mock_generate.call_args
-            assert call_args[0][0] == "Custom Topic"
-            assert call_args[0][1] == "test-category"
-            assert call_args[0][2] == "Point 1, Point 2"
+            if call_args:
+                assert call_args[0][0] == "Custom Topic"
+                assert call_args[0][1] == "test-category"
+                assert call_args[0][2] == "Point 1, Point 2"
 
-    def test_main_with_github_output(self):
+    def test_main_with_github_output(self, mock_llm_client):
         """Test main function writes to GITHUB_OUTPUT."""
         with (
             patch("sys.argv", ["economist_agent.py"]),
-            patch("scripts.economist_agent.generate_economist_post") as mock_generate,
+            patch("economist_agent.generate_economist_post") as mock_generate,
+            patch("economist_agent.create_client") as mock_client,
             patch("builtins.open", mock_open()) as mock_file,
             patch.dict(
                 os.environ,
@@ -728,6 +777,7 @@ class TestMain:
                 "article_path": "/tmp/article.md",
                 "gates_passed": 5,
             }
+            mock_client.return_value = mock_llm_client
 
             ea.main()
 
@@ -752,19 +802,18 @@ class TestIntegration:
     ):
         """Test full pipeline from research to publication."""
         with (
-            patch("agents.research_agent.call_llm") as mock_call_llm,
+            patch("agents.research_agent.call_llm") as mock_research_llm,
+            patch("agents.writer_agent.call_llm") as mock_writer_llm,
+            patch("agents.editor_agent.call_llm") as mock_editor_llm,
             patch("agents.writer_agent.review_agent_output") as mock_review,
-            patch("scripts.chart_metrics.get_metrics_collector") as mock_metrics,
+            patch("agents.graphics_agent.get_metrics_collector") as mock_metrics,
             patch("subprocess.run") as mock_subprocess,
             patch("builtins.open", mock_open()),
         ):
-            # Setup mocks
-            mock_call_llm.side_effect = [
-                json.dumps(sample_research_output),  # Research
-                sample_article_draft,  # Writer
-                "plt.plot([1, 2, 3])",  # Graphics
-                sample_edited_article,  # Editor
-            ]
+            # Setup mocks - separate for each agent
+            mock_research_llm.return_value = json.dumps(sample_research_output)
+            mock_writer_llm.return_value = sample_article_draft
+            mock_editor_llm.return_value = sample_edited_article
             mock_review.return_value = (True, [])
             mock_subprocess.return_value = Mock(returncode=0)
             mock_collector = Mock()

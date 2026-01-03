@@ -117,7 +117,7 @@ def mock_editor_response():
 - Natural integration: Good
 **Decision**: Chart well integrated
 
-**OVERALL GATES MET**: 5/5
+**OVERALL GATES PASSED**: 5/5
 **PUBLICATION DECISION**: READY
 
 ---
@@ -228,7 +228,7 @@ def test_edit_with_failures(mock_client, sample_draft):
 **GATE 4: STRUCTURE** - PASS
 **GATE 5: CHART INTEGRATION** - PASS
 
-**OVERALL GATES MET**: 3/5
+**OVERALL GATES PASSED**: 3/5
 **PUBLICATION DECISION**: NEEDS REVISION"""
 
     agent = EditorAgent(mock_client)
@@ -540,9 +540,10 @@ def test_edit_with_empty_response(mock_client, sample_draft):
     with patch("agents.editor_agent.call_llm", return_value=""):
         edited, gates_passed, gates_failed = agent.edit(sample_draft)
 
-    assert edited == ""
+    # Should return draft unchanged when response is invalid
+    assert edited == sample_draft
     assert gates_passed == 0
-    assert gates_failed == 0
+    assert gates_failed == 5  # All gates fail when format invalid
 
 
 def test_edit_with_no_article_section(mock_client, sample_draft):
@@ -553,8 +554,8 @@ def test_edit_with_no_article_section(mock_client, sample_draft):
     with patch("agents.editor_agent.call_llm", return_value=response):
         edited, gates_passed, gates_failed = agent.edit(sample_draft)
 
-    # Should return full response when no section marker found
-    assert "GATE 1" in edited
+    # Should return draft unchanged when format invalid (no proper gates section)
+    assert edited == sample_draft
 
 
 def test_validate_opening_multiline():

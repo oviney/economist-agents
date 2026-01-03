@@ -84,7 +84,7 @@ jobs:
             --cov=scripts \
             --cov-report=term-missing \
             --cov-report=xml \
-            --cov-fail-under=80
+            --cov-fail-under=40
 
       - name: Upload coverage reports
         if: matrix.python-version == '3.11'

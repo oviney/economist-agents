@@ -36,8 +36,12 @@ class ChartMetricsCollector:
     def _load_metrics(self) -> dict[str, Any]:
         """Load existing metrics or create new"""
         if self.metrics_file.exists() and self.metrics_file.stat().st_size > 0:
-            with open(self.metrics_file) as f:
-                return json.load(f)
+            try:
+                with open(self.metrics_file) as f:
+                    return json.load(f)
+            except (json.JSONDecodeError, ValueError):
+                # Corrupted file, recreate
+                return self._create_default_metrics()
         else:
             return self._create_default_metrics()
 

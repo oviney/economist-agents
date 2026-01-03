@@ -119,7 +119,7 @@ class TestResearchAgent:
         assert agent.client == mock_client
         assert agent.governance == mock_governance
 
-    @patch("scripts.llm_client.call_llm")
+    @patch("agents.research_agent.call_llm")
     @patch("agents.research_agent.review_agent_output")
     def test_research_success(
         self, mock_review, mock_call_llm, mock_client, sample_research_response
@@ -151,7 +151,7 @@ class TestResearchAgent:
         # Verify self-validation was called
         mock_review.assert_called_once_with("research_agent", result)
 
-    @patch("scripts.llm_client.call_llm")
+    @patch("agents.research_agent.call_llm")
     @patch("agents.research_agent.review_agent_output")
     def test_research_with_governance_logging(
         self,
@@ -199,7 +199,7 @@ class TestResearchAgent:
         with pytest.raises(ValueError, match="Topic too short"):
             agent.research("AI")
 
-    @patch("scripts.llm_client.call_llm")
+    @patch("agents.research_agent.call_llm")
     @patch("agents.research_agent.review_agent_output")
     def test_research_handles_malformed_json(
         self, mock_review, mock_call_llm, mock_client
@@ -218,7 +218,7 @@ class TestResearchAgent:
         assert result["raw_research"] == "This is not JSON at all"
         assert result["chart_data"] is None
 
-    @patch("scripts.llm_client.call_llm")
+    @patch("agents.research_agent.call_llm")
     @patch("agents.research_agent.review_agent_output")
     def test_research_with_unverified_claims(
         self, mock_review, mock_call_llm, mock_client, capsys
@@ -251,7 +251,7 @@ class TestResearchAgent:
         captured = capsys.readouterr()
         assert "3 unverified claims flagged" in captured.out
 
-    @patch("scripts.llm_client.call_llm")
+    @patch("agents.research_agent.call_llm")
     @patch("agents.research_agent.review_agent_output")
     def test_research_validation_failure_logged(
         self, mock_review, mock_call_llm, mock_client, sample_research_response, capsys
@@ -286,7 +286,7 @@ class TestResearchAgent:
 class TestBackwardCompatibility:
     """Test backward compatibility with original function."""
 
-    @patch("scripts.llm_client.call_llm")
+    @patch("agents.research_agent.call_llm")
     @patch("agents.research_agent.review_agent_output")
     def test_run_research_agent_function(
         self, mock_review, mock_call_llm, mock_client, sample_research_response
@@ -304,7 +304,7 @@ class TestBackwardCompatibility:
         assert "data_points" in result
         assert len(result["data_points"]) == 2
 
-    @patch("scripts.llm_client.call_llm")
+    @patch("agents.research_agent.call_llm")
     @patch("agents.research_agent.review_agent_output")
     def test_run_research_agent_with_all_params(
         self,
@@ -396,7 +396,7 @@ Hope this helps!"""
 class TestIntegrationScenarios:
     """Test end-to-end integration scenarios."""
 
-    @patch("scripts.llm_client.call_llm")
+    @patch("agents.research_agent.call_llm")
     @patch("agents.research_agent.review_agent_output")
     def test_full_research_pipeline(
         self, mock_review, mock_call_llm, mock_client, sample_research_response, capsys

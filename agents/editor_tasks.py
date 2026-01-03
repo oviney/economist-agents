@@ -268,22 +268,29 @@ def parse_quality_gates(response: str) -> dict[str, Any]:
     Returns:
         Parsed gate results with counts and details
     """
-    # Count PASS/FAIL occurrences
-    gates_passed = response.upper().count("PASS")
-    gates_failed = response.upper().count("FAIL")
-
-    # Extract individual gate results
+    # Extract individual gate results first to get accurate count
     gate_results = {}
+    gates_passed = 0
+    gates_failed = 0
+
     for i in range(1, 6):
-        gate_name = f"GATE {i}"
-        if gate_name in response.upper():
-            # Find the decision line
-            gate_section = response[response.upper().find(gate_name) :]
-            decision_start = gate_section.find("**Decision**:")
-            if decision_start != -1:
-                decision_line = gate_section[decision_start : decision_start + 200]
-                is_pass = "PASS" in decision_line.upper()
-                gate_results[f"gate_{i}"] = "PASS" if is_pass else "FAIL"
+        gate_pattern = f"**GATE {i}:"
+        if gate_pattern in response:
+            # Find the gate line (e.g., "**GATE 1: OPENING** - PASS")
+            gate_section = response[response.find(gate_pattern) :]
+            gate_line_end = gate_section.find("\n")
+            if gate_line_end != -1:
+                gate_line = gate_section[:gate_line_end]
+            else:
+                # No newline found, take the whole remaining section
+                gate_line = gate_section
+
+            if " - PASS" in gate_line or " - [PASS]" in gate_line:
+                gate_results[f"gate_{i}"] = "PASS"
+                gates_passed += 1
+            elif " - FAIL" in gate_line or " - [FAIL]" in gate_line:
+                gate_results[f"gate_{i}"] = "FAIL"
+                gates_failed += 1
 
     # Check for edited article section
     has_edited_article = "## Edited Article" in response

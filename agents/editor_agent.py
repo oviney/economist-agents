@@ -334,6 +334,29 @@ class EditorAgent:
         """
         self.client = client
         self.governance = governance
+        self.metrics = {
+            "gates_passed": 0,
+            "gates_failed": 0,
+            "edits_made": 0,
+            "quality_issues": [],
+        }
+
+    def validate_draft(self, draft: str) -> None:
+        """Validate draft before editing.
+
+        Args:
+            draft: Article draft to validate
+
+        Raises:
+            ValueError: If draft is invalid or too short
+        """
+        if not draft or not isinstance(draft, str):
+            raise ValueError(
+                f"Invalid draft. Expected non-empty string, got: {type(draft).__name__}"
+            )
+
+        if len(draft.strip()) < 100:
+            raise ValueError("Draft too short. Need at least 100 characters.")
 
     def edit(self, draft: str) -> tuple[str, int, int]:
         """Review and edit article draft through quality gates.
@@ -387,6 +410,13 @@ class EditorAgent:
 
         # Extract edited article
         edited_article = self._extract_edited_article(response)
+
+        # Update metrics
+        self.metrics["gates_passed"] = gates_passed
+        self.metrics["gates_failed"] = gates_failed
+        self.metrics["edits_made"] += 1
+        if gates_failed > 0:
+            self.metrics["quality_issues"].append(f"{gates_failed} gates failed")
 
         # Log to governance if available
         if self.governance:
@@ -498,17 +528,17 @@ class EditorAgent:
         lines = response.split("\n")
         article_start = -1
         for i, line in enumerate(lines):
-            if line.strip() == "---" and i > 0:
-                # Check if this is start of article (after gate results)
-                if any(
+            if (
+                line.strip() == "---"
+                and i > 0
+                and any(
                     gate_text in "\n".join(lines[:i])
                     for gate_text in ["**GATE", "Quality Gate Results"]
-                ):
-                    article_start = i
-                    break
-
-        if article_start > 0:
-            return "\n".join(lines[article_start:]).strip()
+                )
+            ):
+                article_start = i
+                break
+        return "\n".join(lines[article_start:]).strip()
 
         # Last resort: return everything after PUBLICATION DECISION
         if "**PUBLICATION DECISION**:" in response:

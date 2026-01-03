@@ -31,7 +31,7 @@ import yaml
 
 # CrewAI is optional - delay import to avoid breaking pytest collection
 Agent = None
-try:
+try:  # noqa: SIM105
     from crewai import Agent
 except ImportError:
     pass  # CrewAI not installed - will error if AgentFactory is actually used

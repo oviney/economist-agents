@@ -22,8 +22,8 @@ _scripts_dir = Path(__file__).parent.parent / "scripts"
 if str(_scripts_dir) not in sys.path:
     sys.path.insert(0, str(_scripts_dir))
 
-from publication_validator import PublicationValidator
-from writer_agent import WriterAgent
+from publication_validator import PublicationValidator  # noqa: E402
+from writer_agent import WriterAgent  # noqa: E402
 
 
 class TestWriterAgentReferences:

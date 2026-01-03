@@ -24,8 +24,8 @@ for dir_path in [_project_root, _scripts_dir, _agents_dir]:
     if str(dir_path) not in sys.path:
         sys.path.insert(0, str(dir_path))
 
-from editor_agent import run_editor_agent
-from llm_client import create_llm_client
+from editor_agent import run_editor_agent  # noqa: E402
+from llm_client import create_llm_client  # noqa: E402
 
 # Test topics for variety
 TEST_TOPICS = [

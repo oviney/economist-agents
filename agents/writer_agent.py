@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 try:
-    import orjson
+    import orjson  # noqa: F401
 
     HAS_ORJSON = True
 except ImportError:
@@ -24,9 +24,9 @@ _scripts_dir = Path(__file__).parent.parent / "scripts"
 if str(_scripts_dir) not in sys.path:
     sys.path.insert(0, str(_scripts_dir))
 
-from agent_reviewer import review_agent_output  # type: ignore
-from governance import GovernanceTracker  # type: ignore
-from llm_client import call_llm  # type: ignore
+from agent_reviewer import review_agent_output  # type: ignore  # noqa: E402
+from governance import GovernanceTracker  # type: ignore  # noqa: E402
+from llm_client import call_llm  # type: ignore  # noqa: E402
 
 # ═══════════════════════════════════════════════════════════════════════════
 # WRITER AGENT PROMPT

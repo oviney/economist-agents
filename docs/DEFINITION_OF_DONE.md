@@ -28,11 +28,21 @@ A story is **DONE** when ALL of the following are TRUE:
 - [ ] **No skipped tests** without documented reason
 - [ ] **Security scan passing** (bandit, no HIGH/CRITICAL issues)
 
+**CI/CD Fix Validation** (when fixing broken build):
+- [ ] **Full test suite run locally** before push (all passing tests still pass)
+- [ ] **Build status verified within 5 min** of push (monitored on GitHub Actions)
+- [ ] **If build fails**: Blocker created immediately, team notified
+- [ ] **Fix documented** in CI_HEALTH_LOG.md (what broke, what fixed, what remains)
+- [ ] **Prevention measures** identified and added to backlog
+
 **RED BUILD = P0 BLOCKER**:
 - If CI fails, stop all sprint work
 - Investigate root cause immediately
 - Fix before resuming development
 - Report to team at next standup
+- Validate fix locally before pushing
+- Monitor GitHub Actions within 5 minutes
+- Document in CI_HEALTH_LOG.md
 
 ### 3. Documentation ✅
 
@@ -202,12 +212,33 @@ Approval: @product-owner (2026-01-02)
 
 ---
 
+## CI/CD Health Log
+
+**NEW - Sprint 9 Story 0 Addition**:
+
+**File**: `docs/CI_HEALTH_LOG.md`
+
+**Purpose**: Track all CI/CD incidents, fixes, and prevention measures
+
+**Required Entries**:
+- Every red build incident
+- Every fix attempt (success or failure)
+- Root cause analysis
+- Prevention measures identified
+- Time metrics (detection, fix, resolution)
+
+**Review Frequency**: Weekly in sprint retrospective
+
+---
+
 ## Related Documents
 
+- [QUALITY_ENFORCER_RESPONSIBILITIES.md](QUALITY_ENFORCER_RESPONSIBILITIES.md) - DevOps role
 - [SCRUM_MASTER_PROTOCOL.md](SCRUM_MASTER_PROTOCOL.md) - Process discipline
 - [SPRINT_CEREMONY_GUIDE.md](SPRINT_CEREMONY_GUIDE.md) - Ceremony automation
 - [DEFECT_PREVENTION.md](DEFECT_PREVENTION.md) - Quality gates
 - [ADR-004-python-version-constraint.md](ADR-004-python-version-constraint.md) - Python version policy
+- [CI_HEALTH_LOG.md](CI_HEALTH_LOG.md) - CI/CD incident tracking
 
 ---
 

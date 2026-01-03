@@ -6,7 +6,7 @@
             "id": "FEATURE-001",
             "type": "enhancement",
             "priority": "high",
-            "status": "backlog",
+            "status": "completed",
             "title": "Add references/citations section to generated articles",
             "description": "Enhance Writer Agent to include properly formatted references section citing sources used in article research. This improves content credibility and provides readers with source attribution.",
             "user_story": "As a reader, I need to see references and citations for article claims so that I can verify information and explore sources.",

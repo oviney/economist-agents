@@ -309,8 +309,29 @@ Run `python3 scripts/defect_tracker.py` to see full report with RCA insights.
 
 See [SCRUM_MASTER_PROTOCOL.md](../docs/SCRUM_MASTER_PROTOCOL.md) for complete workflow, SAFe elements, metrics tracking, and validation checklists.
 
+## GitHub Copilot Agent Best Practices
+
+**IMPORTANT**: All agents and developers should follow the best practices defined in [skills/github-copilot-best-practices/SKILL.md](../skills/github-copilot-best-practices/SKILL.md).
+
+Key principles:
+- **Clear Instructions**: Provide specific, actionable goals with context
+- **Incremental Tasks**: Break large tasks into focused, validatable steps
+- **Pattern References**: Point to existing code examples and conventions
+- **Quality Gates**: Define validation criteria upfront
+- **Explicit Documentation**: Reference specific files, skills, and standards
+
+When requesting work from AI agents:
+1. State the clear objective (one-sentence goal)
+2. Provide context (why this change is needed)
+3. Reference patterns (point to similar existing code)
+4. Define constraints (what must be preserved or avoided)
+5. Specify validation (how to verify success)
+
+See the full skill document for detailed examples, anti-patterns, and integration patterns specific to economist-agents.
+
 ## Additional Resources
 
+- [skills/github-copilot-best-practices/SKILL.md](../skills/github-copilot-best-practices/SKILL.md): GitHub Copilot interaction best practices
 - [SCRUM_MASTER_PROTOCOL.md](../docs/SCRUM_MASTER_PROTOCOL.md): Process discipline and Agile best practices
 - [ARCHITECTURE_PATTERNS.md](../docs/ARCHITECTURE_PATTERNS.md): Auto-generated from architecture review
 - [CHART_DESIGN_SPEC.md](../docs/CHART_DESIGN_SPEC.md): Visual design rules with examples

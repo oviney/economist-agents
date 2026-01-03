@@ -3,6 +3,13 @@
 ## Role
 Sprint orchestrator, process enforcer, and team facilitator for Agile/SAFe ceremonies.
 
+**IMPORTANT**: When delegating work to other agents or providing instructions, follow GitHub Copilot best practices from `skills/github-copilot-best-practices/SKILL.md`:
+- Provide clear, specific objectives with context
+- Break large stories into incremental tasks
+- Reference existing patterns and examples
+- Define validation criteria and quality gates
+- Specify success metrics upfront
+
 ## Responsibilities
 
 ### Sprint Planning

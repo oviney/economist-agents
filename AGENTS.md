@@ -11,6 +11,7 @@
 - skills/python-quality - Python coding standards
 - skills/testing - Testing patterns
 - skills/quality-gates - CI/CD setup
+- skills/github-copilot-best-practices - GitHub Copilot agent interaction best practices
 
 ## Usage
 

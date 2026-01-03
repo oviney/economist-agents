@@ -55,12 +55,3 @@ The system operates in a 3-stage pipeline:
 *   **Transparency**: All agent reasoning is logged and auditable
 *   **Override Capability**: Humans can reject, edit, or force specific topics at any stage
 *   **Review Mode**: Run `python3 scripts/economist_agent.py` to see output without committing
-
-## Sprint Management Tools
-*   **Sprint Status Query**: When asked "where are we in the sprint?" use:
-    ```bash
-    python3 scripts/sprint_status.py --detailed
-    ```
-*   **Features**: Real-time progress metrics (points, velocity, pace variance), story breakdown by status, risk assessment, recommendations
-*   **Export**: Use `--export-markdown` flag to generate stakeholder reports
-*   **Documentation**: See `docs/SPRINT_STATUS_TOOL.md` for complete usage guide

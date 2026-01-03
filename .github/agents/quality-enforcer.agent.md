@@ -24,7 +24,33 @@ You are a quality enforcement specialist for the economist-agents repository.
 7. Extract hardcoded prompts to module-level constants
 8. Use `orjson` instead of `json`
 9. Run quality tools and fix violations
+## Git Workflow (Pre-Commit Hooks)
 
+When committing code, pre-commit hooks will auto-fix files (whitespace, EOF).
+This requires a two-step commit process:
+
+**Standard Workflow:**
+```bash
+# Step 1: Initial commit (triggers hooks)
+git add [files]
+git commit -m "message"
+
+# Step 2: If hooks modified files, commit the fixes
+git add -A
+git commit --amend --no-edit
+
+# Step 3: Push
+git push origin main
+```
+
+**Quick Workaround (bypasses hooks):**
+```bash
+git add -A
+git commit -m "message" --no-verify
+git push origin main
+```
+
+Use standard workflow by default. Use --no-verify only for urgent fixes.
 ## Before Making Changes
 
 Always run these commands first to understand current state:

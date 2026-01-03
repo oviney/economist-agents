@@ -484,21 +484,21 @@ git push origin main
 def commit_with_precommit_handling(message: str, max_retries: int = 3):
     """
     Commit with pre-commit hook handling.
-    
+
     Args:
         message: Commit message
         max_retries: Max attempts before failing (prevent infinite loop)
-    
+
     Returns:
         bool: True if committed successfully
     """
     for attempt in range(max_retries):
         # Attempt commit
         result = run_in_terminal(f'git commit -m "{message}"')
-        
+
         # Check if pre-commit modified files
         diff_check = run_in_terminal('git diff --quiet && git diff --cached --quiet')
-        
+
         if diff_check.exit_code == 0:
             # No modifications, commit succeeded
             return True
@@ -508,7 +508,7 @@ def commit_with_precommit_handling(message: str, max_retries: int = 3):
             # Retry with --no-verify to avoid double-running hooks
             result = run_in_terminal(f'git commit -m "{message}" --no-verify')
             return True
-    
+
     # Max retries reached
     raise RuntimeError(f"Failed to commit after {max_retries} attempts")
 ```
@@ -523,18 +523,18 @@ def test_git_commit_with_precommit_modifications():
     # Create test file with trailing whitespace (will be auto-fixed)
     with open('test_file.py', 'w') as f:
         f.write('# Test file   \n')  # Trailing spaces
-    
+
     # Stage and commit (pre-commit will remove spaces)
     run_in_terminal('git add test_file.py')
     success = commit_with_precommit_handling('Test commit')
-    
+
     # Assert commit succeeded
     assert success
-    
+
     # Assert file was modified (spaces removed)
     with open('test_file.py') as f:
         assert f.read() == '# Test file\n'
-    
+
     # Assert commit exists in git log
     log = run_in_terminal('git log -1 --oneline')
     assert 'Test commit' in log.stdout

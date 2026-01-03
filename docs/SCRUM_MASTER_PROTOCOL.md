@@ -486,7 +486,128 @@ Complete guide: [SPRINT_CEREMONY_GUIDE.md](SPRINT_CEREMONY_GUIDE.md)
 
 ---
 
+## GIT OPERATIONS (Temporary Rule - Until CrewAI Migration)
+
+**CRITICAL: Only @quality-enforcer performs git operations**
+
+### The Problem
+
+Parallel agents cause git conflicts in shared workspace:
+- Multiple agents running `git add/commit/push` simultaneously
+- Pre-commit hooks modify files after agent commits
+- Race conditions cause lost work and merge conflicts
+- No single source of truth for build status
+
+### The Solution
+
+**Single agent owns all git operations until CrewAI execution migrated (Sprint 10-11)**
+
+### Agent Responsibilities
+
+**All agents** (Research, Writer, Editor, Graphics, PO, SM):
+- ✅ Create/modify files as assigned
+- ✅ Signal completion to @scrum-master
+- ❌ DO NOT run `git add`, `git commit`, or `git push`
+- ❌ DO NOT interact with git directly
+
+**@quality-enforcer only**:
+- ✅ Collects completed work from all agents
+- ✅ Executes atomic commit: `git add -A && git commit -m "message"`
+- ✅ Handles pre-commit hook fixes automatically
+- ✅ Pushes to main branch
+- ✅ Reports build status to @scrum-master
+- ✅ Resolves any git conflicts
+
+**@scrum-master**:
+- ✅ Coordinates agent work (parallel execution)
+- ✅ Signals @quality-enforcer when work complete
+- ✅ Confirms commit success before resuming sprint
+- ❌ Does NOT run git operations
+
+### Workflow
+
+```
+1. Agents work in parallel (create/modify files)
+   Research → research_output.json
+   Writer → article.md
+   Graphics → chart.png
+
+2. Agents signal: "Files ready: [list]"
+   Research: "research_output.json ready"
+   Writer: "article.md ready"
+   Graphics: "chart.png ready"
+
+3. @scrum-master: Signals @quality-enforcer to commit
+   "All files ready. @quality-enforcer, please commit."
+
+4. @quality-enforcer: Collects all files, commits, pushes
+   git add -A
+   git commit -m "Sprint N Story X: Complete [details]"
+   git push origin main
+   "Commit successful: abc1234. Build status: GREEN"
+
+5. @scrum-master: Confirms commit, resumes sprint
+   "Commit confirmed. Proceeding to next story."
+```
+
+### Why This Works
+
+**Benefits**:
+- ✅ No git conflicts (single committer)
+- ✅ Atomic commits (all work in one commit)
+- ✅ Pre-commit hooks handled by single agent
+- ✅ Clear build status reporting
+- ✅ Agents focus on core work (not git operations)
+
+**Drawbacks**:
+- ⚠️ Temporary bottleneck (@quality-enforcer must be available)
+- ⚠️ Coordination overhead (signal-collect-commit)
+- ⚠️ Not true parallel completion (sequential commit)
+
+**Mitigation**:
+- This is TEMPORARY until CrewAI execution migrated
+- CrewAI provides proper multi-agent coordination
+- Expected: Sprint 10-11 migration complete
+
+### Expiration
+
+**This rule expires when**:
+- CrewAI execution fully migrated (Sprint 10-11)
+- CrewAI handles agent coordination and file management
+- Single execution context eliminates git conflicts
+
+**Until then**:
+- Strictly enforce: Only @quality-enforcer runs git operations
+- All other agents signal completion, do not commit
+- @scrum-master coordinates, does not execute git commands
+
+### Validation
+
+**Pre-commit checklist** (for @quality-enforcer only):
+```
+□ All agent files collected?
+□ git add -A executed?
+□ Pre-commit hooks passed? (or auto-fixed)
+□ Commit message follows convention?
+□ Push successful?
+□ Build status reported to @scrum-master?
+```
+
+**Process violation** (if any agent runs git):
+- Stop immediately
+- Revert partial commits
+- Let @quality-enforcer re-commit correctly
+- Document violation for retrospective
+
+---
+
 ## VERSION HISTORY
+
+**v1.3 (2026-01-02)**:
+- Added Git Operations section (temporary rule until CrewAI migration)
+- Only @quality-enforcer performs git operations (prevents parallel conflicts)
+- Workflow: Agents signal → @scrum-master coordinates → @quality-enforcer commits
+- Expires: Sprint 10-11 when CrewAI execution migrated
 
 **v1.2 (2026-01-02)**:
 - Enhanced DoR with Technical Prerequisites validation (Sprint 7 lesson)

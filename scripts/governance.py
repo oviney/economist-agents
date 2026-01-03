@@ -208,8 +208,10 @@ class InteractiveMode:
                 temp_path = f.name
 
             # Open in editor
+            import subprocess
+
             editor = os.environ.get("EDITOR", "nano")
-            os.system(f"{editor} {temp_path}")
+            subprocess.run([editor, temp_path], check=False)
 
             # Read edited content
             with open(temp_path) as f:

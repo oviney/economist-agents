@@ -169,7 +169,7 @@ def generate_featured_image(
             # Image returned as URL, need to download
             import requests
 
-            image_response = requests.get(image_data.url)
+            image_response = requests.get(image_data.url, timeout=30)
             image_response.raise_for_status()
             image_bytes = image_response.content
         else:

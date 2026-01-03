@@ -1,17 +1,17 @@
 {
   "errors": [],
-  "generated_at": "2026-01-03T03:38:51Z",
+  "generated_at": "2026-01-03T06:10:03Z",
   "metrics": {
     "_totals": {
-      "CONFIDENCE.HIGH": 56,
-      "CONFIDENCE.LOW": 1,
+      "CONFIDENCE.HIGH": 57,
+      "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
       "CONFIDENCE.UNDEFINED": 0,
-      "SEVERITY.HIGH": 1,
-      "SEVERITY.LOW": 55,
-      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 57,
+      "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 13666,
+      "loc": 13831,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -115,7 +115,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 258,
+      "loc": 261,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -212,12 +212,12 @@
     },
     "scripts/featured_image_agent.py": {
       "CONFIDENCE.HIGH": 0,
-      "CONFIDENCE.LOW": 1,
+      "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
       "CONFIDENCE.UNDEFINED": 0,
       "SEVERITY.HIGH": 0,
       "SEVERITY.LOW": 0,
-      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
       "loc": 197,
       "nosec": 0,
@@ -288,6 +288,19 @@
       "nosec": 0,
       "skipped_tests": 0
     },
+    "scripts/github_issue_validator.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 161,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
     "scripts/github_sprint_sync.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
@@ -302,15 +315,15 @@
       "skipped_tests": 0
     },
     "scripts/governance.py": {
-      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.HIGH": 2,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
       "CONFIDENCE.UNDEFINED": 0,
-      "SEVERITY.HIGH": 1,
-      "SEVERITY.LOW": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 2,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 208,
+      "loc": 209,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -666,46 +679,5 @@
       "skipped_tests": 0
     }
   },
-  "results": [
-    {
-      "code": "171 \n172             image_response = requests.get(image_data.url)\n173             image_response.raise_for_status()\n",
-      "col_offset": 29,
-      "end_col_offset": 57,
-      "filename": "scripts/featured_image_agent.py",
-      "issue_confidence": "LOW",
-      "issue_cwe": {
-        "id": 400,
-        "link": "https://cwe.mitre.org/data/definitions/400.html"
-      },
-      "issue_severity": "MEDIUM",
-      "issue_text": "Call to requests without timeout",
-      "line_number": 172,
-      "line_range": [
-        172
-      ],
-      "more_info": "https://bandit.readthedocs.io/en/1.9.2/plugins/b113_request_without_timeout.html",
-      "test_id": "B113",
-      "test_name": "request_without_timeout"
-    },
-    {
-      "code": "211             editor = os.environ.get(\"EDITOR\", \"nano\")\n212             os.system(f\"{editor} {temp_path}\")\n213 \n",
-      "col_offset": 12,
-      "end_col_offset": 46,
-      "filename": "scripts/governance.py",
-      "issue_confidence": "HIGH",
-      "issue_cwe": {
-        "id": 78,
-        "link": "https://cwe.mitre.org/data/definitions/78.html"
-      },
-      "issue_severity": "HIGH",
-      "issue_text": "Starting a process with a shell, possible injection detected, security issue.",
-      "line_number": 212,
-      "line_range": [
-        212
-      ],
-      "more_info": "https://bandit.readthedocs.io/en/1.9.2/plugins/b605_start_process_with_a_shell.html",
-      "test_id": "B605",
-      "test_name": "start_process_with_a_shell"
-    }
-  ]
+  "results": []
 }

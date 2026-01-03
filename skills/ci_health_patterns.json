@@ -1,0 +1,148 @@
+{
+    "version": "1.0",
+    "last_updated": "2026-01-03T06:30:00Z",
+    "skills": {
+        "status_thresholds": {
+            "description": "Learned thresholds for CI health status classification",
+            "patterns": [
+                {
+                    "id": "green_threshold",
+                    "severity": "info",
+                    "pattern": "All recent runs passed (0 failures in last N runs)",
+                    "check": "consecutive_failures == 0",
+                    "action": "Continue normal work",
+                    "learned_from": "Historical baseline (2026-01-02)"
+                },
+                {
+                    "id": "yellow_threshold",
+                    "severity": "warning",
+                    "pattern": "1 recent failure (not consecutive)",
+                    "check": "consecutive_failures == 1",
+                    "action": "Monitor closely, check logs for transient issues",
+                    "learned_from": "Run #28 analysis (single format failure)"
+                },
+                {
+                    "id": "red_threshold",
+                    "severity": "critical",
+                    "pattern": "2+ consecutive failures (systematic issue)",
+                    "check": "consecutive_failures >= 2",
+                    "action": "P0 escalation - stop all work",
+                    "learned_from": "Runs #23-28 pattern (security vulnerabilities)"
+                }
+            ]
+        },
+        "failure_detection": {
+            "description": "Known failure patterns and their signatures",
+            "patterns": [
+                {
+                    "id": "security_scan_failure",
+                    "severity": "high",
+                    "pattern": "Bandit security scan finds HIGH or MEDIUM severity issues",
+                    "check": "Job 'Security Scan' failed with B605, B113, etc.",
+                    "root_cause": "Code contains security vulnerabilities",
+                    "resolution": "Fix security issues, re-run Bandit locally",
+                    "learned_from": "Runs #23-28 (BUG-026, BUG-027)"
+                },
+                {
+                    "id": "format_violation",
+                    "severity": "medium",
+                    "pattern": "Ruff format check fails",
+                    "check": "Job 'Code Quality Checks' fails on 'Run ruff format check'",
+                    "root_cause": "Code not formatted per ruff standards",
+                    "resolution": "Run 'ruff format .' locally, commit fixes",
+                    "learned_from": "Run #28 (6 files needed formatting)"
+                },
+                {
+                    "id": "test_failure_missing_mock",
+                    "severity": "high",
+                    "pattern": "Test fails with 'No API key found' in CI but passes locally",
+                    "check": "Test failure mentions ANTHROPIC_API_KEY or OPENAI_API_KEY",
+                    "root_cause": "Test missing mock fixture for LLM client",
+                    "resolution": "Add mock_llm_client fixture to test",
+                    "learned_from": "Run #28 (test_po_agent.py::test_initialization)"
+                },
+                {
+                    "id": "sprint_discipline_violation",
+                    "severity": "medium",
+                    "pattern": "Commit message doesn't reference story or use approved prefix",
+                    "check": "Job 'Validate Sprint Discipline' fails",
+                    "root_cause": "Commit message missing 'Story N', '#N', or 'docs:', 'chore:', 'ci:' prefix",
+                    "resolution": "Amend commit message with proper reference",
+                    "learned_from": "Run #29 (force push broke git history)"
+                },
+                {
+                    "id": "git_history_break",
+                    "severity": "high",
+                    "pattern": "Git revision range invalid after force push",
+                    "check": "'fatal: Invalid revision range' in logs",
+                    "root_cause": "Force push created new commit hash not in remote history",
+                    "resolution": "Push new commit instead of force push, or use --force-with-lease",
+                    "learned_from": "Run #62 (force push aftermath)"
+                }
+            ]
+        },
+        "escalation_triggers": {
+            "description": "When and how to escalate CI failures",
+            "patterns": [
+                {
+                    "id": "immediate_p0",
+                    "severity": "critical",
+                    "pattern": "2+ consecutive failures with same root cause",
+                    "check": "consecutive_failures >= 2 AND same_error_pattern",
+                    "action": "Create GitHub issue immediately, notify team, halt work",
+                    "learned_from": "Runs #23-28 (systematic security issue)"
+                },
+                {
+                    "id": "delayed_escalation",
+                    "severity": "warning",
+                    "pattern": "Single failure resolved in next run",
+                    "check": "consecutive_failures == 1 AND next_run == success",
+                    "action": "Document in CI_HEALTH_LOG.md, no issue needed",
+                    "learned_from": "Transient test failures pattern"
+                },
+                {
+                    "id": "create_github_issue",
+                    "severity": "high",
+                    "pattern": "RED status (2+ failures) detected",
+                    "check": "status == 'RED'",
+                    "action": "Run: python3 scripts/ci_health_monitor.py --create-issue",
+                    "learned_from": "CI monitoring automation (2026-01-03)"
+                }
+            ]
+        },
+        "response_protocols": {
+            "description": "Standard response procedures for different scenarios",
+            "patterns": [
+                {
+                    "id": "p0_security_incident",
+                    "severity": "critical",
+                    "pattern": "Security scan failure",
+                    "protocol": "1. STOP all work 2. Fix security issue 3. Test locally 4. Push fix 5. Monitor CI 6. Document",
+                    "sla": "< 1 hour to resolution",
+                    "learned_from": "BUG-026/027 (35 min resolution)"
+                },
+                {
+                    "id": "p1_format_violation",
+                    "severity": "medium",
+                    "pattern": "Format check failure",
+                    "protocol": "1. Run 'ruff format .' 2. Git add/commit 3. Push 4. Verify CI green",
+                    "sla": "< 15 minutes to resolution",
+                    "learned_from": "Run #28 (format fixes)"
+                },
+                {
+                    "id": "documentation_requirement",
+                    "severity": "info",
+                    "pattern": "Any CI incident resolved",
+                    "protocol": "Update docs/CI_HEALTH_LOG.md with: date, root cause, fix, prevention",
+                    "sla": "Within 24 hours of resolution",
+                    "learned_from": "CI health log established 2026-01-02"
+                }
+            ]
+        }
+    },
+    "validation_stats": {
+        "total_runs": 6,
+        "patterns_learned": 15,
+        "last_run": "2026-01-03T06:30:00Z"
+    }
+}

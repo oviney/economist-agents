@@ -55,7 +55,7 @@ def mock_llm_client():
 class TestProductOwnerAgent:
     """Test suite for ProductOwnerAgent"""
 
-    def test_initialization(self, temp_backlog):
+    def test_initialization(self, temp_backlog, mock_llm_client):
         """Test agent initialization with backlog file"""
         agent = ProductOwnerAgent(backlog_file=temp_backlog)
         assert agent.backlog_file == Path(temp_backlog)

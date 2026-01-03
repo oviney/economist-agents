@@ -1,5 +1,125 @@
 # Economist Agents - Development Log
 
+## 2026-01-02: BUG-025 Logged - Pre-commit Hook Loop Blocks Autonomous Git Operations
+
+### Summary
+Logged critical bug (HIGH severity) that blocks autonomous git operations. Pre-commit hooks modify files after commit, causing infinite retry loop. Agent workflows need enhancement to detect pre-commit modifications and re-stage changes.
+
+### Bug Details
+
+**BUG-025: Pre-commit hooks cause infinite commit loop** (GitHub Issue #41)
+- **Severity**: HIGH
+- **Component**: git_workflow
+- **Responsible Agent**: quality_enforcer
+- **Discovered**: Development (2026-01-02)
+- **Impact**: Blocks autonomous operations - agents cannot push code
+
+**Current Behavior** (Infinite Loop):
+1. Agent: `git commit -m "message"`
+2. Pre-commit: Modifies files (whitespace, EOF fixes)
+3. Git: Commit fails (working directory dirty)
+4. Agent: Tries `git push` (nothing to push)
+5. Agent: Retries from step 1 → **infinite loop**
+
+**Expected Behavior**:
+1. Agent: `git commit -m "message"`
+2. Pre-commit: Modifies files
+3. Agent: Detects modification, runs `git add . && git commit -m "message"`
+4. Agent: `git push` succeeds
+
+**Root Cause**:
+- **Integration Error**: Pre-commit hooks modify files after commit attempt
+- Agent workflow does not detect post-commit file changes
+- No re-staging logic for pre-commit auto-fixes
+
+**Test Gap**:
+- **Type**: integration_test
+- **Missing**: Git workflow with pre-commit hooks integration test
+- **Coverage**: 42.9% integration test gap (Sprint 7 finding)
+
+### Workaround (Manual)
+
+```bash
+git add -A && git commit -m "message" --no-verify && git push
+```
+
+**Note**: `--no-verify` bypasses pre-commit hooks (not recommended for production)
+
+### Fix Required
+
+**Implementation Tasks** (3-5 story points):
+
+1. **Update Agent Git Workflow** (2 hours)
+   - Detect pre-commit file modifications
+   - Auto-stage changes: `git add -A`
+   - Retry commit after staging
+   - Max 3 retries to prevent infinite loop
+
+2. **Add Integration Test** (1 hour)
+   - Test git workflow with pre-commit hooks
+   - Verify auto-staging on hook modifications
+   - Test infinite loop prevention
+
+3. **Update Documentation** (30 min)
+   - Document in `QUALITY_ENFORCER_RESPONSIBILITIES.md`
+   - Add to git workflow guide
+   - Update `run_in_terminal` tool documentation
+
+### Prevention Strategy
+
+**Process Changes**:
+- Enhanced git workflow with pre-commit detection
+- Auto-staging after hook modifications
+- Retry logic with max attempts
+
+**Documentation**:
+- Git workflow guide update
+- Quality enforcer responsibilities
+- Agent tool usage patterns
+
+**New Tests**:
+- Integration test for git + pre-commit hooks
+- Test max retry prevention
+- Test file modification detection
+
+### Impact Metrics
+
+**Before Fix**:
+- Autonomous git operations: ❌ BLOCKED
+- Manual intervention required: 100%
+- Agent productivity: Halted on commits
+
+**After Fix** (Target):
+- Autonomous git operations: ✅ UNBLOCKED
+- Manual intervention required: 0%
+- Agent productivity: Restored
+
+### Files Modified
+
+- `skills/defect_tracker.json` - BUG-025 logged with full RCA
+- GitHub Issue #41 created
+- `docs/CHANGELOG.md` - This entry
+
+### Related Work
+
+**Sprint 7 Finding**:
+- Integration test gap: 42.9% (highest gap)
+- Recommendation: Add git workflow integration tests
+
+**BUG-020 Context**:
+- GitHub auto-close integration (also git workflow)
+- Fixed with commit-msg hook validation
+- Same pattern: git operations need robust handling
+
+### Commits
+
+**Pending**: "Log BUG-025: Pre-commit hook infinite loop blocks autonomous git operations"
+- GitHub Issue #41 created
+- Defect tracker updated with full RCA
+- CHANGELOG documented
+
+---
+
 ## 2026-01-02: Sprint 9 Story 0 VALIDATED - CI/CD Fix Confirmed GREEN ✅
 
 ### Summary

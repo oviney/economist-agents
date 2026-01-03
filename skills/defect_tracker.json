@@ -268,21 +268,54 @@
         "requirement_existed": false,
         "requirement_note": "Requirements did not specify that articles must include references/citations section. Research Agent collects sources but requirement for reader-facing references was never documented. This is a specification gap, not an implementation defect - team built to incomplete requirements. Original Writer Agent story (Sprint 1) specified: Generate Economist-style articles with proper structure, voice, and data integration. References section was not explicitly required or forbidden. This is specification evolution (enhancement request), not implementation failure (bug)."
       }
+    },
+    {
+      "id": "BUG-025",
+      "severity": "high",
+      "discovered_in": "development",
+      "discovered_date": "2026-01-02T22:31:26.009629",
+      "description": "Pre-commit hooks cause infinite commit loop blocking autonomous git operations",
+      "github_issue": 41,
+      "component": "git_workflow",
+      "responsible_agent": "quality_enforcer",
+      "status": "open",
+      "fixed_date": null,
+      "fix_commit": null,
+      "is_production_escape": false,
+      "root_cause": "integration_error",
+      "root_cause_notes": "Pre-commit hooks modify files after commit, causing dirty working directory. Agent workflow does not detect and re-stage changes.",
+      "introduced_in_commit": null,
+      "introduced_date": "2025-12-31",
+      "time_to_detect_days": 2,
+      "time_to_resolve_days": null,
+      "missed_by_test_type": "integration_test",
+      "test_gap_description": "No integration test for git workflow with pre-commit hooks",
+      "prevention_test_added": false,
+      "prevention_test_file": null,
+      "prevention_strategy": [
+        "process_change",
+        "documentation"
+      ],
+      "prevention_actions": [
+        "Update agent git workflow to detect pre-commit modifications",
+        "Add git add -A after pre-commit runs",
+        "Document in QUALITY_ENFORCER_RESPONSIBILITIES.md"
+      ]
     }
   ],
   "summary": {
-    "total_bugs": 8,
+    "total_bugs": 9,
     "fixed_bugs": 7,
     "production_bugs": 6,
-    "defect_escape_rate": 75.0,
+    "defect_escape_rate": 66.7,
     "by_severity": {
       "critical": 2,
-      "high": 3,
+      "high": 4,
       "medium": 3,
       "low": 0
     },
     "by_stage": {
-      "development": 2,
+      "development": 3,
       "staging": 0,
       "production": 6
     },
@@ -290,20 +323,21 @@
       "validation_gap": 2,
       "prompt_engineering": 1,
       "requirements_gap": 2,
-      "integration_error": 1,
+      "integration_error": 2,
       "code_logic": 2
     },
     "test_gap_distribution": {
       "visual_qa": 2,
-      "integration_test": 2,
+      "integration_test": 3,
       "manual_test": 4
     },
     "agent_defect_distribution": {
-      "writer_agent": 1
+      "writer_agent": 1,
+      "quality_enforcer": 1
     },
-    "avg_time_to_detect_days": 6.6,
+    "avg_time_to_detect_days": 6.1,
     "avg_time_to_resolve_days": 0.7,
     "avg_critical_ttd_days": 5.5,
-    "last_updated": "2026-01-02T16:17:43.265981"
+    "last_updated": "2026-01-02T22:31:26.009659"
   }
 }

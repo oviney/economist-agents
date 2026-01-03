@@ -51,6 +51,47 @@ For stories involving new dependencies or frameworks:
 
 ---
 
+## GITHUB ISSUE CREATION (MANDATORY VALIDATION)
+
+**BEFORE creating ANY GitHub issue:**
+
+□ Check skills/defect_tracker.json for existing bug ID
+□ If bug exists AND github_issue field != null → REUSE existing issue number
+□ If bug exists AND github_issue == null → CREATE new issue, update tracker
+□ If bug doesn't exist → CREATE bug entry + GitHub issue together
+
+**Violation**: Creating duplicate GitHub issues wastes issue numbers and creates confusion.
+
+**Command Sequence** (MANDATORY):
+```bash
+# Step 1: Validate before creation
+python3 scripts/github_issue_validator.py --validate BUG-XXX --title "Issue title"
+
+# Step 2: If validation passes, create issue
+gh issue create --title "..." --body "..." --label "..."
+
+# Step 3: Update defect_tracker.json with github_issue number
+python3 scripts/defect_tracker.py --update BUG-XXX --github-issue N
+```
+
+**Tool**: `scripts/github_issue_validator.py`
+- `--bug BUG-XXX`: Check if bug has GitHub issue
+- `--validate BUG-XXX`: Block if duplicate detected (exit code 1 = BLOCKED)
+- `--list-missing`: Show bugs without GitHub issues
+- `--next-id`: Get next available BUG-XXX ID
+
+**Example - Correct Workflow**:
+```bash
+# Check first
+$ python3 scripts/github_issue_validator.py --bug BUG-026
+⚠️  BUG-026 already has GitHub issue #42
+   View: gh issue view 42
+
+# BLOCKED - reuse #42 instead of creating duplicate
+```
+
+---
+
 ## EXECUTION BLOCKERS (Hard Stops)
 
 ### NEVER Start Work Without:

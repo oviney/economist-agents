@@ -1,5 +1,125 @@
 # Economist Agents - Development Log
 
+## 2026-01-02: Security Vulnerabilities BUG-026 & BUG-027 Logged (CI/CD Scan)
+
+### Summary
+Logged 2 security vulnerabilities discovered in CI/CD Bandit scan. Created GitHub Issues #42 and #43 with full RCA and prevention strategies. Both bugs found in development (zero production escapes).
+
+### Security Bugs Logged
+
+**BUG-026: B605 Command injection risk in governance.py** (GitHub Issue #42)
+- **Severity**: HIGH
+- **Category**: Security
+- **File**: scripts/governance.py:212
+- **Discovered**: Development (CI/CD Bandit scan)
+- **Impact**: Command injection vulnerability
+
+**Issue Details**:
+- `subprocess.run()` called with `shell=True` at line 212
+- Enables arbitrary command execution if user input reaches subprocess call
+- Bandit security code: B605
+
+**Root Cause**:
+- **code_logic**: Unsafe subprocess usage pattern
+- Missing security validation in code review
+- No pre-commit security scanning
+
+**Fix Required**:
+```python
+# BEFORE (VULNERABLE):
+subprocess.run(cmd, shell=True)
+
+# AFTER (SECURE):
+subprocess.run(["git", "add", file], shell=False)
+```
+
+**Prevention Strategy**:
+- Add Bandit security scan to CI/CD pipeline
+- Review all subprocess calls for shell=True usage
+- Add pre-commit security validation hook
+- Code review checklist: No shell=True without explicit justification
+
+---
+
+**BUG-027: B113 Missing timeout in featured_image_agent.py** (GitHub Issue #43)
+- **Severity**: MEDIUM
+- **Category**: Security
+- **File**: scripts/featured_image_agent.py:172
+- **Discovered**: Development (CI/CD Bandit scan)
+- **Impact**: Potential hanging requests, DoS vulnerability
+
+**Issue Details**:
+- `requests.get()` called without timeout parameter at line 172
+- Could hang indefinitely causing Denial of Service
+- Bandit security code: B113
+
+**Root Cause**:
+- **code_logic**: Missing timeout on HTTP client calls
+- No timeout validation in code review
+- No integration tests for network resilience
+
+**Fix Required**:
+```python
+# BEFORE (VULNERABLE):
+response = requests.get(url)
+
+# AFTER (SECURE):
+response = requests.get(url, timeout=30)
+```
+
+**Prevention Strategy**:
+- Add timeout validation to all requests.get/post calls
+- Add linting rule for missing timeouts (Bandit or ruff)
+- Review all HTTP client usage across codebase
+- Integration tests for timeout behavior
+
+### Impact Metrics
+
+**Defect Tracker Status**:
+- Total Bugs: 11 (was 9)
+- Production Escapes: 6 (unchanged - both found in dev)
+- Defect Escape Rate: 54.5% (was 50.0%)
+- Security Bugs: 2 (new category)
+
+**Security Posture**:
+- Both vulnerabilities caught in development ✅
+- Zero security bugs escaped to production ✅
+- CI/CD security scanning working as designed ✅
+
+**Test Gap Analysis**:
+- Missing: unit_test for subprocess security
+- Missing: unit_test for HTTP timeout validation
+- Missing: Security validation in pre-commit hooks
+
+### Files Modified
+
+- `skills/defect_tracker.json` - BUG-026 & BUG-027 logged with full RCA
+- GitHub Issue #42 - BUG-026 command injection risk
+- GitHub Issue #43 - BUG-027 missing timeout
+- `docs/CHANGELOG.md` - This entry
+
+### Next Steps
+
+**Immediate (P0)**:
+1. Fix BUG-026: Remove shell=True from governance.py (1 hour)
+2. Fix BUG-027: Add timeout=30 to featured_image_agent.py (15 min)
+3. Test fixes with integration tests (30 min)
+
+**Sprint 9 (P1)**:
+1. Add Bandit security scan to CI/CD pipeline
+2. Review all subprocess.run() calls for shell=True
+3. Review all requests.get/post() calls for timeouts
+4. Add security validation to pre-commit hooks
+
+### Commits
+
+**Pending**: "Log security bugs BUG-026 & BUG-027 from CI/CD scan"
+- 2 bugs logged in defect tracker
+- GitHub Issues #42, #43 created
+- CHANGELOG updated with security analysis
+
+---
+
 ## 2026-01-02: BUG-025 Logged - Pre-commit Hook Loop Blocks Autonomous Git Operations
 
 ### Summary

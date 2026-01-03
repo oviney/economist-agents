@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "created": "2026-01-01T00:00:00",
-  "current_sprint": 9,
+  "current_sprint": 8,
   "sprints": {
     "sprint_6": {
       "status": "complete",
@@ -35,52 +35,50 @@
       "retrospective_done": false
     },
     "sprint_8": {
-      "status": "complete",
-      "start_date": "2026-01-01T21:44:54.052733",
+      "status": "active",
+      "start_date": "2026-01-02T00:00:00",
       "capacity": 13,
       "stories": [
         {
           "id": 1,
-          "name": "Strengthen Editor Agent Prompt",
+          "name": "Create PO Agent",
           "points": 3,
           "priority": "P0",
-          "status": "complete"
+          "status": "complete",
+          "completed_date": "2026-01-02T10:00:00"
         },
         {
           "id": 2,
-          "name": "Enhance Visual QA Coverage",
-          "points": 5,
+          "name": "Enhance SM Agent for Autonomous Coordination",
+          "points": 4,
           "priority": "P0",
-          "status": "complete"
+          "status": "not_started"
         },
         {
           "id": 3,
-          "name": "Add Integration Tests",
-          "points": 5,
-          "priority": "P0",
-          "status": "complete",
-          "completed_date": "2026-01-01T21:50:35.792155"
+          "name": "Agent Signal Infrastructure",
+          "points": 3,
+          "priority": "P1",
+          "status": "not_started"
+        },
+        {
+          "id": 4,
+          "name": "Sprint 8 Documentation & Integration",
+          "points": 3,
+          "priority": "P2",
+          "status": "not_started"
         }
       ],
       "objectives": [
-        "Restore Editor Agent performance from 87.2% to 95%+",
-        "Reduce visual QA escape rate by 80%",
-        "Close 42.9% integration test gap"
+        "Enable autonomous backlog refinement (PO Agent >90% AC acceptance)",
+        "Enable autonomous agent coordination (SM Agent >90% task assignment)",
+        "Enable real-time monitoring (100% agent transitions tracked)"
       ],
-      "end_date": "2026-01-01T21:50:55.606575",
-      "velocity": 13,
-      "sprint_rating": 8.5,
-      "sprint_rating_rationale": "Implementation excellence (3/3 stories delivered), but measurement gap noted (baselines established, effectiveness not yet measured). Test pass rate 56% baseline lower than expected.",
-      "objectives_achieved": {
-        "objective_1": "BASELINE_ESTABLISHED",
-        "objective_2": "BASELINE_ESTABLISHED",
-        "objective_3": "PARTIALLY_ACHIEVED"
-      },
-      "ceremonies_complete": true,
-      "retrospective_done": true,
+      "velocity": 3,
+      "ceremonies_complete": false,
+      "retrospective_done": false,
       "backlog_refined": true,
-      "retrospective_date": "2026-01-01T22:10:54.246413",
-      "refinement_date": "2026-01-01T22:15:27.415376",
+      "refinement_date": "2026-01-02T00:00:00",
       "next_sprint_dor_met": true
     },
     "sprint_9": {

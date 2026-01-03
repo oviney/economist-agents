@@ -1,0 +1,52 @@
+{
+    "version": "1.0",
+    "created": "2026-01-02T00:00:00",
+    "description": "Human PO review queue for ambiguous requirements and edge cases",
+    "pending_escalations": [],
+    "answered_escalations": [],
+    "dismissed_escalations": [],
+    "metadata": {
+        "total_escalations": 0,
+        "pending_count": 0,
+        "average_response_time_hours": 0,
+        "last_updated": "2026-01-02T00:00:00"
+    },
+    "schema": {
+        "escalation": {
+            "id": "Unique escalation ID (UUID)",
+            "story_id": "Reference to story in backlog.json",
+            "question": "Specific question requiring human PO decision",
+            "context": {
+                "user_story": "Story text for context",
+                "acceptance_criteria": "Current AC for reference",
+                "ambiguity_type": "unclear_requirements|technical_feasibility|business_value|scope|dependencies",
+                "agent_recommendation": "PO Agent's suggested approach"
+            },
+            "priority": "P0|P1|P2",
+            "created": "ISO 8601 timestamp",
+            "status": "pending|answered|dismissed",
+            "answer": "Human PO response (when status=answered)",
+            "answered_by": "Human PO name/ID",
+            "answered_date": "ISO 8601 timestamp (when answered)",
+            "resolution_notes": "How answer was incorporated into story"
+        }
+    },
+    "examples": [
+        {
+            "id": "esc-001",
+            "story_id": 0,
+            "question": "Should chart quality improvement include refactoring existing 50+ charts or only new chart generation?",
+            "context": {
+                "user_story": "As a user, I need improved chart quality, so that data visualization is trustworthy",
+                "acceptance_criteria": [
+                    "[ ] Given chart, When rendered, Then meets visual standards"
+                ],
+                "ambiguity_type": "scope",
+                "agent_recommendation": "Start with new charts only (3 pts), defer existing chart refactoring to separate story (8 pts)"
+            },
+            "priority": "P1",
+            "created": "2026-01-02T10:00:00",
+            "status": "pending"
+        }
+    ]
+}

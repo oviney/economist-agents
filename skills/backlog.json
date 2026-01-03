@@ -1,0 +1,49 @@
+{
+    "version": "1.0",
+    "created": "2026-01-02T00:00:00",
+    "description": "Product backlog for autonomous sprint execution",
+    "stories": [],
+    "escalations": [],
+    "metadata": {
+        "total_story_points": 0,
+        "last_updated": "2026-01-02T00:00:00",
+        "sprint_capacity": 13
+    },
+    "schema": {
+        "story": {
+            "user_story": "As a [role], I need [capability], so that [business value]",
+            "acceptance_criteria": [
+                "[ ] Given X, When Y, Then Z",
+                "[ ] Quality: Measurable criterion"
+            ],
+            "story_points": "1|2|3|5|8|13",
+            "estimation_confidence": "high|medium|low",
+            "quality_requirements": {
+                "content_quality": "Sources, citations, formatting standards",
+                "performance": "Time limits, resource usage",
+                "accessibility": "WCAG compliance if applicable",
+                "seo": "Meta tags if content-facing",
+                "security": "Data handling requirements",
+                "maintainability": "Documentation standards"
+            },
+            "priority": "P0|P1|P2",
+            "status": "backlog|in_progress|complete|blocked",
+            "escalations": [
+                "Specific question for human PO"
+            ],
+            "implementation_notes": "Brief guidance for developer agent",
+            "created": "ISO 8601 timestamp",
+            "started": "ISO 8601 timestamp (when status=in_progress)",
+            "completed": "ISO 8601 timestamp (when status=complete)",
+            "request": "Original user request text"
+        },
+        "escalation": {
+            "story_id": "Index into stories array",
+            "question": "Specific question requiring human PO decision",
+            "created": "ISO 8601 timestamp",
+            "status": "pending|answered|dismissed",
+            "answer": "Human PO response (when status=answered)",
+            "answered_date": "ISO 8601 timestamp (when answered)"
+        }
+    }
+}

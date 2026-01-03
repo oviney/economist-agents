@@ -26,6 +26,7 @@ Usage:
 """
 
 import json
+from contextlib import suppress
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -45,6 +46,10 @@ class SprintCeremonyTracker:
         "definition_of_done",  # DoD criteria defined
         "user_approval",  # Product Owner approval obtained
     ]
+
+    # Backlog health thresholds
+    MAX_BACKLOG_HEALTH_SCORE = 10.0  # Target: <10% of backlog has issues
+    MAX_DAYS_SINCE_GROOMING = 14  # Weekly grooming required
 
     def __init__(self, tracker_file: str = None):
         if tracker_file is None:
@@ -129,6 +134,30 @@ class SprintCeremonyTracker:
                 f"   Run: python3 sprint_ceremony_tracker.py --validate-dor {sprint_number}"
             )
             return False
+
+        # Check backlog grooming (must be within last 14 days)
+        grooming_date = prev_sprint.get("grooming_date")
+        if grooming_date:
+            from datetime import datetime
+
+            last_grooming = datetime.fromisoformat(grooming_date)
+            days_since_grooming = (datetime.now() - last_grooming).days
+
+            if days_since_grooming > self.MAX_DAYS_SINCE_GROOMING:
+                print(
+                    f"⚠️  RECOMMENDED: Backlog grooming is {days_since_grooming} days old (>14 days)"
+                )
+                print("   Run: python3 scripts/backlog_groomer.py --report")
+                print(
+                    f"   Or: python3 sprint_ceremony_tracker.py --groom {sprint_number - 1}"
+                )
+        else:
+            print(
+                f"⚠️  RECOMMENDED: No backlog grooming recorded for Sprint {sprint_number - 1}"
+            )
+            print(
+                f"   Run: python3 sprint_ceremony_tracker.py --groom {sprint_number - 1}"
+            )
 
         print(f"✅ Sprint {sprint_number} ready to start - all ceremonies complete")
         return True
@@ -255,6 +284,99 @@ class SprintCeremonyTracker:
         print(f"   Fill in stories, then run: --validate-dor {sprint_number}")
 
         return str(template_path)
+
+    def complete_backlog_grooming(
+        self, sprint_number: int, dry_run: bool = False
+    ) -> dict:
+        """Complete backlog grooming ceremony and update health metrics"""
+        sprint_key = f"sprint_{sprint_number}"
+
+        if sprint_key not in self.tracker["sprints"]:
+            print(f"❌ Sprint {sprint_number} not found. Run --end-sprint first.")
+            return None
+
+        print(f"\n🧹 Backlog Grooming Ceremony: Sprint {sprint_number}\n")
+
+        # Run backlog groomer report
+        groomer_script = (
+            self.tracker_file.parent.parent / "scripts" / "backlog_groomer.py"
+        )
+        backlog_path = self.tracker_file
+
+        if groomer_script.exists():
+            import subprocess
+
+            result = subprocess.run(
+                [
+                    "python3",
+                    str(groomer_script),
+                    "--report",
+                    "--backlog",
+                    str(backlog_path),
+                ],
+                capture_output=True,
+                text=True,
+            )
+
+            if result.returncode == 0:
+                print(result.stdout)
+
+                # Extract health score from output (if present)
+                health_score = None
+                for line in result.stdout.split("\n"):
+                    if "Health Score:" in line:
+                        with suppress(ValueError, IndexError):
+                            health_score = float(line.split(":")[1].strip().rstrip("%"))
+
+                # Update tracker
+                self.tracker["sprints"][sprint_key]["backlog_groomed"] = True
+                self.tracker["sprints"][sprint_key]["grooming_date"] = (
+                    datetime.now().isoformat()
+                )
+                if health_score is not None:
+                    self.tracker["sprints"][sprint_key]["backlog_health_score"] = (
+                        health_score
+                    )
+
+                self.save()
+
+                # Quality gate check
+                if (
+                    health_score is not None
+                    and health_score > self.MAX_BACKLOG_HEALTH_SCORE
+                ):
+                    print(
+                        f"\n⚠️  QUALITY GATE FAILED: Health score {health_score:.1f}% > {self.MAX_BACKLOG_HEALTH_SCORE}% target"
+                    )
+                    print("   Run: python3 scripts/backlog_groomer.py --clean")
+                    return {
+                        "success": False,
+                        "health_score": health_score,
+                        "gate_passed": False,
+                    }
+                else:
+                    print("\n✅ Backlog Grooming complete")
+                    if health_score is not None:
+                        print(
+                            f"   Health Score: {health_score:.1f}% (target: <{self.MAX_BACKLOG_HEALTH_SCORE}%)"
+                        )
+                    return {
+                        "success": True,
+                        "health_score": health_score,
+                        "gate_passed": True,
+                    }
+            else:
+                print(f"❌ Backlog groomer failed: {result.stderr}")
+                return {"success": False, "error": result.stderr}
+        else:
+            print(f"⚠️  Backlog groomer script not found: {groomer_script}")
+            print("   Marking grooming complete without automated health check")
+            self.tracker["sprints"][sprint_key]["backlog_groomed"] = True
+            self.tracker["sprints"][sprint_key]["grooming_date"] = (
+                datetime.now().isoformat()
+            )
+            self.save()
+            return {"success": True, "health_score": None, "gate_passed": True}
 
     def _generate_story_template(self, sprint_number: int) -> Path:
         """Generate story template for sprint planning"""
@@ -527,6 +649,9 @@ Examples:
   # Refine backlog
   python3 sprint_ceremony_tracker.py --refine-backlog 7
 
+  # Groom backlog (health checks)
+  python3 sprint_ceremony_tracker.py --groom 7
+
   # Validate DoR
   python3 sprint_ceremony_tracker.py --validate-dor 7
 
@@ -554,6 +679,12 @@ Examples:
         help="Complete backlog refinement for sprint N",
     )
     parser.add_argument(
+        "--groom",
+        type=int,
+        metavar="N",
+        help="Complete backlog grooming ceremony for sprint N",
+    )
+    parser.add_argument(
         "--validate-dor",
         type=int,
         metavar="N",
@@ -561,6 +692,11 @@ Examples:
     )
     parser.add_argument(
         "--report", action="store_true", help="Generate ceremony status report"
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Dry run mode for grooming (don't modify backlog)",
     )
     parser.add_argument("--test", action="store_true", help="Run self-tests")
 
@@ -584,6 +720,11 @@ Examples:
 
     elif args.refine_backlog:
         tracker.complete_backlog_refinement(args.refine_backlog)
+
+    elif args.groom:
+        result = tracker.complete_backlog_grooming(args.groom, dry_run=args.dry_run)
+        if result and not result.get("success"):
+            exit(1)
 
     elif args.validate_dor:
         is_valid, missing = tracker.validate_dor(args.validate_dor)

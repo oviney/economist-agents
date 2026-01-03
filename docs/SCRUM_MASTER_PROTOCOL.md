@@ -237,6 +237,33 @@ Scrum Master: "Let me write the story..."
 - Priority: P0 (critical), P1 (high), P2 (nice-to-have)
 ```
 
+**Step 2b: Backlog Grooming** (Weekly/Monthly/Quarterly)
+```
+Scrum Master: "Maintaining overall backlog health..."
+
+Weekly (30 min):
+- Run: python3 scripts/backlog_groomer.py --report
+- Review stories >30 days old (flag for review)
+- Close stories >90 days inactive (with PO approval)
+- Identify duplicates (>80% similarity)
+- Check priority drift (P0 older than P2/P3)
+- Quality Gate: Health score <10%
+
+Monthly (60 min):
+- Epic decomposition (break large stories)
+- Technical debt assessment
+- Market alignment review
+- Feature registry validation
+- Cross-team dependencies
+
+Quarterly (90 min):
+- 3-month roadmap planning
+- Major initiatives prioritization
+- Quarterly capacity estimation
+- PI objectives (if SAFe)
+- Stakeholder alignment
+```
+
 **Step 3: Three Amigos Review** (10-15 min)
 ```
 Scrum Master leads review with:

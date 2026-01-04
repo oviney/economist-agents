@@ -52,19 +52,70 @@ CrewAI requires Python 3.13 or lower. Python 3.14+ is not currently supported.
    # Edit .env with your ANTHROPIC_API_KEY
    ```
 
-## 🤖 Custom Agents
+## 🤖 Agent Registry & Crews
 
-This project uses a registry of specialized agents:
+This project uses **ADR-002 Agent Registry Pattern** for centralized agent discovery and multi-agent coordination via CrewAI.
 
+### Current Agents (13 total)
+
+**Core Agents:**
 | Agent | Role | Responsibility |
 |-------|------|----------------|
-| **Topic Scout** | Discovery | Scans landscape for high-value topics |
-| **Editorial Board** | Governance | 6-persona voting on content strategy |
-| **Research Agent** | Intelligence | Gathers verified data and sources |
-| **Writer Agent** | Production | Drafts content in Economist style |
-| **Editor Agent** | Quality | Enforces style, tone, and structure |
-| **Graphics Agent** | Visuals | Generates brand-compliant charts |
-| **Visual QA** | Validation | Validates chart layout and zones |
+| **devops** | Infrastructure | CI/CD automation and deployment |
+| **git-operator** | Version Control | Git operations and repo management |
+| **migration-engineer** | Architecture | CrewAI migration and system design |
+| **po-agent** | Product | Backlog refinement and story creation |
+| **product-research-agent** | Research | Market analysis and competitive intel |
+| **qa-specialist** | Quality | Test strategy and QA process |
+| **quality-enforcer** | Standards | Code quality gates and enforcement |
+| **refactor-specialist** | Code Quality | Refactoring and optimization |
+| **scrum-master** | Orchestration | Sprint coordination and ceremonies |
+| **scrum-master-v3** | Enhanced Orchestration | Advanced sprint management |
+| **test-writer** | Testing | Test case generation and coverage |
+| **visual-qa-agent** | Visual Quality | Chart and design validation |
+
+### Active Crews (2 operational)
+
+**Stage 3 Crew** (`src/crews/stage3_crew.py`) - Content Generation
+- **Purpose**: Research, writing, and chart creation pipeline
+- **Agents**: Research Agent → Writer Agent → Graphics Agent
+- **Output**: YAML with article content and chart data
+- **Status**: ✅ Operational (100% test pass rate)
+
+**Stage 4 Crew** (`src/crews/stage4_crew.py`) - Editorial Review
+- **Purpose**: 5-gate editorial quality validation
+- **Agents**: Editor Agent (multi-gate validation)
+- **Output**: JSON with quality assessment and edited article
+- **Status**: ✅ Operational (100% test pass rate)
+
+### Agent Registry Architecture
+
+**AgentRegistry** (`scripts/agent_registry.py`) provides:
+- 🔍 **Discovery**: Auto-loads all `.agent.md` files from `.github/agents/`
+- 🏗️ **Factory**: Creates Agent instances with consistent LLM configuration
+- 📋 **Validation**: Ensures all agents have required fields (role, goal, backstory)
+- 🧠 **Context Injection**: Adds AGILE_MINDSET system prompt to all agents
+- 📊 **Introspection**: Lists available agents and their capabilities
+
+### Usage
+
+```python
+from agent_registry import AgentRegistry
+
+# Initialize registry (auto-discovers all agents)
+registry = AgentRegistry()
+
+# Create specific agent
+research_agent = registry.create_agent("product-research-agent")
+
+# Create all agents
+all_agents = registry.create_all_agents()
+
+# List available agents
+agent_ids = registry.list_agents()
+```
+
+
 ## 🔄 Shared Context System
 
 **Eliminates 99.7% of agent briefing time** by enabling automatic context inheritance between agents.

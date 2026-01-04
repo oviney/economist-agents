@@ -203,6 +203,112 @@ This file tracks architectural improvements and technical debt identified throug
 
 ---
 
+## Medium Priority
+
+### 🟡 Migrate Stage 3 Content Generation to CrewAI (Phase 2)
+**Status**: Ready
+**Priority**: P2 (Medium)
+**Effort**: Large
+**Type**: Technical Enabler
+**Created**: 2026-01-03
+**Related**: ADR-003 CrewAI Migration Strategy
+
+**Context**: 
+- Phase 1 COMPLETE: CrewAI 1.7.2 installed, 18/18 tests passing
+- AgentFactory operational with schemas/agents.yaml
+- Sprint 7 delivered CrewAI foundation infrastructure
+- Sprint 9 Story 0 resolved Python 3.13/3.14 compatibility
+
+**Problem**: Stage 3 Content Generation agents (Research, Writer, Editor) still use direct LLM calls. Need to migrate to CrewAI framework for improved orchestration, task dependencies, and context sharing.
+
+**Solution**:
+Implement Phase 2 of ADR-003 selective migration strategy:
+
+**Tasks**:
+1. **Migrate Research Agent to CrewAI** (3-4 hours)
+   - Convert research_agent.py to CrewAI agent
+   - Define research tasks with sequential dependencies
+   - Validate data_points and chart_data output format
+   - Ensure 90%+ verification rate maintained
+
+2. **Migrate Writer Agent to CrewAI** (3-4 hours)
+   - Convert writer_agent.py to CrewAI agent
+   - Implement task dependency on Research Agent output
+   - Preserve banned phrases validation
+   - Maintain chart embedding logic
+   - Test against Sprint 6 quality baseline
+
+3. **Migrate Editor Agent to CrewAI** (2-3 hours)
+   - Convert editor_agent.py to CrewAI agent
+   - Implement 5 quality gate checks as CrewAI tasks
+   - Preserve PASS/FAIL format from Sprint 8 enhancements
+   - Target 95%+ gate pass rate
+
+4. **Sequential Task Orchestration** (2-3 hours)
+   - Implement Research → Writer → Editor pipeline
+   - Add context sharing between agents
+   - Preserve quality gates and validation
+   - Test end-to-end with 5+ articles
+
+5. **Quality Validation** (2-3 hours)
+   - Compare metrics vs Sprint 6-8 baselines
+   - Writer: 80%+ clean draft rate
+   - Editor: 95%+ gate pass rate
+   - Graphics: 88%+ Visual QA pass rate
+   - Verify no quality regression
+
+6. **Update Documentation** (1-2 hours)
+   - Update ADR-003 with Phase 2 completion notes
+   - Document migration patterns for Phase 3
+   - Update SPRINT.md with new architecture
+
+**Files to Modify**:
+- `agents/research_agent.py` (230 lines → CrewAI agent)
+- `agents/writer_agent.py` (400 lines → CrewAI agent)
+- `agents/editor_agent.py` (544 lines → CrewAI agent)
+- `scripts/economist_agent.py` (orchestration logic)
+- `tests/test_agent_integration.py` (validate CrewAI pipeline)
+- `docs/ADR-003-crewai-migration-strategy.md` (Phase 2 status)
+
+**Acceptance Criteria**:
+- [ ] All 3 agents migrated to CrewAI framework
+- [ ] Sequential task dependencies working (Research → Writer → Editor)
+- [ ] Quality metrics match or exceed Sprint 6-8 baselines
+- [ ] 18+ tests passing (existing + new CrewAI integration tests)
+- [ ] End-to-end article generation via CrewAI pipeline successful
+- [ ] Documentation updated with migration patterns
+
+**Success Metrics**:
+- Research verification rate: ≥90%
+- Writer clean draft rate: ≥80%
+- Editor gate pass rate: ≥95%
+- Graphics Visual QA: ≥88%
+- Integration test pass rate: 100%
+
+**Dependencies**:
+- CrewAI 1.7.2+ (✅ installed)
+- Python 3.10-3.13 (✅ 3.13.11 active)
+- schemas/agents.yaml (✅ exists)
+- Sprint 6-8 quality baselines (✅ documented)
+
+**Risks**:
+- Quality regression during migration
+- Context sharing between agents may need tuning
+- Sequential dependencies could increase latency
+- AgentFactory may need enhancements for complex orchestration
+
+**Mitigation**:
+- Parallel track: Keep existing agents as fallback
+- Comprehensive A/B testing vs baselines
+- Incremental migration (one agent at a time)
+- Rollback plan if quality degrades >10%
+
+**Estimate**: 13-17 hours (Large effort, 2 sprint story)
+
+**Phase 3 Preview**: Migrate Graphics Agent, implement parallel task execution, optimize CrewAI crew performance
+
+---
+
 ## Low Priority
 
 ### 🟢 Integration Tests

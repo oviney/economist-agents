@@ -40,7 +40,7 @@ repos:
       - id: pytest
         name: pytest
         description: Run test suite with pytest (pre-push only)
-        entry: pytest
+        entry: bash -c 'source .venv/bin/activate && pytest'
         args: [tests/, -v, --tb=short]
         language: system
         pass_filenames: false

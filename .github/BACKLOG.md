@@ -477,3 +477,45 @@ Self-learning architecture analyzer with skills system.
 - **Weekly**: Review P0-P1 items
 - **Monthly**: Review P2-P3 items
 - **Quarterly**: Revisit icebox items
+---
+
+## Story 10: Phase 2 Migration (Stage 3 Content Gen)
+
+**Status**: 🟢 Ready
+**Type**: Technical Enabler
+**Priority**: P1 (High)
+**Effort**: Large (8 story points)
+**Added**: 2026-01-04
+
+**Problem**: Stage 3 (Content Generation) still uses legacy orchestration. Need to migrate to CrewAI pattern for consistency and maintainability.
+
+**Solution**: Port Stage 3 logic to `Stage3Crew` class following TDD approach established in Phase 1.
+
+**Acceptance Criteria**:
+1. **TDD Mandate**: A reproduction script (`tests/verify_stage3_migration.py`) must be created AND fail *before* any implementation code is written.
+2. **Migration**: The legacy `Stage 3` logic is ported to a `Stage3Crew` class using `crewai`.
+3. **Validation**: The reproduction script passes with 100% accuracy.
+4. **Cleanup**: Legacy code is marked deprecated (not deleted yet).
+
+**Files to Create**:
+- `tests/verify_stage3_migration.py` - TDD reproduction script
+- `agents/stage3_crew.py` - New CrewAI implementation
+- `agents/stage3_tasks.py` - Task definitions for Stage 3
+
+**Files to Modify**:
+- Legacy Stage 3 orchestration code - mark as deprecated
+- Update integration tests
+
+**Dependencies**:
+- Phase 1 migration (Stage 1 & Stage 2) must be complete
+- CrewAI framework already in use
+
+**Testing Strategy**:
+1. Create failing reproduction script first (TDD)
+2. Implement Stage3Crew to pass reproduction script
+3. Run existing integration tests to ensure no regression
+4. Compare output quality between legacy and CrewAI implementations
+
+**Related Work**:
+- ADR-003: CrewAI Migration Strategy
+- Phase 1 completion documentation

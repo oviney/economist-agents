@@ -1115,6 +1115,29 @@ See [EPIC_PRODUCT_DISCOVERY.md](docs/EPIC_PRODUCT_DISCOVERY.md) for complete spe
    - Performance Target: Process 5 concurrent articles, <2GB memory, <4 cores
    - See: `skills/feature_registry.json` for complete specification
 
+3. **STORY-010: Stage 3 Migration with TDD Enforcement** (8 pts, P0 - CRITICAL PATH)
+   - Component: agents/stage3_crew.py
+   - User Story: Migrate Stage 3 (Content Generation) from economist_agent.py to CrewAI using strict Test-Driven Development
+   - Status: Ready for Sprint 10 (Phase 2 Migration)
+   - Agent: migration-engineer
+   - TDD Protocol: RED (failing test) → GREEN (passing implementation) → REFACTOR (improve quality)
+   - Key Constraint: **Logs must show distinct failure phase before success** (evidence-based quality)
+   - Quality Requirements:
+     * Verification script exists and FAILS initially (RED phase proof)
+     * Implementation makes tests PASS (GREEN phase proof)
+     * Refactoring maintains green state (regression prevention)
+     * Type hints 100%, docstrings complete, linting passes
+   - Deliverables:
+     * tests/verify_stage3_migration.py (test-first specification)
+     * agents/stage3_crew.py (CrewAI implementation with researcher, writer, editor agents)
+     * docs/sprint_logs/story_10_tdd_log.md (RED→GREEN→REFACTOR evidence)
+   - Success Metrics:
+     * TDD discipline: Log proves RED→GREEN→REFACTOR cycle
+     * Code quality: 100% type hints, 0 linting errors, 0 type errors
+     * Functionality: Stage3Crew produces article output, backward compatible
+   - Related: ADR-003 (CrewAI Migration Strategy), Story 7 (previous CrewAI mission)
+   - See: `docs/STORY_10_TDD_MISSION.md` for complete mission brief
+
 **Medium Priority (P2):**
 - Issue #29: Research Spike - Agent Performance as Team Skills Gap Indicator (5 pts)
   - **Blocked by**: Need defect RCA baseline (20+ bugs with root cause data)

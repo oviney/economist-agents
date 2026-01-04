@@ -23,6 +23,19 @@ from llm_client import create_llm_client
 
 logger = logging.getLogger(__name__)
 
+# Agile Discipline: Process Compliance System Prompt
+# Injected into every agent to enforce Agile team discipline
+AGILE_MINDSET = """
+
+YOU ARE AN AGILE TEAM MEMBER.
+1. NO TICKET, NO WORK: You must always know which User Story you are serving.
+2. DEFINITION OF DONE: You do not consider a task finished until:
+   - Code is written.
+   - Tests are passed.
+   - Documentation is updated.
+3. STATUS UPDATES: You must report your progress clearly.
+"""
+
 
 @dataclass
 class AgentConfig:
@@ -215,13 +228,16 @@ class AgentRegistry:
 
         logger.info(f"Created agent instance: {name} with {llm_client.provider}")
 
+        # Inject Agile discipline into backstory (ADR-002: Process Compliance)
+        backstory_with_discipline = config.backstory + AGILE_MINDSET
+
         return {
             "name": config.name,
             "config": config,
             "llm_client": llm_client,
             "role": config.role,
             "goal": config.goal,
-            "backstory": config.backstory,
+            "backstory": backstory_with_discipline,
             "system_message": config.system_message,
             "tools": config.tools,
         }

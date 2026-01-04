@@ -23,11 +23,62 @@ See [AGENT_VELOCITY_ANALYSIS.md](docs/AGENT_VELOCITY_ANALYSIS.md) for full resea
 
 ## Current Sprint Status
 
-**Active Sprint**: Sprint 12 - IN PROGRESS 🚀 (0/1 pts delivered, 0% complete)
+**Active Sprint**: Sprint 12 - IN PROGRESS 🚀 (0/3 pts delivered, 0% complete)
 **Previous Sprint**: Sprint 11 - COMPLETE ✅ (13/13 pts, 100% - Phase 2 Final Stage)
 **Quality Score**: 9.5/10 (Sprint 11)
-**Sprint 12 Status**: 0/1 points delivered (0%)
-**Sprint 12 Goal**: Dashboard Enhancement Phase 2 - Configure Project Custom Fields for Velocity Tracking
+**Sprint 12 Status**: 0/3 points delivered (0%)
+**Sprint 12 Goal**: Quality Dashboard Data Accuracy + Validation
+
+**Sprint 12 Story 1: Fix Dashboard Data Accuracy + Validation** (3 pts, P0) - IN PROGRESS 🚧
+
+**Story Goal**: Fix Quality Engineering Dashboard bugs - accurate agent metrics, working sprint trends, validation tests
+
+**Why Now**: Phase 1 dashboard has critical bugs (100% false scores, missing trends). Must fix data accuracy before adding predictive analytics.
+
+**Tasks**:
+1. ⏳ **Task 1: Fix Agent Metrics Integration** (90 min, P0)
+   - Debug _build_agent_summary() method (lines 165-227)
+   - Verify skills/agent_metrics.json has real run data
+   - Replace baseline fallback with "NO DATA" display when metrics unavailable
+   - Test with actual agent runs to validate real data display
+   - DoD: Agent metrics show real percentages or "NO DATA" label, no fake 100% scores
+
+2. ⏳ **Task 2: Fix Sprint Trends Display** (45 min, P0)
+   - Debug _render_sprint_trends() method (lines 412-568)
+   - Check skills/sprint_history.json exists with 2+ sprint snapshots
+   - If missing, run save_sprint_snapshot() for Sprint 10-11
+   - Verify "Last 3 Sprints Comparison" section renders in output
+   - DoD: Sprint trends table displays with velocity, quality score, escape rate comparison
+
+3. ⏳ **Task 3: Add Dashboard Validation Tests** (45 min, P0)
+   - Create tests/test_quality_dashboard.py with pytest framework
+   - Test 1: validate_metrics_accuracy() - Compare dashboard output to source files
+   - Test 2: validate_sprint_trends_rendering() - Check section exists in output
+   - Test 3: validate_quality_score_calculation() - Verify formula correctness
+   - Test 4: validate_no_baseline_fallback() - Ensure "NO DATA" when metrics missing
+   - Test 5: validate_dashboard_generation() - End-to-end smoke test
+   - Add tests to CI/CD pipeline (GitHub Actions)
+   - DoD: 5+ tests passing in CI/CD, dashboard validated against source data
+
+**Acceptance Criteria** (4 total):
+- [ ] Agent metrics show real data or "NO DATA" (no fake 100% baseline values)
+- [ ] Sprint trends render with 3-sprint comparison table (velocity, quality, escape rate)
+- [ ] 5+ validation tests passing in CI/CD
+- [ ] Dashboard output validated against skills/defect_tracker.json and skills/agent_metrics.json
+
+**Definition of Done**:
+- [ ] All 3 tasks complete with acceptance criteria met
+- [ ] Tests passing locally and in CI/CD
+- [ ] Dashboard regenerated showing accurate metrics
+- [ ] Code reviewed and documented
+- [ ] SPRINT.md updated with completion status
+
+**Estimated Effort**: 180 minutes (3 hours) = 3 story points
+**Priority**: P0 (CRITICAL - blocks dashboard trust)
+**Dependencies**: None (standalone fix)
+**Risk**: Low - isolated changes to dashboard code
+
+---
 
 **Sprint 11 Status** (Jan 4, 2026) - COMPLETE ✅:
 - ✅ **Story 13: Stage 4 Migration (Review & Refinement) (5 pts, P0) - COMPLETE** ✨ (Editorial Review: 5-gate quality)

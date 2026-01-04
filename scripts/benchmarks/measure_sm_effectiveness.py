@@ -159,11 +159,11 @@ class SMEffectivenessBenchmark:
 
         # Build prompt for SM agent
         prompt = f"""
-{self.sm_agent['system_message']}
+{self.sm_agent["system_message"]}
 
 ## Current Request
 
-User says: "{scenario['request']}"
+User says: "{scenario["request"]}"
 
 Your task: Analyze this request and decide:
 1. Is it clear enough to create a story? (DoR compliant)
@@ -297,9 +297,9 @@ Respond in JSON format:
         Returns:
             Complete benchmark results with metrics
         """
-        print(f"\n{'='*70}")
+        print(f"\n{'=' * 70}")
         print("SM Agent Effectiveness Benchmark (Story 4)")
-        print(f"{'='*70}\n")
+        print(f"{'=' * 70}\n")
         print(f"Using agent: {self.sm_agent['name']}")
         print(f"Provider: {self.sm_agent['llm_client'].provider}")
         print(f"Model: {self.sm_agent['llm_client'].model}")
@@ -368,9 +368,9 @@ Respond in JSON format:
         # Overall pass/fail
         passed = dor_compliance_rate >= 90.0
 
-        print(f"\n{'='*70}")
+        print(f"\n{'=' * 70}")
         print("BENCHMARK RESULTS")
-        print(f"{'='*70}\n")
+        print(f"{'=' * 70}\n")
         print(f"Total Tests:           {total_tests}")
         print(
             f"Routing Accuracy:      {routing_accuracy:.1f}% ({correct_routing}/{total_tests})"

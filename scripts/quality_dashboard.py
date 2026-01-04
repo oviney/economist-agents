@@ -175,57 +175,63 @@ class QualityDashboard:
 
     def _build_agent_summary(self) -> dict:
         """Build agent summary from metrics"""
-        # Get latest run or use defaults
+        # Get latest run or return NO DATA indicators
         latest = self.agent_metrics.get_latest_run()
+        run_count = len(self.agent_metrics.metrics.get("runs", []))
 
+        # Initialize with NO DATA markers
         summary = {
             "writer": {
-                "clean_rate": 75,  # Baseline - will improve with tracking
-                "articles": len(self.agent_metrics.metrics.get("runs", [])),
-                "avg_word_count": 1000,
+                "clean_rate": None,  # Will be "NO DATA" if not available
+                "articles": run_count,
+                "avg_word_count": None,
             },
             "editor": {
-                "accuracy": 60,  # Baseline target
-                "reviews": len(self.agent_metrics.metrics.get("runs", [])),
-                "avg_gates_passed": 4,
+                "accuracy": None,
+                "reviews": run_count,
+                "avg_gates_passed": None,
             },
             "graphics": {
-                "visual_qa_pass_rate": 75,  # Baseline
-                "charts": len(self.agent_metrics.metrics.get("runs", [])),
-                "zone_violations": 0,
+                "visual_qa_pass_rate": None,
+                "charts": run_count,
+                "zone_violations": None,
             },
             "research": {
-                "verification_rate": 80,  # Baseline
-                "briefs": len(self.agent_metrics.metrics.get("runs", [])),
-                "avg_data_points": 8,
+                "verification_rate": None,
+                "briefs": run_count,
+                "avg_data_points": None,
             },
         }
 
-        # Update with actual latest data if available
-        if latest:
-            if "writer_agent" in latest["agents"]:
-                w = latest["agents"]["writer_agent"]
+        # Update with actual data if available
+        if latest and "agents" in latest:
+            agents = latest["agents"]
+
+            if "writer_agent" in agents:
+                w = agents["writer_agent"]
+                # Calculate clean rate from banned phrases
+                banned = w.get("banned_phrases", 0)
                 summary["writer"]["clean_rate"] = (
-                    100 if w.get("banned_phrases", 0) == 0 else 75
+                    100 if banned == 0 else round((1 - banned / 10) * 100, 1)
                 )
-                summary["writer"]["avg_word_count"] = w.get("word_count", 1000)
+                summary["writer"]["avg_word_count"] = w.get("word_count")
 
-            if "editor_agent" in latest["agents"]:
-                e = latest["agents"]["editor_agent"]
-                summary["editor"]["avg_gates_passed"] = e.get("gates_passed", 4)
-                summary["editor"]["accuracy"] = e.get("gate_pass_rate", 60)
+            if "editor_agent" in agents:
+                e = agents["editor_agent"]
+                summary["editor"]["avg_gates_passed"] = e.get("gates_passed")
+                summary["editor"]["accuracy"] = e.get("gate_pass_rate")
 
-            if "graphics_agent" in latest["agents"]:
-                g = latest["agents"]["graphics_agent"]
-                summary["graphics"]["visual_qa_pass_rate"] = g.get("qa_pass_rate", 75)
-                summary["graphics"]["zone_violations"] = g.get("zone_violations", 0)
-
-            if "research_agent" in latest["agents"]:
-                r = latest["agents"]["research_agent"]
-                summary["research"]["verification_rate"] = r.get(
-                    "verification_rate", 80
+            if "graphics_agent" in agents:
+                g = agents["graphics_agent"]
+                summary["graphics"]["visual_qa_pass_rate"] = g.get(
+                    "visual_qa_pass_rate"
                 )
-                summary["research"]["avg_data_points"] = r.get("data_points", 8)
+                summary["graphics"]["zone_violations"] = g.get("zone_violations")
+
+            if "research_agent" in agents:
+                r = agents["research_agent"]
+                summary["research"]["verification_rate"] = r.get("verification_rate")
+                summary["research"]["avg_data_points"] = r.get("data_points")
 
         return summary
 
@@ -411,10 +417,18 @@ Progress: [{progress_bar}] {progress_pct}%"""
 
     def _render_sprint_trends(self) -> str:
         """Render sprint-over-sprint comparison table"""
+        # Check if history has data
+        if not self.history or not self.history.get("sprints"):
+            return "📊 No sprint history available. Run with --save-sprint to start tracking."
+
         sprints = self.get_sprint_trends(3)
 
         if len(sprints) < 2:
-            return "📊 Need at least 2 sprints for trend analysis"
+            return (
+                "📊 Need at least 2 sprints for trend analysis (current: "
+                + str(len(sprints))
+                + " sprint)"
+            )
 
         lines = []
         lines.append("### Last 3 Sprints Comparison")

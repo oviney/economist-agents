@@ -262,8 +262,7 @@ class AgentRegistry:
         if name not in self._agents:
             available = ", ".join(self._agents.keys())
             raise ValueError(
-                f"Agent '{name}' not found in registry. "
-                f"Available agents: {available}"
+                f"Agent '{name}' not found in registry. Available agents: {available}"
             )
 
         config = self._agents[name]
@@ -371,8 +370,7 @@ class AgentRegistry:
         if name not in self._agents:
             available = ", ".join(self._agents.keys())
             raise ValueError(
-                f"Agent '{name}' not found in registry. "
-                f"Available agents: {available}"
+                f"Agent '{name}' not found in registry. Available agents: {available}"
             )
 
         return self._agents[name]

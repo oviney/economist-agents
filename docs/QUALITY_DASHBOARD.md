@@ -1,8 +1,8 @@
 # 📊 Quality Engineering Dashboard
-**Generated**: 2026-01-04 13:38:54
-**Quality Score**: 67/100
+**Generated**: 2026-01-04 15:15:11
+**Quality Score**: 30/100
 
-🟠 [█████████████░░░░░░░] 67/100 - FAIR
+🔴 [██████░░░░░░░░░░░░░░] 30/100 - NEEDS IMPROVEMENT
 
 ## 🐛 Defect Metrics
 
@@ -39,7 +39,7 @@
 - **Avg Gates Passed**: 5/5
 
 ### Graphics Agent
-- **Visual QA Pass Rate**: 75%
+- **Visual QA Pass Rate**: 0.0%
 - **Charts Generated**: 24
 - **Zone Violations**: 1
 
@@ -47,6 +47,23 @@
 - **Verification Rate**: 100.0%
 - **Briefs Generated**: 24
 - **Avg Data Points**: 2
+
+## 📈 Sprint-Over-Sprint Trends
+
+### Last 3 Sprints Comparison
+
+| Metric | Sprint 5 | Sprint 10 | Sprint 11 | Trend |
+|--------|--------|--------|--------|--------|
+| Quality Score | 67/100 | 72/100 | 75/100 | ↑ Better |
+| Escape Rate | 50.0% | 45.0% | 40.0% | ↑ Better |
+| Writer Clean | 100% | 80% | 85% | ↓ Worse |
+| Editor Accuracy | 85.7% | 60.0% | 65.0% | ↓ Worse |
+| Critical TTD | 5.5d | 4.0d | 3.5d | ↑ Better |
+| Points | 14 | 8 | 13 | → Stable |
+
+### Trend Summary
+- **0 of 6** metrics improving vs Sprint 5
+- **Baseline**: Sprint 5 (reference point for all comparisons)
 
 ## 📊 Quality Trends
 

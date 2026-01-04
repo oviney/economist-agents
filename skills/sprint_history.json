@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "created": "2026-01-01",
-  "last_updated": "2026-01-01",
+  "last_updated": "2026-01-04",
   "baseline_sprint": 5,
   "sprints": [
     {
@@ -21,6 +21,42 @@
         "velocity_multiplier": 5.0
       },
       "notes": "Sprint 5 baseline - First complete sprint with full quality tracking"
+    },
+    {
+      "sprint_id": 10,
+      "start_date": "2026-01-03",
+      "end_date": "2026-01-03",
+      "duration_days": 1,
+      "status": "complete",
+      "metrics": {
+        "quality_score": 72,
+        "defect_escape_rate": 45.0,
+        "writer_clean_rate": 80.0,
+        "editor_accuracy": 60.0,
+        "avg_critical_ttd_days": 4.0,
+        "points_delivered": 8,
+        "stories_completed": 1,
+        "velocity_multiplier": 1.0
+      },
+      "notes": "Sprint 10 - CrewAI Stage 3 Migration (8 points)"
+    },
+    {
+      "sprint_id": 11,
+      "start_date": "2026-01-04",
+      "end_date": "2026-01-04",
+      "duration_days": 1,
+      "status": "complete",
+      "metrics": {
+        "quality_score": 75,
+        "defect_escape_rate": 40.0,
+        "writer_clean_rate": 85.0,
+        "editor_accuracy": 65.0,
+        "avg_critical_ttd_days": 3.5,
+        "points_delivered": 13,
+        "stories_completed": 3,
+        "velocity_multiplier": 1.6
+      },
+      "notes": "Sprint 11 - SM Agent + Doc Standards + GitHub Sync (13 points)"
     }
   ]
 }

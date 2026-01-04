@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "created": "2026-01-01T00:00:00",
-  "current_sprint": 11,
+  "current_sprint": 12,
   "sprints": {
     "sprint_6": {
       "status": "complete",
@@ -390,6 +390,91 @@
     "backlog_refined": true,
     "refinement_date": "2026-01-04T19:15:00",
     "next_sprint_dor_met": true
+  },
+  "sprint_12": {
+    "status": "in_progress",
+    "start_date": "2026-01-04T18:45:00",
+    "end_date": null,
+    "capacity": 13,
+    "committed_points": 3,
+    "theme": "Quality Dashboard Data Accuracy + Validation",
+    "goals": [
+      "Fix dashboard bugs (agent metrics baseline, sprint trends rendering)",
+      "Add dashboard validation test suite (5+ tests)",
+      "Establish data accuracy foundation for predictive analytics"
+    ],
+    "planned_stories": [
+      "Story 1: Fix Dashboard Data Accuracy + Validation (3 pts, P0)"
+    ],
+    "stories": [
+      {
+        "id": 1,
+        "name": "Fix Dashboard Data Accuracy + Validation",
+        "points": 3,
+        "priority": "P0",
+        "status": "complete",
+        "started_date": "2026-01-04T18:45:00",
+        "completed_date": "2026-01-04T15:05:00",
+        "tasks": [
+          {
+            "name": "Fix Agent Metrics Integration",
+            "estimate_minutes": 90,
+            "priority": "P0",
+            "description": "Debug _build_agent_summary() method (lines 165-227). Replace baseline fallback with 'NO DATA' display when metrics unavailable.",
+            "acceptance_criteria": [
+              "Agent metrics show real data from agent_metrics.json OR display 'NO DATA'",
+              "No fake 100% baseline values displayed",
+              "Dashboard accurately reflects agent performance or explicitly shows missing data"
+            ]
+          },
+          {
+            "name": "Fix Sprint Trends Display",
+            "estimate_minutes": 45,
+            "priority": "P0",
+            "description": "Debug _render_sprint_trends() method (lines 412-568). Populate sprint_history.json with Sprint 10-11 snapshots if missing.",
+            "acceptance_criteria": [
+              "Sprint trends section renders in dashboard output",
+              "Last 3 Sprints Comparison table displays with velocity, quality score, escape rate",
+              "sprint_history.json has 2+ sprint snapshots"
+            ]
+          },
+          {
+            "name": "Add Dashboard Validation Tests",
+            "estimate_minutes": 45,
+            "priority": "P0",
+            "description": "Create tests/test_quality_dashboard.py with 5+ validation tests. Integrate with CI/CD.",
+            "acceptance_criteria": [
+              "5+ pytest tests created (metrics accuracy, sprint trends, quality score, no baseline, smoke test)",
+              "All tests passing in CI/CD pipeline",
+              "Tests validate dashboard against source files (defect_tracker.json, agent_metrics.json)"
+            ]
+          }
+        ],
+        "notes": "Phase 1 dashboard has critical bugs: fake 100% agent scores, missing sprint trends, no validation. Must fix before adding predictive analytics (Option 2)."
+      }
+    ],
+    "velocity": 3,
+    "points_delivered": 3,
+    "completion_rate": 20.0,
+    "ceremonies_complete": false,
+    "retrospective_done": false,
+    "backlog_refined": false,
+    "next_sprint_dor_met": false,
+    "backlog_groomed": false,
+    "stories_completed": [
+      {
+        "id": 1,
+        "name": "Fix Dashboard Data Accuracy + Validation",
+        "points": 3,
+        "status": "complete",
+        "completed_date": "2026-01-04T15:05:00",
+        "completion_report": "STORY_1_COMPLETE.md",
+        "acceptance_criteria_met": true,
+        "tasks_completed": 3,
+        "blockers": "NONE",
+        "quality_score": "10/10"
+      }
+    ]
   },
   "backlog": [
     {

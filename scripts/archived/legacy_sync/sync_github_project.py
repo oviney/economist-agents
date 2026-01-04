@@ -135,7 +135,7 @@ class GitHubProjectSync:
 
 **Story**: {story_name}
 
-**Notes**: {story.get('notes', 'No notes available')}
+**Notes**: {story.get("notes", "No notes available")}
 
 ---
 
@@ -303,7 +303,7 @@ class GitHubProjectSync:
         print(
             f"Points Delivered: {sprint.get('points_delivered', 0)}/{sprint.get('capacity', 0)}"
         )
-        print(f"Completion: {sprint.get('completion_rate', 0)*100:.0f}%")
+        print(f"Completion: {sprint.get('completion_rate', 0) * 100:.0f}%")
 
         if "github_project" in sprint:
             gh = sprint["github_project"]

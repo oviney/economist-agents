@@ -72,20 +72,20 @@ Examples:
             print(f"Manager crew loaded: {manager_crew}")
 
         # Execute the mission
-        print(f"\n{'='*70}")
+        print(f"\n{'=' * 70}")
         print("MISSION CONTROL: Executing Mission")
-        print(f"{'='*70}")
+        print(f"{'=' * 70}")
         print(f"Mission: {args.mission}")
-        print(f"{'='*70}\n")
+        print(f"{'=' * 70}\n")
 
         result = manager_crew.kickoff(inputs={"mission": args.mission})
 
         # Display results
-        print(f"\n{'='*70}")
+        print(f"\n{'=' * 70}")
         print("MISSION CONTROL: Mission Complete")
-        print(f"{'='*70}")
+        print(f"{'=' * 70}")
         print(f"\nResult:\n{result}")
-        print(f"\n{'='*70}\n")
+        print(f"\n{'=' * 70}\n")
 
         return 0
 

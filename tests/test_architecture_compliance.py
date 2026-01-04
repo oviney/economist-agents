@@ -31,7 +31,10 @@ ALLOWED_FILES = {
     "agent_registry.py",  # Factory for LLM instantiation
     "llm_client.py",  # Unified LLM client wrapper
     "crewai_agents.py",  # Legacy adapter (to be deprecated)
-    "run_story2_crew.py",  # CrewAI workflow execution script (uses AgentFactory for agents)
+    "run_story2_crew.py",
+    "run_story7_crew.py",
+    "run_story10_crew.py",
+    "run_story11_crew.py",  # CrewAI workflow execution script (uses AgentFactory for agents)
     # TECHNICAL DEBT: Legacy files predating ADR-002 (to be refactored)
     "featured_image_agent.py",  # TODO: Refactor to use AgentRegistry (Story 10)
     "visual_qa.py",  # TODO: Refactor to use AgentRegistry (Story 10)

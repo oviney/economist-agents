@@ -525,3 +525,75 @@ Self-learning architecture analyzer with skills system.
 - ADR-003: CrewAI Migration Strategy
 - Phase 1 completion documentation
 - TDD best practices from Phase 1
+
+---
+
+### 🟢 Story 12: Autonomous Documentation Refresh
+**Status**: Ready
+**Priority**: P2 (Medium)
+**Effort**: Small (3 Points)
+**Created**: 2026-01-04
+**Agent**: scrum-master or docs-specialist
+
+**Goal**: Update `README.md` and `docs/architecture.md` to reflect the Agent Registry, TDD patterns, and CrewAI migration.
+
+**Problem**: Documentation is out of sync with recent architectural changes:
+- Agent Registry pattern now implemented (ADR-002)
+- TDD methodology established in Phase 1 migration
+- CrewAI framework migration in progress (ADR-003)
+- Current docs don't reflect these patterns
+
+**Solution**: Comprehensive documentation refresh covering:
+1. **README.md Updates**:
+   - Add Agent Registry pattern overview
+   - Document TDD workflow (RED → GREEN → REFACTOR)
+   - Update architecture diagram with CrewAI integration
+   - Add migration status section
+   - Update quick start guide with new patterns
+
+2. **docs/architecture.md Updates**:
+   - Document Agent Registry implementation details
+   - Add CrewAI migration architecture
+   - Explain TDD patterns used in codebase
+   - Update component diagrams
+   - Document agent configuration extraction pattern
+
+**Files to Modify**:
+- `README.md` - high-level overview and quick start
+- `docs/architecture.md` - detailed architecture documentation
+- Potentially `docs/ARCHITECTURE_PATTERNS.md` - learned patterns
+
+**Content to Include**:
+- Agent Registry usage examples
+- TDD workflow diagram
+- CrewAI crew structure
+- Configuration extraction pattern
+- Before/after migration comparison
+
+**Testing Strategy**:
+- Documentation completeness checklist
+- Link validation (all references work)
+- Code examples are runnable
+- Diagrams render correctly
+
+**Quality Gates**:
+- All ADRs referenced correctly
+- No broken links in documentation
+- Code examples validated
+- Peer review by another agent
+
+**Estimate**: 3 story points (4-6 hours)
+- 2 hours: README.md update
+- 2 hours: architecture.md update
+- 1-2 hours: validation and peer review
+
+**Dependencies**:
+- ADR-002 implementation complete ✅
+- Phase 1 migration lessons documented
+- Agent Registry in production use
+
+**Related Work**:
+- ADR-002: Agent Registry Pattern
+- ADR-003: CrewAI Migration Strategy
+- Phase 1 TDD lessons learned
+- Architecture review patterns

@@ -45,7 +45,7 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
-        stages: [push]  # Only run on git push, not git commit
+        stages: [pre-push]  # Only run on git push, not git commit
 
       # Badge validation - Prevent stale badges (BUG-023)
       - id: badge-validation

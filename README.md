@@ -133,7 +133,8 @@ ctx.save_audit_log('logs/audit.json')
 - **Usage Examples**: [examples/crew_context_usage.py](examples/crew_context_usage.py)
 - **Unit Tests**: [tests/test_context_manager.py](tests/test_context_manager.py)
 - **Integration Tests**: [tests/test_crew_context_integration.py](tests/test_crew_context_integration.py)
-## � Development Workflow
+
+## 🛠️ Development Workflow
 
 We follow a strict quality-first workflow enforced by automated gates (checkpoints that validate code).
 
@@ -142,26 +143,63 @@ We follow a strict quality-first workflow enforced by automated gates (checkpoin
 git checkout -b feature/my-feature
 ```
 
-### 2. Run Quality Checks
-Before committing, ensure all local checks pass:
-```bash
-make quality
-# Runs: format, lint (ruff), type-check (mypy), and test (pytest)
-```
+### 2. Make Changes & Commit
 
-### 3. Commit with Convention
-We use conventional commits. The pre-commit hook will validate your message.
+**Fast commits** (no test suite):
 ```bash
+git add .
 git commit -m "feat: add new research capability"
+# Runs: ruff format + ruff check (~0.5s)
 ```
 
-### 4. Push and Create PR
+**Git operations** are optimized for speed:
+- `git commit`: ~0.5 seconds (format + lint only)
+- `git push`: ~7.5 seconds (includes full test suite)
+
+### 3. Run Tests Before Push (Automatic)
+
+Tests run automatically on `git push`:
 ```bash
 git push origin feature/my-feature
+# Pre-push hook runs pytest automatically
+```
+
+Or run tests manually:
+```bash
+make test          # Quick test run
+make quality       # Full quality checks (format, lint, type-check, test)
+```
+
+### 4. Create Pull Request
+```bash
 gh pr create
 ```
 
-## �📂 Project Structure
+### Pre-commit Hook Performance
+
+| Hook | When | Duration | What it does |
+|------|------|----------|--------------|
+| `ruff-format` | commit | ~300ms | Auto-format Python code |
+| `ruff check` | commit | ~200ms | Lint code (checks only) |
+| `pytest` | **push** | ~7.5s | Run full test suite (166+ tests) |
+| `check-yaml` | commit | ~50ms | Validate YAML syntax |
+| `check-json` | commit | ~50ms | Validate JSON syntax |
+
+**Why tests run on push, not commit:**
+- Faster commit workflow (0.5s vs 7.5s)
+- Encourages frequent small commits
+- Tests still validate before code reaches remote
+
+### Re-enabling Pre-commit Hooks
+
+If hooks were previously disabled, re-enable them:
+```bash
+source .venv/bin/activate
+pre-commit install --install-hooks
+pre-commit install --hook-type pre-push
+```
+
+## 📂 Project Structure
 
 ```
 economist-agents/

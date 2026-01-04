@@ -34,17 +34,18 @@ repos:
         # Temporarily non-blocking - 498 type errors to be fixed in separate PR
         stages: [manual]
 
-  # Pytest - Run test suite
+  # Pytest - Run test suite on push (not commit for speed)
   - repo: local
     hooks:
       - id: pytest
         name: pytest
-        description: Run test suite with pytest
+        description: Run test suite with pytest (pre-push only)
         entry: pytest
         args: [tests/, -v, --tb=short]
         language: system
         pass_filenames: false
         always_run: true
+        stages: [push]  # Only run on git push, not git commit
 
       # Badge validation - Prevent stale badges (BUG-023)
       - id: badge-validation

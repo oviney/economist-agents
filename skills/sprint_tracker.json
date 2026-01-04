@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "created": "2026-01-01T00:00:00",
-  "current_sprint": 12,
+  "current_sprint": 13,
   "sprints": {
     "sprint_6": {
       "status": "complete",
@@ -392,9 +392,9 @@
     "next_sprint_dor_met": true
   },
   "sprint_12": {
-    "status": "in_progress",
+    "status": "complete",
     "start_date": "2026-01-04T18:45:00",
-    "end_date": null,
+    "end_date": "2026-01-04T23:59:59",
     "capacity": 13,
     "committed_points": 3,
     "theme": "Quality Dashboard Data Accuracy + Validation",
@@ -475,6 +475,195 @@
         "quality_score": "10/10"
       }
     ]
+  },
+  "sprint_13": {
+    "status": "planned",
+    "start_date": "2026-01-05",
+    "end_date": null,
+    "capacity": 13,
+    "committed_points": 9,
+    "theme": "Production-Grade Agentic Evolution (v2.0) - João Moura Principles",
+    "epic": "EPIC-001",
+    "goals": [
+      "Implement Flow-based deterministic orchestration (0-agency transitions)",
+      "Establish Style Memory RAG with Gold Standard articles",
+      "Deploy ROI telemetry for business validation"
+    ],
+    "planned_stories": [
+      "STORY-005: Shift to Deterministic Backbone (3 pts, P0)",
+      "STORY-006: Establish Style Memory RAG (3 pts, P1)",
+      "STORY-007: Implement ROI Telemetry Hook (3 pts, P2)"
+    ],
+    "stories": [
+      {
+        "id": 5,
+        "name": "Shift to Deterministic Backbone",
+        "points": 3,
+        "priority": "P0",
+        "status": "ready",
+        "description": "Refactor src/ to use Flow-based state-machine orchestration with 0-agency for editorial transitions. Replace WORKFLOW_SEQUENCE dict with CrewAI @start/@listen decorators.",
+        "acceptance_criteria": [
+          "Flow class created with @start/@listen decorators for stage progression",
+          "Stage3/Stage4 crews integrated and orchestrated by Flow (not WORKFLOW_SEQUENCE)",
+          "Temperature=0 maintained for deterministic Editor evaluation",
+          "Quality gate router directs publish/revision paths",
+          "3+ integration tests passing validating Flow end-to-end"
+        ],
+        "tasks": [
+          {
+            "name": "Create Flow Architecture",
+            "effort_hours": 2,
+            "priority": "P0"
+          },
+          {
+            "name": "Integrate Stage3 Crew",
+            "effort_hours": 2,
+            "priority": "P0"
+          },
+          {
+            "name": "Integrate Stage4 Crew",
+            "effort_hours": 1.5,
+            "priority": "P0"
+          },
+          {
+            "name": "Integration Tests",
+            "effort_hours": 2,
+            "priority": "P0"
+          },
+          {
+            "name": "Documentation",
+            "effort_hours": 1.5,
+            "priority": "P1"
+          },
+          {
+            "name": "Cleanup WORKFLOW_SEQUENCE",
+            "effort_hours": 0.5,
+            "priority": "P2"
+          }
+        ],
+        "dependencies": [
+          "CrewAI Flow library (crewai>=0.95.0)",
+          "Existing Stage3Crew (src/crews/stage3_crew.py)",
+          "Existing Stage4Crew (src/crews/stage4_crew.py)"
+        ],
+        "dor_met": true
+      },
+      {
+        "id": 6,
+        "name": "Establish Style Memory RAG",
+        "points": 3,
+        "priority": "P1",
+        "status": "ready",
+        "description": "Vector-store with Gold Standard articles from archived/ accessible to Editor Agent for GATE 3 (VOICE) enhancement. Use ChromaDB with OpenAI embeddings.",
+        "acceptance_criteria": [
+          "Vector store populated with archived/*.md articles, query latency <500ms",
+          "Minimum 1 Gold Standard article indexed with relevance score >0.7",
+          "style_memory_tool integrated with Editor in Stage4Crew tools list",
+          "Editor prompt updated to suggest style_memory_tool usage for GATE 3",
+          "3+ integration tests passing validating RAG retrieval"
+        ],
+        "tasks": [
+          {
+            "name": "Vector Database Setup (ChromaDB)",
+            "effort_hours": 2,
+            "priority": "P0"
+          },
+          {
+            "name": "Embeddings Pipeline",
+            "effort_hours": 2,
+            "priority": "P0"
+          },
+          {
+            "name": "Style Memory Tool",
+            "effort_hours": 2,
+            "priority": "P0"
+          },
+          {
+            "name": "Editor Integration",
+            "effort_hours": 1.5,
+            "priority": "P0"
+          },
+          {
+            "name": "Integration Tests",
+            "effort_hours": 1.5,
+            "priority": "P1"
+          },
+          {
+            "name": "Documentation",
+            "effort_hours": 1,
+            "priority": "P2"
+          }
+        ],
+        "dependencies": [
+          "archived/ directory (may be empty initially)",
+          "Editor Agent in Stage4Crew",
+          "OpenAI API (text-embedding-ada-002)",
+          "ChromaDB library (pip install chromadb)"
+        ],
+        "dor_met": true
+      },
+      {
+        "id": 7,
+        "name": "Implement ROI Telemetry Hook",
+        "points": 3,
+        "priority": "P2",
+        "status": "ready",
+        "description": "Automated logging of token costs vs human-hour value in logs/execution_roi.json for business ROI validation. Track GPT-4 token usage with cost calculations.",
+        "acceptance_criteria": [
+          "execution_roi.json logs token usage with <10ms overhead per LLM call",
+          "Cost calculation accuracy within 1% of actual API charges",
+          "ROI multiplier shows efficiency gain (>100x expected)",
+          "Writer/Editor agents tracked with per-agent token breakdowns",
+          "3+ integration tests passing validating telemetry accuracy"
+        ],
+        "tasks": [
+          {
+            "name": "ROI Schema Design",
+            "effort_hours": 1,
+            "priority": "P0"
+          },
+          {
+            "name": "ROI Tracker Middleware",
+            "effort_hours": 2,
+            "priority": "P0"
+          },
+          {
+            "name": "LLM Call Instrumentation",
+            "effort_hours": 2,
+            "priority": "P0"
+          },
+          {
+            "name": "ROI Calculation Logic",
+            "effort_hours": 1.5,
+            "priority": "P1"
+          },
+          {
+            "name": "Integration Tests",
+            "effort_hours": 1.5,
+            "priority": "P1"
+          },
+          {
+            "name": "Documentation",
+            "effort_hours": 1,
+            "priority": "P2"
+          }
+        ],
+        "dependencies": [
+          "scripts/agent_registry.py (instrumentation point)",
+          "logs/ directory",
+          "Model pricing data (GPT-4: $0.03/$0.06 per 1k tokens)"
+        ],
+        "dor_met": true
+      }
+    ],
+    "velocity": null,
+    "points_delivered": 0,
+    "completion_rate": 0.0,
+    "ceremonies_complete": false,
+    "retrospective_done": false,
+    "backlog_refined": true,
+    "refinement_date": "2026-01-04T23:00:00",
+    "next_sprint_dor_met": true
   },
   "backlog": [
     {

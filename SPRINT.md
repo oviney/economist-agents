@@ -82,6 +82,148 @@ See [AGENT_VELOCITY_ANALYSIS.md](docs/AGENT_VELOCITY_ANALYSIS.md) for full resea
 
 ---
 
+## Sprint 13 Backlog: Epic EPIC-001 - Production-Grade Agentic Evolution (v2.0)
+
+**Epic Theme**: João Moura's "Production ROI" Principles Integration
+**Epic Status**: READY FOR KICKOFF ✅
+**Total Story Points**: 9 points (3 stories × 3 points each)
+**Priority**: P0 Foundation → P1 Enhancement → P2 Observability
+**Epic Documentation**: [EPIC_PRODUCTION_AGENTIC_EVOLUTION.md](docs/EPIC_PRODUCTION_AGENTIC_EVOLUTION.md)
+
+### Epic Overview
+
+Integration of CrewAI founder João Moura's production-grade AI system philosophy:
+
+1. **Deterministic Orchestration**: Replace autonomous agent routing with state-machine precision (Flows)
+2. **Quality Memory Systems**: RAG-based style/pattern memory for consistent outputs
+3. **ROI Measurement**: Token costs vs human-hour equivalents for business validation
+
+**Current State**: Agent routing via WORKFLOW_SEQUENCE dict, no style memory, no ROI telemetry
+**Target State**: Flow-based orchestration, vector-store RAG, automated ROI logging
+
+### Sprint 13 Stories
+
+#### STORY-005: Shift to Deterministic Backbone (3 pts, P0) - READY
+
+**Story Goal**: Refactor src/ to use Flow-based state-machine orchestration with 0-agency for editorial transitions
+
+**Why Now**: 
+- Current WORKFLOW_SEQUENCE dict is brittle (hardcoded routing)
+- CrewAI Flows provide @start/@listen decorators for deterministic progression
+- Foundation for all future agentic work (blocks STORY-006/007)
+
+**Technical Approach**:
+1. Create src/economist_agents/flow.py with EconomistContentFlow class
+2. Implement @start/@listen decorators for stage progression
+3. Refactor Stage3Crew/Stage4Crew for Flow orchestration
+4. Remove WORKFLOW_SEQUENCE from scripts/sm_agent.py
+5. Maintain temperature=0 for deterministic Editor evaluation
+
+**Acceptance Criteria** (5 total):
+- [ ] Flow class created with @start/@listen decorators for stage progression
+- [ ] Stage3/Stage4 crews integrated, orchestrated by Flow (not WORKFLOW_SEQUENCE)
+- [ ] Temperature=0 maintained for deterministic Editor evaluation
+- [ ] Quality gate router directs publish/revision paths
+- [ ] 3+ integration tests passing validating Flow end-to-end
+
+**Quality Requirements**: Deterministic routing, state management, <10% latency increase, >80% test coverage
+
+**Estimated Effort**: 9.5 hours = 3.4 story points → CAPPED AT 3 POINTS
+**Priority**: P0 (Architectural foundation, blocks STORY-006/007)
+**Dependencies**: CrewAI Flow (crewai>=0.95.0), Stage3/Stage4 crews
+**Risk**: Breaking changes (mitigated by integration tests, WORKFLOW_SEQUENCE fallback)
+
+---
+
+#### STORY-006: Establish Style Memory RAG (3 pts, P1) - READY
+
+**Story Goal**: Vector-store with Gold Standard articles from archived/ accessible to Editor Agent for GATE 3 (VOICE) enhancement
+
+**Why Now**:
+- Editor GATE 3 (Voice) at 87% pass rate (target 95%)
+- archived/ has production-quality Gold Standard examples
+- RAG retrieval provides concrete style patterns vs abstract rules
+
+**Technical Approach**:
+1. Select vector database (ChromaDB - lightweight, Python-native)
+2. Create embeddings pipeline for archived/*.md articles
+3. Build src/tools/style_memory_tool.py for Editor integration
+4. Integrate tool with Stage4Crew Editor Agent
+5. Implement style query logic with relevance scoring
+
+**Acceptance Criteria** (5 total):
+- [ ] Vector store populated with archived/*.md articles, query latency <500ms
+- [ ] Minimum 1 Gold Standard article indexed, relevance score >0.7 for top-1 result
+- [ ] style_memory_tool integrated with Editor in Stage4Crew tools list
+- [ ] Editor prompt updated to suggest style_memory_tool usage for GATE 3
+- [ ] 3+ integration tests passing validating RAG retrieval
+
+**Quality Requirements**: Embedding accuracy >90%, query latency <500ms, concurrent query support, rate limiting
+
+**Estimated Effort**: 10 hours = 3.6 story points → CAPPED AT 3 POINTS
+**Priority**: P1 (Quality enhancement, soft dependency on STORY-005 Flow)
+**Dependencies**: archived/ directory (may be empty), OpenAI API, ChromaDB
+**Risk**: Empty archive (graceful degradation), relevance tuning (0.7 threshold configurable)
+
+---
+
+#### STORY-007: Implement ROI Telemetry Hook (3 pts, P2) - READY
+
+**Story Goal**: Automated logging of token costs vs human-hour value in logs/execution_roi.json for business ROI validation
+
+**Why Now**:
+- Current ROI claims anecdotal ("50x faster")
+- No telemetry for token costs (can't optimize spend)
+- Need business justification for agentic investment
+
+**Technical Approach**:
+1. Design execution_roi.json schema (similar to agent_metrics.json)
+2. Create src/telemetry/roi_tracker.py middleware
+3. Instrument agent LLM calls in scripts/agent_registry.py
+4. Calculate ROI metrics (token costs, human-hour equivalent, efficiency multiplier)
+5. Build aggregation queries for ROI dashboard
+
+**Acceptance Criteria** (5 total):
+- [ ] execution_roi.json logs token usage with <10ms overhead per LLM call
+- [ ] Cost calculation accuracy within 1% of actual API charges
+- [ ] ROI multiplier shows efficiency gain (>100x expected)
+- [ ] Writer/Editor agents tracked with per-agent token breakdowns
+- [ ] 3+ integration tests passing validating telemetry accuracy
+
+**Quality Requirements**: Accurate cost calculation, minimal overhead <10ms, no PII in logs, 30-day rotation
+
+**Estimated Effort**: 9 hours = 3.2 story points → CAPPED AT 3 POINTS
+**Priority**: P2 (Observability/measurement, no blockers, parallel work)
+**Dependencies**: agent_registry.py, model pricing data, human-hour benchmarks
+**Risk**: Performance overhead (async logging), pricing changes (configurable)
+
+---
+
+### Sprint 13 Planning
+
+**Total Capacity**: 13 story points
+**Planned Allocation**: 9 points (3 stories × 3 points each)
+**Buffer**: 4 points (31% reserve for quality/unknowns)
+
+**Story Sequence**:
+1. STORY-005 (3 pts, P0) - Week 1 focus (architectural foundation)
+2. STORY-006 (3 pts, P1) - Week 1-2 parallel (RAG system, soft dependency on STORY-005)
+3. STORY-007 (3 pts, P2) - Week 1-2 parallel (telemetry, no dependencies)
+
+**Parallel Execution**:
+- STORY-005 and STORY-007 can run in parallel (no dependencies)
+- STORY-006 should start after STORY-005 kickoff (benefits from Flow architecture)
+- All 3 stories can overlap if team capacity allows (2-3 developers)
+
+**Success Metrics**:
+- Flow-based orchestration operational (0 WORKFLOW_SEQUENCE references)
+- RAG system retrieves style examples (query latency <500ms)
+- execution_roi.json logs token costs accurately (±1% error)
+- No regressions in existing functionality
+- Business ROI validated (telemetry shows >100x efficiency)
+
+---
+
 **Sprint 11 Status** (Jan 4, 2026) - COMPLETE ✅:
 - ✅ **Story 13: Stage 4 Migration (Review & Refinement) (5 pts, P0) - COMPLETE** ✨ (Editorial Review: 5-gate quality)
 - ✅ **Story 12: Phase 2 Documentation (3 pts, P1) - COMPLETE** ✨ (Agent Registry & Architecture)

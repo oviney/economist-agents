@@ -150,21 +150,27 @@ git checkout -b feature/my-feature
 git add .
 git commit -m "feat: add new research capability"
 # Runs: ruff format + ruff check (~0.5s)
+# Tests DO NOT run on commit (for speed)
 ```
 
 **Git operations** are optimized for speed:
-- `git commit`: ~0.5 seconds (format + lint only)
-- `git push`: ~7.5 seconds (includes full test suite)
+- `git commit`: ~0.5 seconds (format + lint only) ⚡
+- `git push`: ~7.5 seconds (includes full test suite) 🧪
 
 ### 3. Run Tests Before Push (Automatic)
 
-Tests run automatically on `git push`:
+**Tests run automatically on `git push`** (not on commit):
 ```bash
 git push origin feature/my-feature
-# Pre-push hook runs pytest automatically
+# Pre-push hook runs pytest automatically (~7.5s)
 ```
 
-Or run tests manually:
+**Emergency bypass** (use sparingly):
+```bash
+git push --no-verify  # Skip tests (for urgent hotfixes only)
+```
+
+**Or run tests manually** before pushing:
 ```bash
 make test          # Quick test run
 make quality       # Full quality checks (format, lint, type-check, test)
@@ -179,16 +185,22 @@ gh pr create
 
 | Hook | When | Duration | What it does |
 |------|------|----------|--------------|
-| `ruff-format` | commit | ~300ms | Auto-format Python code |
-| `ruff check` | commit | ~200ms | Lint code (checks only) |
-| `pytest` | **push** | ~7.5s | Run full test suite (166+ tests) |
-| `check-yaml` | commit | ~50ms | Validate YAML syntax |
-| `check-json` | commit | ~50ms | Validate JSON syntax |
+| `ruff-format` | **commit** | ~300ms | Auto-format Python code |
+| `ruff check` | **commit** | ~200ms | Lint code (checks only) |
+| `pytest` | **push** ⚡ | ~7.5s | Run full test suite (166+ tests) |
+| `check-yaml` | **commit** | ~50ms | Validate YAML syntax |
+| `check-json` | **commit** | ~50ms | Validate JSON syntax |
 
 **Why tests run on push, not commit:**
-- Faster commit workflow (0.5s vs 7.5s)
-- Encourages frequent small commits
-- Tests still validate before code reaches remote
+- ⚡ **Faster commit workflow** (0.5s vs 7.5s)
+- ✅ **Encourages frequent small commits**
+- 🧪 **Tests still validate before code reaches remote**
+- 🚀 **Improves local iteration speed**
+
+**Emergency bypass** (use with caution):
+```bash
+git push --no-verify  # Skip pre-push tests (for urgent hotfixes only)
+```
 
 ### Re-enabling Pre-commit Hooks
 

@@ -1130,6 +1130,93 @@ See [EPIC_PRODUCT_DISCOVERY.md](docs/EPIC_PRODUCT_DISCOVERY.md) for complete spe
 
 ## Backlog (Prioritized for Sprint 6+)
 
+### Sprint 10 Candidates (Architecture Improvements)
+
+**ADR-002: Agent Registry Pattern Enforcement**
+
+**Story 1: Implement Agent Registry Core** (5 pts, P0)
+- **Status**: APPROVED - ADR-002 accepted 2026-01-03
+- **Goal**: Create central registry for agent discovery and instantiation
+- **Dependencies**: None (foundation work)
+
+**Tasks** (5 story points, ~14 hours):
+1. **Create `scripts/agent_registry.py`** (4 hours, P0)
+   - Implement `AgentRegistry` class with discovery layer
+   - Add `_load_agents()` reading from `.github/agents/*.agent.md`
+   - Implement `_parse_markdown_frontmatter()` for YAML extraction
+   - Add `get_agent()` factory method with LLM injection
+   - Add `list_agents()` with category filtering
+   - Implement `get_config()` for raw configuration access
+
+2. **Create `LLMProvider` Protocol** (2 hours, P0)
+   - Define `LLMProvider` protocol interface in `scripts/llm_client.py`
+   - Refactor existing code to implement protocol
+   - Add `OpenAIProvider` and `AnthropicProvider` classes
+   - Test provider abstraction with mock
+
+3. **Add Unit Tests** (3 hours, P0)
+   - Create `tests/test_agent_registry.py`
+   - Test agent loading from `.agent.md` files
+   - Test factory method creates proper instances
+   - Test category filtering
+   - Test frontmatter parsing edge cases
+   - Target: >90% coverage
+
+4. **Documentation** (1 hour, P1)
+   - Add docstrings to all public methods
+   - Create usage examples in ADR-002
+   - Update ARCHITECTURE_PATTERNS.md to deprecate "Prompts As Code"
+
+**Acceptance Criteria**:
+- [ ] `AgentRegistry` class loads all `.agent.md` files from `.github/agents/`
+- [ ] `get_agent()` creates agent instances with proper LLM injection
+- [ ] `list_agents(category="...")` filters correctly
+- [ ] `LLMProvider` protocol implemented by both OpenAI and Anthropic
+- [ ] 10+ unit tests passing with >90% coverage
+- [ ] Can swap LLM provider with 1-line config change
+
+---
+
+**Story 2: Enforce Registry Pattern** (3 pts, P0)
+- **Status**: APPROVED - ADR-002 accepted 2026-01-03
+- **Goal**: Prevent direct LLM instantiation, enforce registry pattern
+- **Dependencies**: Story 1 (Agent Registry Core)
+
+**Tasks** (3 story points, ~8 hours):
+1. **Update `scripts.instructions.md`** (1 hour, P0)
+   - Add ban on direct LLM instantiation
+   - Require `AgentRegistry` for all agent creation
+   - Add examples of correct/incorrect patterns
+   - Document exception cases (e.g., llm_client.py itself)
+
+2. **Add Linting Rule** (3 hours, P0)
+   - Option A: Create semgrep rule for direct LLM imports
+   - Option B: Simple grep check in CI/CD pipeline
+   - Block direct imports of `openai.OpenAI` or `anthropic.Anthropic` outside registry
+   - Whitelist: `scripts/llm_client.py`, `scripts/agent_registry.py`
+   - Add to pre-commit hook for fast feedback
+
+3. **Refactor Existing Code** (3 hours, P1)
+   - Update `scripts/editorial_board.py` to use registry
+   - Update `scripts/economist_agent.py` to use registry
+   - Remove old agent instantiation code
+   - Verify all tests still pass
+
+4. **Documentation** (1 hour, P1)
+   - Update `.github/instructions/scripts.instructions.md`
+   - Add migration guide for team members
+   - Document enforcement tooling
+
+**Acceptance Criteria**:
+- [ ] `scripts.instructions.md` bans direct LLM instantiation
+- [ ] Linting rule fails build on direct `openai`/`anthropic` imports
+- [ ] Pre-commit hook catches violations before commit
+- [ ] All existing scripts migrated to use registry
+- [ ] Zero direct agent instantiation in codebase (except registry)
+- [ ] CI/CD pipeline green with new enforcement rules
+
+---
+
 ### Sprint 6 Candidates (TBD - To Be Planned)
 
 **High Priority:**
@@ -1147,7 +1234,7 @@ See [EPIC_PRODUCT_DISCOVERY.md](docs/EPIC_PRODUCT_DISCOVERY.md) for complete spe
 
 **Future Enhancements:**
 - Issue #14: GenAI Featured Images (DALL-E 3 integration)
-- Issue #26: Extract Agent Definitions to YAML
+- ~~Issue #26: Extract Agent Definitions to YAML~~ → **SUPERSEDED by ADR-002** (Markdown with frontmatter)
 - Agent benchmarking framework
 
 ---

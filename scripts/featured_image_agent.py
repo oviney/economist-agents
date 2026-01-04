@@ -22,8 +22,7 @@ Usage:
 import base64
 import os
 from pathlib import Path
-
-# Import unified LLM client
+from typing import Literal
 
 # ═══════════════════════════════════════════════════════════════════════════
 # ECONOMIST VISUAL STYLE SPECIFICATION
@@ -114,8 +113,8 @@ def generate_featured_image(
     article_summary: str,
     output_path: str,
     contrarian_angle: str = "",
-    size: str = "1024x1024",
-    quality: str = "standard",
+    size: Literal["1024x1024", "1792x1024", "1024x1792"] = "1024x1024",
+    quality: Literal["standard", "hd"] = "standard",
 ) -> str | None:
     """
     Generate a featured image using DALL-E 3.
@@ -130,6 +129,10 @@ def generate_featured_image(
 
     Returns:
         Path to saved image, or None if generation failed
+
+    Raises:
+        ValueError: If output_path is invalid
+        RuntimeError: If image generation fails
     """
 
     print(f"🎨 Featured Image Agent: Generating illustration for '{topic[:50]}...'")
@@ -144,9 +147,11 @@ def generate_featured_image(
 
     try:
         # Import OpenAI (only if API key is set)
+        # Note: DALL-E uses specialized image generation endpoint, not standard chat
+        # completion, so we maintain direct client instantiation here per ADR-002 exception
         import openai
 
-        # Create OpenAI client
+        # Create OpenAI client for DALL-E image generation
         client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
         # Generate image with DALL-E 3
@@ -160,6 +165,10 @@ def generate_featured_image(
         )
 
         # Get the image URL or b64_json
+        # Type narrowing: response.data is list[Image] | None
+        if not response.data:
+            raise RuntimeError("DALL-E returned no image data")
+
         image_data = response.data[0]
 
         if hasattr(image_data, "b64_json") and image_data.b64_json:
@@ -186,7 +195,7 @@ def generate_featured_image(
         print(f"   ✓ Image saved to {output_path}")
 
         # Log the revised prompt (DALL-E 3 may revise prompts)
-        if hasattr(image_data, "revised_prompt"):
+        if hasattr(image_data, "revised_prompt") and image_data.revised_prompt:
             print(f"   ℹ DALL-E revised prompt: {image_data.revised_prompt[:100]}...")
 
         return str(output_path)

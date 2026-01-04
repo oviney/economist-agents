@@ -1,7 +1,7 @@
 # ADR-002: Implement Agent Registry Pattern
 
-**Status:** Proposed
-**Date:** 2026-01-01
+**Status:** Approved
+**Date:** 2026-01-01 (Approved: 2026-01-03)
 **Deciders:** Ouray Viney (Agentic AI Architect)
 **Dependencies:** ADR-001 (Agent Configuration Extraction)
 
@@ -16,6 +16,8 @@ After extracting agent definitions to YAML (ADR-001), we need a systematic way t
 5. **Version agents:** Load specific agent versions
 
 Currently, each script directly instantiates agents with hardcoded provider logic. This creates coupling and makes testing difficult.
+
+**Note:** This ADR deprecates the "Prompts As Code" pattern documented in `ARCHITECTURE_PATTERNS.md`. Agent configurations will be externalized to `.agent.md` files instead of large string constants in Python files.
 
 ## Decision
 
@@ -56,12 +58,21 @@ class AgentRegistry:
         self._load_agents()
 
     def _load_agents(self):
-        """Load all YAML files from config directory"""
-        for yaml_file in self.config_dir.rglob("*.yaml"):
-            with open(yaml_file) as f:
-                config = yaml.safe_load(f)
-                agent_config = AgentConfig(**config)
-                self._agents[agent_config.name] = agent_config
+        """Load all .agent.md files from config directory"""
+        for agent_file in self.config_dir.rglob("*.agent.md"):
+            config = self._parse_markdown_frontmatter(agent_file)
+            agent_config = AgentConfig(**config)
+            self._agents[agent_config.name] = agent_config
+
+    def _parse_markdown_frontmatter(self, file_path: Path) -> Dict:
+        """Extract YAML frontmatter from Markdown file"""
+        with open(file_path) as f:
+            content = f.read()
+            if content.startswith('---'):
+                parts = content.split('---', 2)
+                if len(parts) >= 3:
+                    return yaml.safe_load(parts[1])
+        raise ValueError(f"No valid frontmatter in {file_path}")
 
     def get_agent(self, name: str, model: str = "gpt-4o") -> Agent:
         """Factory method: Create agent instance"""
@@ -100,7 +111,7 @@ class AgentRegistry:
 
 # Usage in scripts
 registry = AgentRegistry(
-    config_dir=Path("agents/"),
+    config_dir=Path(".github/agents/"),
     llm_factory=OpenAIProvider()
 )
 
@@ -193,17 +204,22 @@ board_agents = [
 ```python
 # tests/test_agent_registry.py
 
-def test_load_agents_from_yaml(tmp_path):
-    """Registry loads all YAML files"""
-    (tmp_path / "test_agent.yaml").write_text("""
-    name: test_agent
-    role: Tester
-    goal: Test things
-    backstory: I test
-    system_message: You are a test
-    tools: []
-    metadata:
-      category: testing
+def test_load_agents_from_markdown(tmp_path):
+    """Registry loads all .agent.md files"""
+    (tmp_path / "test_agent.agent.md").write_text("""---
+name: test_agent
+role: Tester
+goal: Test things
+backstory: I test
+system_message: You are a test
+tools: []
+metadata:
+  category: testing
+---
+
+# Test Agent
+
+This is the main agent documentation.
     """)
 
     registry = AgentRegistry(tmp_path, MockLLMProvider())
@@ -211,7 +227,7 @@ def test_load_agents_from_yaml(tmp_path):
 
 def test_get_agent_creates_instance(mock_llm_factory):
     """Factory method creates proper agent instance"""
-    registry = AgentRegistry(Path("agents/"), mock_llm_factory)
+    registry = AgentRegistry(Path(".github/agents/"), mock_llm_factory)
     agent = registry.get_agent("vp_engineering")
 
     assert agent.role == "VP of Engineering perspective on QE"
@@ -219,7 +235,7 @@ def test_get_agent_creates_instance(mock_llm_factory):
 
 def test_list_agents_filters_by_category():
     """Can filter agents by category"""
-    registry = AgentRegistry(Path("agents/"), MockLLMProvider())
+    registry = AgentRegistry(Path(".github/agents/"), MockLLMProvider())
     board_agents = registry.list_agents(category="editorial_board")
 
     assert len(board_agents) == 6

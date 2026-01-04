@@ -107,6 +107,84 @@ def test_research_agent():
     assert result["data"] == "test"
 ```
 
+## Spec-First TDD (Test-Driven Development)
+
+**CRITICAL**: All new scripts MUST follow spec-first TDD workflow.
+
+### Workflow
+
+1. **Write Specification First**
+   ```python
+   """
+   Module: github_project_tool.py
+   
+   Purpose: Interact with GitHub Projects API v2
+   
+   Functions:
+   - list_project_items(project_id: str) -> list[dict]
+     Returns all items in a project
+   
+   - add_item_to_project(project_id: str, issue_url: str) -> dict
+     Adds GitHub issue to project board
+   
+   - update_item_status(item_id: str, status: str) -> dict
+     Updates item status (Todo, In Progress, Done)
+   """
+   ```
+
+2. **Write Tests (Before Implementation)**
+   ```python
+   def test_list_project_items():
+       """Test listing project items."""
+       mock_client = Mock()
+       mock_client.graphql.return_value = {"data": {"items": []}}
+       
+       result = list_project_items(mock_client, "PROJECT_123")
+       assert result == []
+       mock_client.graphql.assert_called_once()
+   ```
+
+3. **Implement to Pass Tests**
+   ```python
+   def list_project_items(client, project_id: str) -> list[dict]:
+       """List all items in GitHub project."""
+       query = """
+       query($projectId: ID!) {
+           node(id: $projectId) {
+               ... on ProjectV2 {
+                   items(first: 100) { nodes { id } }
+               }
+           }
+       }
+       """
+       response = client.graphql(query, variables={"projectId": project_id})
+       return response.get("data", {}).get("items", [])
+   ```
+
+4. **Validate with pytest**
+   ```bash
+   pytest tests/test_github_project_tool.py -v
+   ```
+
+### Benefits
+
+- ✅ Forces clear design before coding
+- ✅ Prevents scope creep (spec is contract)
+- ✅ Tests catch regressions immediately
+- ✅ Documentation generated from spec
+- ✅ Parallel development (spec enables team work)
+
+### When to Skip TDD
+
+**Never skip for:**
+- API integrations (GitHub, Anthropic, etc.)
+- Data transformations (JSON, CSV parsing)
+- Agent orchestration logic
+
+**Can skip for:**
+- One-time scripts (< 50 lines)
+- Exploratory prototypes (mark as experimental)
+
 ## Custom Copilot Agents
 
 Use specialized agents for this codebase:

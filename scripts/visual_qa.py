@@ -18,7 +18,7 @@ import json
 import os
 from pathlib import Path
 
-import anthropic
+from scripts.agent_registry import AgentRegistry
 
 # ═══════════════════════════════════════════════════════════════════════════
 # VISUAL QA PROMPT
@@ -244,10 +244,18 @@ def validate_chart_before_publish(image_path: str, auto_fix: bool = False) -> tu
     """
     Validate a chart and optionally suggest fixes.
 
+    Uses Agent Registry to get visual QA agent with Claude vision support.
+    Per ADR-002, this provides centralized LLM client management.
+
     Returns:
         (passed: bool, result: dict)
     """
-    client = anthropic.Anthropic()
+    # Get visual QA agent from registry
+    # This agent uses Claude Sonnet 4 with vision capabilities
+    registry = AgentRegistry()
+    agent = registry.get_agent("visual-qa-agent", provider="anthropic")
+    client = agent["llm_client"]
+
     result = run_visual_qa(client, image_path)
 
     passed = result.get("overall_pass", False)

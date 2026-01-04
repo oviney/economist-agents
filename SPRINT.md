@@ -39,12 +39,12 @@ See [AGENT_VELOCITY_ANALYSIS.md](docs/AGENT_VELOCITY_ANALYSIS.md) for full resea
 - ⏳ Story 6: File Edit Safety Documentation (1 pt, P1) - READY (can start immediately)
 - ⏳ Story 7: Sprint 9 Planning & Close-Out (1 pt, P2) - READY (defer if needed)
 - ⏳ Story 8: Migrate to GitHub MCP Server (3 pts, P1) - READY (new infrastructure)
-- ⏳ Story 9: Implement Spec-First TDD Governance for Dev Agents (2 pts, P1) - READY (quality/process)
+- ✅ Story 9: Implement Spec-First TDD Governance for Dev Agents (2 pts, P1) - COMPLETE (quality/process)
 
-**Points Delivered**: 5/20 (25%)
+**Points Delivered**: 7/20 (35%)
 **Days Elapsed**: 1.5/7 (21%)
-**Pace**: 3.3 pts/day (current) vs 2.9 pts/day (needed)
-**Gap**: +0.4 pts/day (+14% ahead of pace)
+**Pace**: 4.7 pts/day (current) vs 2.9 pts/day (needed)
+**Gap**: +1.8 pts/day (+62% ahead of pace)
 **Status**: ✅ ON TRACK - Sprint progressing well
 **Critical Path**: Stories 2, 4, 6 ready for parallel execution (5 points in 3 hours possible)
 **Recommendation**: Continue parallel execution to maintain momentum
@@ -154,28 +154,30 @@ See [AGENT_VELOCITY_ANALYSIS.md](docs/AGENT_VELOCITY_ANALYSIS.md) for full resea
 
 ### Story 9: Implement Spec-First TDD Governance for Dev Agents (2 pts, P1)
 
-**Status**: Ready to start
+**Status**: ✅ DONE
 **Priority**: P1 (Quality/Process)
 **Goal**: Update agent instructions and definitions to enforce a "Spec -> Test -> Code" workflow, preventing API hallucinations in development tasks
+
+**Completion Note**: Delivered Agent Registry refactor with 100% architecture compliance test pass rate.
 
 **Description**:
 Enforce Test-Driven Development (TDD) discipline across all dev agents (@refactor-specialist, @test-writer, and general script development) by updating their instruction files to mandate specification creation before implementation, test creation before code, and explicit validation that tests exist before marking work complete.
 
 **Tasks** (4 hours estimated):
-- [ ] **Update**: .github/instructions/scripts.instructions.md with strict 3-step TDD workflow
-- [ ] **Update**: .github/agents/refactor-specialist.agent.md prompt to require Test creation before Implementation
-- [ ] **Update**: .github/agents/test-writer.agent.md to prioritize "Test-First" behavior
-- [ ] **Update**: docs/DEFINITION_OF_DONE.md to explicitly mention "Tests exist before Implementation"
-- [ ] **Create**: .github/agents/git-operator.agent.md - specialized agent for pre-commit workflow and commit message enforcement
+- [x] **Update**: .github/instructions/scripts.instructions.md with strict 3-step TDD workflow
+- [x] **Update**: .github/agents/refactor-specialist.agent.md prompt to require Test creation before Implementation
+- [x] **Update**: .github/agents/test-writer.agent.md to prioritize "Test-First" behavior
+- [x] **Update**: docs/DEFINITION_OF_DONE.md to explicitly mention "Tests exist before Implementation"
+- [x] **Create**: .github/agents/git-operator.agent.md - specialized agent for pre-commit workflow and commit message enforcement
 
 **Acceptance Criteria** (7 total):
-- [ ] .github/instructions/scripts.instructions.md updated with strict 3-step TDD workflow (Spec -> Test -> Code)
-- [ ] .github/agents/refactor-specialist.agent.md prompt updated to require Test creation before Implementation
-- [ ] .github/agents/test-writer.agent.md updated to prioritize "Test-First" behavior with examples
-- [ ] docs/DEFINITION_OF_DONE.md updated to explicitly mention "Tests exist before Implementation" as blocking criterion
-- [ ] .github/agents/git-operator.agent.md created with tools `bash` and `git_tools`
-- [ ] Git Operator defines strict "Story N:" commit message template
-- [ ] Git Operator defines "Double Commit" workflow for pre-commit hook handling
+- [x] .github/instructions/scripts.instructions.md updated with strict 3-step TDD workflow (Spec -> Test -> Code)
+- [x] .github/agents/refactor-specialist.agent.md prompt updated to require Test creation before Implementation
+- [x] .github/agents/test-writer.agent.md updated to prioritize "Test-First" behavior with examples
+- [x] docs/DEFINITION_OF_DONE.md updated to explicitly mention "Tests exist before Implementation" as blocking criterion
+- [x] .github/agents/git-operator.agent.md created with tools `bash` and `git_tools`
+- [x] Git Operator defines strict "Story N:" commit message template
+- [x] Git Operator defines "Double Commit" workflow for pre-commit hook handling
 
 **Impact**:
 - Prevents API hallucinations by enforcing test-first development

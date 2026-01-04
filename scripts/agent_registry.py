@@ -23,6 +23,18 @@ from llm_client import create_llm_client
 
 logger = logging.getLogger(__name__)
 
+# CrewAI Tools - REQUIRED dependency
+try:
+    from crewai_tools import (
+        DirectoryReadTool,
+        FileReadTool,
+        FileWriterTool,
+    )
+except ImportError as err:
+    raise ImportError(
+        "CRITICAL: 'crewai-tools' is missing. Run 'pip install crewai-tools'."
+    ) from err
+
 # Agile Discipline: Process Compliance System Prompt
 # Injected into every agent to enforce Agile team discipline
 AGILE_MINDSET = """
@@ -177,6 +189,44 @@ class AgentRegistry:
 
         return ""
 
+    def _instantiate_tools(self, tool_names: list[str]) -> list[Any]:
+        """Convert tool name strings to actual tool instances.
+
+        Args:
+            tool_names: List of tool names from agent config (e.g., ['file_read', 'file_write'])
+
+        Returns:
+            List of instantiated CrewAI tool objects
+
+        Raises:
+            ValueError: If unknown tool name provided
+        """
+        # Tool factory mapping
+        TOOL_FACTORY = {
+            "file_read": FileReadTool,
+            "file_write": FileWriterTool,
+            "directory_read": DirectoryReadTool,
+            # Add more tool mappings here as needed
+        }
+
+        instantiated = []
+        for tool_name in tool_names:
+            # Normalize tool name (handle both file_read and FileReadTool formats)
+            normalized = tool_name.lower().replace("tool", "").replace("_tool", "")
+
+            if normalized in TOOL_FACTORY:
+                tool_class = TOOL_FACTORY[normalized]
+                tool_instance = tool_class()
+                instantiated.append(tool_instance)
+                logger.debug(f"Instantiated tool: {tool_name} -> {tool_class.__name__}")
+            else:
+                logger.warning(
+                    f"Unknown tool '{tool_name}' requested. "
+                    f"Available: {', '.join(TOOL_FACTORY.keys())}"
+                )
+
+        return instantiated
+
     def get_agent(
         self, name: str, model: str | None = None, provider: str | None = None
     ) -> dict[str, Any]:
@@ -231,6 +281,9 @@ class AgentRegistry:
         # Inject Agile discipline into backstory (ADR-002: Process Compliance)
         backstory_with_discipline = config.backstory + AGILE_MINDSET
 
+        # Instantiate actual tool objects from string names
+        tool_instances = self._instantiate_tools(config.tools)
+
         return {
             "name": config.name,
             "config": config,
@@ -239,7 +292,7 @@ class AgentRegistry:
             "goal": config.goal,
             "backstory": backstory_with_discipline,
             "system_message": config.system_message,
-            "tools": config.tools,
+            "tools": tool_instances,  # Now actual tool instances, not strings
         }
 
     def list_agents(

@@ -25,24 +25,20 @@ Expected Output:
 
 from pathlib import Path
 
-from crewai import Crew, Task
+from crewai import Agent, Crew, Task
 
-# Use AgentFactory from crewai_agents (ADR-002 compliant)
-from crewai_agents import AgentFactory
+from scripts.agent_registry import AgentRegistry
 
 # ============================================================================
 # CONFIGURATION
 # ============================================================================
 
 STORY_ID = "10"
-STORY_CONTEXT = (
-    "AS A Migration Engineer, I WANT to migrate Stage 3 Content Generation to CrewAI "
-    "using TDD, SO THAT we have testable confidence in the migration."
-)
+STORY_CONTEXT = "Migrate src/stage3.py to CrewAI Stage3Crew using strict TDD"
 REQUIRED_AGENTS = ["migration-engineer"]
 
 # TDD Configuration
-TDD_VERIFICATION_SCRIPT = "tests/verify_stage3_migration.py"
+TDD_VERIFICATION_SCRIPT = "tests/reproduce_stage3.py"
 STAGE3_CREW_MODULE = "agents/stage3_crew.py"
 
 # ============================================================================
@@ -50,23 +46,41 @@ STAGE3_CREW_MODULE = "agents/stage3_crew.py"
 # ============================================================================
 
 
-def load_agents() -> dict:
-    """Load required agents using AgentFactory (ADR-002 compliant).
+def load_agents(registry: AgentRegistry) -> dict:
+    """Load required agents from registry.
+
+    Args:
+        registry: Initialized AgentRegistry instance
 
     Returns:
         Dictionary mapping role names to CrewAI Agent instances
     """
-    factory = AgentFactory()
     agents = {}
-
     for role in REQUIRED_AGENTS:
-        agent = factory.create_agent(role, verbose=True, allow_delegation=False)
-        if agent is None:
+        agent_dict = registry.get_agent(role)
+        if agent_dict is None:
             raise ValueError(
-                f"Agent '{role}' not found in schemas/agents.yaml. "
-                f"Check agent configuration."
+                f"Agent '{role}' not found. "
+                f"Available: {', '.join(registry.list_agents())}"
             )
-        agents[role] = agent
+
+        # Convert AgentRegistry output to CrewAI Agent instance
+        # Include tools if available (now actual tool instances, not strings)
+        agent_params = {
+            "role": agent_dict["role"],
+            "goal": agent_dict["goal"],
+            "backstory": agent_dict["backstory"],
+            "verbose": True,
+            "allow_delegation": False,
+        }
+
+        # Add tools if available
+        if agent_dict.get("tools"):
+            agent_params["tools"] = agent_dict["tools"]
+            print(f"✓ Loaded {len(agent_dict['tools'])} tools for {role}")
+
+        crewai_agent = Agent(**agent_params)
+        agents[role] = crewai_agent
     return agents
 
 
@@ -76,194 +90,129 @@ def load_agents() -> dict:
 
 
 def define_tasks(agents: dict) -> list[Task]:
-    """Define tasks enforcing Red-Green-Refactor TDD discipline.
+    """Define TDD-enforced tasks for Stage3 migration.
+
+    Task 1 (The Trap): Create a failing test that captures expected behavior
+    Task 2 (The Escape): Implement Stage3Crew to make the test pass
 
     Args:
         agents: Dictionary of loaded CrewAI agents
 
     Returns:
-        List of Task objects for the TDD mission
-
-    TDD Flow:
-        Task 1 (RED): Create failing reproduction script
-        Task 2 (GREEN): Implement code to pass test
-        Task 3 (REFACTOR): Clean up while maintaining green
+        List of Task objects enforcing TDD discipline
     """
     tasks = []
 
     # ========================================================================
-    # TASK 1: RED STATE - Create Failing Test
+    # TASK 1: THE TRAP - Create Failing Test
     # ========================================================================
     tasks.append(
         Task(
             description=(
-                "## RED PHASE: Create Failing Reproduction Script\n\n"
-                f"Create `{TDD_VERIFICATION_SCRIPT}` that:\n"
-                "1. Mocks the input (topic, research data)\n"
-                "2. Asserts expected CrewAI output structure:\n"
-                "   - Research findings with sources\n"
-                "   - Article draft in Economist style\n"
-                "   - Editor feedback with quality gates\n"
-                "3. Attempts to import and run Stage3Crew\n"
-                "4. MUST FAIL because Stage3Crew doesn't exist yet\n\n"
-                "**CRITICAL**: Run this script immediately after creation.\n"
-                "The output MUST show:\n"
-                "- ModuleNotFoundError or ImportError for Stage3Crew\n"
-                "- OR AssertionError showing expected structure missing\n"
-                "- EXIT CODE: 1 (failure)\n\n"
-                "**Evidence Required**:\n"
-                "- pytest output showing FAILED\n"
-                "- Error traceback proving code is missing\n"
-                "- Clear assertion of what SHOULD exist but DOESN'T\n\n"
-                "Include in script:\n"
+                "## TASK 1: THE TRAP - Create Failing Reproduction Test\n\n"
+                "**Goal**: Analyze legacy `src/stage3.py` and create a test that "
+                "asserts the expected output of the NEW Crew. The test MUST FAIL.\n\n"
+                "**Instructions**:\n"
+                f"1. Analyze the legacy `src/stage3.py` module\n"
+                "2. Understand its input/output interface and functionality\n"
+                f"3. Write the reproduction code to disk using the `file_write` tool at `{TDD_VERIFICATION_SCRIPT}` that:\n"
+                "   - Imports the NEW (not yet existing) Stage3Crew class\n"
+                "   - Instantiates it with sample inputs\n"
+                "   - Calls the kickoff method\n"
+                "   - Asserts the expected output matches legacy behavior\n"
+                f"4. **CRITICAL**: USE THE `file_write` TOOL to save the test to `{TDD_VERIFICATION_SCRIPT}`. DO NOT just show the code. SAVE IT.\n"
+                "5. RUN THE TEST - it MUST FAIL because Stage3Crew doesn't exist yet\n\n"
+                "**Critical TDD Rule**: You must run the test and confirm it FAILS.\n"
+                "Show the test execution output with the failure message.\n\n"
+                "**Expected Test Structure**:\n"
                 "```python\n"
-                "# Test: Stage 3 CrewAI Migration\n"
-                "def test_stage3_crew_exists():\n"
-                "    from agents.stage3_crew import Stage3Crew\n"
-                "    assert Stage3Crew is not None\n"
-                "\n"
-                "def test_content_creator_agent():\n"
-                "    crew = Stage3Crew()\n"
-                "    assert crew.content_creator is not None\n"
-                "    assert crew.content_creator.role == 'content-creator'\n"
-                "\n"
-                "def test_stage3_pipeline():\n"
-                "    crew = Stage3Crew()\n"
-                "    result = crew.run(topic='Self-Healing Tests')\n"
+                "def test_stage3_crew_migration():\n"
+                "    # Arrange\n"
+                "    crew = Stage3Crew(topic='Self-Healing Tests')\n"
+                "    \n"
+                "    # Act\n"
+                "    result = crew.kickoff()\n"
+                "    \n"
+                "    # Assert\n"
                 "    assert 'article' in result\n"
                 "    assert 'chart_data' in result\n"
-                "```\n"
+                "    assert len(result['article']) > 500\n"
+                "```\n\n"
+                "**Deliverables**:\n"
+                f"- File `{TDD_VERIFICATION_SCRIPT}` created\n"
+                "- Test execution output showing FAILURE\n"
+                "- Analysis of legacy src/stage3.py functionality\n"
+                "- Clear acceptance criteria for the new Crew\n"
             ),
             agent=agents["migration-engineer"],
             expected_output=(
-                f"File created: {TDD_VERIFICATION_SCRIPT}\n"
-                "Test execution output showing:\n"
-                "- RED STATE CONFIRMED: Tests FAIL\n"
-                "- ModuleNotFoundError or ImportError\n"
-                "- Exit code: 1\n"
-                "- Proof that expected code does NOT exist\n\n"
-                "Example output:\n"
+                f"1. File `{TDD_VERIFICATION_SCRIPT}` created\n"
+                "2. Test execution output showing FAILURE (ImportError or AssertionError)\n"
+                "3. Analysis document describing legacy Stage3 functionality\n"
+                "4. Clear acceptance criteria for the new Stage3Crew\n\n"
+                "Example failure output:\n"
                 "```\n"
-                "$ pytest tests/verify_stage3_migration.py\n"
-                "FAILED tests/verify_stage3_migration.py::test_stage3_crew_exists\n"
-                "ModuleNotFoundError: No module named 'agents.stage3_crew'\n"
-                "=== 3 failed in 0.12s ===\n"
+                f"$ pytest {TDD_VERIFICATION_SCRIPT} -v\n"
+                "FAILED - ModuleNotFoundError: No module named 'agents.stage3_crew'\n"
+                "=== 1 failed in 0.12s ===\n"
                 "```"
             ),
         )
     )
 
     # ========================================================================
-    # TASK 2: GREEN STATE - Implement Minimum Code
+    # TASK 2: THE ESCAPE - Implement Solution
     # ========================================================================
     tasks.append(
         Task(
             description=(
-                "## GREEN PHASE: Implement Stage3Crew Class\n\n"
-                f"Create `{STAGE3_CREW_MODULE}` with:\n"
-                "1. Stage3Crew class with CrewAI agents:\n"
-                "   - researcher (web search, arxiv tools)\n"
-                "   - writer (Economist style constraints)\n"
-                "   - editor (quality gates)\n"
-                "2. Sequential task pipeline:\n"
-                "   - Research task → JSON with sources\n"
-                "   - Write task → Markdown article\n"
-                "   - Edit task → Final polished article\n"
-                "3. run() method that accepts topic and returns result\n\n"
-                "**Reference**: ADR-003 CrewAI Migration Strategy\n"
-                "- Use agents.yaml definitions from docs/ADR-003\n"
-                "- Use tasks.yaml structure from docs/ADR-003\n"
-                "- Maintain backward compatibility with economist_agent.py\n\n"
-                "**CRITICAL**: After implementing, run the verification script again.\n"
-                "Iterate until:\n"
-                "- All import errors resolved\n"
-                "- All assertions pass\n"
-                "- EXIT CODE: 0 (success)\n\n"
-                "**Evidence Required**:\n"
-                "- pytest output showing PASSED\n"
-                "- All 3 tests green\n"
-                "- No errors or warnings\n\n"
-                "Expected iteration cycle:\n"
+                "## TASK 2: THE ESCAPE - Implement Stage3Crew\n\n"
+                "**Goal**: Implement the Stage3Crew class to make the test pass. "
+                "Run the test again. Iterate until it PASSES.\n\n"
+                "**Instructions**:\n"
+                f"1. Write the `Stage3Crew` class implementation and SAVE it to `{STAGE3_CREW_MODULE}` using the `file_write` tool\n"
+                f"2. **CRITICAL**: USE THE `file_write` TOOL to save the implementation. DO NOT just show the code. SAVE IT.\n"
+                "3. Implement the required methods to match legacy behavior\n"
+                f"4. RUN `{TDD_VERIFICATION_SCRIPT}` again\n"
+                "5. ITERATE on the implementation until the test PASSES\n\n"
+                "**TDD Cycle**:\n"
+                "- Red: Test fails (already done in Task 1) ✅\n"
+                "- Green: Make minimal changes to pass the test\n"
+                "- Refactor: Clean up code while keeping tests green\n\n"
+                "**Implementation Requirements**:\n"
+                "- Stage3Crew class with __init__ and kickoff methods\n"
+                "- Match legacy src/stage3.py input/output interface\n"
+                "- Use CrewAI agents and tasks pattern\n"
+                "- Maintain backward compatibility\n\n"
+                "**Success Criteria**:\n"
+                f"- `pytest {TDD_VERIFICATION_SCRIPT} -v` shows PASS\n"
+                "- New Crew produces same output structure as legacy Stage3\n"
+                "- Code follows project standards (ruff, mypy clean)\n\n"
+                "**Iteration Example**:\n"
                 "1. Implement Stage3Crew skeleton → run test → see assertion failures\n"
-                "2. Add researcher agent → run test → see partial success\n"
-                "3. Add writer agent → run test → see more passing\n"
-                "4. Add editor agent → run test → ALL GREEN\n"
+                "2. Add basic kickoff method → run test → see partial success\n"
+                "3. Add proper output structure → run test → ALL GREEN ✅\n\n"
+                "**Deliverables**:\n"
+                f"- File `{STAGE3_CREW_MODULE}` created\n"
+                "- Test execution showing PASS\n"
+                "- Side-by-side comparison: legacy vs new behavior\n"
             ),
             agent=agents["migration-engineer"],
             expected_output=(
-                f"File created: {STAGE3_CREW_MODULE}\n"
-                "Test execution output showing:\n"
-                "- GREEN STATE CONFIRMED: Tests PASS\n"
-                "- All assertions successful\n"
-                "- Exit code: 0\n"
-                "- Proof that code NOW exists and works\n\n"
-                "Example output:\n"
+                f"1. Stage3Crew class implemented in `{STAGE3_CREW_MODULE}`\n"
+                "2. Test execution output showing PASS\n"
+                "3. Comparison showing legacy and new behavior match\n"
+                "4. Quality checks passed (ruff, mypy, pytest)\n\n"
+                "Example success output:\n"
                 "```\n"
-                "$ pytest tests/verify_stage3_migration.py\n"
-                "PASSED tests/verify_stage3_migration.py::test_stage3_crew_exists\n"
-                "PASSED tests/verify_stage3_migration.py::test_content_creator_agent\n"
-                "PASSED tests/verify_stage3_migration.py::test_stage3_pipeline\n"
-                "=== 3 passed in 2.45s ===\n"
+                f"$ pytest {TDD_VERIFICATION_SCRIPT} -v\n"
+                "PASSED - test_stage3_crew_migration\n"
+                "=== 1 passed in 2.45s ===\n"
                 "```\n\n"
                 "Implementation includes:\n"
-                "- Stage3Crew class with __init__ and run() methods\n"
-                "- CrewAI agents: researcher, writer, editor\n"
-                "- CrewAI tasks with sequential dependencies\n"
-                "- Integration with existing economist_agent.py API"
-            ),
-        )
-    )
-
-    # ========================================================================
-    # TASK 3: REFACTOR STATE - Clean Up While Green
-    # ========================================================================
-    tasks.append(
-        Task(
-            description=(
-                "## REFACTOR PHASE: Improve Code Quality\n\n"
-                "With tests GREEN, refactor for quality:\n"
-                "1. Add type hints to all methods\n"
-                "2. Extract configuration to constants\n"
-                "3. Add docstrings (Google style)\n"
-                "4. Split large methods (>20 lines)\n"
-                "5. Add error handling with logging\n\n"
-                "**CONSTRAINT**: Tests MUST stay GREEN during refactoring.\n"
-                "Run `pytest tests/verify_stage3_migration.py` after EACH change.\n"
-                "If tests fail → revert last change → try different approach.\n\n"
-                "**Refactoring Checklist**:\n"
-                "- [ ] Type hints on all methods\n"
-                "- [ ] Docstrings on all classes/methods\n"
-                "- [ ] Magic numbers → named constants\n"
-                "- [ ] Long methods → smaller functions\n"
-                "- [ ] Try/except blocks for external calls\n"
-                "- [ ] Logging for debugging\n"
-                "- [ ] Tests still pass (run after each item)\n\n"
-                "**Evidence Required**:\n"
-                "- pytest output showing PASSED (after refactoring)\n"
-                "- Diff showing improved code quality\n"
-                "- No functionality changes (output identical)\n"
-            ),
-            agent=agents["migration-engineer"],
-            expected_output=(
-                "Refactored code with:\n"
-                "- Type hints: Fully typed Stage3Crew class\n"
-                "- Docstrings: All public methods documented\n"
-                "- Configuration: Extracted to module constants\n"
-                "- Error handling: try/except with logging\n"
-                "- Tests: Still 100% passing (proof of no regression)\n\n"
-                "Final test output:\n"
-                "```\n"
-                "$ pytest tests/verify_stage3_migration.py -v\n"
-                "test_stage3_crew_exists PASSED\n"
-                "test_content_creator_agent PASSED\n"
-                "test_stage3_pipeline PASSED\n"
-                "=== 3 passed in 2.41s ===\n"
-                "```\n\n"
-                "Code quality metrics:\n"
-                "- mypy: 0 type errors\n"
-                "- ruff: 0 linting errors\n"
-                "- Readability: Hemingway < 10\n"
-                "- Test coverage: 100% of Stage3Crew class"
+                "- Stage3Crew class with __init__ and kickoff methods\n"
+                "- Proper output structure matching legacy\n"
+                "- Clean, maintainable code\n"
             ),
         )
     )
@@ -297,8 +246,9 @@ def run_mission():
     print("  3️⃣  REFACTOR: Clean up while keeping tests green")
     print(f"\n{'=' * 70}\n")
 
-    # Load agents using AgentFactory
-    agents = load_agents()
+    # Initialize registry and load agents
+    registry = AgentRegistry()
+    agents = load_agents(registry)
 
     # Define TDD tasks
     tasks = define_tasks(agents)

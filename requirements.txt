@@ -1,23 +1,21 @@
-# Economist Agents - Python Dependencies
 
 # Core dependencies
+# CrewAI framework (Phase 1 migration - ADR-003)
+# Development dependencies
+# Economist Agents - Python Dependencies
+# Optional dependencies
+# Security (recommended)
 anthropic>=0.40.0        # Anthropic Claude API (optional if using OpenAI)
-openai>=1.0.0            # OpenAI API (optional if using Anthropic)
+crewai
+crewai-tools
+crewai-tools>=0.2.0      # CrewAI tool integrations
+crewai>=0.28.0           # Multi-agent orchestration framework
+jsonschema>=4.17.0       # JSON Schema validation (optional, has fallback)
 matplotlib>=3.7.0        # Chart generation
 numpy>=1.24.0            # Data manipulation for charts
+openai>=1.0.0            # OpenAI API (optional if using Anthropic)
+PyGithub>=2.1.0          # GitHub API integration for sprint sync
+pytest>=7.0.0            # Testing framework (optional)
+python-dotenv>=1.0.0     # Secure .env file loading
 python-slugify>=8.0.0    # URL-safe filenames
 pyyaml>=6.0              # YAML parsing for config
-
-# Security (recommended)
-python-dotenv>=1.0.0     # Secure .env file loading
-
-# Optional dependencies
-jsonschema>=4.17.0       # JSON Schema validation (optional, has fallback)
-PyGithub>=2.1.0          # GitHub API integration for sprint sync
-
-# CrewAI framework (Phase 1 migration - ADR-003)
-crewai>=0.28.0           # Multi-agent orchestration framework
-crewai-tools>=0.2.0      # CrewAI tool integrations
-
-# Development dependencies
-pytest>=7.0.0            # Testing framework (optional)

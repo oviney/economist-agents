@@ -8,8 +8,17 @@ Executes Story 2 using the qa-specialist agent to achieve 100% integration test 
 from datetime import datetime
 from pathlib import Path
 
-from agent_registry import AgentRegistry
-from crewai import Agent, Crew, Task
+# Use AgentFactory from crewai_agents (ADR-002 compliant)
+from crewai_agents import AgentFactory
+
+# Import Crew and Task from crewai (allowed in execution scripts)
+try:
+    from crewai import Crew, Task
+except ImportError:
+    print("CrewAI not installed. Install with: pip install crewai crewai-tools")
+    import sys
+
+    sys.exit(1)
 
 # Story context with known issues
 STORY_CONTEXT = """
@@ -33,17 +42,10 @@ def main():
     print("=" * 70)
     print()
 
-    # Initialize registry and get the qa-specialist agent data
-    registry = AgentRegistry()
-    qa_agent_data = registry.get_agent("qa-specialist")
-
-    # Create CrewAI Agent from registry data
-    qa_agent = Agent(
-        role=qa_agent_data["role"],
-        goal=qa_agent_data["goal"],
-        backstory=qa_agent_data["backstory"],
-        verbose=True,
-        allow_delegation=False,
+    # Use AgentFactory to create CrewAI Agent (ADR-002 pattern)
+    factory = AgentFactory()
+    qa_agent = factory.create_agent(
+        "qa_specialist", verbose=True, allow_delegation=False
     )
 
     # Create tasks

@@ -12,6 +12,7 @@ omit =
     scripts/defect_tracker.py
     scripts/github_sprint_sync.py
     scripts/migrate_backlog_to_github.py
+    scripts/backlog_groomer.py
 
     # Quality and metrics dashboards
     scripts/*_dashboard.py
@@ -44,6 +45,7 @@ omit =
     # Test validation utilities
     scripts/validate_editor_fixes.py
     scripts/validate_sprint_report.py
+    scripts/validate_*.py
 
     # CI/CD monitoring (bootstrap script)
     scripts/ci_health_monitor.py
@@ -70,6 +72,14 @@ omit =
 
     # Validation tools
     scripts/publication_validator.py
+
+    # One-off utility scripts (fix, run, measure)
+    scripts/fix_*.py
+    scripts/run_*.py
+    scripts/measure_*.py
+
+    # Benchmarking utilities (not core functionality)
+    scripts/benchmarks/measure_sm_effectiveness.py
 
 [report]
 exclude_lines =

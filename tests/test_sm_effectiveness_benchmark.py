@@ -7,6 +7,7 @@ Validates test scenario definitions, evaluation logic, and report generation.
 """
 
 import json
+import os
 import sys
 import tempfile
 from pathlib import Path
@@ -19,7 +20,14 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from scripts.benchmarks.measure_sm_effectiveness import SMEffectivenessBenchmark
 
+# Skip tests if no API keys available (CI environment)
+requires_api_key = pytest.mark.skipif(
+    not os.environ.get("ANTHROPIC_API_KEY") and not os.environ.get("OPENAI_API_KEY"),
+    reason="Requires ANTHROPIC_API_KEY or OPENAI_API_KEY",
+)
 
+
+@requires_api_key
 class TestSMEffectivenessBenchmark:
     """Test suite for SM effectiveness benchmark infrastructure."""
 

@@ -5,9 +5,17 @@ Test Agent Registry
 Validates that AgentRegistry can load and instantiate Stage3Crew and Stage4Crew.
 """
 
+import os
+
 import pytest
 
 from src.registry import AgentRegistry
+
+# Skip tests that require CrewAI and API keys
+requires_crewai = pytest.mark.skipif(
+    not os.environ.get("OPENAI_API_KEY"),
+    reason="Requires OPENAI_API_KEY for CrewAI",
+)
 
 
 class TestAgentRegistry:
@@ -18,6 +26,7 @@ class TestAgentRegistry:
         registry = AgentRegistry()
         assert registry is not None
 
+    @requires_crewai
     def test_load_stage3_crew(self):
         """Test that AgentRegistry can load Stage3Crew"""
         registry = AgentRegistry()
@@ -31,6 +40,7 @@ class TestAgentRegistry:
         assert crew_instance is not None
         assert hasattr(crew_instance, "kickoff")
 
+    @requires_crewai
     def test_load_stage4_crew(self):
         """Test that AgentRegistry can load Stage4Crew"""
         registry = AgentRegistry()

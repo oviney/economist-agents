@@ -19,7 +19,8 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from llm_client import create_llm_client
+
+from scripts.llm_client import create_llm_client
 
 logger = logging.getLogger(__name__)
 

@@ -1,0 +1,212 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Execution ROI Schema",
+    "description": "Token cost tracking and ROI calculation for agent executions",
+    "type": "object",
+    "required": [
+        "metadata",
+        "executions"
+    ],
+    "properties": {
+        "metadata": {
+            "type": "object",
+            "description": "Schema metadata and rotation policy",
+            "required": [
+                "schema_version",
+                "created",
+                "last_updated"
+            ],
+            "properties": {
+                "schema_version": {
+                    "type": "string",
+                    "pattern": "^\\d+\\.\\d+$",
+                    "description": "Schema version (e.g., '1.0')"
+                },
+                "created": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "ISO 8601 timestamp of when log file was created"
+                },
+                "last_updated": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "ISO 8601 timestamp of last execution logged"
+                },
+                "rotation_policy": {
+                    "type": "string",
+                    "enum": [
+                        "30-day",
+                        "90-day",
+                        "manual"
+                    ],
+                    "description": "Log rotation policy (future enhancement)"
+                }
+            }
+        },
+        "executions": {
+            "type": "array",
+            "description": "Array of agent execution records with token costs and ROI",
+            "items": {
+                "type": "object",
+                "required": [
+                    "execution_id",
+                    "timestamp",
+                    "topic",
+                    "agents",
+                    "totals"
+                ],
+                "properties": {
+                    "execution_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Unique identifier for this execution (UUID v4)"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "ISO 8601 timestamp of when execution started"
+                    },
+                    "topic": {
+                        "type": "string",
+                        "minLength": 5,
+                        "maxLength": 500,
+                        "description": "Article topic being generated"
+                    },
+                    "agents": {
+                        "type": "array",
+                        "description": "Per-agent token usage and costs",
+                        "minItems": 1,
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "agent_name",
+                                "tokens_used",
+                                "model",
+                                "cost_usd"
+                            ],
+                            "properties": {
+                                "agent_name": {
+                                    "type": "string",
+                                    "enum": [
+                                        "research",
+                                        "writer",
+                                        "editor",
+                                        "graphics"
+                                    ],
+                                    "description": "Name of the agent that executed"
+                                },
+                                "tokens_used": {
+                                    "type": "object",
+                                    "required": [
+                                        "prompt_tokens",
+                                        "completion_tokens",
+                                        "total_tokens"
+                                    ],
+                                    "properties": {
+                                        "prompt_tokens": {
+                                            "type": "integer",
+                                            "minimum": 0,
+                                            "description": "Number of prompt tokens consumed"
+                                        },
+                                        "completion_tokens": {
+                                            "type": "integer",
+                                            "minimum": 0,
+                                            "description": "Number of completion tokens generated"
+                                        },
+                                        "total_tokens": {
+                                            "type": "integer",
+                                            "minimum": 0,
+                                            "description": "Total tokens (prompt + completion)"
+                                        }
+                                    }
+                                },
+                                "model": {
+                                    "type": "string",
+                                    "enum": [
+                                        "gpt-4",
+                                        "gpt-4-turbo",
+                                        "gpt-3.5-turbo"
+                                    ],
+                                    "description": "LLM model used for this agent"
+                                },
+                                "cost_usd": {
+                                    "type": "number",
+                                    "minimum": 0,
+                                    "description": "Cost in USD for this agent's execution"
+                                },
+                                "duration_seconds": {
+                                    "type": "number",
+                                    "minimum": 0,
+                                    "description": "Execution time in seconds (optional)"
+                                }
+                            }
+                        }
+                    },
+                    "totals": {
+                        "type": "object",
+                        "description": "Aggregated totals and ROI calculations",
+                        "required": [
+                            "total_tokens",
+                            "total_cost_usd",
+                            "human_hours_equivalent",
+                            "roi_multiplier"
+                        ],
+                        "properties": {
+                            "total_tokens": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "description": "Sum of all agent token usage"
+                            },
+                            "total_cost_usd": {
+                                "type": "number",
+                                "minimum": 0,
+                                "description": "Sum of all agent costs in USD"
+                            },
+                            "human_hours_equivalent": {
+                                "type": "number",
+                                "minimum": 0,
+                                "description": "Estimated human hours to produce same output"
+                            },
+                            "roi_multiplier": {
+                                "type": "number",
+                                "minimum": 0,
+                                "description": "ROI multiplier (human_cost / agent_cost)"
+                            },
+                            "time_saved_hours": {
+                                "type": "number",
+                                "minimum": 0,
+                                "description": "Human hours saved by using agents"
+                            },
+                            "word_count": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "description": "Article word count (used for ROI calculation)"
+                            }
+                        }
+                    },
+                    "benchmarks": {
+                        "type": "object",
+                        "description": "Human-hour benchmarks used for ROI calculation (optional)",
+                        "properties": {
+                            "writing_hours_per_1k_words": {
+                                "type": "number",
+                                "minimum": 0,
+                                "description": "Human writing speed (default: 3.0 hours)"
+                            },
+                            "editing_hours_per_1k_words": {
+                                "type": "number",
+                                "minimum": 0,
+                                "description": "Human editing speed (default: 1.5 hours)"
+                            },
+                            "human_hourly_rate_usd": {
+                                "type": "number",
+                                "minimum": 0,
+                                "description": "Human hourly rate used for cost comparison (default: $50)"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

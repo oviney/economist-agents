@@ -38,12 +38,14 @@ See [AGENT_VELOCITY_ANALYSIS.md](docs/AGENT_VELOCITY_ANALYSIS.md) for full resea
 - 🚫 Story 5: Sprint 8 Quality Score Report (1 pt, P1) - BLOCKED (needs Story 4)
 - ⏳ Story 6: File Edit Safety Documentation (1 pt, P1) - READY (can start immediately)
 - ⏳ Story 7: Sprint 9 Planning & Close-Out (1 pt, P2) - READY (defer if needed)
+- ⏳ Story 8: Migrate to GitHub MCP Server (3 pts, P1) - READY (new infrastructure)
+- ⏳ Story 9: Implement Spec-First TDD Governance for Dev Agents (2 pts, P1) - READY (quality/process)
 
-**Points Delivered**: 5/15 (33%)
+**Points Delivered**: 5/20 (25%)
 **Days Elapsed**: 1.5/7 (21%)
-**Pace**: 3.3 pts/day (current) vs 2.4 pts/day (needed)
-**Gap**: +0.9 pts/day (+38% ahead of pace)
-**Status**: ✅ ACCELERATION ACHIEVED - Sprint back on track
+**Pace**: 3.3 pts/day (current) vs 2.9 pts/day (needed)
+**Gap**: +0.4 pts/day (+14% ahead of pace)
+**Status**: ✅ ON TRACK - Sprint progressing well
 **Critical Path**: Stories 2, 4, 6 ready for parallel execution (5 points in 3 hours possible)
 **Recommendation**: Continue parallel execution to maintain momentum
 
@@ -53,7 +55,7 @@ See [AGENT_VELOCITY_ANALYSIS.md](docs/AGENT_VELOCITY_ANALYSIS.md) for full resea
 
 **Sprint Duration**: January 10-17, 2026 (1 week)
 **Sprint Goal**: Complete Sprint 8 technical debt + validate agent effectiveness + fix infrastructure gaps
-**Sprint Capacity**: 13 points (planned) + 2 points (unplanned) = 15 points
+**Sprint Capacity**: 13 points (planned) + 2 points (unplanned) + 3 points (Story 8) = 18 points
 
 ### Sprint 9 Unplanned Work 🚨
 
@@ -116,6 +118,73 @@ See [AGENT_VELOCITY_ANALYSIS.md](docs/AGENT_VELOCITY_ANALYSIS.md) for full resea
 - Story 0 does NOT block Stories 1-4 (parallel execution)
 - If Story 0 extends, defer to Sprint 10
 - BUT recommend completion before Stories 6-7 (documentation work)
+
+---
+
+### Story 8: Migrate to GitHub MCP Server (3 pts, P1)
+
+**Status**: Ready to start
+**Priority**: P1 (Infrastructure modernization)
+**Goal**: Replace custom GitHub CLI scripts with Model Context Protocol server integration
+
+**Tasks** (6 hours estimated):
+- [ ] **Infra**: Enable @modelcontextprotocol/server-github in local .env or Docker config
+- [ ] **Refactor**: Update scrum-master.agent.md to remove gh CLI dependencies
+- [ ] **Feature**: Implement GitHubProjectTool wrapper for Project V2 items
+- [ ] **Cleanup**: Archive scripts/github_sprint_sync.py, scripts/sync_github_project.py, and scripts/github_issue_validator.py
+- [ ] **Test**: Run a dry-run sprint sync using the Scrum Master agent purely via MCP
+
+**Acceptance Criteria** (5 total):
+- [ ] MCP GitHub server configured and accessible
+- [ ] Scrum Master agent uses MCP tools instead of gh CLI
+- [ ] Project V2 operations functional via MCP
+- [ ] Legacy scripts archived with deprecation notice
+- [ ] Sprint sync test passes end-to-end
+
+**Impact**:
+- Reduces custom integration code
+- Leverages standardized MCP protocol
+- Improves maintainability and reliability
+- Enables better error handling and retry logic
+
+**Dependencies**:
+- None (can run in parallel with other stories)
+
+---
+
+### Story 9: Implement Spec-First TDD Governance for Dev Agents (2 pts, P1)
+
+**Status**: Ready to start
+**Priority**: P1 (Quality/Process)
+**Goal**: Update agent instructions and definitions to enforce a "Spec -> Test -> Code" workflow, preventing API hallucinations in development tasks
+
+**Description**:
+Enforce Test-Driven Development (TDD) discipline across all dev agents (@refactor-specialist, @test-writer, and general script development) by updating their instruction files to mandate specification creation before implementation, test creation before code, and explicit validation that tests exist before marking work complete.
+
+**Tasks** (4 hours estimated):
+- [ ] **Update**: .github/instructions/scripts.instructions.md with strict 3-step TDD workflow
+- [ ] **Update**: .github/agents/refactor-specialist.agent.md prompt to require Test creation before Implementation
+- [ ] **Update**: .github/agents/test-writer.agent.md to prioritize "Test-First" behavior
+- [ ] **Update**: docs/DEFINITION_OF_DONE.md to explicitly mention "Tests exist before Implementation"
+- [ ] **Create**: .github/agents/git-operator.agent.md - specialized agent for pre-commit workflow and commit message enforcement
+
+**Acceptance Criteria** (7 total):
+- [ ] .github/instructions/scripts.instructions.md updated with strict 3-step TDD workflow (Spec -> Test -> Code)
+- [ ] .github/agents/refactor-specialist.agent.md prompt updated to require Test creation before Implementation
+- [ ] .github/agents/test-writer.agent.md updated to prioritize "Test-First" behavior with examples
+- [ ] docs/DEFINITION_OF_DONE.md updated to explicitly mention "Tests exist before Implementation" as blocking criterion
+- [ ] .github/agents/git-operator.agent.md created with tools `bash` and `git_tools`
+- [ ] Git Operator defines strict "Story N:" commit message template
+- [ ] Git Operator defines "Double Commit" workflow for pre-commit hook handling
+
+**Impact**:
+- Prevents API hallucinations by enforcing test-first development
+- Improves code quality through specification clarity
+- Reduces rework from assumptions/guesses
+- Aligns with prevention-first culture established in Sprint 6
+
+**Dependencies**:
+- None (can run in parallel with other stories)
 
 ---
 

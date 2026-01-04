@@ -1,14 +1,14 @@
 {
   "version": "1.0",
-  "last_updated": "2026-01-03T11:50:25.895046",
+  "last_updated": "2026-01-03T13:01:28.322972",
   "summary": {
-    "total_charts_generated": 9,
-    "total_visual_qa_runs": 11,
+    "total_charts_generated": 11,
+    "total_visual_qa_runs": 15,
     "visual_qa_pass_count": 1,
-    "visual_qa_fail_count": 10,
+    "visual_qa_fail_count": 14,
     "total_zone_violations": 2,
     "total_regenerations": 1,
-    "total_generation_time_seconds": 19.771138191223145
+    "total_generation_time_seconds": 20.999629259109497
   },
   "failure_patterns": {
     "zone_violation": {
@@ -35,9 +35,9 @@
         "last_seen": "2026-01-01T12:39:58.818071"
       },
       "failed to parse qa response": {
-        "count": 9,
+        "count": 13,
         "first_seen": "2026-01-03T10:23:15.230169",
-        "last_seen": "2026-01-03T11:50:03.925129"
+        "last_seen": "2026-01-03T13:01:00.848786"
       }
     }
   },
@@ -367,6 +367,94 @@
           "chart_type": "line",
           "generation_success": true,
           "generation_time_seconds": 1.6818530559539795,
+          "visual_qa_run": true,
+          "visual_qa_passed": false,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-03T13:00:02.936688",
+      "duration_seconds": 21.780678272247314,
+      "charts_generated": 1,
+      "visual_qa_runs": 1,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "The automation gap",
+          "timestamp": "2026-01-03T12:59:41.156037",
+          "start_time": 1767463181.15604,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 0.6951169967651367,
+          "visual_qa_run": true,
+          "visual_qa_passed": false,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-03T13:00:29.036297",
+      "duration_seconds": 47.880287170410156,
+      "charts_generated": 1,
+      "visual_qa_runs": 1,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "The automation gap",
+          "timestamp": "2026-01-03T12:59:41.156037",
+          "start_time": 1767463181.15604,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 0.6951169967651367,
+          "visual_qa_run": true,
+          "visual_qa_passed": false,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-03T13:01:00.799753",
+      "duration_seconds": 24.959843158721924,
+      "charts_generated": 1,
+      "visual_qa_runs": 1,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "The automation gap",
+          "timestamp": "2026-01-03T13:00:35.839950",
+          "start_time": 1767463235.839953,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 0.5333740711212158,
+          "visual_qa_run": true,
+          "visual_qa_passed": false,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-03T13:01:28.322945",
+      "duration_seconds": 52.48303532600403,
+      "charts_generated": 1,
+      "visual_qa_runs": 1,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "The automation gap",
+          "timestamp": "2026-01-03T13:00:35.839950",
+          "start_time": 1767463235.839953,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 0.5333740711212158,
           "visual_qa_run": true,
           "visual_qa_passed": false,
           "zone_violations": [],

@@ -227,7 +227,236 @@ The Scrum Master is the sprint orchestrator, process enforcer, and team facilita
 4. Document root cause for retrospective
 5. Resume sprint only when GREEN
 
-### 5. GitHub Integration & Synchronization
+### 5. GitHub Projects v2 Integration (Collaboration with @devops)
+
+#### Purpose
+Leverage GitHub Projects v2 for comprehensive sprint visibility, data-driven planning, and proactive hygiene. @devops implements and maintains the infrastructure; @scrum-master operationalizes it in sprint ceremonies.
+
+#### Overview
+**Evolution**: From basic Issues/Labels → Projects v2 ecosystem with:
+- Custom views (Kanban, Table, Roadmap, Calendar)
+- Custom fields (sprint, story-points, priority, owner, status)
+- Automation rules (auto-assign, auto-close, status-sync)
+- Real-time burndown charts
+- Velocity tracking (3-sprint rolling average)
+- Sprint health dashboards
+- Hygiene automation (stale issue detection, priority drift alerts)
+
+**Roles**:
+- **@devops**: Implements Projects v2 infrastructure, generates burndown charts, maintains API integrations, monitors system health
+- **@scrum-master**: Uses dashboards in ceremonies, validates data accuracy, requests enhancements, provides operational feedback
+
+#### Sprint Burndown Monitoring
+
+**Access**: GitHub Project Board → "Burndown" custom view
+**Frequency**: Daily review at 9am (automated generation via cron job)
+
+**Daily Review Checklist**:
+- [ ] Burndown chart updated with yesterday's data
+- [ ] Remaining points trending toward zero by sprint end
+- [ ] Scope changes flagged (ideal line vs actual deviation)
+- [ ] No stories stuck in same status >3 days
+- [ ] All in-progress stories have active commits (last 24h)
+
+**Escalation Triggers**:
+- Burndown >20% above ideal line → Discuss scope in daily standup
+- Story stuck >3 days → Investigate blocker, assign help
+- Scope creep >15% → Emergency backlog refinement
+- Zero progress 2+ days → Team intervention
+
+**Standup Integration**:
+- Share burndown chart (link or screenshot)
+- Highlight anomalies: "Burndown shows Story 4 hasn't moved in 3 days"
+- Data-driven prioritization: "We're 2 points behind ideal, need to close 2 stories today"
+
+**Quality Gate**: Burndown chart MUST update daily. If missing, escalate to @devops.
+
+#### Velocity Tracking
+
+**Access**: GitHub Project Board → "Velocity Dashboard" custom view
+**Frequency**: Sprint Planning (capacity calculation), Sprint Retrospective (trend analysis)
+
+**Pre-Planning Review**:
+1. Check 3-sprint rolling average (displayed in velocity graph)
+2. Identify trend: STABLE (±10%), UP (>10% increase), DOWN (>10% decrease)
+3. Calculate confidence interval: avg ± std_deviation
+4. Recommend capacity: Conservative (avg - std_dev), Target (avg), Aggressive (avg + std_dev)
+
+**Sprint Commitment Decision**:
+- **STABLE trend + team confident**: Commit at TARGET capacity
+- **UP trend**: Consider AGGRESSIVE capacity (with risk mitigation)
+- **DOWN trend**: Commit at CONSERVATIVE capacity (quality over quantity)
+- **High variance (std_dev >30%)**: Cap at previous sprint's LOWEST delivery
+
+**Retrospective Integration**:
+- Review velocity graph: "Last 5 sprints: 10, 12, 10, 13, 12 points"
+- Discuss trend: "We're stable, slight upward trend due to automation improvements"
+- Forecast next sprint: "Based on 3-sprint average (11.7 pts) and ±2 std_dev, commit 10-14 points"
+
+**Quality Gate**: Velocity dashboard MUST include ≥3 sprints data before using for capacity decisions.
+
+#### Sprint Health Dashboard
+
+**Access**: GitHub Project Board → Multiple custom views
+
+**Kanban View** (Work-in-Progress Limits):
+- Backlog: Unlimited (refined stories)
+- Ready: Max 3 stories (prevent thrashing)
+- In Progress: Max 2 stories per developer (focus)
+- Review: Max 2 stories (bottleneck detection)
+- Done: Unlimited (celebrate wins)
+
+**Table View** (Sortable Columns):
+- Sort by: Priority (P0→P3), Story Points (high→low), Owner (grouping), Sprint (current first)
+- Filter: Current sprint only, By priority, By owner, Blocked stories
+- Quick checks: Missing story points? Unassigned stories? Stale statuses?
+
+**Roadmap View** (Sprint Timeline):
+- Horizontal swim lanes by sprint
+- Visual: Sprint start/end dates, story dependencies, milestone markers
+- Use in Sprint Review: Show stakeholders what's coming next sprint
+
+**Custom Field Validation**:
+- **sprint**: All in-progress stories MUST have current sprint assigned
+- **story-points**: All Ready/In-Progress stories MUST have estimates
+- **priority**: All stories MUST have P0-P3 priority
+- **owner**: All In-Progress stories MUST have assigned developer
+- **status**: MUST match GitHub Issue status (automated sync validation)
+
+**Status Accuracy Check** (Weekly):
+- Run bidirectional sync: `python3 scripts/sync_github_project.py --bidirectional --sprint N`
+- Review sync report: Mismatches? Manual status changes?
+- Escalate discrepancies: "Story 4 shows 'In Progress' in Project but Issue is closed"
+
+**Hygiene Alerts** (Weekly Report):
+- **Stale Issues**: >30 days no activity (flag for review), >90 days (auto-close with approval)
+- **Priority Drift**: P0 stories older than P2/P3 stories (triage needed)
+- **Unlinked Issues**: GitHub Issues without Project Board items (orphaned work)
+
+#### Collaboration Protocol with @devops
+
+**When to Request @devops**:
+- Burndown chart not updating → "@devops, Sprint N burndown hasn't updated since yesterday"
+- Velocity calculation incorrect → "@devops, velocity shows 15 pts but we delivered 12, check data"
+- Project Board out of sync → "@devops, Story 4 status differs between Issue and Board"
+- New custom field needed → "@devops, add 'blocked-by' field for dependency tracking"
+- Hygiene rule adjustment → "@devops, change stale threshold from 30→45 days"
+
+**What @devops Delivers**:
+- Daily automated burndown generation (cron job)
+- Weekly velocity dashboard updates
+- Weekly hygiene reports (stale/drift/duplicate detection)
+- Bidirectional sync validation (nightly)
+- API rate limit monitoring (alert at 80% quota)
+- Token expiry reminders (90-day rotation)
+
+**What @scrum-master Validates**:
+- Data accuracy: "Does burndown match manual count?"
+- Timeliness: "Did chart update on schedule?"
+- Actionability: "Can I use velocity for capacity decisions?"
+- Escalation quality: "Are hygiene alerts genuine issues?"
+
+**Feedback Loop**:
+- Sprint Retrospective: "What's working well? What needs improvement?"
+- Example feedback: "Burndown chart helpful, but need scope change annotations"
+- @devops iterates based on operational learnings
+
+#### Integration with Sprint Ceremonies
+
+**Sprint Planning**:
+1. Review velocity dashboard → determine capacity
+2. Show stakeholders Roadmap view → alignment on priorities
+3. Drag stories from Backlog → Ready column (visual commitment)
+4. Validate: All Ready stories have story-points, owner, sprint assigned
+
+**Daily Standup**:
+1. Display burndown chart → highlight progress/blockers
+2. Review Kanban view → identify bottlenecks (too many in Review?)
+3. Check: Any story >3 days in same column?
+
+**Sprint Review**:
+1. Show velocity graph → celebrate trend improvement
+2. Demonstrate Roadmap view → preview next sprint scope
+3. Highlight hygiene improvements → "Closed 10 stale issues this sprint"
+
+**Sprint Retrospective**:
+1. Analyze burndown chart → Did we finish early? Late? Scope creep?
+2. Review velocity trend → Are we improving? Plateauing?
+3. Discuss Project Board usability → Is it helping or admin burden?
+
+**Backlog Refinement**:
+1. Use Table view sorted by Priority → ensure P0s have full details
+2. Check stale issue report → Close/update old stories
+3. Validate: All stories meeting DoR before moving to Ready
+
+#### Quality Gates
+
+**Burndown Chart Quality**:
+- [ ] Daily updates (automated cron job confirmed working)
+- [ ] Ideal line vs actual plotted
+- [ ] Scope changes annotated (if >10% change)
+- [ ] Accessible via Project Board → Burndown view
+- [ ] README badge displays current sprint status
+
+**Velocity Dashboard Quality**:
+- [ ] Minimum 3 sprints historical data before using for capacity decisions
+- [ ] 3-sprint rolling average calculated correctly (verified against manual calculation)
+- [ ] Trend identified: UP/DOWN/STABLE (±10% threshold)
+- [ ] Confidence interval shown (avg ± std_deviation)
+- [ ] Accessible via Project Board → Velocity view
+
+**Project Board Synchronization Quality**:
+- [ ] Bidirectional sync validated weekly (run `sync_github_project.py --validate`)
+- [ ] Status field matches GitHub Issue status (automated check)
+- [ ] All in-progress stories have owner assigned
+- [ ] No orphaned Issues (all linked to Project Board)
+- [ ] Custom fields populated: sprint, story-points, priority, owner
+
+**Hygiene Report Quality**:
+- [ ] Weekly automated reports generated (cron job confirmed)
+- [ ] Stale issue detection: >30 days flagged, >90 days auto-closed
+- [ ] Priority drift alerts: P0 older than P2 by >14 days flagged
+- [ ] Duplicate detection: Similar titles/descriptions flagged
+- [ ] All alerts actionable (reviewed and closed/updated)
+
+**Integration Testing**:
+- [ ] Burndown chart used in daily standup (team understands it)
+- [ ] Velocity dashboard used in Sprint Planning (capacity calculation accurate)
+- [ ] Roadmap view shown in Sprint Review (stakeholders engaged)
+- [ ] Hygiene report reviewed in Backlog Refinement (stale issues cleaned)
+- [ ] Project Board is single source of truth (team trusts data)
+
+#### Troubleshooting
+
+**Issue**: Burndown chart not updating
+**Check**:
+1. GitHub Actions workflow status (should run daily at 9am)
+2. @devops API token valid? (run `gh auth status`)
+3. Manual trigger: `python3 scripts/generate_burndown.py --sprint N`
+4. Check script logs for errors
+
+**Issue**: Velocity calculation incorrect
+**Check**:
+1. Verify closed Issues have story-points custom field populated
+2. Check sprint filter: `python3 scripts/calculate_velocity.py --debug`
+3. Manual calculation vs automated: Sum last 3 sprints' completed points
+4. Escalate to @devops if data integrity issue
+
+**Issue**: Project Board out of sync with GitHub Issues
+**Check**:
+1. Run bidirectional sync manually: `python3 scripts/sync_github_project.py --bidirectional --sprint N`
+2. Review sync report: Which stories mismatched?
+3. Validate webhook configuration (should trigger on Issue status change)
+4. Escalate to @devops if webhook broken
+
+**Issue**: Hygiene alerts not appearing
+**Check**:
+1. Verify weekly cron job status: `crontab -l | grep project_hygiene`
+2. Manual run: `python3 scripts/project_hygiene.py --health-report`
+3. Check email/Slack notification configuration
+4. Escalate to @devops if delivery issue
+
+### 6. GitHub Integration & Synchronization
 
 #### Issue Management
 **Responsibilities**:

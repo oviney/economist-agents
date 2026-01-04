@@ -131,7 +131,20 @@
           "name": "Fix Integration Tests",
           "points": 2,
           "priority": "P0",
-          "status": "not_started"
+          "status": "complete",
+          "started_date": "2026-01-03T12:59:35.241571",
+          "assigned_to": "devops",
+          "notes": "Integration tests fixed! All 9/9 tests passing (100%). Improved from 56% pass rate in Sprint 8. Root cause: CI/CD infrastructure fixes from Story 0 (Python 3.13 environment) resolved mock setup and dependency issues.",
+          "completed_date": "2026-01-03T13:01:38.353273",
+          "validation": {
+            "test_pass_rate": "100%",
+            "tests_passed": 9,
+            "tests_failed": 0,
+            "tests_total": 9,
+            "improvement": "56% \u2192 100% (+44 percentage points)",
+            "test_file": "scripts/test_agent_integration.py",
+            "execution_time": "~50 seconds"
+          }
         },
         {
           "id": 3,
@@ -181,16 +194,18 @@
         "Complete Sprint 8 technical debt (Editor Agent validation)",
         "Measure autonomous orchestration effectiveness (PO + SM Agents)",
         "Fix CI/CD infrastructure (green build)",
-        "Improve integration test pass rate (56% → 90%+)"
+        "Improve integration test pass rate (56% \u2192 90%+)"
       ],
       "velocity": 13,
-      "points_delivered": 13,
-      "completion_rate": 0.87,
+      "points_delivered": 15,
+      "completion_rate": 1.0,
       "ceremonies_complete": false,
       "retrospective_done": false,
       "backlog_refined": true,
       "refinement_date": "2026-01-02T00:00:00",
-      "next_sprint_dor_met": false
+      "next_sprint_dor_met": false,
+      "backlog_groomed": true,
+      "grooming_date": "2026-01-03T13:10:53.517850"
     }
   },
   "sprint_9": {
@@ -338,57 +353,58 @@
     "refinement_date": "2026-01-02T23:45:00",
     "next_sprint_dor_met": true,
     "github_issues": {
-      "synced_at": "2026-01-03T12:40:23.126444",
+      "synced_at": "2026-01-03T14:33:40.724126",
       "issues": [
         {
           "story_id": 0,
-          "issue_number": "50",
-          "issue_url": "https://github.com/oviney/economist-agents/issues/50",
+          "issue_number": "67",
+          "issue_url": "https://github.com/oviney/economist-agents/issues/67",
           "title": "Story 0: Fix CI/CD Infrastructure Crisis"
         },
         {
           "story_id": 1,
-          "issue_number": "51",
-          "issue_url": "https://github.com/oviney/economist-agents/issues/51",
+          "issue_number": "68",
+          "issue_url": "https://github.com/oviney/economist-agents/issues/68",
           "title": "Story 1: Complete Editor Agent Remediation"
         },
         {
           "story_id": 2,
-          "issue_number": "52",
-          "issue_url": "https://github.com/oviney/economist-agents/issues/52",
+          "issue_number": "69",
+          "issue_url": "https://github.com/oviney/economist-agents/issues/69",
           "title": "Story 2: Fix Integration Tests"
         },
         {
           "story_id": 3,
-          "issue_number": "53",
-          "issue_url": "https://github.com/oviney/economist-agents/issues/53",
+          "issue_number": "70",
+          "issue_url": "https://github.com/oviney/economist-agents/issues/70",
           "title": "Story 3: Measure PO Agent Effectiveness"
         },
         {
           "story_id": 4,
-          "issue_number": "54",
-          "issue_url": "https://github.com/oviney/economist-agents/issues/54",
+          "issue_number": "71",
+          "issue_url": "https://github.com/oviney/economist-agents/issues/71",
           "title": "Story 4: Measure SM Agent Effectiveness"
         },
         {
           "story_id": 5,
-          "issue_number": "55",
-          "issue_url": "https://github.com/oviney/economist-agents/issues/55",
+          "issue_number": "72",
+          "issue_url": "https://github.com/oviney/economist-agents/issues/72",
           "title": "Story 5: Sprint 9 Quality Report"
         },
         {
           "story_id": 6,
-          "issue_number": "56",
-          "issue_url": "https://github.com/oviney/economist-agents/issues/56",
+          "issue_number": "73",
+          "issue_url": "https://github.com/oviney/economist-agents/issues/73",
           "title": "Story 6: File Edit Safety Documentation"
         },
         {
           "story_id": 7,
-          "issue_number": "57",
-          "issue_url": "https://github.com/oviney/economist-agents/issues/57",
+          "issue_number": "74",
+          "issue_url": "https://github.com/oviney/economist-agents/issues/74",
           "title": "Story 7: Sprint 9 Planning & Close-Out"
         }
-      ]
+      ],
+      "project_url": "https://github.com/users/oviney/projects/1"
     }
   },
   "sprint_10": {
@@ -470,6 +486,103 @@
           "shields_io_api": "PUBLIC - no authentication needed, supports dynamic badges",
           "sprint_tracker_format": "JSON - clean key-value pairs, easily parseable"
         }
+      },
+      {
+        "id": 9,
+        "name": "GitHub Projects v2 Evolution: Custom Views, Burndown & Velocity Tracking",
+        "points": 5,
+        "priority": "P1",
+        "status": "backlog",
+        "assigned_to": "@devops",
+        "sprint_target": 10,
+        "created_date": "2026-01-03",
+        "description": "Evolve from basic GitHub Issues/Labels to comprehensive Projects v2 ecosystem with custom views (Kanban, Table, Roadmap, Calendar), automated burndown chart generation (daily), velocity tracking dashboard (3-sprint rolling average), and sprint health monitoring (hygiene automation).",
+        "scope": [
+          "1. User Token Refresh: Update GitHub token with 'project' scope (read:project, write:project) via 'gh auth refresh -s project'",
+          "2. Projects v2 Setup: Create project board 'Economist Agents Sprint Board', link to repository, configure custom fields (sprint, story-points, priority, owner, status)",
+          "3. Custom Views: Kanban (workflow columns with WIP limits), Table (sortable priority/points/owner), Roadmap (timeline with milestones), Calendar (story start/end dates)",
+          "4. Burndown Chart: Python script 'scripts/generate_burndown.py' → matplotlib chart → daily auto-update → commit to 'docs/burndown_current.png'",
+          "5. Velocity Dashboard: Python script 'scripts/calculate_velocity.py' → 3-sprint rolling average + trend analysis + confidence interval → JSON export → shields.io badge",
+          "6. Sprint Health Monitoring: Hygiene automation (stale issue detection >30 days flag, >90 days auto-close), priority drift alerts (P0 older than P2/P3), duplicate detection, unlinked issue warnings",
+          "7. Bidirectional Sync: 'scripts/sync_github_projects.py' → sprint_tracker.json ↔ GitHub Issues ↔ Projects v2 board → detect mismatches → weekly validation report",
+          "8. API Integration: GraphQL client for Projects v2 API, handle rate limiting (5000 req/hr), token rotation, error handling with exponential backoff",
+          "9. Documentation: 'docs/GITHUB_PROJECTS_GUIDE.md' (setup, custom views, burndown usage, velocity interpretation, troubleshooting), update README with Projects v2 setup instructions",
+          "10. Sprint Ceremony Integration: Scrum Master procedures in 'skills/scrum-master/SKILL.md' updated with burndown review (standup), velocity tracking (planning), roadmap view (sprint review), hygiene cleanup (refinement)"
+        ],
+        "acceptance_criteria": [
+          "AC1: Projects v2 board accessible at github.com/[owner]/[repo]/projects/[N] with custom fields (sprint, story-points, priority, owner, status)",
+          "AC2: Kanban view shows 5 columns (Backlog, Ready, In Progress, Review, Done) with WIP limits configured (Ready max 3, In Progress max 2/dev, Review max 2)",
+          "AC3: Table view sortable by priority/points/owner/sprint with filter options",
+          "AC4: Roadmap view displays sprint timeline with story start/end dates and dependencies",
+          "AC5: Burndown chart 'docs/burndown_current.png' auto-generates daily showing ideal vs actual with scope change annotations",
+          "AC6: Velocity dashboard shows 3-sprint rolling average with trend (STABLE/UP/DOWN) and confidence interval (avg ± std_dev)",
+          "AC7: Hygiene automation flags stale issues (>30 days), detects priority drift (P0 older than P2/P3), identifies duplicates (>80% title similarity)",
+          "AC8: Bidirectional sync validates sprint_tracker.json ↔ GitHub Issues ↔ Projects v2 weekly, generates mismatch report",
+          "AC9: GraphQL API integration handles rate limiting (5000 req/hr), implements exponential backoff on errors",
+          "AC10: Documentation complete: 'docs/GITHUB_PROJECTS_GUIDE.md' with setup steps, custom view usage, burndown interpretation, velocity tracking, troubleshooting",
+          "AC11: Scrum Master skills updated with Projects v2 operational procedures (burndown review in standup, velocity tracking in planning, roadmap demo in sprint review)",
+          "AC12: End-to-end test: Create test story → add to Projects v2 → verify sync → check burndown update → validate velocity calculation → confirm hygiene alert"
+        ],
+        "dependencies": [
+          "User must refresh GitHub token with 'project' scope: 'gh auth refresh -s project' (BLOCKER - user action required before sprint starts)",
+          "@devops agent definition complete in '.github/agents/devops.agent.md' (COMPLETE - established in parallel with this story)",
+          "Story 6 baseline: GitHub Issues sync operational (COMPLETE - Sprint 9 Story 6 delivered bidirectional sync foundation)",
+          "GraphQL API client library: Install 'python-gql' or 'sgqlc' for Projects v2 API access",
+          "Python visualization libraries: matplotlib (burndown charts), pandas (velocity analysis)",
+          "@scrum-master skills documentation: 'skills/scrum-master/SKILL.md' Section 5 references Projects v2 operational procedures (COMPLETE - comprehensive collaboration protocol documented)"
+        ],
+        "technical_notes": [
+          "Foundation: Story 6 (Sprint 9) established GitHub Issues sync pattern (sprint_tracker.json ↔ Issues). This story extends sync to Projects v2 board (Issues ↔ Projects v2).",
+          "Projects v2 API: Use GraphQL endpoint 'https://api.github.com/graphql' with query 'projectV2(number: X)' for board operations. REST API v3 does NOT support Projects v2.",
+          "Burndown Calculation: For each sprint day: remaining_points = sum(story_points) where status != 'Done'. Ideal line = total_points * (1 - day/sprint_length). Scope change = new stories added after day 0.",
+          "Velocity Tracking: Calculate completed story points per sprint for last 3 sprints. Rolling avg = sum(last_3)/3. Trend = 'UP' if current > avg+10%, 'DOWN' if current < avg-10%, else 'STABLE'. Confidence interval = avg ± std_dev.",
+          "Hygiene Automation: Run nightly via GitHub Actions cron. Query Issues API for 'updated_at < 30 days ago' (flag), 'updated_at < 90 days ago' (auto-close with comment). Check priority field for P0 issues older than P2/P3 (drift alert).",
+          "Bidirectional Sync: sprint_tracker.json is source of truth for story details. GitHub Issues is operational system (where work happens). Projects v2 board is visualization layer. Sync validates: sprint_tracker story_points = Issue custom field = Projects v2 field.",
+          "Rate Limiting: Projects v2 API has 5000 req/hr limit. Implement exponential backoff: wait 2^retry_count seconds on 429 status. Cache query results for 5 minutes. Batch updates (update multiple fields in single mutation).",
+          "Token Security: Store token in GitHub Secrets 'GITHUB_TOKEN' (not environment variables). Rotate token quarterly. Implement token expiry reminder (check 'expires_at' field, alert 14 days before expiry)."
+        ],
+        "sprint_assignment_rationale": "Sprint 10 theme 'Autonomous Orchestration & Visibility' aligns perfectly with Projects v2 evolution (automation + stakeholder visibility). 5-point story fits Sprint 10 capacity (assume velocity 12 from Sprint 8). Gives user time to refresh token before sprint starts. Foundation (Story 6 sync, @devops agent definition) complete in previous sprints.",
+        "objectives": [
+          "1. Enable stakeholder self-service: Product Owners, VPs, and external stakeholders view sprint progress via Projects v2 board without interrupting team",
+          "2. Data-driven sprint planning: Velocity dashboard with 3-sprint rolling average and confidence interval informs capacity decisions (Conservative/Target/Aggressive commitment matrix)",
+          "3. Proactive sprint health monitoring: Hygiene automation detects stale issues, priority drift, duplicates before they become problems",
+          "4. Real-time burndown visibility: Daily burndown chart shows progress vs ideal, scope changes annotated, accessible in standup",
+          "5. Validate sync pattern foundation: Projects v2 integration tests bidirectional sync architecture (sprint_tracker.json ↔ Issues ↔ Projects v2) established in Story 6, informing Sprint 11+ enhancements"
+        ],
+        "risks": [
+          {
+            "risk": "User token scope dependency: If user doesn't refresh token with 'project' scope, story blocked",
+            "likelihood": "MEDIUM",
+            "impact": "HIGH (story cannot start without token)",
+            "mitigation": "Add user action reminder in Sprint 10 Planning ceremony. Provide exact command: 'gh auth refresh -s project'. Test token scope before sprint starts with GraphQL query."
+          },
+          {
+            "risk": "GraphQL API learning curve: Team unfamiliar with Projects v2 GraphQL schema",
+            "likelihood": "MEDIUM",
+            "impact": "MEDIUM (slower implementation, debugging time)",
+            "mitigation": "Allocate 2 hours in story for API exploration. Use GitHub GraphQL Explorer (https://docs.github.com/en/graphql/overview/explorer) for interactive testing. Reference GitHub Projects v2 API docs (https://docs.github.com/en/issues/planning-and-tracking-with-projects/automating-your-project/using-the-api-to-manage-projects)."
+          },
+          {
+            "risk": "API rate limiting: Frequent sync operations exceed 5000 req/hr limit",
+            "likelihood": "LOW",
+            "impact": "MEDIUM (sync delays, missing updates)",
+            "mitigation": "Implement caching (5-minute TTL on query results). Batch mutations (update multiple fields in single request). Monitor rate limit headers ('X-RateLimit-Remaining'). Add exponential backoff on 429 responses."
+          },
+          {
+            "risk": "Sync latency: Projects v2 board updates lag behind sprint_tracker.json changes",
+            "likelihood": "LOW",
+            "impact": "LOW (visibility delay, not data loss)",
+            "mitigation": "Set user expectations: sync runs nightly (burndown, hygiene) or on-demand via GitHub Actions manual trigger. Display 'Last synced: [timestamp]' on board. Investigate GitHub webhooks for real-time sync in Sprint 11 if latency problematic."
+          }
+        ],
+        "definition_of_done": [
+          "All 12 acceptance criteria validated with evidence (screenshots for board views, logs for automation, test results for sync)",
+          "Code merged to main branch: 'scripts/generate_burndown.py', 'scripts/calculate_velocity.py', 'scripts/sync_github_projects.py' passing all tests",
+          "Documentation complete: 'docs/GITHUB_PROJECTS_GUIDE.md' reviewed by Scrum Master, setup instructions validated on clean repository",
+          "Sprint Review demo: Show Projects v2 board to stakeholders with Kanban/Table/Roadmap views, live burndown chart, velocity dashboard",
+          "Sprint Retrospective: Team discusses what worked (automation wins, visibility improvements), what needs improvement (API challenges, sync latency), lessons learned for Sprint 11 enhancements",
+          "Sprint 11 Planning uses Projects v2: Velocity dashboard informs capacity decision, Roadmap view shows upcoming work, hygiene report reviewed in backlog refinement"
+        ]
       }
     ],
     "objectives": [

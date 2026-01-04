@@ -239,23 +239,22 @@ class GitHubProjectSync:
         print(f"\n✅ Updated {self.sprint_tracker_path} with GitHub info")
 
     def run_create(self, sprint_num: int = 9) -> dict:
-        """Full workflow: create issues (simplified - no project board)"""
+        """Full workflow: create issues and project board"""
         print("=" * 70)
-        print(f"🚀 GitHub Issues Creation - Sprint {sprint_num}")
+        print(f"🚀 GitHub Sync - Sprint {sprint_num}")
         print("=" * 70)
 
         # Step 1: Check auth
         if not self.check_auth():
             sys.exit(1)
 
-        # Step 2: Create issues (skip project board for now)
-        print(
-            "\n⚠️  Note: Creating issues only (project board requires 'project' scope)"
-        )
-        print("   Run 'gh auth refresh -s project' to enable project board creation")
+        # Step 2: Create issues
         issues = self.create_issues(sprint_num)
 
-        # Step 3: Update tracker (without project URL)
+        # Step 3: Create project board
+        project_url = self.create_project(sprint_num)
+
+        # Step 4: Update tracker with both issues and project
         tracker = self.load_sprint_tracker()
         if "sprint_9" not in tracker:
             tracker["sprint_9"] = {}
@@ -263,6 +262,7 @@ class GitHubProjectSync:
         tracker["sprint_9"]["github_issues"] = {
             "synced_at": datetime.now().isoformat(),
             "issues": issues,
+            "project_url": project_url,
         }
 
         with open(self.sprint_tracker_path, "w") as f:
@@ -271,17 +271,19 @@ class GitHubProjectSync:
         print(f"\n✅ Updated {self.sprint_tracker_path} with GitHub info")
 
         print("\n" + "=" * 70)
-        print("✅ COMPLETE: GitHub Issues Created")
+        print("✅ COMPLETE: GitHub Sprint Board Created")
         print("=" * 70)
         print(f"\n📝 Issues Created: {len(issues)}")
         print(f"   Stories: {[i['story_id'] for i in issues]}")
         issues_url = f"https://github.com/{self.repo}/issues?q=is%3Aissue+label%3Asprint-{sprint_num}"
         print(f"\n🔗 View issues: {issues_url}")
+        print(f"🔗 Project board: {project_url}")
 
         return {
             "issues_created": len(issues),
             "issues": issues,
             "issues_url": issues_url,
+            "project_url": project_url,
         }
 
     def show_status(self, sprint_num: int = 9) -> None:

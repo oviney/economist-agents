@@ -74,9 +74,9 @@ class GitHubIntegrationTests:
         # Check Story 1 structure
         story1 = stories[0]
         assert story1["number"] == 1, "Story 1 not found"
-        assert story1["points"] == 2, (
-            f"Story 1 should be 2 points, got {story1['points']}"
-        )
+        assert (
+            story1["points"] == 2
+        ), f"Story 1 should be 2 points, got {story1['points']}"
         assert len(story1["tasks"]) > 0, "Story 1 has no tasks"
         print(f"      Found {len(stories)} stories with correct structure")
 
@@ -195,9 +195,9 @@ class GitHubIntegrationTests:
         with open("skills/blog_qa_skills.json") as f:
             skills = json.load(f)
 
-        assert "sprint_discipline" in skills["skills"], (
-            "sprint_discipline category missing"
-        )
+        assert (
+            "sprint_discipline" in skills["skills"]
+        ), "sprint_discipline category missing"
 
         sprint_skills = skills["skills"]["sprint_discipline"]
         assert "patterns" in sprint_skills, "No patterns in sprint_discipline"

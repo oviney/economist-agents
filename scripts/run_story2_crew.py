@@ -8,8 +8,8 @@ Executes Story 2 using the qa-specialist agent to achieve 100% integration test 
 from datetime import datetime
 from pathlib import Path
 
-from agent_registry import registry
-from crewai import Crew, Task
+from agent_registry import AgentRegistry
+from crewai import Agent, Crew, Task
 
 # Story context with known issues
 STORY_CONTEXT = """
@@ -33,8 +33,18 @@ def main():
     print("=" * 70)
     print()
 
-    # Get the qa-specialist agent from registry
-    qa_agent = registry.get_agent("qa-specialist")
+    # Initialize registry and get the qa-specialist agent data
+    registry = AgentRegistry()
+    qa_agent_data = registry.get_agent("qa-specialist")
+
+    # Create CrewAI Agent from registry data
+    qa_agent = Agent(
+        role=qa_agent_data["role"],
+        goal=qa_agent_data["goal"],
+        backstory=qa_agent_data["backstory"],
+        verbose=True,
+        allow_delegation=False,
+    )
 
     # Create tasks
     audit_task = Task(

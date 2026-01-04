@@ -63,7 +63,63 @@
 ✅ Approved from DevOps perspective
 ```
 
-### 4. CI/CD Fix Validation 🔧 (When Fixing Build)
+### 4. AI Cognitive Health 🧠 (Nightly)
+
+**Monitor**: Check the Nightly Evaluation Workflow results every morning.
+
+**Access Results**:
+- Navigate to: https://github.com/oviney/economist-agents/actions/workflows/nightly-eval.yml
+- Download latest artifact: `sm-effectiveness-report-[run-number]`
+- Review: `docs/metrics/sm_effectiveness_report.json`
+
+**Compliance Rate Thresholds**:
+- **🟢 Green**: >90% Compliance Rate
+  - ✅ Report "AI agents healthy" in daily standup
+  - Continue normal operations
+
+- **🟡 Yellow**: 80-90% Compliance Rate
+  - ⚠️ Report "AI agent degradation detected" in standup
+  - Create investigation story for next Sprint
+  - Document findings in `docs/AI_HEALTH_LOG.md`
+
+- **🔴 Red**: <80% Compliance Rate
+  - 🚨 **IMMEDIATE ACTION REQUIRED**
+  - Create P0 Bug: "Regression: SM Agent Effectiveness dropped below 80%"
+  - Include nightly report artifact as evidence
+  - Tag @scrum-master and @quality-enforcer
+  - Block new agent deployments until resolved
+
+**Bug Template** (when Red):
+```markdown
+**Title**: [P0] Regression: SM Agent Effectiveness dropped below 80%
+
+**Nightly Report**: [Link to artifact]
+**Compliance Rate**: X% (threshold: ≥80%)
+**Date Detected**: [YYYY-MM-DD]
+
+**Affected Scenarios**: [List scenarios with <80% compliance]
+
+**Impact**:
+- Agent quality degraded
+- Risk of incorrect task assignments
+- Sprint planning may be unreliable
+
+**Requires Investigation**:
+- [ ] Review recent agent prompt changes
+- [ ] Check LLM model updates
+- [ ] Analyze failing test cases
+- [ ] Validate benchmark accuracy
+
+**Blocker**: YES - No agent updates until resolved
+```
+
+**Documentation**:
+- Create `docs/AI_HEALTH_LOG.md` if it doesn't exist
+- Log all threshold violations (Yellow and Red)
+- Track trends over time
+- Report in weekly CI/CD health report
+
+### 5. CI/CD Fix Validation 🔧 (When Fixing Build)
 
 **CRITICAL - When build is red and you're fixing it**:
 
@@ -110,7 +166,7 @@
    - Escalate to team in Slack
    - Document in CI_HEALTH_LOG.md
 
-### 5. CI/CD Fix Verification ✅ (After Fix Pushed)
+### 6. CI/CD Fix Verification ✅ (After Fix Pushed)
 
 **Within 5 minutes of pushing fix**:
 
@@ -177,7 +233,7 @@
      **Next Actions**: [What's next]
      ```
 
-### 6. Build Monitoring SLA 📊
+### 7. Build Monitoring SLA 📊
 
 **Service Level Agreement for CI/CD**:
 

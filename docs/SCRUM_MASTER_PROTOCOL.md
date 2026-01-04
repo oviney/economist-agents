@@ -249,6 +249,15 @@ Weekly (30 min):
 - Check priority drift (P0 older than P2/P3)
 - Quality Gate: Health score <10%
 
+**GitHub Backlog Health** (Weekly after sprint close):
+- Close completed sprint issues: gh issue list --state open --label "completed"
+- Remove duplicate issues (same story number, multiple GitHub issues)
+- Add missing priority labels (P0-P4) to bugs and stories
+- Add effort labels (effort:small/medium/large) for estimation
+- Archive stale issues (>90 days no activity, low priority)
+- Validate: skills/defect_tracker.json bugs have GitHub issues
+- Target: All open issues properly labeled and categorized
+
 Monthly (60 min):
 - Epic decomposition (break large stories)
 - Technical debt assessment

@@ -43,8 +43,13 @@ class TestAgentMetricsIntegration:
             dashboard = QualityDashboard()
             summary = dashboard._build_agent_summary()
 
-            # Verify no baseline fallback values
-            assert summary is None or "NO DATA" in str(summary)
+            # Verify no baseline fallback values (all None when no data)
+            assert summary is not None
+            assert all(
+                val is None or val == 0
+                for agent in summary.values()
+                for val in agent.values()
+            )
 
     def test_agent_metrics_from_real_data(self):
         """AC2: Dashboard displays actual agent performance metrics"""
@@ -121,13 +126,13 @@ class TestDashboardValidation:
 
         dashboard = QualityDashboard()
 
-        # Verify source files loaded
-        assert dashboard.tracker is not None
-        assert dashboard.metrics is not None
+        # Verify source files loaded (correct attribute names)
+        assert dashboard.defect_tracker is not None
+        assert dashboard.agent_metrics is not None
         assert dashboard.history is not None
 
         # Verify defect data
-        metrics = dashboard.tracker.get_metrics()
+        metrics = dashboard.defect_tracker.get_metrics()
         assert metrics["total_bugs"] > 0
 
     def test_quality_score_exists(self):
@@ -170,8 +175,8 @@ class TestDataConsistency:
         with open(metrics_file) as f:
             data = json.load(f)
 
-        # Verify structure
-        assert "sessions" in data or "session" in data
+        # Verify structure (schema uses 'runs' not 'sessions')
+        assert "runs" in data
 
 
 class TestAcceptanceCriteria:

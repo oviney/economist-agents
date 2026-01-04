@@ -254,17 +254,17 @@ class QualityDashboard:
 
         # Writer clean rate bonus/penalty (max ±20)
         writer_clean = agent_summary["writer"]["clean_rate"]
-        if writer_clean < 80:
+        if writer_clean is not None and writer_clean < 80:
             score -= (80 - writer_clean) * 0.5
 
         # Editor accuracy bonus/penalty (max ±15)
         editor_acc = agent_summary["editor"]["accuracy"]
-        if editor_acc < 60:
+        if editor_acc is not None and editor_acc < 60:
             score -= (60 - editor_acc) * 0.5
 
         # Visual QA bonus/penalty (max ±15)
         visual_qa = agent_summary["graphics"]["visual_qa_pass_rate"]
-        if visual_qa < 80:
+        if visual_qa is not None and visual_qa < 80:
             score -= (80 - visual_qa) * 0.5
 
         return max(0, min(100, int(score)))
@@ -307,18 +307,18 @@ class QualityDashboard:
 
         # Writer clean rate
         writer_clean = agent_summary["writer"]["clean_rate"]
-        if writer_clean >= 80:
+        if writer_clean is not None and writer_clean >= 80:
             trends.append("✅ Writer Agent meeting target (>80% clean)")
-        else:
+        elif writer_clean is not None:
             trends.append(
                 "🔄 Writer Agent improving (current: " + str(writer_clean) + "%)"
             )
 
         # Editor accuracy
         editor_acc = agent_summary["editor"]["accuracy"]
-        if editor_acc >= 60:
+        if editor_acc is not None and editor_acc >= 60:
             trends.append("✅ Editor Agent meeting target (>60% accuracy)")
-        else:
+        elif editor_acc is not None:
             trends.append(
                 "🔄 Editor Agent improving (current: " + str(editor_acc) + "%)"
             )

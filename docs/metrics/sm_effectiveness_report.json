@@ -3,7 +3,8 @@
   "story_id": "Story 4",
   "timestamp": "2026-01-04T00:11:52.764047",
   "agent_config": {
-    "name": "scrum-master-v3",
+    "name": "scrum-master",
+    "version": "3.0",
     "provider": "openai",
     "model": "gpt-4o"
   },

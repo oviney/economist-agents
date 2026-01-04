@@ -9,4 +9,4 @@ Archived article_fixer.py - not needed with strengthened prompts
 - `sync_github_project.py` - Replaced by GitHub MCP `create_issue` + Projects V2 integration  
 - `github_issue_validator.py` - Replaced by GitHub MCP's built-in validation
 
-**Migration**: See `scripts/archived/legacy_sync/README.md` for detailed migration guide and `.github/agents/scrum-master-v3.agent.md` for MCP-based workflows
+**Migration**: See `scripts/archived/legacy_sync/README.md` for detailed migration guide and `.github/agents/scrum-master.agent.md` for MCP-based workflows

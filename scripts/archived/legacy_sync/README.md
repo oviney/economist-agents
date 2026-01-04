@@ -9,7 +9,7 @@
 ### github_sprint_sync.py
 - **Purpose**: Synchronized sprint tracker with GitHub Issues
 - **Replaced by**: GitHub MCP Server `create_issue`, `update_issue`, `list_issues` tools
-- **Migration**: See `.github/agents/scrum-master-v3.agent.md` for MCP-based workflows
+- **Migration**: See `.github/agents/scrum-master.agent.md` for MCP-based workflows
 
 ### sync_github_project.py  
 - **Purpose**: Synced backlog items to GitHub Projects V2

@@ -81,7 +81,7 @@ ruff format scripts/agent_registry.py \
 
 ```python
 # scripts/benchmarks/measure_sm_effectiveness.py:40
-self.sm_agent = registry.get_agent("scrum-master-v3")
+self.sm_agent = registry.get_agent("scrum-master")  # v3.0 with over-escalation fix
     ↓
 # scripts/agent_registry.py:272
 llm_client = create_llm_client(provider=provider)

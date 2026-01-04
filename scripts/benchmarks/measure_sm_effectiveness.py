@@ -37,7 +37,7 @@ class SMEffectivenessBenchmark:
     def __init__(self):
         """Initialize benchmark with agent registry."""
         registry = AgentRegistry()
-        self.sm_agent = registry.get_agent("scrum-master-v3")
+        self.sm_agent = registry.get_agent("scrum-master")
         self.results: list[dict[str, Any]] = []
         self.test_scenarios = self._define_test_scenarios()
 

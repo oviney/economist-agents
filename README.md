@@ -70,7 +70,7 @@ This project uses **ADR-002 Agent Registry Pattern** for centralized agent disco
 | **quality-enforcer** | Standards | Code quality gates and enforcement |
 | **refactor-specialist** | Code Quality | Refactoring and optimization |
 | **scrum-master** | Orchestration | Sprint coordination and ceremonies |
-| **scrum-master-v3** | Enhanced Orchestration | Advanced sprint management |
+| **scrum-master** | Enhanced Orchestration | Advanced sprint management with over-escalation fix |
 | **test-writer** | Testing | Test case generation and coverage |
 | **visual-qa-agent** | Visual Quality | Chart and design validation |
 

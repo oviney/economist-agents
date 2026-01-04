@@ -64,7 +64,7 @@ return {
 ✅ quality-enforcer          - Agile discipline enforced
 ✅ scrum-master              - Agile discipline enforced
 ✅ po-agent                  - Agile discipline enforced
-✅ scrum-master-v3           - Agile discipline enforced
+✅ scrum-master           - Agile discipline enforced (v3.0 with over-escalation fix)
 ✅ visual-qa-agent           - Agile discipline enforced
 ✅ git-operator              - Agile discipline enforced
 ✅ product-research-agent    - Agile discipline enforced

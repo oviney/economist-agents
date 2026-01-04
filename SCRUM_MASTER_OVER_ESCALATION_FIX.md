@@ -62,7 +62,7 @@ To test the fix:
 
 ## Files Modified
 
-- `.github/agents/scrum-master-v3.agent.md`
+- `.github/agents/scrum-master.agent.md` (v3.0 with over-escalation fix merged)
   - Added "Request Triage & Intake" section (30 lines)
   - Added "Two-Stage Process" section (40 lines)
   - Added concrete intake examples (60 lines)

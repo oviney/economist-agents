@@ -1,6 +1,6 @@
 # GitHub Backlog Cleanup Report
 **Date**: 2026-01-04
-**Executor**: @scrum-master-v3
+**Executor**: @scrum-master (v3.0)
 **Trigger**: User escalation - "issues open for sprints that are closed"
 
 ## Problem Identified

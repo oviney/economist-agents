@@ -273,6 +273,6 @@ Sprint 12: 3/15 points delivered (20%)
 
 ---
 
-**Story Owner**: @scrum-master-v3
+**Story Owner**: @scrum-master (consolidated v3.0)
 **Reviewed By**: Autonomous execution (no human review required)
 **Quality Score**: 10/10 (all AC met, tests passing, no blockers)

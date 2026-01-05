@@ -11,13 +11,13 @@
       "github_issue": 15,
       "component": "jekyll_layout",
       "status": "fixed",
-      "fixed_date": "2026-01-02T23:02:14.834797",
+      "fixed_date": "2026-01-05T02:07:42.265204",
       "fix_commit": "5d97545",
       "is_production_escape": true,
       "fix_notes": "Added category tag to post.html layout",
       "prevention_test_added": true,
       "prevention_test_file": "scripts/blog_qa_agent.py",
-      "time_to_resolve_days": 1,
+      "time_to_resolve_days": 3,
       "root_cause": "validation_gap",
       "root_cause_notes": "Jekyll layout validation missing - no check for category tag display",
       "introduced_in_commit": "unknown",
@@ -43,13 +43,13 @@
       "github_issue": 16,
       "component": "writer_agent",
       "status": "fixed",
-      "fixed_date": "2026-01-02T23:02:14.834842",
+      "fixed_date": "2026-01-05T02:07:42.265239",
       "fix_commit": "469f402",
       "is_production_escape": false,
       "fix_notes": "Enhanced Writer Agent prompt + Publication Validator",
       "prevention_test_added": true,
       "prevention_test_file": "scripts/publication_validator.py",
-      "time_to_resolve_days": 1,
+      "time_to_resolve_days": 3,
       "root_cause": "prompt_engineering",
       "root_cause_notes": "Writer Agent prompt didn't explicitly require chart embedding. Graphics Agent created charts but Writer didn't reference them.",
       "introduced_in_commit": "a1b2c3d",
@@ -76,11 +76,11 @@
       "github_issue": 17,
       "component": "writer_agent",
       "status": "fixed",
-      "fixed_date": "2026-01-02T23:02:14.834867",
+      "fixed_date": "2026-01-05T02:07:42.265258",
       "fix_commit": "5509dec",
       "is_production_escape": true,
       "fix_notes": "Removed image: field from front matter",
-      "time_to_resolve_days": 1,
+      "time_to_resolve_days": 3,
       "root_cause": "requirements_gap",
       "root_cause_notes": "Unclear requirements: featured image vs embedded chart. Jekyll 'image:' field rendered as hero image, causing duplication.",
       "introduced_in_commit": "469f402",
@@ -377,27 +377,28 @@
       "github_issue": null,
       "component": "writer_agent",
       "responsible_agent": "writer_agent",
-      "status": "open",
-      "fixed_date": null,
-      "fix_commit": null,
+      "status": "fixed",
+      "fixed_date": "2026-01-05T10:30:00",
+      "fix_commit": "938776c",
       "is_production_escape": false,
       "root_cause": "prompt_engineering",
       "root_cause_notes": "Writer Agent prompt does not explicitly require opening '---' delimiter in YAML frontmatter. Articles fail publication validation.",
       "introduced_in_commit": null,
       "introduced_date": "2026-01-04",
       "time_to_detect_days": 0,
-      "time_to_resolve_days": null,
+      "time_to_resolve_days": 1,
       "missed_by_test_type": "integration_test",
       "test_gap_description": "No test validates YAML frontmatter delimiter presence before publication",
-      "prevention_test_added": false,
-      "prevention_test_file": null,
+      "prevention_test_added": true,
+      "prevention_test_file": "tests/test_writer_agent_yaml.py",
       "prevention_strategy": [
         "enhanced_prompt",
         "new_validation"
       ],
       "prevention_actions": [
         "Update Writer Agent prompt to enforce '---' as first line",
-        "Add Publication Validator check for YAML delimiter presence"
+        "Add Publication Validator check for YAML delimiter presence",
+        "Production validated: Workflow 20719290473 confirmed fix"
       ]
     },
     {
@@ -430,7 +431,9 @@
       "prevention_actions": [
         "Update Writer Agent prompt: 'Write 800-1000 words minimum'",
         "Add self-validation check for word count in Writer Agent"
-      ]
+      ],
+      "planned_for_sprint": 14,
+      "priority_justification": "Production blocker - OpenDNS article quarantined at 482 words vs 800 minimum"
     },
     {
       "id": "BUG-030",
@@ -500,8 +503,8 @@
       "featured_image_agent": 1
     },
     "avg_time_to_detect_days": 4.1,
-    "avg_time_to_resolve_days": 1.1,
+    "avg_time_to_resolve_days": 2.0,
     "avg_critical_ttd_days": 3.7,
-    "last_updated": "2026-01-04T18:52:29.399400"
+    "last_updated": "2026-01-05T02:07:42.265320"
   }
 }

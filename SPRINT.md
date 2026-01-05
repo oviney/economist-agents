@@ -87,7 +87,8 @@ See [AGENT_VELOCITY_ANALYSIS.md](docs/AGENT_VELOCITY_ANALYSIS.md) for full resea
 **Sprint Start**: 2026-01-04
 **Capacity**: 13 points (9 committed + 4 buffer)
 **Focus**: Production-Grade Agentic Evolution (Epic EPIC-001)
-**Unplanned Work**: BUG-028 Writer Agent YAML fix (2 hours, P0)
+**Unplanned Work**: 
+- BUG-028 Writer Agent YAML Delimiter Fix - COMPLETE (2h unplanned, commit 938776c) ✅
 
 ---
 
@@ -230,6 +231,52 @@ Integration of CrewAI founder João Moura's production-grade AI system philosoph
 - execution_roi.json logs token costs accurately (±1% error)
 - No regressions in existing functionality
 - Business ROI validated (telemetry shows >100x efficiency)
+
+---
+
+---
+
+## Sprint 14 Backlog
+
+**Sprint Start**: TBD
+**Capacity**: 13 points
+**Focus**: Writer Agent Quality + Epic EPIC-001 Continuation
+
+### Story 0: BUG-029 - Writer Agent Word Count Fix (3 pts, P0)
+
+**Story Goal**: Fix Writer Agent to consistently generate 800-1000 word articles (Economist editorial standard)
+
+**Impact**: 
+- **Production Blocker**: OpenDNS article quarantined at 482 words vs 800 minimum
+- **Quality Standard**: All Economist-style articles require 800+ words minimum
+- **User Trust**: Short articles undermine publication credibility
+
+**Fix Plan**:
+1. Enhance Writer Agent prompt with explicit word count requirement:
+   - "Write 800-1000 words minimum (Economist editorial standard)"
+   - Add word count self-validation check before return
+   - Regenerate if below 800 words (max 2 retries)
+
+2. Add Publication Validator check:
+   - Reject articles <800 words with clear error message
+   - Add to quality gate checklist
+
+3. Create integration test:
+   - tests/test_writer_agent_word_count.py
+   - Validate 10 articles all meet 800+ word minimum
+   - Test self-validation retry logic
+
+**Acceptance Criteria**:
+- [ ] Writer Agent prompt includes explicit "800-1000 words minimum" requirement
+- [ ] Writer Agent self-validates word count before returning draft
+- [ ] Publication Validator rejects articles <800 words
+- [ ] tests/test_writer_agent_word_count.py passes with 10/10 articles ≥800 words
+- [ ] OpenDNS article regenerated and published successfully
+
+**Estimated Effort**: 3 hours = 3 story points
+**Priority**: P0 (Production blocker)
+**Dependencies**: None (standalone fix)
+**Risk**: Low - prompt enhancement + validation check
 
 ---
 

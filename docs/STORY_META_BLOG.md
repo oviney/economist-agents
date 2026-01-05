@@ -1,11 +1,12 @@
 # Story: How Six AI Personas Vote on Content Topics
 
-**Sprint**: Sprint 10
+**Sprint**: Sprint 14 (Deferred from exploratory work in Sprint 13)
 **Story Type**: Content Generation
 **Priority**: P2 (Nice-to-have, showcase piece)
 **Story Points**: 3
 **Estimated Time**: 6-8 hours
 **Created**: 2026-01-04
+**Status**: Not Started (Exploratory work completed 2026-01-04, revealed Writer Agent bugs)
 **Title**: "How Six AI Personas Vote on Your Content: Inside the Economist-Agents Architecture"
 
 ---

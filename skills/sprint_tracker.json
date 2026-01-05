@@ -477,8 +477,9 @@
     ]
   },
   "sprint_13": {
-    "status": "planned",
+    "status": "in_progress",
     "start_date": "2026-01-05",
+    "planning_complete": "2026-01-05",
     "end_date": null,
     "capacity": 13,
     "committed_points": 9,

@@ -82,6 +82,15 @@ See [AGENT_VELOCITY_ANALYSIS.md](docs/AGENT_VELOCITY_ANALYSIS.md) for full resea
 
 ---
 
+## Sprint 13 Status: IN PROGRESS (9/13 pts committed + 2h unplanned tech debt)
+
+**Sprint Start**: 2026-01-04
+**Capacity**: 13 points (9 committed + 4 buffer)
+**Focus**: Production-Grade Agentic Evolution (Epic EPIC-001)
+**Unplanned Work**: BUG-028 Writer Agent YAML fix (2 hours, P0)
+
+---
+
 ## Sprint 13 Backlog: Epic EPIC-001 - Production-Grade Agentic Evolution (v2.0)
 
 **Epic Theme**: João Moura's "Production ROI" Principles Integration

@@ -367,46 +367,141 @@
         "Add linting rule for missing timeouts",
         "Review all HTTP client calls"
       ]
+    },
+    {
+      "id": "BUG-028",
+      "severity": "critical",
+      "discovered_in": "development",
+      "discovered_date": "2026-01-04T18:52:29.399271",
+      "description": "Writer Agent YAML frontmatter missing opening '---' delimiter",
+      "github_issue": null,
+      "component": "writer_agent",
+      "responsible_agent": "writer_agent",
+      "status": "open",
+      "fixed_date": null,
+      "fix_commit": null,
+      "is_production_escape": false,
+      "root_cause": "prompt_engineering",
+      "root_cause_notes": "Writer Agent prompt does not explicitly require opening '---' delimiter in YAML frontmatter. Articles fail publication validation.",
+      "introduced_in_commit": null,
+      "introduced_date": "2026-01-04",
+      "time_to_detect_days": 0,
+      "time_to_resolve_days": null,
+      "missed_by_test_type": "integration_test",
+      "test_gap_description": "No test validates YAML frontmatter delimiter presence before publication",
+      "prevention_test_added": false,
+      "prevention_test_file": null,
+      "prevention_strategy": [
+        "enhanced_prompt",
+        "new_validation"
+      ],
+      "prevention_actions": [
+        "Update Writer Agent prompt to enforce '---' as first line",
+        "Add Publication Validator check for YAML delimiter presence"
+      ]
+    },
+    {
+      "id": "BUG-029",
+      "severity": "high",
+      "discovered_in": "development",
+      "discovered_date": "2026-01-04T18:52:29.399339",
+      "description": "Writer Agent generates articles 478-543 words (needs 800+ minimum)",
+      "github_issue": null,
+      "component": "writer_agent",
+      "responsible_agent": "writer_agent",
+      "status": "open",
+      "fixed_date": null,
+      "fix_commit": null,
+      "is_production_escape": false,
+      "root_cause": "prompt_engineering",
+      "root_cause_notes": "Writer Agent prompt lacks explicit 800-word minimum requirement. Articles fail quality standards.",
+      "introduced_in_commit": null,
+      "introduced_date": "2026-01-04",
+      "time_to_detect_days": 0,
+      "time_to_resolve_days": null,
+      "missed_by_test_type": "integration_test",
+      "test_gap_description": "No test validates article length before publication",
+      "prevention_test_added": false,
+      "prevention_test_file": null,
+      "prevention_strategy": [
+        "enhanced_prompt",
+        "new_validation"
+      ],
+      "prevention_actions": [
+        "Update Writer Agent prompt: 'Write 800-1000 words minimum'",
+        "Add self-validation check for word count in Writer Agent"
+      ]
+    },
+    {
+      "id": "BUG-030",
+      "severity": "medium",
+      "discovered_in": "development",
+      "discovered_date": "2026-01-04T18:52:29.399384",
+      "description": "Publication validator false positive on 'your-content' in filename (from actual title)",
+      "github_issue": null,
+      "component": "publication_validator",
+      "responsible_agent": null,
+      "status": "open",
+      "fixed_date": null,
+      "fix_commit": null,
+      "is_production_escape": false,
+      "root_cause": "validation_gap",
+      "root_cause_notes": "Placeholder detection regex too aggressive - flags legitimate title-derived slugs as placeholders",
+      "introduced_in_commit": null,
+      "introduced_date": "2026-01-04",
+      "time_to_detect_days": 0,
+      "time_to_resolve_days": null,
+      "missed_by_test_type": "unit_test",
+      "test_gap_description": "No test for placeholder detection with real title slugs",
+      "prevention_test_added": false,
+      "prevention_test_file": null,
+      "prevention_strategy": [
+        "new_validation"
+      ],
+      "prevention_actions": [
+        "Adjust placeholder regex to allow title-derived slugs",
+        "Add test cases for legitimate slug patterns"
+      ]
     }
   ],
   "summary": {
-    "total_bugs": 11,
+    "total_bugs": 14,
     "fixed_bugs": 7,
     "production_bugs": 6,
-    "defect_escape_rate": 54.5,
+    "defect_escape_rate": 42.9,
     "by_severity": {
-      "critical": 2,
-      "high": 5,
-      "medium": 4,
+      "critical": 3,
+      "high": 6,
+      "medium": 5,
       "low": 0
     },
     "by_stage": {
-      "development": 5,
+      "development": 8,
       "staging": 0,
       "production": 6
     },
     "root_cause_distribution": {
-      "validation_gap": 2,
-      "prompt_engineering": 1,
+      "validation_gap": 3,
+      "prompt_engineering": 3,
       "requirements_gap": 2,
       "integration_error": 2,
       "code_logic": 4
     },
     "test_gap_distribution": {
       "visual_qa": 2,
-      "integration_test": 3,
+      "integration_test": 5,
       "manual_test": 4,
-      "unit_test": 2
+      "unit_test": 3
     },
     "agent_defect_distribution": {
-      "writer_agent": 1,
+      "writer_agent": 3,
       "quality_enforcer": 1,
       "governance_tracker": 1,
       "featured_image_agent": 1
     },
-    "avg_time_to_detect_days": 5.2,
+    "avg_time_to_detect_days": 4.1,
     "avg_time_to_resolve_days": 1.1,
-    "avg_critical_ttd_days": 5.5,
-    "last_updated": "2026-01-02T23:02:14.834956"
+    "avg_critical_ttd_days": 3.7,
+    "last_updated": "2026-01-04T18:52:29.399400"
   }
 }

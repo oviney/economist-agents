@@ -374,7 +374,7 @@
       "discovered_in": "development",
       "discovered_date": "2026-01-04T18:52:29.399271",
       "description": "Writer Agent YAML frontmatter missing opening '---' delimiter",
-      "github_issue": null,
+      "github_issue": 92,
       "component": "writer_agent",
       "responsible_agent": "writer_agent",
       "status": "fixed",

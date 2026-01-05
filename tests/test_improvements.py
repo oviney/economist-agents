@@ -81,9 +81,9 @@ def test_json_schema_validation():
             temp_path, schema_dir / "content_queue_schema.json"
         )
         assert not is_valid, "Invalid content queue passed validation!"
-        assert any(
-            "topics" in str(e).lower() for e in errors
-        ), "Should detect missing 'topics' field"
+        assert any("topics" in str(e).lower() for e in errors), (
+            "Should detect missing 'topics' field"
+        )
         print("   ✅ Invalid content_queue.json correctly rejected")
     finally:
         temp_path.unlink()
@@ -270,9 +270,9 @@ def test_error_messages():
     except ValueError as e:
         error_msg = str(e)
         assert "[EDITOR_AGENT]" in error_msg, "Error should include agent name"
-        assert (
-            "too short" in error_msg or "chars" in error_msg
-        ), "Error should include details"
+        assert "too short" in error_msg or "chars" in error_msg, (
+            "Error should include details"
+        )
         print(f"   ✅ Editor agent error: {error_msg[:60]}...")
 
     print("   ✅ Error Messages: PASSED")

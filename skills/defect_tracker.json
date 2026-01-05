@@ -411,6 +411,8 @@
       "component": "writer_agent",
       "responsible_agent": "writer_agent",
       "status": "open",
+      "planned_for_sprint": 14,
+      "priority_justification": "Production blocker - OpenDNS article quarantined, content pipeline halted",
       "fixed_date": null,
       "fix_commit": null,
       "is_production_escape": false,
@@ -431,9 +433,7 @@
       "prevention_actions": [
         "Update Writer Agent prompt: 'Write 800-1000 words minimum'",
         "Add self-validation check for word count in Writer Agent"
-      ],
-      "planned_for_sprint": 14,
-      "priority_justification": "Production blocker - OpenDNS article quarantined at 482 words vs 800 minimum"
+      ]
     },
     {
       "id": "BUG-030",

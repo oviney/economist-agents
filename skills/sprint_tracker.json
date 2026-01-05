@@ -485,6 +485,7 @@
     "committed_points": 9,
     "theme": "Production-Grade Agentic Evolution (v2.0) - João Moura Principles",
     "epic": "EPIC-001",
+    "github_synced": "2026-01-04T23:45:00",
     "goals": [
       "Implement Flow-based deterministic orchestration (0-agency transitions)",
       "Establish Style Memory RAG with Gold Standard articles",
@@ -494,6 +495,37 @@
       "STORY-005: Shift to Deterministic Backbone (3 pts, P0)",
       "STORY-006: Establish Style Memory RAG (3 pts, P1)",
       "STORY-007: Implement ROI Telemetry Hook (3 pts, P2)"
+    ],
+    "github_issues": [
+      {
+        "story_id": 5,
+        "issue_number": 87,
+        "issue_url": "https://github.com/oviney/economist-agents/issues/87",
+        "title": "STORY-005: Shift to Deterministic Backbone",
+        "labels": ["sprint-13", "P0", "3-points", "type:architecture"]
+      },
+      {
+        "story_id": 6,
+        "issue_number": 88,
+        "issue_url": "https://github.com/oviney/economist-agents/issues/88",
+        "title": "STORY-006: Establish Style Memory RAG",
+        "labels": ["sprint-13", "P1", "3-points", "type:enhancement"]
+      },
+      {
+        "story_id": 6,
+        "issue_number": 89,
+        "issue_url": "https://github.com/oviney/economist-agents/issues/89",
+        "title": "STORY-006: Establish Style Memory RAG",
+        "labels": ["sprint-13", "P1", "3-points", "type:enhancement"],
+        "note": "Duplicate created due to terminal issue - close #88 or #89"
+      },
+      {
+        "story_id": 7,
+        "issue_number": 90,
+        "issue_url": "https://github.com/oviney/economist-agents/issues/90",
+        "title": "STORY-007: Implement ROI Telemetry Hook",
+        "labels": ["sprint-13", "P2", "3-points", "type:enhancement"]
+      }
     ],
     "stories": [
       {

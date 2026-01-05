@@ -121,6 +121,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           TOPIC: ${{ github.event.inputs.topic }}
           OUTPUT_DIR: output
+          PYTHONPATH: ${{ github.workspace }}
         run: |
           if [ "${{ github.event.inputs.interactive }}" == "true" ]; then
             python scripts/economist_agent.py --interactive

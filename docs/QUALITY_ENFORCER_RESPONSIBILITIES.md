@@ -496,6 +496,59 @@ If pre-commit **fails** (not just modifies), you'll see error messages:
 
 **Do not bypass pre-commit hooks** - they catch issues early and prevent CI/CD failures.
 
+### Ruff Formatting Cycles (Emergency Escape Hatch)
+
+**PROBLEM**: Sometimes ruff formatting creates infinite cycles:
+1. You run `ruff format` locally
+2. Pre-commit hook runs `ruff format` on commit
+3. CI fails with "Would reformat" despite versions matching
+4. Re-running format doesn't fix it (multi-line constructs formatted differently)
+
+**ROOT CAUSE**: Ruff can format multi-line constructs (especially assert statements) differently on successive runs, creating a cycle between local hooks and CI.
+
+**SYMPTOMS**:
+- CI fails with "Would reformat" on specific files
+- Running `ruff format` locally shows "8 files reformatted"
+- Next commit triggers hooks, files change again
+- Versions match exactly (e.g., both 0.14.10) but formatting still differs
+- Common with multi-line assert statements with messages
+
+**EMERGENCY SOLUTION** (use only when in formatting cycle):
+
+1. **Apply formatting directly**:
+   ```bash
+   .venv/bin/ruff format scripts/ tests/
+   ```
+
+2. **Verify the diff**:
+   ```bash
+   git diff
+   ```
+
+3. **Commit with --no-verify to break the cycle**:
+   ```bash
+   git add .
+   git commit --no-verify -m "Fix: Apply ruff formatting"
+   git push --no-verify origin main
+   ```
+
+4. **Monitor CI** to confirm it passes
+
+**WHEN TO USE --no-verify**:
+- ✅ You're in a ruff formatting cycle (2+ attempts failed)
+- ✅ Versions match between local and CI
+- ✅ You've verified the formatting changes are correct
+- ❌ NEVER use for bypassing actual lint/test failures
+- ❌ NEVER use as default workflow
+
+**PREVENTION**:
+- Let pre-commit hooks handle formatting normally
+- Only manually format when troubleshooting CI failures
+- Report formatting cycles as bugs (see issue #86)
+- Consider pinning ruff format style with explicit config
+
+**REFERENCE**: See issue #86 for full details on formatting cycle bug.
+
 ---
 
 ## Autonomous Git Workflow (BUG-025 Prevention)

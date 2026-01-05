@@ -91,10 +91,12 @@ jobs:
 
       - name: Upload coverage reports
         if: matrix.python-version == '3.11'
+        continue-on-error: true
         uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml
           fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   security-scan:
     name: Security Scan

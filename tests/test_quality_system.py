@@ -91,9 +91,9 @@ Companies investing in robust infrastructure will outpace competitors.
 
     # Verify failure
     assert not is_valid, "Agent reviewer should have caught missing chart"
-    assert any(
-        "chart not embedded" in i.lower() for i in issues
-    ), "Should explicitly flag missing chart embedding"
+    assert any("chart not embedded" in i.lower() for i in issues), (
+        "Should explicitly flag missing chart embedding"
+    )
 
     print("   ✅ Correctly flagged missing chart embedding")
 
@@ -303,9 +303,9 @@ def test_chart_visual_bug_title_overlap():
     # Visual QA should fail
     assert not chart_metadata["red_bar_visible"], "Red bar should be hidden by title"
     assert len(chart_metadata["zone_violations"]) > 0, "Should detect zone violation"
-    assert (
-        chart_metadata["title_y_position"] >= 0.96
-    ), "Title intrudes into red bar zone"
+    assert chart_metadata["title_y_position"] >= 0.96, (
+        "Title intrudes into red bar zone"
+    )
 
     print("\n✅ PASS: Title/red bar overlap would be caught by Visual QA")
     return True
@@ -493,12 +493,12 @@ choice is becoming binary.
     print(f"   Schema Validator: {len(critical_schema)} critical issues")
 
     # Should have no critical issues
-    assert (
-        len(critical_review) == 0
-    ), f"Should have no critical review issues, got: {critical_review}"
-    assert (
-        len(critical_schema) == 0
-    ), f"Should have no critical schema issues, got: {critical_schema}"
+    assert len(critical_review) == 0, (
+        f"Should have no critical review issues, got: {critical_review}"
+    )
+    assert len(critical_schema) == 0, (
+        f"Should have no critical schema issues, got: {critical_schema}"
+    )
 
     print("\n✅ PASS: Well-formed article passes all validation layers")
     return True

@@ -236,9 +236,9 @@ def test_automation_gap_exists():
     assert gap > 50, f"Gap ({gap}) should be significant to show automation paradox"
 
     # AI adoption should be much higher
-    assert (
-        ai_final > maint_final * 3
-    ), "AI adoption should be multiple of maintenance reduction"
+    assert ai_final > maint_final * 3, (
+        "AI adoption should be multiple of maintenance reduction"
+    )
 
 
 def test_trend_directions():
@@ -253,9 +253,9 @@ def test_trend_directions():
     # AI should grow faster (that's the gap)
     ai_growth = ai[-1] - ai[0]
     maint_growth = maint[-1] - maint[0]
-    assert (
-        ai_growth > maint_growth * 3
-    ), "AI growth should far exceed maintenance reduction growth"
+    assert ai_growth > maint_growth * 3, (
+        "AI growth should far exceed maintenance reduction growth"
+    )
 
 
 def test_year_range_reasonable():

@@ -72,9 +72,9 @@ class TestSMEffectivenessBenchmark:
             "needs_clarification",
         }
 
-        assert expected_categories.issubset(categories), (
-            f"Missing categories: {expected_categories - categories}"
-        )
+        assert expected_categories.issubset(
+            categories
+        ), f"Missing categories: {expected_categories - categories}"
 
         # Should have mix of expected outcomes
         routings = {s["expected_routing"] for s in benchmark.test_scenarios}
@@ -289,9 +289,9 @@ class TestSMEffectivenessBenchmark:
 
         for scenario in vague_requests:
             # Vague requests should NOT be DoR compliant
-            assert scenario["expected_dor_compliance"] is False, (
-                f"Vague scenario {scenario['id']} incorrectly marked DoR compliant"
-            )
+            assert (
+                scenario["expected_dor_compliance"] is False
+            ), f"Vague scenario {scenario['id']} incorrectly marked DoR compliant"
 
     @patch("scripts.benchmarks.measure_sm_effectiveness.call_llm")
     def test_send_request_handles_llm_success(self, mock_call_llm):

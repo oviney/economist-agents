@@ -460,9 +460,9 @@ Content without chart."""
         violations = prevention.check_all(article_missing_chart, {"chart_data": True})
 
         # Should detect missing chart embedding
-        assert any("chart" in v.lower() for v in violations), (
-            f"Should catch missing chart. Got violations: {violations}"
-        )
+        assert any(
+            "chart" in v.lower() for v in violations
+        ), f"Should catch missing chart. Got violations: {violations}"
 
     def test_bug_015_pattern_prevented(self):
         """Test: BUG-015 pattern (missing category) is caught"""
@@ -478,9 +478,9 @@ date: 2026-01-01
         violations = prevention.check_all(article_no_category, {})
 
         # Should detect missing category
-        assert any("category" in v.lower() for v in violations), (
-            "Should catch missing category"
-        )
+        assert any(
+            "category" in v.lower() for v in violations
+        ), "Should catch missing category"
 
 
 # ═══════════════════════════════════════════════════════════════════════════

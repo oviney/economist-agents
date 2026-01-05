@@ -65,24 +65,24 @@ class TestDashboardMetricsAccuracy:
             summary = dashboard._build_agent_summary()
 
             # Validate real data is used (not baseline values)
-            assert (
-                summary["writer"]["clean_rate"] == 100
-            ), "Writer clean rate should be 100% (0 banned phrases)"
-            assert (
-                summary["writer"]["avg_word_count"] > 0
-            ), "Word count should be greater than 0"
-            assert (
-                summary["editor"]["accuracy"] == 80.0
-            ), "Editor accuracy should match gate_pass_rate"
-            assert (
-                summary["editor"]["avg_gates_passed"] == 4
-            ), "Gates passed should match actual"
-            assert (
-                summary["graphics"]["visual_qa_pass_rate"] == 90.0
-            ), "Visual QA should match actual"
-            assert (
-                summary["research"]["verification_rate"] == 85.5
-            ), "Verification rate should match actual"
+            assert summary["writer"]["clean_rate"] == 100, (
+                "Writer clean rate should be 100% (0 banned phrases)"
+            )
+            assert summary["writer"]["avg_word_count"] > 0, (
+                "Word count should be greater than 0"
+            )
+            assert summary["editor"]["accuracy"] == 80.0, (
+                "Editor accuracy should match gate_pass_rate"
+            )
+            assert summary["editor"]["avg_gates_passed"] == 4, (
+                "Gates passed should match actual"
+            )
+            assert summary["graphics"]["visual_qa_pass_rate"] == 90.0, (
+                "Visual QA should match actual"
+            )
+            assert summary["research"]["verification_rate"] == 85.5, (
+                "Verification rate should match actual"
+            )
 
     def test_no_data_handling(self, tmp_path):
         """Test that NO DATA is displayed when metrics unavailable"""
@@ -96,16 +96,16 @@ class TestDashboardMetricsAccuracy:
             summary = dashboard._build_agent_summary()
 
             # All percentages should be None when no data
-            assert (
-                summary["writer"]["clean_rate"] is None
-            ), "Should be None when no data"
+            assert summary["writer"]["clean_rate"] is None, (
+                "Should be None when no data"
+            )
             assert summary["editor"]["accuracy"] is None, "Should be None when no data"
-            assert (
-                summary["graphics"]["visual_qa_pass_rate"] is None
-            ), "Should be None when no data"
-            assert (
-                summary["writer"]["avg_word_count"] is None
-            ), "Word count should be None when no data"
+            assert summary["graphics"]["visual_qa_pass_rate"] is None, (
+                "Should be None when no data"
+            )
+            assert summary["writer"]["avg_word_count"] is None, (
+                "Word count should be None when no data"
+            )
 
     def test_no_baseline_fallback(self, tmp_path):
         """Test that baseline values (75%, 60%, etc.) are NOT used"""
@@ -119,12 +119,12 @@ class TestDashboardMetricsAccuracy:
             # Ensure NO baseline values are present
             assert summary["writer"]["clean_rate"] != 75, "Should not use baseline 75%"
             assert summary["editor"]["accuracy"] != 60, "Should not use baseline 60%"
-            assert (
-                summary["graphics"]["visual_qa_pass_rate"] != 75
-            ), "Should not use baseline 75%"
-            assert (
-                summary["research"]["verification_rate"] != 80
-            ), "Should not use baseline 80%"
+            assert summary["graphics"]["visual_qa_pass_rate"] != 75, (
+                "Should not use baseline 75%"
+            )
+            assert summary["research"]["verification_rate"] != 80, (
+                "Should not use baseline 80%"
+            )
 
 
 class TestSprintTrendsRendering:
@@ -193,9 +193,9 @@ class TestSprintTrendsRendering:
             trends = dashboard._render_sprint_trends()
 
             # Should show helpful message
-            assert (
-                "Need at least 2 sprints" in trends
-            ), "Should explain minimum requirement"
+            assert "Need at least 2 sprints" in trends, (
+                "Should explain minimum requirement"
+            )
             assert "1 sprint" in trends, "Should show current count"
 
     def test_sprint_trends_no_history(self):
@@ -207,9 +207,9 @@ class TestSprintTrendsRendering:
             dashboard = QualityDashboard()
             trends = dashboard._render_sprint_trends()
 
-            assert (
-                "No sprint history available" in trends
-            ), "Should show no data message"
+            assert "No sprint history available" in trends, (
+                "Should show no data message"
+            )
             assert "--save-sprint" in trends, "Should suggest how to start tracking"
 
 
@@ -330,9 +330,9 @@ class TestDashboardGeneration:
                 latest = metrics_data["runs"][-1]
                 if "agents" in latest and "writer_agent" in latest["agents"]:
                     # Dashboard should reflect actual data, not baseline
-                    assert summary["writer"]["articles"] == len(
-                        metrics_data["runs"]
-                    ), "Article count should match runs array length"
+                    assert summary["writer"]["articles"] == len(metrics_data["runs"]), (
+                        "Article count should match runs array length"
+                    )
 
 
 # Fixtures

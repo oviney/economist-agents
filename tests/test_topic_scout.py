@@ -766,8 +766,8 @@ def test_trend_research_prompt_structure():
     - Focus on QE leaders
     """
     assert "Search for and analyze" in TREND_RESEARCH_PROMPT
-    assert "Recent announcements" in TREND_RESEARCH_PROMPT
-    assert "senior QE leader" in TREND_RESEARCH_PROMPT
+    assert "Testing tool vendor announcements" in TREND_RESEARCH_PROMPT
+    assert "senior engineering leaders" in TREND_RESEARCH_PROMPT
     assert "What happened" in TREND_RESEARCH_PROMPT
     assert "When" in TREND_RESEARCH_PROMPT
 

@@ -209,6 +209,7 @@ WRONG formats (DO NOT USE):
 title: "Myth vs Reality"  ← Too generic
 date: 2023-11-09          ← Wrong date
 ---
+---
 title: "Article"  ← MISSING layout field - page won't render properly!
 date: {current_date}
 ---

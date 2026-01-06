@@ -309,6 +309,344 @@ Run `python3 scripts/defect_tracker.py` to see full report with RCA insights.
 
 See [SCRUM_MASTER_PROTOCOL.md](../docs/SCRUM_MASTER_PROTOCOL.md) for complete workflow, SAFe elements, metrics tracking, and validation checklists.
 
+## Learned Anti-Patterns
+
+*Auto-generated from skills/*.json and docs/ARCHITECTURE_PATTERNS.md on 2026-01-05*
+
+### Defect Prevention Patterns
+
+#### Code Logic
+
+**BUG-021** (medium) - build_process
+- **Issue**: README.md badges show stale values - not updated by build process
+- **Missed By**: manual_test
+- **Prevention**:
+  - Created scripts/update_readme_badges.py for automatic updates
+  - Will add to pre-commit hook for validation
+  - Add CI check to verify badges are current
+
+**BUG-022** (medium) - documentation
+- **Issue**: SPRINT.md shows Sprint 2-3 content but Sprint 5 is complete
+- **Missed By**: manual_test
+
+#### Integration Error
+
+**BUG-020** (critical) - git_workflow
+- **Issue**: GitHub integration broken - issues not auto-closing
+- **Missed By**: integration_test
+- **Prevention**:
+  - Created .git/hooks/commit-msg to validate GitHub close syntax
+  - Hook blocks commits with invalid format (bullet lists, missing issue numbers)
+  - Sprint 6 Story 1: Final validation and documentation complete
+
+#### Prompt Engineering
+
+**BUG-016** (critical) - writer_agent
+- **Issue**: Charts generated but never embedded in articles
+- **Missed By**: integration_test
+- **Prevention**:
+  - Enhanced Writer Agent prompt with explicit chart embedding requirements
+  - Added Publication Validator Check #7: Chart Embedding
+  - Added agent_reviewer.py validation for Writer Agent outputs
+
+**BUG-028** (critical) - writer_agent
+- **Issue**: Writer Agent YAML frontmatter missing opening '---' delimiter
+- **Missed By**: integration_test
+- **Prevention**:
+  - Update Writer Agent prompt to enforce '---' as first line
+  - Add Publication Validator check for YAML delimiter presence
+  - Production validated: Workflow 20719290473 confirmed fix
+
+#### Requirements Gap
+
+**BUG-017** (medium) - writer_agent
+- **Issue**: Duplicate chart display (featured image + embed)
+- **Missed By**: visual_qa
+- **Prevention**:
+  - Removed 'image:' field from YAML frontmatter specification
+  - Documented chart embedding pattern: use markdown only, not frontmatter
+  - Updated Writer Agent to use single chart embedding method
+
+#### Validation Gap
+
+**BUG-015** (high) - jekyll_layout
+- **Issue**: Missing category tag on article page
+- **Missed By**: visual_qa
+- **Prevention**:
+  - Added blog_qa_agent.py Jekyll layout validation
+  - Created pre-commit hook for blog structure checks
+
+**BUG-023** (high) - documentation
+- **Issue**: README.md badges show stale data - breaks documentation trust
+- **Missed By**: manual_test
+- **Prevention**:
+  - Created separate badge generator scripts (generate_sprint_badge.py, generate_tests_badge.py, generate_coverage_badge.py)
+  - Created dedicated validate_badges.py for pre-commit hook
+  - Converted all dynamic badges to shields.io endpoint format with JSON files
+  - Updated pre-commit hook to validate badge accuracy on every commit
+
+### Content Quality Patterns
+
+#### Agent Architecture
+
+**prompts_as_code** (architectural)
+- **Pattern**: Agent behavior defined by large prompt constants at top of files
+- **Check**: When modifying agent behavior, edit prompt constants first
+
+**persona_based_voting** (architectural)
+- **Pattern**: Editorial board uses weighted persona agents for consensus
+- **Check**: New personas must define weight, perspective, and decision criteria
+
+**sequential_agent_orchestration** (architectural)
+- **Pattern**: Pipeline stages executed sequentially with data handoffs
+- **Check**: Ensure each agent validates its inputs and outputs structured data
+
+#### Chart Integration
+
+**chart_not_embedded** (critical)
+- **Pattern**: Chart generated but not embedded in article
+- **Check**: agent_reviewer.py checks for ![...](chart_path) in article
+
+**chart_not_referenced** (medium)
+- **Pattern**: Chart embedded but not referenced in text
+- **Check**: agent_reviewer.py scans for 'As the chart shows' or similar
+
+**duplicate_chart_display** (medium)
+- **Pattern**: Chart appears twice (featured image + embedded)
+- **Check**: Scan for both 'image:' field and markdown embed
+
+#### Content Quality
+
+**ai_disclosure_compliance** (medium)
+- **Pattern**: Posts with AI-generated content must have ai_assisted: true flag
+- **Check**: Scan content for AI mentions without disclosure flag
+
+**banned_openings** (critical)
+- **Pattern**: Article starts with banned throat-clearing phrases
+- **Check**: Scan first paragraph for patterns like 'In today\'s world', 'It\'s no secret'
+- **Auto-fix**: Remove opening sentences with banned patterns
+
+**banned_closings** (critical)
+- **Pattern**: Article ends with summary or weak closing
+- **Check**: Scan last 3 paragraphs for 'In conclusion', 'remains to be seen', summaries
+- **Auto-fix**: Replace with definitive prediction or implication
+
+**verification_flags_present** (critical)
+- **Pattern**: Article contains [NEEDS SOURCE] or [UNVERIFIED] markers
+- **Check**: Grep for verification flags in article body
+- **Auto-fix**: Delete unsourced claims or add proper attribution
+
+#### Data Flow
+
+**json_intermediate_format** (architectural)
+- **Pattern**: Pipeline stages communicate via JSON files on disk
+- **Check**: Validate JSON schema compatibility between producer/consumer
+
+**configurable_output_paths** (architectural)
+- **Pattern**: Output paths configurable via environment variables
+- **Check**: Provide sensible defaults when env vars not set
+
+#### Dependencies
+
+**centralized_llm_client** (architectural)
+- **Pattern**: All agents use Anthropic Claude API via shared client
+- **Check**: Create client once, pass to agents - don't create per-request
+
+#### Error Handling
+
+**defensive_json_parsing** (best_practice)
+- **Pattern**: Extract JSON from LLM responses with find/rfind before parsing
+- **Check**: Always use try/except around json.loads()
+
+**explicit_verification_flags** (architectural)
+- **Pattern**: Research agent flags unverifiable claims with [UNVERIFIED]
+- **Check**: Never publish content with verification flags
+
+#### Front Matter Validation
+
+**missing_categories_field** (critical)
+- **Pattern**: Front matter missing 'categories' field
+- **Check**: schema_validator.py enforces required field
+
+**missing_layout_field** (critical)
+- **Pattern**: Front matter missing 'layout' field causes page rendering failure
+- **Check**: schema_validator.py enforces required field
+
+**generic_titles** (high)
+- **Pattern**: Titles use generic patterns like 'Myth vs Reality', 'Ultimate Guide'
+- **Check**: schema_validator.py regex patterns detect generic titles
+
+**wrong_date_in_frontmatter** (high)
+- **Pattern**: Date in front matter doesn't match today's date
+- **Check**: schema_validator.py compares date to expected_date
+
+#### Link Validation
+
+**dead_internal_links** (high)
+- **Pattern**: Internal links pointing to non-existent pages
+- **Check**: Verify all internal links resolve to actual files
+
+#### Performance
+
+**font_preload_warnings** (low)
+- **Pattern**: Font preload resource hints causing warnings
+- **Check**: Review preload strategy in layout templates
+
+#### Prompt Engineering
+
+**structured_output_specification** (best_practice)
+- **Pattern**: Prompts explicitly define expected JSON output structure
+- **Check**: Every agent that returns structured data must specify format
+
+**explicit_constraint_lists** (best_practice)
+- **Pattern**: Style constraints explicitly listed as BANNED/FORBIDDEN
+- **Check**: Update constraint lists based on editor agent rejections
+
+#### Seo Validation
+
+**missing_page_title** (critical)
+- **Pattern**: Empty or missing <title> tag
+- **Check**: Verify page layout includes title metadata rendering
+
+**placeholder_urls** (high)
+- **Pattern**: URLs containing 'YOUR-', 'REPLACE-', 'PLACEHOLDER'
+- **Check**: Scan for template placeholder text in links
+
+#### Sprint Discipline
+
+**work_without_planning** (critical)
+- **Pattern**: Starting implementation without sprint story
+- **Check**: Before any implementation: (1) Is there an active sprint? (2) Is this work part of a sprint story? (3) Are story points estimated?
+
+**scope_creep_mid_sprint** (high)
+- **Pattern**: Adding new stories during active sprint without re-planning
+- **Check**: Before adding work: (1) Will this prevent sprint goal completion? (2) Can it wait until next sprint?
+
+**missing_progress_tracking** (medium)
+- **Pattern**: Not updating SPRINT.md task checkboxes daily
+- **Check**: At end of each work session: (1) Update task checkboxes (2) Add blockers if stuck (3) Update sprint status
+
+**skipped_retrospective** (high)
+- **Pattern**: Completing sprint without retrospective
+- **Check**: At sprint end: (1) What went well? (2) What could improve? (3) Action items for next sprint?
+
+**work_without_acceptance_criteria** (high)
+- **Pattern**: Starting story without clear definition of done
+- **Check**: Before implementation: (1) Are acceptance criteria defined? (2) How will we know it's complete? (3) What tests prove it works?
+
+**unestimated_work** (medium)
+- **Pattern**: Working on story without story point estimation
+- **Check**: Before starting story: (1) Estimated story points? (2) Fits in sprint capacity?
+
+#### Sprint Report Quality
+
+**missing_artifact_links** (high)
+- **Pattern**: File mentioned in report but no GitHub link provided
+- **Check**: Scan for file paths without accompanying [text](https://github.com/...) links
+
+**broken_commit_references** (high)
+- **Pattern**: Commit SHA mentioned but not linked
+- **Check**: All commit SHAs must be clickable links to GitHub commits
+
+**unlinked_issues** (medium)
+- **Pattern**: Issue numbers mentioned without links
+- **Check**: All #XX references must link to GitHub issues
+
+#### Testing Strategy
+
+**continuous_learning_validation** (architectural)
+- **Pattern**: Validation agents learn from each run using skills system
+- **Check**: Call skills_manager.learn_pattern() when new issues discovered
+
+**human_review_checkpoints** (architectural)
+- **Pattern**: Manual review gates between pipeline stages
+- **Check**: Never auto-publish - require explicit human approval
+
+### Architectural Patterns
+
+#### Agent Architecture
+
+**Font Preload Warnings** (low)
+- **Pattern**: Font preload resource hints causing warnings
+- **Check**: Review preload strategy in layout templates
+
+**Prompts As Code** (architectural)
+- **Pattern**: Agent behavior defined by large prompt constants at top of files
+- **Rationale**: Makes agent logic explicit, versionable, and reviewable
+- **Check**: When modifying agent behavior, edit prompt constants first
+
+**Persona Based Voting** (architectural)
+- **Pattern**: Editorial board uses weighted persona agents for consensus
+- **Rationale**: Simulates diverse stakeholder perspectives with different priorities
+- **Check**: New personas must define weight, perspective, and decision criteria
+
+#### Data Flow
+
+**Sequential Agent Orchestration** (architectural)
+- **Pattern**: Pipeline stages executed sequentially with data handoffs
+- **Rationale**: Each agent specializes in one task, outputs feed next agent
+- **Check**: Ensure each agent validates its inputs and outputs structured data
+
+**Json Intermediate Format** (architectural)
+- **Pattern**: Pipeline stages communicate via JSON files on disk
+- **Rationale**: Enables inspection between stages, supports manual intervention
+- **Check**: Validate JSON schema compatibility between producer/consumer
+
+#### Dependencies
+
+**Explicit Verification Flags** (architectural)
+- **Pattern**: Research agent flags unverifiable claims with [UNVERIFIED]
+- **Rationale**: Maintains credibility, prevents false claims in output
+- **Check**: Never publish content with verification flags
+
+#### Error Handling
+
+**Explicit Constraint Lists** (best_practice)
+- **Pattern**: Style constraints explicitly listed as BANNED/FORBIDDEN
+- **Rationale**: Learned from manual editing cycles - codified editorial lessons
+- **Check**: Update constraint lists based on editor agent rejections
+
+**Defensive Json Parsing** (best_practice)
+- **Pattern**: Extract JSON from LLM responses with find/rfind before parsing
+- **Rationale**: LLMs may wrap JSON in markdown or explanatory text
+- **Check**: Always use try/except around json.loads()
+
+#### Performance
+
+**Ai Disclosure Compliance** (medium)
+- **Pattern**: Posts with AI-generated content must have ai_assisted: true flag
+- **Check**: Scan content for AI mentions without disclosure flag
+
+#### Prompt Engineering
+
+**Configurable Output Paths** (architectural)
+- **Pattern**: Output paths configurable via environment variables
+- **Rationale**: Supports multiple deployment targets (local, blog repo, CI/CD)
+- **Check**: Provide sensible defaults when env vars not set
+
+**Structured Output Specification** (best_practice)
+- **Pattern**: Prompts explicitly define expected JSON output structure
+- **Rationale**: Reduces parsing errors and improves output consistency
+- **Check**: Every agent that returns structured data must specify format
+
+#### Testing Strategy
+
+**Centralized Llm Client** (architectural)
+- **Pattern**: All agents use Anthropic Claude API via shared client
+- **Rationale**: Consistent model selection, easier rate limiting, unified error handling
+- **Check**: Create client once, pass to agents - don't create per-request
+
+**Continuous Learning Validation** (architectural)
+- **Pattern**: Validation agents learn from each run using skills system
+- **Rationale**: Zero-config improvement, patterns persist across runs
+- **Check**: Call skills_manager.learn_pattern() when new issues discovered
+
+**Human Review Checkpoints** (architectural)
+- **Pattern**: Manual review gates between pipeline stages
+- **Rationale**: Prevents runaway automation, ensures quality
+- **Check**: Never auto-publish - require explicit human approval
+
+
 ## Additional Resources
 
 - [SCRUM_MASTER_PROTOCOL.md](../docs/SCRUM_MASTER_PROTOCOL.md): Process discipline and Agile best practices

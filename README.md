@@ -285,6 +285,33 @@ See [docs/QUALITY_DASHBOARD.md](docs/QUALITY_DASHBOARD.md) for detailed metrics.
 - **Critical Bug TTD:** <2 days
 - **Gate Pass Rate:** 95% (Editor Agent)
 
+## 🧠 Hybrid Copilot Strategy
+
+This project uses a **Hybrid Copilot Strategy** that bridges local agent memory with GitHub Copilot's real-time reasoning:
+
+**Architecture:**
+```
+Agent Memory (skills/*.json) → sync_copilot_context.py → .github/copilot-instructions.md → GitHub Copilot
+```
+
+**What Gets Synced (58 patterns as of 2026-01-05):**
+- **Defect Prevention**: 8 bugs with RCA (BUG-015 through BUG-028)
+- **Content Quality**: 36 patterns from blog QA and agent validation
+- **Architectural**: 14 best practices from architecture reviews
+
+**Manual Sync:**
+```bash
+.venv/bin/python scripts/sync_copilot_context.py --dry-run  # Preview
+.venv/bin/python scripts/sync_copilot_context.py            # Execute
+```
+
+**Automatic Sync**: GitHub Actions workflow runs on:
+- Push to `skills/defect_tracker.json`, `skills/blog_qa_skills.json`, or `docs/ARCHITECTURE_PATTERNS.md`
+- Weekly schedule (Sundays at midnight UTC)
+- Manual dispatch from Actions tab
+
+See **[COPILOT_SYNC.md](COPILOT_SYNC.md)** for complete documentation, troubleshooting, and best practices.
+
 ## 🏷️ Badge Configuration
 
 All badges use shields.io with dynamic JSON endpoints to prevent staleness (BUG-023 fix).

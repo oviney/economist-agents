@@ -1,0 +1,12 @@
+{
+  "version": "1.0",
+  "created": "2026-01-08T11:06:14.076583",
+  "executions": [],
+  "summary": {
+    "total_executions": 0,
+    "total_tokens": 0,
+    "total_cost_usd": 0.0,
+    "total_human_hours_saved": 0.0,
+    "avg_roi_multiplier": 0.0
+  }
+}

@@ -313,14 +313,20 @@ IN PROGRESS 🔄
 **Dependencies**: archived/ directory (may be empty), OpenAI API, ChromaDB
 **Risk**: Empty archive (graceful degradation), relevance tuning (0.7 threshold configurable)
 
-**Sprint 14 Progress**: 6/9 points complete (67%)
+**Sprint 14 Progress**: 9/9 points complete (100% ✅)
 - ✅ STORY-005 (Flow): 3 pts COMPLETE
 - ✅ STORY-006 (RAG): 3 pts COMPLETE  
-- ⏳ STORY-007 (ROI): 3 pts REMAINING
+- ✅ STORY-007 (ROI): 3 pts COMPLETE
+
+**Sprint 14 Status**: COMPLETE ✅ (2026-01-08)
 
 ---
 
-#### STORY-007: Implement ROI Telemetry Hook (3 pts, P2) - READY
+#### STORY-007: Implement ROI Telemetry Hook (3 pts, P2) - ✅ COMPLETE
+
+**Status**: COMPLETE (2026-01-08)  
+**Implementation Time**: 1.5 hours (83% faster than 9h estimate)  
+**See**: [STORY-007-COMPLETE.md](STORY-007-COMPLETE.md)
 
 **Story Goal**: Automated logging of token costs vs human-hour value in logs/execution_roi.json for business ROI validation
 

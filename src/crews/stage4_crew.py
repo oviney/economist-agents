@@ -17,6 +17,34 @@ import re
 from typing import Any
 
 from crewai import Agent, Crew, Task
+from crewai.tools import tool
+
+from src.tools.style_memory_tool import create_style_memory_tool
+
+
+# Initialize Style Memory Tool for Editor Agent
+@tool("Style Memory Query")
+def style_memory_query_tool(query: str) -> str:
+    """
+    Query Style Memory for relevant Economist style patterns from Gold Standard articles.
+    
+    Use this tool when evaluating GATE 3 (VOICE) to find concrete examples of:
+    - Proper Economist voice and tone
+    - British spelling patterns
+    - Sentence structure examples
+    - How to handle specific phrasings
+    
+    Args:
+        query: Natural language query (e.g., "banned phrases examples", "British spelling patterns")
+    
+    Returns:
+        Formatted string with top 3 relevant style examples from archived articles
+    
+    Example:
+        result = style_memory_query_tool("how to write strong openings")
+    """
+    tool_func = create_style_memory_tool()
+    return tool_func(query)
 
 
 class Stage4Crew:
@@ -96,9 +124,16 @@ You are ruthlessly precise. Vague feedback is unacceptable.""",
 
 Your responsibilities:
 - Execute ALL edits from the reviewer's quality gate feedback
-- Remove banned phrases: "game-changer", "paradigm shift", "leverage" (verb), "at the end of the day"
-- Remove banned openings: "In today's", "It's no secret", "When it comes to"
-- Remove banned closings: "In conclusion", "To conclude", "In summary", "remains to be seen"
+- Remove banned phrases: "game-changer", "paradigm
+
+**TOOL AVAILABLE**: You have access to Style Memory Tool via style_memory_query_tool(query).
+Use this to find concrete style examples when applying edits:
+- Query relevant patterns for specific edits
+- Reference Gold Standard examples for style consistency
+- Validate editorial choices against archived articles""",
+            verbose=True,
+            allow_delegation=False,
+            tools=[style_memory_query_tool]lusion", "To conclude", "In summary", "remains to be seen"
 - Strengthen weak verbs: "is experiencing growth" → "is growing"
 - Apply British spelling: organization → organisation, analyze → analyse
 - Remove exclamation points

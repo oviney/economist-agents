@@ -433,9 +433,9 @@
     }
   },
   "validation_stats": {
-    "total_runs": 9,
-    "issues_found": 18,
+    "total_runs": 10,
+    "issues_found": 19,
     "issues_fixed": 3,
-    "last_run": "2026-01-01T04:15:16.696098"
+    "last_run": "2026-01-04T23:00:09.968609"
   }
 }

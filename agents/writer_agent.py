@@ -169,9 +169,12 @@ Every regeneration = unnecessary compute, token waste, carbon footprint.
 □ 9. Closing makes PREDICTION/IMPLICATION (not summary)?
 □ 10. NO banned closings ("In conclusion", "remains to be seen")?
 
-**Format Validation**:
-□ 11. YAML uses --- delimiters (NOT ```yaml)?
-□ 12. Date is {current_date} (NOT dates from research sources)?
+**YAML Front Matter Validation** (CRITICAL - Publication Blocker):
+□ 11. Article starts with opening --- delimiter?
+□ 12. All required YAML fields present (layout, title, date, author)?
+□ 13. Article has closing --- delimiter after front matter?
+□ 14. NO code fences (```yaml) wrapping front matter?
+□ 15. Date is {current_date} (NOT dates from research sources)?
 
 ═══════════════════════════════════════════════════════════════════════════
 ⚠️  GREEN SOFTWARE COMMITMENT:
@@ -187,33 +190,68 @@ YOUR RESEARCH BRIEF:
 
 Write the article now. Return complete Markdown with YAML frontmatter.
 
-⚠️  CRITICAL FORMAT REQUIREMENTS:
+⚠️  CRITICAL FORMAT REQUIREMENTS (YAML FRONT MATTER):
 
-1. DATE: Use TODAY'S DATE ({current_date}), NOT dates from research sources
-2. YAML: Use --- delimiters, NOT ```yaml code fences
-3. TITLE: Must be specific with context, NOT generic
-4. LAYOUT: MUST include "layout: post" for Jekyll rendering
+**MANDATORY YAML STRUCTURE** (Publication Validator will REJECT without this):
 
-Correct format:
----
-layout: post
-title: "Self-Healing Tests: Myth vs Reality"
-date: {current_date}
+```
+---  ← MUST be first 3 characters of file
+layout: post  ← REQUIRED for Jekyll
+title: "Specific Title with Context"  ← NOT generic
+date: {current_date}  ← Use TODAY'S DATE
 author: "The Economist"
----
+---  ← Closing delimiter REQUIRED
 
-[Article content here]
+[Article content starts here]
+```
 
-WRONG formats (DO NOT USE):
-```yaml          ← NO code fences
-title: "Myth vs Reality"  ← Too generic
-date: 2023-11-09          ← Wrong date
----
----
-title: "Article"  ← MISSING layout field - page won't render properly!
+**YAML VALIDATION CHECKLIST:**
+□ Opening --- is first line (no spaces/text before)
+□ layout: post field present
+□ title: "Specific Title" field present (not generic)
+□ date: {current_date} field present (TODAY'S DATE)
+□ author: "The Economist" field present
+□ Closing --- after all YAML fields
+□ Article content starts AFTER closing ---
+□ NO code fences (```yaml) anywhere
+
+**WRONG FORMATS THAT WILL BE REJECTED:**
+
+❌ Missing opening ---:
+```
+title: "Article"
 date: {current_date}
 ---
 ```
+
+❌ Code fence wrapper:
+```
+```yaml
+title: "Article"
+date: {current_date}
+```
+```
+
+❌ Missing closing ---:
+```
+---
+title: "Article"
+date: {current_date}
+[article starts here with no closing ---]
+```
+
+❌ Missing layout field:
+```
+---
+title: "Article"  ← MISSING layout field
+date: {current_date}
+---
+```
+
+**IF ANY CHECKBOX FAILS → FIX YAML BEFORE RETURNING OUTPUT**
+
+Publication Validator will QUARANTINE articles with invalid YAML.
+First-time-right YAML = zero regeneration = green software.
 
 ═══════════════════════════════════════════════════════════════════════════
 REFERENCES SECTION - MANDATORY
@@ -421,6 +459,7 @@ image: {featured_image}
         )
 
         critical_issues = []
+        regenerated = False  # Track whether regeneration occurred
         # If validation fails and issues are critical, attempt one regeneration
         if not is_valid:
             critical_issues = [i for i in issues if "CRITICAL" in i or "BANNED" in i]
@@ -447,6 +486,7 @@ image: {featured_image}
                     f"Fix the issues and regenerate: {topic}",
                     max_tokens=3000,
                 )
+                regenerated = True  # Mark that regeneration occurred
 
                 # Re-validate
                 is_valid, issues = review_agent_output(
@@ -473,14 +513,14 @@ image: {featured_image}
                     "topic": topic,
                     "length": len(draft),
                     "is_valid": is_valid,
-                    "regenerated": bool(not is_valid and critical_issues),
+                    "regenerated": regenerated,
                 },
             )
 
         # Return draft with validation metadata
         return draft, {
             "is_valid": is_valid,
-            "regenerated": bool(not is_valid and critical_issues),
+            "regenerated": regenerated,
             "critical_issues": len(critical_issues) if not is_valid else 0,
         }
 

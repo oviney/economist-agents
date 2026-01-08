@@ -1,5 +1,5 @@
 # 📊 Quality Engineering Dashboard
-**Generated**: 2026-01-04 21:15:04
+**Generated**: 2026-01-07 23:01:25
 **Quality Score**: 30/100
 
 🔴 [██████░░░░░░░░░░░░░░] 30/100 - NEEDS IMPROVEMENT
@@ -18,7 +18,7 @@
 ### Time Metrics
 - **Avg TTD**: 4.1 days ✅ (target: <7)
 - **Critical Bug TTD**: 3.7 days
-- **Avg TTR**: 1.1 days
+- **Avg TTR**: 2.0 days
 
 ### Test Gap Analysis
 - Integration Test: ███ 5 (36%)

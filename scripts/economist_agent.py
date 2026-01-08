@@ -21,6 +21,7 @@ import argparse
 import base64
 import json
 import os
+import sys
 from datetime import datetime
 from pathlib import Path
 
@@ -1063,6 +1064,10 @@ Examples:
         with open(os.environ["GITHUB_OUTPUT"], "a") as f:
             f.write(f"article_path={result.get('article_path', '')}\n")
             f.write(f"quality_score={result.get('gates_passed', 0)}/5\n")
+
+    # Exit with error if article was rejected/quarantined
+    if result.get("status") == "rejected":
+        sys.exit(1)
 
 
 if __name__ == "__main__":

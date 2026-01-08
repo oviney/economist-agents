@@ -9,6 +9,13 @@
 - [ARCHITECTURE_REVIEW_PROCESS.md](ARCHITECTURE_REVIEW_PROCESS.md) - Self-learning architecture review
 - [CHART_DESIGN_SPEC.md](CHART_DESIGN_SPEC.md) - Economist-style chart specifications
 
+## Core Architecture
+
+### Intelligence & Memory
+- [HYBRID_COPILOT_STRATEGY.md](HYBRID_COPILOT_STRATEGY.md) - How repo memory feeds Copilot context
+- [SKILLS_LEARNING.md](SKILLS_LEARNING.md) - Self-learning system with persistent knowledge
+- [SKILLS_MANAGER_ROLE_AWARE.md](SKILLS_MANAGER_ROLE_AWARE.md) - Role-aware skills management
+
 ## Agent Systems
 - [SKILLS_LEARNING.md](SKILLS_LEARNING.md) - Self-learning blog QA agent
 - [GOVERNANCE_GUIDE.md](GOVERNANCE_GUIDE.md) - Human-in-the-loop governance

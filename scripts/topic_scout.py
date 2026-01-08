@@ -58,37 +58,17 @@ EVALUATION CRITERIA (score each 1-5):
    - Inherent tension or paradox
    - Good title potential (puns, wordplay)
 
-TOPIC CATEGORIES (Aligned with blog menu structure):
-
-**SOFTWARE ENGINEERING Topics:**
-- Platform engineering & developer experience
-- DevOps and CI/CD practices
-- Performance and reliability engineering (SRE)
-- Security testing integration
-- Technical debt management and refactoring
-- Architecture and design patterns
-- Code quality and static analysis
-- Developer productivity and tooling
-
-**TEST AUTOMATION Topics:**
+TOPIC CATEGORIES TO MONITOR:
 - Test automation economics (ROI, maintenance costs, build times)
 - AI/ML in testing (copilots, test generation, visual testing)
+- Platform engineering & developer experience
+- Shift-left/shift-right movements
 - Quality metrics and observability
 - Tool ecosystem changes (Playwright, Cypress, k6, etc.)
 - Organizational models (embedded QE, SRE, platform teams)
+- Performance and reliability engineering
+- Security testing integration
 - Mobile and cross-platform testing
-- Visual testing and accessibility
-- API and integration testing strategies
-
-**CROSS-CUTTING Perspectives (like Economist's formats):**
-- Strategic Analysis (executive-level insights, ROI frameworks)
-- Data-Driven (benchmark reports, survey data, industry trends)
-- Contrarian View (challenge conventional wisdom)
-- Case Studies (real-world implementations, war stories)
-
-**ARTICLE CATEGORY VALUES (use exactly these):**
-- "software-engineering" (for Software Engineering topics)
-- "test-automation" (for Test Automation topics)
 
 OUTPUT FORMAT:
 Return a JSON array of exactly 5 topics:
@@ -116,40 +96,23 @@ Return a JSON array of exactly 5 topics:
 Sort by total_score descending. Be specific—not "AI in Testing" but "Why AI Test Generation Tools Are Overpromising on Maintenance Reduction".
 """
 
-TREND_RESEARCH_PROMPT = """You are researching current trends in software quality engineering and software development.
+TREND_RESEARCH_PROMPT = """You are researching current trends in software quality engineering.
 
-Search for and analyze across 14 intelligence sources:
+Search for and analyze:
+1. Recent announcements from major testing tool vendors (last 30 days)
+2. Hot discussions in QE communities
+3. New research reports or surveys on testing practices
+4. Conference talk submissions/trends (if visible)
+5. Job posting trends for QE roles
+6. Venture capital activity in testing/quality space
 
-**PRIMARY SOURCES (Deep Analysis):**
-1. Testing tool vendor announcements (last 30 days) - New releases, acquisitions
-2. Research reports and surveys - Gartner, Forrester, State of Testing, Stack Overflow
-3. Conference trends - QCon, SeleniumConf, TestGuild, DevOps Enterprise Summit
-4. Venture capital activity - Funding rounds in testing/quality/DevOps space
+For each finding, note:
+- What happened
+- When (be specific)
+- Why it matters to QE leaders
+- Data/numbers if available
 
-**COMMUNITY SIGNALS (Emerging Trends):**
-5. Reddit r/QualityAssurance, r/softwaretesting, r/devops - Pain points, solutions
-6. Stack Overflow trends - Most asked questions in testing/QA tags
-7. Twitter/X discussions - Testing thought leaders, trending hashtags (#TestAutomation, #QualityEngineering)
-8. LinkedIn engineering posts - QE influencer content, engagement patterns
-
-**TECHNICAL ECOSYSTEM (Practitioner Activity):**
-9. GitHub trending - Popular testing/QA repositories, starred projects, PR activity
-10. Dev.to and Medium - Testing articles with high engagement (claps, comments)
-11. YouTube tech channels - Test Guild, Continuous Delivery, DevOps tutorials gaining traction
-12. Podcasts - Test Guild, Quality Bits, Engineering Enablement episode themes
-
-**MARKET INTELLIGENCE:**
-13. Job posting trends - Testing/QE role growth, required skills evolution
-14. Open source project activity - Playwright, Cypress, k6, JMeter adoption metrics
-
-For each finding, document:
-- **What happened** (specific event/trend)
-- **When** (date-specific for timeliness)
-- **Why it matters** (strategic implications for QE/engineering leaders)
-- **Data/numbers** (chart potential, statistics)
-- **Geographic/domain context** (which region, which industry vertical)
-
-Focus on developments that would interest senior engineering leaders making strategic decisions about quality, testing, and software delivery."""
+Focus on developments that would interest a senior QE leader making strategic decisions."""
 
 
 def create_client():

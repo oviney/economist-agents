@@ -117,7 +117,16 @@ class TaskQueueManager:
         return tasks
 
     def assign_to_agent(self, task: dict[str, Any]) -> str:
-        """Determine which specialist agent should handle task"""
+        """
+        Determine which specialist agent should handle task
+
+        DEPRECATED (Sprint 14): Consider using Flow-based orchestration instead.
+        See: src/economist_agents/flow.py (EconomistContentFlow)
+
+        This WORKFLOW_SEQUENCE dict is maintained for backward compatibility
+        but new implementations should use @start/@listen/@router decorators
+        for deterministic state-machine progression.
+        """
         phase_to_agent = {
             "research": "research_agent",
             "writing": "writer_agent",

@@ -15,8 +15,9 @@ A sophisticated multi-agent system (6 AI personas collaborate) that produces pub
 
 ## 🚀 Project Status
 
-**Current Phase:** CrewAI Migration & Quality Consolidation (Sprint 7)
+**Current Phase:** Production-Grade Agentic Evolution (Sprint 14)
 
+- **Flow-Based Orchestration:** Deterministic state-machine (@start/@listen/@router)
 - **Defect Prevention:** Automated system catching 83% of historical bug patterns
 - **Green Software:** Self-validating agents reducing token waste by 30%
 - **Quality Gates:** 4-layer validation (automated checkpoints enforce standards)
@@ -81,12 +82,14 @@ This project uses **ADR-002 Agent Registry Pattern** for centralized agent disco
 - **Agents**: Research Agent → Writer Agent → Graphics Agent
 - **Output**: YAML with article content and chart data
 - **Status**: ✅ Operational (100% test pass rate)
+- **Integration**: Via Flow-based orchestration (see Flow Architecture below)
 
 **Stage 4 Crew** (`src/crews/stage4_crew.py`) - Editorial Review
 - **Purpose**: 5-gate editorial quality validation
 - **Agents**: Editor Agent (multi-gate validation)
 - **Output**: JSON with quality assessment and edited article
 - **Status**: ✅ Operational (100% test pass rate)
+- **Integration**: Via Flow-based orchestration (@router for publish/revision)
 
 ### Agent Registry Architecture
 
@@ -245,6 +248,64 @@ gh pr create
 **Why tests run on push, not commit:**
 - ⚡ **Faster commit workflow** (0.5s vs 7.5s)
 - ✅ **Encourages frequent small commits**
+
+## 🔄 Flow-Based Orchestration
+
+**Production-grade deterministic state-machine** replacing hardcoded routing dictionaries.
+
+### What is Flow-Based Orchestration?
+
+CrewAI Flows provide `@start`, `@listen`, and `@router` decorators for zero-agency transitions:
+
+```python
+from src.economist_agents.flow import EconomistContentFlow
+
+class EconomistContentFlow(Flow):
+    @start()  # Entry point
+    def discover_topics(self):
+        return {"topics": [...]}
+    
+    @listen(discover_topics)  # Sequential trigger
+    def editorial_review(self, topics):
+        return selected_topic
+    
+    @router(generate_content)  # Conditional routing
+    def quality_gate(self, article):
+        return "publish" if score >= 8 else "revision"
+```
+
+### Flow Architecture
+
+```
+discover_topics(@start) → editorial_review(@listen) → generate_content(@listen)
+                                                               ↓
+                                                      quality_gate(@router)
+                                                      ↙              ↘
+                                   publish_article(@listen)   request_revision(@listen)
+```
+
+### Usage
+
+**CLI Execution:**
+```bash
+python3 src/economist_agents/flow.py
+```
+
+**Python API:**
+```python
+from src.economist_agents.flow import EconomistContentFlow
+
+flow = EconomistContentFlow()
+result = flow.kickoff()
+
+if result['status'] == 'published':
+    print(f"✅ Article published (quality: {result['quality_score']}/10)")
+```
+
+**See Full Documentation:** [FLOW_ARCHITECTURE.md](docs/FLOW_ARCHITECTURE.md)
+
+**Migration Guide:** Replacing WORKFLOW_SEQUENCE dict with Flow decorators
+
 - 🧪 **Tests still validate before code reaches remote**
 - 🚀 **Improves local iteration speed**
 

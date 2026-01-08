@@ -10,12 +10,123 @@ Usage:
     python3 blog_qa_agent.py --blog-dir /path/to/blog --show-skills
 """
 
+import os
 import re
+import subprocess
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import yaml
 from skills_manager import SkillsManager
+
+
+def write_validation_log(
+    log_path: Path, issues: list[str], posts_validated: int
+) -> None:
+    """Write validation issues to log file for learning.
+
+    Args:
+        log_path: Path to write log file
+        issues: List of validation issues found
+        posts_validated: Number of posts validated
+    """
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(log_path, "w") as f:
+        f.write(f"Blog QA Validation Run - {datetime.now().isoformat()}\n")
+        f.write("=" * 60 + "\n\n")
+        f.write(f"Posts Validated: {posts_validated}\n")
+        f.write(f"Issues Found: {len(issues)}\n\n")
+
+        if issues:
+            f.write("VALIDATION ISSUES:\n")
+            f.write("-" * 60 + "\n")
+            for i, issue in enumerate(issues, 1):
+                f.write(f"{i}. {issue}\n")
+        else:
+            f.write("✅ No issues found - all validation checks passed\n")
+
+
+def run_learning_loop(log_path: Path, role_name: str = "blog_qa") -> bool:
+    """Execute automated learning loop via skill_synthesizer.py.
+
+    Quality Gates (from skills/devops/SKILL.md):
+    - Only run if issues were detected (total_issues > 0)
+    - Log file must exist and be readable
+    - skill_synthesizer.py must be available
+    - LLM API must be accessible
+
+    Args:
+        log_path: Path to validation log file
+        role_name: Role name for skills database (default: blog_qa)
+
+    Returns:
+        True if learning succeeded, False otherwise
+    """
+    if not log_path.exists():
+        print(f"⚠️  Learning skipped: Log file not found: {log_path}")
+        return False
+
+    # Quality Gate: Check log file size (must have content)
+    if log_path.stat().st_size == 0:
+        print("⚠️  Learning skipped: Empty log file")
+        return False
+
+    # Quality Gate: Verify skill_synthesizer.py exists
+    synthesizer_path = Path(__file__).parent / "skill_synthesizer.py"
+    if not synthesizer_path.exists():
+        print(
+            f"⚠️  Learning skipped: skill_synthesizer.py not found at {synthesizer_path}"
+        )
+        return False
+
+    # Quality Gate: Verify LLM API is accessible (check for API key)
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        print("⚠️  Learning skipped: ANTHROPIC_API_KEY not set (LLM unavailable)")
+        return False
+
+    print("\n🤖 Automated Learning Loop: Analyzing validation issues...")
+    print(f"   Log file: {log_path}")
+    print(f"   Role: {role_name}")
+    print("   Category: blog_validation")
+
+    try:
+        # Call skill_synthesizer.py with the validation log
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(synthesizer_path),
+                "--log",
+                str(log_path),
+                "--role",
+                role_name,
+                "--category",
+                "blog_validation",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=60,  # 60 second timeout
+        )
+
+        if result.returncode == 0:
+            print("✅ Learning loop completed successfully")
+            if result.stdout:
+                # Print synthesizer output (pattern summaries)
+                print(result.stdout)
+            return True
+        else:
+            print(f"❌ Learning loop failed (exit code {result.returncode})")
+            if result.stderr:
+                print(f"   Error: {result.stderr}")
+            return False
+
+    except subprocess.TimeoutExpired:
+        print("❌ Learning loop timed out after 60 seconds")
+        return False
+    except Exception as e:
+        print(f"❌ Learning loop error: {e}")
+        return False
 
 
 def validate_yaml_front_matter(file_path, skills_manager=None, blog_dir=None):
@@ -365,6 +476,8 @@ if __name__ == "__main__":
     else:
         # Validate entire blog
         blog_dir = Path(args.blog_dir)
+        all_validation_issues = []  # Collect all issues for learning loop
+        posts_validated = 0
 
         # Validate structure with Jekyll config checks
         structure_issues = validate_blog_structure(
@@ -374,12 +487,16 @@ if __name__ == "__main__":
 
         if structure_issues > 0:
             print(f"\n⚠️  Found {structure_issues} structural issues")
+            all_validation_issues.append(
+                f"[STRUCTURE] {structure_issues} issues in blog structure"
+            )
 
         # Validate all posts
         posts_dir = blog_dir / "_posts"
         if posts_dir.exists():
             posts = sorted(posts_dir.glob("*.md"))
-            print(f"\n📄 Validating {len(posts)} posts...\n")
+            posts_validated = len(posts)
+            print(f"\n📄 Validating {posts_validated} posts...\n")
 
             failed_posts = []
             for post in posts:
@@ -388,6 +505,9 @@ if __name__ == "__main__":
                 ):
                     failed_posts.append(post.name)
                     total_issues += 1
+                    all_validation_issues.append(
+                        f"[POST] {post.name} failed validation"
+                    )
 
             if failed_posts:
                 print(f"\n❌ {len(failed_posts)} posts failed validation:")
@@ -396,6 +516,7 @@ if __name__ == "__main__":
             else:
                 print("\n✅ Blog structure validation complete!")
 
+        # Save skills from inline learning
         if args.learn:
             skills_manager.record_run(total_issues, 0)
             skills_manager.save()
@@ -403,33 +524,27 @@ if __name__ == "__main__":
                 f"\n💡 Skills updated. Total runs: {skills_manager.get_stats()['total_runs']}"
             )
             print("   Run with --show-skills to see learned patterns.")
+
+        # AUTOMATED LEARNING LOOP (Quality Gate: only if issues detected)
+        if args.learn and total_issues > 0:
+            # Write validation log for skill_synthesizer
+            log_dir = Path("logs")
+            log_path = (
+                log_dir
+                / f"blog_qa_validation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+            )
+
+            write_validation_log(log_path, all_validation_issues, posts_validated)
+            print(f"\n📝 Validation log written: {log_path}")
+
+            # Trigger automated learning via skill_synthesizer.py
+            learning_success = run_learning_loop(log_path, role_name="blog_qa")
+
+            if learning_success:
+                print(
+                    "\n🎓 Automated learning complete - new patterns may have been learned"
+                )
+            else:
+                print("\n⚠️  Automated learning encountered issues (see above)")
 
         sys.exit(0 if total_issues == 0 else 1)
-        # Validate all posts
-        posts = sorted((blog_dir / "_posts").glob("*.md"))
-        print(f"\n📄 Validating {len(posts)} posts...\n")
-
-        failed_posts = []
-        for post in posts:
-            if not validate_post(
-                post, blog_dir, skills_manager if args.learn else None
-            ):
-                failed_posts.append(post.name)
-                total_issues += 1
-
-        if failed_posts:
-            print(f"\n❌ {len(failed_posts)} posts failed validation:")
-            for post_name in failed_posts:
-                print(f"  • {post_name}")
-        else:
-            print("\n✅ Blog structure validation complete!")
-
-        if args.learn:
-            skills_manager.record_run(total_issues, 0)
-            skills_manager.save()
-            print(
-                f"\n💡 Skills updated. Total runs: {skills_manager.get_stats()['total_runs']}"
-            )
-            print("   Run with --show-skills to see learned patterns.")
-
-        sys.exit(0 if not failed_posts else 1)

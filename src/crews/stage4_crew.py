@@ -27,19 +27,19 @@ from src.tools.style_memory_tool import create_style_memory_tool
 def style_memory_query_tool(query: str) -> str:
     """
     Query Style Memory for relevant Economist style patterns from Gold Standard articles.
-    
+
     Use this tool when evaluating GATE 3 (VOICE) to find concrete examples of:
     - Proper Economist voice and tone
     - British spelling patterns
     - Sentence structure examples
     - How to handle specific phrasings
-    
+
     Args:
         query: Natural language query (e.g., "banned phrases examples", "British spelling patterns")
-    
+
     Returns:
         Formatted string with top 3 relevant style examples from archived articles
-    
+
     Example:
         result = style_memory_query_tool("how to write strong openings")
     """
@@ -133,7 +133,18 @@ Use this to find concrete style examples when applying edits:
 - Validate editorial choices against archived articles""",
             verbose=True,
             allow_delegation=False,
-            tools=[style_memory_query_tool]lusion", "To conclude", "In summary", "remains to be seen"
+            tools=[style_memory_query_tool],
+        )
+
+        # Create Editor Agent
+        self.editor_agent = Agent(
+            role="Chief Editor",
+            goal="""Edit articles to meet The Economist's exacting standards while preserving author voice and data integrity.""",
+            backstory="""You are the Chief Editor at The Economist with 20 years experience.
+You enforce house style ruthlessly but fairly, improving clarity without sacrificing substance.
+
+CRITICAL EDITS (ALWAYS CHECK):
+- Cut banned closings: "In conclusion", "To conclude", "In summary", "remains to be seen"
 - Strengthen weak verbs: "is experiencing growth" → "is growing"
 - Apply British spelling: organization → organisation, analyze → analyse
 - Remove exclamation points

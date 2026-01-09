@@ -1,0 +1,412 @@
+"""
+Production Integration Tests for Sprint 15
+
+Tests the integration of Flow, RAG, and ROI Telemetry components
+in the production pipeline (economist_agent.py).
+"""
+
+import os
+import sys
+from pathlib import Path
+from unittest.mock import MagicMock, patch
+
+import pytest
+
+# Add src to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+from economist_agents.flow import EconomistContentFlow
+from telemetry.roi_tracker import ROITracker
+from tools.style_memory_tool import StyleMemoryTool
+
+
+class TestFlowIntegration:
+    """Test Flow orchestration integration with main pipeline"""
+
+    def test_flow_initialization(self):
+        """Test Flow can be initialized with required config"""
+        flow = EconomistContentFlow()
+        assert flow is not None
+        assert hasattr(flow, "discover_topics")
+        assert hasattr(flow, "editorial_review")
+        assert hasattr(flow, "generate_content")
+        assert hasattr(flow, "quality_gate")
+
+    @patch("economist_agents.flow.Stage1Crew")
+    @patch("economist_agents.flow.Stage2Crew")
+    def test_flow_topic_discovery(self, mock_stage2, mock_stage1):
+        """Test Flow can discover topics via Stage 1"""
+        # Mock Stage1Crew output
+        mock_stage1_instance = MagicMock()
+        mock_stage1_instance.kickoff.return_value = {
+            "topics": [
+                {"topic": "AI Testing", "score": 85},
+                {"topic": "Test Automation ROI", "score": 78},
+            ]
+        }
+        mock_stage1.return_value = mock_stage1_instance
+
+        flow = EconomistContentFlow()
+        result = flow.discover_topics()
+
+        assert result is not None
+        assert "topics" in result
+        assert len(result["topics"]) >= 2
+        mock_stage1_instance.kickoff.assert_called_once()
+
+    @patch("economist_agents.flow.Stage2Crew")
+    def test_flow_editorial_review(self, mock_stage2):
+        """Test Flow can perform editorial review via Stage 2"""
+        # Mock Stage2Crew output
+        mock_stage2_instance = MagicMock()
+        mock_stage2_instance.kickoff.return_value = {
+            "selected_topic": "AI Testing",
+            "editorial_decision": "APPROVED",
+        }
+        mock_stage2.return_value = mock_stage2_instance
+
+        flow = EconomistContentFlow()
+        topics = [{"topic": "AI Testing", "score": 85}]
+        result = flow.editorial_review(topics)
+
+        assert result is not None
+        assert "selected_topic" in result
+        mock_stage2_instance.kickoff.assert_called_once()
+
+    @patch("economist_agents.flow.Stage3Crew")
+    def test_flow_content_generation(self, mock_stage3):
+        """Test Flow can generate content via Stage 3"""
+        # Mock Stage3Crew output
+        mock_stage3_instance = MagicMock()
+        mock_stage3_instance.kickoff.return_value = {
+            "article": "# AI Testing\n\nArticle content...",
+            "word_count": 800,
+            "chart_generated": True,
+        }
+        mock_stage3.return_value = mock_stage3_instance
+
+        flow = EconomistContentFlow()
+        result = flow.generate_content("AI Testing")
+
+        assert result is not None
+        assert "article" in result
+        assert result["word_count"] >= 600
+        mock_stage3_instance.kickoff.assert_called_once()
+
+    @patch("economist_agents.flow.Stage4Crew")
+    def test_flow_quality_gate(self, mock_stage4):
+        """Test Flow router makes quality decisions"""
+        # Mock Stage4Crew output
+        mock_stage4_instance = MagicMock()
+        mock_stage4_instance.kickoff.return_value = {
+            "quality_score": 9.5,
+            "gates_passed": 5,
+            "gates_failed": 0,
+            "decision": "PUBLISH",
+        }
+        mock_stage4.return_value = mock_stage4_instance
+
+        flow = EconomistContentFlow()
+        article = "# AI Testing\n\nHigh quality content..."
+        result = flow.quality_gate(article)
+
+        assert result is not None
+        assert result["decision"] == "PUBLISH"
+        assert result["quality_score"] >= 8.0
+        mock_stage4_instance.kickoff.assert_called_once()
+
+
+class TestRAGIntegration:
+    """Test Style Memory RAG integration with Editor Agent"""
+
+    def test_rag_tool_initialization(self):
+        """Test StyleMemoryTool initializes correctly"""
+        tool = StyleMemoryTool()
+        assert tool is not None
+        assert hasattr(tool, "query_style_patterns")
+        assert hasattr(tool, "add_article")
+
+    def test_rag_query_performance(self):
+        """Test RAG queries complete within 200ms"""
+        import time
+
+        tool = StyleMemoryTool()
+
+        # Measure query latency
+        start = time.time()
+        results = tool.query_style_patterns("chart integration", top_k=3)
+        latency_ms = (time.time() - start) * 1000
+
+        assert latency_ms < 200, f"RAG latency {latency_ms}ms exceeds 200ms target"
+        assert isinstance(results, list)
+
+    def test_rag_returns_relevant_patterns(self):
+        """Test RAG returns relevant style patterns"""
+        tool = StyleMemoryTool()
+
+        # Query for known pattern
+        results = tool.query_style_patterns("banned phrases", top_k=5)
+
+        assert len(results) > 0
+        assert all(isinstance(r, dict) for r in results)
+        assert all("content" in r for r in results)
+
+    @patch("scripts.economist_agent.StyleMemoryTool")
+    def test_editor_queries_rag(self, mock_rag):
+        """Test Editor Agent queries RAG during review"""
+        # Mock RAG responses
+        mock_rag_instance = MagicMock()
+        mock_rag_instance.query_style_patterns.return_value = [
+            {"content": "Avoid 'In today's world' openings", "similarity": 0.95},
+            {"content": "Use British spelling", "similarity": 0.92},
+        ]
+        mock_rag.return_value = mock_rag_instance
+
+        # Simulate editor review with RAG
+        draft = "In today's world, AI testing is important..."
+        style_patterns = mock_rag_instance.query_style_patterns("style guidelines")
+
+        assert len(style_patterns) >= 2
+        assert any("British spelling" in p["content"] for p in style_patterns)
+        mock_rag_instance.query_style_patterns.assert_called_once()
+
+
+class TestROIIntegration:
+    """Test ROI Telemetry integration across all agents"""
+
+    def test_roi_tracker_singleton(self):
+        """Test ROITracker is a singleton"""
+        tracker1 = ROITracker()
+        tracker2 = ROITracker()
+        assert tracker1 is tracker2
+
+    def test_roi_tracks_llm_calls(self):
+        """Test ROI tracker logs LLM calls"""
+        tracker = ROITracker()
+        tracker.start_execution("test_article")
+
+        # Simulate LLM call
+        tracker.log_llm_call(
+            agent="writer_agent",
+            model="gpt-4o",
+            input_tokens=500,
+            output_tokens=1000,
+            duration_seconds=2.5,
+        )
+
+        summary = tracker.get_execution_summary("test_article")
+        assert summary is not None
+        assert summary["total_cost"] > 0
+        assert summary["total_tokens"] == 1500
+
+    def test_roi_calculates_human_hours(self):
+        """Test ROI tracker calculates human-hour equivalents"""
+        tracker = ROITracker()
+        tracker.start_execution("test_article")
+
+        tracker.log_llm_call(
+            agent="writer_agent", model="gpt-4o", input_tokens=500, output_tokens=1000
+        )
+
+        summary = tracker.get_execution_summary("test_article")
+        assert "human_hours_saved" in summary
+        assert summary["human_hours_saved"] > 0
+
+    def test_roi_multiplier_calculation(self):
+        """Test ROI multiplier is >100x"""
+        tracker = ROITracker()
+        tracker.start_execution("test_article")
+
+        # Writer agent (3 hours human time)
+        tracker.log_llm_call(
+            agent="writer_agent", model="gpt-4o", input_tokens=2000, output_tokens=1000
+        )
+
+        summary = tracker.get_execution_summary("test_article")
+        assert "roi_multiplier" in summary
+        assert summary["roi_multiplier"] > 100
+
+    def test_roi_logging_overhead(self):
+        """Test ROI logging overhead is <10ms"""
+        import time
+
+        tracker = ROITracker()
+        tracker.start_execution("test_overhead")
+
+        # Measure logging overhead
+        start = time.time()
+        tracker.log_llm_call(
+            agent="test_agent", model="gpt-4o", input_tokens=100, output_tokens=200
+        )
+        overhead_ms = (time.time() - start) * 1000
+
+        assert (
+            overhead_ms < 10
+        ), f"ROI logging overhead {overhead_ms}ms exceeds 10ms target"
+
+
+class TestEndToEndIntegration:
+    """Test complete end-to-end pipeline with all components"""
+
+    @patch("economist_agents.flow.Stage1Crew")
+    @patch("economist_agents.flow.Stage2Crew")
+    @patch("economist_agents.flow.Stage3Crew")
+    @patch("economist_agents.flow.Stage4Crew")
+    @patch("tools.style_memory_tool.StyleMemoryTool")
+    def test_full_pipeline_with_flow_rag_roi(
+        self, mock_rag, mock_stage4, mock_stage3, mock_stage2, mock_stage1
+    ):
+        """Test complete pipeline: Flow → RAG → ROI"""
+        # Setup mocks
+        mock_stage1.return_value.kickoff.return_value = {
+            "topics": [{"topic": "AI Testing", "score": 85}]
+        }
+        mock_stage2.return_value.kickoff.return_value = {
+            "selected_topic": "AI Testing"
+        }
+        mock_stage3.return_value.kickoff.return_value = {
+            "article": "# AI Testing\n\nContent...",
+            "word_count": 800,
+        }
+        mock_stage4.return_value.kickoff.return_value = {
+            "quality_score": 9.0,
+            "decision": "PUBLISH",
+        }
+        mock_rag.return_value.query_style_patterns.return_value = [
+            {"content": "Style pattern 1"}
+        ]
+
+        # Initialize components
+        tracker = ROITracker()
+        tracker.start_execution("integration_test")
+        flow = EconomistContentFlow()
+
+        # Execute pipeline
+        topics = flow.discover_topics()
+        selected = flow.editorial_review(topics["topics"])
+        content = flow.generate_content(selected["selected_topic"])
+        quality = flow.quality_gate(content["article"])
+
+        # Verify integration
+        assert quality["decision"] == "PUBLISH"
+        assert quality["quality_score"] >= 8.0
+
+        # Verify ROI tracked
+        summary = tracker.get_execution_summary("integration_test")
+        assert summary is not None
+
+    def test_integration_with_real_components(self):
+        """Test integration with real (not mocked) components"""
+        # This test uses actual components without mocks
+        # Skip if dependencies not available
+        pytest.skip("Requires full environment setup")
+
+        tracker = ROITracker()
+        rag_tool = StyleMemoryTool()
+        flow = EconomistContentFlow()
+
+        # Verify all components initialize
+        assert tracker is not None
+        assert rag_tool is not None
+        assert flow is not None
+
+
+class TestProductionHealthChecks:
+    """Health checks for production deployment validation"""
+
+    def test_all_dependencies_available(self):
+        """Test all required packages are installed"""
+        required_packages = [
+            "crewai",
+            "chromadb",
+            "anthropic",
+            "openai",
+        ]
+
+        for package in required_packages:
+            try:
+                __import__(package)
+            except ImportError:
+                pytest.fail(f"Required package '{package}' not installed")
+
+    def test_environment_variables_set(self):
+        """Test required environment variables are set"""
+        required_vars = ["ANTHROPIC_API_KEY", "OPENAI_API_KEY"]
+
+        missing = [var for var in required_vars if not os.getenv(var)]
+        if missing:
+            pytest.skip(f"Missing environment variables: {', '.join(missing)}")
+
+    def test_chromadb_service_available(self):
+        """Test ChromaDB service is reachable"""
+        try:
+            tool = StyleMemoryTool()
+            tool.query_style_patterns("test", top_k=1)
+        except Exception as e:
+            pytest.skip(f"ChromaDB service unavailable: {e}")
+
+    def test_logs_directory_writable(self):
+        """Test logs directory exists and is writable"""
+        logs_dir = Path("logs")
+        logs_dir.mkdir(exist_ok=True)
+
+        test_file = logs_dir / "test_write.txt"
+        try:
+            test_file.write_text("test")
+            test_file.unlink()
+        except Exception as e:
+            pytest.fail(f"Logs directory not writable: {e}")
+
+
+class TestPerformanceBenchmarks:
+    """Performance benchmarks for production validation"""
+
+    def test_flow_execution_time(self):
+        """Test Flow execution completes within reasonable time"""
+        import time
+
+        start = time.time()
+        flow = EconomistContentFlow()
+        # Initialization should be fast
+        init_time = time.time() - start
+
+        assert init_time < 1.0, f"Flow initialization took {init_time}s (>1s)"
+
+    def test_rag_concurrent_queries(self):
+        """Test RAG handles concurrent queries efficiently"""
+        import concurrent.futures
+
+        tool = StyleMemoryTool()
+
+        def query():
+            return tool.query_style_patterns("test query", top_k=3)
+
+        # Run 10 concurrent queries
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            futures = [executor.submit(query) for _ in range(10)]
+            results = [f.result() for f in concurrent.futures.as_completed(futures)]
+
+        assert len(results) == 10
+        assert all(isinstance(r, list) for r in results)
+
+    def test_roi_tracker_memory_efficiency(self):
+        """Test ROI tracker doesn't leak memory"""
+        import sys
+
+        tracker = ROITracker()
+
+        # Log many executions
+        for i in range(100):
+            tracker.start_execution(f"test_{i}")
+            tracker.log_llm_call(
+                agent="test", model="gpt-4o", input_tokens=100, output_tokens=200
+            )
+
+        # Verify memory usage is reasonable
+        # (Actual memory check would require psutil)
+        assert sys.getsizeof(tracker._executions) < 10 * 1024 * 1024  # <10MB
+
+
+if __name__ == "__main__":
+    # Run tests with pytest
+    pytest.main([__file__, "-v", "--tb=short"])

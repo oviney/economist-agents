@@ -16,6 +16,7 @@ A sophisticated multi-agent system (6 AI personas collaborate) that produces pub
 ## 🚀 Project Status
 
 **Current Phase:** Integration and Production Deployment (Sprint 15)
+**Current Quality Score:** 30/100 (red) - Test suite needs stabilization
 
 **Recent Achievement (Sprint 14 - Complete ✅):**
 - **Flow-Based Orchestration:** Deterministic state-machine (@start/@listen/@router) - 9/9 tests passing
@@ -27,6 +28,14 @@ A sophisticated multi-agent system (6 AI personas collaborate) that produces pub
 - **Defect Prevention:** Automated system catching 83% of historical bug patterns
 - **Green Software:** Self-validating agents reducing token waste by 30%
 - **Quality Gates:** 4-layer validation (automated checkpoints enforce standards)
+
+**Known Issues (Sprint 15 P0):**
+- ⚠️ Test suite has 5 collection errors blocking 447 tests
+- ⚠️ Python 3.14 compatibility issues (requires 3.13 downgrade)
+⚠️ **CRITICAL**: CrewAI requires Python 3.13 or lower. Python 3.14+ causes collection errors.
+
+**Current Issue**: Some environments running Python 3.14.2 - causing 5 test collection errors.
+Downgrade to 3.13 to resolve: `pyenv install 3.13.11 && pyenv local 3.13.11`
 
 ## 🛠️ Installation
 
@@ -57,13 +66,7 @@ CrewAI requires Python 3.13 or lower. Python 3.14+ is not currently supported.
    ```bash
    cp .env.example .env
    # Edit .env with your ANTHROPIC_API_KEY
-   ```
-
-## 🤖 Agent Registry & Crews
-
-This project uses **ADR-002 Agent Registry Pattern** for centralized agent discovery and multi-agent coordination via CrewAI.
-
-### Current Agents (13 total)
+   ```1 total)
 
 **Core Agents:**
 | Agent | Role | Responsibility |
@@ -72,6 +75,11 @@ This project uses **ADR-002 Agent Registry Pattern** for centralized agent disco
 | **git-operator** | Version Control | Git operations and repo management |
 | **migration-engineer** | Architecture | CrewAI migration and system design |
 | **po-agent** | Product | Backlog refinement and story creation |
+| **product-research-agent** | Research | Market analysis and competitive intel |
+| **qa-specialist** | Quality | Test strategy and QA process |
+| **quality-enforcer** | Standards | Code quality gates and enforcement |
+| **refactor-specialist** | Code Quality | Refactoring and optimization |
+| **scrum-master** | Orchestration | Sprint coordination and ceremonies
 | **product-research-agent** | Research | Market analysis and competitive intel |
 | **qa-specialist** | Quality | Test strategy and QA process |
 | **quality-enforcer** | Standards | Code quality gates and enforcement |
@@ -94,30 +102,26 @@ This project uses **ADR-002 Agent Registry Pattern** for centralized agent disco
 - **Purpose**: 5-gate editorial quality validation
 - **Agents**: Editor Agent (multi-gate validation)
 - **Output**: JSON with quality assessment and edited article
-- **Status**: ✅ Operational (100% test pass rate)
-- **Integration**: Via Flow-based orchestration (@router for publish/revision)
-
-### Agent Registry Architecture
-
-**AgentRegistry** (`scripts/agent_registry.py`) provides:
-- 🔍 **Discovery**: Auto-loads all `.agent.md` files from `.github/agents/`
-- 🏗️ **Factory**: Creates Agent instances with consistent LLM configuration
-- 📋 **Validation**: Ensures all agents have required fields (role, goal, backstory)
+- **Sta Discovery** via `.github/agents/` directory:
+- 🔍 **Discovery**: Agent definitions stored as `.agent.md` files
+- 📋 **Validation**: Each agent has required fields (role, goal, backstory)
 - 🧠 **Context Injection**: Adds AGILE_MINDSET system prompt to all agents
-- 📊 **Introspection**: Lists available agents and their capabilities
+- 📊 **Count**: 11 active agent definitions
 
-### Usage
+### Agent Definition Files
 
-```python
-from agent_registry import AgentRegistry
-
-# Initialize registry (auto-discovers all agents)
-registry = AgentRegistry()
-
-# Create specific agent
-research_agent = registry.create_agent("product-research-agent")
-
-# Create all agents
+Agents are defined in `.github/agents/` directory as markdown files:
+- `devops.agent.md`
+- `git-operator.agent.md`
+- `migration-engineer.agent.md`
+- `po-agent.agent.md`
+- `product-research-agent.agent.md`
+- `qa-specialist.agent.md`
+- `quality-enforcer.agent.md`
+- `refactor-specialist.agent.md`
+- `scrum-master.agent.md`
+- `test-writer.agent.md`
+- `visual-qa-agent.agent.mdCreate all agents
 all_agents = registry.create_all_agents()
 
 # List available agents
@@ -243,7 +247,7 @@ gh pr create
 
 ### Pre-commit Hook Performance
 
-| Hook | When | Duration | What it does |
+| Hook | When | Duration | What it doetest suite (447 tests, 5 collection error
 |------|------|----------|--------------|
 | `ruff-format` | **commit** | ~300ms | Auto-format Python code |
 | `ruff check` | **commit** | ~200ms | Lint code (checks only) |
@@ -344,9 +348,12 @@ economist-agents/
 └── README.md              # This file
 ```
 
-## 📊 Quality Dashboard
-
-See [docs/QUALITY_DASHBOARD.md](docs/QUALITY_DASHBOARD.md) for detailed metrics.
+**Current Status (Sprint 15):**
+- **Quality Score:** 30/100 (red) - Test stabilization required
+- **Test Suite:** 447 tests collected, 5 collection errors blocking execution
+- **Defect Escape Rate:** <20% (Target)
+- **Critical Bug TTD:** <2 days (Target)
+- **Gate Pass Rate:** 95% (TargeUALITY_DASHBOARD.md) for detailed metrics.
 
 - **Defect Escape Rate:** <20% (Target)
 - **Critical Bug TTD:** <2 days

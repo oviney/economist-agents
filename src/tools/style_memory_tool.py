@@ -210,7 +210,9 @@ class StyleMemoryTool:
                     else [0] * len(documents)
                 )
 
-                for doc, metadata, distance in zip(documents, metadatas, distances, strict=False):
+                for doc, metadata, distance in zip(
+                    documents, metadatas, distances, strict=False
+                ):
                     # Convert distance to similarity score (1 - distance)
                     # ChromaDB uses L2 distance, so lower is better
                     score = 1.0 - min(distance, 1.0)

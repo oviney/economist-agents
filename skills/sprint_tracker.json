@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "created": "2026-01-01T00:00:00",
-  "current_sprint": 13,
+  "current_sprint": 14,
   "sprints": {
     "sprint_6": {
       "status": "complete",
@@ -239,7 +239,7 @@
         "priority": "P0",
         "status": "complete",
         "completed_date": "2026-01-04T16:00:00",
-        "notes": "Phase 2 Migration complete. Delivered Walking Skeleton (run_story10_crew.py, 356 bytes). TDD protocol enforced with RED→GREEN→REFACTOR cycle. CrewAI Stage 3 implementation operational.",
+        "notes": "Phase 2 Migration complete. Delivered Walking Skeleton (run_story10_crew.py, 356 bytes). TDD protocol enforced with RED\u2192GREEN\u2192REFACTOR cycle. CrewAI Stage 3 implementation operational.",
         "artifacts": [
           {
             "name": "run_story10_crew.py",
@@ -483,7 +483,7 @@
     "end_date": null,
     "capacity": 13,
     "committed_points": 9,
-    "theme": "Production-Grade Agentic Evolution (v2.0) - João Moura Principles",
+    "theme": "Production-Grade Agentic Evolution (v2.0) - Jo\u00e3o Moura Principles",
     "epic": "EPIC-001",
     "github_synced": "2026-01-04T23:45:00",
     "goals": [
@@ -502,21 +502,36 @@
         "issue_number": 87,
         "issue_url": "https://github.com/oviney/economist-agents/issues/87",
         "title": "STORY-005: Shift to Deterministic Backbone",
-        "labels": ["sprint-13", "P0", "3-points", "type:architecture"]
+        "labels": [
+          "sprint-13",
+          "P0",
+          "3-points",
+          "type:architecture"
+        ]
       },
       {
         "story_id": 6,
         "issue_number": 88,
         "issue_url": "https://github.com/oviney/economist-agents/issues/88",
         "title": "STORY-006: Establish Style Memory RAG",
-        "labels": ["sprint-13", "P1", "3-points", "type:enhancement"]
+        "labels": [
+          "sprint-13",
+          "P1",
+          "3-points",
+          "type:enhancement"
+        ]
       },
       {
         "story_id": 6,
         "issue_number": 89,
         "issue_url": "https://github.com/oviney/economist-agents/issues/89",
         "title": "STORY-006: Establish Style Memory RAG",
-        "labels": ["sprint-13", "P1", "3-points", "type:enhancement"],
+        "labels": [
+          "sprint-13",
+          "P1",
+          "3-points",
+          "type:enhancement"
+        ],
         "note": "Duplicate created due to terminal issue - close #88 or #89"
       },
       {
@@ -524,7 +539,12 @@
         "issue_number": 90,
         "issue_url": "https://github.com/oviney/economist-agents/issues/90",
         "title": "STORY-007: Implement ROI Telemetry Hook",
-        "labels": ["sprint-13", "P2", "3-points", "type:enhancement"]
+        "labels": [
+          "sprint-13",
+          "P2",
+          "3-points",
+          "type:enhancement"
+        ]
       }
     ],
     "stories": [

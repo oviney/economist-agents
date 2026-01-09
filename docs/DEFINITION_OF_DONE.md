@@ -94,7 +94,29 @@ A sprint is **DONE** when ALL of the following are TRUE:
 - [ ] All unplanned work (Story 0s) documented
 - [ ] Deferred stories have clear justification
 
-### 2. Sprint Ceremonies Complete ✅
+### 2. Sprint Documentation Updated ✅
+
+**CRITICAL - Process Improvement 2026-01-08**:
+
+- [ ] **CHANGELOG.md entry added** with sprint summary (completion date, stories, metrics)
+- [ ] **README.md Project Status** updated (current phase, recent achievements)
+- [ ] **SPRINT.md header** updated (active sprint, previous sprint status)
+- [ ] **sprint_badge.json** updated (current sprint number)
+- [ ] **skills/sprint_tracker.json** updated (current sprint, completion status)
+- [ ] **All documentation changes committed** in atomic commit with sprint completion
+
+**Sprint Documentation Checklist**:
+```bash
+# Before marking sprint complete, verify:
+1. CHANGELOG.md has Sprint N entry with date, stories, quality score
+2. README.md shows Sprint N+1 as current, Sprint N as recent achievement
+3. SPRINT.md header shows Sprint N+1 planning, Sprint N complete
+4. sprint_badge.json message = "N"
+5. skills/sprint_tracker.json current_sprint = N
+6. All above committed together
+```
+
+### 3. Sprint Ceremonies Complete ✅
 
 - [ ] Sprint retrospective held (template in docs/RETROSPECTIVE_SX.md)
 - [ ] Backlog refinement for next sprint done

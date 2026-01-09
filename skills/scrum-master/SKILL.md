@@ -66,10 +66,31 @@ The Scrum Master is the sprint orchestrator, process enforcer, and team facilita
 - Document learnings in RETROSPECTIVE_SN.md
 - Commit to process changes for next sprint
 - Update sprint ceremony tracker
+- **NEW (2026-01-08)**: Execute sprint documentation update checklist
 
 **Quality Gate**: Retrospective must complete before next sprint planning
 
 **Output**: RETROSPECTIVE_SN.md, process improvement commitments
+
+**Sprint Documentation Update Checklist** (NEW - Process Improvement):
+```bash
+# CRITICAL: Execute immediately after retrospective, BEFORE marking sprint complete
+1. [ ] Update CHANGELOG.md with sprint entry (date, stories, metrics, quality score)
+2. [ ] Update README.md Project Status (Sprint N+1 current, Sprint N achievement)
+3. [ ] Update SPRINT.md header (Sprint N+1 planning, Sprint N complete status)
+4. [ ] Update sprint_badge.json (message = \"N\")
+5. [ ] Update skills/sprint_tracker.json (current_sprint = N)
+6. [ ] Update tests_badge.json if test count changed
+7. [ ] Commit all documentation changes atomically
+8. [ ] Push to GitHub immediately
+
+# Validation:
+git status  # Should show all docs committed
+git log -1  # Should show sprint documentation update commit
+```
+
+**Lesson Learned (Sprint 14)**:
+Sprint completion commit was made WITHOUT updating repository documentation (CHANGELOG, README, SPRINT.md, badges). This violated Definition of Done Section 2 (Sprint Documentation). Root cause: No explicit checklist in sprint completion ceremony. Prevention: Added mandatory documentation update checklist above.
 
 #### Backlog Refinement (1-2 hours, weekly during sprint)
 **Purpose**: Prepare stories for upcoming sprint(s)

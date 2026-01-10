@@ -2,8 +2,8 @@
 
 **Purpose**: Quality gates that ALL stories must pass before completion
 
-**Updated**: 2026-01-02 (Sprint 9 Story 0)
-**Version**: 2.0 (added CI/CD requirements)
+**Updated**: 2026-01-10 (Sprint 15)
+**Version**: 3.0 (added Git Hygiene requirements)
 
 ---
 
@@ -44,7 +44,35 @@ A story is **DONE** when ALL of the following are TRUE:
 - Monitor GitHub Actions within 5 minutes
 - Document in CI_HEALTH_LOG.md
 
-### 3. Documentation ✅
+### 3. Git Hygiene ✅
+
+**CRITICAL - Sprint 15 Addition**:
+
+- [ ] **All work committed** with descriptive messages (no uncommitted changes)
+- [ ] **Commits pushed to origin/main** at end of work session (or EOD)
+- [ ] **GitHub issues updated** with commit references (link PRs/commits)
+- [ ] **No local-only work >24 hours** (push daily minimum)
+- [ ] **Commit messages follow convention**: `Type: Brief description\n\nBullet list of changes`
+
+**Git Commit Standards**:
+- Commit messages must be descriptive (not "fix" or "update")
+- Include story/issue reference (e.g., "Sprint 15: STORY-008...")
+- Bullet list of changes for context
+- One logical change per commit (unless batch fixes)
+
+**Push Frequency Requirements**:
+- **End of work session**: Push all commits before stopping work
+- **End of day**: Push all commits by 5pm or EOD (whichever first)
+- **Sprint completion**: Push ALL work immediately (no local-only completions)
+- **Critical fixes**: Push immediately after validation
+
+**Consequences of Not Pushing**:
+- ⚠️ Zero external visibility (stakeholders can't see progress)
+- ⚠️ No backup if local repo corrupted
+- ⚠️ Team collaboration blocked (others can't review/build on work)
+- ⚠️ Sprint progress invisible to leadership
+
+### 4. Documentation ✅
 
 **CRITICAL - Sprint 9 Story 0 Addition**:
 

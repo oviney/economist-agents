@@ -1,30 +1,89 @@
+⚠️  ChromaDB not installed. Style Memory Tool in fallback mode.
+⚠️  EconomistContentFlow not available - using legacy pipeline
    ✓ Output directory: /Users/ouray.viney/code/economist-agents/output
-ℹ Using queued topic: Self-Healing Tests: Myth vs Reality
 
 ======================================================================
-🎯 GENERATING: Self-Healing Tests: Myth vs Reality
+🎯 GENERATING: The End of Manual QA: Why 2026 is the Tipping Point
 ======================================================================
 
 🤖 LLM Provider: openai
    Model: gpt-4o
-📊 Research Agent: Gathering verified data for 'Self-Healing Tests: Myth vs Reality...'
-   ✓ Found 3 data points (2 verified)
+📊 ROI Tracking: Enabled
+📊 Research Agent: Gathering verified data for 'The End of Manual QA: Why 2026 is the Tipping Poin...'
+   ✓ Found 4 data points (4 verified)
    ⚠ 1 unverified claims flagged
-📈 Graphics Agent: Creating visualization 'Adoption and Impact of Self-Healing Test...'
-   ✓ Chart saved to output/charts/self-healing-tests-myth-vs-reality.png
-🎨 Visual QA Agent: Inspecting chart...
-   Visual gates: 4/4 passed
-   ✓ Chart PASSED visual QA
-✍️  Writer Agent: Drafting article on 'Self-Healing Tests: Myth vs Reality...'
-   ✓ Draft complete (667 words)
-📝 Editor Agent: Reviewing 667-word draft against quality gates...
-   Quality gates: 3 passed, 3 failed
-   ⚠ Skipping critique - 3 quality gates failed
+   🔍 Self-validating research...
 
-======================================================================
-✅ COMPLETE
-   Article: output/2026-01-01-self-healing-tests-myth-vs-reality.md
-   Chart:   output/charts/self-healing-tests-myth-vs-reality.png
-   Visual QA: PASSED
-   Editorial: 3/5 gates passed
-======================================================================
+============================================================
+AUTOMATED REVIEW: research_agent
+============================================================
+Status: ✅ PASSED
+Issues Found: 0
+
+  No issues detected - output meets quality standards
+============================================================
+
+   ✅ Research passed self-validation
+📈 Graphics Agent: Creating visualization 'Adoption of AI-Driven Test Automation...'
+   ✓ Chart saved to output/charts/the-end-of-manual-qa-why-2026-is-the-tipping-point.png
+   ℹ Visual QA skipped (requires Anthropic Claude)
+🎨 Featured Image Agent: Generating illustration for 'The End of Manual QA: Why 2026 is the Tipping Poin...'
+   Calling DALL-E 3...
+   ✓ Image saved to output/images/the-end-of-manual-qa-why-2026-is-the-tipping-point.png
+   ℹ DALL-E revised prompt: Create an editorial illustration capturing the essence of a concept, embodying the transition from m...
+✍️  Writer Agent: Drafting article on 'The End of Manual QA: Why 2026 is the Tipping Poin...'
+   ✓ Draft complete (661 words)
+   🔍 Self-validating draft...
+
+============================================================
+AUTOMATED REVIEW: writer_agent
+============================================================
+Status: ❌ FAILED
+Issues Found: 2
+
+ISSUES:
+  [CRITICAL] CRITICAL: Missing required front matter field 'categories'
+  [WARNING] WARNING: Article too short (638 words, ≥800 expected)
+============================================================
+
+   ⚠️  1 critical issues found, regenerating...
+
+============================================================
+AUTOMATED REVIEW: writer_agent
+============================================================
+Status: ❌ FAILED
+Issues Found: 1
+
+ISSUES:
+  [CRITICAL] CRITICAL: No YAML front matter found
+============================================================
+
+   ⚠️  Draft still has 1 issues after regeneration
+⚠️  ChromaDB unavailable - Style Memory Tool disabled
+📝 Editor Agent: Reviewing draft through quality gates...
+   Quality gates: 5/5 passed
+🔍 Critique Agent: Final hostile review...
+   ⚠ 12 potential issues flagged for review
+🔒 Publication Validator: Final quality gate...
+
+══════════════════════════════════════════════════════════════════════
+🔒 PUBLICATION VALIDATION REPORT
+══════════════════════════════════════════════════════════════════════
+
+❌ REJECTED - 1 CRITICAL ISSUES
+
+CRITICAL FAILURES (must fix):
+
+1. DATE_MISMATCH
+   Message: Date mismatch: article shows 2026-01-01, expected 2026-01-10
+   Details: Publication date must match current date
+   Fix: Update date to 2026-01-10
+
+══════════════════════════════════════════════════════════════════════
+
+❌ PUBLICATION BLOCKED: Article failed validation
+
+💡 These issues indicate agent prompts need strengthening.
+   The agents should have prevented these issues.
+   Quarantined to: output/quarantine/2026-01-10-the-end-of-manual-qa-why-2026-is-the-tipping-point.md
+   Report saved: output/quarantine/2026-01-10-the-end-of-manual-qa-why-2026-is-the-tipping-point-VALIDATION-FAILED.txt

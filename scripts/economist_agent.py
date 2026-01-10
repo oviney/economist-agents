@@ -57,6 +57,31 @@ from agents.research_agent import run_research_agent
 # Import extracted Writer Agent
 from agents.writer_agent import run_writer_agent
 
+# Sprint 14 Integration: Flow orchestration, Style Memory RAG, ROI Telemetry
+try:
+    from src.economist_agents.flow import EconomistContentFlow  # noqa: F401
+
+    FLOW_AVAILABLE = True
+except ImportError:
+    FLOW_AVAILABLE = False
+    print("⚠️  EconomistContentFlow not available - using legacy pipeline")
+
+try:
+    from src.tools.style_memory_tool import StyleMemoryTool
+
+    STYLE_MEMORY_AVAILABLE = True
+except ImportError:
+    STYLE_MEMORY_AVAILABLE = False
+    print("⚠️  StyleMemoryTool not available - Editor Agent without RAG")
+
+try:
+    from src.telemetry.roi_tracker import ROITracker
+
+    ROI_TRACKER_AVAILABLE = True
+except ImportError:
+    ROI_TRACKER_AVAILABLE = False
+    print("⚠️  ROITracker not available - no ROI telemetry logging")
+
 # ═══════════════════════════════════════════════════════════════════════════
 # AGENT SYSTEM PROMPTS (v2 - with codified editorial lessons)
 # ═══════════════════════════════════════════════════════════════════════════
@@ -657,6 +682,13 @@ def generate_economist_post(
     # Initialize agent metrics tracking
     agent_metrics = AgentMetrics()
 
+    # Sprint 14 Integration: Initialize ROI Tracker
+    roi_tracker = None
+    if ROI_TRACKER_AVAILABLE:
+        roi_tracker = ROITracker(log_file=f"{output_dir}/execution_roi.json")
+        _ = roi_tracker.start_execution("content_generation")  # Track execution
+        print("📊 ROI Tracking: Enabled")
+
     skip_approvals = False  # Set by 'skip-all' response
 
     # Stage 1: Research
@@ -833,7 +865,17 @@ def generate_economist_post(
             return {"status": "rejected", "stage": "draft"}
 
     # Stage 4: Editing
-    edited_article, gates_passed, gates_failed = run_editor_agent(client, draft)
+    # Sprint 14 Integration: Initialize and pass Style Memory to Editor
+    style_memory = None
+    if STYLE_MEMORY_AVAILABLE:
+        try:
+            style_memory = StyleMemoryTool()
+        except Exception as e:
+            print(f"   ⚠️  Style Memory initialization failed: {e}")
+
+    edited_article, gates_passed, gates_failed = run_editor_agent(
+        client, draft, style_memory_tool=style_memory
+    )
 
     # Track Editor Agent metrics
     agent_metrics.track_editor_agent(

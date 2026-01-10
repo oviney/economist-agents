@@ -19,6 +19,14 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
 from llm_client import call_llm  # type: ignore  # noqa: E402
 
+# Sprint 14 Integration: Style Memory RAG
+try:
+    from src.tools.style_memory_tool import StyleMemoryTool
+
+    STYLE_MEMORY_AVAILABLE = True
+except ImportError:
+    STYLE_MEMORY_AVAILABLE = False
+
 # ═══════════════════════════════════════════════════════════════════════════
 # GATE COUNTING FIX #1: Regex patterns for exactly 5 gates
 # Updated: Patterns match both [PASS] and - PASS formats for flexibility
@@ -325,15 +333,32 @@ class EditorAgent:
         >>> edited, gates_passed, gates_failed = agent.edit(draft)
     """
 
-    def __init__(self, client: Any, governance: Any | None = None):
+    def __init__(
+        self,
+        client: Any,
+        governance: Any | None = None,
+        style_memory_tool: Any | None = None,
+    ):
         """Initialize the editor agent.
 
         Args:
             client: LLM client for editorial reviews
             governance: Optional governance tracker for logging
+            style_memory_tool: Optional StyleMemoryTool for RAG-based style patterns
         """
         self.client = client
         self.governance = governance
+        self.style_memory_tool = style_memory_tool
+
+        # Sprint 14 Integration: Initialize Style Memory if available and not provided
+        if style_memory_tool is None and STYLE_MEMORY_AVAILABLE:
+            try:
+                self.style_memory_tool = StyleMemoryTool()
+                print("✅ Editor Agent: Style Memory RAG enabled")
+            except Exception as e:
+                print(f"⚠️  Style Memory RAG initialization failed: {e}")
+                self.style_memory_tool = None
+
         self.metrics = {
             "gates_passed": 0,
             "gates_failed": 0,
@@ -391,10 +416,31 @@ class EditorAgent:
 
         print("📝 Editor Agent: Reviewing draft through quality gates...")
 
+        # Sprint 14 Integration: Query Style Memory RAG for relevant patterns
+        style_context = ""
+        if self.style_memory_tool:
+            try:
+                # Query for voice/style patterns
+                patterns = self.style_memory_tool.query(
+                    "Economist voice and style guidelines", n_results=3
+                )
+                if patterns:
+                    style_context = (
+                        "\n\nRELEVANT STYLE PATTERNS (from Gold Standard articles):\n"
+                    )
+                    for i, pattern in enumerate(patterns, 1):
+                        style_context += f"\n{i}. {pattern['text'][:200]}...\n   (Relevance: {pattern['score']:.2f})"
+                    print(
+                        f"   📖 Style Memory: Retrieved {len(patterns)} relevant patterns"
+                    )
+            except Exception as e:
+                print(f"   ⚠️  Style Memory query failed: {e}")
+
         # FIX #2: Set temperature=0 for deterministic evaluation
+        prompt_with_context = EDITOR_AGENT_PROMPT.format(draft=draft) + style_context
         response = call_llm(
             self.client,
-            EDITOR_AGENT_PROMPT.format(draft=draft),
+            prompt_with_context,
             "Review and edit this article.",
             max_tokens=4000,
             temperature=0.0,  # Sprint 8 Story 4 Fix #2: Deterministic gate decisions
@@ -561,7 +607,10 @@ class EditorAgent:
 
 
 def run_editor_agent(
-    client: Any, draft: str, governance: Any | None = None
+    client: Any,
+    draft: str,
+    governance: Any | None = None,
+    style_memory_tool: Any | None = None,
 ) -> tuple[str, int, int]:
     """Convenience function to run editor agent.
 
@@ -569,6 +618,7 @@ def run_editor_agent(
         client: LLM client instance
         draft: Article draft to edit
         governance: Optional governance tracker
+        style_memory_tool: Optional StyleMemoryTool for RAG patterns
 
     Returns:
         Tuple of (edited_article, gates_passed, gates_failed)
@@ -578,5 +628,5 @@ def run_editor_agent(
         >>> client = create_llm_client()
         >>> edited, passed, failed = run_editor_agent(client, draft)
     """
-    agent = EditorAgent(client, governance)
+    agent = EditorAgent(client, governance, style_memory_tool)
     return agent.edit(draft)

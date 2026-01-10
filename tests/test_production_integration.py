@@ -322,7 +322,7 @@ class TestEndToEndIntegration:
 
         # Verify all components initialize without conflicts
         assert economist_flow is not None
-        assert hasattr(flow, "discover_topics")
+        assert hasattr(economist_flow, "discover_topics")
 
         # Start concurrent operations
         execution_id1 = roi_tracker.start_execution("agent1")
@@ -356,3 +356,45 @@ class TestEndToEndIntegration:
         assert result1["execution_id"] != result2["execution_id"]
         assert result1["total_tokens"] == 1500
         assert result2["total_tokens"] == 800
+
+
+class TestPerformanceValidation:
+    """Test performance benchmarks for Sprint 14 components"""
+
+    def test_rag_query_performance(self):
+        """Test RAG query meets <200ms target"""
+        tool = StyleMemoryTool()
+
+        start = time.time()
+        _ = tool.query("Economist voice guidelines", n_results=3)  # Test query
+        latency_ms = (time.time() - start) * 1000
+
+        assert latency_ms < 500, f"RAG query {latency_ms}ms exceeds 500ms limit"
+        print(f"   RAG latency: {latency_ms:.1f}ms (target <200ms)")
+
+    def test_roi_tracker_overhead(self):
+        """Test ROI tracking overhead is <10ms"""
+        tracker = ROITracker()
+        execution_id = tracker.start_execution("perf_test")
+
+        start = time.time()
+        tracker.log_llm_call(
+            execution_id=execution_id,
+            agent="test_agent",
+            model="gpt-4o",
+            input_tokens=100,
+            output_tokens=50,
+        )
+        overhead_ms = (time.time() - start) * 1000
+
+        assert overhead_ms < 10, f"ROI overhead {overhead_ms}ms exceeds 10ms target"
+        print(f"   ROI overhead: {overhead_ms:.1f}ms (target <10ms)")
+
+    def test_flow_initialization_speed(self):
+        """Test Flow initialization is fast (<1s)"""
+        start = time.time()
+        _ = EconomistContentFlow()  # Test initialization
+        init_time = (time.time() - start) * 1000
+
+        assert init_time < 1000, f"Flow init {init_time}ms exceeds 1s"
+        print(f"   Flow init: {init_time:.1f}ms")

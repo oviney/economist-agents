@@ -127,7 +127,7 @@ class LogParser:
                         "type": "quality_gate_failure",
                         "passed": passed,
                         "failed": failed,
-                        "location": f"line {content[:gate_match.start()].count(chr(10)) + 1}",
+                        "location": f"line {content[: gate_match.start()].count(chr(10)) + 1}",
                     }
                 )
 
@@ -142,7 +142,7 @@ class LogParser:
                     {
                         "type": "unverified_claims",
                         "count": count,
-                        "location": f"line {content[:unverified_match.start()].count(chr(10)) + 1}",
+                        "location": f"line {content[: unverified_match.start()].count(chr(10)) + 1}",
                     }
                 )
 
@@ -159,7 +159,7 @@ class LogParser:
                         "type": "visual_qa_failure",
                         "passed": passed,
                         "total": total,
-                        "location": f"line {content[:visual_qa_match.start()].count(chr(10)) + 1}",
+                        "location": f"line {content[: visual_qa_match.start()].count(chr(10)) + 1}",
                     }
                 )
 
@@ -173,7 +173,7 @@ class LogParser:
                         "type": "low_word_count",
                         "count": words,
                         "target": 800,
-                        "location": f"line {content[:word_match.start()].count(chr(10)) + 1}",
+                        "location": f"line {content[: word_match.start()].count(chr(10)) + 1}",
                     }
                 )
 
@@ -215,7 +215,7 @@ class LogParser:
                     "type": "test_error",
                     "test": test_name,
                     "error": error_msg,
-                    "location": f"line {content[:match.start()].count(chr(10)) + 1}",
+                    "location": f"line {content[: match.start()].count(chr(10)) + 1}",
                 }
             )
 
@@ -243,7 +243,7 @@ class LogParser:
                 {
                     "type": "python_traceback",
                     "traceback": match.group(0),
-                    "location": f"line {content[:match.start()].count(chr(10)) + 1}",
+                    "location": f"line {content[: match.start()].count(chr(10)) + 1}",
                 }
             )
 
@@ -257,7 +257,7 @@ class LogParser:
                         "type": "error_message",
                         "severity": keyword.lower(),
                         "message": match.group(0).strip(),
-                        "location": f"line {content[:match.start()].count(chr(10)) + 1}",
+                        "location": f"line {content[: match.start()].count(chr(10)) + 1}",
                     }
                 )
 

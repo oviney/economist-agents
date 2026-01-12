@@ -596,6 +596,106 @@ python3 scripts/sprint_ceremony_tracker.py --can-start 7
 
 Complete guide: [SPRINT_CEREMONY_GUIDE.md](SPRINT_CEREMONY_GUIDE.md)
 
+### Documentation Ownership & Maintenance (NEW - 2026-01-11)
+
+**Problem Identified**: Documentation drifted 70% stale (Sprint 15 showed as "PLANNING" when "IN PROGRESS Day 4")
+
+**Root Cause**: No clear ownership, no ceremony enforcement, DoD requirement not enforced
+
+**Solution**: Documentation updates are **part of sprint ceremonies**, ownership clarified
+
+#### Ownership Model
+
+**@scrum-master** (Documentation Coordinator):
+- ✅ **WRITES** documentation updates for sprint ceremonies:
+  - Sprint Kickoff: Updates README.md + SPRINT.md + CHANGELOG.md
+  - Story Completion: Updates CHANGELOG.md with story entry
+  - Sprint Close: Updates Sprint Complete report + CHANGELOG
+- ✅ Validates documentation accuracy (daily standup check)
+- ✅ Runs `scripts/validate_documentation_accuracy.py` to check staleness
+- ✅ Signals @quality-enforcer to commit documentation changes
+- ❌ Does NOT commit directly (follows git operations protocol)
+
+**@quality-enforcer** (Git Executor):
+- ✅ **COMMITS** documentation written by @scrum-master
+- ✅ Executes atomic commits for ceremony documentation
+- ✅ Ensures documentation changes pass pre-commit hooks
+- ❌ Does NOT write documentation content (coordination role)
+
+**Story Implementers** (All agents):
+- ✅ Create STORY-NNN-COMPLETE.md reports (existing practice)
+- ✅ Update technical documentation related to their work
+- ✅ Signal @scrum-master when documentation ready
+- ⚠️  MAY write CHANGELOG entries as part of story completion (optional)
+
+#### Ceremony Integration
+
+**Sprint Kickoff** (Monday 9:00 AM):
+```bash
+# 1. @scrum-master updates documentation
+python3 scripts/sprint_ceremony_tracker.py --update-docs-kickoff 15
+
+# 2. @scrum-master signals @quality-enforcer
+# "@quality-enforcer, sprint kickoff docs ready for commit"
+
+# 3. @quality-enforcer commits
+git add README.md SPRINT.md docs/CHANGELOG.md
+git commit -m "docs: Sprint 15 kickoff - [goal]"
+git push origin main
+```
+
+**Story Completion** (As stories finish):
+```bash
+# 1. Story implementer creates completion report
+# STORY-009-COMPLETE.md created
+
+# 2. @scrum-master updates CHANGELOG
+python3 scripts/sprint_ceremony_tracker.py --update-docs-story 15 9 "Production Deployment"
+
+# 3. @scrum-master signals @quality-enforcer
+# "@quality-enforcer, Story 9 docs ready for commit"
+
+# 4. @quality-enforcer commits
+git add STORY-009-COMPLETE.md docs/CHANGELOG.md
+git commit -m "docs: Story 9 complete - Production Deployment"
+git push origin main
+```
+
+**Daily Standup** (Every day):
+- @scrum-master asks: **"Is documentation current?"**
+- Run validation: `python3 scripts/validate_documentation_accuracy.py`
+- If stale: Flag as P1 task (30 min fix)
+
+#### Validation & Enforcement
+
+**Automated Validation**:
+- `scripts/validate_documentation_accuracy.py` checks:
+  - README.md sprint status vs sprint_tracker.json
+  - SPRINT.md sprint status vs sprint_tracker.json
+  - CHANGELOG.md has entry for current sprint
+  - Documentation staleness < 24 hours
+
+**Definition of Done** (Section 2 - Sprint Documentation):
+- ✅ CHANGELOG.md entry added (sprint kickoff, story completion, sprint close)
+- ✅ README.md current (sprint status accurate within 24h)
+- ✅ SPRINT.md current (progress metrics accurate)
+- ✅ All documentation committed before story marked complete
+
+**Quality Gate**: Documentation validation runs as pre-commit warning (doesn't block, but alerts)
+
+#### Success Metrics
+
+**Sprint 16+ Targets**:
+- README.md sprint status lag: <24 hours (measured daily)
+- CHANGELOG.md completeness: 100% (all stories have entries)
+- Documentation staleness detections: 0 per sprint
+- Daily standup "Is documentation current?" answer: YES 100%
+
+**Monitoring**:
+- Add to CI/CD: `scripts/validate_documentation_accuracy.py`
+- Report staleness in GitHub Actions quality-tests.yml
+- Track in sprint retrospectives
+
 ---
 
 ## GIT OPERATIONS (Temporary Rule - Until CrewAI Migration)

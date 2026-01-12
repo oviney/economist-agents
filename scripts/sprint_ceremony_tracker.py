@@ -26,6 +26,7 @@ Usage:
 """
 
 import json
+import re
 from contextlib import suppress
 from datetime import datetime
 from pathlib import Path
@@ -621,6 +622,137 @@ Total Estimate: [Sum of tasks]
 
         return "\n".join(report)
 
+    def update_documentation_sprint_kickoff(self, sprint_number: int) -> bool:
+        """Update README.md, SPRINT.md, and CHANGELOG.md for sprint kickoff"""
+        print(f"\n📝 Updating documentation for Sprint {sprint_number} kickoff...")
+
+        repo_root = self.tracker_file.parent.parent
+        readme_path = repo_root / "README.md"
+        sprint_path = repo_root / "SPRINT.md"
+        changelog_path = repo_root / "docs" / "CHANGELOG.md"
+
+        updates_made = []
+
+        # Update README.md
+        try:
+            with open(readme_path) as f:
+                readme_content = f.read()
+
+            # Update sprint status to IN PROGRESS
+            readme_content = re.sub(
+                rf"Sprint {sprint_number}.*?PLANNING",
+                f"Sprint {sprint_number} - IN PROGRESS (Day 1)",
+                readme_content,
+            )
+
+            with open(readme_path, "w") as f:
+                f.write(readme_content)
+
+            updates_made.append("README.md")
+        except Exception as e:
+            print(f"⚠️  Failed to update README.md: {e}")
+
+        # Update SPRINT.md
+        try:
+            with open(sprint_path) as f:
+                sprint_content = f.read()
+
+            sprint_content = re.sub(
+                rf"\*\*Active Sprint\*\*:\s*Sprint {sprint_number}.*?PLANNING.*?\n",
+                f"**Active Sprint**: Sprint {sprint_number} - IN PROGRESS (Day 1, 0/X pts complete)\n",
+                sprint_content,
+            )
+
+            sprint_content = re.sub(
+                rf"\*\*Sprint {sprint_number} Status\*\*:.*?\n",
+                f"**Sprint {sprint_number} Status**: Kickoff complete, stories ready\n",
+                sprint_content,
+            )
+
+            with open(sprint_path, "w") as f:
+                f.write(sprint_content)
+
+            updates_made.append("SPRINT.md")
+        except Exception as e:
+            print(f"⚠️  Failed to update SPRINT.md: {e}")
+
+        # Add CHANGELOG.md entry
+        try:
+            with open(changelog_path) as f:
+                changelog_content = f.read()
+
+            # Find the first heading and insert after it
+            kickoff_entry = f"""
+## {datetime.now().strftime("%Y-%m-%d")}: Sprint {sprint_number} Kickoff
+
+### Sprint {sprint_number} Goals
+**Focus**: [Sprint goal from SPRINT.md]
+**Capacity**: [X story points]
+**Sprint Start**: {datetime.now().strftime("%Y-%m-%d")}
+
+---
+
+"""
+            # Insert after first # heading
+            parts = changelog_content.split("\n\n", 1)
+            if len(parts) == 2:
+                changelog_content = parts[0] + "\n" + kickoff_entry + parts[1]
+
+            with open(changelog_path, "w") as f:
+                f.write(changelog_content)
+
+            updates_made.append("CHANGELOG.md")
+        except Exception as e:
+            print(f"⚠️  Failed to update CHANGELOG.md: {e}")
+
+        if updates_made:
+            print(f"✅ Updated: {', '.join(updates_made)}")
+            print("   Next: Commit documentation updates")
+            return True
+
+        return False
+
+    def update_documentation_story_complete(
+        self, sprint_number: int, story_id: int, story_name: str
+    ) -> bool:
+        """Update CHANGELOG.md and SPRINT.md when a story completes"""
+        print(f"\n📝 Updating documentation for Story {story_id} completion...")
+
+        changelog_path = self.tracker_file.parent.parent / "docs" / "CHANGELOG.md"
+
+        try:
+            with open(changelog_path) as f:
+                changelog_content = f.read()
+
+            story_entry = f"""
+## {datetime.now().strftime("%Y-%m-%d")}: STORY-{story_id:03d} Complete - {story_name}
+
+### Summary
+[Story completion summary]
+
+**Deliverables**:
+- [Key deliverable 1]
+- [Key deliverable 2]
+
+**Quality**: [Test coverage, validation status]
+
+---
+
+"""
+            # Insert after first heading
+            parts = changelog_content.split("\n\n", 1)
+            if len(parts) == 2:
+                changelog_content = parts[0] + "\n" + story_entry + parts[1]
+
+            with open(changelog_path, "w") as f:
+                f.write(changelog_content)
+
+            print(f"✅ Added CHANGELOG.md entry for Story {story_id}")
+            return True
+        except Exception as e:
+            print(f"⚠️  Failed to update CHANGELOG.md: {e}")
+            return False
+
     def save(self) -> None:
         """Persist tracker to disk"""
         self.tracker_file.parent.mkdir(parents=True, exist_ok=True)
@@ -698,6 +830,18 @@ Examples:
         action="store_true",
         help="Dry run mode for grooming (don't modify backlog)",
     )
+    parser.add_argument(
+        "--update-docs-kickoff",
+        type=int,
+        metavar="N",
+        help="Update documentation for sprint N kickoff (README, SPRINT, CHANGELOG)",
+    )
+    parser.add_argument(
+        "--update-docs-story",
+        nargs=3,
+        metavar=("SPRINT", "STORY_ID", "STORY_NAME"),
+        help="Update documentation for story completion",
+    )
     parser.add_argument("--test", action="store_true", help="Run self-tests")
 
     args = parser.parse_args()
@@ -742,6 +886,15 @@ Examples:
 
     elif args.report:
         print(tracker.generate_report())
+
+    elif args.update_docs_kickoff:
+        tracker.update_documentation_sprint_kickoff(args.update_docs_kickoff)
+
+    elif args.update_docs_story:
+        sprint_num = int(args.update_docs_story[0])
+        story_id = int(args.update_docs_story[1])
+        story_name = args.update_docs_story[2]
+        tracker.update_documentation_story_complete(sprint_num, story_id, story_name)
 
     else:
         parser.print_help()

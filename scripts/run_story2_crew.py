@@ -2,7 +2,7 @@
 """
 Story 2 Crew Execution: Fix Integration Tests
 
-Executes Story 2 using the qa-specialist agent to achieve 100% integration test pass rate.
+Executes Story 2 using the test-specialist agent to achieve 100% integration test pass rate.
 """
 
 from datetime import datetime
@@ -35,7 +35,7 @@ Known Issues:
 
 
 def main():
-    """Execute Story 2 crew with qa-specialist agent."""
+    """Execute Story 2 crew with test-specialist agent."""
 
     print("=" * 70)
     print("Story 2: Fix Integration Tests")

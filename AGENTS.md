@@ -2,9 +2,8 @@
 
 ## Available Custom Agents
 
-- @quality-enforcer - Enforce Python standards
-- @test-writer - Write comprehensive tests
-- @refactor-specialist - Refactor to quality standards
+- @code-quality-specialist - TDD-based refactoring and quality standards enforcement
+- @test-specialist - Comprehensive test writing and quality assurance
 
 ## Skills
 
@@ -15,9 +14,9 @@
 ## Usage
 
 ```
-@quality-enforcer Fix all ruff/mypy violations in scripts/
-@test-writer Create tests for scripts/editorial_board.py
-@refactor-specialist Add type hints to scripts/topic_scout.py
+@code-quality-specialist Fix all ruff/mypy violations in scripts/
+@test-specialist Create tests for scripts/editorial_board.py
+@code-quality-specialist Add type hints to scripts/topic_scout.py
 ```
 
 See skills/ directory for complete documentation.

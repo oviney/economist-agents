@@ -1,0 +1,72 @@
+{
+    "version": "1.0",
+    "last_updated": "2026-01-10",
+    "description": "Copilot behavior anti-patterns learned from token waste incidents",
+    "patterns": [
+        {
+            "id": "tool_availability_check_failure",
+            "severity": "CRITICAL",
+            "category": "cost_optimization",
+            "pattern": "Running commands without checking tool availability first",
+            "evidence": {
+                "date": "2026-01-10",
+                "incident": "CI formatting failure - tried to run ruff, crewai, python without checking which command first",
+                "token_waste": "~10,000 tokens on failed command attempts",
+                "root_cause": "Ignored copilot-instructions.md Pre-Action Checklist item #1"
+            },
+            "prevention": {
+                "check": "BEFORE any terminal command: run 'which <tool>' or check terminal history",
+                "rule": "If tool not available → delegate to agent who has it OR use different approach",
+                "example": "which ruff || echo 'ruff not available, use @quality-enforcer'"
+            },
+            "recovery": {
+                "step1": "Stop immediately - don't retry",
+                "step2": "Read copilot-instructions.md Pre-Action Checklist",
+                "step3": "Identify correct agent for task",
+                "step4": "Provide clear delegation prompt"
+            }
+        },
+        {
+            "id": "ci_error_message_ignored",
+            "severity": "HIGH",
+            "category": "cost_optimization",
+            "pattern": "CI fails with clear error message but agent doesn't read it",
+            "evidence": {
+                "date": "2026-01-10",
+                "incident": "CI told exactly which 4 files need formatting, but agent tried to run tools instead of fixing files",
+                "token_waste": "~5,000 tokens investigating instead of reading error"
+            },
+            "prevention": {
+                "check": "Read CI error message FIRST before taking any action",
+                "rule": "CI errors usually tell you EXACTLY what to fix",
+                "example": "ruff format --check failed → ruff found formatting issues in 4 files → fix those 4 files"
+            }
+        },
+        {
+            "id": "agent_delegation_failure",
+            "severity": "HIGH",
+            "category": "workflow_optimization",
+            "pattern": "Not using specialized agents when they exist",
+            "evidence": {
+                "date": "2026-01-10",
+                "incident": "CI quality check failed but didn't delegate to @quality-enforcer",
+                "context": "AGENTS.md clearly defines @quality-enforcer for Python standards"
+            },
+            "prevention": {
+                "check": "Read AGENTS.md for task-agent mapping",
+                "agents": {
+                    "@quality-enforcer": "Python standards (ruff, mypy)",
+                    "@test-writer": "Test creation and maintenance",
+                    "@refactor-specialist": "Code quality improvements"
+                },
+                "rule": "Quality issues → @quality-enforcer, Tests → @test-writer, Refactor → @refactor-specialist"
+            }
+        }
+    ],
+    "enforcement": {
+        "trigger": "Add this file to copilot-instructions.md references",
+        "validation": "Each pattern violation = skills update",
+        "cost_tracking": "Estimate token waste per violation",
+        "improvement_metric": "Reduction in repeated failures over time"
+    }
+}

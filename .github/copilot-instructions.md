@@ -5,7 +5,7 @@
 **BEFORE running ANY command or tool:**
 1. ✅ **Check environment**: Does the tool exist? (`which ruff`, `which python3`, etc.)
 2. ✅ **Read error messages fully**: Don't guess, parse the actual failure
-3. ✅ **Use agent delegation**: CI fixes → @quality-enforcer, tests → @test-writer
+3. ✅ **Use agent delegation**: CI fixes → @code-quality-specialist, tests → @test-specialist
 4. ✅ **Verify context**: Check terminal history for recent command results
 5. ✅ **Apply learned patterns**: Review skills/*.json for similar past issues
 6. ✅ **Review behavior patterns**: Check skills/copilot_behavior_patterns.json for anti-patterns to avoid

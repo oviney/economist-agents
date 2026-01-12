@@ -67,12 +67,11 @@ if make quality; then
     echo "3. Start developing!"
     echo ""
     echo "Custom Copilot Agents available:"
-    echo "  @quality-enforcer - Enforce Python standards"
-    echo "  @test-writer - Write comprehensive tests"
-    echo "  @refactor-specialist - Refactor to quality standards"
+    echo "  @code-quality-specialist - TDD-based refactoring and quality standards enforcement"
+    echo "  @test-specialist - Comprehensive test writing and quality assurance"
 else
     echo ""
     echo "⚠️  Initial quality checks failed"
     echo "Some files may need refactoring to meet standards"
-    echo "Use: @refactor-specialist to fix violations"
+    echo "Use: @code-quality-specialist to fix violations"
 fi

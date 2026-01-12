@@ -35,7 +35,7 @@ from scripts.agent_registry import AgentRegistry
 
 STORY_ID = "10"
 STORY_CONTEXT = "Migrate src/stage3.py to CrewAI Stage3Crew using strict TDD"
-REQUIRED_AGENTS = ["migration-engineer"]
+REQUIRED_AGENTS = ["code-quality-specialist"]
 
 # TDD Configuration
 TDD_VERIFICATION_SCRIPT = "tests/reproduce_stage3.py"
@@ -144,7 +144,7 @@ def define_tasks(agents: dict) -> list[Task]:
                 "- Analysis of legacy src/stage3.py functionality\n"
                 "- Clear acceptance criteria for the new Crew\n"
             ),
-            agent=agents["migration-engineer"],
+            agent=agents["code-quality-specialist"],
             expected_output=(
                 f"1. File `{TDD_VERIFICATION_SCRIPT}` created\n"
                 "2. Test execution output showing FAILURE (ImportError or AssertionError)\n"
@@ -197,7 +197,7 @@ def define_tasks(agents: dict) -> list[Task]:
                 "- Test execution showing PASS\n"
                 "- Side-by-side comparison: legacy vs new behavior\n"
             ),
-            agent=agents["migration-engineer"],
+            agent=agents["code-quality-specialist"],
             expected_output=(
                 f"1. Stage3Crew class implemented in `{STAGE3_CREW_MODULE}`\n"
                 "2. Test execution output showing PASS\n"

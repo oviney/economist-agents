@@ -1,0 +1,8 @@
+{
+    "folders": [
+        {"path": "src"},
+        {"path": "tests"},
+        {"path": "agents"},
+        {"path": "scripts"}
+    ]
+}

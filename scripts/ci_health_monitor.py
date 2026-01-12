@@ -2,7 +2,7 @@
 """
 CI Health Monitor - Automated GitHub Actions Status Checker
 
-Responsible Agent: @quality-enforcer
+Responsible Agent: @code-quality-specialist
 Purpose: Daily CI/CD health monitoring and automated dispatch
 Schedule: Run daily at 9:00 AM or on-demand
 Created: 2026-01-03
@@ -203,7 +203,7 @@ class CIHealthMonitor:
 
         body = f"""## CI/CD Failure Detected
 
-**Detected By**: @quality-enforcer (automated monitoring)
+**Detected By**: @code-quality-specialist (automated monitoring)
 **Timestamp**: {datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC")}
 **Priority**: P0 - CRITICAL
 
@@ -250,7 +250,7 @@ class CIHealthMonitor:
 
 ---
 
-**Assigned**: @quality-enforcer
+**Assigned**: @code-quality-specialist
 **Labels**: P0, ci-failure, devops
 """
 

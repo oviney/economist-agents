@@ -27,9 +27,12 @@ logger = logging.getLogger(__name__)
 # CrewAI Tools - REQUIRED dependency
 try:
     from crewai_tools import (
+        CodeInterpreterTool,
         DirectoryReadTool,
+        DirectorySearchTool,
         FileReadTool,
         FileWriterTool,
+        TXTSearchTool,
     )
 except ImportError as err:
     raise ImportError(
@@ -202,11 +205,21 @@ class AgentRegistry:
         Raises:
             ValueError: If unknown tool name provided
         """
-        # Tool factory mapping
+        # Get the current working directory for search tools
+        project_dir = Path.cwd()
+
+        # Tool factory mapping with directory-aware instantiation
         TOOL_FACTORY = {
-            "file_read": FileReadTool,
-            "file_write": FileWriterTool,
-            "directory_read": DirectoryReadTool,
+            "file_read": lambda: FileReadTool(),
+            "file_write": lambda: FileWriterTool(),
+            "directory_read": lambda: DirectoryReadTool(),
+            "directory_search": lambda: DirectorySearchTool(directory=str(project_dir)),
+            "file_search": lambda: DirectorySearchTool(
+                directory=str(project_dir)
+            ),  # Map file_search to directory_search
+            "bash": lambda: CodeInterpreterTool(),  # Map bash commands to code interpreter
+            "pytest": lambda: CodeInterpreterTool(),  # Map pytest to code interpreter
+            "txt_search": lambda: TXTSearchTool(),
             # Add more tool mappings here as needed
         }
 
@@ -216,10 +229,12 @@ class AgentRegistry:
             normalized = tool_name.lower().replace("tool", "").replace("_tool", "")
 
             if normalized in TOOL_FACTORY:
-                tool_class = TOOL_FACTORY[normalized]
-                tool_instance = tool_class()
+                tool_factory = TOOL_FACTORY[normalized]
+                tool_instance = tool_factory()  # Call the factory function
                 instantiated.append(tool_instance)
-                logger.debug(f"Instantiated tool: {tool_name} -> {tool_class.__name__}")
+                logger.debug(
+                    f"Instantiated tool: {tool_name} -> {tool_instance.__class__.__name__}"
+                )
             else:
                 logger.warning(
                     f"Unknown tool '{tool_name}' requested. "
@@ -313,7 +328,7 @@ class AgentRegistry:
             ['po-agent', 'scrum-master', 'writer-agent', ...]
 
             >>> dev_agents = registry.list_agents(category='development')
-            ['refactor-specialist', 'test-writer']
+            ['code-quality-specialist', 'test-specialist']
 
             >>> detailed = registry.list_agents(include_metadata=True)
             [{'name': 'po-agent', 'role': '...', 'category': 'management'}, ...]

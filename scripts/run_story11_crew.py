@@ -37,7 +37,7 @@ from scripts.agent_registry import AgentRegistry
 
 STORY_ID = "11"
 STORY_CONTEXT = "Transplant logic from Legacy to Crew for Stage 3"
-REQUIRED_AGENTS = ["migration-engineer"]
+REQUIRED_AGENTS = ["code-quality-specialist"]
 
 # File paths for logic transplant
 LEGACY_STAGE3_PATH = "scripts/economist_agent.py"  # Legacy Stage 3 logic location
@@ -141,7 +141,7 @@ def define_tasks(agents: dict) -> list[Task]:
                 "  3. Key data structures and interfaces\n"
                 "  4. Dependencies and imports needed\n"
             ),
-            agent=agents["migration-engineer"],
+            agent=agents["code-quality-specialist"],
             expected_output=(
                 "Analysis document containing:\n"
                 "1. List of prompt templates with descriptions\n"
@@ -213,7 +213,7 @@ def define_tasks(agents: dict) -> list[Task]:
                 "- CrewAI agents and tasks properly defined\n"
                 "- Same kickoff() interface maintained\n"
             ),
-            agent=agents["migration-engineer"],
+            agent=agents["code-quality-specialist"],
             expected_output=(
                 f"1. File `{STAGE3_CREW_MODULE}` rewritten and saved\n"
                 "2. Contains CrewAI Agent definitions for all phases\n"
@@ -283,7 +283,7 @@ def define_tasks(agents: dict) -> list[Task]:
                 "- Tests validate output is not empty\n"
                 "- Tests validate format mimics legacy\n"
             ),
-            agent=agents["migration-engineer"],
+            agent=agents["code-quality-specialist"],
             expected_output=(
                 f"1. File `{TEST_MODULE}` updated and saved\n"
                 "2. Contains comprehensive assertions:\n"
@@ -328,7 +328,7 @@ def define_tasks(agents: dict) -> list[Task]:
                 "- Verification that all assertions executed\n"
                 "- Confirmation of legacy format compliance\n"
             ),
-            agent=agents["migration-engineer"],
+            agent=agents["code-quality-specialist"],
             expected_output=(
                 "Test execution results:\n"
                 "```\n"

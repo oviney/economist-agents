@@ -72,22 +72,13 @@ CrewAI requires Python 3.13 or lower. Python 3.14+ is not currently supported.
 **Core Agents:**
 | Agent | Role | Responsibility |
 |-------|------|----------------|
+| **code-quality-specialist** | Code Quality | TDD-based refactoring and quality standards enforcement |
 | **devops** | Infrastructure | CI/CD automation and deployment |
 | **git-operator** | Version Control | Git operations and repo management |
-| **migration-engineer** | Architecture | CrewAI migration and system design |
 | **po-agent** | Product | Backlog refinement and story creation |
-| **product-research-agent** | Research | Market analysis and competitive intel |
-| **qa-specialist** | Quality | Test strategy and QA process |
-| **quality-enforcer** | Standards | Code quality gates and enforcement |
-| **refactor-specialist** | Code Quality | Refactoring and optimization |
-| **scrum-master** | Orchestration | Sprint coordination and ceremonies
-| **product-research-agent** | Research | Market analysis and competitive intel |
-| **qa-specialist** | Quality | Test strategy and QA process |
-| **quality-enforcer** | Standards | Code quality gates and enforcement |
-| **refactor-specialist** | Code Quality | Refactoring and optimization |
+| **product-research-agent** | Research | Market analysis and competitive intelligence |
 | **scrum-master** | Orchestration | Sprint coordination and ceremonies |
-| **scrum-master** | Enhanced Orchestration | Advanced sprint management with over-escalation fix |
-| **test-writer** | Testing | Test case generation and coverage |
+| **test-specialist** | Testing | Comprehensive test writing and quality assurance |
 | **visual-qa-agent** | Visual Quality | Chart and design validation |
 
 ### Active Crews (2 operational)
@@ -107,22 +98,23 @@ CrewAI requires Python 3.13 or lower. Python 3.14+ is not currently supported.
 - 🔍 **Discovery**: Agent definitions stored as `.agent.md` files
 - 📋 **Validation**: Each agent has required fields (role, goal, backstory)
 - 🧠 **Context Injection**: Adds AGILE_MINDSET system prompt to all agents
-- 📊 **Count**: 11 active agent definitions
+- 📊 **Count**: 8 active agent definitions
 
 ### Agent Definition Files
 
 Agents are defined in `.github/agents/` directory as markdown files:
+- `code-quality-specialist.agent.md`
 - `devops.agent.md`
 - `git-operator.agent.md`
-- `migration-engineer.agent.md`
 - `po-agent.agent.md`
 - `product-research-agent.agent.md`
-- `qa-specialist.agent.md`
-- `quality-enforcer.agent.md`
-- `refactor-specialist.agent.md`
 - `scrum-master.agent.md`
-- `test-writer.agent.md`
-- `visual-qa-agent.agent.mdCreate all agents
+- `test-specialist.agent.md`
+- `visual-qa-agent.agent.md`
+
+### Usage Example
+```python
+# Create all agents
 all_agents = registry.create_all_agents()
 
 # List available agents

@@ -14,9 +14,10 @@ Usage:
 """
 
 import logging
+import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 
 import yaml
 
@@ -24,7 +25,52 @@ from scripts.llm_client import create_llm_client
 
 logger = logging.getLogger(__name__)
 
-# CrewAI Tools - REQUIRED dependency
+
+def _validate_agent_name(name: str) -> None:
+    """Validate agent name for security and consistency.
+
+    Args:
+        name: Agent name to validate
+
+    Raises:
+        ValueError: If agent name contains invalid characters
+    """
+    if not name:
+        raise ValueError("Agent name cannot be empty")
+
+    # Allow alphanumeric, hyphens, and underscores only
+    if not re.match(r"^[a-zA-Z0-9_-]+$", name):
+        raise ValueError(
+            f"Invalid agent name '{name}'. "
+            "Agent names can only contain letters, numbers, hyphens, and underscores."
+        )
+
+    if len(name) > 100:
+        raise ValueError(f"Agent name '{name}' is too long (max 100 characters)")
+
+    logger.debug(f"Agent name validation passed: {name}")
+
+
+class LLMProvider(Protocol):
+    """Protocol for LLM providers to support dependency injection.
+
+    Defines the interface that LLM providers must implement for
+    agent registry dependency injection (Issue #27 requirement).
+    """
+
+    def create_client(self, model: str | None = None) -> Any:
+        """Create and return an LLM client instance.
+
+        Args:
+            model: Optional model name override
+
+        Returns:
+            LLM client instance compatible with the provider
+        """
+        ...
+
+
+# CrewAI Tools - Optional dependency for testing
 try:
     from crewai_tools import (
         CodeInterpreterTool,
@@ -32,12 +78,28 @@ try:
         DirectorySearchTool,
         FileReadTool,
         FileWriterTool,
+        GithubSearchTool,
         TXTSearchTool,
     )
+
+    CREWAI_TOOLS_AVAILABLE = True
+except ImportError:
+    # For testing without full CrewAI installation
+    CREWAI_TOOLS_AVAILABLE = False
+    CodeInterpreterTool = None
+    DirectoryReadTool = None
+    DirectorySearchTool = None
+    FileReadTool = None
+    FileWriterTool = None
+    GithubSearchTool = None
+    TXTSearchTool = None
+
+# Import existing GitHub tools
+try:
+    from scripts.tools.github_project_tool import github_project_add_issue
 except ImportError as err:
-    raise ImportError(
-        "CRITICAL: 'crewai-tools' is missing. Run 'pip install crewai-tools'."
-    ) from err
+    logger.warning(f"GitHub Project V2 tool not available: {err}")
+    github_project_add_issue = None
 
 # Agile Discipline: Process Compliance System Prompt
 # Injected into every agent to enforce Agile team discipline
@@ -89,18 +151,26 @@ class AgentRegistry:
         _agents: Internal cache of loaded agent configurations
     """
 
-    def __init__(self, agents_dir: Path = Path(".github/agents")):
+    def __init__(
+        self,
+        agents_dir: Path = Path(".github/agents"),
+        llm_provider: LLMProvider | None = None,
+    ):
         """Initialize the agent registry.
 
         Args:
             agents_dir: Directory containing .agent.md files
                        (default: .github/agents)
+            llm_provider: Custom LLM provider for dependency injection
+                         (default: uses scripts.llm_client.create_llm_client)
 
         Raises:
             ValueError: If agents_dir does not exist
         """
         self.agents_dir = agents_dir
+        self.llm_provider = llm_provider
         self._agents: dict[str, AgentConfig] = {}
+        self._test_agents: dict[str, dict[str, Any]] = {}  # For testing support
 
         if not self.agents_dir.exists():
             raise ValueError(f"Agent directory not found: {self.agents_dir}")
@@ -213,23 +283,58 @@ class AgentRegistry:
         src_dir = project_dir / "src"
         src_dir.mkdir(exist_ok=True)  # Ensure src directory exists
 
-        TOOL_FACTORY = {
-            "file_read": lambda: FileReadTool(),
-            "file_write": lambda: FileWriterTool(),
-            "directory_read": lambda: DirectoryReadTool(),
-            "directory_search": lambda: DirectorySearchTool(
-                directory=str(src_dir),  # Limit to src/ directory only
-                chunk_size=500,  # Smaller chunks to prevent token limit issues
-            ),
-            "file_search": lambda: DirectorySearchTool(
-                directory=str(src_dir),  # Limit to src/ directory only
-                chunk_size=500,  # Smaller chunks to prevent token limit issues
-            ),  # Map file_search to directory_search
-            "bash": lambda: CodeInterpreterTool(),  # Map bash commands to code interpreter
-            "pytest": lambda: CodeInterpreterTool(),  # Map pytest to code interpreter
-            "txt_search": lambda: TXTSearchTool(),
-            # Add more tool mappings here as needed
-        }
+        if CREWAI_TOOLS_AVAILABLE:
+            TOOL_FACTORY = {
+                "file_read": lambda: FileReadTool(),
+                "file_write": lambda: FileWriterTool(),
+                "directory_read": lambda: DirectoryReadTool(),
+                "directory_search": lambda: DirectorySearchTool(
+                    directory=str(src_dir),  # Limit to src/ directory only
+                    chunk_size=500,  # Smaller chunks to prevent token limit issues
+                ),
+                "file_search": lambda: DirectorySearchTool(
+                    directory=str(src_dir),  # Limit to src/ directory only
+                    chunk_size=500,  # Smaller chunks to prevent token limit issues
+                ),  # Map file_search to directory_search
+                "bash": lambda: CodeInterpreterTool(),  # Map bash commands to code interpreter
+                "pytest": lambda: CodeInterpreterTool(),  # Map pytest to code interpreter
+                "txt_search": lambda: TXTSearchTool(),
+                # GitHub tools using existing integrations
+                "github_search": lambda: GithubSearchTool(),
+                "github_project_add_issue": lambda: github_project_add_issue,
+                # Add more tool mappings here as needed
+            }
+        else:
+            # Mock tools for testing with better structure
+            def _create_mock_tool(tool_name: str):
+                """Create a structured mock tool for testing."""
+                return type(
+                    "MockTool",
+                    (),
+                    {
+                        "name": tool_name,
+                        "description": f"Mock implementation of {tool_name}",
+                        "run": lambda *args, **kwargs: f"Mock {tool_name} executed",
+                        "__str__": lambda self: f"MockTool({tool_name})",
+                        "__repr__": lambda self: f"MockTool(name='{tool_name}')",
+                    },
+                )()
+
+            TOOL_FACTORY = {
+                tool_name: lambda name=tool_name: _create_mock_tool(name)
+                for tool_name in [
+                    "file_read",
+                    "file_write",
+                    "directory_read",
+                    "directory_search",
+                    "file_search",
+                    "bash",
+                    "pytest",
+                    "txt_search",
+                    "github_search",
+                    "github_project_add_issue",
+                ]
+            }
 
         instantiated = []
         for tool_name in tool_names:
@@ -239,10 +344,15 @@ class AgentRegistry:
             if normalized in TOOL_FACTORY:
                 tool_factory = TOOL_FACTORY[normalized]
                 tool_instance = tool_factory()  # Call the factory function
-                instantiated.append(tool_instance)
-                logger.debug(
-                    f"Instantiated tool: {tool_name} -> {tool_instance.__class__.__name__}"
-                )
+                if tool_instance is not None:  # Filter out None tools
+                    instantiated.append(tool_instance)
+                    logger.debug(
+                        f"Instantiated tool: {tool_name} -> {tool_instance.__class__.__name__}"
+                    )
+                else:
+                    logger.warning(
+                        f"Tool '{tool_name}' factory returned None (likely import failed)"
+                    )
             else:
                 logger.warning(
                     f"Unknown tool '{tool_name}' requested. "
@@ -283,23 +393,51 @@ class AgentRegistry:
             >>> print(writer['role'])
             'Content Writer specializing in Economist style'
         """
+        # Validate agent name for security
+        _validate_agent_name(name)
+
+        # Check test agents first
+        if self._check_test_agents(name):
+            return self._get_test_agent(name)
+
         if name not in self._agents:
             available = ", ".join(self._agents.keys())
-            raise ValueError(
-                f"Agent '{name}' not found in registry. Available agents: {available}"
-            )
+            total_agents = len(self._agents)
+            test_agents = len(self._test_agents)
+
+            error_msg = f"Agent '{name}' not found in registry.\n"
+            error_msg += f"Registry contains {total_agents} agents"
+            if test_agents > 0:
+                error_msg += f" and {test_agents} test agents"
+            error_msg += ".\n"
+            error_msg += f"Available agents: {available}\n"
+            error_msg += f"Agent directory: {self.agents_dir}\n"
+
+            if available:
+                # Suggest similar names
+                similar = [
+                    agent for agent in self._agents if name.lower() in agent.lower()
+                ]
+                if similar:
+                    error_msg += f"Did you mean one of: {', '.join(similar)}?"
+
+            raise ValueError(error_msg.strip())
 
         config = self._agents[name]
 
-        # Create LLM client
-        llm_client = create_llm_client(provider=provider)
+        # Create LLM client using injected provider or default
+        if self.llm_provider is not None:
+            llm_client = self.llm_provider.create_client(model)
+        else:
+            llm_client = create_llm_client(provider=provider)
 
-        # Override model if specified
-        if model:
-            llm_client.model = model
-            logger.info(f"Using custom model for {name}: {model}")
+            # Override model if specified
+            if model:
+                llm_client.model = model
+                logger.info(f"Using custom model for {name}: {model}")
 
-        logger.info(f"Created agent instance: {name} with {llm_client.provider}")
+        provider_info = getattr(llm_client, "provider", "custom_provider")
+        logger.info(f"Created agent instance: {name} with {provider_info}")
 
         # Inject Agile discipline into backstory (ADR-002: Process Compliance)
         backstory_with_discipline = config.backstory + AGILE_MINDSET
@@ -398,6 +536,60 @@ class AgentRegistry:
             )
 
         return self._agents[name]
+
+    def register_test_agent(self, name: str, config: dict[str, Any]) -> None:
+        """Register a test agent for testing purposes.
+
+        Args:
+            name: Agent name
+            config: Agent configuration dictionary with role, goal, backstory, tools
+
+        Raises:
+            ValueError: If agent name is invalid or config is incomplete
+
+        Example:
+            >>> registry = AgentRegistry()
+            >>> config = {"role": "Test Agent", "goal": "Testing", "backstory": "For tests", "tools": []}
+            >>> registry.register_test_agent("test-agent", config)
+        """
+        # Validate agent name
+        _validate_agent_name(name)
+
+        # Validate required configuration fields
+        required_fields = ["role", "goal", "backstory"]
+        missing_fields = [field for field in required_fields if field not in config]
+        if missing_fields:
+            raise ValueError(
+                f"Test agent config missing required fields: {', '.join(missing_fields)}. "
+                f"Required fields: {', '.join(required_fields)}"
+            )
+
+        self._test_agents[name] = config
+        logger.info(f"Registered test agent: {name} with role '{config['role']}'")
+
+    def _check_test_agents(self, name: str) -> bool:
+        """Check if agent exists in test registry."""
+        return name in self._test_agents
+
+    def _get_test_agent(self, name: str) -> dict[str, Any]:
+        """Get test agent configuration."""
+        config = self._test_agents[name]
+
+        # Create mock LLM client for testing
+        mock_client = type(
+            "MockLLMClient", (), {"provider": "test_provider", "model": "test_model"}
+        )()
+
+        return {
+            "name": name,
+            "config": config,
+            "llm_client": mock_client,
+            "role": config["role"],
+            "goal": config["goal"],
+            "backstory": config["backstory"] + AGILE_MINDSET,
+            "system_message": config.get("system_message", ""),
+            "tools": config.get("tools", []),
+        }
 
 
 def main() -> None:

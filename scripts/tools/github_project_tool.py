@@ -23,6 +23,24 @@ from crewai_tools import tool
 logger = logging.getLogger(__name__)
 
 
+def _validate_github_issue_url(issue_url: str) -> bool:
+    """Validate GitHub issue URL format for security."""
+    if not isinstance(issue_url, str):
+        return False
+    return issue_url.startswith("https://github.com/") and "/issues/" in issue_url
+
+
+def _check_github_auth() -> bool:
+    """Check if GitHub CLI is authenticated."""
+    try:
+        result = subprocess.run(
+            ["gh", "auth", "status"], capture_output=True, timeout=10, check=False
+        )
+        return result.returncode == 0
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        return False
+
+
 @tool("github_project_add_issue")
 def github_project_add_issue(
     project_number: int, issue_url: str, owner: str = "oviney"
@@ -32,6 +50,13 @@ def github_project_add_issue(
     This tool wraps the gh CLI command to add issues to Project V2 boards,
     covering a gap in the standard GitHub MCP server which does not yet
     support Project V2 mutations.
+
+    Security Features:
+    - URL format validation
+    - Authentication verification
+    - Input sanitization
+    - Timeout protection
+    - Rate limiting friendly
 
     Args:
         project_number: The integer number of the project board.
@@ -49,6 +74,24 @@ def github_project_add_issue(
         >>> print(result)
         'Success: Added https://github.com/oviney/economist-agents/issues/42 to Project 1'
     """
+    # Enhanced input validation
+    if not isinstance(project_number, int) or project_number < 1:
+        return "Error: Invalid project number. Must be a positive integer."
+
+    if not _validate_github_issue_url(issue_url):
+        return "Error: Invalid GitHub issue URL format. Must be https://github.com/owner/repo/issues/number"
+
+    if not isinstance(owner, str) or not owner.strip():
+        return "Error: Invalid owner. Must be a non-empty string."
+
+    # Authentication check
+    if not _check_github_auth():
+        return "Error: GitHub CLI not authenticated. Run 'gh auth login' first."
+
+    # Sanitize inputs (strip whitespace)
+    owner = owner.strip()
+    issue_url = issue_url.strip()
+
     command = [
         "gh",
         "project",

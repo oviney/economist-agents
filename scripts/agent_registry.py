@@ -209,13 +209,21 @@ class AgentRegistry:
         project_dir = Path.cwd()
 
         # Tool factory mapping with directory-aware instantiation
+        # Configure src_dir for limited scope to prevent embedding context limits
+        src_dir = project_dir / "src"
+        src_dir.mkdir(exist_ok=True)  # Ensure src directory exists
+
         TOOL_FACTORY = {
             "file_read": lambda: FileReadTool(),
             "file_write": lambda: FileWriterTool(),
             "directory_read": lambda: DirectoryReadTool(),
-            "directory_search": lambda: DirectorySearchTool(directory=str(project_dir)),
+            "directory_search": lambda: DirectorySearchTool(
+                directory=str(src_dir),  # Limit to src/ directory only
+                chunk_size=500,  # Smaller chunks to prevent token limit issues
+            ),
             "file_search": lambda: DirectorySearchTool(
-                directory=str(project_dir)
+                directory=str(src_dir),  # Limit to src/ directory only
+                chunk_size=500,  # Smaller chunks to prevent token limit issues
             ),  # Map file_search to directory_search
             "bash": lambda: CodeInterpreterTool(),  # Map bash commands to code interpreter
             "pytest": lambda: CodeInterpreterTool(),  # Map pytest to code interpreter

@@ -9,12 +9,17 @@ Story #145: Advanced caching utility function - COMPLETED
 """
 
 import hashlib
-import json
+import importlib
 import logging
 import time
 from collections.abc import Callable
 from functools import wraps
 from typing import Any
+
+try:
+    import orjson as json
+except ImportError:
+    import json
 
 logger = logging.getLogger(__name__)
 
@@ -130,7 +135,7 @@ class RedisCache(CacheBackend):
         self._memory_fallback = MemoryCache() if fallback_to_memory else None
 
         try:
-            import redis
+            redis = importlib.import_module("redis")
 
             self._redis_client = redis.from_url(redis_url)
             # Test connection
@@ -146,7 +151,10 @@ class RedisCache(CacheBackend):
             if self._redis_client:
                 data = self._redis_client.get(key)
                 if data:
-                    return json.loads(data.decode("utf-8"))
+                    if hasattr(json, "loads"):
+                        return json.loads(data.decode("utf-8"))
+                    else:  # orjson
+                        return json.loads(data)
         except Exception as e:
             logger.warning(f"Redis get error: {e}")
 
@@ -160,7 +168,10 @@ class RedisCache(CacheBackend):
         """Set value in Redis or memory fallback."""
         try:
             if self._redis_client:
-                serialized = json.dumps(value, default=str)
+                if hasattr(json, "dumps"):
+                    serialized = json.dumps(value, default=str)
+                else:  # orjson
+                    serialized = json.dumps(value).decode("utf-8")
                 result = self._redis_client.setex(key, ttl, serialized)
                 if result:
                     return True
@@ -237,13 +248,13 @@ class MultiLevelCache:
         """Delete from both caches."""
         l1_success = self.l1_cache.delete(key)
         l2_success = self.l2_cache.delete(key)
-        return l1_success and l2_success
+        return l1_success or l2_success  # Success if either cache deletes successfully
 
     def clear(self) -> bool:
         """Clear both caches."""
         l1_success = self.l1_cache.clear()
         l2_success = self.l2_cache.clear()
-        return l1_success and l2_success
+        return l1_success or l2_success  # Success if either cache clears successfully
 
 
 # Global cache instance
@@ -278,7 +289,10 @@ def cache_key(*args, **kwargs) -> str:
     """Generate cache key from function arguments."""
     # Create deterministic key from args and kwargs
     key_data = {"args": args, "kwargs": sorted(kwargs.items())}
-    key_str = json.dumps(key_data, sort_keys=True, default=str)
+    if hasattr(json, "dumps"):
+        key_str = json.dumps(key_data, sort_keys=True, default=str)
+    else:  # orjson
+        key_str = json.dumps(key_data, option=json.OPT_SORT_KEYS).decode("utf-8")
     key_hash = hashlib.md5(key_str.encode()).hexdigest()
     return f"{CACHE_KEY_PREFIX}:{key_hash}"
 

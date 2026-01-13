@@ -85,34 +85,44 @@ class TestMemoryCache:
 class TestRedisCache:
     """Test RedisCache implementation with mocking."""
 
-    @patch("redis.from_url")
-    def test_redis_cache_success(self, mock_redis):
+    def test_redis_cache_success(self):
         """Test successful Redis operations."""
-        mock_client = Mock()
-        mock_redis.return_value = mock_client
-        mock_client.ping.return_value = True
-        mock_client.get.return_value = b'{"test": "data"}'
-        mock_client.setex.return_value = True
+        with patch("src.utils.caching.importlib.import_module") as mock_import:
+            # Mock redis module
+            mock_redis_module = Mock()
+            mock_client = Mock()
+            mock_redis_module.from_url.return_value = mock_client
+            mock_client.ping.return_value = True
+            mock_client.get.return_value = b'{"test": "data"}'
+            mock_client.setex.return_value = True
 
-        cache = RedisCache()
+            def mock_import_side_effect(module_name):
+                if module_name == "redis":
+                    return mock_redis_module
+                raise ImportError(f"No module named '{module_name}'")
 
-        # Test successful get
-        result = cache.get("test_key")
-        assert result == {"test": "data"}
+            mock_import.side_effect = mock_import_side_effect
 
-        # Test successful set
-        assert cache.set("test_key", {"test": "data"}, 60)
+            cache = RedisCache()
 
-    @patch("redis.from_url")
-    def test_redis_cache_fallback_to_memory(self, mock_redis):
+            # Test successful get
+            result = cache.get("test_key")
+            assert result == {"test": "data"}
+
+            # Test successful set
+            assert cache.set("test_key", {"test": "data"}, 60)
+
+    def test_redis_cache_fallback_to_memory(self):
         """Test fallback to memory cache when Redis fails."""
-        mock_redis.side_effect = Exception("Redis connection failed")
+        with patch("src.utils.caching.importlib.import_module") as mock_import:
+            # Mock ImportError for redis module
+            mock_import.side_effect = ImportError("No module named 'redis'")
 
-        cache = RedisCache(fallback_to_memory=True)
+            cache = RedisCache(fallback_to_memory=True)
 
-        # Should fallback to memory cache
-        assert cache.set("test_key", "test_value", 60)
-        assert cache.get("test_key") == "test_value"
+            # Should fallback to memory cache
+            assert cache.set("test_key", "test_value", 60)
+            assert cache.get("test_key") == "test_value"
 
 
 class TestMultiLevelCache:
@@ -130,14 +140,30 @@ class TestMultiLevelCache:
 
     def test_multi_level_cache_l2_promotion(self):
         """Test L2 hit promoting to L1."""
-        cache = MultiLevelCache()
+        with patch("src.utils.caching.importlib.import_module") as mock_import:
+            # Mock redis module for L2 cache
+            mock_redis_module = Mock()
+            mock_client = Mock()
+            mock_redis_module.from_url.return_value = mock_client
+            mock_client.ping.return_value = True
+            mock_client.get.return_value = b'"test_value"'  # JSON-encoded string
+            mock_client.setex.return_value = True
 
-        # Manually set only in L2 cache
-        cache.l2_cache.set("test_key", "test_value", 60)
+            def mock_import_side_effect(module_name):
+                if module_name == "redis":
+                    return mock_redis_module
+                raise ImportError(f"No module named '{module_name}'")
 
-        # Get should promote to L1
-        assert cache.get("test_key") == "test_value"
-        assert cache.l1_cache.get("test_key") == "test_value"
+            mock_import.side_effect = mock_import_side_effect
+
+            cache = MultiLevelCache()
+
+            # Manually set only in L2 cache
+            assert cache.l2_cache.set("test_key", "test_value", 60)
+
+            # Get should promote to L1
+            assert cache.get("test_key") == "test_value"
+            assert cache.l1_cache.get("test_key") == "test_value"
 
 
 class TestCacheDecorator:

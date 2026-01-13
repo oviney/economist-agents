@@ -6,10 +6,10 @@ Provides secure data sanitization for various input types.
 Enhanced with security improvements based on senior review feedback.
 """
 
-import re
 import logging
+import re
 from pathlib import Path
-from typing import Dict, Any, Union
+from typing import Any
 
 # Configure logging for security events
 logger = logging.getLogger(__name__)
@@ -20,11 +20,11 @@ MAX_EMAIL_LENGTH = 254  # RFC 5321 limit
 MAX_PATH_LENGTH = 4096  # Typical filesystem limit
 
 # Pre-compiled regex patterns for performance
-HTML_TAG_PATTERN = re.compile(r'<[^>]*>')
-EMAIL_PATTERN = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+HTML_TAG_PATTERN = re.compile(r"<[^>]*>")
+EMAIL_PATTERN = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
 
 
-def _validate_input_size(input_data: Union[str, None], max_size: int) -> bool:
+def _validate_input_size(input_data: str | None, max_size: int) -> bool:
     """Validate input size to prevent DoS attacks."""
     if input_data is None:
         return True
@@ -34,7 +34,7 @@ def _validate_input_size(input_data: Union[str, None], max_size: int) -> bool:
     return True
 
 
-def sanitize_html(input_text: Union[str, None]) -> str:
+def sanitize_html(input_text: str | None) -> str:
     """
     Remove HTML tags from input text with enhanced security.
 
@@ -58,7 +58,7 @@ def sanitize_html(input_text: Union[str, None]) -> str:
         raise ValueError(f"Input size exceeds maximum allowed ({MAX_INPUT_SIZE} bytes)")
 
     # Remove HTML tags using pre-compiled regex
-    clean_text = HTML_TAG_PATTERN.sub('', input_text)
+    clean_text = HTML_TAG_PATTERN.sub("", input_text)
 
     # Log security event if HTML tags were found
     if clean_text != input_text:
@@ -92,15 +92,15 @@ def sanitize_sql(input_text: str) -> str:
         r"('|(\\')|(;)|(\\';)|(--)|(--)|(\\--))",
         r"((\%27)|(\\')|(;)|(\\%27)|(\\%3B))",
         r"(union)|(select)|(insert)|(delete)|(update)|(drop)|(create)|(alter)",
-        r"(script)|(javascript)|(vbscript)|(iframe)|(object)|(embed)"
+        r"(script)|(javascript)|(vbscript)|(iframe)|(object)|(embed)",
     ]
 
     original_text = input_text
 
     # Escape dangerous characters
     sanitized = input_text.replace("'", "''")  # Escape single quotes
-    sanitized = sanitized.replace(";", "\\;")   # Escape semicolons
-    sanitized = sanitized.replace("--", "\\--") # Escape SQL comments
+    sanitized = sanitized.replace(";", "\\;")  # Escape semicolons
+    sanitized = sanitized.replace("--", "\\--")  # Escape SQL comments
 
     # Log security event if SQL patterns detected
     for pattern in sql_patterns:
@@ -111,7 +111,7 @@ def sanitize_sql(input_text: str) -> str:
     return sanitized if sanitized != original_text else input_text
 
 
-def validate_email(email: Union[str, None]) -> bool:
+def validate_email(email: str | None) -> bool:
     """
     Validate email format with enhanced security checks.
 
@@ -135,8 +135,8 @@ def validate_email(email: Union[str, None]) -> bool:
     # Prevent emails with suspicious patterns
     suspicious_patterns = [
         r'[<>"]',  # HTML/script injection
-        r'javascript:',  # JavaScript injection
-        r'%[0-9a-fA-F]{2}',  # URL encoding
+        r"javascript:",  # JavaScript injection
+        r"%[0-9a-fA-F]{2}",  # URL encoding
     ]
 
     for pattern in suspicious_patterns:
@@ -147,7 +147,7 @@ def validate_email(email: Union[str, None]) -> bool:
     return True
 
 
-def sanitize_path(file_path: Union[str, None]) -> str:
+def sanitize_path(file_path: str | None) -> str:
     """
     Sanitize file paths to prevent directory traversal with enhanced security.
 
@@ -167,7 +167,9 @@ def sanitize_path(file_path: Union[str, None]) -> str:
         return ""
 
     if len(file_path) > MAX_PATH_LENGTH:
-        raise ValueError(f"Path length exceeds maximum allowed ({MAX_PATH_LENGTH} characters)")
+        raise ValueError(
+            f"Path length exceeds maximum allowed ({MAX_PATH_LENGTH} characters)"
+        )
 
     try:
         # Use pathlib for robust path handling
@@ -178,13 +180,16 @@ def sanitize_path(file_path: Union[str, None]) -> str:
         resolved = path.resolve()
 
         # Convert back to string and remove leading slashes
-        clean_path = str(resolved).lstrip('/')
+        clean_path = str(resolved).lstrip("/")
 
         # Additional security: remove common traversal patterns
         traversal_patterns = [
-            '../', '..\\', './',
-            '%2e%2e%2f', '%2e%2e%5c',  # URL encoded
-            '%252e%252e%252f',  # Double URL encoded
+            "../",
+            "..\\",
+            "./",
+            "%2e%2e%2f",
+            "%2e%2e%5c",  # URL encoded
+            "%252e%252e%252f",  # Double URL encoded
         ]
 
         for pattern in traversal_patterns:
@@ -192,9 +197,9 @@ def sanitize_path(file_path: Union[str, None]) -> str:
                 logger.warning(f"Path traversal attempt detected: {pattern}")
 
         # Remove any remaining traversal components
-        clean_path = clean_path.replace('../', '').replace('..\\', '')
-        clean_path = re.sub(r'/+', '/', clean_path)
-        clean_path = clean_path.lstrip('/')
+        clean_path = clean_path.replace("../", "").replace("..\\", "")
+        clean_path = re.sub(r"/+", "/", clean_path)
+        clean_path = clean_path.lstrip("/")
 
         return clean_path
 
@@ -203,7 +208,7 @@ def sanitize_path(file_path: Union[str, None]) -> str:
         return ""
 
 
-def sanitize_data(data: Dict[str, Any]) -> Dict[str, Any]:
+def sanitize_data(data: dict[str, Any]) -> dict[str, Any]:
     """
     Comprehensive data sanitization for dictionary input.
 
@@ -230,13 +235,13 @@ def sanitize_data(data: Dict[str, Any]) -> Dict[str, Any]:
     for key, value in data.items():
         if isinstance(value, str):
             # Apply different sanitization based on key name
-            if 'html' in key.lower() or 'content' in key.lower():
+            if "html" in key.lower() or "content" in key.lower():
                 sanitized[key] = sanitize_html(value)
-            elif 'email' in key.lower():
+            elif "email" in key.lower():
                 sanitized[key] = value  # Keep valid emails as-is
-            elif 'path' in key.lower() or 'file' in key.lower():
+            elif "path" in key.lower() or "file" in key.lower():
                 sanitized[key] = sanitize_path(value)
-            elif 'sql' in key.lower() or 'query' in key.lower():
+            elif "sql" in key.lower() or "query" in key.lower():
                 sanitized[key] = sanitize_sql(value)
             else:
                 sanitized[key] = value  # Keep other text as-is

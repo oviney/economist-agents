@@ -7,7 +7,6 @@ All tests should initially FAIL until implementation is complete.
 """
 
 import pytest
-from typing import Dict, Any
 
 
 def test_remove_html_tags():
@@ -35,7 +34,9 @@ def test_sanitize_sql_injection():
     # Should neutralize SQL injection patterns (escaped)
     assert sanitize_sql("'; DROP TABLE users; --") == "''\\; DROP TABLE users\\; \\--"
     assert sanitize_sql("1' OR '1'='1") == "1'' OR ''1''=''1"
-    assert sanitize_sql("UNION SELECT * FROM passwords") == "UNION SELECT * FROM passwords"
+    assert (
+        sanitize_sql("UNION SELECT * FROM passwords") == "UNION SELECT * FROM passwords"
+    )
 
     # Should handle normal input safely
     assert sanitize_sql("normal user input") == "normal user input"
@@ -47,15 +48,15 @@ def test_validate_email_format():
     from src.utils.data_sanitization import validate_email
 
     # Valid emails should pass
-    assert validate_email("user@example.com") == True
-    assert validate_email("test.user+tag@domain.co.uk") == True
+    assert validate_email("user@example.com")
+    assert validate_email("test.user+tag@domain.co.uk")
 
     # Invalid emails should fail
-    assert validate_email("invalid-email") == False
-    assert validate_email("@domain.com") == False
-    assert validate_email("user@") == False
-    assert validate_email("") == False
-    assert validate_email(None) == False
+    assert not validate_email("invalid-email")
+    assert not validate_email("@domain.com")
+    assert not validate_email("user@")
+    assert not validate_email("")
+    assert not validate_email(None)
 
 
 def test_sanitize_file_paths():
@@ -93,7 +94,7 @@ def test_comprehensive_data_sanitization():
         "user_email": "user@example.com",
         "file_path": "../../../sensitive.txt",
         "sql_query": "'; DROP TABLE users; --",
-        "normal_text": "This is clean text"
+        "normal_text": "This is clean text",
     }
 
     clean_data = sanitize_data(dirty_data)
@@ -101,7 +102,9 @@ def test_comprehensive_data_sanitization():
     assert clean_data["html_content"] == "alert('xss')Hello"
     assert clean_data["user_email"] == "user@example.com"
     assert "sensitive.txt" in clean_data["file_path"]  # Path contains safe portion
-    assert clean_data["sql_query"] == "''\\; DROP TABLE users\\; \\--"  # Escaped/neutralized
+    assert (
+        clean_data["sql_query"] == "''\\; DROP TABLE users\\; \\--"
+    )  # Escaped/neutralized
     assert clean_data["normal_text"] == "This is clean text"
 
 

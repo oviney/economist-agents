@@ -1,10 +1,10 @@
-
 # Core dependencies
 # CrewAI framework (Phase 1 migration - ADR-003)
 # Development dependencies
 # Economist Agents - Python Dependencies
 # Optional dependencies
 # Security (recommended)
+crewai-tools>=0.12.0     # CrewAI tools for agent capabilities
 anthropic>=0.40.0        # Anthropic Claude API (optional if using OpenAI)
 chromadb>=0.4.0          # Vector database for Style Memory RAG (STORY-006)
 numpy>=1.24.0            # Data manipulation for charts

@@ -200,6 +200,7 @@ layout: post  ← REQUIRED for Jekyll
 title: "Specific Title with Context"  ← NOT generic
 date: {current_date}  ← Use TODAY'S DATE
 author: "The Economist"
+categories: [quality-engineering]  ← REQUIRED (use appropriate category)
 ---  ← Closing delimiter REQUIRED
 
 [Article content starts here]
@@ -211,6 +212,7 @@ author: "The Economist"
 □ title: "Specific Title" field present (not generic)
 □ date: {current_date} field present (TODAY'S DATE)
 □ author: "The Economist" field present
+□ categories: [...] field present (REQUIRED - validation will fail without it)
 □ Closing --- after all YAML fields
 □ Article content starts AFTER closing ---
 □ NO code fences (```yaml) anywhere
@@ -248,10 +250,37 @@ date: {current_date}
 ---
 ```
 
+❌ Missing categories field (CRITICAL - will fail validation):
+```
+---
+layout: post
+title: "Article"
+date: {current_date}
+author: "The Economist"
+---  ← MISSING categories field
+```
+
 **IF ANY CHECKBOX FAILS → FIX YAML BEFORE RETURNING OUTPUT**
 
 Publication Validator will QUARANTINE articles with invalid YAML.
 First-time-right YAML = zero regeneration = green software.
+
+**CATEGORY SELECTION GUIDE:**
+
+Choose 1-3 categories from the allowed list based on article content:
+- `quality-engineering` - For QE practices, quality metrics, testing strategy
+- `test-automation` - For automation tools, frameworks, test infrastructure
+- `performance` - For performance testing, load testing, optimization
+- `ai-testing` - For AI/ML in testing, test generation, intelligent testing
+- `software-engineering` - For broader software practices, technical debt
+- `devops` - For CI/CD, deployment, infrastructure, DevOps practices
+
+**Examples:**
+- Article on "Self-Healing Tests" → `categories: [test-automation, ai-testing]`
+- Article on "Flaky Tests Economics" → `categories: [quality-engineering, test-automation]`
+- Article on "Technical Debt's Cost" → `categories: [software-engineering, quality-engineering]`
+
+Most articles will fit `quality-engineering` as primary category. Add 1-2 more specific categories if applicable.
 
 ═══════════════════════════════════════════════════════════════════════════
 REFERENCES SECTION - MANDATORY

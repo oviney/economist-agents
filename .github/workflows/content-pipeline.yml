@@ -42,7 +42,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install anthropic openai matplotlib numpy python-slugify pyyaml
+          pip install anthropic openai matplotlib numpy python-slugify pyyaml requests
 
       - name: Run Topic Scout
         env:
@@ -71,7 +71,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install anthropic openai matplotlib numpy python-slugify pyyaml
+          pip install anthropic openai matplotlib numpy python-slugify pyyaml requests
 
       - name: Download topics
         uses: actions/download-artifact@v4
@@ -107,7 +107,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install anthropic openai matplotlib numpy python-slugify pyyaml
+          pip install anthropic openai matplotlib numpy python-slugify pyyaml requests
 
       - name: Download board decision (if exists)
         uses: actions/download-artifact@v4

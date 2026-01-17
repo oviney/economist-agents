@@ -72,6 +72,7 @@ layout: post
 title: "Understanding OpenDNS: Cybersecurity Protection"
 date: 2026-01-05
 author: "The Economist"
+categories: [quality-engineering]
 ---
 
 # The DNS Guardian
@@ -387,6 +388,50 @@ class TestYAMLFrontMatterValidation:
         assert "date: 2024-03-15" not in draft, "Must not use research source dates"
         assert metadata["regenerated"] is True
 
+    @patch("agents.writer_agent.call_llm")
+    @patch("agents.writer_agent.review_agent_output")
+    def test_missing_categories_field_triggers_regeneration(
+        self,
+        mock_review,
+        mock_call_llm,
+        mock_client,
+        sample_research,
+        valid_yaml_article,
+    ):
+        """GIVEN article missing required categories field (BUG-015 pattern)
+        WHEN Writer Agent validates
+        THEN critical issue flagged (categories required for Jekyll)
+        """
+        # Arrange - article without categories field
+        missing_categories_article = """---
+layout: post
+title: "Understanding OpenDNS: Cybersecurity Protection"
+date: 2026-01-05
+author: "The Economist"
+---
+
+# Article content here...
+"""
+        mock_call_llm.side_effect = [missing_categories_article, valid_yaml_article]
+        mock_review.side_effect = [
+            (False, ["CRITICAL: Missing required field 'categories'"]),
+            (True, []),
+        ]
+
+        agent = WriterAgent(mock_client, None)
+
+        # Act
+        draft, metadata = agent.write(
+            topic="Test Topic",
+            research_brief=sample_research,
+            current_date="2026-01-05",
+            chart_filename=None,
+        )
+
+        # Assert
+        assert "categories:" in draft, "Must have categories field"
+        assert metadata["regenerated"] is True
+
 
 # ═══════════════════════════════════════════════════════════════════════════
 # BACKWARD COMPATIBILITY WRAPPER TESTS
@@ -455,6 +500,7 @@ layout: post
 title: "Understanding OpenDNS: Cybersecurity Protection"
 date: 2026-01-05
 author: "The Economist"
+categories: [quality-engineering]
 ---
 
 # The DNS Guardian

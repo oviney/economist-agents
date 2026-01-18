@@ -1,14 +1,14 @@
 {
   "version": "1.0",
-  "last_updated": "2026-01-03T13:01:28.322972",
+  "last_updated": "2026-01-18T12:43:02.352199",
   "summary": {
-    "total_charts_generated": 11,
+    "total_charts_generated": 14,
     "total_visual_qa_runs": 15,
     "visual_qa_pass_count": 1,
     "visual_qa_fail_count": 14,
     "total_zone_violations": 2,
     "total_regenerations": 1,
-    "total_generation_time_seconds": 20.999629259109497
+    "total_generation_time_seconds": 36.437190532684326
   },
   "failure_patterns": {
     "zone_violation": {
@@ -457,6 +457,72 @@
           "generation_time_seconds": 0.5333740711212158,
           "visual_qa_run": true,
           "visual_qa_passed": false,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-18T12:27:12.880212",
+      "duration_seconds": 53.81208395957947,
+      "charts_generated": 1,
+      "visual_qa_runs": 0,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "Global Spending on Software Testing",
+          "timestamp": "2026-01-18T12:26:19.068136",
+          "start_time": 1768757179.0681448,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 5.436899185180664,
+          "visual_qa_run": false,
+          "visual_qa_passed": null,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-18T12:40:19.495812",
+      "duration_seconds": 62.048683166503906,
+      "charts_generated": 1,
+      "visual_qa_runs": 0,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "Distribution of Test Automation Budget",
+          "timestamp": "2026-01-18T12:39:17.447153",
+          "start_time": 1768757957.4471629,
+          "chart_type": "bar",
+          "generation_success": true,
+          "generation_time_seconds": 5.346644163131714,
+          "visual_qa_run": false,
+          "visual_qa_passed": null,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-18T12:43:02.352099",
+      "duration_seconds": 43.75409293174744,
+      "charts_generated": 1,
+      "visual_qa_runs": 0,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "Test Coverage vs. Productivity",
+          "timestamp": "2026-01-18T12:42:18.598027",
+          "start_time": 1768758138.598036,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 4.654017925262451,
+          "visual_qa_run": false,
+          "visual_qa_passed": null,
           "zone_violations": [],
           "regeneration_count": 0,
           "errors": []

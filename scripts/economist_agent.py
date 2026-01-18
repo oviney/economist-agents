@@ -874,7 +874,7 @@ def generate_economist_post(
             print(f"   ⚠️  Style Memory initialization failed: {e}")
 
     edited_article, gates_passed, gates_failed = run_editor_agent(
-        client, draft, style_memory_tool=style_memory
+        client, draft, style_memory_tool=style_memory, current_date=date_str
     )
 
     # Track Editor Agent metrics

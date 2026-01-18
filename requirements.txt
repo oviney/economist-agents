@@ -5,10 +5,9 @@
 # Optional dependencies
 # Security (recommended)
 crewai-tools>=0.12.0     # CrewAI tools for agent capabilities
-anthropic>=0.40.0        # Anthropic Claude API (optional if using OpenAI)
 chromadb>=0.4.0          # Vector database for Style Memory RAG (STORY-006)
 numpy>=1.24.0            # Data manipulation for charts
-openai>=1.0.0            # OpenAI API (optional if using Anthropic)
+openai>=1.0.0            # OpenAI API (required)
 PyGithub>=2.1.0          # GitHub API integration for sprint sync
 pytest>=7.0.0            # Testing framework (optional)
 python-dotenv>=1.0.0     # Secure .env file loading
@@ -16,3 +15,4 @@ python-slugify>=8.0.0    # URL-safe filenames
 pyyaml>=6.0              # YAML parsing for config
 orjson>=3.9.0
 redis>=4.0.0             # Optional Redis cache backend (Story #145)
+requests>=2.31.0         # HTTP requests for image generation

@@ -40,7 +40,9 @@ You are a senior writer at The Economist, crafting an article on quality enginee
 ECONOMIST VOICE - MANDATORY RULES
 ═══════════════════════════════════════════════════════════════════════════
 
-STRUCTURE (800-1200 words):
+⚠️  CRITICAL LENGTH REQUIREMENT: MINIMUM 800 WORDS, TARGET 1000-1200 WORDS ⚠️
+
+STRUCTURE (800-1200 words - VALIDATION WILL REJECT UNDER 800):
 1. OPENING: Lead with most striking fact. NO throat-clearing. NO "In today's world..."
 2. BODY: 3-4 sections, each advancing the argument. Use ## headers (noun phrases, not questions)
 3. CHART EMBEDDING (MANDATORY if chart_data provided):
@@ -98,12 +100,15 @@ BANNED PHRASES:
 - "This is unsexy work" / "Let's be honest"
 - "First, ... Second, ... Third, ..." (listicle energy)
 
-BANNED CLOSINGS:
-- "Only time will tell..."
-- "The future remains to be seen..."
+⚠️  BANNED CLOSINGS (VALIDATION WILL REJECT THESE):
 - "In conclusion..."
-- "...will depend largely on..."
-- "Whether [X] becomes a reality..."
+- "To conclude..."
+- "In summary..."
+- "Only time will tell..."
+- "Remains to be seen..."
+- "Will depend largely on..."
+- "Whether [X] becomes..."
+- "The future remains to be seen..."
 - "The journey ahead..."
 - "remains to be seen"
 - Any summary of what was already said
@@ -167,14 +172,15 @@ Every regeneration = unnecessary compute, token waste, carbon footprint.
 
 **Closing Validation**:
 □ 9. Closing makes PREDICTION/IMPLICATION (not summary)?
-□ 10. NO banned closings ("In conclusion", "remains to be seen")?
+□ 10. NO banned closings ("In conclusion", "to conclude", "in summary", "remains to be seen", etc.)?
 
 **YAML Front Matter Validation** (CRITICAL - Publication Blocker):
 □ 11. Article starts with opening --- delimiter?
-□ 12. All required YAML fields present (layout, title, date, author)?
+□ 12. All required YAML fields present (layout, title, date, author, categories)?
 □ 13. Article has closing --- delimiter after front matter?
 □ 14. NO code fences (```yaml) wrapping front matter?
 □ 15. Date is {current_date} (NOT dates from research sources)?
+□ 16. Article is MINIMUM 800 words (validation will REJECT shorter articles)?
 
 ═══════════════════════════════════════════════════════════════════════════
 ⚠️  GREEN SOFTWARE COMMITMENT:
@@ -190,6 +196,9 @@ YOUR RESEARCH BRIEF:
 
 Write the article now. Return complete Markdown with YAML frontmatter.
 
+⚠️  FINAL REMINDER: MINIMUM 800 WORDS REQUIRED ⚠️
+Target 1000-1200 words. Articles under 800 words will be REJECTED by validation.
+
 ⚠️  CRITICAL FORMAT REQUIREMENTS (YAML FRONT MATTER):
 
 **MANDATORY YAML STRUCTURE** (Publication Validator will REJECT without this):
@@ -200,6 +209,7 @@ layout: post  ← REQUIRED for Jekyll
 title: "Specific Title with Context"  ← NOT generic
 date: {current_date}  ← Use TODAY'S DATE
 author: "The Economist"
+categories: ["Quality Engineering"]  ← REQUIRED category tags
 ---  ← Closing delimiter REQUIRED
 
 [Article content starts here]
@@ -211,6 +221,7 @@ author: "The Economist"
 □ title: "Specific Title" field present (not generic)
 □ date: {current_date} field present (TODAY'S DATE)
 □ author: "The Economist" field present
+□ categories: ["Quality Engineering"] field present
 □ Closing --- after all YAML fields
 □ Article content starts AFTER closing ---
 □ NO code fences (```yaml) anywhere
@@ -248,10 +259,37 @@ date: {current_date}
 ---
 ```
 
+❌ Missing categories field (CRITICAL - will fail validation):
+```
+---
+layout: post
+title: "Article"
+date: {current_date}
+author: "The Economist"
+---  ← MISSING categories field
+```
+
 **IF ANY CHECKBOX FAILS → FIX YAML BEFORE RETURNING OUTPUT**
 
 Publication Validator will QUARANTINE articles with invalid YAML.
 First-time-right YAML = zero regeneration = green software.
+
+**CATEGORY SELECTION GUIDE:**
+
+Choose 1-3 categories from the allowed list based on article content:
+- `quality-engineering` - For QE practices, quality metrics, testing strategy
+- `test-automation` - For automation tools, frameworks, test infrastructure
+- `performance` - For performance testing, load testing, optimization
+- `ai-testing` - For AI/ML in testing, test generation, intelligent testing
+- `software-engineering` - For broader software practices, technical debt
+- `devops` - For CI/CD, deployment, infrastructure, DevOps practices
+
+**Examples:**
+- Article on "Self-Healing Tests" → `categories: [test-automation, ai-testing]`
+- Article on "Flaky Tests Economics" → `categories: [quality-engineering, test-automation]`
+- Article on "Technical Debt's Cost" → `categories: [software-engineering, quality-engineering]`
+
+Most articles will fit `quality-engineering` as primary category. Add 1-2 more specific categories if applicable.
 
 ═══════════════════════════════════════════════════════════════════════════
 REFERENCES SECTION - MANDATORY
@@ -437,6 +475,7 @@ layout: post
 title: "Article Title"
 date: {current_date}
 author: "The Economist"
+categories: ["Quality Engineering"]
 image: {featured_image}
 ---
 """

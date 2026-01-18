@@ -54,12 +54,11 @@ Add this **Repository Secret**:
 
 ### Step 4: Verify API Keys
 
-Ensure these secrets exist in your repository:
+Ensure this secret exists in your repository:
 
 | Secret Name | Required For | Get From |
 |-------------|--------------|----------|
 | `OPENAI_API_KEY` | Article generation | [OpenAI API Keys](https://platform.openai.com/api-keys) |
-| `ANTHROPIC_API_KEY` | Research agent | [Anthropic Console](https://console.anthropic.com/) |
 
 ## 🚀 Usage Options
 
@@ -140,7 +139,7 @@ If your blog uses a different structure, modify the paths in:
 **Check logs:** Go to repository → Actions → Content Generation Pipeline → View logs
 
 **Common issues:**
-- Missing API keys (OpenAI/Anthropic)
+- Missing OpenAI API key
 - Wrong repository variables (BLOG_REPO_OWNER/NAME)
 - Insufficient token permissions
 - Blog repository doesn't exist

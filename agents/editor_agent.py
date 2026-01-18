@@ -226,7 +226,7 @@ Then return the EDITED article with all fixes applied.
 
 ⚠️  CRITICAL: YAML front matter format:
 - Must use --- delimiters (NOT ```yaml code fences)
-- Date must be TODAY: 2026-01-01 (not dates from sources)
+- Date must be TODAY: {current_date} (not dates from sources)
 - Title must be specific, not generic
 
 ❌ WRONG:
@@ -238,7 +238,7 @@ date: 2023-11-09
 ✅ CORRECT:
 ---
 title: "Self-Healing Tests: Myth vs Reality"
-date: 2026-01-01
+date: {current_date}
 ---
 
 ═══════════════════════════════════════════════════════════════════════════
@@ -287,13 +287,16 @@ You MUST output in this EXACT format with explicit PASS/FAIL for each gate:
 
 ## Edited Article
 
-[If ALL gates PASS, include edited article with YAML frontmatter]
-[If ANY gate FAILS, explain what needs fixing before returning edited version]
+⚠️  CRITICAL: ALWAYS return the edited article below, regardless of gate results.
+Even if gates fail, return your best attempt at fixing the issues.
+Do NOT return explanations - return the actual edited article content.
+
+[Return the complete edited article with YAML frontmatter here]
 
 ---
 layout: post
 title: "Specific Title with Context"
-date: 2026-01-01
+date: {current_date}
 ---
 
 [Full article content]
@@ -383,11 +386,12 @@ class EditorAgent:
         if len(draft.strip()) < 100:
             raise ValueError("Draft too short. Need at least 100 characters.")
 
-    def edit(self, draft: str) -> tuple[str, int, int]:
+    def edit(self, draft: str, current_date: str) -> tuple[str, int, int]:
         """Review and edit article draft through quality gates.
 
         Args:
             draft: Article draft to review and edit
+            current_date: Current date in YYYY-MM-DD format for article frontmatter
 
         Returns:
             Tuple of (edited_article, gates_passed, gates_failed)
@@ -437,7 +441,10 @@ class EditorAgent:
                 print(f"   ⚠️  Style Memory query failed: {e}")
 
         # FIX #2: Set temperature=0 for deterministic evaluation
-        prompt_with_context = EDITOR_AGENT_PROMPT.format(draft=draft) + style_context
+        prompt_with_context = (
+            EDITOR_AGENT_PROMPT.format(draft=draft, current_date=current_date)
+            + style_context
+        )
         response = call_llm(
             self.client,
             prompt_with_context,
@@ -611,6 +618,7 @@ def run_editor_agent(
     draft: str,
     governance: Any | None = None,
     style_memory_tool: Any | None = None,
+    current_date: str | None = None,
 ) -> tuple[str, int, int]:
     """Convenience function to run editor agent.
 
@@ -628,5 +636,11 @@ def run_editor_agent(
         >>> client = create_llm_client()
         >>> edited, passed, failed = run_editor_agent(client, draft)
     """
+    # Default to today's date if not provided
+    if current_date is None:
+        from datetime import datetime
+
+        current_date = datetime.now().strftime("%Y-%m-%d")
+
     agent = EditorAgent(client, governance, style_memory_tool)
-    return agent.edit(draft)
+    return agent.edit(draft, current_date)

@@ -196,13 +196,21 @@ YOUR RESEARCH BRIEF:
 
 Write the article now. Return complete Markdown with YAML frontmatter.
 
-🚨 CRITICAL REQUIREMENTS - FAILURE WILL REJECT ARTICLE 🚨
-1. MUST start with YAML frontmatter (--- opening delimiter)
-2. MUST be minimum 800 words (target 1000-1200)
-3. MUST include "## References" section before closing
-4. MUST use today's date: {current_date} in YAML
+🚨🚨🚨 ARTICLE WILL BE REJECTED WITHOUT THESE 🚨🚨🚨
 
-⚠️  VALIDATION WILL REJECT: Missing YAML, <800 words, No References ⚠️
+1. ❌ NO YAML FRONTMATTER = AUTOMATIC REJECTION
+2. ❌ LESS THAN 800 WORDS = AUTOMATIC REJECTION
+3. ❌ NO "## References" SECTION = AUTOMATIC REJECTION
+4. ❌ BANNED PHRASES ("leverage", "in conclusion") = AUTOMATIC REJECTION
+
+🔥 YOUR RESPONSE MUST:
+- START with "---" (YAML frontmatter)
+- BE 800+ words minimum
+- END with "## References" section
+- USE date: {current_date}
+- NEVER use banned phrases
+
+🚨 FAILURE = QUARANTINE 🚨
 
 ⚠️  CRITICAL FORMAT REQUIREMENTS (YAML FRONT MATTER):
 
@@ -330,13 +338,24 @@ All articles MUST include a "## References" section before the closing paragraph
 ⚠️  REMINDER: Run the 12-point validation checklist above BEFORE outputting.
 Green software = first-time-right quality = zero regeneration waste.
 
-🚨 BEFORE SUBMITTING YOUR RESPONSE: VERIFY 🚨
-✅ Article starts with "---" (YAML frontmatter)
-✅ Article is 800+ words minimum
-✅ Article ends with "## References" section
-✅ YAML date field shows: {current_date}
+🚨🚨🚨 MANDATORY PRE-SUBMISSION CHECKLIST 🚨🚨🚨
 
-FAILURE TO INCLUDE THESE = ARTICLE REJECTION
+BEFORE YOU SUBMIT - CHECK EVERY SINGLE ITEM:
+
+❌ Does article start with "---"? (YES = continue, NO = START OVER)
+❌ Is article 800+ words? (YES = continue, NO = START OVER)
+❌ Does article end with "## References"? (YES = continue, NO = START OVER)
+❌ Contains ZERO banned phrases? (YES = continue, NO = START OVER)
+❌ YAML date is {current_date}? (YES = continue, NO = START OVER)
+
+BANNED PHRASES THAT WILL CAUSE REJECTION:
+- "leverage" (as verb)
+- "in conclusion"
+- "to conclude"
+- "in summary"
+- "game-changer"
+
+🚨 IF ANY CHECKLIST ITEM FAILS = COMPLETELY REWRITE ARTICLE 🚨
 
 Now write the article:"""
 

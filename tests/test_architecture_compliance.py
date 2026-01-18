@@ -35,6 +35,10 @@ ALLOWED_FILES = {
     "run_story7_crew.py",
     "run_story10_crew.py",
     "run_story11_crew.py",  # CrewAI workflow execution script (uses AgentFactory for agents)
+    # TEST FILES: Need direct CrewAI access for testing agent functionality
+    "test_full_workflow_streamlined.py",  # Test complete TDD workflow
+    "test_git_operations_direct.py",  # Test git operations with minimal setup
+    "test_simple_git_workflow.py",  # Test simple git workflow without embeddings
     # TECHNICAL DEBT: Legacy files predating ADR-002 (to be refactored)
     "featured_image_agent.py",  # TODO: Refactor to use AgentRegistry (Story 10)
     "visual_qa.py",  # TODO: Refactor to use AgentRegistry (Story 10)
@@ -227,9 +231,9 @@ def test_allowed_files_have_llm_imports():
                 found_exceptions.append(file_path.name)
 
     # At least llm_client.py should have LLM imports
-    assert len(found_exceptions) > 0, (
-        "No LLM imports found in exception files - ALLOWED_FILES may be stale"
-    )
+    assert (
+        len(found_exceptions) > 0
+    ), "No LLM imports found in exception files - ALLOWED_FILES may be stale"
 
 
 def test_ast_parsing_works():
@@ -279,9 +283,9 @@ def test_allowed_files_configuration(filename: str, should_be_allowed: bool):
         should_be_allowed: Whether file should be allowed to import LLMs
     """
     is_allowed = filename in ALLOWED_FILES
-    assert is_allowed == should_be_allowed, (
-        f"{filename} allowed status is incorrect: expected {should_be_allowed}, got {is_allowed}"
-    )
+    assert (
+        is_allowed == should_be_allowed
+    ), f"{filename} allowed status is incorrect: expected {should_be_allowed}, got {is_allowed}"
 
 
 # ═══════════════════════════════════════════════════════════════════════════

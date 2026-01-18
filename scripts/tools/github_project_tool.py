@@ -18,7 +18,7 @@ Usage:
 import logging
 import subprocess
 
-from crewai_tools import tool
+from crewai.tools import tool
 
 logger = logging.getLogger(__name__)
 
@@ -41,8 +41,7 @@ def _check_github_auth() -> bool:
         return False
 
 
-@tool("github_project_add_issue")
-def github_project_add_issue(
+def _github_project_add_issue_impl(
     project_number: int, issue_url: str, owner: str = "oviney"
 ) -> str:
     """Add a GitHub Issue to a Project V2 board.
@@ -74,14 +73,25 @@ def github_project_add_issue(
         >>> print(result)
         'Success: Added https://github.com/oviney/economist-agents/issues/42 to Project 1'
     """
-    # Enhanced input validation
-    if not isinstance(project_number, int) or project_number < 1:
+    # Enhanced input validation with type checking
+    if not isinstance(project_number, int):
+        raise TypeError(
+            f"project_number must be an integer, got {type(project_number).__name__}"
+        )
+
+    if project_number < 1:
         return "Error: Invalid project number. Must be a positive integer."
+
+    if not isinstance(issue_url, str):
+        raise TypeError(f"issue_url must be a string, got {type(issue_url).__name__}")
 
     if not _validate_github_issue_url(issue_url):
         return "Error: Invalid GitHub issue URL format. Must be https://github.com/owner/repo/issues/number"
 
-    if not isinstance(owner, str) or not owner.strip():
+    if not isinstance(owner, str):
+        raise TypeError(f"owner must be a string, got {type(owner).__name__}")
+
+    if not owner.strip():
         return "Error: Invalid owner. Must be a non-empty string."
 
     # Authentication check
@@ -128,6 +138,60 @@ def github_project_add_issue(
         msg = f"Unexpected error: {type(e).__name__}: {e}"
         logger.error(msg)
         return f"Error: {msg}"
+
+
+class CallableTool:
+    """Wrapper to make CrewAI tools callable like functions"""
+
+    def __init__(self, tool, original_func):
+        self.tool = tool
+        self._original_func = original_func
+        # Expose all tool attributes
+        for attr in ["name", "__doc__", "description"]:
+            if hasattr(tool, attr):
+                setattr(self, attr, getattr(tool, attr))
+
+        # Make inspect.getsource work by exposing the original function's attributes
+        for attr in ["__module__", "__qualname__", "__annotations__"]:
+            if hasattr(original_func, attr):
+                setattr(self, attr, getattr(original_func, attr))
+
+    def __call__(self, *args, **kwargs):
+        # Use the tool's run method
+        return self.tool.run(*args, **kwargs)
+
+    def __getattr__(self, name):
+        # For inspect operations, try the original function first
+        if hasattr(self._original_func, name):
+            return getattr(self._original_func, name)
+        # Delegate any other attributes to the underlying tool
+        return getattr(self.tool, name)
+
+    # Make this object appear like the original function to inspect
+    @property
+    def __wrapped__(self):
+        return self._original_func
+
+    # Override inspect-related attributes to point to original function
+    @property
+    def __code__(self):
+        return self._original_func.__code__
+
+    @property
+    def __globals__(self):
+        return self._original_func.__globals__
+
+
+# Create the decorated tool and make it callable
+_tool_instance = tool("github_project_add_issue")(_github_project_add_issue_impl)
+_tool_instance.__doc__ = _github_project_add_issue_impl.__doc__
+github_project_add_issue = CallableTool(_tool_instance, _github_project_add_issue_impl)
+
+# Export the raw function for direct calling if needed
+github_project_add_issue_raw = _github_project_add_issue_impl
+
+# Export as class name for backward compatibility
+GitHubProjectTool = github_project_add_issue
 
 
 if __name__ == "__main__":

@@ -744,9 +744,9 @@ def generate_economist_post(
         if metrics.current_session["charts"]:
             chart_record = metrics.current_session["charts"][-1]
 
-        # Stage 2b: Visual QA (optional - only if vision supported)
-        if chart_path and client.provider == "anthropic":
-            # Only Anthropic Claude has good vision support
+        # Stage 2b: Visual QA (runs for providers with vision support)
+        # Both Anthropic Claude and OpenAI GPT-4o support vision
+        if chart_path and client.provider in ("anthropic", "openai"):
             visual_qa_result = run_visual_qa_agent(client, chart_path, chart_record)
             visual_qa_passed = visual_qa_result.get("overall_pass", False)
 
@@ -775,14 +775,14 @@ def generate_economist_post(
                 validation_passed=visual_qa_passed,
             )
         elif chart_path:
-            # Track Graphics Agent even without Visual QA
-            print("   ℹ Visual QA skipped (requires Anthropic Claude)")
+            # Track Graphics Agent for providers without vision support
+            print("   ℹ Visual QA skipped (provider does not support vision)")
             agent_metrics.track_graphics_agent(
                 charts_generated=1,
-                visual_qa_passed=1,  # Assume pass if no QA available
+                visual_qa_passed=0,  # Mark as not passed when QA unavailable
                 zone_violations=0,
                 regenerations=0,
-                validation_passed=True,  # Chart generated successfully
+                validation_passed=False,  # Cannot validate without vision
             )
 
     # Stage 2c: Featured Image Generation (optional)

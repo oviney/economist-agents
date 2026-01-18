@@ -6,6 +6,7 @@
 # Security (recommended)
 crewai-tools>=0.12.0     # CrewAI tools for agent capabilities
 chromadb>=0.4.0          # Vector database for Style Memory RAG (STORY-006)
+matplotlib>=3.7.0        # Chart generation for graphics agent
 numpy>=1.24.0            # Data manipulation for charts
 openai>=1.0.0            # OpenAI API (required)
 PyGithub>=2.1.0          # GitHub API integration for sprint sync

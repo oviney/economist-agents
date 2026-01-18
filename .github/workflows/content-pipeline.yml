@@ -157,13 +157,13 @@ jobs:
           git checkout -b $BRANCH
 
           # Copy generated files
-          mkdir -p _posts assets/charts
+          mkdir -p _posts assets/charts assets/images
           cp ../output/*.md _posts/ 2>/dev/null || true
           cp ../output/charts/*.png assets/charts/ 2>/dev/null || true
-          cp ../output/images/*.png assets/charts/ 2>/dev/null || true
+          cp ../output/images/*.png assets/images/ 2>/dev/null || true
 
           # Commit and push
-          git add _posts/*.md assets/charts/*.png
+          git add _posts/*.md assets/charts/*.png assets/images/*.png
           git commit -m "content: Add generated article from economist-agents" || exit 0
           git push origin $BRANCH
 

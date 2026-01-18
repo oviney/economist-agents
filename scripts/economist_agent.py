@@ -798,7 +798,7 @@ def generate_economist_post(
         )
         if featured_image_path:
             # Use blog path in frontmatter (where image will be deployed)
-            featured_image_blog_path = f"/assets/charts/{slug}.png"
+            featured_image_blog_path = f"/assets/images/{slug}.png"
         else:
             print("   ℹ Continuing without featured image")
     else:

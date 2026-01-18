@@ -731,59 +731,108 @@ def generate_economist_post(
             print("❌ Research rejected. Exiting.")
             return {"status": "rejected", "stage": "research"}
 
-    # Stage 2: Graphics
+    # Stage 2: Graphics (with regeneration on Visual QA failure)
     chart_path = None
     chart_record = None
     visual_qa_passed = True
+    visual_qa_result = None
+    max_chart_attempts = 2  # Try regeneration once if QA fails
+    chart_attempts = 0
+
     if research.get("chart_data"):
         chart_filename = str(charts_dir / f"{slug}.png")
-        chart_path = run_graphics_agent(client, research["chart_data"], chart_filename)
 
-        # Get the chart record for metrics tracking
-        metrics = get_metrics_collector()
-        if metrics.current_session["charts"]:
-            chart_record = metrics.current_session["charts"][-1]
+        while chart_attempts < max_chart_attempts:
+            chart_attempts += 1
 
-        # Stage 2b: Visual QA (runs for providers with vision support)
-        # Both Anthropic Claude and OpenAI GPT-4o support vision
-        if chart_path and client.provider in ("anthropic", "openai"):
-            visual_qa_result = run_visual_qa_agent(client, chart_path, chart_record)
-            visual_qa_passed = visual_qa_result.get("overall_pass", False)
-
-            if not visual_qa_passed:
-                print("   ⚠ Chart failed Visual QA - flagging for manual review")
-                # Save QA report for debugging
-                qa_report_path = chart_path.replace(".png", "-qa-report.json")
-                with open(qa_report_path, "w") as f:
-                    json.dump(visual_qa_result, f, indent=2)
-
-            # Log to governance
-            if governance:
-                governance.log_agent_output(
-                    "graphics_agent",
-                    {"chart_path": chart_path, "visual_qa": visual_qa_result},
-                    metadata={"passed_qa": visual_qa_passed},
+            # Generate chart
+            if chart_attempts > 1:
+                print(
+                    f"   🔄 Regenerating chart (attempt {chart_attempts}/{max_chart_attempts})..."
                 )
+                # Add QA feedback to chart spec for regeneration
+                if visual_qa_result and visual_qa_result.get("critical_issues"):
+                    research["chart_data"]["_qa_feedback"] = visual_qa_result[
+                        "critical_issues"
+                    ]
 
-            # Track Graphics Agent metrics
-            zone_violations = len(visual_qa_result.get("critical_issues", []))
-            agent_metrics.track_graphics_agent(
-                charts_generated=1,
-                visual_qa_passed=1 if visual_qa_passed else 0,
-                zone_violations=zone_violations,
-                regenerations=0,
-                validation_passed=visual_qa_passed,
+            chart_path = run_graphics_agent(
+                client, research["chart_data"], chart_filename
             )
-        elif chart_path:
-            # Track Graphics Agent for providers without vision support
-            print("   ℹ Visual QA skipped (provider does not support vision)")
-            agent_metrics.track_graphics_agent(
-                charts_generated=1,
-                visual_qa_passed=0,  # Mark as not passed when QA unavailable
-                zone_violations=0,
-                regenerations=0,
-                validation_passed=False,  # Cannot validate without vision
+
+            if not chart_path:
+                break  # Chart generation failed entirely
+
+            # Get the chart record for metrics tracking
+            metrics = get_metrics_collector()
+            if metrics.current_session["charts"]:
+                chart_record = metrics.current_session["charts"][-1]
+
+            # Stage 2b: Visual QA (runs for providers with vision support)
+            if client.provider in ("anthropic", "openai"):
+                visual_qa_result = run_visual_qa_agent(client, chart_path, chart_record)
+                visual_qa_passed = visual_qa_result.get("overall_pass", False)
+
+                if visual_qa_passed:
+                    print("   ✓ Chart passed Visual QA")
+                    break  # Success - exit loop
+                else:
+                    print(
+                        f"   ⚠ Chart failed Visual QA (attempt {chart_attempts}/{max_chart_attempts})"
+                    )
+                    # Save QA report for debugging
+                    qa_report_path = chart_path.replace(
+                        ".png", f"-qa-report-{chart_attempts}.json"
+                    )
+                    with open(qa_report_path, "w") as f:
+                        json.dump(visual_qa_result, f, indent=2)
+
+                    if chart_attempts >= max_chart_attempts:
+                        print(
+                            "   ❌ Chart failed Visual QA after all attempts - BLOCKING publication"
+                        )
+            else:
+                # No vision support - can't validate
+                print("   ℹ Visual QA skipped (provider does not support vision)")
+                visual_qa_passed = False
+                break
+
+        # Log to governance
+        if governance and visual_qa_result:
+            governance.log_agent_output(
+                "graphics_agent",
+                {"chart_path": chart_path, "visual_qa": visual_qa_result},
+                metadata={"passed_qa": visual_qa_passed, "attempts": chart_attempts},
             )
+
+        # Track Graphics Agent metrics
+        zone_violations = (
+            len(visual_qa_result.get("critical_issues", [])) if visual_qa_result else 0
+        )
+        agent_metrics.track_graphics_agent(
+            charts_generated=chart_attempts,
+            visual_qa_passed=1 if visual_qa_passed else 0,
+            zone_violations=zone_violations,
+            regenerations=chart_attempts - 1,
+            validation_passed=visual_qa_passed,
+        )
+
+        # BLOCK publication if chart failed Visual QA
+        if chart_path and not visual_qa_passed:
+            print("\n" + "=" * 70)
+            print("❌ BLOCKED: Chart failed Visual QA")
+            print("   Critical issues:")
+            for issue in (visual_qa_result or {}).get("critical_issues", ["Unknown"]):
+                print(f"   • {issue}")
+            print("=" * 70 + "\n")
+
+            return {
+                "status": "rejected",
+                "reason": "visual_qa_failed",
+                "chart_path": chart_path,
+                "visual_qa_result": visual_qa_result,
+                "attempts": chart_attempts,
+            }
 
     # Stage 2c: Featured Image Generation (optional)
     featured_image_path = None

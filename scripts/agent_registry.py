@@ -361,15 +361,12 @@ class AgentRegistry:
 
         return instantiated
 
-    def get_agent(
-        self, name: str, model: str | None = None, provider: str | None = None
-    ) -> dict[str, Any]:
+    def get_agent(self, name: str, model: str | None = None) -> dict[str, Any]:
         """Factory method: Create agent instance with LLM client.
 
         Args:
             name: Agent name (without .agent.md extension)
-            model: LLM model to use (default: provider default)
-            provider: LLM provider ('anthropic' or 'openai', default: auto-detect)
+            model: LLM model to use (default: gpt-4o)
 
         Returns:
             Dictionary containing agent configuration and LLM client:
@@ -429,7 +426,7 @@ class AgentRegistry:
         if self.llm_provider is not None:
             llm_client = self.llm_provider.create_client(model)
         else:
-            llm_client = create_llm_client(provider=provider)
+            llm_client = create_llm_client()
 
             # Override model if specified
             if model:

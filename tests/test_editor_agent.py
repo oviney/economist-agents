@@ -197,7 +197,7 @@ def test_edit_success(mock_client, sample_draft, mock_editor_response):
     agent = EditorAgent(mock_client)
 
     with patch("agents.editor_agent.call_llm", return_value=mock_editor_response):
-        edited, gates_passed, gates_failed = agent.edit(sample_draft)
+        edited, gates_passed, gates_failed = agent.edit(sample_draft, current_date="2026-01-18")
 
     assert isinstance(edited, str)
     assert gates_passed == 5
@@ -212,7 +212,7 @@ def test_edit_with_governance(
     agent = EditorAgent(mock_client, governance=mock_governance)
 
     with patch("agents.editor_agent.call_llm", return_value=mock_editor_response):
-        edited, gates_passed, gates_failed = agent.edit(sample_draft)
+        edited, gates_passed, gates_failed = agent.edit(sample_draft, current_date="2026-01-18")
 
     assert mock_governance.log_agent_output.called
     assert gates_passed == 5
@@ -234,7 +234,7 @@ def test_edit_with_failures(mock_client, sample_draft):
     agent = EditorAgent(mock_client)
 
     with patch("agents.editor_agent.call_llm", return_value=response):
-        edited, gates_passed, gates_failed = agent.edit(sample_draft)
+        edited, gates_passed, gates_failed = agent.edit(sample_draft, current_date="2026-01-18")
 
     assert gates_passed == 3
     assert gates_failed == 2
@@ -245,7 +245,7 @@ def test_edit_extracts_article_section(mock_client, sample_draft, mock_editor_re
     agent = EditorAgent(mock_client)
 
     with patch("agents.editor_agent.call_llm", return_value=mock_editor_response):
-        edited, _, _ = agent.edit(sample_draft)
+        edited, _, _ = agent.edit(sample_draft, current_date="2026-01-18")
 
     assert "---" in edited  # YAML frontmatter
     assert "layout: post" in edited
@@ -538,7 +538,7 @@ def test_edit_with_empty_response(mock_client, sample_draft):
     agent = EditorAgent(mock_client)
 
     with patch("agents.editor_agent.call_llm", return_value=""):
-        edited, gates_passed, gates_failed = agent.edit(sample_draft)
+        edited, gates_passed, gates_failed = agent.edit(sample_draft, current_date="2026-01-18")
 
     # Should return draft unchanged when response is invalid
     assert edited == sample_draft
@@ -552,7 +552,7 @@ def test_edit_with_no_article_section(mock_client, sample_draft):
     agent = EditorAgent(mock_client)
 
     with patch("agents.editor_agent.call_llm", return_value=response):
-        edited, gates_passed, gates_failed = agent.edit(sample_draft)
+        edited, gates_passed, gates_failed = agent.edit(sample_draft, current_date="2026-01-18")
 
     # Should return draft unchanged when format invalid (no proper gates section)
     assert edited == sample_draft

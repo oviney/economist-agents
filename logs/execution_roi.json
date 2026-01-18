@@ -1051,15 +1051,175 @@
       "human_hours_equivalent": 1.0,
       "human_cost_equivalent": 75.0,
       "roi_multiplier": 294117.65
+    },
+    {
+      "execution_id": "research_agent_20260118_133237",
+      "agent": "research_agent",
+      "start_time": "2026-01-18T13:32:37.332080",
+      "end_time": "2026-01-18T13:32:37.332097",
+      "llm_calls": [
+        {
+          "timestamp": "2026-01-18T13:32:37.332088",
+          "agent": "research_agent",
+          "model": "gpt-4o",
+          "input_tokens": 1000,
+          "output_tokens": 500,
+          "total_tokens": 1500,
+          "cost_usd": 0.0075,
+          "metadata": {}
+        }
+      ],
+      "total_input_tokens": 1000,
+      "total_output_tokens": 500,
+      "total_tokens": 1500,
+      "total_cost_usd": 0.0075,
+      "human_hours_equivalent": 2.0,
+      "human_cost_equivalent": 150.0,
+      "roi_multiplier": 20000.0
+    },
+    {
+      "execution_id": "writer_agent_20260118_133237",
+      "agent": "writer_agent",
+      "start_time": "2026-01-18T13:32:37.340631",
+      "end_time": "2026-01-18T13:32:37.340638",
+      "llm_calls": [
+        {
+          "timestamp": "2026-01-18T13:32:37.340634",
+          "agent": "writer_agent",
+          "model": "gpt-4o",
+          "input_tokens": 500,
+          "output_tokens": 1000,
+          "total_tokens": 1500,
+          "cost_usd": 0.01125,
+          "metadata": {}
+        }
+      ],
+      "total_input_tokens": 500,
+      "total_output_tokens": 1000,
+      "total_tokens": 1500,
+      "total_cost_usd": 0.0112,
+      "human_hours_equivalent": 3.0,
+      "human_cost_equivalent": 225.0,
+      "roi_multiplier": 20000.0
+    },
+    {
+      "execution_id": "writer_agent_20260118_133237",
+      "agent": "writer_agent",
+      "start_time": "2026-01-18T13:32:37.348057",
+      "end_time": "2026-01-18T13:32:37.348065",
+      "llm_calls": [
+        {
+          "timestamp": "2026-01-18T13:32:37.348061",
+          "agent": "writer_agent",
+          "model": "gpt-4o",
+          "input_tokens": 2000,
+          "output_tokens": 1000,
+          "total_tokens": 3000,
+          "cost_usd": 0.015,
+          "metadata": {}
+        }
+      ],
+      "total_input_tokens": 2000,
+      "total_output_tokens": 1000,
+      "total_tokens": 3000,
+      "total_cost_usd": 0.015,
+      "human_hours_equivalent": 3.0,
+      "human_cost_equivalent": 225.0,
+      "roi_multiplier": 15000.0
+    },
+    {
+      "execution_id": "full_pipeline_20260118_133237",
+      "agent": "full_pipeline",
+      "start_time": "2026-01-18T13:32:37.358379",
+      "end_time": "2026-01-18T13:32:37.359216",
+      "llm_calls": [
+        {
+          "timestamp": "2026-01-18T13:32:37.359075",
+          "agent": "research_agent",
+          "model": "gpt-4o",
+          "input_tokens": 500,
+          "output_tokens": 200,
+          "total_tokens": 700,
+          "cost_usd": 0.00325,
+          "metadata": {}
+        },
+        {
+          "timestamp": "2026-01-18T13:32:37.359149",
+          "agent": "writer_agent",
+          "model": "gpt-4o",
+          "input_tokens": 2000,
+          "output_tokens": 1500,
+          "total_tokens": 3500,
+          "cost_usd": 0.02,
+          "metadata": {}
+        }
+      ],
+      "total_input_tokens": 2500,
+      "total_output_tokens": 1700,
+      "total_tokens": 4200,
+      "total_cost_usd": 0.0232,
+      "human_hours_equivalent": 1.0,
+      "human_cost_equivalent": 75.0,
+      "roi_multiplier": 3225.81
+    },
+    {
+      "execution_id": "agent1_20260118_133237",
+      "agent": "agent1",
+      "start_time": "2026-01-18T13:32:37.390109",
+      "end_time": "2026-01-18T13:32:37.454681",
+      "llm_calls": [
+        {
+          "timestamp": "2026-01-18T13:32:37.454668",
+          "agent": "agent1",
+          "model": "gpt-4o",
+          "input_tokens": 1000,
+          "output_tokens": 500,
+          "total_tokens": 1500,
+          "cost_usd": 0.0075,
+          "metadata": {}
+        }
+      ],
+      "total_input_tokens": 1000,
+      "total_output_tokens": 500,
+      "total_tokens": 1500,
+      "total_cost_usd": 0.0075,
+      "human_hours_equivalent": 1.0,
+      "human_cost_equivalent": 75.0,
+      "roi_multiplier": 10000.0
+    },
+    {
+      "execution_id": "agent2_20260118_133237",
+      "agent": "agent2",
+      "start_time": "2026-01-18T13:32:37.390113",
+      "end_time": "2026-01-18T13:32:37.456434",
+      "llm_calls": [
+        {
+          "timestamp": "2026-01-18T13:32:37.454678",
+          "agent": "agent2",
+          "model": "gpt-4o-mini",
+          "input_tokens": 500,
+          "output_tokens": 300,
+          "total_tokens": 800,
+          "cost_usd": 0.000255,
+          "metadata": {}
+        }
+      ],
+      "total_input_tokens": 500,
+      "total_output_tokens": 300,
+      "total_tokens": 800,
+      "total_cost_usd": 0.0003,
+      "human_hours_equivalent": 1.0,
+      "human_cost_equivalent": 75.0,
+      "roi_multiplier": 294117.65
     }
   ],
   "summary": {
-    "total_executions": 40,
-    "total_tokens": 79100,
-    "total_cost_usd": 0.41,
-    "total_human_hours_saved": 75.0,
-    "total_human_cost_saved": 5625.0,
-    "avg_roi_multiplier": 63248.82,
-    "last_updated": "2026-01-18T13:29:18.118351"
+    "total_executions": 46,
+    "total_tokens": 91600,
+    "total_cost_usd": 0.47,
+    "total_human_hours_saved": 86.0,
+    "total_human_cost_saved": 6450.0,
+    "avg_roi_multiplier": 62876.0,
+    "last_updated": "2026-01-18T13:32:37.456447"
   }
 }

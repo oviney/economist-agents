@@ -119,8 +119,8 @@ class TestAgentRegistryProviderAbstraction:
         }
         registry.register_test_agent("test-agent", test_config)
 
-        # Test agent should work regardless of provider parameter
-        agent = registry.get_agent("test-agent", provider="any_provider")
+        # Test agent should work with OpenAI (only provider now)
+        agent = registry.get_agent("test-agent")
         assert agent["role"] == "Test Agent"
 
 

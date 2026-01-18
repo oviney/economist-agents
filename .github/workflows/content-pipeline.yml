@@ -160,6 +160,7 @@ jobs:
           mkdir -p _posts assets/charts
           cp ../output/*.md _posts/ 2>/dev/null || true
           cp ../output/charts/*.png assets/charts/ 2>/dev/null || true
+          cp ../output/images/*.png assets/charts/ 2>/dev/null || true
 
           # Commit and push
           git add _posts/*.md assets/charts/*.png

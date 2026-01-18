@@ -482,7 +482,7 @@ class TestRunGraphicsAgent:
         }
 
         with (
-            patch("agents.research_agent.call_llm") as mock_call_llm,
+            patch("llm_client.call_llm") as mock_call_llm,
             patch("agents.graphics_agent.get_metrics_collector") as mock_metrics,
             patch("subprocess.run") as mock_subprocess,
             patch("builtins.open", mock_open()),
@@ -531,7 +531,7 @@ class TestRunGraphicsAgent:
         chart_spec = {"title": "Test Chart", "data": []}
 
         with (
-            patch("agents.research_agent.call_llm") as mock_call_llm,
+            patch("llm_client.call_llm") as mock_call_llm,
             patch("agents.graphics_agent.get_metrics_collector") as mock_metrics,
             patch("subprocess.run") as mock_subprocess,
             patch("builtins.open", mock_open()),
@@ -552,7 +552,7 @@ class TestRunGraphicsAgent:
         chart_spec = {"title": "Test Chart", "data": []}
 
         with (
-            patch("agents.research_agent.call_llm") as mock_call_llm,
+            patch("llm_client.call_llm") as mock_call_llm,
             patch("agents.graphics_agent.get_metrics_collector") as mock_metrics,
             patch("subprocess.run") as mock_subprocess,
             patch("builtins.open", mock_open()),
@@ -806,6 +806,7 @@ class TestIntegration:
             patch("agents.writer_agent.call_llm") as mock_writer_llm,
             patch("agents.editor_agent.call_llm") as mock_editor_llm,
             patch("agents.writer_agent.review_agent_output") as mock_review,
+            patch("llm_client.call_llm") as mock_graphics_llm,
             patch("agents.graphics_agent.get_metrics_collector") as mock_metrics,
             patch("subprocess.run") as mock_subprocess,
             patch("builtins.open", mock_open()),
@@ -814,6 +815,9 @@ class TestIntegration:
             mock_research_llm.return_value = json.dumps(sample_research_output)
             mock_writer_llm.return_value = sample_article_draft
             mock_editor_llm.return_value = sample_edited_article
+            mock_graphics_llm.return_value = (
+                "plt.plot([1, 2, 3])\nplt.savefig('test.png')"
+            )
             mock_review.return_value = (True, [])
             mock_subprocess.return_value = Mock(returncode=0)
             mock_collector = Mock()
@@ -864,13 +868,12 @@ class TestIntegration:
     ):
         """Test pipeline with governance approval gates."""
         with (
-            patch("agents.research_agent.call_llm") as mock_call_llm,
+            patch("agents.research_agent.call_llm") as mock_research_llm,
+            patch("agents.writer_agent.call_llm") as mock_writer_llm,
             patch("agents.writer_agent.review_agent_output") as mock_review,
         ):
-            mock_call_llm.side_effect = [
-                json.dumps(sample_research_output),
-                sample_article_draft,
-            ]
+            mock_research_llm.return_value = json.dumps(sample_research_output)
+            mock_writer_llm.return_value = sample_article_draft
             mock_review.return_value = (True, [])
 
             # Research with governance

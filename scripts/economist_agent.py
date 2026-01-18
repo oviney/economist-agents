@@ -787,6 +787,7 @@ def generate_economist_post(
 
     # Stage 2c: Featured Image Generation (optional)
     featured_image_path = None
+    featured_image_blog_path = None  # Path to use in frontmatter (blog destination)
     if os.environ.get("OPENAI_API_KEY"):
         featured_image_filename = str(posts_dir / "images" / f"{slug}.png")
         featured_image_path = generate_featured_image(
@@ -795,7 +796,10 @@ def generate_economist_post(
             contrarian_angle=research.get("contrarian_angle", ""),
             output_path=featured_image_filename,
         )
-        if not featured_image_path:
+        if featured_image_path:
+            # Use blog path in frontmatter (where image will be deployed)
+            featured_image_blog_path = f"/assets/charts/{slug}.png"
+        else:
             print("   ℹ Continuing without featured image")
     else:
         print("   ℹ OPENAI_API_KEY not set, skipping featured image generation")
@@ -807,7 +811,7 @@ def generate_economist_post(
         chart_filename = f"/assets/charts/{slug}.png"
 
     draft, writer_metadata = run_writer_agent(
-        client, topic, research, date_str, chart_filename, featured_image_path
+        client, topic, research, date_str, chart_filename, featured_image_blog_path
     )
 
     # Track Writer Agent metrics

@@ -289,10 +289,11 @@ def cache_key(*args, **kwargs) -> str:
     """Generate cache key from function arguments."""
     # Create deterministic key from args and kwargs
     key_data = {"args": args, "kwargs": sorted(kwargs.items())}
-    if hasattr(json, "dumps"):
-        key_str = json.dumps(key_data, sort_keys=True, default=str)
-    else:  # orjson
+    # Check if we're using orjson (which is imported as json)
+    if hasattr(json, "OPT_SORT_KEYS"):  # This is unique to orjson
         key_str = json.dumps(key_data, option=json.OPT_SORT_KEYS).decode("utf-8")
+    else:  # Standard json module
+        key_str = json.dumps(key_data, sort_keys=True, default=str)
     key_hash = hashlib.md5(key_str.encode()).hexdigest()
     return f"{CACHE_KEY_PREFIX}:{key_hash}"
 

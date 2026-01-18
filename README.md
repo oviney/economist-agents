@@ -401,6 +401,25 @@ python3 scripts/validate_badges.py
 
 All badges use shields.io endpoint format with JSON files in repo root for dynamic updates.
 
+## 📚 Documentation
+
+This README provides a project overview and quick start guide. For comprehensive documentation, see:
+
+**📖 [Complete Documentation Hub](docs/README.md)** - Navigation to all guides, architecture, and references
+
+### Quick Links
+- **[Contributing Guidelines](CONTRIBUTING.md)** - Development workflow, TDD, quality gates
+- **[Agent System](AGENTS.md)** - Multi-agent architecture and usage
+- **[Architecture & ADRs](docs/architecture/)** - Design decisions and system architecture
+- **[User Guides](docs/guides/)** - Step-by-step guides for deployment, CI/CD, and development
+- **[Historical Archive](docs/archive/)** - Sprint reports, story completions, and system history
+
+### For Different Audiences
+- **New Contributors**: [README](README.md) → [Contributing](CONTRIBUTING.md) → [Setup Guide](docs/guides/CONTINUE_SETUP.md)
+- **Developers**: [Agents Overview](AGENTS.md) → [Quality System](docs/DEFINITION_OF_DONE.md) → [Workflow Guide](docs/guides/WORKFLOW_GUIDE.md)
+- **Architects**: [ADR Collection](docs/architecture/) → [Flow Architecture](docs/FLOW_ARCHITECTURE.md) → [Context System](docs/CREWAI_CONTEXT_ARCHITECTURE.md)
+- **Project Managers**: [Current Sprint](SPRINT.md) → [Quality Dashboard](docs/QUALITY_DASHBOARD.md) → [Archive](docs/archive/)
+
 ## 📖 Glossary
 
 **Multi-Agent System:** AI architecture where specialized agents (personas) collaborate on complex tasks. Each agent has a specific role (research, writing, editing) and they communicate through structured data exchanges.

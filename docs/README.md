@@ -1,33 +1,106 @@
-# Documentation Index
+# Economist-Agents Documentation
 
-Welcome to the Economist Agents documentation! This page provides easy navigation to all guides, reports, and technical documentation.
+Welcome to the comprehensive documentation for the Economist-Agents project! This multi-agent content generation system produces publication-quality blog posts in The Economist's signature style.
 
 ## 🚀 Getting Started
 
 **New to the project?** Start here:
-1. [Main README](../README.md) - Overview, quick start, architecture
-2. [SPRINT_4_COMPLETE.md](../SPRINT_4_COMPLETE.md) - Latest features and testing results
-3. [METRICS_GUIDE.md](METRICS_GUIDE.md) - How to use the metrics dashboard
 
-## 📊 Sprint 4 Reports (January 1, 2026)
+1. **[Main README](../README.md)** - Project overview, installation, and quick start
+2. **[Contributing Guidelines](../CONTRIBUTING.md)** - Development workflow, TDD, quality gates
+3. **[Agent System Overview](../AGENTS.md)** - Multi-agent architecture and usage
+4. **[Installation Guide](guides/CONTINUE_SETUP.md)** - Detailed setup instructions
 
-The latest sprint delivered **metrics tracking** and **GenAI featured images**:
+## 📖 User Guides
 
-### Primary Reports
-- [**SPRINT_4_COMPLETE.md**](../SPRINT_4_COMPLETE.md) ⭐ **START HERE**
-  - Full delivery summary
-  - Testing results
-  - Production deployment status
-  - Files changed and features added
+### Development & Setup
+- **[Blog Deployment](guides/BLOG_DEPLOYMENT.md)** - Deploy generated articles to blog repository
+- **[CI/CD Monitoring](guides/CI_MONITORING_GUIDE.md)** - Monitor GitHub Actions and quality gates
+- **[Copilot Integration](guides/COPILOT_SYNC.md)** - Sync agent patterns with GitHub Copilot
+- **[Workflow Guide](guides/WORKFLOW_GUIDE.md)** - Development workflows and best practices
+- **[Validation Reference](guides/VALIDATION_QUICK_REF.md)** - Quick validation commands
 
-- [**SPRINT_4_RETROSPECTIVE.md**](SPRINT_4_RETROSPECTIVE.md)
-  - Complete sprint analysis
-  - Story-by-story breakdown
-  - Metrics comparison (Sprint 3 vs 4)
-  - Learnings and action items
-  - Sprint 5 recommendations
+### Implementation Guides
+- **[Agentic Phase 1 Plan](guides/AGENTIC_PHASE_1_PLAN.md)** - Multi-agent system implementation
+- **[Implementation Roadmap](guides/IMPLEMENTATION_ROADMAP.md)** - Feature development roadmap
+- **[Quality Improvement Plan](guides/QUALITY_IMPROVEMENT_PLAN.md)** - Quality enhancement strategies
+- **[Git Performance Fix](guides/GIT_PERFORMANCE_FIX_REPORT.md)** - Git workflow optimizations
+- **[Skills Synthesizer](guides/SKILL_SYNTHESIZER_GUIDE.md)** - Agent skills management
 
-- [**SPRINT_4_PLAN.md**](SPRINT_4_PLAN.md)
+## 🏗️ Architecture & Design
+
+### Architecture Decision Records (ADRs)
+- **[ADR-001: Agent Configuration Extraction](architecture/ADR-001-agent-configuration-extraction.md)**
+- **[ADR-002: Agent Registry Pattern](architecture/ADR-002-agent-registry-pattern.md)**
+- **[ADR-003: CrewAI Migration Strategy](architecture/ADR-003-crewai-migration-strategy.md)**
+- **[ADR-002 Refactoring Complete](architecture/ADR-002-REFACTORING-COMPLETE.md)**
+
+### System Architecture
+- **[Flow-Based Orchestration](FLOW_ARCHITECTURE.md)** - Deterministic state-machine design
+- **[CrewAI Context Architecture](CREWAI_CONTEXT_ARCHITECTURE.md)** - Shared context system
+- **[Quality System](DEFINITION_OF_DONE.md)** - Quality gates and validation layers
+
+## 📚 Technical Reference
+
+### API & Integration
+- **[CrewAI API Reference](CREWAI_API_REFERENCE.md)** - Complete API documentation
+- **[Quality Dashboard](QUALITY_DASHBOARD.md)** - Metrics and quality tracking
+- **[Changelog](CHANGELOG.md)** - Complete development history
+
+### Current Development
+- **[Current Sprint](../SPRINT.md)** - Sprint 15 progress and goals
+- **[Project Standards](../CLAUDE.md)** - Python coding standards and requirements
+
+## 📦 Historical Archive
+
+### Sprint Reports
+- **[Sprint Reports](archive/sprints/)** - Complete sprint execution records
+  - Sprint 4, 6, 8, 9, 14, 15 completion reports
+  - Execution summaries and retrospectives
+  - Performance metrics and learnings
+
+### Story Completions
+- **[Story Reports](archive/stories/)** - Individual story implementation details
+  - Story 1-7 complete implementations
+  - Production deployment reports
+  - Validation and acceptance criteria
+
+### System Reports
+- **[CI/CD Reports](archive/ci-reports/)** - Build and deployment history
+  - Coverage analysis and test results
+  - Performance improvements and fixes
+  - Quality gate implementations
+
+- **[Bug Reports](archive/bugs/)** - Issue analysis and resolutions
+  - Security bug summaries
+  - Performance issue fixes
+  - Validation reports
+
+## 🎯 Quick Navigation
+
+### For New Contributors
+1. [Main README](../README.md) → [Contributing](../CONTRIBUTING.md) → [Installation](guides/CONTINUE_SETUP.md)
+2. [Agent Overview](../AGENTS.md) → [Architecture](FLOW_ARCHITECTURE.md) → [API Reference](CREWAI_API_REFERENCE.md)
+
+### For Developers
+1. [Quality System](DEFINITION_OF_DONE.md) → [Workflow Guide](guides/WORKFLOW_GUIDE.md) → [Current Sprint](../SPRINT.md)
+2. [CI/CD Guide](guides/CI_MONITORING_GUIDE.md) → [Deployment](guides/BLOG_DEPLOYMENT.md) → [Validation](guides/VALIDATION_QUICK_REF.md)
+
+### For Architects
+1. [ADR Collection](architecture/) → [Flow Architecture](FLOW_ARCHITECTURE.md) → [Context System](CREWAI_CONTEXT_ARCHITECTURE.md)
+2. [Implementation Roadmap](guides/IMPLEMENTATION_ROADMAP.md) → [Quality Plan](guides/QUALITY_IMPROVEMENT_PLAN.md)
+
+### For Project Managers
+1. [Current Sprint](../SPRINT.md) → [Sprint Archive](archive/sprints/) → [Story Archive](archive/stories/)
+2. [Quality Dashboard](QUALITY_DASHBOARD.md) → [CI Reports](archive/ci-reports/) → [Performance History](archive/)
+
+---
+
+**💡 Can't find what you're looking for?**
+- Check the [main README](../README.md) for project overview
+- Browse [architecture decisions](architecture/) for design rationale
+- Review [archive folders](archive/) for historical context
+- See [guides](guides/) for step-by-step instructions
   - Original sprint planning
   - Story definitions and acceptance criteria
   - Risk assessment

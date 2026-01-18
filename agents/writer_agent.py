@@ -196,8 +196,13 @@ YOUR RESEARCH BRIEF:
 
 Write the article now. Return complete Markdown with YAML frontmatter.
 
-⚠️  FINAL REMINDER: MINIMUM 800 WORDS REQUIRED ⚠️
-Target 1000-1200 words. Articles under 800 words will be REJECTED by validation.
+🚨 CRITICAL REQUIREMENTS - FAILURE WILL REJECT ARTICLE 🚨
+1. MUST start with YAML frontmatter (--- opening delimiter)
+2. MUST be minimum 800 words (target 1000-1200)
+3. MUST include "## References" section before closing
+4. MUST use today's date: {current_date} in YAML
+
+⚠️  VALIDATION WILL REJECT: Missing YAML, <800 words, No References ⚠️
 
 ⚠️  CRITICAL FORMAT REQUIREMENTS (YAML FRONT MATTER):
 
@@ -324,6 +329,14 @@ All articles MUST include a "## References" section before the closing paragraph
 
 ⚠️  REMINDER: Run the 12-point validation checklist above BEFORE outputting.
 Green software = first-time-right quality = zero regeneration waste.
+
+🚨 BEFORE SUBMITTING YOUR RESPONSE: VERIFY 🚨
+✅ Article starts with "---" (YAML frontmatter)
+✅ Article is 800+ words minimum
+✅ Article ends with "## References" section
+✅ YAML date field shows: {current_date}
+
+FAILURE TO INCLUDE THESE = ARTICLE REJECTION
 
 Now write the article:"""
 

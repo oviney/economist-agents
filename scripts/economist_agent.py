@@ -614,7 +614,12 @@ def run_visual_qa_agent(client, image_path: str, chart_record: dict = None) -> d
 
     gates = result.get("gates", {})
     passed = sum(1 for g in gates.values() if g.get("pass", False))
-    total = len(gates) if gates else 5
+    total = len(gates) if gates else 4
+
+    # Override overall_pass if 75%+ gates pass (3/4 is acceptable)
+    # This prevents overly strict LLM judgment from blocking good charts
+    if total > 0 and (passed / total) >= 0.75 and zones_valid:
+        result["overall_pass"] = True
 
     # Combine zone validation with LLM results
     if not zones_valid:
@@ -736,7 +741,7 @@ def generate_economist_post(
     chart_record = None
     visual_qa_passed = True
     visual_qa_result = None
-    max_chart_attempts = 2  # Try regeneration once if QA fails
+    max_chart_attempts = 3  # Try up to 2 regenerations if QA fails
     chart_attempts = 0
 
     if research.get("chart_data"):

@@ -272,8 +272,21 @@ class PublicationValidator:
 
     def _check_weak_endings(self, content: str):
         """Check for weak/hedging endings that violate Economist style"""
-        # Extract last 500 characters (roughly last 2 paragraphs)
-        ending = content[-500:] if len(content) > 500 else content
+        # Exclude References section - it contains link titles we shouldn't check
+        refs_patterns = [
+            r"\n## References\b",
+            r"\n## Sources\b",
+            r"\n## Bibliography\b",
+        ]
+        article_body = content
+        for pattern in refs_patterns:
+            match = re.search(pattern, content, re.IGNORECASE)
+            if match:
+                article_body = content[: match.start()]
+                break
+
+        # Extract last 500 characters of article body (roughly last 2 paragraphs)
+        ending = article_body[-500:] if len(article_body) > 500 else article_body
 
         BANNED_ENDINGS = [
             (r"\bIn conclusion\b", "Summative closing"),

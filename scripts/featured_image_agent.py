@@ -31,6 +31,12 @@ from typing import Literal
 ECONOMIST_IMAGE_STYLE = """
 VISUAL STYLE: Editorial illustration for The Economist magazine
 
+CRITICAL - NO TEXT:
+- ABSOLUTELY NO TEXT, WORDS, LETTERS, NUMBERS, OR SYMBOLS ANYWHERE IN THE IMAGE
+- No labels, captions, signs, or written content of any kind
+- No text on objects, buildings, or backgrounds
+- If you feel tempted to add text, DO NOT - leave that area blank instead
+
 REQUIREMENTS:
 - Minimalist and conceptual (symbolic, not literal)
 - Limited color palette:
@@ -39,7 +45,6 @@ REQUIREMENTS:
   - Warm beige (#f1f0e9) for backgrounds
   - Use negative space effectively
 - Professional, businesslike tone
-- No text, labels, or words in the image
 - Avoid technology clichés:
   - NO lightbulbs (for ideas)
   - NO upward arrows (for growth)
@@ -94,15 +99,23 @@ def create_image_prompt(
         prompt += f"CONTRARIAN ANGLE: {contrarian_angle}\n\n"
 
     prompt += """
-TASK: Create an editorial illustration that captures the essence of this article.
-The image should be conceptual and metaphorical, not literal.
-Think about what visual metaphor best represents the tension or paradox in the topic.
+TASK: Create an editorial illustration that clearly communicates the article's main theme.
 
-Remember:
-- No text or labels
-- Economist color palette only
-- Avoid obvious tech clichés
-- Favor clever, subtle symbolism over literal representation
+First, identify the CORE CONCEPT of the article (e.g., failure, transformation, cost, risk).
+Then choose a SPECIFIC VISUAL METAPHOR that unmistakably represents that concept:
+- For "failure" or "falling short": crumbling structures, sinking ships, broken bridges
+- For "transformation": metamorphosis imagery, before/after contrasts, chrysalis
+- For "cost" or "waste": money flowing away, resources depleting, empty containers
+- For "disconnect": separated elements, gaps, misaligned parts
+- For "risk": tightrope, balancing acts, precarious positions
+
+The viewer should be able to guess the article's theme just from the image.
+
+CRITICAL REMINDERS:
+- ZERO TEXT in the image - no words, letters, numbers, or symbols
+- The image must visually communicate the article's subject matter
+- Avoid generic abstract shapes that could represent anything
+- Choose a specific, recognizable visual metaphor
 """
 
     return prompt

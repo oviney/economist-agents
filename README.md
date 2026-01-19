@@ -31,12 +31,12 @@ A sophisticated multi-agent system (6 AI personas collaborate) that produces pub
 - **Quality Gates:** 4-layer validation (automated checkpoints enforce standards)
 
 **Known Issues (Sprint 15 P0):**
-- ⚠️ Test suite has 5 collection errors blocking 447 tests
-- ⚠️ Python 3.14 compatibility issues (requires 3.13 downgrade)
-⚠️ **CRITICAL**: CrewAI requires Python 3.13 or lower. Python 3.14+ causes collection errors.
+- ✅ **RESOLVED**: Test suite collection errors - Fixed by ensuring Python 3.13.11 environment
+- ✅ **RESOLVED**: Python 3.14 compatibility - Default .venv now uses Python 3.13.11
+- ✅ **RESOLVED**: CrewAI dependency issues - All 538 tests now collect successfully
 
-**Current Issue**: Some environments running Python 3.14.2 - causing 5 test collection errors.
-Downgrade to 3.13 to resolve: `pyenv install 3.13.11 && pyenv local 3.13.11`
+**Test Suite Status**: ✅ 537 passed, 1 skipped (538 total collected)
+**Environment**: Python 3.13.11 with CrewAI 1.7.2 compatibility confirmed
 
 ## 🛠️ Installation
 

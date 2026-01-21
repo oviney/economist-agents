@@ -17,3 +17,5 @@ pyyaml>=6.0              # YAML parsing for config
 orjson>=3.9.0
 redis>=4.0.0             # Optional Redis cache backend (Story #145)
 requests>=2.31.0         # HTTP requests for image generation
+arxiv>=2.1.0             # arXiv API for cutting-edge research papers
+feedparser>=6.0.0        # RSS feed parsing for additional research sources

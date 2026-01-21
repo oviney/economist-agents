@@ -121,6 +121,10 @@ Each agent definition includes:
 
 ### Stage 3 Crew (Content Generation)
 - **Research Agent**: Market analysis and content research
+  - ✨ **NEW**: Fresh Academic Sources via arXiv API integration
+  - 🔬 Access to cutting-edge 2026 research papers (vs stale 2023-2024 training data)
+  - 📊 Real-time competitive intelligence from pre-publication academic research
+  - 🎯 Business Value: Eliminates "dated sources" limitation, provides fresh insights
 - **Writer Agent**: Article writing in Economist style
 - **Graphics Agent**: Chart and visualization creation
 - **Status**: ✅ Operational (100% test pass rate)

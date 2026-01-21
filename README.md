@@ -63,6 +63,8 @@ CrewAI requires Python 3.13 or lower. Python 3.14+ is not currently supported.
    pip install -r requirements-dev.txt
    ```
 
+   **Note**: Includes arXiv integration for fresh academic research sources
+
 4. **Configure environment:**
    ```bash
    cp .env.example .env
@@ -86,6 +88,8 @@ CrewAI requires Python 3.13 or lower. Python 3.14+ is not currently supported.
 **Stage 3 Crew** (`src/crews/stage3_crew.py`) - Content Generation
 - **Purpose**: Research, writing, and chart creation pipeline
 - **Agents**: Research Agent → Writer Agent → Graphics Agent
+- **🆕 Fresh Research**: arXiv API integration provides cutting-edge 2026 academic sources
+- **🎯 Business Value**: Eliminates "dated sources" limitation with real-time research access
 - **Output**: YAML with article content and chart data
 - **Status**: ✅ Operational (100% test pass rate)
 - **Integration**: Via Flow-based orchestration (see Flow Architecture below)

@@ -31,3 +31,6 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Local databases (cached by GitHub Actions)
+.chromadb/

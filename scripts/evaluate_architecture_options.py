@@ -21,7 +21,7 @@ try:
 except ImportError:
     import json
 
-from llm_client import create_llm_client, call_llm
+from llm_client import call_llm, create_llm_client
 
 logger = logging.getLogger(__name__)
 

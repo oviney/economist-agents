@@ -17,12 +17,14 @@ try:
 except ImportError:
     import json
 
-from llm_client import create_llm_client, call_llm
+from llm_client import call_llm, create_llm_client
 
 logger = logging.getLogger(__name__)
 
 # Load the research brief as context
-RESEARCH_BRIEF_PATH = Path(__file__).parent.parent / "docs/research/FRESH_DATA_OPTIONS_BRIEF.md"
+RESEARCH_BRIEF_PATH = (
+    Path(__file__).parent.parent / "docs/research/FRESH_DATA_OPTIONS_BRIEF.md"
+)
 
 ANALYST_PROMPT = """You are a Senior Solutions Architect evaluating technology options for an AI agent system.
 

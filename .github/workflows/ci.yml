@@ -75,6 +75,15 @@ jobs:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt', 'requirements-dev.txt') }}
 
+      # Cache ChromaDB for tests that use Style Memory RAG
+      - name: Cache ChromaDB Vector Store
+        uses: actions/cache@v4
+        with:
+          path: .chromadb
+          key: chromadb-v1-${{ hashFiles('archived/**/*.md', 'src/tools/style_memory_tool.py') }}
+          restore-keys: |
+            chromadb-v1-
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip

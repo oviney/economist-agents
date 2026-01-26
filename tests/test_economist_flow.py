@@ -29,6 +29,10 @@ import pytest
 from src.economist_agents.flow import EconomistContentFlow
 
 
+@pytest.mark.skipif(
+    not os.environ.get("OPENAI_API_KEY"),
+    reason="OPENAI_API_KEY required for CrewAI agent initialization",
+)
 class TestEconomistFlow:
     """Integration tests for EconomistContentFlow"""
 

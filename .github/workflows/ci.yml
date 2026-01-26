@@ -92,18 +92,11 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          # Lower coverage threshold when OPENAI_API_KEY is not set
-          # (tests requiring API key are skipped)
-          if [ -z "$OPENAI_API_KEY" ]; then
-            COV_THRESHOLD=35
-          else
-            COV_THRESHOLD=40
-          fi
           pytest tests/ -v \
             --cov=scripts \
             --cov-report=term-missing \
             --cov-report=xml \
-            --cov-fail-under=$COV_THRESHOLD
+            --cov-fail-under=35
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 

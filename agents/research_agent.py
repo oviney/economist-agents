@@ -27,6 +27,7 @@ from llm_client import call_llm  # type: ignore  # noqa: E402
 # Import arXiv integration (optional dependency)
 try:
     from arxiv_search import search_arxiv_for_topic  # type: ignore  # noqa: E402
+
     ARXIV_AVAILABLE = True
 except ImportError:
     ARXIV_AVAILABLE = False
@@ -189,7 +190,12 @@ class ResearchAgent:
 
         return research_data
 
-    def _build_user_prompt(self, topic: str, talking_points: str, arxiv_insights: dict[str, Any] | None = None) -> str:
+    def _build_user_prompt(
+        self,
+        topic: str,
+        talking_points: str,
+        arxiv_insights: dict[str, Any] | None = None,
+    ) -> str:
         """Build user prompt for LLM call with optional arXiv context."""
         base_prompt = f"""Research this topic for an Economist-style article:
 
@@ -203,7 +209,7 @@ Find specific, VERIFIABLE data with exact sources. Flag anything you cannot veri
             recent_context = f"""
 
 CUTTING-EDGE RESEARCH CONTEXT:
-{insights.get('source_freshness', 'Recent academic sources available')}
+{insights.get("source_freshness", "Recent academic sources available")}
 
 Fresh Academic Insights:
 """
@@ -213,9 +219,11 @@ Fresh Academic Insights:
             if insights.get("recent_findings"):
                 recent_context += "\nThis Week's Findings:\n"
                 for finding in insights["recent_findings"][:2]:
-                    recent_context += f"• {finding['finding']} ({finding['days_old']} days ago)\n"
+                    recent_context += (
+                        f"• {finding['finding']} ({finding['days_old']} days ago)\n"
+                    )
 
-            recent_context += f"""
+            recent_context += """
 Academic Citations:
 """
             for citation in insights.get("citations", [])[:3]:
@@ -285,7 +293,12 @@ Academic Citations:
 
         return research_data
 
-    def _log_metrics(self, research_data: dict[str, Any], topic: str, arxiv_insights: dict[str, Any] | None = None) -> None:
+    def _log_metrics(
+        self,
+        research_data: dict[str, Any],
+        topic: str,
+        arxiv_insights: dict[str, Any] | None = None,
+    ) -> None:
         """Log research metrics to console."""
         verified = sum(
             1

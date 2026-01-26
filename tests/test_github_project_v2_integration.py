@@ -549,7 +549,7 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
         print(f"   Total Tests: {total_tests}")
         print(f"   ✅ Passed: {passed}")
         print(f"   ❌ Failed: {failed}")
-        print(f"   Success Rate: {(passed/total_tests)*100:.1f}%")
+        print(f"   Success Rate: {(passed / total_tests) * 100:.1f}%")
 
         print("\n📋 DETAILED RESULTS:")
         for i, test in enumerate(cls.test_results["tests"], 1):

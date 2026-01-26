@@ -102,6 +102,16 @@ jobs:
         with:
           python-version: '3.13'
 
+      # Cache ChromaDB vector store to persist Style Memory RAG across runs
+      # Key includes hash of archived articles (source data for embeddings)
+      - name: Cache ChromaDB Vector Store
+        uses: actions/cache@v4
+        with:
+          path: .chromadb
+          key: chromadb-v1-${{ hashFiles('archived/**/*.md', 'src/tools/style_memory_tool.py') }}
+          restore-keys: |
+            chromadb-v1-
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip

@@ -7,6 +7,7 @@ in the production pipeline.
 Tests API compatibility between Sprint 14 components.
 """
 
+import os
 import time
 from unittest.mock import MagicMock, patch
 
@@ -20,6 +21,10 @@ from src.tools.style_memory_tool import StyleMemoryTool
 class TestFlowOrchestration:
     """Test Flow-based orchestration patterns"""
 
+    @pytest.mark.skipif(
+        not os.environ.get("OPENAI_API_KEY"),
+        reason="OPENAI_API_KEY required for CrewAI agent initialization",
+    )
     def test_flow_initialization(self):
         """Test EconomistContentFlow initializes correctly"""
         flow = EconomistContentFlow()
@@ -29,6 +34,10 @@ class TestFlowOrchestration:
         assert hasattr(flow, "generate_content")
         assert hasattr(flow, "quality_gate")
 
+    @pytest.mark.skipif(
+        not os.environ.get("OPENAI_API_KEY"),
+        reason="OPENAI_API_KEY required for CrewAI agent initialization",
+    )
     def test_flow_topic_discovery(self):
         """Test Flow can discover topics via Stage 1"""
         # Stage1Crew not yet integrated - test stub implementation
@@ -48,6 +57,10 @@ class TestFlowOrchestration:
         """Placeholder for Stage 2 tests when implemented"""
         pass
 
+    @pytest.mark.skipif(
+        not os.environ.get("OPENAI_API_KEY"),
+        reason="OPENAI_API_KEY required for CrewAI agent initialization",
+    )
     @patch("src.economist_agents.flow.Stage3Crew")
     def test_flow_content_generation(self, mock_stage3):
         """Test Flow can generate content via Stage 3"""
@@ -241,6 +254,10 @@ class TestROIIntegration:
 class TestEndToEndIntegration:
     """Test complete end-to-end pipeline with all components"""
 
+    @pytest.mark.skipif(
+        not os.environ.get("OPENAI_API_KEY"),
+        reason="OPENAI_API_KEY required for CrewAI agent initialization",
+    )
     @patch("src.economist_agents.flow.Stage3Crew")
     @patch("src.economist_agents.flow.Stage4Crew")
     @patch("src.tools.style_memory_tool.StyleMemoryTool")
@@ -314,6 +331,10 @@ class TestEndToEndIntegration:
         assert roi_result["total_cost_usd"] > 0
         assert roi_result["roi_multiplier"] > 100
 
+    @pytest.mark.skipif(
+        not os.environ.get("OPENAI_API_KEY"),
+        reason="OPENAI_API_KEY required for CrewAI agent initialization",
+    )
     def test_concurrent_operations(self):
         """Test Flow, RAG, and ROI work concurrently"""
         economist_flow = EconomistContentFlow()
@@ -390,6 +411,10 @@ class TestPerformanceValidation:
         assert overhead_ms < 10, f"ROI overhead {overhead_ms}ms exceeds 10ms target"
         print(f"   ROI overhead: {overhead_ms:.1f}ms (target <10ms)")
 
+    @pytest.mark.skipif(
+        not os.environ.get("OPENAI_API_KEY"),
+        reason="OPENAI_API_KEY required for CrewAI agent initialization",
+    )
     def test_flow_initialization_speed(self):
         """Test Flow initialization is fast (<1s)"""
         start = time.time()

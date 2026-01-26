@@ -34,6 +34,23 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 logger = logging.getLogger(__name__)
 
 
+def is_gh_cli_available() -> bool:
+    """Check if GitHub CLI is installed and authenticated."""
+    try:
+        result = subprocess.run(
+            ["gh", "auth", "status"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        return result.returncode == 0
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        return False
+
+
+GH_CLI_AVAILABLE = is_gh_cli_available()
+
+
 class GitHubProjectV2IntegrationTests(unittest.TestCase):
     """Comprehensive GitHub Project V2 Integration Test Suite
 
@@ -90,6 +107,9 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
             self.log_test_result("GitHub Project Tool Import", "FAIL", str(e))
             self.fail(f"Failed to import github_project_add_issue: {e}")
 
+    @unittest.skipUnless(
+        GH_CLI_AVAILABLE, "GitHub CLI not available or not authenticated"
+    )
     def test_02_github_cli_availability(self):
         """Test 2: Verify GitHub CLI is installed and authenticated"""
         try:
@@ -112,6 +132,9 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
             self.log_test_result("GitHub CLI Availability", "FAIL", str(e))
             self.fail(f"GitHub CLI not available: {e}")
 
+    @unittest.skipUnless(
+        GH_CLI_AVAILABLE, "GitHub CLI not available or not authenticated"
+    )
     def test_03_project_boards_exist(self):
         """Test 3: Verify target Project V2 boards exist and are accessible"""
         try:
@@ -137,6 +160,9 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
             self.log_test_result("Project Boards Exist", "FAIL", str(e))
             self.fail(f"Failed to verify project boards: {e}")
 
+    @unittest.skipUnless(
+        GH_CLI_AVAILABLE, "GitHub CLI not available or not authenticated"
+    )
     def test_04_sprint_16_issues_exist(self):
         """Test 4: Verify Sprint 16 issues (#95, #96, #97) exist for testing"""
         try:
@@ -327,6 +353,9 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
             self.log_test_result("Real Project Board Operation", "FAIL", str(e))
             self.fail(f"Live project board operation failed: {e}")
 
+    @unittest.skipUnless(
+        GH_CLI_AVAILABLE, "GitHub CLI not available or not authenticated"
+    )
     def test_10_batch_project_operations(self):
         """Test 10: Validate batch operations for multiple Sprint 16 issues"""
         from scripts.tools.github_project_tool import github_project_add_issue

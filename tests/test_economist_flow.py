@@ -15,6 +15,7 @@ Usage:
     pytest tests/test_economist_flow.py -v
 """
 
+import os
 import sys
 from pathlib import Path
 
@@ -263,6 +264,10 @@ class TestEconomistFlow:
         print("✅ Test 8: request_revision() returns revision metadata")
 
 
+@pytest.mark.skipif(
+    not os.environ.get("OPENAI_API_KEY"),
+    reason="OPENAI_API_KEY required for CrewAI agent initialization",
+)
 def test_flow_decorators_registered():
     """
     Test 9: Verify Flow decorators are properly registered

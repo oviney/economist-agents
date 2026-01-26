@@ -213,7 +213,10 @@ class TestRunResearchAgent:
         with (
             patch("agents.research_agent.call_llm") as mock_call_llm,
             patch("agents.research_agent.review_agent_output") as mock_review,
-            patch.object(ea.ResearchAgent, "_gather_arxiv_research", return_value=None),
+            patch(
+                "agents.research_agent.ResearchAgent._gather_arxiv_research",
+                return_value=None,
+            ),
         ):
             # Return the properly structured mock response
             mock_call_llm.return_value = json.dumps(sample_research_output)
@@ -303,7 +306,10 @@ class TestRunResearchAgent:
         with (
             patch("agents.research_agent.call_llm") as mock_call_llm,
             patch("agents.research_agent.review_agent_output") as mock_review,
-            patch.object(ea.ResearchAgent, "_gather_arxiv_research", return_value=None),
+            patch(
+                "agents.research_agent.ResearchAgent._gather_arxiv_research",
+                return_value=None,
+            ),
         ):
             mock_call_llm.return_value = json.dumps(sample_research_output)
             mock_review.return_value = (

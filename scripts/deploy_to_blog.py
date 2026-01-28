@@ -18,7 +18,8 @@ from pathlib import Path
 
 def run_command(cmd, cwd=None):
     """Run shell command and return output"""
-    result = subprocess.run(cmd, shell=True, capture_output=True, text=True, cwd=cwd)
+    # nosec B602 - shell=True is intentional for git commands with quoted arguments
+    result = subprocess.run(cmd, shell=True, capture_output=True, text=True, cwd=cwd)  # nosec B602
     if result.returncode != 0:
         print(f"❌ Command failed: {cmd}")
         print(f"Error: {result.stderr}")

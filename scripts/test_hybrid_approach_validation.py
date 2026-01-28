@@ -158,7 +158,7 @@ class HybridApproachValidation:
             },
             "overall_efficiency": {
                 "current_sprint_effort": "100% human (coordination + execution)",
-                "hybrid_approach_effort": f"{human_coordination_percentage:.0f}% human coordination + {100-avg_story_automation:.0f}% human execution",
+                "hybrid_approach_effort": f"{human_coordination_percentage:.0f}% human coordination + {100 - avg_story_automation:.0f}% human execution",
                 "time_savings": f"{(avg_story_automation * 0.7):.0f}% reduction in execution time",
                 "value_concentration": "Human focuses on high-value strategic work",
             },
@@ -322,7 +322,7 @@ class HybridApproachValidation:
     def run_hybrid_validation(self) -> dict[str, Any]:
         """Run complete hybrid approach validation."""
         print("\n🤝 VALIDATING HYBRID APPROACH: HUMAN COORDINATION + AGENT EXECUTION")
-        print(f"{'='*85}")
+        print(f"{'=' * 85}")
 
         # Assess value proposition
         value_prop = self.assess_hybrid_value_proposition()

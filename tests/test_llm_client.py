@@ -3,6 +3,7 @@
 Target: 80%+ coverage for OpenAI-only functionality
 """
 
+import contextlib
 import os
 import sys
 from pathlib import Path
@@ -130,9 +131,11 @@ class TestErrorHandling:
                 raise ImportError("No module named 'openai'")
             return __builtins__["__import__"](name, *args, **kwargs)
 
-        with patch("builtins.__import__", side_effect=mock_import):
-            with pytest.raises(ImportError, match="openai package not installed"):
-                create_llm_client()
+        with (
+            patch("builtins.__import__", side_effect=mock_import),
+            pytest.raises(ImportError, match="openai package not installed"),
+        ):
+            create_llm_client()
 
     def test_rate_limit_retry_logic(self, clean_env, capsys):
         """Test rate limiting retry logic."""
@@ -155,11 +158,13 @@ class TestErrorHandling:
 
         mock_module.OpenAI = mock_openai_constructor
 
-        with patch("builtins.__import__", return_value=mock_module):
-            with patch("time.sleep"):  # Speed up test
-                client = create_llm_client(max_retries=3, base_delay=1)
-                assert isinstance(client, LLMClient)
-                assert client.client == mock_client
+        with (
+            patch("builtins.__import__", return_value=mock_module),
+            patch("time.sleep"),  # Speed up test
+        ):
+            client = create_llm_client(max_retries=3, base_delay=1)
+            assert isinstance(client, LLMClient)
+            assert client.client == mock_client
 
         captured = capsys.readouterr()
         assert "Rate limited. Retrying" in captured.out
@@ -264,50 +269,11 @@ def test_main_execution_success(clean_env, mock_openai_client, capsys):
         import llm_client
 
         # Simulate running as main
-        with patch("llm_client.__name__", "__main__"):
+        with (
+            patch("llm_client.__name__", "__main__"),
+            contextlib.suppress(SystemExit),
+        ):
             # This would normally be executed when script is run directly
-            try:
-                exec(
-                    """
-if __name__ == "__main__":
-    print("Testing LLM Client Factory\\n")
-    try:
-        client = create_llm_client()
-        print(f"✅ Created: {client}")
-        response = call_llm(
-            client,
-            "You are a helpful assistant.",
-            "Say 'Hello, I am working!' and nothing else.",
-            max_tokens=50,
-        )
-        print(f"\\n✅ Test Response: {response}")
-    except Exception as e:
-        print(f"❌ Error: {e}")
-""",
-                    {
-                        "create_llm_client": llm_client.create_llm_client,
-                        "call_llm": llm_client.call_llm,
-                        "__name__": "__main__",
-                    },
-                )
-            except SystemExit:
-                pass
-
-    captured = capsys.readouterr()
-    assert "Testing LLM Client Factory" in captured.out
-    assert "✅ Created: LLMClient(provider=openai, model=gpt-4o)" in captured.out
-    assert "✅ Test Response: Test response from GPT" in captured.out
-
-
-def test_main_execution_failure(clean_env, capsys):
-    """Test the main execution block when API key is missing."""
-    # No API key set, should fail
-
-    # Import the module
-    import llm_client
-
-    with patch("llm_client.__name__", "__main__"):
-        try:
             exec(
                 """
 if __name__ == "__main__":
@@ -331,8 +297,47 @@ if __name__ == "__main__":
                     "__name__": "__main__",
                 },
             )
-        except SystemExit:
-            pass
+
+    captured = capsys.readouterr()
+    assert "Testing LLM Client Factory" in captured.out
+    assert "✅ Created: LLMClient(provider=openai, model=gpt-4o)" in captured.out
+    assert "✅ Test Response: Test response from GPT" in captured.out
+
+
+def test_main_execution_failure(clean_env, capsys):
+    """Test the main execution block when API key is missing."""
+    # No API key set, should fail
+
+    # Import the module
+    import llm_client
+
+    with (
+        patch("llm_client.__name__", "__main__"),
+        contextlib.suppress(SystemExit),
+    ):
+        exec(
+            """
+if __name__ == "__main__":
+    print("Testing LLM Client Factory\\n")
+    try:
+        client = create_llm_client()
+        print(f"✅ Created: {client}")
+        response = call_llm(
+            client,
+            "You are a helpful assistant.",
+            "Say 'Hello, I am working!' and nothing else.",
+            max_tokens=50,
+        )
+        print(f"\\n✅ Test Response: {response}")
+    except Exception as e:
+        print(f"❌ Error: {e}")
+""",
+            {
+                "create_llm_client": llm_client.create_llm_client,
+                "call_llm": llm_client.call_llm,
+                "__name__": "__main__",
+            },
+        )
 
     captured = capsys.readouterr()
     assert "Testing LLM Client Factory" in captured.out

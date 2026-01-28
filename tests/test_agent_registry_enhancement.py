@@ -196,9 +196,9 @@ class TestAgentRegistryPerformance:
         avg_time_per_agent = elapsed_time / 3
 
         # Should be less than 50ms per agent
-        assert (
-            avg_time_per_agent < 0.05
-        ), f"Agent loading too slow: {avg_time_per_agent:.3f}s per agent"
+        assert avg_time_per_agent < 0.05, (
+            f"Agent loading too slow: {avg_time_per_agent:.3f}s per agent"
+        )
 
 
 class TestAgentRegistryTesting:

@@ -90,7 +90,7 @@ def close_sprint(sprint_number: int) -> dict[str, Any]:
 
         # Execute sprint finalization
         print(f"\n🏁 CLOSING SPRINT {sprint_number}")
-        print(f"{'='*70}")
+        print(f"{'=' * 70}")
 
         finalization_result = orchestrator._finalize_sprint_metrics(
             sprint_number, sprint_data, story_results
@@ -401,6 +401,6 @@ def main():
 if __name__ == "__main__":
     print("\n🚀 CrewAI Development Sprint Execution")
     print(f"Story: {STORY_CONTEXT}")
-    print(f"{'='*70}")
+    print(f"{'=' * 70}")
 
     main()

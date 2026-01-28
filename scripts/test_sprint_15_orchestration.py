@@ -196,10 +196,10 @@ class Sprint15OrchestrationTest:
         # Analyze complexity factors
         complexity_analysis = {
             "story_type_diversity": len(
-                set(s["crew_type"] for s in sprint_data["stories"])
+                {s["crew_type"] for s in sprint_data["stories"]}
             ),
-            "priority_mix": len(set(s["priority"] for s in sprint_data["stories"])),
-            "status_mix": len(set(s["status"] for s in sprint_data["stories"])),
+            "priority_mix": len({s["priority"] for s in sprint_data["stories"]}),
+            "status_mix": len({s["status"] for s in sprint_data["stories"]}),
             "parallel_execution_potential": len(
                 [s for s in sprint_data["stories"] if s["status"] != "COMPLETE"]
             ),
@@ -280,7 +280,7 @@ class Sprint15OrchestrationTest:
         coordination_challenges = []
 
         # Challenge 1: Status management complexity
-        statuses = set(s["status"] for s in sprint_data["stories"])
+        statuses = {s["status"] for s in sprint_data["stories"]}
         if len(statuses) > 1:
             coordination_challenges.append(
                 {
@@ -472,7 +472,7 @@ class Sprint15OrchestrationTest:
 
         # Calculate overall automation potential
         automation_scores = []
-        for work_type, details in human_coordination_work.items():
+        for _work_type, details in human_coordination_work.items():
             potential = details["automation_potential"]
             if "High" in potential:
                 automation_scores.append(85)
@@ -507,7 +507,7 @@ class Sprint15OrchestrationTest:
     def run_sprint_15_validation(self) -> dict[str, Any]:
         """Run complete Sprint 15 orchestration validation."""
         print("\n🚀 TESTING SPRINT ORCHESTRATOR WITH REAL SPRINT 15")
-        print(f"{'='*80}")
+        print(f"{'=' * 80}")
 
         # Parse real Sprint 15 data
         sprint_data = self.parse_real_sprint_15()

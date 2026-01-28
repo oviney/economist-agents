@@ -420,8 +420,8 @@ class SprintOrchestratorCrew:
                 **SPRINT FINALIZATION**: Generate final metrics and close Sprint {sprint_number} infrastructure.
 
                 **Sprint Number**: {sprint_number}
-                **Total Stories**: {sprint_data['total_stories']}
-                **Total Points**: {sprint_data['total_points']}
+                **Total Stories**: {sprint_data["total_stories"]}
+                **Total Points**: {sprint_data["total_points"]}
 
                 **Your Tasks**:
                 1. **Generate Sprint Metrics**:
@@ -554,8 +554,8 @@ class SprintOrchestratorCrew:
                 description=f"""
                 **CI/CD PIPELINE VALIDATION**: Validate build health and infrastructure after story completion.
 
-                **Story**: {story.get('story_title', 'No title provided')}
-                **Story Number**: {story.get('story_number', 'N')}
+                **Story**: {story.get("story_title", "No title provided")}
+                **Story Number**: {story.get("story_number", "N")}
 
                 **Context**: Story has been implemented, reviewed, and committed to git. Validate that CI/CD pipeline is healthy.
 
@@ -711,9 +711,9 @@ class SprintOrchestratorCrew:
         Returns:
             Sprint execution results with metrics
         """
-        print(f"\n{'='*70}")
+        print(f"\n{'=' * 70}")
         print(f"EXECUTING SPRINT {sprint_number} WITH CREWAI DEVELOPMENT TEAMS")
-        print(f"{'='*70}")
+        print(f"{'=' * 70}")
 
         try:
             # 0. Validate Previous Sprint Closure

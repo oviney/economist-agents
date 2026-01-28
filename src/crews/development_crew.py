@@ -96,10 +96,10 @@ class DevelopmentCrew:
             description=f"""
             **TDD RED PHASE**: Write failing tests for story implementation.
 
-            **Story**: {story_data.get('story_title', 'No title provided')}
+            **Story**: {story_data.get("story_title", "No title provided")}
 
             **Acceptance Criteria**:
-            {chr(10).join(f'- {ac}' for ac in story_data.get('acceptance_criteria', []))}
+            {chr(10).join(f"- {ac}" for ac in story_data.get("acceptance_criteria", []))}
 
             **Your Task**:
             1. Analyze the acceptance criteria and break down into testable scenarios
@@ -124,7 +124,7 @@ class DevelopmentCrew:
             description=f"""
             **TDD GREEN PHASE**: Implement minimum code to make tests pass.
 
-            **Story**: {story_data.get('story_title', 'No title provided')}
+            **Story**: {story_data.get("story_title", "No title provided")}
 
             **Context**: You have failing tests that define the requirements. Your job is to implement the MINIMUM code needed to make those tests pass.
 
@@ -156,7 +156,7 @@ class DevelopmentCrew:
             description=f"""
             **SENIOR DEVELOPER REVIEW**: Comprehensive code review with architecture focus.
 
-            **Story**: {story_data.get('story_title', 'No title provided')}
+            **Story**: {story_data.get("story_title", "No title provided")}
 
             **Context**: Implementation is complete and tests are passing. Conduct a thorough senior developer review.
 
@@ -189,7 +189,7 @@ class DevelopmentCrew:
             description=f"""
             **TDD REFACTOR PHASE**: Improve code quality while keeping tests green.
 
-            **Story**: {story_data.get('story_title', 'No title provided')}
+            **Story**: {story_data.get("story_title", "No title provided")}
 
             **Context**: Code review feedback has been provided. Address any issues and improve code quality while maintaining all passing tests.
 
@@ -229,7 +229,7 @@ class DevelopmentCrew:
             description=f"""
             **GIT OPERATIONS PHASE**: Commit and push completed story to repository.
 
-            **Story**: {story_data.get('story_title', 'No title provided')}
+            **Story**: {story_data.get("story_title", "No title provided")}
 
             **Context**: Code has been implemented, reviewed, and refactored. All tests are passing and quality standards are met. Time to commit the changes.
 
@@ -238,13 +238,13 @@ class DevelopmentCrew:
             2. Stage all relevant files for commit (exclude any temp/generated files)
             3. Create commit message following the exact template:
                ```
-               Story {story_data.get('story_number', 'N')}: {story_data.get('story_title', 'Story Title')}
+               Story {story_data.get("story_number", "N")}: {story_data.get("story_title", "Story Title")}
 
                - Implemented story requirements with TDD approach
                - All tests passing and code review approved
                - Quality standards met and refactoring complete
 
-               Progress: Story {story_data.get('story_number', 'N')} Complete
+               Progress: Story {story_data.get("story_number", "N")} Complete
                ```
             4. Execute the Double Commit Protocol:
                - Initial commit attempt

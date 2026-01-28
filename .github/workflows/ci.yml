@@ -128,6 +128,7 @@ jobs:
       - name: Run security scan
         run: |
           bandit -r scripts/ \
+            --exclude '*/.venv/*,*/__pycache__/*' \
             -f json \
             -o bandit-report.json \
             --severity-level medium

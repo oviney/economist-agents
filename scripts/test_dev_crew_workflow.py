@@ -270,7 +270,7 @@ def can_start_sprint_with_state(self, sprint_number: int, ceremony_state: dict) 
         """Execute the complete TDD workflow for the test story."""
         print("\n🚀 TESTING DEVELOPMENT CREW WORKFLOW")
         print(f"Story: {self.test_story['story_title']}")
-        print(f"{'='*80}")
+        print(f"{'=' * 80}")
 
         # Execute each phase
         red_result = self.simulate_tdd_red_phase()

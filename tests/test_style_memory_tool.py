@@ -150,9 +150,9 @@ shows, productivity gains plateaued after 2020. Concrete data, clear attribution
                 tool.query("test query", n_results=3)
                 latency_ms = (time.time() - start) * 1000
 
-                assert (
-                    latency_ms < 500
-                ), f"Query took {latency_ms:.1f}ms (exceeds 500ms requirement)"
+                assert latency_ms < 500, (
+                    f"Query took {latency_ms:.1f}ms (exceeds 500ms requirement)"
+                )
             else:
                 pytest.skip("No articles indexed")
 
@@ -179,9 +179,9 @@ shows, productivity gains plateaued after 2020. Concrete data, clear attribution
                 results = tool.query("style patterns", n_results=5, min_score=0.7)
 
                 for result in results:
-                    assert (
-                        result["score"] >= 0.7
-                    ), f"Result score {result['score']} < 0.7 threshold"
+                    assert result["score"] >= 0.7, (
+                        f"Result score {result['score']} < 0.7 threshold"
+                    )
             else:
                 pytest.skip("No articles indexed")
 

@@ -246,9 +246,9 @@ class TestROIIntegration:
         )
         overhead_ms = (time.time() - start) * 1000
 
-        assert (
-            overhead_ms < 10
-        ), f"ROI logging overhead {overhead_ms}ms exceeds 10ms target"
+        assert overhead_ms < 10, (
+            f"ROI logging overhead {overhead_ms}ms exceeds 10ms target"
+        )
 
 
 class TestEndToEndIntegration:

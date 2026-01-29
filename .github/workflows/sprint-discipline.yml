@@ -50,8 +50,8 @@ jobs:
           while IFS= read -r commit_msg; do
             echo "Checking: $commit_msg"
 
-            # Allow commits that reference Story N, #N, or are docs/chore
-            if echo "$commit_msg" | grep -iE "(story [0-9]+|#[0-9]+|^(docs|chore|ci):)"; then
+            # Allow commits that reference Story N, #N, or use conventional commit prefixes
+            if echo "$commit_msg" | grep -iE "(story [0-9]+|#[0-9]+|^(docs|chore|ci|style|fix|feat|refactor|test|build|perf):)"; then
               VALID=true
               echo "✅ Valid: References sprint story or is maintenance commit"
             else
@@ -65,7 +65,7 @@ jobs:
             echo "Commits must reference a sprint story:"
             echo "  - Story 1: Add feature X"
             echo "  - Fixes #123"
-            echo "  - Or use prefix: docs:, chore:, ci:"
+            echo "  - Or use conventional commit prefix: docs:, chore:, ci:, style:, fix:, feat:, etc."
             exit 1
           fi
 

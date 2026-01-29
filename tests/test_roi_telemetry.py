@@ -152,9 +152,9 @@ class TestPerformance:
             elapsed_ms = (time.perf_counter() - start) * 1000
 
             # Verify <10ms overhead
-            assert (
-                elapsed_ms < 10
-            ), f"Logging overhead {elapsed_ms:.2f}ms exceeds 10ms target"
+            assert elapsed_ms < 10, (
+                f"Logging overhead {elapsed_ms:.2f}ms exceeds 10ms target"
+            )
 
     def test_save_overhead(self):
         """Test that save overhead is <10ms."""
@@ -177,9 +177,9 @@ class TestPerformance:
 
             # Verify <50ms overhead (save happens in end_execution)
             # Note: CI runners can have variable I/O latency, so 50ms is more reliable
-            assert (
-                elapsed_ms < 50
-            ), f"Save overhead {elapsed_ms:.2f}ms exceeds 50ms target"
+            assert elapsed_ms < 50, (
+                f"Save overhead {elapsed_ms:.2f}ms exceeds 50ms target"
+            )
 
 
 class TestROICalculations:
@@ -203,9 +203,9 @@ class TestROICalculations:
             final_metrics = tracker.end_execution(execution_id)
 
             # Expected ROI: $225 / $0.10 = 2250x
-            assert (
-                final_metrics["roi_multiplier"] > 100
-            ), "ROI should be >100x for agent automation"
+            assert final_metrics["roi_multiplier"] > 100, (
+                "ROI should be >100x for agent automation"
+            )
 
     def test_human_hour_benchmarks(self):
         """Test human-hour equivalent is properly assigned."""

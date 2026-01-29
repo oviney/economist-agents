@@ -14,9 +14,9 @@ Business Value:
 
 import contextlib
 import logging
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
 import re
+from datetime import datetime, timedelta
+from typing import Any
 
 try:
     import arxiv
@@ -24,15 +24,16 @@ except ImportError:
     arxiv = None
 
 with contextlib.suppress(ImportError):
-    import orjson as json
-if 'json' not in locals():
-    import json
+    pass
+if "json" not in locals():
+    pass
 
 logger = logging.getLogger(__name__)
 
 
 class ArxivSearchError(Exception):
     """Custom exception for arXiv search errors."""
+
     pass
 
 
@@ -78,7 +79,9 @@ class ArxivSearcher:
             f"searching papers from {self.cutoff_date.strftime('%Y-%m-%d')}"
         )
 
-    def search_recent_papers(self, query: str, categories: Optional[List[str]] = None) -> List[Dict[str, Any]]:
+    def search_recent_papers(
+        self, query: str, categories: list[str] | None = None
+    ) -> list[dict[str, Any]]:
         """
         Search arXiv for recent papers matching the query.
 
@@ -111,7 +114,7 @@ class ArxivSearcher:
                 query=search_query,
                 max_results=self.max_results * 2,  # Get extra for filtering
                 sort_by=arxiv.SortCriterion.SubmittedDate,
-                sort_order=arxiv.SortOrder.Descending
+                sort_order=arxiv.SortOrder.Descending,
             )
 
             papers = []
@@ -135,7 +138,7 @@ class ArxivSearcher:
             logger.error(f"arXiv search failed: {e}")
             raise ArxivSearchError(f"Search failed: {e}") from e
 
-    def extract_business_insights(self, papers: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def extract_business_insights(self, papers: list[dict[str, Any]]) -> dict[str, Any]:
         """
         Extract business-relevant insights from arXiv papers.
 
@@ -150,7 +153,7 @@ class ArxivSearcher:
                 "insights": [],
                 "recent_findings": [],
                 "citations": [],
-                "source_freshness": "No recent papers found"
+                "source_freshness": "No recent papers found",
             }
 
         insights = []
@@ -168,15 +171,17 @@ class ArxivSearcher:
             citations.append(citation)
 
             # Highlight recent finding
-            if paper['days_old'] <= 7:  # Published this week
-                recent_findings.append({
-                    "finding": insight,
-                    "source": citation,
-                    "days_old": paper['days_old']
-                })
+            if paper["days_old"] <= 7:  # Published this week
+                recent_findings.append(
+                    {
+                        "finding": insight,
+                        "source": citation,
+                        "days_old": paper["days_old"],
+                    }
+                )
 
         # Calculate source freshness
-        avg_age = sum(p['days_old'] for p in papers) / len(papers)
+        avg_age = sum(p["days_old"] for p in papers) / len(papers)
         freshness_desc = self._describe_freshness(avg_age)
 
         return {
@@ -185,10 +190,12 @@ class ArxivSearcher:
             "citations": citations,
             "source_freshness": freshness_desc,
             "paper_count": len(papers),
-            "average_age_days": round(avg_age, 1)
+            "average_age_days": round(avg_age, 1),
         }
 
-    def _build_search_query(self, query: str, categories: Optional[List[str]] = None) -> str:
+    def _build_search_query(
+        self, query: str, categories: list[str] | None = None
+    ) -> str:
         """Build optimized arXiv search query."""
         # Clean and optimize search terms
         terms = self._optimize_search_terms(query)
@@ -209,7 +216,7 @@ class ArxivSearcher:
             "AI": "artificial intelligence OR machine learning",
             "business": "enterprise OR organizational OR commercial",
             "ROI": "return on investment OR cost benefit OR economic impact",
-            "efficiency": "efficiency OR performance OR productivity"
+            "efficiency": "efficiency OR performance OR productivity",
         }
 
         optimized = query.lower()
@@ -219,7 +226,9 @@ class ArxivSearcher:
 
         return optimized
 
-    def _format_paper_result(self, result: arxiv.Result, original_query: str) -> Dict[str, Any]:
+    def _format_paper_result(
+        self, result: arxiv.Result, original_query: str
+    ) -> dict[str, Any]:
         """Format arXiv result into our standard paper format."""
         # Calculate relevance score
         relevance = self._calculate_relevance(result, original_query)
@@ -232,13 +241,13 @@ class ArxivSearcher:
             "authors": [author.name for author in result.authors],
             "abstract": result.summary,
             "published": result.published.strftime("%Y-%m-%d"),
-            "arxiv_id": result.entry_id.split('/')[-1],
+            "arxiv_id": result.entry_id.split("/")[-1],
             "url": result.entry_id,
             "categories": result.categories,
             "relevance_score": relevance,
             "days_old": days_old,
-            "journal_ref": getattr(result, 'journal_ref', None),
-            "doi": getattr(result, 'doi', None)
+            "journal_ref": getattr(result, "journal_ref", None),
+            "doi": getattr(result, "doi", None),
         }
 
     def _calculate_relevance(self, result: arxiv.Result, query: str) -> float:
@@ -273,27 +282,36 @@ class ArxivSearcher:
 
         return round(score, 2)
 
-    def _extract_key_insight(self, paper: Dict[str, Any]) -> str:
+    def _extract_key_insight(self, paper: dict[str, Any]) -> str:
         """Extract the key business insight from paper abstract."""
-        abstract = paper['abstract']
+        abstract = paper["abstract"]
 
         # Look for quantitative findings
-        numbers = re.findall(r'\b\d+(?:\.\d+)?%?\b', abstract)
+        numbers = re.findall(r"\b\d+(?:\.\d+)?%?\b", abstract)
 
         # Extract first sentence with findings
-        sentences = abstract.split('.')
+        sentences = abstract.split(".")
         for sentence in sentences:
             # Look for sentences with results/findings indicators
-            if any(keyword in sentence.lower() for keyword in
-                   ['show', 'find', 'result', 'demonstrate', 'evidence', 'improve']) and any(num in sentence for num in numbers):
-                return sentence.strip() + '.'
+            if any(
+                keyword in sentence.lower()
+                for keyword in [
+                    "show",
+                    "find",
+                    "result",
+                    "demonstrate",
+                    "evidence",
+                    "improve",
+                ]
+            ) and any(num in sentence for num in numbers):
+                return sentence.strip() + "."
 
         # Fallback to first sentence if no quantitative finding
-        return sentences[0].strip() + '.' if sentences else abstract[:200] + '...'
+        return sentences[0].strip() + "." if sentences else abstract[:200] + "..."
 
-    def _format_citation(self, paper: Dict[str, Any]) -> str:
+    def _format_citation(self, paper: dict[str, Any]) -> str:
         """Format paper citation in academic style."""
-        authors = paper['authors']
+        authors = paper["authors"]
         author_str = f"{authors[0]} et al." if len(authors) > 3 else ", ".join(authors)
 
         # Format: "Author et al. (2026). Title. arXiv:ID"
@@ -314,7 +332,7 @@ class ArxivSearcher:
             return f"Moderately recent (average {int(avg_age_days)} days old)"
 
 
-def search_arxiv_for_topic(topic: str, max_papers: int = 5) -> Dict[str, Any]:
+def search_arxiv_for_topic(topic: str, max_papers: int = 5) -> dict[str, Any]:
     """
     Convenience function for quick arXiv research integration.
 
@@ -339,7 +357,7 @@ def search_arxiv_for_topic(topic: str, max_papers: int = 5) -> Dict[str, Any]:
             "topic": topic,
             "papers_found": len(papers),
             "insights": insights,
-            "error": None
+            "error": None,
         }
 
     except Exception as e:
@@ -349,7 +367,7 @@ def search_arxiv_for_topic(topic: str, max_papers: int = 5) -> Dict[str, Any]:
             "topic": topic,
             "papers_found": 0,
             "insights": {},
-            "error": str(e)
+            "error": str(e),
         }
 
 

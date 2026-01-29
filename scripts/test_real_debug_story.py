@@ -317,7 +317,7 @@ def load_agent_metrics(self) -> dict:
         print(
             f"Bug Location: {self.debug_story['implementation_context']['bug_location']}"
         )
-        print(f"{'='*90}")
+        print(f"{'=' * 90}")
 
         # Execute debug-specific workflow
         investigation = self.simulate_debug_investigation()

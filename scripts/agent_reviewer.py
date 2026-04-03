@@ -227,11 +227,11 @@ class AgentReviewer:
             if not has_ref:
                 issues.append("WARNING: Chart embedded but not referenced in text")
 
-        # Check 9: Readability (word count)
+        # Check 9: Readability (word count) — CRITICAL triggers regeneration
         word_count = len(body.split())
         if word_count < 800:
             issues.append(
-                f"WARNING: Article too short ({word_count} words, ≥800 expected)"
+                f"CRITICAL: Article too short ({word_count} words, ≥800 required)"
             )
         elif word_count > 1500:
             issues.append(

@@ -580,5 +580,83 @@ class TestEnsureFrontmatter:
         assert 'title: "My Article"' in result
 
 
+# ═══════════════════════════════════════════════════════════════════════════
+# WORD COUNT ENFORCEMENT TESTS (BUG-029)
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+class TestWordCountEnforcement:
+    """Test that short articles trigger CRITICAL + regeneration (BUG-029)."""
+
+    @patch("agents.writer_agent.call_llm")
+    @patch("agents.writer_agent.review_agent_output")
+    def test_short_article_triggers_regeneration(
+        self,
+        mock_review,
+        mock_call_llm,
+        mock_client,
+        sample_research,
+    ):
+        """GIVEN article under 800 words
+        WHEN Writer Agent validates
+        THEN CRITICAL issue triggers regeneration
+        """
+        short_article = (
+            '---\nlayout: post\ntitle: "Test"\ndate: 2026-01-05\n'
+            'author: "The Economist"\n---\n\nShort content only.'
+        )
+        long_article = (
+            '---\nlayout: post\ntitle: "Test Article Title"\ndate: 2026-01-05\n'
+            'author: "The Economist"\ncategories: ["quality-engineering"]\n---\n\n'
+            + " ".join(["word"] * 900)
+        )
+        mock_call_llm.side_effect = [short_article, long_article]
+        mock_review.side_effect = [
+            (False, ["CRITICAL: Article too short (5 words, ≥800 required)"]),
+            (True, []),
+        ]
+
+        agent = WriterAgent(mock_client, None)
+        draft, metadata = agent.write(
+            topic="Test Topic",
+            research_brief=sample_research,
+            current_date="2026-01-05",
+        )
+
+        assert metadata["regenerated"] is True
+        assert mock_call_llm.call_count == 2
+
+    @patch("agents.writer_agent.call_llm")
+    @patch("agents.writer_agent.review_agent_output")
+    def test_adequate_word_count_no_regeneration(
+        self,
+        mock_review,
+        mock_call_llm,
+        mock_client,
+        sample_research,
+    ):
+        """GIVEN article at 800+ words
+        WHEN Writer Agent validates
+        THEN no regeneration needed
+        """
+        adequate_article = (
+            '---\nlayout: post\ntitle: "Test"\ndate: 2026-01-05\n'
+            'author: "The Economist"\ncategories: ["quality-engineering"]\n---\n\n'
+            + " ".join(["word"] * 900)
+        )
+        mock_call_llm.return_value = adequate_article
+        mock_review.return_value = (True, [])
+
+        agent = WriterAgent(mock_client, None)
+        draft, metadata = agent.write(
+            topic="Test Topic",
+            research_brief=sample_research,
+            current_date="2026-01-05",
+        )
+
+        assert metadata["regenerated"] is False
+        assert mock_call_llm.call_count == 1
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "--tb=short"])

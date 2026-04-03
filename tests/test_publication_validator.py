@@ -163,6 +163,49 @@ class TestPublicationValidatorReferences:
         assert len(link_issues) == 1
 
 
+class TestPublicationValidatorWordCount:
+    """Word count enforcement checks (BUG-029)."""
+
+    def test_valid_word_count_passes(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article()  # 850 words default
+        is_valid, issues = validator.validate(article)
+        wc_issues = [i for i in issues if i["check"] == "word_count"]
+        assert len(wc_issues) == 0
+
+    def test_short_article_rejected(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        short_body = " ".join(["word"] * 200)
+        # Use empty references to isolate word count to just body
+        article = _make_article(
+            body=short_body, references="## References\n\n1. A\n2. B\n3. C\n"
+        )
+        is_valid, issues = validator.validate(article)
+        assert not is_valid
+        wc_issues = [i for i in issues if i["check"] == "word_count"]
+        assert len(wc_issues) == 1
+        assert wc_issues[0]["severity"] == "CRITICAL"
+
+    def test_borderline_words_rejected(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        # Use minimal references so body word count dominates
+        body = " ".join(["word"] * 750)
+        article = _make_article(
+            body=body, references="## References\n\n1. A\n2. B\n3. C\n"
+        )
+        is_valid, issues = validator.validate(article)
+        wc_issues = [i for i in issues if i["check"] == "word_count"]
+        assert len(wc_issues) == 1
+
+    def test_exactly_800_words_passes(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        body = " ".join(["word"] * 800)
+        article = _make_article(body=body)
+        is_valid, issues = validator.validate(article)
+        wc_issues = [i for i in issues if i["check"] == "word_count"]
+        assert len(wc_issues) == 0
+
+
 class TestPublicationValidatorReport:
     """format_report() output checks."""
 

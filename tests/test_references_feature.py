@@ -257,7 +257,8 @@ This is an article.
         """Should pass with 3+ properly formatted references"""
         validator = PublicationValidator(expected_date="2026-01-02")
 
-        article = """---
+        padding = " ".join(["word"] * 850)
+        article = f"""---
 layout: post
 title: "Test Article: Proper References"
 date: 2026-01-02
@@ -265,7 +266,7 @@ date: 2026-01-02
 
 # Article content
 
-This is a proper article with citations.
+This is a proper article with citations. {padding}
 
 ## References
 
@@ -422,8 +423,9 @@ Content with data.
 
     def test_end_to_end_references_validation(self):
         """Should validate complete article with references"""
+        padding = " ".join(["word"] * 750)
         # Create a complete article with proper references
-        article = """---
+        article = f"""---
 layout: post
 title: "Self-Healing Tests: Myth vs Reality"
 date: 2026-01-02
@@ -440,7 +442,7 @@ The gap between promise and reality reveals something important about automation
 
 Forrester's 2024 study shows that self-healing tests reduce maintenance time by 18%, not 80%. The discrepancy comes from vendor marketing overselling capabilities.
 
-IEEE research confirms these findings. Their September 2024 standards document shows that most "self-healing" features are simple retry logic.
+IEEE research confirms these findings. Their September 2024 standards document shows that most "self-healing" features are simple retry logic. {padding}
 
 ## References
 

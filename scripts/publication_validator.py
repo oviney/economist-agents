@@ -120,7 +120,10 @@ class PublicationValidator:
         # Check 8: References section (FEATURE-001)
         self._check_references_section(article_content)
 
-        # Check 9: Historical defect patterns (v2)
+        # Check 9: Word count (BUG-029 — final gate for minimum length)
+        self._check_word_count(article_content)
+
+        # Check 10: Historical defect patterns (v2)
         if self.defect_checker:
             self._check_defect_patterns(article_content, article_path)
 
@@ -335,6 +338,31 @@ class PublicationValidator:
                     "message": f"Weak/hedging ending detected ({len(violations)} violations)",
                     "details": details,
                     "fix": "Rewrite ending with definitive statement or clear prediction",
+                }
+            )
+
+    def _check_word_count(self, content: str) -> None:
+        """Validate article body meets minimum word count (BUG-029).
+
+        Extracts the body (everything after YAML frontmatter) and checks
+        that it contains at least 800 words.
+        """
+        # Extract body after frontmatter
+        if content.startswith("---"):
+            parts = content.split("---", 2)
+            body = parts[2].strip() if len(parts) >= 3 else ""
+        else:
+            body = content
+
+        word_count = len(body.split())
+        if word_count < 800:
+            self.issues.append(
+                {
+                    "check": "word_count",
+                    "severity": "CRITICAL",
+                    "message": f"Article too short: {word_count} words (minimum 800 required)",
+                    "details": "Economist-style articles require 800-1200 words for adequate depth",
+                    "fix": "Expand article with additional examples, data points, or deeper analysis",
                 }
             )
 

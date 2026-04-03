@@ -34,3 +34,6 @@ Thumbs.db
 
 # Local databases (cached by GitHub Actions)
 .chromadb/
+
+# Runtime logs (written by ROI tracker and tests — should not be tracked)
+logs/execution_roi.json

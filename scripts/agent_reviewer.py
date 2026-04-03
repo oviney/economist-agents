@@ -19,7 +19,7 @@ import yaml
 class AgentReviewer:
     """Automated reviewer that validates agent outputs against quality standards"""
 
-    def __init__(self, standards_file: str = None):
+    def __init__(self, standards_file: str | Path | None = None):
         if standards_file is None:
             script_dir = Path(__file__).parent.parent
             standards_file = (
@@ -124,7 +124,7 @@ class AgentReviewer:
         return len(issues) == 0, issues
 
     def review_writer_output(
-        self, article_content: str, chart_filename: str = None
+        self, article_content: str, chart_filename: str | None = None
     ) -> tuple[bool, list[str]]:
         """Review Writer Agent output"""
         issues = []

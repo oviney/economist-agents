@@ -65,7 +65,7 @@ class PublicationValidator:
         },
     }
 
-    def __init__(self, expected_date: str = None):
+    def __init__(self, expected_date: str | None = None):
         """
         Args:
             expected_date: Expected publication date (YYYY-MM-DD).
@@ -81,8 +81,8 @@ class PublicationValidator:
             self.defect_checker = None
 
     def validate(
-        self, article_content: str, article_path: str = None
-    ) -> tuple[bool, list[dict]]:
+        self, article_content: str, article_path: str | None = None
+    ) -> tuple[bool, list[dict[str, str]]]:
         """
         Validate article for publication.
 

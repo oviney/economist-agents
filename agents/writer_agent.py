@@ -6,6 +6,8 @@ Extracts writer agent functionality from economist_agent.py
 for improved modularity and testability.
 """
 
+import logging
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -27,6 +29,8 @@ if str(_scripts_dir) not in sys.path:
 from agent_reviewer import review_agent_output  # type: ignore  # noqa: E402
 from governance import GovernanceTracker  # type: ignore  # noqa: E402
 from llm_client import call_llm  # type: ignore  # noqa: E402
+
+logger = logging.getLogger(__name__)
 
 # ═══════════════════════════════════════════════════════════════════════════
 # WRITER AGENT PROMPT
@@ -399,6 +403,47 @@ class WriterAgent:
         self.client = client
         self.governance = governance
 
+    @staticmethod
+    def _ensure_frontmatter(draft: str) -> str:
+        """Programmatically fix known YAML frontmatter issues.
+
+        Repairs missing opening ``---`` delimiter and strips code-fence
+        wrappers so downstream validators always receive well-formed
+        frontmatter.  This is a deterministic safety net — the LLM
+        prompt already requests correct formatting, but LLMs are not
+        guaranteed to comply.
+
+        Args:
+            draft: Raw article text from LLM.
+
+        Returns:
+            Article text with corrected frontmatter delimiters.
+        """
+        text = draft.strip()
+
+        # Strip ```yaml / ```yml code-fence wrapper
+        if text.startswith("```yaml") or text.startswith("```yml"):
+            # Remove opening fence line
+            text = re.sub(r"^```ya?ml\s*\n", "", text, count=1)
+            # Remove trailing ``` that closed the fence (if present)
+            text = re.sub(r"\n```\s*$", "", text, count=1)
+            # The content now likely starts with YAML fields — fall through
+            # to the missing-opener check below.
+
+        # If the article already starts with ---, nothing to do
+        if text.startswith("---"):
+            return text
+
+        # Heuristic: looks like YAML fields without the opening ---
+        yaml_field_pattern = re.compile(
+            r"^(layout|title|date|author|categories|image)\s*:", re.MULTILINE
+        )
+        if yaml_field_pattern.match(text):
+            logger.warning("Frontmatter missing opening '---' — prepending delimiter")
+            text = "---\n" + text
+
+        return text
+
     def write(
         self,
         topic: str,
@@ -520,6 +565,8 @@ image: {featured_image}
             f"⚠️  REMEMBER: Use date: {current_date} in YAML front matter.\n\nWrite an Economist-style article on: {topic}",
             max_tokens=3000,
         )
+        # Deterministic fix for BUG-028: ensure opening --- is present
+        draft = self._ensure_frontmatter(draft)
         word_count = len(draft.split())
         print(f"   ✓ Draft complete ({word_count} words)")
 
@@ -557,6 +604,8 @@ image: {featured_image}
                     f"Fix the issues and regenerate: {topic}",
                     max_tokens=3000,
                 )
+                # Deterministic fix for BUG-028 on regenerated output
+                draft = self._ensure_frontmatter(draft)
                 regenerated = True  # Mark that regeneration occurred
 
                 # Re-validate

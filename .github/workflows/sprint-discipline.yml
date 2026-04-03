@@ -71,10 +71,10 @@ jobs:
 
       - name: Check PR has story reference
         if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
         run: |
-          PR_TITLE="${{ github.event.pull_request.title }}"
-          PR_BODY="${{ github.event.pull_request.body }}"
-
           echo "PR Title: $PR_TITLE"
 
           # Check if title or body references a story or issue

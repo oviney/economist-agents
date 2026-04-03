@@ -501,5 +501,84 @@ author: "The Economist"
         assert "critical_issues" in metadata
 
 
+# ═══════════════════════════════════════════════════════════════════════════
+# DETERMINISTIC FRONTMATTER FIX TESTS (BUG-028)
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+class TestEnsureFrontmatter:
+    """Test WriterAgent._ensure_frontmatter() deterministic safety net."""
+
+    def test_valid_frontmatter_unchanged(self) -> None:
+        """GIVEN article with correct frontmatter
+        WHEN _ensure_frontmatter is called
+        THEN article is returned unchanged
+        """
+        article = '---\nlayout: post\ntitle: "Test"\ndate: 2026-01-05\n---\n\nContent'
+        result = WriterAgent._ensure_frontmatter(article)
+        assert result == article
+
+    def test_missing_opening_delimiter_prepended(self) -> None:
+        """GIVEN article missing opening ---
+        WHEN _ensure_frontmatter is called
+        THEN --- is prepended (BUG-028 fix)
+        """
+        article = 'layout: post\ntitle: "Test"\ndate: 2026-01-05\n---\n\nContent'
+        result = WriterAgent._ensure_frontmatter(article)
+        assert result.startswith("---\n")
+        assert "layout: post" in result
+
+    def test_code_fence_yaml_stripped(self) -> None:
+        """GIVEN article wrapped in ```yaml code fence
+        WHEN _ensure_frontmatter is called
+        THEN code fence is stripped and --- is prepended
+        """
+        article = (
+            '```yaml\nlayout: post\ntitle: "Test"\ndate: 2026-01-05\n```\n\nContent'
+        )
+        result = WriterAgent._ensure_frontmatter(article)
+        assert not result.startswith("```")
+        assert result.startswith("---\n")
+        assert "layout: post" in result
+
+    def test_code_fence_yml_stripped(self) -> None:
+        """GIVEN article wrapped in ```yml code fence
+        WHEN _ensure_frontmatter is called
+        THEN code fence is stripped and --- is prepended
+        """
+        article = '```yml\nlayout: post\ntitle: "Test"\n```\n\nContent'
+        result = WriterAgent._ensure_frontmatter(article)
+        assert not result.startswith("```")
+        assert result.startswith("---\n")
+
+    def test_whitespace_stripped_before_check(self) -> None:
+        """GIVEN article with leading whitespace
+        WHEN _ensure_frontmatter is called
+        THEN whitespace is stripped and frontmatter is valid
+        """
+        article = '\n  \n---\nlayout: post\ntitle: "Test"\n---\n\nContent'
+        result = WriterAgent._ensure_frontmatter(article)
+        assert result.startswith("---\n")
+
+    def test_non_yaml_content_not_modified(self) -> None:
+        """GIVEN article that is plain text (no YAML fields)
+        WHEN _ensure_frontmatter is called
+        THEN content is not modified with spurious ---
+        """
+        article = "This is just a plain article without any frontmatter."
+        result = WriterAgent._ensure_frontmatter(article)
+        assert not result.startswith("---")
+
+    def test_title_first_field_detected(self) -> None:
+        """GIVEN article starting with title: field (no layout)
+        WHEN _ensure_frontmatter is called
+        THEN --- is prepended since it looks like YAML
+        """
+        article = 'title: "My Article"\ndate: 2026-01-05\n---\n\nContent'
+        result = WriterAgent._ensure_frontmatter(article)
+        assert result.startswith("---\n")
+        assert 'title: "My Article"' in result
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "--tb=short"])

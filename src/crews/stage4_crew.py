@@ -145,7 +145,18 @@ def _apply_editorial_fixes(article: str, current_date: str | None = None) -> str
     text = re.sub(r"\s*\[UNVERIFIED\]", "", text)
     text = re.sub(r"\s*\[REPLACE[-_]?ME\]", "", text, flags=re.IGNORECASE)
 
-    # 8. Clean up double spaces from phrase/placeholder removal
+    # 8. Enforce required frontmatter fields (layout, categories)
+    if text.startswith("---"):
+        parts = text.split("---", 2)
+        if len(parts) >= 3:
+            fm = parts[1]
+            if "layout:" not in fm:
+                fm = "\nlayout: post" + fm
+            if "categories:" not in fm:
+                fm = fm.rstrip() + '\ncategories: ["Quality Engineering"]\n'
+            text = "---" + fm + "---" + parts[2]
+
+    # 9. Clean up double spaces from phrase/placeholder removal
     text = re.sub(r"  +", " ", text)
 
     return text

@@ -15,6 +15,7 @@ Usage:
 """
 
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 
 from crewai.flow.flow import Flow, listen, router, start
@@ -24,6 +25,7 @@ from src.crews.stage4_crew import Stage4Crew
 from src.economist_agents.adapters import (
     PublicationValidator,
     create_llm_client,
+    generate_featured_image,
     run_editorial_board,
     scout_topics,
 )
@@ -170,6 +172,34 @@ class EconomistContentFlow(Flow):
         article = result.get("article", "")
         print(f"   ✅ Article generated: {len(article.split())} words")
 
+        # Generate featured image via DALL-E
+        slug = topic.lower()
+        for ch in " :?!,.'\"()":
+            slug = slug.replace(ch, "-")
+        slug = slug.strip("-")[:60]
+
+        output_dir = Path("output/images")
+        output_dir.mkdir(parents=True, exist_ok=True)
+        image_path = str(output_dir / f"{slug}.png")
+
+        print("🎨 Generating featured image...")
+        try:
+            generated = generate_featured_image(
+                topic=topic,
+                article_summary=article[:200],
+                output_path=image_path,
+            )
+            if generated:
+                result["featured_image"] = f"/assets/images/{slug}.png"
+                result["featured_image_local"] = image_path
+                print(f"   ✅ Featured image: {image_path}")
+            else:
+                result["featured_image"] = "/assets/images/blog-default.svg"
+                print("   ℹ️  Using default image")
+        except Exception as e:
+            result["featured_image"] = "/assets/images/blog-default.svg"
+            print(f"   ℹ️  Image generation failed ({e}), using default")
+
         return result
 
     @router(generate_content)
@@ -190,10 +220,29 @@ class EconomistContentFlow(Flow):
         # Preserve draft for revision loop
         self.state["article_draft"] = article_draft
 
+        # Inject featured image into frontmatter before review
+        article_text = article_draft.get("article", "")
+        featured_image = article_draft.get(
+            "featured_image", "/assets/images/blog-default.svg"
+        )
+        if (
+            article_text.startswith("---")
+            and "image:" not in article_text.split("---", 2)[1]
+        ):
+            parts = article_text.split("---", 2)
+            if len(parts) >= 3:
+                article_text = (
+                    "---"
+                    + parts[1].rstrip()
+                    + f"\nimage: {featured_image}\n"
+                    + "---"
+                    + parts[2]
+                )
+
         # Stage4Crew expects positional dict with "article" key
         result = self.stage4_crew.kickoff(
             {
-                "article": article_draft.get("article", ""),
+                "article": article_text,
                 "chart_data": article_draft.get("chart_data"),
             }
         )

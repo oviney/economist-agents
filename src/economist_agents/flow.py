@@ -14,12 +14,23 @@ Usage:
     result = flow.kickoff()
 """
 
+from datetime import datetime
 from typing import Any
 
 from crewai.flow.flow import Flow, listen, router, start
 
 from src.crews.stage3_crew import Stage3Crew
 from src.crews.stage4_crew import Stage4Crew
+from src.economist_agents.adapters import (
+    PublicationValidator,
+    create_llm_client,
+    run_editorial_board,
+    scout_topics,
+)
+
+# Editorial score threshold (0-100 scale) for publication
+PUBLISH_THRESHOLD = 80
+MAX_REVISIONS = 1
 
 
 class EconomistContentFlow(Flow):
@@ -27,232 +38,304 @@ class EconomistContentFlow(Flow):
     Production-grade content generation flow with deterministic orchestration.
 
     Flow Stages:
-    1. discover_topics() - @start - Entry point, generates topic candidates
-    2. editorial_review() - @listen - Selects winning topic for production
+    1. discover_topics() - @start - LLM-based topic scouting
+    2. editorial_review() - @listen - 6-persona weighted board voting
     3. generate_content() - @listen - Research → Write → Graphics pipeline
-    4. quality_gate() - @router - Editor evaluation with publish/revision routing
-
-    State Management:
-    - topics: List of topic candidates with scores
-    - selected_topic: Editorial board winner
-    - article_draft: Generated content with metadata
-    - quality_score: Editor evaluation (0-10 scale)
-    - decision: "publish" or "revision"
+    4. quality_gate() - @router - Stage4Crew + PublicationValidator routing
+    5a. publish_article() - @listen("publish") - Terminal success
+    5b. request_revision() - @listen("revision") - 1-retry with feedback
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize flow with crew dependencies."""
         super().__init__()
-        # Note: Crews will be initialized on-demand in generate_content()
-        # Stage3Crew requires topic parameter
         self.stage4_crew = Stage4Crew()
 
     @start()
     def discover_topics(self) -> dict[str, Any]:
-        """
-        Entry point: Generate topic candidates via Topic Scout.
+        """Stage 1: Discover topic candidates via Topic Scout.
 
-        STUB: Currently returns mock topics for Flow architecture validation.
-        TODO (Sprint 14): Integrate with Stage1Crew/Stage2Crew (Topic Scout + Editorial Board)
+        Makes 2 LLM calls (trend research + topic generation).
 
         Returns:
-            dict: {
-                "topics": [{"topic": str, "score": float, "hook": str}, ...],
-                "timestamp": str
-            }
+            dict with "topics" list and "timestamp".
         """
-        # STUB: Mock topics for Flow validation
-        mock_topics = {
-            "topics": [
-                {
-                    "topic": "The AI Testing Paradox: Why Automation Creates More Work",
-                    "score": 8.5,
-                    "hook": "Companies adopting AI testing tools report 40% more maintenance work",
-                    "thesis": "Self-healing tests promise to reduce overhead but create new complexity",
-                },
-                {
-                    "topic": "Quality Engineering's Invisible Tax",
-                    "score": 7.2,
-                    "hook": "Flaky tests cost Fortune 500 companies $2.1B annually in lost productivity",
-                    "thesis": "Test reliability is the new technical debt",
-                },
-            ],
-            "timestamp": "2026-01-07T00:00:00Z",
-        }
-
         print("🔭 Flow Stage 1: Topic Discovery")
-        print(f"   Generated {len(mock_topics['topics'])} topic candidates")
 
-        return mock_topics
+        client = create_llm_client()
+        raw_topics = scout_topics(client, focus_area=None)
+
+        # Normalise scout scores (0-25 sum) to 0-10 scale for display
+        topics = []
+        for t in raw_topics:
+            topics.append(
+                {
+                    "topic": t["topic"],
+                    "score": round(t.get("total_score", 0) * 10 / 25, 1),
+                    "hook": t.get("hook", ""),
+                    "thesis": t.get("thesis", ""),
+                    "data_sources": t.get("data_sources", []),
+                    "contrarian_angle": t.get("contrarian_angle", ""),
+                    "talking_points": t.get("talking_points", ""),
+                    "raw": t,
+                }
+            )
+
+        print(f"   Generated {len(topics)} topic candidates")
+
+        return {"topics": topics, "timestamp": datetime.now().isoformat()}
 
     @listen(discover_topics)
     def editorial_review(self, topics: dict[str, Any]) -> dict[str, Any]:
-        """
-        Sequential stage: Editorial board selects winning topic.
+        """Stage 2: Editorial board selects winning topic.
 
-        STUB: Currently selects top-scored topic for Flow validation.
-        TODO (Sprint 14): Integrate with Stage2Crew (Editorial Board persona voting)
+        6 personas vote in parallel with weighted scoring.
 
         Args:
-            topics: Output from discover_topics()
+            topics: Output from discover_topics().
 
         Returns:
-            dict: {
-                "selected_topic": str,
-                "score": float,
-                "hook": str,
-                "thesis": str
-            }
+            dict with selected topic, score, consensus info.
         """
-        # STUB: Select top-scored topic
+        print("📋 Flow Stage 2: Editorial Review")
+
         topic_list = topics.get("topics", [])
         if not topic_list:
             raise ValueError("No topics available for editorial review")
 
-        selected = max(topic_list, key=lambda t: t.get("score", 0))
+        client = create_llm_client()
+        raw_topics = [t.get("raw", t) for t in topic_list]
 
-        print("📋 Flow Stage 2: Editorial Review")
+        board_result = run_editorial_board(client, raw_topics, parallel=True)
+
+        top = board_result.get("top_pick")
+        if not top:
+            # Fallback: pick highest-scored topic
+            selected = max(topic_list, key=lambda t: t.get("score", 0))
+            print(f"   Fallback selection: {selected['topic']}")
+            return selected
+
+        original = top.get("original_topic", {})
+        selected = {
+            "topic": top["topic"],
+            "score": top.get("weighted_score", 0),
+            "hook": original.get("hook", ""),
+            "thesis": original.get("thesis", ""),
+            "consensus": board_result.get("consensus", False),
+            "dissenting_views": board_result.get("dissenting_views", []),
+        }
+
         print(f"   Selected: {selected['topic']}")
-        print(f"   Score: {selected['score']}/10")
+        print(f"   Score: {selected['score']:.1f}/10")
+        print(f"   Consensus: {selected['consensus']}")
 
         return selected
 
     @listen(editorial_review)
     def generate_content(self, selected_topic: dict[str, Any]) -> dict[str, Any]:
-        """
-        Sequential stage: Research → Write → Graphics pipeline via Stage3Crew.
-
-        Executes Stage3Crew.kickoff() with selected topic as input.
-        Stage3Crew orchestrates: ResearchAgent → WriterAgent → GraphicsAgent
+        """Stage 3: Research → Write → Graphics pipeline via Stage3Crew.
 
         Args:
-            selected_topic: Output from editorial_review()
+            selected_topic: Output from editorial_review().
 
         Returns:
-            dict: {
-                "article": str (markdown with YAML frontmatter),
-                "chart_path": str | None,
-                "word_count": int,
-                "metadata": dict
-            }
+            dict with "article" (markdown) and "chart_data" (dict).
         """
+        # Preserve for revision loop
+        self.state["selected_topic"] = selected_topic
+
         topic = selected_topic.get("topic", "")
 
         print("✍️  Flow Stage 3: Content Generation (Stage3Crew)")
         print(f"   Topic: {topic}")
 
-        # Initialize Stage3Crew with topic (required parameter)
         stage3_crew = Stage3Crew(topic=topic)
-
-        # Execute Stage3Crew workflow
-        # Stage3Crew.kickoff() returns: {article, chart_path, word_count, metadata}
         result = stage3_crew.kickoff()
 
-        print(f"   ✅ Article generated: {result.get('word_count', 0)} words")
-        if result.get("chart_path"):
-            print(f"   ✅ Chart created: {result['chart_path']}")
+        article = result.get("article", "")
+        print(f"   ✅ Article generated: {len(article.split())} words")
 
         return result
 
     @router(generate_content)
     def quality_gate(self, article_draft: dict[str, Any]) -> str:
-        """
-        Router stage: Editor evaluation with publish/revision routing.
+        """Stage 4: Editorial review + publication validation.
 
-        Executes Stage4Crew.kickoff() for 5-gate editorial review.
-        Routes based on quality score threshold (≥8 = publish, <8 = revision).
+        Runs Stage4Crew (5-gate editorial review) then PublicationValidator.
+        Routes to "publish" if both pass, "revision" otherwise.
 
         Args:
-            article_draft: Output from generate_content()
+            article_draft: Output from generate_content().
 
         Returns:
-            str: "publish" or "revision" (routing decision)
+            "publish" or "revision" routing decision.
         """
-        print("🔍 Flow Stage 4: Quality Gate (Stage4Crew)")
+        print("🔍 Flow Stage 4: Quality Gate")
 
-        # Execute Stage4Crew workflow (5-gate editorial review)
-        # Stage4Crew.kickoff() returns: {edited_article, gates_passed, quality_score}
+        # Preserve draft for revision loop
+        self.state["article_draft"] = article_draft
+
+        # Stage4Crew expects positional dict with "article" key
         result = self.stage4_crew.kickoff(
-            inputs={
-                "draft": article_draft.get("article", ""),
-                "chart_data": article_draft.get("chart_path"),
+            {
+                "article": article_draft.get("article", ""),
+                "chart_data": article_draft.get("chart_data"),
             }
         )
 
-        quality_score = result.get("quality_score", 0)
+        editorial_score = result.get("editorial_score", 0)
         gates_passed = result.get("gates_passed", 0)
+        edited_article = result.get("article", article_draft.get("article", ""))
 
-        print(f"   Quality Score: {quality_score}/10")
+        print(f"   Editorial Score: {editorial_score}/100")
         print(f"   Gates Passed: {gates_passed}/5")
 
-        # Routing decision: ≥8 publish, <8 revision
-        decision = "publish" if quality_score >= 8 else "revision"
-
-        print(f"   Decision: {decision.upper()}")
-
-        # Store result in flow state for downstream access
         self.state["quality_result"] = result
-        self.state["decision"] = decision
 
-        return decision
+        # Gate 1: Editorial score
+        if editorial_score < PUBLISH_THRESHOLD:
+            self.state["decision"] = "revision"
+            self.state["revision_reason"] = (
+                f"Editorial score {editorial_score}/100 below {PUBLISH_THRESHOLD} threshold"
+            )
+            self.state["revision_feedback"] = result.get("specific_edits", [])
+            print(
+                f"   Decision: REVISION (score {editorial_score} < {PUBLISH_THRESHOLD})"
+            )
+            return "revision"
+
+        # Gate 2: Publication validator
+        validator = PublicationValidator(
+            expected_date=datetime.now().strftime("%Y-%m-%d")
+        )
+        is_valid, issues = validator.validate(edited_article)
+        self.state["validation_issues"] = issues
+
+        if not is_valid:
+            critical = [i for i in issues if i["severity"] == "CRITICAL"]
+            self.state["decision"] = "revision"
+            self.state["revision_reason"] = (
+                f"Publication validation failed: {len(critical)} critical issues"
+            )
+            self.state["revision_feedback"] = [i["message"] for i in critical]
+            print(f"   Decision: REVISION ({len(critical)} critical validation issues)")
+            return "revision"
+
+        self.state["decision"] = "publish"
+        print("   Decision: PUBLISH ✅")
+        return "publish"
 
     @listen("publish")
     def publish_article(self) -> dict[str, Any]:
-        """
-        Terminal stage (publish path): Finalize article for publication.
-
-        TODO (Future): Integrate with Stage5Crew (DevOps publishing automation)
+        """Terminal stage (publish path): Article approved for publication.
 
         Returns:
-            dict: {
-                "status": "published",
-                "article_path": str,
-                "quality_score": float
-            }
+            dict with status, article, editorial_score, gates_passed.
         """
         quality_result = self.state.get("quality_result", {})
 
-        print("✅ Flow Complete: PUBLISH PATH")
-        print(f"   Quality Score: {quality_result.get('quality_score', 0)}/10")
+        print("✅ Flow Complete: PUBLISHED")
+        print(f"   Editorial Score: {quality_result.get('editorial_score', 0)}/100")
 
         return {
             "status": "published",
-            "article": quality_result.get("edited_article", ""),
-            "quality_score": quality_result.get("quality_score", 0),
+            "article": quality_result.get("article", ""),
+            "editorial_score": quality_result.get("editorial_score", 0),
             "gates_passed": quality_result.get("gates_passed", 0),
         }
 
     @listen("revision")
     def request_revision(self) -> dict[str, Any]:
-        """
-        Terminal stage (revision path): Flag article for rework.
+        """Revision path: retry content generation once with feedback.
 
-        TODO (Future): Implement revision loop (Writer re-attempt with Editor feedback)
+        Re-runs Stage3Crew with revision instructions, then re-runs
+        Stage4Crew + PublicationValidator. Returns final result regardless
+        of pass/fail (max 1 retry to avoid runaway LLM costs).
 
         Returns:
-            dict: {
-                "status": "needs_revision",
-                "quality_score": float,
-                "failed_gates": list[str]
-            }
+            dict with status, article (if published), scores, retry_count.
         """
-        quality_result = self.state.get("quality_result", {})
+        retry_count = self.state.get("retry_count", 0)
 
-        print("⚠️  Flow Complete: REVISION REQUIRED")
-        print(f"   Quality Score: {quality_result.get('quality_score', 0)}/10")
+        if retry_count >= MAX_REVISIONS:
+            quality_result = self.state.get("quality_result", {})
+            print(f"⛔ Revision exhausted ({retry_count}/{MAX_REVISIONS} retries used)")
+            return {
+                "status": "needs_revision",
+                "editorial_score": quality_result.get("editorial_score", 0),
+                "gates_passed": quality_result.get("gates_passed", 0),
+                "revision_reason": self.state.get("revision_reason", "Unknown"),
+                "retry_count": retry_count,
+            }
 
+        self.state["retry_count"] = retry_count + 1
+        revision_feedback = self.state.get("revision_feedback", [])
+        revision_reason = self.state.get("revision_reason", "")
+        feedback_text = (
+            "\n".join(revision_feedback) if revision_feedback else revision_reason
+        )
+
+        print(f"🔄 Revision attempt {retry_count + 1}/{MAX_REVISIONS}")
+        print(f"   Feedback: {feedback_text[:200]}")
+
+        # Re-run Stage3Crew with revision instructions appended to topic
+        topic = self.state.get("selected_topic", {}).get("topic", "")
+        enhanced_topic = (
+            f"{topic}\n\n"
+            f"REVISION INSTRUCTIONS — the previous draft failed review. "
+            f"Fix these issues:\n{feedback_text}"
+        )
+
+        stage3_crew = Stage3Crew(topic=enhanced_topic)
+        new_draft = stage3_crew.kickoff()
+
+        # Re-run Stage4Crew
+        result = self.stage4_crew.kickoff(
+            {
+                "article": new_draft.get("article", ""),
+                "chart_data": new_draft.get("chart_data"),
+            }
+        )
+
+        editorial_score = result.get("editorial_score", 0)
+        gates_passed = result.get("gates_passed", 0)
+        edited_article = result.get("article", new_draft.get("article", ""))
+
+        self.state["quality_result"] = result
+
+        # Run publication validator
+        validator = PublicationValidator(
+            expected_date=datetime.now().strftime("%Y-%m-%d")
+        )
+        is_valid, issues = validator.validate(edited_article)
+
+        if editorial_score >= PUBLISH_THRESHOLD and is_valid:
+            print(f"   ✅ Revision succeeded (score: {editorial_score}/100)")
+            return {
+                "status": "published",
+                "article": edited_article,
+                "editorial_score": editorial_score,
+                "gates_passed": gates_passed,
+                "retry_count": self.state["retry_count"],
+            }
+
+        critical = [i for i in issues if i.get("severity") == "CRITICAL"]
+        print(
+            f"   ⚠️  Revision still failing (score: {editorial_score}, issues: {len(critical)})"
+        )
         return {
             "status": "needs_revision",
-            "quality_score": quality_result.get("quality_score", 0),
-            "gates_passed": quality_result.get("gates_passed", 0),
-            "gates_failed": 5 - quality_result.get("gates_passed", 0),
+            "editorial_score": editorial_score,
+            "gates_passed": gates_passed,
+            "validation_issues": [i["message"] for i in critical],
+            "retry_count": self.state["retry_count"],
         }
 
 
-def main():
+def main() -> None:
     """CLI entry point for standalone Flow execution."""
     print("╔════════════════════════════════════════════════════════════════╗")
-    print("║ ECONOMIST CONTENT FLOW - Deterministic Orchestration           ║")
+    print("║ ECONOMIST CONTENT FLOW - End-to-End Pipeline                  ║")
     print("╚════════════════════════════════════════════════════════════════╝\n")
 
     flow = EconomistContentFlow()
@@ -264,7 +347,9 @@ def main():
         print("║ FLOW RESULT                                                     ║")
         print("╚════════════════════════════════════════════════════════════════╝")
         print(f"Status: {result.get('status', 'unknown')}")
-        print(f"Quality Score: {result.get('quality_score', 0)}/10")
+        print(f"Editorial Score: {result.get('editorial_score', 0)}/100")
+        if result.get("retry_count"):
+            print(f"Retries: {result['retry_count']}")
 
     except Exception as e:
         print(f"\n❌ Flow execution failed: {e}")

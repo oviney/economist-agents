@@ -6,10 +6,12 @@ Tests the Flow-based state-machine orchestration with @start/@listen/@router dec
 
 Test Coverage:
 1. Flow initialization and state management
-2. Stage3Crew integration via generate_content()
-3. Stage4Crew routing logic via quality_gate()
-4. End-to-end publish path
-5. End-to-end revision path
+2. Topic discovery via scout_topics adapter
+3. Editorial review via run_editorial_board adapter
+4. Stage3Crew integration via generate_content()
+5. Stage4Crew + PublicationValidator routing (publish/revision)
+6. Revision loop with feedback (1 retry)
+7. Revision exhaustion
 
 Usage:
     pytest tests/test_economist_flow.py -v
@@ -18,13 +20,12 @@ Usage:
 import os
 import sys
 from pathlib import Path
-
-# Add src/ to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
 from unittest.mock import Mock, patch
 
 import pytest
+
+# Add src/ to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.economist_agents.flow import EconomistContentFlow
 
@@ -34,71 +35,93 @@ from src.economist_agents.flow import EconomistContentFlow
     reason="OPENAI_API_KEY required for CrewAI agent initialization",
 )
 class TestEconomistFlow:
-    """Integration tests for EconomistContentFlow"""
+    """Integration tests for EconomistContentFlow."""
 
     @pytest.fixture
-    def flow(self):
-        """Create Flow instance for testing"""
+    def flow(self) -> EconomistContentFlow:
+        """Create Flow instance for testing."""
         return EconomistContentFlow()
 
-    def test_flow_initialization(self, flow):
-        """
-        Test 1: Flow initialization and state management
-
-        Given: EconomistContentFlow class
-        When: Instance created
-        Then: Flow initialized with crew dependencies and state
-        """
+    def test_flow_initialization(self, flow: EconomistContentFlow) -> None:
+        """Flow initializes with stage4_crew and state."""
         assert flow is not None
         assert hasattr(flow, "stage4_crew")
         assert hasattr(flow, "state")
-        # Note: stage3_crew initialized on-demand in generate_content()
-        print("✅ Test 1: Flow initialized with stage4_crew and state")
 
-    def test_discover_topics_stage(self, flow):
-        """
-        Test 2: @start stage returns topic candidates
+    @patch("src.economist_agents.flow.scout_topics")
+    @patch("src.economist_agents.flow.create_llm_client")
+    def test_discover_topics_stage(
+        self,
+        mock_create_client: Mock,
+        mock_scout: Mock,
+        flow: EconomistContentFlow,
+    ) -> None:
+        """discover_topics() calls scout_topics and normalises scores."""
+        mock_create_client.return_value = Mock()
+        mock_scout.return_value = [
+            {
+                "topic": "AI Testing Paradox",
+                "total_score": 20,
+                "hook": "Hook A",
+                "thesis": "Thesis A",
+                "data_sources": [],
+                "contrarian_angle": "Angle A",
+                "talking_points": "Points A",
+            },
+            {
+                "topic": "Quality Tax",
+                "total_score": 15,
+                "hook": "Hook B",
+                "thesis": "Thesis B",
+                "data_sources": [],
+                "contrarian_angle": "Angle B",
+                "talking_points": "Points B",
+            },
+        ]
 
-        Given: Flow discover_topics() method
-        When: Called as entry point
-        Then: Returns mock topics with structure {topics: [...], timestamp}
-        """
         result = flow.discover_topics()
 
         assert "topics" in result
         assert "timestamp" in result
-        assert len(result["topics"]) > 0
-        assert all("topic" in t for t in result["topics"])
-        assert all("score" in t for t in result["topics"])
-        print("✅ Test 2: discover_topics() returns structured topic data")
+        assert len(result["topics"]) == 2
+        # 20/25 * 10 = 8.0
+        assert result["topics"][0]["score"] == 8.0
+        # 15/25 * 10 = 6.0
+        assert result["topics"][1]["score"] == 6.0
+        assert result["topics"][0]["topic"] == "AI Testing Paradox"
+        mock_scout.assert_called_once()
 
-    def test_editorial_review_stage(self, flow):
-        """
-        Test 3: @listen stage selects winning topic
-
-        Given: Mock topics from discover_topics()
-        When: editorial_review() called
-        Then: Returns single topic with highest score
-        """
-        topics = {
-            "topics": [
-                {
-                    "topic": "Topic A",
-                    "score": 7.5,
+    @patch("src.economist_agents.flow.run_editorial_board")
+    @patch("src.economist_agents.flow.create_llm_client")
+    def test_editorial_review_stage(
+        self,
+        mock_create_client: Mock,
+        mock_board: Mock,
+        flow: EconomistContentFlow,
+    ) -> None:
+        """editorial_review() calls run_editorial_board and selects top pick."""
+        mock_create_client.return_value = Mock()
+        mock_board.return_value = {
+            "top_pick": {
+                "topic": "AI Testing Paradox",
+                "weighted_score": 8.5,
+                "original_topic": {
                     "hook": "Hook A",
                     "thesis": "Thesis A",
                 },
+            },
+            "consensus": True,
+            "dissenting_views": [],
+        }
+
+        topics = {
+            "topics": [
                 {
-                    "topic": "Topic B",
-                    "score": 8.5,
-                    "hook": "Hook B",
-                    "thesis": "Thesis B",
-                },
-                {
-                    "topic": "Topic C",
-                    "score": 6.2,
-                    "hook": "Hook C",
-                    "thesis": "Thesis C",
+                    "topic": "AI Testing Paradox",
+                    "score": 8.0,
+                    "hook": "Hook A",
+                    "thesis": "Thesis A",
+                    "raw": {"topic": "AI Testing Paradox"},
                 },
             ],
             "timestamp": "2026-01-07T00:00:00Z",
@@ -106,197 +129,234 @@ class TestEconomistFlow:
 
         result = flow.editorial_review(topics)
 
-        assert result["topic"] == "Topic B"  # Highest score
+        assert result["topic"] == "AI Testing Paradox"
         assert result["score"] == 8.5
-        assert "hook" in result
-        assert "thesis" in result
-        print("✅ Test 3: editorial_review() selects top-scored topic")
+        assert result["consensus"] is True
+        mock_board.assert_called_once()
+
+    def test_editorial_review_fallback_no_top_pick(
+        self, flow: EconomistContentFlow
+    ) -> None:
+        """editorial_review() falls back to highest score if board returns no top_pick."""
+        with (
+            patch("src.economist_agents.flow.create_llm_client") as mock_client,
+            patch("src.economist_agents.flow.run_editorial_board") as mock_board,
+        ):
+            mock_client.return_value = Mock()
+            mock_board.return_value = {
+                "top_pick": None,
+                "consensus": False,
+                "dissenting_views": [],
+            }
+
+            topics = {
+                "topics": [
+                    {"topic": "Topic A", "score": 6.0, "hook": "", "thesis": ""},
+                    {"topic": "Topic B", "score": 9.0, "hook": "", "thesis": ""},
+                ],
+            }
+
+            result = flow.editorial_review(topics)
+            assert result["topic"] == "Topic B"
+
+    def test_editorial_review_empty_topics_raises(
+        self, flow: EconomistContentFlow
+    ) -> None:
+        """editorial_review() raises ValueError on empty topic list."""
+        with pytest.raises(ValueError, match="No topics"):
+            flow.editorial_review({"topics": []})
 
     @patch("src.economist_agents.flow.Stage3Crew")
-    def test_stage3_crew_integration(self, mock_stage3_class, flow):
-        """
-        Test 4: Stage3Crew kickoff via generate_content()
-
-        Given: Mocked Stage3Crew
-        When: generate_content() called with selected topic
-        Then: Stage3Crew.kickoff() executed with topic parameter
-        """
-        # Mock Stage3Crew.kickoff() return value
-        mock_crew_instance = Mock()
-        mock_crew_instance.kickoff.return_value = {
-            "article": "# Test Article\n\nContent here...",
-            "chart_path": "/path/to/chart.png",
-            "word_count": 750,
-            "metadata": {"category": "quality-engineering"},
+    def test_generate_content(
+        self, mock_stage3_class: Mock, flow: EconomistContentFlow
+    ) -> None:
+        """generate_content() initializes Stage3Crew and preserves topic in state."""
+        mock_instance = Mock()
+        mock_instance.kickoff.return_value = {
+            "article": "---\ntitle: Test\n---\n\nContent here",
+            "chart_data": {"title": "Chart"},
         }
-        mock_stage3_class.return_value = mock_crew_instance
+        mock_stage3_class.return_value = mock_instance
 
-        selected_topic = {
-            "topic": "The AI Testing Paradox",
-            "score": 8.5,
-            "hook": "Companies report 40% more maintenance",
-            "thesis": "Self-healing tests create new complexity",
-        }
+        selected = {"topic": "AI Testing", "score": 8.5, "hook": "", "thesis": ""}
+        result = flow.generate_content(selected)
 
-        result = flow.generate_content(selected_topic)
-
-        # Verify Stage3Crew was initialized with topic
-        mock_stage3_class.assert_called_once_with(topic="The AI Testing Paradox")
-
-        # Verify Stage3Crew.kickoff() was called
-        mock_crew_instance.kickoff.assert_called_once()
-
-        # Verify result structure
+        mock_stage3_class.assert_called_once_with(topic="AI Testing")
+        mock_instance.kickoff.assert_called_once()
         assert "article" in result
-        assert "word_count" in result
-        print(
-            "✅ Test 4: Stage3Crew initialized and kickoff() called via generate_content()"
+        assert flow.state["selected_topic"] == selected
+
+    @patch("src.economist_agents.flow.PublicationValidator")
+    @patch("src.economist_agents.flow.Stage4Crew")
+    def test_quality_gate_publish(
+        self, mock_stage4_class: Mock, mock_validator_class: Mock
+    ) -> None:
+        """quality_gate() routes to 'publish' when editorial score >= 80 and validation passes."""
+        mock_s4 = Mock()
+        mock_s4.kickoff.return_value = {
+            "article": "Polished article",
+            "editorial_score": 92,
+            "gates_passed": 5,
+        }
+        mock_stage4_class.return_value = mock_s4
+
+        mock_validator = Mock()
+        mock_validator.validate.return_value = (True, [])
+        mock_validator_class.return_value = mock_validator
+
+        flow = EconomistContentFlow()
+        draft = {"article": "Draft", "chart_data": {"title": "Chart"}}
+        decision = flow.quality_gate(draft)
+
+        assert decision == "publish"
+        assert flow.state["decision"] == "publish"
+        # Verify Stage4Crew called with correct signature
+        mock_s4.kickoff.assert_called_once_with(
+            {"article": "Draft", "chart_data": {"title": "Chart"}}
         )
 
     @patch("src.economist_agents.flow.Stage4Crew")
-    def test_stage4_crew_routing_publish(self, mock_stage4_class, flow):
-        """
-        Test 5: Stage4Crew router - publish path
-
-        Given: Mocked Stage4Crew with quality_score ≥ 8
-        When: quality_gate() called
-        Then: Returns "publish" routing decision
-        """
-        # Mock Stage4Crew.kickoff() with high quality score
-        mock_crew_instance = Mock()
-        mock_crew_instance.kickoff.return_value = {
-            "edited_article": "# Edited Article\n\nPolished content...",
-            "gates_passed": 5,
-            "quality_score": 9.2,
-        }
-        mock_stage4_class.return_value = mock_crew_instance
-
-        flow_with_mock = EconomistContentFlow()
-
-        article_draft = {
-            "article": "# Draft Article\n\nDraft content...",
-            "chart_path": None,
-            "word_count": 750,
-        }
-
-        decision = flow_with_mock.quality_gate(article_draft)
-
-        assert decision == "publish"
-        assert flow_with_mock.state["decision"] == "publish"
-        assert flow_with_mock.state["quality_result"]["quality_score"] == 9.2
-        print("✅ Test 5: quality_gate() routes to publish (score ≥8)")
-
-    @patch("src.economist_agents.flow.Stage4Crew")
-    def test_stage4_crew_routing_revision(self, mock_stage4_class, flow):
-        """
-        Test 6: Stage4Crew router - revision path
-
-        Given: Mocked Stage4Crew with quality_score < 8
-        When: quality_gate() called
-        Then: Returns "revision" routing decision
-        """
-        # Mock Stage4Crew.kickoff() with low quality score
-        mock_crew_instance = Mock()
-        mock_crew_instance.kickoff.return_value = {
-            "edited_article": "# Draft Article\n\nNeeds work...",
+    def test_quality_gate_revision_low_score(self, mock_stage4_class: Mock) -> None:
+        """quality_gate() routes to 'revision' when editorial score < 80."""
+        mock_s4 = Mock()
+        mock_s4.kickoff.return_value = {
+            "article": "Weak article",
+            "editorial_score": 65,
             "gates_passed": 3,
-            "quality_score": 6.5,
+            "specific_edits": ["Fix opening", "Add sources"],
         }
-        mock_stage4_class.return_value = mock_crew_instance
+        mock_stage4_class.return_value = mock_s4
 
-        flow_with_mock = EconomistContentFlow()
-
-        article_draft = {
-            "article": "# Draft Article\n\nDraft content...",
-            "chart_path": None,
-            "word_count": 750,
-        }
-
-        decision = flow_with_mock.quality_gate(article_draft)
+        flow = EconomistContentFlow()
+        draft = {"article": "Draft", "chart_data": {}}
+        decision = flow.quality_gate(draft)
 
         assert decision == "revision"
-        assert flow_with_mock.state["decision"] == "revision"
-        assert flow_with_mock.state["quality_result"]["quality_score"] == 6.5
-        print("✅ Test 6: quality_gate() routes to revision (score <8)")
+        assert flow.state["revision_reason"].startswith("Editorial score 65")
+        assert flow.state["revision_feedback"] == ["Fix opening", "Add sources"]
 
-    def test_publish_terminal_stage(self, flow):
-        """
-        Test 7: Publish path terminal stage
-
-        Given: Flow state with publish decision
-        When: publish_article() called
-        Then: Returns published status with quality metadata
-        """
-        # Set flow state as if quality_gate() routed to publish
-        flow.state["quality_result"] = {
-            "edited_article": "# Published Article",
+    @patch("src.economist_agents.flow.PublicationValidator")
+    @patch("src.economist_agents.flow.Stage4Crew")
+    def test_quality_gate_revision_validation_fails(
+        self, mock_stage4_class: Mock, mock_validator_class: Mock
+    ) -> None:
+        """quality_gate() routes to 'revision' when validation fails despite good score."""
+        mock_s4 = Mock()
+        mock_s4.kickoff.return_value = {
+            "article": "Good score but bad format",
+            "editorial_score": 90,
             "gates_passed": 5,
-            "quality_score": 9.0,
         }
-        flow.state["decision"] = "publish"
+        mock_stage4_class.return_value = mock_s4
+
+        mock_validator = Mock()
+        mock_validator.validate.return_value = (
+            False,
+            [{"severity": "CRITICAL", "message": "Missing YAML frontmatter"}],
+        )
+        mock_validator_class.return_value = mock_validator
+
+        flow = EconomistContentFlow()
+        draft = {"article": "Draft", "chart_data": {}}
+        decision = flow.quality_gate(draft)
+
+        assert decision == "revision"
+        assert "validation failed" in flow.state["revision_reason"]
+        assert "Missing YAML frontmatter" in flow.state["revision_feedback"]
+
+    def test_publish_article(self, flow: EconomistContentFlow) -> None:
+        """publish_article() returns publication metadata from state."""
+        flow.state["quality_result"] = {
+            "article": "# Published Article",
+            "editorial_score": 92,
+            "gates_passed": 5,
+        }
 
         result = flow.publish_article()
 
         assert result["status"] == "published"
-        assert result["quality_score"] == 9.0
+        assert result["editorial_score"] == 92
         assert result["gates_passed"] == 5
-        assert "article" in result
-        print("✅ Test 7: publish_article() returns publication metadata")
+        assert result["article"] == "# Published Article"
 
-    def test_revision_terminal_stage(self, flow):
-        """
-        Test 8: Revision path terminal stage
+    @patch("src.economist_agents.flow.PublicationValidator")
+    @patch("src.economist_agents.flow.Stage3Crew")
+    def test_revision_loop_succeeds(
+        self,
+        mock_stage3_class: Mock,
+        mock_validator_class: Mock,
+        flow: EconomistContentFlow,
+    ) -> None:
+        """request_revision() retries and succeeds on second attempt."""
+        # Setup state as if quality_gate routed to revision
+        flow.state["selected_topic"] = {"topic": "AI Testing"}
+        flow.state["revision_reason"] = "Editorial score 65/100"
+        flow.state["revision_feedback"] = ["Fix opening"]
+        flow.state["quality_result"] = {"editorial_score": 65, "gates_passed": 3}
+        flow.state["retry_count"] = 0
 
-        Given: Flow state with revision decision
-        When: request_revision() called
-        Then: Returns needs_revision status with failed gates count
-        """
-        # Set flow state as if quality_gate() routed to revision
-        flow.state["quality_result"] = {
-            "edited_article": "# Draft Needs Revision",
-            "gates_passed": 2,
-            "quality_score": 5.5,
+        # Mock Stage3Crew for revision
+        mock_s3 = Mock()
+        mock_s3.kickoff.return_value = {
+            "article": "Improved article",
+            "chart_data": {},
         }
-        flow.state["decision"] = "revision"
+        mock_stage3_class.return_value = mock_s3
+
+        # Mock Stage4Crew (already on flow instance)
+        flow.stage4_crew = Mock()
+        flow.stage4_crew.kickoff.return_value = {
+            "article": "Polished improved article",
+            "editorial_score": 88,
+            "gates_passed": 5,
+        }
+
+        # Mock PublicationValidator
+        mock_validator = Mock()
+        mock_validator.validate.return_value = (True, [])
+        mock_validator_class.return_value = mock_validator
+
+        result = flow.request_revision()
+
+        assert result["status"] == "published"
+        assert result["editorial_score"] == 88
+        assert result["retry_count"] == 1
+        # Verify Stage3Crew was called with revision instructions
+        topic_arg = mock_stage3_class.call_args[1]["topic"]
+        assert "REVISION INSTRUCTIONS" in topic_arg
+        assert "Fix opening" in topic_arg
+
+    def test_revision_exhausted(self, flow: EconomistContentFlow) -> None:
+        """request_revision() gives up after max retries."""
+        flow.state["retry_count"] = 1  # Already used 1 retry
+        flow.state["quality_result"] = {"editorial_score": 50, "gates_passed": 2}
+        flow.state["revision_reason"] = "Still failing"
 
         result = flow.request_revision()
 
         assert result["status"] == "needs_revision"
-        assert result["quality_score"] == 5.5
-        assert result["gates_passed"] == 2
-        assert result["gates_failed"] == 3
-        print("✅ Test 8: request_revision() returns revision metadata")
+        assert result["retry_count"] == 1
+        assert result["revision_reason"] == "Still failing"
 
 
 @pytest.mark.skipif(
     not os.environ.get("OPENAI_API_KEY"),
     reason="OPENAI_API_KEY required for CrewAI agent initialization",
 )
-def test_flow_decorators_registered():
-    """
-    Test 9: Verify Flow decorators are properly registered
-
-    Given: EconomistContentFlow class
-    When: Inspected for decorated methods
-    Then: @start, @listen, @router decorators present
-    """
+def test_flow_decorators_registered() -> None:
+    """All Flow decorated methods are registered and callable."""
     flow = EconomistContentFlow()
 
-    # Check method existence
-    assert hasattr(flow, "discover_topics")
-    assert hasattr(flow, "editorial_review")
-    assert hasattr(flow, "generate_content")
-    assert hasattr(flow, "quality_gate")
-    assert hasattr(flow, "publish_article")
-    assert hasattr(flow, "request_revision")
-
-    # Verify methods are callable
-    assert callable(flow.discover_topics)
-    assert callable(flow.editorial_review)
-    assert callable(flow.generate_content)
-    assert callable(flow.quality_gate)
-
-    print("✅ Test 9: All Flow decorated methods registered")
+    for method_name in [
+        "discover_topics",
+        "editorial_review",
+        "generate_content",
+        "quality_gate",
+        "publish_article",
+        "request_revision",
+    ]:
+        assert hasattr(flow, method_name)
+        assert callable(getattr(flow, method_name))
 
 
 if __name__ == "__main__":

@@ -216,8 +216,8 @@ class TestEconomistFlow:
         )
 
     @patch("src.economist_agents.flow.Stage4Crew")
-    def test_quality_gate_revision_low_score(self, mock_stage4_class: Mock) -> None:
-        """quality_gate() routes to 'revision' when editorial score < 80."""
+    def test_quality_gate_revision_failed_gates(self, mock_stage4_class: Mock) -> None:
+        """quality_gate() routes to 'revision' when any editorial gate fails."""
         mock_s4 = Mock()
         mock_s4.kickoff.return_value = {
             "article": "Weak article",
@@ -232,7 +232,7 @@ class TestEconomistFlow:
         decision = flow.quality_gate(draft)
 
         assert decision == "revision"
-        assert flow.state["revision_reason"].startswith("Editorial score 65")
+        assert "3/5" in flow.state["revision_reason"]
         assert flow.state["revision_feedback"] == ["Fix opening", "Add sources"]
 
     @patch("src.economist_agents.flow.PublicationValidator")
@@ -328,14 +328,14 @@ class TestEconomistFlow:
 
     def test_revision_exhausted(self, flow: EconomistContentFlow) -> None:
         """request_revision() gives up after max retries."""
-        flow.state["retry_count"] = 1  # Already used 1 retry
+        flow.state["retry_count"] = 2  # Already used 2 retries (MAX_REVISIONS)
         flow.state["quality_result"] = {"editorial_score": 50, "gates_passed": 2}
         flow.state["revision_reason"] = "Still failing"
 
         result = flow.request_revision()
 
         assert result["status"] == "needs_revision"
-        assert result["retry_count"] == 1
+        assert result["retry_count"] == 2
         assert result["revision_reason"] == "Still failing"
 
 

@@ -239,6 +239,19 @@ class EconomistContentFlow(Flow):
                     + parts[2]
                 )
 
+        # Gate 0: Frontmatter schema validation (Story #117 boundary)
+        from scripts.frontmatter_schema import FrontmatterSchema
+
+        schema_result = FrontmatterSchema().validate_article(article_text)
+        if not schema_result.is_valid:
+            self.state["decision"] = "revision"
+            self.state["revision_reason"] = (
+                f"Frontmatter schema validation failed: {schema_result.errors}"
+            )
+            self.state["revision_feedback"] = schema_result.errors
+            print(f"   Decision: REVISION (schema: {schema_result.errors})")
+            return "revision"
+
         # Stage4Crew expects positional dict with "article" key
         result = self.stage4_crew.kickoff(
             {

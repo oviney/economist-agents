@@ -38,6 +38,21 @@ class DevelopmentCrew:
         self.agents = self._create_agents()
         self.crew = self._create_crew()
 
+    @staticmethod
+    def _get_model_string(config: dict[str, Any]) -> str:
+        """Extract model string from agent config for CrewAI compatibility.
+
+        CrewAI expects a string model name (e.g. 'gpt-4o'), not our custom
+        LLMClient object.
+        """
+        client = config.get("llm_client")
+        if client is None:
+            return "gpt-4o"
+        model = getattr(client, "model", None)
+        if model:
+            return str(model)
+        return "gpt-4o"
+
     def _create_agents(self) -> dict[str, Agent]:
         """Create agents for the development crew."""
         # Load agent configurations
@@ -46,7 +61,7 @@ class DevelopmentCrew:
         code_reviewer_config = self.registry.get_agent("code-reviewer")
         git_operator_config = self.registry.get_agent("git-operator")
 
-        # Create CrewAI Agent instances
+        # Create CrewAI Agent instances — pass model string, not LLMClient
         agents = {
             "code_quality_specialist": Agent(
                 role=code_quality_config["role"],
@@ -54,7 +69,7 @@ class DevelopmentCrew:
                 backstory=code_quality_config["backstory"],
                 verbose=True,
                 allow_delegation=False,
-                llm=code_quality_config["llm_client"],
+                llm=self._get_model_string(code_quality_config),
                 tools=code_quality_config["tools"],
             ),
             "test_specialist": Agent(
@@ -63,7 +78,7 @@ class DevelopmentCrew:
                 backstory=test_specialist_config["backstory"],
                 verbose=True,
                 allow_delegation=False,
-                llm=test_specialist_config["llm_client"],
+                llm=self._get_model_string(test_specialist_config),
                 tools=test_specialist_config["tools"],
             ),
             "code_reviewer": Agent(
@@ -72,7 +87,7 @@ class DevelopmentCrew:
                 backstory=code_reviewer_config["backstory"],
                 verbose=True,
                 allow_delegation=False,
-                llm=code_reviewer_config["llm_client"],
+                llm=self._get_model_string(code_reviewer_config),
                 tools=code_reviewer_config["tools"],
             ),
             "git_operator": Agent(
@@ -81,7 +96,7 @@ class DevelopmentCrew:
                 backstory=git_operator_config["backstory"],
                 verbose=True,
                 allow_delegation=False,
-                llm=git_operator_config["llm_client"],
+                llm=self._get_model_string(git_operator_config),
                 tools=git_operator_config["tools"],
             ),
         }

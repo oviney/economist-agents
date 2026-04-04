@@ -140,7 +140,12 @@ def _apply_editorial_fixes(article: str, current_date: str | None = None) -> str
             flags=re.DOTALL,
         )
 
-    # 7. Clean up double spaces from phrase removal
+    # 7. Strip verification placeholders that should never reach publication
+    text = re.sub(r"\s*\[NEEDS SOURCE\]", "", text)
+    text = re.sub(r"\s*\[UNVERIFIED\]", "", text)
+    text = re.sub(r"\s*\[REPLACE[-_]?ME\]", "", text, flags=re.IGNORECASE)
+
+    # 8. Clean up double spaces from phrase/placeholder removal
     text = re.sub(r"  +", " ", text)
 
     return text

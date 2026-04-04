@@ -4,96 +4,17 @@ on:
   workflow_dispatch:
     inputs:
       topic:
-        description: 'Article topic (leave empty to use editorial board winner)'
+        description: 'Article topic (leave empty for auto-discovery)'
         required: false
         type: string
-      run_scout:
-        description: 'Run topic scout first'
-        required: false
-        type: boolean
-        default: false
-      run_board:
-        description: 'Run editorial board voting'
-        required: false
-        type: boolean
-        default: false
-      interactive:
-        description: 'Enable interactive approval gates'
-        required: false
-        type: boolean
-        default: false
 
   schedule:
-    # Run topic scout every Monday at 9am UTC
+    # Run every Monday at 9am UTC
     - cron: '0 9 * * 1'
 
 jobs:
-  scout-topics:
-    runs-on: ubuntu-latest
-    if: github.event.inputs.run_scout == 'true' || github.event_name == 'schedule'
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run Topic Scout
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python scripts/topic_scout.py
-
-      - name: Upload topics
-        uses: actions/upload-artifact@v4
-        with:
-          name: content-queue
-          path: content_queue.json
-
-  editorial-board:
-    runs-on: ubuntu-latest
-    needs: scout-topics
-    if: github.event.inputs.run_board == 'true' || github.event_name == 'schedule'
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Download topics
-        uses: actions/download-artifact@v4
-        with:
-          name: content-queue
-
-      - name: Run Editorial Board
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python scripts/editorial_board.py
-
-      - name: Upload board decision
-        uses: actions/upload-artifact@v4
-        with:
-          name: board-decision
-          path: |
-            board_decision.json
-            board_report.md
-
   generate-article:
     runs-on: ubuntu-latest
-    needs: [scout-topics, editorial-board]
-    if: always()
     steps:
       - uses: actions/checkout@v4
 
@@ -102,8 +23,7 @@ jobs:
         with:
           python-version: '3.13'
 
-      # Cache ChromaDB vector store to persist Style Memory RAG across runs
-      # Key includes hash of archived articles (source data for embeddings)
+      # Cache ChromaDB vector store for Style Memory RAG
       - name: Cache ChromaDB Vector Store
         uses: actions/cache@v4
         with:
@@ -117,35 +37,73 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Download board decision (if exists)
-        uses: actions/download-artifact@v4
-        with:
-          name: board-decision
-        continue-on-error: true
-
-      - name: Generate Article
+      - name: Generate Article via Flow Pipeline
+        id: generate
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          TOPIC: ${{ github.event.inputs.topic }}
-          OUTPUT_DIR: output
           PYTHONPATH: ${{ github.workspace }}
         run: |
-          if [ "${{ github.event.inputs.interactive }}" == "true" ]; then
-            python scripts/economist_agent.py --interactive
-          else
-            python scripts/economist_agent.py
-          fi
+          python -c "
+          from src.economist_agents.flow import EconomistContentFlow
+          from pathlib import Path
+          from datetime import datetime
+          import json
 
-      - name: Upload generated content (artifact)
+          flow = EconomistContentFlow()
+          result = flow.kickoff()
+
+          status = result.get('status', 'unknown')
+          article = result.get('article', '')
+          score = result.get('editorial_score', 0)
+
+          print(f'Status: {status}')
+          print(f'Editorial Score: {score}/100')
+          print(f'Word count: {len(article.split())}')
+
+          # Save article to output/
+          if status == 'published' and article:
+              output_dir = Path('output')
+              output_dir.mkdir(exist_ok=True)
+
+              # Extract title for filename
+              title_slug = 'generated-article'
+              for line in article.split('\n'):
+                  if line.strip().startswith('title:'):
+                      raw_title = line.split(':', 1)[1].strip().strip('\"')
+                      title_slug = raw_title.lower()
+                      for ch in [' ', ':', '?', '!', ',', '.', '\"', \"'\", '(', ')']:
+                          title_slug = title_slug.replace(ch, '-')
+                      title_slug = title_slug.strip('-')[:60]
+                      break
+
+              date_str = datetime.now().strftime('%Y-%m-%d')
+              filename = f'{date_str}-{title_slug}.md'
+              filepath = output_dir / filename
+              filepath.write_text(article)
+              print(f'Saved: {filepath}')
+
+              # Write outputs for downstream steps
+              with open('article_path.txt', 'w') as f:
+                  f.write(str(filepath))
+              with open('article_title.txt', 'w') as f:
+                  f.write(raw_title if 'raw_title' in dir() else title_slug)
+          else:
+              print(f'Article not published: {status}')
+              issues = result.get('validation_issues', [])
+              if issues:
+                  print(f'Issues: {issues}')
+              exit(1)
+          "
+
+      - name: Upload generated content
         uses: actions/upload-artifact@v4
         with:
           name: generated-article
           path: |
             output/*.md
             output/charts/*.png
-            output/governance/**/*
 
-      # OPTION 1: Push to blog repo (if BLOG_REPO_TOKEN is configured)
+      # Push to blog repo (if configured)
       - name: Push to Blog Repository
         if: vars.BLOG_REPO_OWNER && vars.BLOG_REPO_NAME
         env:
@@ -178,14 +136,34 @@ jobs:
           git push origin $BRANCH
 
           # Create PR in blog repo
+          ARTICLE_TITLE=$(cat ../article_title.txt 2>/dev/null || echo "Generated Article")
           gh pr create \
             --repo ${BLOG_OWNER}/${BLOG_REPO} \
-            --title "📝 New Article: $(date +%Y-%m-%d)" \
-            --body "Automated article generated by economist-agents pipeline.<br><br>**Review checklist:**<br>- [ ] Article quality<br>- [ ] Chart rendering<br>- [ ] YAML front matter<br>- [ ] British spelling<br><br>**Generated:** $(date)" \
+            --title "📝 New Article: ${ARTICLE_TITLE}" \
+            --body "$(cat <<'PREOF'
+          ## Generated Article
+
+          Automated article generated by the economist-agents Flow pipeline.
+
+          **Quality Metrics:**
+          - Pipeline: Flow-based (Topic Scout → Editorial Board → Stage3Crew → Stage4Crew)
+          - Editorial review: 5-gate quality system
+          - Publication validator: deterministic checks
+
+          **Review checklist:**
+          - [ ] Article quality and accuracy
+          - [ ] Chart rendering
+          - [ ] YAML front matter correct
+          - [ ] British spelling throughout
+          - [ ] References section present
+
+          🤖 Generated by [economist-agents](https://github.com/oviney/economist-agents)
+          PREOF
+          )" \
             --head $BRANCH
 
-      # OPTION 2: Create PR in this repo (fallback if no blog repo configured)
-      - name: Create Pull Request (economist-agents repo)
+      # Fallback: create PR in this repo
+      - name: Create Pull Request (fallback)
         if: ${{ !vars.BLOG_REPO_OWNER }}
         uses: peter-evans/create-pull-request@v6
         with:
@@ -196,17 +174,11 @@ jobs:
           body: |
             ## Generated Content
 
-            Automated article generation completed.
+            Article generated by Flow pipeline (Topic Scout → Editorial Board → Stage3Crew → Quality Gate).
 
-            **Quality Check:**
-            - Review article in `output/` directory
-            - Check charts in `output/charts/`
-            - Review governance logs if available
+            **Review checklist:**
+            - [ ] Review article in `output/`
+            - [ ] Check quality score
+            - [ ] Approve and merge
 
-            **Next Steps:**
-            - Review content quality
-            - Approve and merge to publish
-            - Or request regeneration with different topic
-
-            ---
-            💡 **Tip:** Configure BLOG_REPO_TOKEN to push directly to your blog repo!
+            🤖 Generated by economist-agents Flow pipeline

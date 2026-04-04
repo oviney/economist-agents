@@ -8,6 +8,7 @@ tools:
 skills:
   - skills/python-quality
   - skills/architecture-patterns
+  - skills/agent-traceability
 ---
 
 # Code Reviewer Agent

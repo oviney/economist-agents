@@ -63,7 +63,22 @@ class EconomistContentFlow(Flow):
         print("🔭 Flow Stage 1: Topic Discovery")
 
         client = create_llm_client()
-        raw_topics = scout_topics(client, focus_area=None)
+
+        # Retry once if scout returns empty (LLM JSON parsing can fail)
+        raw_topics: list[dict[str, Any]] = []
+        for attempt in range(2):
+            raw_topics = scout_topics(client, focus_area=None)
+            if raw_topics:
+                break
+            print(
+                f"   ⚠️  Topic scout returned empty (attempt {attempt + 1}/2), retrying..."
+            )
+
+        if not raw_topics:
+            raise ValueError(
+                "Topic scout returned no topics after 2 attempts. "
+                "Check LLM connectivity and scout_topics() JSON parsing."
+            )
 
         # Normalise scout scores (0-25 sum) to 0-10 scale for display
         topics = []

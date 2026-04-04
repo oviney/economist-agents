@@ -111,11 +111,17 @@ DO NOT describe the article or summarize what it contains.
 DO NOT say "Above is..." or "Here is..." or reference the article.
 OUTPUT the actual article text directly, starting with:
 ---
+layout: post
 title: "Your Title"
 date: YYYY-MM-DD
 author: "The Economist"
+categories: ["Quality Engineering"]
+image: /assets/images/SLUG.png
 summary: "One-sentence summary of the article"
 ---
+
+IMPORTANT for categories: Choose 1-3 from: Quality Engineering, Test Automation, AI Testing, Software Engineering, DevOps, Performance.
+IMPORTANT for image: Replace SLUG with a lowercase-hyphenated version of the title (e.g., "ai-testing-costs").
 
 Then the full article body (minimum 800 words).
 

@@ -137,6 +137,25 @@ jobs:
 
           git push origin main
 
+      # Post-deployment quality check (shift-right editorial judge)
+      - name: Editorial Judge — Post-Deployment QA
+        if: vars.BLOG_REPO_OWNER && vars.BLOG_REPO_NAME
+        env:
+          GH_TOKEN: ${{ secrets.BLOG_REPO_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          ARTICLE_FILE=$(ls output/*.md 2>/dev/null | head -1 | xargs basename)
+          if [ -n "$ARTICLE_FILE" ]; then
+            python scripts/editorial_judge.py \
+              --blog-owner "${{ vars.BLOG_REPO_OWNER }}" \
+              --blog-repo "${{ vars.BLOG_REPO_NAME }}" \
+              --article "$ARTICLE_FILE" \
+              --create-issue-on-failure
+          else
+            echo "No article found to judge"
+          fi
+
       # Fallback: commit to this repo
       - name: Commit article (fallback)
         if: ${{ !vars.BLOG_REPO_OWNER }}

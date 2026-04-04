@@ -102,6 +102,7 @@ jobs:
           path: |
             output/*.md
             output/charts/*.png
+            output/images/*.png
 
       # Publish directly to blog repo main branch (no PR needed —
       # article already passed 5 editorial gates + publication validator)

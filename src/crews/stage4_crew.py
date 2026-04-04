@@ -1,88 +1,173 @@
 #!/usr/bin/env python3
 """
-Stage 4 Crew - Review and Final Editorial Polish
+Stage 4 Crew - Editorial Review and Deterministic Polish
 
-This crew represents the final review stage after Stage 3 (Research + Writing + Graphics + Initial Edit).
-Stage 4 focuses on:
-- Final editorial review with strict Economist standards
-- Style compliance validation (no banned phrases, proper structure)
-- Quality gate enforcement (>95% pass rate requirement)
-- Publication readiness assessment
+Uses an LLM reviewer agent for quality gate evaluation, then applies
+deterministic post-processing fixes.  The Final Editor LLM agent was
+removed because it hallucinated unrelated articles instead of making
+targeted edits — a well-known failure mode when LLMs are asked to
+"rewrite" rather than evaluate.
 
 Architecture:
-    Stage 3 Output (YAML/JSON) → Stage 4 Reviewer → Final Editor → Polished Article
+    Stage 3 Output → Reviewer Agent (LLM, 5-gate eval)
+                   → Deterministic Polish (regex/string ops)
+                   → Polished Article
 """
 
+import json
+import logging
 import re
+from datetime import datetime
 from typing import Any
 
 from crewai import Agent, Crew, Task
-from crewai.tools import tool
 
-from src.tools.style_memory_tool import create_style_memory_tool
+logger = logging.getLogger(__name__)
+
+# British spelling replacements (American → British)
+_BRITISH_SPELLING: dict[str, str] = {
+    "organization": "organisation",
+    "Organization": "Organisation",
+    "optimize": "optimise",
+    "Optimize": "Optimise",
+    "optimization": "optimisation",
+    "analyze": "analyse",
+    "Analyze": "Analyse",
+    "analyzing": "analysing",
+    "utilize": "utilise",
+    "utilizing": "utilising",
+    "recognize": "recognise",
+    "customize": "customise",
+    "prioritize": "prioritise",
+    "standardize": "standardise",
+    "modernize": "modernise",
+    "behavior": "behaviour",
+    "favor": "favour",
+    "favorable": "favourable",
+    "color": "colour",
+    "labor": "labour",
+    "center": "center",  # Keep as-is for tech terms
+}
+
+# Banned phrases to strip
+_BANNED_PHRASES: list[str] = [
+    "game-changer",
+    "game changer",
+    "paradigm shift",
+    "at the end of the day",
+]
+
+# Banned phrase patterns (case-insensitive) — only match "leverage" as verb
+_BANNED_PATTERNS: list[tuple[re.Pattern[str], str]] = [
+    (
+        re.compile(
+            r"\bleverage\b(?=\s+(?:the|our|their|its|this|that|these|those))",
+            re.IGNORECASE,
+        ),
+        "use",
+    ),
+]
+
+# Banned openings (first paragraph)
+_BANNED_OPENINGS: list[str] = [
+    "In today's world",
+    "In today's fast-paced",
+    "It's no secret",
+    "When it comes to",
+    "Amidst",
+]
+
+# Banned closings (last 500 chars)
+_BANNED_CLOSINGS: list[str] = [
+    "In conclusion",
+    "To conclude",
+    "In summary",
+    "remains to be seen",
+    "only time will tell",
+    "The journey ahead",
+]
 
 
-# Initialize Style Memory Tool for Editor Agent
-@tool("Style Memory Query")
-def style_memory_query_tool(query: str) -> str:
-    """
-    Query Style Memory for relevant Economist style patterns from Gold Standard articles.
+def _apply_editorial_fixes(article: str, current_date: str | None = None) -> str:
+    """Apply deterministic editorial fixes to an article.
 
-    Use this tool when evaluating GATE 3 (VOICE) to find concrete examples of:
-    - Proper Economist voice and tone
-    - British spelling patterns
-    - Sentence structure examples
-    - How to handle specific phrasings
+    Performs the mechanical edits that the Editorial Reviewer might flag:
+    British spelling, banned phrase removal, exclamation point removal,
+    and date correction.  Does NOT rewrite content — only surgical fixes.
 
     Args:
-        query: Natural language query (e.g., "banned phrases examples", "British spelling patterns")
+        article: Full article text with YAML frontmatter.
+        current_date: Expected publication date (YYYY-MM-DD).
 
     Returns:
-        Formatted string with top 3 relevant style examples from archived articles
-
-    Example:
-        result = style_memory_query_tool("how to write strong openings")
+        Article with deterministic fixes applied.
     """
-    tool_func = create_style_memory_tool()
-    return tool_func(query)
+    text = article
+
+    # 1. British spelling
+    for american, british in _BRITISH_SPELLING.items():
+        text = text.replace(american, british)
+
+    # 2. Remove banned phrases (exact match, case-insensitive)
+    for phrase in _BANNED_PHRASES:
+        pattern = re.compile(re.escape(phrase), re.IGNORECASE)
+        text = pattern.sub("", text)
+
+    # 3. Remove banned patterns (regex)
+    for pattern, replacement in _BANNED_PATTERNS:
+        text = pattern.sub(replacement, text)
+
+    # 4. Remove exclamation points (not inside code blocks)
+    lines = text.split("\n")
+    in_code_block = False
+    for i, line in enumerate(lines):
+        if line.strip().startswith("```"):
+            in_code_block = not in_code_block
+        if not in_code_block:
+            lines[i] = line.replace("!", ".")
+    text = "\n".join(lines)
+
+    # 5. Fix double periods from exclamation replacement
+    text = text.replace("..", ".")
+
+    # 6. Fix date in YAML frontmatter if needed
+    if current_date and text.startswith("---"):
+        text = re.sub(
+            r"^(---\n.*?date:\s*)\S+(.*?\n---)",
+            rf"\g<1>{current_date}\g<2>",
+            text,
+            count=1,
+            flags=re.DOTALL,
+        )
+
+    # 7. Clean up double spaces from phrase removal
+    text = re.sub(r"  +", " ", text)
+
+    return text
 
 
 class Stage4Crew:
-    """
-    Stage 4: Final Review and Editorial Polish
+    """Stage 4: Editorial review (LLM) + deterministic polish.
 
-    Agents:
-        1. Reviewer Agent - Applies 5 quality gates to Stage 3 output
-        2. Final Editor Agent - Polish and style enforcement
-
-    Input: Stage 3 output dict with 'article' and 'chart_data'
-    Output: dict with refined article, editorial score, and publication status
+    The reviewer agent evaluates the article against 5 quality gates
+    and returns a structured JSON assessment.  Deterministic post-
+    processing then applies mechanical fixes (spelling, banned phrases,
+    date correction).  No LLM is used for the editing step.
     """
 
-    def __init__(self):
-        """Initialize Stage 4 Crew with reviewer and editor agents"""
+    def __init__(self) -> None:
+        """Initialise Stage 4 with reviewer agent only."""
         self.reviewer_agent = self._create_reviewer_agent()
-        self.final_editor_agent = self._create_final_editor_agent()
         self.review_task = self._create_review_task()
-        self.polish_task = self._create_polish_task()
 
         self.crew = Crew(
-            agents=[self.reviewer_agent, self.final_editor_agent],
-            tasks=[self.review_task, self.polish_task],
+            agents=[self.reviewer_agent],
+            tasks=[self.review_task],
             verbose=True,
         )
 
     def _create_reviewer_agent(self) -> Agent:
-        """
-        Reviewer Agent - Applies 5 quality gates from Economist editorial standards
-
-        Quality Gates (extracted from agents/editor_agent.py):
-        1. OPENING - Hook quality, no throat-clearing
-        2. EVIDENCE - All statistics sourced, no weasel phrases
-        3. VOICE - British spelling, active voice, Economist style
-        4. STRUCTURE - Logical flow, strong ending (no "in conclusion")
-        5. CHART INTEGRATION - Chart embedded and referenced naturally
-        """
+        """Reviewer Agent — applies 5 quality gates."""
         return Agent(
             role="Editorial Reviewer",
             goal="Apply 5 quality gates to ensure article meets Economist standards with >95% pass rate",
@@ -101,64 +186,15 @@ BANNED OPENINGS: "In today's world", "It's no secret", "When it comes to", "Amid
 BANNED CLOSINGS: "In conclusion", "To conclude", "remains to be seen", "only time will tell"
 BANNED PHRASES: "game-changer", "paradigm shift", "leverage" (as verb), "at the end of the day"
 
-You are ruthlessly precise. Vague feedback is unacceptable.""",
-            verbose=True,
-            allow_delegation=False,
-        )
+You are ruthlessly precise. Vague feedback is unacceptable.
 
-    def _create_final_editor_agent(self) -> Agent:
-        """
-        Final Editor - Applies reviewer feedback and polishes for publication
-
-        This agent:
-        - Executes specific edits from reviewer feedback
-        - Removes banned phrases/patterns
-        - Strengthens weak verbs
-        - Ensures British spelling throughout
-        - Validates final article structure
-        """
-        return Agent(
-            role="Final Editor",
-            goal="Polish article to publication-ready state by applying reviewer feedback and enforcing style guide",
-            backstory="""You are The Economist's final copy editor before publication.
-
-Your responsibilities:
-- Execute ALL edits from the reviewer's quality gate feedback
-- Remove banned phrases: "game-changer", "paradigm
-
-**TOOL AVAILABLE**: You have access to Style Memory Tool via style_memory_query_tool(query).
-Use this to find concrete style examples when applying edits:
-- Query relevant patterns for specific edits
-- Reference Gold Standard examples for style consistency
-- Validate editorial choices against archived articles""",
-            verbose=True,
-            allow_delegation=False,
-            tools=[style_memory_query_tool],
-        )
-
-        # Create Editor Agent
-        self.editor_agent = Agent(
-            role="Chief Editor",
-            goal="""Edit articles to meet The Economist's exacting standards while preserving author voice and data integrity.""",
-            backstory="""You are the Chief Editor at The Economist with 20 years experience.
-You enforce house style ruthlessly but fairly, improving clarity without sacrificing substance.
-
-CRITICAL EDITS (ALWAYS CHECK):
-- Cut banned closings: "In conclusion", "To conclude", "In summary", "remains to be seen"
-- Strengthen weak verbs: "is experiencing growth" → "is growing"
-- Apply British spelling: organization → organisation, analyze → analyse
-- Remove exclamation points
-- Ensure chart embedding if chart_data present
-
-You catch what others miss. No article goes to print without your approval.
-
-Quality standard: Editorial score must be ≥95/100.""",
+CRITICAL: You are EVALUATING the article. Do NOT rewrite it. Return ONLY the JSON assessment.""",
             verbose=True,
             allow_delegation=False,
         )
 
     def _create_review_task(self) -> Task:
-        """Create review task for quality gate assessment"""
+        """Create review task for quality gate assessment."""
         return Task(
             description="""Review article from Stage 3 against 5 quality gates.
 
@@ -171,7 +207,7 @@ QUALITY GATES TO CHECK:
 4. STRUCTURE - Logical flow? Strong ending (no "in conclusion")?
 5. CHART INTEGRATION - Chart embedded if chart_data exists? Referenced naturally?
 
-OUTPUT FORMAT (JSON):
+OUTPUT FORMAT (JSON only — no other text):
 {
     "gates_passed": <number 0-5>,
     "gate_1_opening": {"pass": true/false, "issue": "..."},
@@ -183,56 +219,21 @@ OUTPUT FORMAT (JSON):
     "specific_edits": ["Edit 1", "Edit 2", ...]
 }
 
-CRITICAL: gates_passed must be ≥4.75 (95% pass rate)""",
+CRITICAL: Return ONLY valid JSON. Do NOT include the article text in your response.""",
             expected_output="JSON object with gate results and specific edit recommendations",
             agent=self.reviewer_agent,
         )
 
-    def _create_polish_task(self) -> Task:
-        """Create polish task for final editorial refinement"""
-        return Task(
-            description="""Apply reviewer feedback to polish article to publication standard.
-
-INPUTS:
-- Original article from Stage 3
-- Reviewer's gate assessment with specific_edits list
-
-ACTIONS:
-1. Execute ALL edits from reviewer's specific_edits list
-2. Remove banned phrases: "game-changer", "paradigm shift", "leverage" (verb)
-3. Remove banned openings: "In today's", "It's no secret", "When it comes"
-4. Remove banned closings: "In conclusion", "To conclude", "remains to be seen"
-5. Apply British spelling: -ize → -ise, -or → -our where appropriate
-6. Remove all exclamation points
-7. Strengthen weak verbs: "is experiencing" → present tense
-8. Ensure chart markdown present if chart_data exists
-9. Validate YAML frontmatter intact
-
-OUTPUT FORMAT (JSON):
-{
-    "article": "<polished article with YAML frontmatter>",
-    "editorial_score": <number 0-100>,
-    "gates_passed": <number 0-5>,
-    "publication_ready": true/false,
-    "reviewer_feedback": "<summary of what was changed>"
-}
-
-CRITICAL: editorial_score must be ≥95 for publication_ready=true""",
-            expected_output="JSON object with polished article and quality metrics",
-            agent=self.final_editor_agent,
-        )
-
     def kickoff(self, stage3_input: dict[str, Any]) -> dict[str, Any]:
-        """
-        Execute Stage 4 review and polish pipeline
+        """Execute Stage 4 review and deterministic polish.
 
         Args:
-            stage3_input: dict with 'article' (str) and 'chart_data' (dict)
+            stage3_input: dict with 'article' (str) and optional 'chart_data'.
 
         Returns:
-            dict with refined article, editorial_score, gates_passed, publication_ready
+            dict with 'article', 'editorial_score', 'gates_passed',
+            'publication_ready', 'reviewer_feedback', 'specific_edits'.
         """
-        # Validate Stage 3 input structure
         if not isinstance(stage3_input, dict):
             raise ValueError("stage3_input must be a dictionary")
         if "article" not in stage3_input:
@@ -241,53 +242,57 @@ CRITICAL: editorial_score must be ≥95 for publication_ready=true""",
         article = stage3_input["article"]
         chart_data = stage3_input.get("chart_data", {})
 
-        # Store context for agents
+        # --- LLM step: reviewer evaluates the article ---
         self.review_task.context = {"article": article, "chart_data": chart_data}
-        self.polish_task.context = {"article": article, "chart_data": chart_data}
-
-        # Execute crew (review → polish)
         crew_output = self.crew.kickoff()
-
-        # Parse result - CrewOutput object has .raw attribute with final output
-        import json
 
         result_str = (
             str(crew_output.raw) if hasattr(crew_output, "raw") else str(crew_output)
         )
 
-        try:
-            # Try direct JSON parse
-            parsed_result = json.loads(result_str)
-        except (json.JSONDecodeError, ValueError):
-            # Fallback: extract JSON from text if wrapped
-            json_match = re.search(r"\{.*\}", result_str, re.DOTALL)
-            if json_match:
-                try:
-                    parsed_result = json.loads(json_match.group())
-                except json.JSONDecodeError:
-                    # Emergency fallback: return original with metadata
-                    parsed_result = {
-                        "article": article,
-                        "editorial_score": 0,
-                        "gates_passed": 0,
-                        "publication_ready": False,
-                        "reviewer_feedback": "Failed to parse crew output",
-                    }
-            else:
-                # Emergency fallback
-                parsed_result = {
-                    "article": article,
-                    "editorial_score": 0,
-                    "gates_passed": 0,
-                    "publication_ready": False,
-                    "reviewer_feedback": "Failed to extract JSON from crew output",
-                }
+        review_result = self._parse_review_json(result_str)
 
-        return parsed_result
+        # --- Deterministic step: apply mechanical fixes ---
+        current_date = datetime.now().strftime("%Y-%m-%d")
+        polished_article = _apply_editorial_fixes(article, current_date)
+
+        editorial_score = review_result.get("editorial_score", 0)
+        gates_passed = review_result.get("gates_passed", 0)
+
+        return {
+            "article": polished_article,
+            "editorial_score": editorial_score,
+            "gates_passed": gates_passed,
+            "publication_ready": editorial_score >= 95,
+            "reviewer_feedback": review_result.get("specific_edits", []),
+            "specific_edits": review_result.get("specific_edits", []),
+        }
+
+    @staticmethod
+    def _parse_review_json(result_str: str) -> dict[str, Any]:
+        """Extract JSON from reviewer output, with fallbacks."""
+        try:
+            return json.loads(result_str)
+        except (json.JSONDecodeError, ValueError):
+            pass
+
+        # Try extracting JSON from surrounding text
+        json_match = re.search(r"\{.*\}", result_str, re.DOTALL)
+        if json_match:
+            try:
+                return json.loads(json_match.group())
+            except json.JSONDecodeError:
+                pass
+
+        logger.warning("Failed to parse reviewer JSON output")
+        return {
+            "editorial_score": 0,
+            "gates_passed": 0,
+            "specific_edits": ["Failed to parse reviewer output"],
+        }
 
 
 if __name__ == "__main__":
-    # Quick test
     print("Stage4Crew initialized")
     crew = Stage4Crew()
     print(f"Agents: {len(crew.crew.agents)}")

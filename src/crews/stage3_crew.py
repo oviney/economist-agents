@@ -119,9 +119,16 @@ summary: "One-sentence summary of the article"
 
 Then the full article body (minimum 800 words).
 
+MANDATORY: End with a "## References" section containing at least 3 numbered, properly cited sources.
+Example:
+## References
+1. Author/Org, ["Report Title"](https://example.com), *Publication*, Year
+2. ...
+3. ...
+
 Use British spelling, sharp wit, verified sources, and natural chart references.""",
             agent=self.writer_agent,
-            expected_output="The complete article text in full, with YAML frontmatter header (---\ntitle:\ndate:\nauthor:\nsummary:\n---) followed by the entire article body (minimum 800 words)",
+            expected_output="The complete article text in full, with YAML frontmatter header (---\ntitle:\ndate:\nauthor:\nsummary:\n---) followed by the entire article body (minimum 800 words) ending with a ## References section (minimum 3 sources)",
             context=[self.research_task],  # Access research findings
         )
 

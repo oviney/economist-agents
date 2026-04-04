@@ -30,7 +30,7 @@ from src.economist_agents.adapters import (
 
 # Editorial score threshold (0-100 scale) for publication
 PUBLISH_THRESHOLD = 80
-MAX_REVISIONS = 1
+MAX_REVISIONS = 2
 
 
 class EconomistContentFlow(Flow):
@@ -207,7 +207,17 @@ class EconomistContentFlow(Flow):
 
         self.state["quality_result"] = result
 
-        # Gate 1: Editorial score
+        # Gate 1: All 5 editorial gates must pass
+        if gates_passed < 5:
+            self.state["decision"] = "revision"
+            self.state["revision_reason"] = (
+                f"Only {gates_passed}/5 editorial gates passed"
+            )
+            self.state["revision_feedback"] = result.get("specific_edits", [])
+            print(f"   Decision: REVISION ({gates_passed}/5 gates, need 5/5)")
+            return "revision"
+
+        # Gate 2: Editorial score
         if editorial_score < PUBLISH_THRESHOLD:
             self.state["decision"] = "revision"
             self.state["revision_reason"] = (
@@ -219,7 +229,7 @@ class EconomistContentFlow(Flow):
             )
             return "revision"
 
-        # Gate 2: Publication validator
+        # Gate 3: Publication validator
         validator = PublicationValidator(
             expected_date=datetime.now().strftime("%Y-%m-%d")
         )

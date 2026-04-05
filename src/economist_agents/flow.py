@@ -1,3 +1,9 @@
-# Updated content from ruff format
+class Flow:
+    _tracer: AgentTraceLogger  # Class attribute annotation
 
-# Your updated code here after running ruff formatting on the flow.py file.
+    def __init__(self, ...):
+        self._tracer = AgentTraceLogger()
+        super().__init__(...)  # Initialize the parent class
+        # Additional initialization code...
+        
+    # Other methods of the Flow class...

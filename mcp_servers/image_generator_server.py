@@ -153,6 +153,9 @@ def generate_editorial_image(
 
     prompt = _build_dalle_prompt(article_title, article_summary)
 
+    # Allow operators to tune the image-download timeout via the environment
+    _download_timeout = int(os.environ.get("IMAGE_DOWNLOAD_TIMEOUT_SECONDS", "15"))
+
     try:
         import base64
 
@@ -181,7 +184,7 @@ def generate_editorial_image(
         if hasattr(image_data, "b64_json") and image_data.b64_json:
             image_bytes = base64.b64decode(image_data.b64_json)
         elif hasattr(image_data, "url") and image_data.url:
-            http_response = requests.get(image_data.url, timeout=30)
+            http_response = requests.get(image_data.url, timeout=_download_timeout)
             http_response.raise_for_status()
             image_bytes = http_response.content
         else:
@@ -207,10 +210,17 @@ def generate_editorial_image(
             "path": None,
             "size_bytes": 0,
         }
-    except Exception as exc:  # noqa: BLE001
-        logger.error("Image generation failed: %s", exc)
+    except (requests.RequestException, OSError) as exc:
+        logger.error("I/O error during image generation: %s", exc)
         return {
-            "error": f"Image generation failed: {exc}",
+            "error": f"I/O error during image generation: {exc}",
+            "path": None,
+            "size_bytes": 0,
+        }
+    except openai.OpenAIError as exc:
+        logger.error("OpenAI API error: %s", exc)
+        return {
+            "error": f"OpenAI API error: {exc}",
             "path": None,
             "size_bytes": 0,
         }

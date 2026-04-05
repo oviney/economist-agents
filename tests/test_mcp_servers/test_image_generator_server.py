@@ -7,6 +7,7 @@ All OpenAI interactions are mocked.
 """
 
 import base64
+import os
 from pathlib import Path
 from unittest.mock import MagicMock, Mock, patch
 
@@ -243,12 +244,9 @@ class TestGenerateEditorialImageErrors:
         """Given no OPENAI_API_KEY, the tool returns an error dict without raising."""
         output_path = str(tmp_path / "img.png")
 
-        with patch.dict("os.environ", {}, clear=True):
-            # Remove OPENAI_API_KEY if set in environment
-            import os
-
-            os.environ.pop("OPENAI_API_KEY", None)
-
+        # Remove OPENAI_API_KEY from the environment
+        env_without_key = {k: v for k, v in os.environ.items() if k != "OPENAI_API_KEY"}
+        with patch.dict("os.environ", env_without_key, clear=True):
             result = generate_editorial_image(
                 article_title="T",
                 article_summary="S",
@@ -356,7 +354,9 @@ class TestGenerateEditorialImageErrors:
         self,
         tmp_path: Path,
     ) -> None:
-        """Any unexpected exception is caught and returned as a structured error."""
+        """A requests.RequestException is caught and returned as a structured error."""
+        import requests as _requests
+
         output_path = str(tmp_path / "img.png")
 
         with (
@@ -364,7 +364,9 @@ class TestGenerateEditorialImageErrors:
             patch("openai.OpenAI") as mock_client_cls,
         ):
             mock_client = mock_client_cls.return_value
-            mock_client.images.generate.side_effect = RuntimeError("Network timeout")
+            mock_client.images.generate.side_effect = _requests.RequestException(
+                "Network timeout"
+            )
 
             result = generate_editorial_image(
                 article_title="T",
@@ -374,6 +376,37 @@ class TestGenerateEditorialImageErrors:
 
         assert "error" in result
         assert "Network timeout" in result["error"]
+        assert result["path"] is None
+        assert result["size_bytes"] == 0
+
+    @pytest.mark.unit
+    def test_openai_api_error_returns_structured_error(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """An openai.OpenAIError is caught and returned as a structured error."""
+        import openai
+
+        output_path = str(tmp_path / "img.png")
+
+        with (
+            patch.dict("os.environ", {"OPENAI_API_KEY": "sk-test-valid"}),
+            patch("openai.OpenAI") as mock_client_cls,
+        ):
+            mock_client = mock_client_cls.return_value
+            mock_client.images.generate.side_effect = openai.APIStatusError(
+                message="Rate limit exceeded",
+                response=MagicMock(status_code=429, headers={}),
+                body={"error": {"message": "Rate limit exceeded"}},
+            )
+
+            result = generate_editorial_image(
+                article_title="T",
+                article_summary="S",
+                output_path=output_path,
+            )
+
+        assert "error" in result
         assert result["path"] is None
         assert result["size_bytes"] == 0
 

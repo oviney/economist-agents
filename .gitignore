@@ -38,3 +38,4 @@ Thumbs.db
 # Runtime logs (written by ROI tracker and tests — should not be tracked)
 logs/execution_roi.json
 logs/quality_dashboard.json
+.coverage

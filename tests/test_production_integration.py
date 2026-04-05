@@ -93,9 +93,9 @@ class TestFlowOrchestration:
         mock_stage4.return_value = mock_stage4_instance
 
         flow = EconomistContentFlow()
-        # quality_gate expects dict from generate_content, not string
+        # quality_gate expects dict with valid frontmatter (schema gate fires first)
         article_draft = {
-            "article": "# AI Testing\n\nHigh quality content...",
+            "article": '---\nlayout: post\ntitle: "AI Testing"\ndate: 2026-04-04\ncategories: ["QE"]\nimage: /assets/images/test.png\n---\n\nHigh quality content...',
             "chart_path": None,
             "word_count": 100,
         }

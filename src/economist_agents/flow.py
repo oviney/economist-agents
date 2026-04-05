@@ -20,6 +20,7 @@ from typing import Any
 
 from crewai.flow.flow import Flow, listen, router, start
 
+from scripts.agent_trace_logger import AgentTraceLogger
 from src.crews.stage3_crew import Stage3Crew
 from src.crews.stage4_crew import Stage4Crew
 from src.economist_agents.adapters import (
@@ -49,9 +50,15 @@ class EconomistContentFlow(Flow):
     """
 
     def __init__(self) -> None:
-        """Initialize flow with crew dependencies."""
+        """Initialize flow with crew dependencies and tracer."""
         super().__init__()
         self.stage4_crew = Stage4Crew()
+        self._tracer = AgentTraceLogger()
+
+    @property
+    def tracer(self) -> AgentTraceLogger:
+        """Expose the agent trace logger for downstream consumers."""
+        return self._tracer
 
     @start()
     def discover_topics(self) -> dict[str, Any]:
@@ -100,7 +107,18 @@ class EconomistContentFlow(Flow):
 
         print(f"   Generated {len(topics)} topic candidates")
 
-        return {"topics": topics, "timestamp": datetime.now().isoformat()}
+        result: dict[str, Any] = {
+            "topics": topics,
+            "timestamp": datetime.now().isoformat(),
+        }
+        self._tracer.log_agent_action(
+            agent_name="TopicScout",
+            stage="discover_topics",
+            inputs={"focus_area": None, "attempt_limit": 2},
+            outputs={"topic_count": len(topics), "timestamp": result["timestamp"]},
+            decision=f"generated {len(topics)} topic candidates",
+        )
+        return result
 
     @listen(discover_topics)
     def editorial_review(self, topics: dict[str, Any]) -> dict[str, Any]:
@@ -130,6 +148,17 @@ class EconomistContentFlow(Flow):
             # Fallback: pick highest-scored topic
             selected = max(topic_list, key=lambda t: t.get("score", 0))
             print(f"   Fallback selection: {selected['topic']}")
+            self._tracer.log_agent_action(
+                agent_name="EditorialBoard",
+                stage="editorial_review",
+                inputs={"topic_count": len(topic_list)},
+                outputs={
+                    "selected_topic": selected.get("topic"),
+                    "score": selected.get("score"),
+                },
+                decision=f"fallback selection: '{selected.get('topic')}'",
+                status="revision",
+            )
             return selected
 
         original = top.get("original_topic", {})
@@ -146,6 +175,18 @@ class EconomistContentFlow(Flow):
         print(f"   Score: {selected['score']:.1f}/10")
         print(f"   Consensus: {selected['consensus']}")
 
+        self._tracer.log_agent_action(
+            agent_name="EditorialBoard",
+            stage="editorial_review",
+            inputs={"topic_count": len(topic_list)},
+            outputs={
+                "selected_topic": selected["topic"],
+                "score": selected["score"],
+                "consensus": selected["consensus"],
+                "dissenting_views": selected.get("dissenting_views", []),
+            },
+            decision=f"selected '{selected['topic']}' (score {selected['score']:.1f})",
+        )
         return selected
 
     @listen(editorial_review)
@@ -200,6 +241,18 @@ class EconomistContentFlow(Flow):
             result["featured_image"] = "/assets/images/blog-default.svg"
             print(f"   ℹ️  Image generation failed ({e}), using default")
 
+        word_count = len(result.get("article", "").split())
+        self._tracer.log_agent_action(
+            agent_name="Stage3Crew",
+            stage="generate_content",
+            inputs={"topic": topic},
+            outputs={
+                "word_count": word_count,
+                "featured_image": result.get("featured_image"),
+                "has_chart_data": bool(result.get("chart_data")),
+            },
+            decision=f"generated article ({word_count} words)",
+        )
         return result
 
     @router(generate_content)
@@ -250,6 +303,14 @@ class EconomistContentFlow(Flow):
             )
             self.state["revision_feedback"] = schema_result.errors
             print(f"   Decision: REVISION (schema: {schema_result.errors})")
+            self._tracer.log_agent_action(
+                agent_name="FrontmatterSchema",
+                stage="quality_gate",
+                inputs={"article_length": len(article_text)},
+                outputs={"errors": schema_result.errors},
+                decision=f"revision — schema validation failed: {schema_result.errors}",
+                status="revision",
+            )
             return "revision"
 
         # Stage4Crew expects positional dict with "article" key
@@ -277,6 +338,17 @@ class EconomistContentFlow(Flow):
             )
             self.state["revision_feedback"] = result.get("specific_edits", [])
             print(f"   Decision: REVISION ({gates_passed}/5 gates, need 5/5)")
+            self._tracer.log_agent_action(
+                agent_name="Stage4Crew",
+                stage="quality_gate",
+                inputs={"article_length": len(article_text)},
+                outputs={
+                    "editorial_score": editorial_score,
+                    "gates_passed": gates_passed,
+                },
+                decision=f"revision — only {gates_passed}/5 editorial gates passed",
+                status="revision",
+            )
             return "revision"
 
         # Gate 2: Editorial score
@@ -288,6 +360,17 @@ class EconomistContentFlow(Flow):
             self.state["revision_feedback"] = result.get("specific_edits", [])
             print(
                 f"   Decision: REVISION (score {editorial_score} < {PUBLISH_THRESHOLD})"
+            )
+            self._tracer.log_agent_action(
+                agent_name="Stage4Crew",
+                stage="quality_gate",
+                inputs={"article_length": len(article_text)},
+                outputs={
+                    "editorial_score": editorial_score,
+                    "gates_passed": gates_passed,
+                },
+                decision=f"revision — score {editorial_score} below threshold {PUBLISH_THRESHOLD}",
+                status="revision",
             )
             return "revision"
 
@@ -306,10 +389,25 @@ class EconomistContentFlow(Flow):
             )
             self.state["revision_feedback"] = [i["message"] for i in critical]
             print(f"   Decision: REVISION ({len(critical)} critical validation issues)")
+            self._tracer.log_agent_action(
+                agent_name="PublicationValidator",
+                stage="quality_gate",
+                inputs={"article_length": len(edited_article)},
+                outputs={"critical_issues": len(critical), "total_issues": len(issues)},
+                decision=f"revision — {len(critical)} critical validation issues",
+                status="revision",
+            )
             return "revision"
 
         self.state["decision"] = "publish"
         print("   Decision: PUBLISH ✅")
+        self._tracer.log_agent_action(
+            agent_name="PublicationValidator",
+            stage="quality_gate",
+            inputs={"article_length": len(edited_article)},
+            outputs={"editorial_score": editorial_score, "gates_passed": gates_passed},
+            decision=f"publish — score {editorial_score}/100, all gates passed",
+        )
         return "publish"
 
     @listen("publish")
@@ -324,12 +422,24 @@ class EconomistContentFlow(Flow):
         print("✅ Flow Complete: PUBLISHED")
         print(f"   Editorial Score: {quality_result.get('editorial_score', 0)}/100")
 
-        return {
+        result: dict[str, Any] = {
             "status": "published",
             "article": quality_result.get("article", ""),
             "editorial_score": quality_result.get("editorial_score", 0),
             "gates_passed": quality_result.get("gates_passed", 0),
         }
+        self._tracer.log_agent_action(
+            agent_name="EconomistContentFlow",
+            stage="publish_article",
+            inputs={},
+            outputs={
+                "status": result["status"],
+                "editorial_score": result["editorial_score"],
+                "gates_passed": result["gates_passed"],
+            },
+            decision=f"published — editorial score {result['editorial_score']}/100",
+        )
+        return result
 
     @listen("revision")
     def request_revision(self) -> dict[str, Any]:
@@ -347,13 +457,22 @@ class EconomistContentFlow(Flow):
         if retry_count >= MAX_REVISIONS:
             quality_result = self.state.get("quality_result", {})
             print(f"⛔ Revision exhausted ({retry_count}/{MAX_REVISIONS} retries used)")
-            return {
+            result: dict[str, Any] = {
                 "status": "needs_revision",
                 "editorial_score": quality_result.get("editorial_score", 0),
                 "gates_passed": quality_result.get("gates_passed", 0),
                 "revision_reason": self.state.get("revision_reason", "Unknown"),
                 "retry_count": retry_count,
             }
+            self._tracer.log_agent_action(
+                agent_name="EconomistContentFlow",
+                stage="request_revision",
+                inputs={"retry_count": retry_count, "max_revisions": MAX_REVISIONS},
+                outputs=result,
+                decision=f"revision exhausted after {retry_count} retries",
+                status="error",
+            )
+            return result
 
         self.state["retry_count"] = retry_count + 1
         revision_feedback = self.state.get("revision_feedback", [])
@@ -398,25 +517,50 @@ class EconomistContentFlow(Flow):
 
         if editorial_score >= PUBLISH_THRESHOLD and is_valid:
             print(f"   ✅ Revision succeeded (score: {editorial_score}/100)")
-            return {
+            published: dict[str, Any] = {
                 "status": "published",
                 "article": edited_article,
                 "editorial_score": editorial_score,
                 "gates_passed": gates_passed,
                 "retry_count": self.state["retry_count"],
             }
+            self._tracer.log_agent_action(
+                agent_name="EconomistContentFlow",
+                stage="request_revision",
+                inputs={"retry_count": self.state["retry_count"]},
+                outputs={
+                    "status": published["status"],
+                    "editorial_score": editorial_score,
+                    "gates_passed": gates_passed,
+                },
+                decision=f"revision succeeded (score {editorial_score}/100)",
+            )
+            return published
 
         critical = [i for i in issues if i.get("severity") == "CRITICAL"]
         print(
             f"   ⚠️  Revision still failing (score: {editorial_score}, issues: {len(critical)})"
         )
-        return {
+        needs_revision: dict[str, Any] = {
             "status": "needs_revision",
             "editorial_score": editorial_score,
             "gates_passed": gates_passed,
             "validation_issues": [i["message"] for i in critical],
             "retry_count": self.state["retry_count"],
         }
+        self._tracer.log_agent_action(
+            agent_name="EconomistContentFlow",
+            stage="request_revision",
+            inputs={"retry_count": self.state["retry_count"]},
+            outputs={
+                "status": needs_revision["status"],
+                "editorial_score": editorial_score,
+                "critical_issues": len(critical),
+            },
+            decision=f"revision still failing (score {editorial_score}, {len(critical)} critical)",
+            status="revision",
+        )
+        return needs_revision
 
 
 def main() -> None:

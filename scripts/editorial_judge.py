@@ -437,8 +437,19 @@ class EditorialJudge:
 
         return "\n".join(lines)
 
-    def create_github_issue(self, report: JudgeReport) -> str | None:
-        """Create a GitHub issue on economist-agents if failures found."""
+    def create_github_issue(
+        self, report: JudgeReport, agent_logs: str | None = None
+    ) -> str | None:
+        """Create a GitHub issue on economist-agents if failures found.
+
+        Args:
+            report: The completed JudgeReport with check results.
+            agent_logs: Optional Markdown-formatted agent traceability log
+                to attach as a comment on the newly created issue.
+
+        Returns:
+            The URL of the created issue, or None on failure.
+        """
         if not report.failures:
             return None
 
@@ -467,13 +478,44 @@ class EditorialJudge:
             timeout=30,
         )
 
-        if result.returncode == 0:
-            issue_url = result.stdout.strip()
-            print(f"Created issue: {issue_url}")
-            return issue_url
+        if result.returncode != 0:
+            logger.warning("Failed to create issue: %s", result.stderr)
+            return None
 
-        logger.warning("Failed to create issue: %s", result.stderr)
-        return None
+        issue_url = result.stdout.strip()
+        print(f"Created issue: {issue_url}")
+
+        if agent_logs:
+            self._post_issue_comment(issue_url, agent_logs)
+
+        return issue_url
+
+    def _post_issue_comment(self, issue_url: str, comment_body: str) -> None:
+        """Post a comment on an existing GitHub issue.
+
+        Args:
+            issue_url: The full URL of the GitHub issue to comment on.
+            comment_body: The Markdown body text for the comment.
+        """
+        comment_result = subprocess.run(
+            [
+                "gh",
+                "issue",
+                "comment",
+                issue_url,
+                "--body",
+                comment_body,
+            ],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        if comment_result.returncode == 0:
+            logger.debug("Posted agent trace log comment on %s", issue_url)
+        else:
+            logger.warning(
+                "Failed to post agent trace comment: %s", comment_result.stderr
+            )
 
 
 # ═══════════════════════════════════════════════════════════════════════════

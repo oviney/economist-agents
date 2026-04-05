@@ -109,6 +109,25 @@ jobs:
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
 
+  destructive-change-guard:
+    name: Destructive Change Guard
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Check for destructive changes to critical files
+        run: python scripts/destructive_change_guard.py
+
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest

@@ -14,13 +14,14 @@ Requires:
 """
 
 import base64
+import binascii
 import logging
 import os
 from pathlib import Path
 
 import openai
 import requests
-from fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP
 
 # ═══════════════════════════════════════════════════════════════════════════
 # ECONOMIST EDITORIAL ILLUSTRATION STYLE
@@ -113,7 +114,7 @@ def _build_dalle_prompt(article_title: str, article_summary: str) -> str:
     return prompt
 
 
-@mcp.tool
+@mcp.tool()
 def generate_editorial_image(
     article_title: str,
     article_summary: str,
@@ -156,12 +157,14 @@ def generate_editorial_image(
     prompt = _build_dalle_prompt(article_title, article_summary)
 
     # Allow operators to tune the image-download timeout via the environment.
-    # Fall back to 15 s if the value is missing or non-numeric.
+    # Fall back to 15 s if the value is missing, non-numeric, or non-positive.
     try:
         download_timeout = int(os.environ.get("IMAGE_DOWNLOAD_TIMEOUT_SECONDS", "15"))
+        if download_timeout <= 0:
+            raise ValueError("timeout must be greater than zero")
     except ValueError:
         logger.warning(
-            "IMAGE_DOWNLOAD_TIMEOUT_SECONDS is not a valid integer; using default of 15 s"
+            "IMAGE_DOWNLOAD_TIMEOUT_SECONDS must be a positive integer; using default of 15 s"
         )
         download_timeout = 15
 
@@ -190,7 +193,15 @@ def generate_editorial_image(
         image_url = getattr(image_data, "url", None)
 
         if b64_json:
-            image_bytes = base64.b64decode(b64_json)
+            try:
+                image_bytes = base64.b64decode(b64_json)
+            except binascii.Error as exc:
+                logger.error("Failed to decode base64 image data: %s", exc)
+                return {
+                    "error": f"Failed to decode base64 image data: {exc}",
+                    "path": None,
+                    "size_bytes": 0,
+                }
         elif image_url:
             http_response = requests.get(image_url, timeout=download_timeout)
             http_response.raise_for_status()

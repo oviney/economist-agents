@@ -442,6 +442,103 @@ class TestGenerateEditorialImageErrors:
         assert result["path"] is None
         assert result["size_bytes"] == 0
 
+    @pytest.mark.unit
+    def test_invalid_b64_returns_structured_error(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Invalid base64 payload raises binascii.Error which is returned as structured error."""
+        output_path = str(tmp_path / "img.png")
+
+        image_data = Mock()
+        image_data.b64_json = "NOT_VALID_BASE64!!!!"
+        image_data.url = None
+
+        bad_response = Mock()
+        bad_response.data = [image_data]
+
+        with (
+            patch.dict("os.environ", {"OPENAI_API_KEY": "sk-test-valid"}),
+            patch("openai.OpenAI") as mock_client_cls,
+        ):
+            mock_client = mock_client_cls.return_value
+            mock_client.images.generate.return_value = bad_response
+
+            result = generate_editorial_image(
+                article_title="T",
+                article_summary="S",
+                output_path=output_path,
+            )
+
+        assert "error" in result
+        assert "base64" in result["error"].lower()
+        assert result["path"] is None
+        assert result["size_bytes"] == 0
+
+    @pytest.mark.unit
+    def test_zero_timeout_env_var_falls_back_to_default(
+        self,
+        tmp_path: Path,
+        fake_png_bytes: bytes,
+        mock_openai_image_response: Mock,
+    ) -> None:
+        """Zero IMAGE_DOWNLOAD_TIMEOUT_SECONDS falls back to 15 s default."""
+        output_path = str(tmp_path / "img.png")
+
+        with (
+            patch.dict(
+                "os.environ",
+                {
+                    "OPENAI_API_KEY": "sk-test-valid",
+                    "IMAGE_DOWNLOAD_TIMEOUT_SECONDS": "0",
+                },
+            ),
+            patch("openai.OpenAI") as mock_client_cls,
+        ):
+            mock_client = mock_client_cls.return_value
+            mock_client.images.generate.return_value = mock_openai_image_response
+
+            result = generate_editorial_image(
+                article_title="T",
+                article_summary="S",
+                output_path=output_path,
+            )
+
+        assert result["path"] == output_path
+        assert result["size_bytes"] > 0
+
+    @pytest.mark.unit
+    def test_negative_timeout_env_var_falls_back_to_default(
+        self,
+        tmp_path: Path,
+        fake_png_bytes: bytes,
+        mock_openai_image_response: Mock,
+    ) -> None:
+        """Negative IMAGE_DOWNLOAD_TIMEOUT_SECONDS falls back to 15 s default."""
+        output_path = str(tmp_path / "img.png")
+
+        with (
+            patch.dict(
+                "os.environ",
+                {
+                    "OPENAI_API_KEY": "sk-test-valid",
+                    "IMAGE_DOWNLOAD_TIMEOUT_SECONDS": "-5",
+                },
+            ),
+            patch("openai.OpenAI") as mock_client_cls,
+        ):
+            mock_client = mock_client_cls.return_value
+            mock_client.images.generate.return_value = mock_openai_image_response
+
+            result = generate_editorial_image(
+                article_title="T",
+                article_summary="S",
+                output_path=output_path,
+            )
+
+        assert result["path"] == output_path
+        assert result["size_bytes"] > 0
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # MCP server registration
@@ -472,7 +569,7 @@ class TestMcpServerRegistration:
 
         tools = asyncio.run(mcp.list_tools())
         tool = next(t for t in tools if t.name == "generate_editorial_image")
-        schema_props = tool.parameters.get("properties", {})
+        schema_props = tool.inputSchema.get("properties", {})
         assert "article_title" in schema_props
         assert "article_summary" in schema_props
         assert "output_path" in schema_props

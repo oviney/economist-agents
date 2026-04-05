@@ -158,12 +158,12 @@ def generate_editorial_image(
     # Allow operators to tune the image-download timeout via the environment.
     # Fall back to 15 s if the value is missing or non-numeric.
     try:
-        _download_timeout = int(os.environ.get("IMAGE_DOWNLOAD_TIMEOUT_SECONDS", "15"))
+        download_timeout = int(os.environ.get("IMAGE_DOWNLOAD_TIMEOUT_SECONDS", "15"))
     except ValueError:
         logger.warning(
             "IMAGE_DOWNLOAD_TIMEOUT_SECONDS is not a valid integer; using default of 15 s"
         )
-        _download_timeout = 15
+        download_timeout = 15
 
     try:
         client = openai.OpenAI(api_key=api_key)
@@ -186,10 +186,13 @@ def generate_editorial_image(
 
         image_data = response.data[0]
 
-        if hasattr(image_data, "b64_json") and image_data.b64_json:
-            image_bytes = base64.b64decode(image_data.b64_json)
-        elif hasattr(image_data, "url") and image_data.url:
-            http_response = requests.get(image_data.url, timeout=_download_timeout)
+        b64_json = getattr(image_data, "b64_json", None)
+        image_url = getattr(image_data, "url", None)
+
+        if b64_json:
+            image_bytes = base64.b64decode(b64_json)
+        elif image_url:
+            http_response = requests.get(image_url, timeout=download_timeout)
             http_response.raise_for_status()
             image_bytes = http_response.content
         else:

@@ -245,7 +245,7 @@ class TestGenerateEditorialImageErrors:
         output_path = str(tmp_path / "img.png")
 
         with patch.dict("os.environ", {"OPENAI_API_KEY": ""}, clear=False):
-            # Overwrite with empty string so os.environ.get returns falsy value
+            # Remove the key entirely so os.environ.get returns None
             os.environ.pop("OPENAI_API_KEY", None)
             result = generate_editorial_image(
                 article_title="T",

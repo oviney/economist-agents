@@ -21,7 +21,6 @@ try:
     import chromadb
     import chromadb.errors
 
-    CHROMADB_AVAILABLE = True
     _UPSERT_ERRORS: tuple[type[Exception], ...] = (
         chromadb.errors.ChromaError,
         ValueError,
@@ -29,10 +28,9 @@ try:
         OSError,
     )
 except ImportError:
-    CHROMADB_AVAILABLE = False
     _UPSERT_ERRORS = (ValueError, RuntimeError, OSError)
 
-from fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP
 
 from src.tools.style_memory_tool import StyleMemoryTool
 
@@ -94,7 +92,9 @@ def query_style_memory(query: str, n_results: int = 3) -> list[dict[str, Any]]:
     Returns:
         A list of dicts, each containing:
           - text (str): the matched excerpt
-          - score (float): cosine-similarity score in [0, 1]
+          - score (float): distance-derived relevance score in [0, 1],
+            computed as ``1 - min(L2_distance, 1.0)``; higher values indicate
+            closer (more relevant) matches
           - source (str): source article filename
           - paragraph (int): paragraph index within the source article
     """
@@ -152,7 +152,13 @@ def add_to_style_memory(article_text: str, metadata: dict[str, Any]) -> dict[str
             "message": "No paragraphs with ≥50 characters found in article_text.",
         }
 
-    source_label = str(metadata.get("source", "unknown"))
+    source_label = str(metadata.get("source", "")).strip()
+    if not source_label:
+        return {
+            "success": False,
+            "indexed_paragraphs": 0,
+            "message": 'metadata must include a non-empty "source" key to prevent ID collisions.',
+        }
     # Build unique IDs based on source + paragraph index so repeated indexing
     # of the same article is idempotent (ChromaDB upsert behaviour).
     ids = [f"mcp_{source_label}_p{i}" for i in range(len(paragraphs))]

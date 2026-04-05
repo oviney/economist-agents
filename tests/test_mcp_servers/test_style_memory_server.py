@@ -357,6 +357,33 @@ class TestAddToStyleMemory:
         assert result["success"] is False
         assert "simulated DB error" in result["message"]
 
+    def test_missing_source_returns_failure(self):
+        """Metadata without a 'source' key returns a failure dict."""
+        import mcp_servers.style_memory_server as server
+
+        tool = _make_in_memory_tool()
+        server._set_tool_for_testing(tool)
+
+        long_text = "E" * 60 + "\n\n" + "F" * 60
+        result = server.add_to_style_memory(long_text, {})
+
+        assert result["success"] is False
+        assert result["indexed_paragraphs"] == 0
+        assert "source" in result["message"]
+
+    def test_empty_source_returns_failure(self):
+        """Metadata with an empty 'source' value returns a failure dict."""
+        import mcp_servers.style_memory_server as server
+
+        tool = _make_in_memory_tool()
+        server._set_tool_for_testing(tool)
+
+        long_text = "G" * 60 + "\n\n" + "H" * 60
+        result = server.add_to_style_memory(long_text, {"source": "   "})
+
+        assert result["success"] is False
+        assert result["indexed_paragraphs"] == 0
+
     def test_metadata_attached_to_paragraphs(self):
         """Custom metadata fields are stored alongside each paragraph."""
         import mcp_servers.style_memory_server as server
@@ -388,7 +415,7 @@ class TestMCPServerObject:
 
     def test_server_is_fastmcp_instance(self):
         """mcp is a FastMCP instance."""
-        from fastmcp import FastMCP
+        from mcp.server.fastmcp import FastMCP
 
         import mcp_servers.style_memory_server as server
 

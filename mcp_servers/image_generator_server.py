@@ -105,7 +105,7 @@ def _build_dalle_prompt(article_title: str, article_summary: str) -> str:
         "TASK: Create a SCENE, not a symbol.  Show a specific moment that captures "
         "the article's argument.\n\n"
         "Think: \"What would a photograph of this article's thesis look like, if "
-        "drawn by a political cartoonist with a paintbrush?\"\n\n"
+        'drawn by a political cartoonist with a paintbrush?"\n\n'
         "The viewer should understand the article's ARGUMENT from the image, "
         "not just its topic.\n\n"
         "CRITICAL: ZERO text, words, letters, numbers, or symbols in the image."

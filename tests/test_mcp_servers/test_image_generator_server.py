@@ -19,19 +19,18 @@ from mcp_servers.image_generator_server import (
     mcp,
 )
 
-
 # ─────────────────────────────────────────────────────────────────────────────
 # Fixtures
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-@pytest.fixture()
+@pytest.fixture
 def fake_png_bytes() -> bytes:
     """Minimal PNG-like bytes for testing file writes."""
     return b"\x89PNG\r\n\x1a\n" + b"\x00" * 100
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_openai_image_response(fake_png_bytes: bytes) -> Mock:
     """Build a mock OpenAI images.generate() response with b64_json."""
     image_data = Mock()
@@ -44,7 +43,7 @@ def mock_openai_image_response(fake_png_bytes: bytes) -> Mock:
     return response
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_openai_url_response(fake_png_bytes: bytes) -> Mock:
     """Build a mock OpenAI images.generate() response with a URL."""
     image_data = Mock()

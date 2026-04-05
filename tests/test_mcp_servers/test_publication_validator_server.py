@@ -7,8 +7,6 @@ and returns the expected result structure.
 
 import asyncio
 
-import pytest
-
 from mcp_servers.publication_validator_server import mcp, validate_for_publication
 
 # ---------------------------------------------------------------------------
@@ -55,11 +53,6 @@ def _make_article(
         fields.append(f"categories: {categories}")
     fm = "\n".join(fields)
     return f"{frontmatter_open}\n{fm}\n{frontmatter_close}\n\n{body}\n\n{references}\n"
-
-
-# ---------------------------------------------------------------------------
-# Import the tool function directly for unit testing
-# ---------------------------------------------------------------------------
 
 
 # ---------------------------------------------------------------------------

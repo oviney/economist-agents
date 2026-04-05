@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the Editorial Judge — post-deployment shift-right quality gate."""
 
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -267,6 +267,110 @@ class TestReport:
         assert "Test Title" in text
         assert "FAIL" in text
         assert "Image not found" in text
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# GitHub issue creation with agent logs
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+class TestCreateGithubIssue:
+    """Tests for create_github_issue() with agent traceability log support."""
+
+    def _failing_report(self) -> JudgeReport:
+        report = JudgeReport("Bad Article", "bad.md", "https://example.com/bad")
+        report.checks = [CheckResult("Image", FAIL, "Image not found")]
+        return report
+
+    def _passing_report(self) -> JudgeReport:
+        report = JudgeReport("Good Article", "good.md", "https://example.com/good")
+        report.checks = [CheckResult("All", PASS, "All checks passed")]
+        return report
+
+    def test_no_issue_when_no_failures(self) -> None:
+        judge = EditorialJudge("o", "b", "good.md")
+        result = judge.create_github_issue(self._passing_report())
+        assert result is None
+
+    def test_issue_created_on_failure(self) -> None:
+        judge = EditorialJudge("o", "b", "bad.md")
+        report = self._failing_report()
+
+        with patch("scripts.editorial_judge.subprocess.run") as mock_run:
+            mock_run.return_value.returncode = 0
+            mock_run.return_value.stdout = "https://github.com/o/r/issues/42\n"
+            url = judge.create_github_issue(report)
+
+        assert url == "https://github.com/o/r/issues/42"
+        # Verify gh issue create was called
+        create_call = mock_run.call_args_list[0]
+        assert "issue" in create_call[0][0]
+        assert "create" in create_call[0][0]
+
+    def test_agent_logs_posted_as_comment_on_success(self) -> None:
+        judge = EditorialJudge("o", "b", "bad.md")
+        report = self._failing_report()
+        agent_logs = "## 🔍 Agent Traceability Log\n\nSome trace data"
+
+        create_result = Mock(
+            returncode=0, stdout="https://github.com/o/r/issues/99\n", stderr=""
+        )
+        comment_result = Mock(returncode=0, stdout="", stderr="")
+
+        with patch("scripts.editorial_judge.subprocess.run") as mock_run:
+            mock_run.side_effect = [create_result, comment_result]
+            url = judge.create_github_issue(report, agent_logs=agent_logs)
+
+        assert url == "https://github.com/o/r/issues/99"
+        assert mock_run.call_count == 2
+        comment_call_args = mock_run.call_args_list[1][0][0]
+        assert "issue" in comment_call_args
+        assert "comment" in comment_call_args
+        # The agent log body should be passed as --body argument
+        body_index = comment_call_args.index("--body")
+        assert comment_call_args[body_index + 1] == agent_logs
+
+    def test_no_comment_when_agent_logs_none(self) -> None:
+        judge = EditorialJudge("o", "b", "bad.md")
+        report = self._failing_report()
+
+        with patch("scripts.editorial_judge.subprocess.run") as mock_run:
+            mock_run.return_value.returncode = 0
+            mock_run.return_value.stdout = "https://github.com/o/r/issues/7\n"
+            judge.create_github_issue(report, agent_logs=None)
+
+        # Only 1 call: issue create (no comment call)
+        assert mock_run.call_count == 1
+
+    def test_returns_none_when_gh_fails(self) -> None:
+        judge = EditorialJudge("o", "b", "bad.md")
+        report = self._failing_report()
+
+        with patch("scripts.editorial_judge.subprocess.run") as mock_run:
+            mock_run.return_value.returncode = 1
+            mock_run.return_value.stdout = ""
+            mock_run.return_value.stderr = "gh: command not found"
+            url = judge.create_github_issue(report)
+
+        assert url is None
+
+    def test_comment_failure_does_not_raise(self) -> None:
+        """A comment posting failure should log a warning, not propagate."""
+        judge = EditorialJudge("o", "b", "bad.md")
+        report = self._failing_report()
+        agent_logs = "## Trace"
+
+        create_result = Mock(
+            returncode=0, stdout="https://github.com/o/r/issues/5\n", stderr=""
+        )
+        comment_result = Mock(returncode=1, stdout="", stderr="error")
+
+        with patch("scripts.editorial_judge.subprocess.run") as mock_run:
+            mock_run.side_effect = [create_result, comment_result]
+            # Should not raise
+            url = judge.create_github_issue(report, agent_logs=agent_logs)
+
+        assert url == "https://github.com/o/r/issues/5"
 
 
 if __name__ == "__main__":

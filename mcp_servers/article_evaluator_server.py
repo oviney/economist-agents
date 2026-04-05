@@ -19,9 +19,9 @@ _ROOT = Path(__file__).resolve().parent.parent
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP  # noqa: E402
 
-from scripts.article_evaluator import ArticleEvaluator
+from scripts.article_evaluator import ArticleEvaluator  # noqa: E402
 
 logger = logging.getLogger(__name__)
 

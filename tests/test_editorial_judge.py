@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the Editorial Judge — post-deployment shift-right quality gate."""
 
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -312,21 +312,13 @@ class TestCreateGithubIssue:
         report = self._failing_report()
         agent_logs = "## 🔍 Agent Traceability Log\n\nSome trace data"
 
+        create_result = Mock(
+            returncode=0, stdout="https://github.com/o/r/issues/99\n", stderr=""
+        )
+        comment_result = Mock(returncode=0, stdout="", stderr="")
+
         with patch("scripts.editorial_judge.subprocess.run") as mock_run:
-            # First call: gh issue create → success
-            # Second call: gh issue comment → success
-            mock_run.side_effect = [
-                type(
-                    "R",
-                    (),
-                    {
-                        "returncode": 0,
-                        "stdout": "https://github.com/o/r/issues/99\n",
-                        "stderr": "",
-                    },
-                )(),
-                type("R", (), {"returncode": 0, "stdout": "", "stderr": ""})(),
-            ]
+            mock_run.side_effect = [create_result, comment_result]
             url = judge.create_github_issue(report, agent_logs=agent_logs)
 
         assert url == "https://github.com/o/r/issues/99"
@@ -335,9 +327,8 @@ class TestCreateGithubIssue:
         assert "issue" in comment_call_args
         assert "comment" in comment_call_args
         # The agent log body should be passed as --body argument
-        comment_positional = mock_run.call_args_list[1][0][0]
-        body_index = comment_positional.index("--body")
-        assert comment_positional[body_index + 1] == agent_logs
+        body_index = comment_call_args.index("--body")
+        assert comment_call_args[body_index + 1] == agent_logs
 
     def test_no_comment_when_agent_logs_none(self) -> None:
         judge = EditorialJudge("o", "b", "bad.md")
@@ -369,19 +360,13 @@ class TestCreateGithubIssue:
         report = self._failing_report()
         agent_logs = "## Trace"
 
+        create_result = Mock(
+            returncode=0, stdout="https://github.com/o/r/issues/5\n", stderr=""
+        )
+        comment_result = Mock(returncode=1, stdout="", stderr="error")
+
         with patch("scripts.editorial_judge.subprocess.run") as mock_run:
-            mock_run.side_effect = [
-                type(
-                    "R",
-                    (),
-                    {
-                        "returncode": 0,
-                        "stdout": "https://github.com/o/r/issues/5\n",
-                        "stderr": "",
-                    },
-                )(),
-                type("R", (), {"returncode": 1, "stdout": "", "stderr": "error"})(),
-            ]
+            mock_run.side_effect = [create_result, comment_result]
             # Should not raise
             url = judge.create_github_issue(report, agent_logs=agent_logs)
 

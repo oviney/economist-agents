@@ -25,10 +25,11 @@ Usage:
     comment_body = tracer.format_as_github_comment()
 """
 
-import json
 import logging
 from datetime import UTC, datetime
 from typing import Any
+
+import orjson
 
 logger = logging.getLogger(__name__)
 
@@ -198,14 +199,13 @@ class AgentTraceLogger:
             lines.append("")
             lines.append("```json")
             lines.append(
-                json.dumps(
+                orjson.dumps(
                     {
                         "inputs": entry.get("inputs"),
                         "outputs": entry.get("outputs"),
                     },
-                    indent=2,
-                    default=str,
-                )
+                    option=orjson.OPT_INDENT_2,
+                ).decode("utf-8")
             )
             lines.append("```")
             lines.append("")

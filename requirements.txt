@@ -19,3 +19,4 @@ redis>=4.0.0             # Optional Redis cache backend (Story #145)
 requests>=2.31.0         # HTTP requests for image generation
 arxiv>=2.1.0             # arXiv API for cutting-edge research papers
 feedparser>=6.0.0        # RSS feed parsing for additional research sources
+fastmcp>=3.2.0           # FastMCP framework for MCP server implementations (Story 18.6)

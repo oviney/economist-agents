@@ -136,6 +136,7 @@ class TestValidateForPublicationPlaceholders:
         placeholder_issues = [
             i for i in result["issues"] if i["check"] == "placeholder_text"
         ]
+        assert len(placeholder_issues) >= 1
         assert placeholder_issues[0]["message"]
 
     def test_verification_flag_needs_source_rejected(self) -> None:
@@ -228,11 +229,11 @@ class TestMcpToolRegistered:
     def test_tool_listed(self) -> None:
         """validate_for_publication appears in the server's tool registry."""
         tool_names = [
-            t.name for t in asyncio.run(mcp._local_provider.list_tools())
+            t.name for t in asyncio.run(mcp.list_tools())
         ]
         assert "validate_for_publication" in tool_names
 
     def test_tool_has_description(self) -> None:
-        tools = asyncio.run(mcp._local_provider.list_tools())
+        tools = asyncio.run(mcp.list_tools())
         tool = next(t for t in tools if t.name == "validate_for_publication")
         assert tool.description

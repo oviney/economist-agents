@@ -12,7 +12,7 @@ import logging
 import sys
 from pathlib import Path
 
-from fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP
 
 # Ensure the repo root is on sys.path so the scripts package is importable
 # when the server is launched directly (mirrors run.sh behaviour).
@@ -57,7 +57,20 @@ def validate_for_publication(
     )
 
     validator = PublicationValidator(expected_date=expected_date)
-    is_valid, issues = validator.validate(content)
+    try:
+        is_valid, issues = validator.validate(content)
+    except Exception as exc:
+        logger.exception("validate_for_publication failed: %s", exc)
+        return {
+            "is_valid": False,
+            "issues": [
+                {
+                    "check": "validator_error",
+                    "severity": "CRITICAL",
+                    "message": str(exc),
+                }
+            ],
+        }
 
     logger.info(
         "Validation complete: is_valid=%s, issue_count=%d", is_valid, len(issues)

@@ -13,10 +13,12 @@ Requires:
     OPENAI_API_KEY environment variable
 """
 
+import base64
 import logging
 import os
 from pathlib import Path
 
+import openai
 import requests
 from fastmcp import FastMCP
 
@@ -153,14 +155,17 @@ def generate_editorial_image(
 
     prompt = _build_dalle_prompt(article_title, article_summary)
 
-    # Allow operators to tune the image-download timeout via the environment
-    _download_timeout = int(os.environ.get("IMAGE_DOWNLOAD_TIMEOUT_SECONDS", "15"))
+    # Allow operators to tune the image-download timeout via the environment.
+    # Fall back to 15 s if the value is missing or non-numeric.
+    try:
+        _download_timeout = int(os.environ.get("IMAGE_DOWNLOAD_TIMEOUT_SECONDS", "15"))
+    except ValueError:
+        logger.warning(
+            "IMAGE_DOWNLOAD_TIMEOUT_SECONDS is not a valid integer; using default of 15 s"
+        )
+        _download_timeout = 15
 
     try:
-        import base64
-
-        import openai
-
         client = openai.OpenAI(api_key=api_key)
 
         logger.info("Calling DALL-E 3 for '%s'", article_title[:60])

@@ -244,9 +244,9 @@ class TestGenerateEditorialImageErrors:
         """Given no OPENAI_API_KEY, the tool returns an error dict without raising."""
         output_path = str(tmp_path / "img.png")
 
-        # Remove OPENAI_API_KEY from the environment
-        env_without_key = {k: v for k, v in os.environ.items() if k != "OPENAI_API_KEY"}
-        with patch.dict("os.environ", env_without_key, clear=True):
+        with patch.dict("os.environ", {"OPENAI_API_KEY": ""}, clear=False):
+            # Overwrite with empty string so os.environ.get returns falsy value
+            os.environ.pop("OPENAI_API_KEY", None)
             result = generate_editorial_image(
                 article_title="T",
                 article_summary="S",
@@ -355,7 +355,7 @@ class TestGenerateEditorialImageErrors:
         tmp_path: Path,
     ) -> None:
         """A requests.RequestException is caught and returned as a structured error."""
-        import requests as _requests
+        import requests
 
         output_path = str(tmp_path / "img.png")
 
@@ -364,7 +364,7 @@ class TestGenerateEditorialImageErrors:
             patch("openai.OpenAI") as mock_client_cls,
         ):
             mock_client = mock_client_cls.return_value
-            mock_client.images.generate.side_effect = _requests.RequestException(
+            mock_client.images.generate.side_effect = requests.RequestException(
                 "Network timeout"
             )
 
@@ -378,6 +378,39 @@ class TestGenerateEditorialImageErrors:
         assert "Network timeout" in result["error"]
         assert result["path"] is None
         assert result["size_bytes"] == 0
+
+    @pytest.mark.unit
+    def test_invalid_timeout_env_var_falls_back_to_default(
+        self,
+        tmp_path: Path,
+        fake_png_bytes: bytes,
+        mock_openai_image_response: Mock,
+    ) -> None:
+        """Non-numeric IMAGE_DOWNLOAD_TIMEOUT_SECONDS falls back to 15 s default."""
+        output_path = str(tmp_path / "img.png")
+
+        with (
+            patch.dict(
+                "os.environ",
+                {
+                    "OPENAI_API_KEY": "sk-test-valid",
+                    "IMAGE_DOWNLOAD_TIMEOUT_SECONDS": "not-a-number",
+                },
+            ),
+            patch("openai.OpenAI") as mock_client_cls,
+        ):
+            mock_client = mock_client_cls.return_value
+            mock_client.images.generate.return_value = mock_openai_image_response
+
+            # Should succeed despite invalid timeout value (falls back to 15)
+            result = generate_editorial_image(
+                article_title="T",
+                article_summary="S",
+                output_path=output_path,
+            )
+
+        assert result["path"] == output_path
+        assert result["size_bytes"] > 0
 
     @pytest.mark.unit
     def test_openai_api_error_returns_structured_error(

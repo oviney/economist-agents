@@ -35,9 +35,10 @@ def search_arxiv(
         List of source dicts with title, authors, date, url, summary.
     """
     try:
-        from scripts.arxiv_search import search_arxiv_papers
+        from scripts.arxiv_search import search_arxiv_for_topic
 
-        results = search_arxiv_papers(query, max_results=max_results)
+        result = search_arxiv_for_topic(query, max_papers=max_results)
+        results = result.get("papers", [])
         sources = []
         cutoff = datetime.now() - timedelta(days=days)
 

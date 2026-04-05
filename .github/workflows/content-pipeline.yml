@@ -95,6 +95,16 @@ jobs:
               exit(1)
           "
 
+      # Observability metrics pipeline — runs after every article generation
+      # and updates logs/quality_dashboard.json within the 5-minute SLA.
+      - name: Update Observability Metrics Dashboard
+        if: success() || failure()
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python scripts/quality_metrics.py
+          echo "Dashboard updated: logs/quality_dashboard.json"
+
       - name: Upload generated content
         uses: actions/upload-artifact@v4
         with:
@@ -103,6 +113,7 @@ jobs:
             output/*.md
             output/charts/*.png
             output/images/*.png
+            logs/quality_dashboard.json
 
       # Publish directly to blog repo main branch (no PR needed —
       # article already passed 5 editorial gates + publication validator)

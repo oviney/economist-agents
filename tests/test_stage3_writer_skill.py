@@ -64,7 +64,7 @@ class TestWriterBackstoryNoLists:
 
     def test_backstory_bans_lists_section(self, stage3_source: str) -> None:
         """Backstory must have a NO LISTS ban section."""
-        assert "NO LISTS" in stage3_source or "LISTS" in stage3_source
+        assert "NO LISTS" in stage3_source
 
 
 class TestWriterBackstoryNoHedging:
@@ -92,11 +92,11 @@ class TestWriterBackstoryNameNames:
 
     def test_backstory_requires_named_companies(self, stage3_source: str) -> None:
         """Backstory must require at least 2 named companies or individuals."""
-        assert "named companies" in stage3_source or "named" in stage3_source
+        assert "named companies" in stage3_source or "named individuals" in stage3_source
 
     def test_backstory_bans_generic_attribution(self, stage3_source: str) -> None:
         """Backstory must ban generic attribution like 'organisations', 'experts say'."""
-        assert "BANNED GENERIC" in stage3_source or "generic attribution" in stage3_source.lower()
+        assert "BANNED GENERIC" in stage3_source
 
     def test_backstory_bans_experts_say(self, stage3_source: str) -> None:
         """Backstory must ban 'experts say'."""
@@ -128,7 +128,7 @@ class TestWriterBackstoryTitle:
 
     def test_backstory_title_rules_present(self, stage3_source: str) -> None:
         """Backstory must include TITLE RULES."""
-        assert "TITLE RULES" in stage3_source or "TITLE" in stage3_source
+        assert "TITLE RULES" in stage3_source
 
     def test_backstory_bans_why_how_titles(self, stage3_source: str) -> None:
         """Backstory must ban titles starting with 'Why' or 'How'."""
@@ -144,7 +144,7 @@ class TestWriterBackstoryVividEnding:
 
     def test_backstory_bans_summary_closings(self, stage3_source: str) -> None:
         """Backstory must ban summary closings."""
-        assert "BANNED CLOSINGS" in stage3_source or "summary" in stage3_source.lower()
+        assert "BANNED CLOSINGS" in stage3_source
 
     def test_backstory_bans_in_conclusion(self, stage3_source: str) -> None:
         """Backstory must ban 'In conclusion'."""
@@ -191,8 +191,8 @@ class TestWriterTaskDescription:
         assert "LISTS" in stage3_source
 
     def test_task_bans_hedging(self, stage3_source: str) -> None:
-        """Writer task must ban hedging phrases."""
-        assert "hedging" in stage3_source.lower() or "AUTHORITY" in stage3_source
+        """Writer task must ban hedging phrases via the AUTHORITY section label."""
+        assert "AUTHORITY" in stage3_source
 
     def test_task_requires_named_companies(self, stage3_source: str) -> None:
         """Writer task must require named companies/individuals."""

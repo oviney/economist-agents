@@ -220,24 +220,24 @@ class EconomistContentFlow(Flow):
         # Preserve draft for revision loop
         self.state["article_draft"] = article_draft
 
-        # Inject featured image into frontmatter before review
+        # Override image path with the actual generated path (the Writer Agent
+        # invents its own slug which won't match the DALL-E output filename)
         article_text = article_draft.get("article", "")
         featured_image = article_draft.get(
             "featured_image", "/assets/images/blog-default.svg"
         )
-        if (
-            article_text.startswith("---")
-            and "image:" not in article_text.split("---", 2)[1]
-        ):
+        if article_text.startswith("---"):
             parts = article_text.split("---", 2)
             if len(parts) >= 3:
-                article_text = (
-                    "---"
-                    + parts[1].rstrip()
-                    + f"\nimage: {featured_image}\n"
-                    + "---"
-                    + parts[2]
-                )
+                import re as _re
+
+                # Replace existing image: or add if missing
+                fm = parts[1]
+                if "image:" in fm:
+                    fm = _re.sub(r"image:.*", f"image: {featured_image}", fm)
+                else:
+                    fm = fm.rstrip() + f"\nimage: {featured_image}\n"
+                article_text = "---" + fm + "---" + parts[2]
 
         # Gate 0: Frontmatter schema validation (Story #117 boundary)
         from scripts.frontmatter_schema import FrontmatterSchema

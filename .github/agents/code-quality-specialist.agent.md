@@ -7,6 +7,8 @@ tools:
   - file_search
 skills:
   - skills/python-quality
+  - skills/article-evaluation
+  - skills/defect-prevention
 ---
 
 # Code Quality Specialist Agent

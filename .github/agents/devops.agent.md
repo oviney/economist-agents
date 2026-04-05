@@ -1,3 +1,15 @@
+---
+name: devops
+description: Infrastructure automation, CI/CD, observability, and GitHub Projects
+model: claude-sonnet-4-20250514
+tools:
+  - bash
+  - file_search
+skills:
+  - skills/devops
+  - skills/observability
+---
+
 # DevOps Agent
 
 ## Role

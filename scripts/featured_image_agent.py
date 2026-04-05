@@ -29,48 +29,51 @@ from typing import Literal
 # ═══════════════════════════════════════════════════════════════════════════
 
 ECONOMIST_IMAGE_STYLE = """
-VISUAL STYLE: Editorial illustration for The Economist magazine
+Create an editorial illustration in the style of The Economist magazine's
+commissioned artwork — the kind by David Parkins or Kevin "KAL" Kallaugher.
+
+STYLE:
+- Painterly, textured illustration with visible brushstrokes
+- Think oil painting meets political cartoon
+- Rich, layered composition with depth and dimension
+- NOT flat vector art, NOT minimalist icons, NOT stock photography
+- Cross-hatching, colour washes, and artistic texture throughout
 
 CRITICAL - NO TEXT:
-- ABSOLUTELY NO TEXT, WORDS, LETTERS, NUMBERS, OR SYMBOLS ANYWHERE IN THE IMAGE
+- ABSOLUTELY NO TEXT, WORDS, LETTERS, NUMBERS, OR SYMBOLS ANYWHERE
 - No labels, captions, signs, or written content of any kind
-- No text on objects, buildings, or backgrounds
-- If you feel tempted to add text, DO NOT - leave that area blank instead
 
-REQUIREMENTS:
-- Minimalist and conceptual (symbolic, not literal)
-- Limited color palette:
-  - Navy blue (#17648d) for primary subjects
-  - Burgundy red (#843844) for accents or contrast
-  - Warm beige (#f1f0e9) for backgrounds
-  - Use negative space effectively
-- Professional, businesslike tone
-- Avoid technology clichés:
-  - NO lightbulbs (for ideas)
-  - NO upward arrows (for growth)
-  - NO gears or cogs (for systems)
-  - NO puzzle pieces (for integration)
-  - NO handshakes (for partnership)
+HUMAN ELEMENT (MANDATORY):
+- Always include at least one human figure
+- Stylised but expressive — body language tells the story
+- People in suits, at desks, in boardrooms, on factory floors
+- Show emotion: frustration, curiosity, determination, bemusement
+
+COLOUR PALETTE (RICH AND MUTED):
+- Blues: #3b6d8f, #17648d, steel blue
+- Warm greys: #8a8a8a, charcoal shadows
+- Accents: dusty red #a34054, ochre #c4953a, sage green #7a9a6f
+- Natural skin tones, varied
+- Background: cream #f4f0e6, warm grey #d9d3c7, parchment
+- Avoid pure black, neon, or oversaturated colours
 
 COMPOSITION:
-- Simple, clear focal point
-- Abstract or metaphorical representation
-- European editorial illustration aesthetic
-- Flat design or subtle gradients only
-- High contrast between elements
-- Generous margins and breathing room
+- Asymmetric, with a clear focal point
+- Use scale exaggeration for editorial effect (tiny person, enormous machine)
+- Overlapping elements create depth and dimension
+- Environmental context — place subjects in real settings (offices, cities)
+- Generous negative space on one side for text overlay
 
-SUBJECTS TO FAVOR:
-- Human figures in simplified, stylized form
-- Architectural elements (buildings, bridges, structures)
-- Geometric shapes with symbolic meaning
-- Objects in unexpected contexts or scales
-- Subtle visual puns or clever juxtapositions
+AVOID:
+- Technology clichés: lightbulbs, upward arrows, gears, puzzle pieces
+- Generic abstract shapes that could represent anything
+- Flat design or icon-like simplicity
+- Photorealism or stock photo aesthetics
 
 TONE:
 - Intelligent and thought-provoking
-- Slightly wry or knowing
-- Confident without being flashy
+- Slightly satirical or wry
+- Confident editorial voice
 - Timeless, not trendy
 """
 
@@ -99,23 +102,24 @@ def create_image_prompt(
         prompt += f"CONTRARIAN ANGLE: {contrarian_angle}\n\n"
 
     prompt += """
-TASK: Create an editorial illustration that clearly communicates the article's main theme.
+TASK: Create a SCENE, not a symbol. Show a specific moment that captures
+the article's argument.
 
-First, identify the CORE CONCEPT of the article (e.g., failure, transformation, cost, risk).
-Then choose a SPECIFIC VISUAL METAPHOR that unmistakably represents that concept:
-- For "failure" or "falling short": crumbling structures, sinking ships, broken bridges
-- For "transformation": metamorphosis imagery, before/after contrasts, chrysalis
-- For "cost" or "waste": money flowing away, resources depleting, empty containers
-- For "disconnect": separated elements, gaps, misaligned parts
-- For "risk": tightrope, balancing acts, precarious positions
+Think: "What would a photograph of this article's thesis look like, if
+drawn by a political cartoonist with a paintbrush?"
 
-The viewer should be able to guess the article's theme just from the image.
+Examples of good scenes:
+- Article about AI failure → A person in a suit staring at a massive
+  computer screen showing gibberish, painted in frustrated oil strokes
+- Article about testing costs → An engineer buried under a towering pile
+  of paper test reports, rendered in watercolour with dusty red accents
+- Article about security → A figure holding a cracked umbrella while
+  digital rain pours through, in textured blue-grey tones
 
-CRITICAL REMINDERS:
-- ZERO TEXT in the image - no words, letters, numbers, or symbols
-- The image must visually communicate the article's subject matter
-- Avoid generic abstract shapes that could represent anything
-- Choose a specific, recognizable visual metaphor
+The viewer should understand the article's ARGUMENT from the image,
+not just its topic.
+
+CRITICAL: ZERO text, words, letters, numbers, or symbols in the image.
 """
 
     return prompt
@@ -126,8 +130,8 @@ def generate_featured_image(
     article_summary: str,
     output_path: str,
     contrarian_angle: str = "",
-    size: Literal["1024x1024", "1792x1024", "1024x1792"] = "1024x1024",
-    quality: Literal["standard", "hd"] = "standard",
+    size: Literal["1024x1024", "1792x1024", "1024x1792"] = "1792x1024",
+    quality: Literal["standard", "hd"] = "hd",
 ) -> str | None:
     """
     Generate a featured image using DALL-E 3.

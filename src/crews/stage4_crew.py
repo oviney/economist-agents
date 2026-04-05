@@ -57,6 +57,28 @@ _BANNED_PHRASES: list[str] = [
     "at the end of the day",
 ]
 
+# Hedging phrases that undermine the authoritative Economist voice (SKILL.md Rule 4)
+_HEDGING_PHRASES: list[str] = [
+    "it would be misguided",
+    "one might",
+    "it is worth noting",
+    "it should be noted",
+    "it is important to",
+    "it is not a minor footnote",
+    "further complicating matters",
+    "invites closer scrutiny",
+    "in practical terms",
+]
+
+# Verbose padding — throat-clearing and redundant attribution (SKILL.md Rule 6)
+_VERBOSE_PADDING: list[str] = [
+    "it goes without saying",
+    "needless to say",
+    "as mentioned earlier",
+    "as noted above",
+    "as stated above",
+]
+
 # Banned phrase patterns (case-insensitive) — only match "leverage" as verb
 _BANNED_PATTERNS: list[tuple[re.Pattern[str], str]] = [
     (
@@ -75,6 +97,9 @@ _BANNED_OPENINGS: list[str] = [
     "It's no secret",
     "When it comes to",
     "Amidst",
+    "The arrival of",
+    "The emergence of",
+    "The rise of",
 ]
 
 # Banned closings (last 500 chars)
@@ -85,6 +110,10 @@ _BANNED_CLOSINGS: list[str] = [
     "remains to be seen",
     "only time will tell",
     "The journey ahead",
+    "will rest on",
+    "depends on",
+    "the key is",
+    "to summarise",
 ]
 
 
@@ -159,6 +188,19 @@ def _apply_editorial_fixes(article: str, current_date: str | None = None) -> str
     # 9. Clean up double spaces from phrase/placeholder removal
     text = re.sub(r"  +", " ", text)
 
+    # 10. Strip hedging phrases (undermine authoritative voice)
+    for phrase in _HEDGING_PHRASES:
+        pattern = re.compile(re.escape(phrase), re.IGNORECASE)
+        text = pattern.sub("", text)
+
+    # 11. Strip verbose padding (throat-clearing and redundant attribution)
+    for phrase in _VERBOSE_PADDING:
+        pattern = re.compile(re.escape(phrase), re.IGNORECASE)
+        text = pattern.sub("", text)
+
+    # 12. Final cleanup of double spaces introduced by steps 10-11
+    text = re.sub(r"  +", " ", text)
+
     return text
 
 
@@ -198,9 +240,11 @@ You enforce the publication's strict quality standards through 5 quality gates:
 
 Your pass rate must exceed 95% (4.75/5 gates minimum).
 
-BANNED OPENINGS: "In today's world", "It's no secret", "When it comes to", "Amidst"
-BANNED CLOSINGS: "In conclusion", "To conclude", "remains to be seen", "only time will tell"
+BANNED OPENINGS: "In today's world", "It's no secret", "When it comes to", "Amidst", "The arrival/emergence/rise of"
+BANNED CLOSINGS: "In conclusion", "To conclude", "remains to be seen", "only time will tell", "will rest on", "depends on", "to summarise"
 BANNED PHRASES: "game-changer", "paradigm shift", "leverage" (as verb), "at the end of the day"
+BANNED HEDGING: "it would be misguided", "one might", "it is worth noting", "it should be noted", "it is important to", "further complicating matters", "invites closer scrutiny", "in practical terms"
+BANNED STRUCTURE: numbered/bulleted lists in prose body; more than 5 headings
 
 You are ruthlessly precise. Vague feedback is unacceptable.
 

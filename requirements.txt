@@ -19,3 +19,5 @@ redis>=4.0.0             # Optional Redis cache backend (Story #145)
 requests>=2.31.0         # HTTP requests for image generation
 arxiv>=2.1.0             # arXiv API for cutting-edge research papers
 feedparser>=6.0.0        # RSS feed parsing for additional research sources
+mcp>=1.0.0               # Model Context Protocol SDK
+fastmcp>=0.1.0           # FastMCP server framework (MCP tool servers)

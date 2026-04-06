@@ -35,6 +35,14 @@ try:
 except ImportError:
     ARXIV_AVAILABLE = False
 
+# Import Google Search integration (optional dependency)
+try:
+    from google_search import search_google_for_topic  # type: ignore  # noqa: E402
+
+    GOOGLE_SEARCH_AVAILABLE = True
+except ImportError:
+    GOOGLE_SEARCH_AVAILABLE = False
+
 # ═══════════════════════════════════════════════════════════════════════════
 # RESEARCH AGENT PROMPT
 # ═══════════════════════════════════════════════════════════════════════════
@@ -125,8 +133,11 @@ class ResearchAgent:
         # Gather fresh arXiv research if available
         arxiv_insights = self._gather_arxiv_research(topic)
 
-        # Build user prompt with arXiv context
-        user_prompt = self._build_user_prompt(topic, talking_points, arxiv_insights)
+        # Gather live Google Search + Scholar results if available
+        web_research = self._gather_web_research(topic)
+
+        # Build user prompt with arXiv and web context
+        user_prompt = self._build_user_prompt(topic, talking_points, arxiv_insights, web_research)
 
         # Call LLM
         response_text = self._call_llm(user_prompt)
@@ -138,8 +149,12 @@ class ResearchAgent:
         if arxiv_insights:
             research_data["arxiv_insights"] = arxiv_insights
 
+        # Add web/Scholar search results to research data
+        if web_research:
+            research_data["web_research"] = web_research
+
         # Log metrics
-        self._log_metrics(research_data, topic, arxiv_insights)
+        self._log_metrics(research_data, topic, arxiv_insights, web_research)
 
         # Self-validate
         self._self_validate(research_data)
@@ -155,8 +170,9 @@ class ResearchAgent:
         topic: str,
         talking_points: str,
         arxiv_insights: dict[str, Any] | None = None,
+        web_research: dict[str, Any] | None = None,
     ) -> str:
-        """Build user prompt for LLM call with optional arXiv context."""
+        """Build user prompt for LLM call with optional arXiv and web search context."""
         base_prompt = f"""Research this topic for an Economist-style article:
 
 TOPIC: {topic}
@@ -191,7 +207,11 @@ Academic Citations:
 
             recent_context += "\nPRIORITIZE integrating these fresh 2026 academic insights into your analysis."
 
-            return base_prompt + recent_context
+            base_prompt += recent_context
+
+        if web_research and web_research.get("success"):
+            web_context = self._build_web_research_context(web_research)
+            base_prompt += web_context
 
         return base_prompt
 
@@ -224,6 +244,93 @@ Academic Citations:
         except Exception as e:
             print(f"   ⚠️  arXiv search failed: {e}")
             return None
+
+    def _gather_web_research(self, topic: str) -> dict[str, Any] | None:
+        """Gather live Google Search and Google Scholar results.
+
+        Targets the current year and the previous year to ensure source
+        freshness in line with ``skills/research-sourcing/SKILL.md``.
+
+        Args:
+            topic: Research topic to search for.
+
+        Returns:
+            Dictionary with ``web_results``, ``scholar_results``, and
+            metadata, or ``None`` if Google search is unavailable.
+        """
+        if not GOOGLE_SEARCH_AVAILABLE:
+            print("   🔎 Google Search not available - skipping live web research")
+            return None
+
+        try:
+            print("   🔎 Searching Google (web + Scholar) for live research...")
+            result = search_google_for_topic(topic, max_results=5, include_scholar=True)
+
+            if result["success"]:
+                web_count = len(
+                    [r for r in result.get("web_results", []) if "error" not in r]
+                )
+                scholar_count = len(
+                    [r for r in result.get("scholar_results", []) if "error" not in r]
+                )
+                print(
+                    f"   ✅ Google: {web_count} web results, "
+                    f"{scholar_count} Scholar results "
+                    f"({result['year_start']}–{result['current_year']})"
+                )
+                return result
+            else:
+                print(f"   ℹ️  Google search returned no results for '{topic[:30]}...'")
+                return None
+
+        except Exception as e:
+            print(f"   ⚠️  Google search failed: {e}")
+            return None
+
+    def _build_web_research_context(self, web_research: dict[str, Any]) -> str:
+        """Format Google Search and Scholar results for inclusion in the LLM prompt.
+
+        Args:
+            web_research: Result dict from ``search_google_for_topic()``.
+
+        Returns:
+            Formatted string section to append to the user prompt.
+        """
+        year_start = web_research.get("year_start", "")
+        current_year = web_research.get("current_year", "")
+        context = f"\n\nLIVE GOOGLE SEARCH RESULTS ({year_start}–{current_year}):\n"
+        context += "These are real-time sources — integrate them as primary references.\n"
+
+        web_results = [
+            r for r in web_research.get("web_results", []) if "error" not in r
+        ]
+        if web_results:
+            context += "\nWeb Search Results:\n"
+            for item in web_results[:5]:
+                context += f"• {item.get('title', '')}\n"
+                context += f"  URL: {item.get('url', '')}\n"
+                if item.get("snippet"):
+                    context += f"  Summary: {item['snippet']}\n"
+
+        scholar_results = [
+            r for r in web_research.get("scholar_results", []) if "error" not in r
+        ]
+        if scholar_results:
+            context += "\nGoogle Scholar Papers:\n"
+            for item in scholar_results[:5]:
+                year_label = f" ({item['year']})" if item.get("year") else ""
+                context += f"• {item.get('title', '')}{year_label}\n"
+                if item.get("authors"):
+                    context += f"  Authors: {item['authors']}\n"
+                context += f"  URL: {item.get('url', '')}\n"
+                if item.get("snippet"):
+                    context += f"  Abstract: {item['snippet']}\n"
+
+        context += (
+            "\nPRIORITIZE citing these live sources to ensure article references "
+            "reflect current research.\n"
+        )
+        return context
 
     def _call_llm(self, user_prompt: str) -> str:
         """Call LLM with research prompt.
@@ -258,6 +365,7 @@ Academic Citations:
         research_data: dict[str, Any],
         topic: str,
         arxiv_insights: dict[str, Any] | None = None,
+        web_research: dict[str, Any] | None = None,
     ) -> None:
         """Log research metrics to console."""
         verified = sum(
@@ -281,6 +389,17 @@ Academic Citations:
             recent_findings = len(arxiv_insights["insights"].get("recent_findings", []))
             if recent_findings > 0:
                 print(f"   🆕 {recent_findings} findings from this week")
+
+        if web_research and web_research.get("success"):
+            web_count = len(
+                [r for r in web_research.get("web_results", []) if "error" not in r]
+            )
+            scholar_count = len(
+                [r for r in web_research.get("scholar_results", []) if "error" not in r]
+            )
+            print(
+                f"   🔎 Google: {web_count} web + {scholar_count} Scholar results integrated"
+            )
 
     def _self_validate(self, research_data: dict[str, Any]) -> None:
         """Run self-validation on research output."""

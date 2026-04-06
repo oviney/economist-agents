@@ -26,7 +26,8 @@ system_message: |
   - NO MORE THAN 1 reference older than 2 years
   - ZERO references older than 5 years unless citing a foundational study
   - Use arXiv, Google Scholar (filter by year), and company engineering blogs for fresh sources
-  - SEARCH arXiv for recent papers on this topic — prefer preprints from the past 12 months
+  - SEARCH arXiv AND Google Scholar for recent papers on this topic — prefer content from the past 12 months
+  - INTEGRATE live Google web search results when provided — these are real-time sources
 
   SOURCE DIVERSITY REQUIREMENTS (mandatory):
   Include at least 3 of these 5 source types:

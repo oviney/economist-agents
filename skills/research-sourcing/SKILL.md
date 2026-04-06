@@ -59,6 +59,28 @@ The Research Agent should use this tool to find papers from the past
 12 months on the article's topic.  arXiv papers provide cutting-edge
 data that analyst reports lag by 6-12 months.
 
+### Google Search & Scholar Integration
+The pipeline now has `scripts/google_search.py` for live Google Web Search
+and Google Scholar via the Serper API.  The Research Agent calls
+`search_google_for_topic()` automatically when `SERPER_API_KEY` is set.
+
+Key behaviour:
+- **Year targeting** — queries are automatically scoped to the current year
+  and the previous year (e.g., 2025–2026) to maximise source freshness.
+- **Google Scholar** — academic papers with author and citation metadata are
+  retrieved via Serper's `/scholar` endpoint.
+- **MCP tool** — the `search_google_scholar` tool in
+  `mcp_servers/web_researcher_server.py` exposes the same capability to any
+  MCP-aware agent in the pipeline.
+
+To enable:
+```
+export SERPER_API_KEY=<your-key>   # https://serper.dev
+```
+
+When the key is absent the agent falls back to arXiv-only search and LLM
+training-data knowledge without error.
+
 ## Verification Requirements
 
 Every cited statistic must include:

@@ -1,14 +1,12 @@
 """Unit tests for scripts/agent_loader.py."""
 
-import json
+# Add scripts dir to path so agent_loader can be imported
+import sys
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 import yaml
 
-# Add scripts dir to path so agent_loader can be imported
-import sys
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
 from agent_loader import (
@@ -20,7 +18,6 @@ from agent_loader import (
     load_scout_prompts,
     validate_all,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers

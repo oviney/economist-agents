@@ -29,6 +29,7 @@ from src.economist_agents.adapters import (
     run_editorial_board,
     scout_topics,
 )
+from src.tools.topic_deduplicator import TopicDeduplicator
 
 # Editorial score threshold (0-100 scale) for publication
 PUBLISH_THRESHOLD = 80
@@ -52,6 +53,7 @@ class EconomistContentFlow(Flow):
         """Initialize flow with crew dependencies."""
         super().__init__()
         self.stage4_crew = Stage4Crew()
+        self._deduplicator = TopicDeduplicator()
 
     @start()
     def discover_topics(self) -> dict[str, Any]:
@@ -99,6 +101,31 @@ class EconomistContentFlow(Flow):
             )
 
         print(f"   Generated {len(topics)} topic candidates")
+
+        # ── Deduplication step ──────────────────────────────────────────
+        # Query published_articles ChromaDB collection and remove near-
+        # duplicates before the editorial board wastes a vote on them.
+        # Thresholds (issue #157):
+        #   >0.8  → REJECT (too similar to existing article)
+        #   0.6-0.8 → WARN  (related coverage exists; flagged for editors)
+        #   <0.6  → PASS   (novel topic)
+        topics, rejected = self._deduplicator.filter_topics(topics)
+
+        if rejected:
+            print(
+                f"   🚫 Dedup filtered {len(rejected)} topic(s): "
+                + ", ".join(f"'{t.get('topic', '?')}'" for t in rejected)
+            )
+
+        warned = [t for t in topics if t.get("dedup_warning")]
+        if warned:
+            print(
+                f"   ⚠️  Dedup flagged {len(warned)} topic(s) as related coverage: "
+                + ", ".join(f"'{t.get('topic', '?')}'" for t in warned)
+            )
+
+        print(f"   {len(topics)} topic(s) forwarded to editorial board")
+        # ───────────────────────────────────────────────────────────────
 
         return {"topics": topics, "timestamp": datetime.now().isoformat()}
 
@@ -320,13 +347,23 @@ class EconomistContentFlow(Flow):
             dict with status, article, editorial_score, gates_passed.
         """
         quality_result = self.state.get("quality_result", {})
+        article_text = quality_result.get("article", "")
 
         print("✅ Flow Complete: PUBLISHED")
         print(f"   Editorial Score: {quality_result.get('editorial_score', 0)}/100")
 
+        # ── Post-publication indexing ───────────────────────────────────
+        # Index the article in the published_articles archive so future
+        # deduplication runs can detect coverage of this topic.
+        selected_topic = self.state.get("selected_topic", {})
+        title = selected_topic.get("topic", "")
+        if title and article_text:
+            self._deduplicator.index_article(title=title, content=article_text)
+        # ───────────────────────────────────────────────────────────────
+
         return {
             "status": "published",
-            "article": quality_result.get("article", ""),
+            "article": article_text,
             "editorial_score": quality_result.get("editorial_score", 0),
             "gates_passed": quality_result.get("gates_passed", 0),
         }

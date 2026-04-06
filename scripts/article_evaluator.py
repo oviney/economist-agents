@@ -224,15 +224,22 @@ class ArticleEvaluator:
             if re.search(pattern, first_para, re.IGNORECASE):
                 return 2
 
-        # Check for data in first sentence (numbers, percentages, currency)
-        data_tokens = re.findall(
+        # Check for data in first sentence and first paragraph
+        data_in_sentence = re.findall(
             r"\d+%|\$[\d,.]+|\d+\.?\d*\s*(billion|million|thousand)",
             first_sentence,
             re.IGNORECASE,
         )
-        if len(data_tokens) >= 2:
+        data_in_para = re.findall(
+            r"\d+%|\$[\d,.]+|\d+\.?\d*\s*(billion|million|thousand)",
+            first_para,
+            re.IGNORECASE,
+        )
+        if len(data_in_sentence) >= 2:
             return 10
-        if len(data_tokens) >= 1:
+        if len(data_in_para) >= 2:
+            return 9  # Data-rich opening paragraph
+        if len(data_in_sentence) >= 1:
             return 8
 
         # Has some hook but no data
@@ -353,9 +360,9 @@ class ArticleEvaluator:
         if len(list_items) > 2:
             score -= 2
 
-        # Check word count
+        # Check word count (600 minimum per economist-writing skill)
         word_count = len(body.split())
-        if word_count < 800:
+        if word_count < 600:
             score -= 3
         elif word_count > 1500:
             score -= 1
@@ -391,15 +398,15 @@ class ArticleEvaluator:
     # --- Dimension 5: Visual Engagement ---
 
     def _score_visual(self, frontmatter: dict[str, Any], body: str) -> int:
-        score = 4  # Base score
+        score = 5  # Base score (not every article needs a chart)
 
         # Image field present
         if frontmatter.get("image"):
-            score += 2
+            score += 3
 
-        # Chart/image embedded in body
+        # Chart/image embedded in body (bonus, not required)
         if re.search(r"!\[.*?\]\(.*?\)", body):
-            score += 2
+            score += 1
 
         # Chart referenced naturally
         chart_refs = [

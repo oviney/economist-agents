@@ -124,8 +124,11 @@ def mock_llm_client(mock_llm_response_trends, mock_llm_response_topics):
         # First call is trend research (has TREND_RESEARCH_PROMPT)
         if "Search for and analyze" in user_prompt:
             return mock_llm_response_trends
-        # Second call is topic scouting (has SCOUT_AGENT_PROMPT)
-        elif "Based on these current trends" in user_prompt:
+        # Second call is topic scouting. Detect by the SCOUT_AGENT_PROMPT
+        # marker "YOUR MISSION" which is unique to that prompt and stable
+        # across structural changes to the wrapping prose (ADR-0007 wired
+        # the Performance Context block in above the trends section).
+        elif "YOUR MISSION" in user_prompt:
             return mock_llm_response_topics
         # Fallback
         return '{"error": "unexpected prompt"}'
@@ -868,6 +871,113 @@ def test_scout_topics_network_timeout(mock_llm_client):
         pytest.raises(TimeoutError),
     ):
         scout_topics(mock_client)
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# TESTS: ADR-0007 Feedback Loop — Performance Context Injection (Story #179)
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+def test_performance_context_injected_into_scout_prompt(
+    mock_llm_client, monkeypatch
+):
+    """Performance context from content_intelligence must appear in the scout prompt.
+
+    This is the central integration test for Story #179: the feedback
+    loop from ADR-0007. If this test fails, the whole "agent fleet is
+    learning from audience data" claim is broken.
+    """
+    mock_client, call_llm_side_effect = mock_llm_client
+    fake_context = (
+        "## Performance Context\n\n"
+        "Over the last 30 days, the blog served **50,000 pageviews**.\n\n"
+        "### Top performers (build on what's working)\n"
+        "| Score | Pageviews | Title |\n"
+        "|-------|-----------|-------|\n"
+        "| 0.500 | 1000 | Fake Top Article |\n"
+    )
+    monkeypatch.setattr(
+        "topic_scout.get_performance_context", lambda **kwargs: fake_context
+    )
+
+    with patch("topic_scout.call_llm", side_effect=call_llm_side_effect) as mock_call:
+        scout_topics(mock_client)
+
+    # Second LLM call is the scout prompt
+    scout_call = mock_call.call_args_list[1]
+    scout_prompt = scout_call[0][2]  # user_prompt is the 3rd positional arg
+    assert "Performance Context" in scout_prompt
+    assert "Fake Top Article" in scout_prompt
+    assert "50,000 pageviews" in scout_prompt
+    assert "Top performers" in scout_prompt
+
+
+def test_performance_context_fallback_when_db_missing(
+    mock_llm_client, monkeypatch
+):
+    """When content_intelligence reports no data, scout must still run.
+
+    Graceful degradation is an acceptance criterion for Story #179:
+    the feedback loop should be a signal source, not a blocker.
+    """
+    mock_client, call_llm_side_effect = mock_llm_client
+    fallback = (
+        "## Performance Context\n\n"
+        "_No performance data available yet. Run `scripts/ga4_etl.py` "
+        "to populate `data/performance.db`._\n"
+    )
+    monkeypatch.setattr(
+        "topic_scout.get_performance_context", lambda **kwargs: fallback
+    )
+
+    with patch("topic_scout.call_llm", side_effect=call_llm_side_effect):
+        topics = scout_topics(mock_client)
+
+    # Scout should still succeed with the fallback context
+    assert len(topics) == 2
+
+
+def test_scout_prompt_explicitly_references_performance_data(
+    mock_llm_client, monkeypatch
+):
+    """The scout prompt must tell the LLM to *use* the performance data.
+
+    Injecting the data without instructions means the LLM may ignore
+    it. The SCOUT_AGENT_PROMPT must instruct the LLM to favour topics
+    similar to top performers and reframe underperformers.
+    """
+    mock_client, call_llm_side_effect = mock_llm_client
+    monkeypatch.setattr(
+        "topic_scout.get_performance_context",
+        lambda **kwargs: "## Performance Context\n\nfake data\n",
+    )
+
+    with patch("topic_scout.call_llm", side_effect=call_llm_side_effect) as mock_call:
+        scout_topics(mock_client)
+
+    scout_prompt = mock_call.call_args_list[1][0][2]
+    # The prompt must explicitly reference the performance context
+    assert "TOP PERFORMERS" in scout_prompt or "top performers" in scout_prompt.lower()
+    assert "UNDERPERFORMERS" in scout_prompt or "underperformer" in scout_prompt.lower()
+
+
+def test_get_performance_context_called_once_per_scout_run(
+    mock_llm_client, monkeypatch
+):
+    """Verify the feedback loop query happens exactly once per scout invocation."""
+    mock_client, call_llm_side_effect = mock_llm_client
+    call_count = {"n": 0}
+
+    def counting_fake(**kwargs):
+        call_count["n"] += 1
+        return "## Performance Context\n\nfake\n"
+
+    monkeypatch.setattr("topic_scout.get_performance_context", counting_fake)
+
+    with patch("topic_scout.call_llm", side_effect=call_llm_side_effect):
+        scout_topics(mock_client)
+
+    assert call_count["n"] == 1, f"expected 1 call, got {call_count['n']}"
 
 
 if __name__ == "__main__":

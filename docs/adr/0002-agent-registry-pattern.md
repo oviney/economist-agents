@@ -1,9 +1,9 @@
-# ADR-002: Implement Agent Registry Pattern
+# ADR-0002: Implement Agent Registry Pattern
 
-**Status:** Approved
-**Date:** 2026-01-01 (Approved: 2026-01-03)
+**Status:** Accepted
+**Date:** 2026-01-01 (Accepted: 2026-01-03)
 **Deciders:** Ouray Viney (Agentic AI Architect)
-**Dependencies:** ADR-001 (Agent Configuration Extraction)
+**Dependencies:** [ADR-0001](0001-extract-agent-definitions-to-yaml.md)
 
 ## Context
 

@@ -141,6 +141,28 @@ curious, not tell them the conclusion.
 - Longer than 10 words without a colon or twist
 - Purely descriptive (tells you the topic, not the argument)
 
+## Length and Density
+
+The Economist values density over length.  A tight 650-word argument
+beats a padded 1000-word survey.  Quality targets:
+- **Minimum:** 600 words (below this lacks depth)
+- **Sweet spot:** 700-1000 words
+- **Maximum:** 1200 words (above this, tighten)
+
+Every paragraph must advance the argument.  If removing a paragraph
+doesn't weaken the thesis, the paragraph is padding.  Cut it.
+
+## Visual Engagement
+
+Not every article needs a chart.  If the topic is data-driven (market
+trends, adoption rates), embed a chart and reference it naturally.  If
+the topic is conceptual (architecture, strategy), a featured image is
+sufficient.  Never embed a chart just to fill a checkbox.
+
+- Featured image: always present in frontmatter (`image:` field)
+- Chart: only when data-driven content warrants it
+- No stock photos — use DALL-E editorial illustrations or the blog default
+
 ## Voice Reference
 
 The Economist voice is:

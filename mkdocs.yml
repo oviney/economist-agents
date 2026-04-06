@@ -1,0 +1,117 @@
+site_name: Economist Agents
+site_description: Multi-agent content pipeline that generates Economist-style articles with autonomous research, writing, illustration, and deployment
+site_url: https://oviney.github.io/economist-agents
+repo_url: https://github.com/oviney/economist-agents
+repo_name: oviney/economist-agents
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - toc.follow
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+
+  - Architecture:
+    - Agent Registry: agent-registry-spec.md
+    - Flow Architecture: FLOW_ARCHITECTURE.md
+    - Autonomous Orchestration: AUTONOMOUS_ORCHESTRATION_STRATEGY.md
+    - Shared Context System: CREWAI_CONTEXT_ARCHITECTURE.md
+    - Architecture Patterns: ARCHITECTURE_PATTERNS.md
+    - Architecture Review Process: ARCHITECTURE_REVIEW_PROCESS.md
+
+  - ADRs:
+    - ADR-0001 — Extract Agent Definitions to YAML: adr/0001-extract-agent-definitions-to-yaml.md
+    - ADR-0002 — Agent Registry Pattern: adr/0002-agent-registry-pattern.md
+    - ADR-0003 — Phased CrewAI Migration (Superseded): adr/0003-phased-crewai-migration.md
+    - ADR-0004 — Python Version Constraint: adr/0004-python-version-constraint.md
+    - ADR-0005 — Agile Discipline Enforcement: adr/0005-agile-discipline-enforcement.md
+    - ADR-0006 — Agent Framework Selection: adr/0006-agent-framework-selection.md
+    - ADR-0007 — Content Intelligence Engine: adr/0007-content-intelligence-engine.md
+    - ADR-0008 — Agent Skill Governance: adr/0008-agent-skill-governance.md
+
+  - Skills:
+    - Agent Delegation: skills/agent-delegation/SKILL.md
+    - ADR Governance: skills/adr-governance/SKILL.md
+    - Research Sourcing: skills/research-sourcing/SKILL.md
+    - Economist Writing: skills/economist-writing/SKILL.md
+    - Editorial Illustration: skills/editorial-illustration/SKILL.md
+    - Article Evaluation: skills/article-evaluation/SKILL.md
+    - Quality Gates: skills/quality-gates/SKILL.md
+    - Python Quality: skills/python-quality/SKILL.md
+    - Testing: skills/testing/SKILL.md
+    - Defect Prevention: skills/defect-prevention/SKILL.md
+    - DevOps: skills/devops/SKILL.md
+    - Sprint Management: skills/sprint-management/SKILL.md
+    - Scrum Master: skills/scrum-master/SKILL.md
+    - Agent Traceability: skills/agent-traceability/SKILL.md
+    - Observability: skills/observability/SKILL.md
+    - MCP Development: skills/mcp-development/SKILL.md
+
+  - Guides:
+    - Workflow Guide: guides/WORKFLOW_GUIDE.md
+    - Blog Deployment: guides/BLOG_DEPLOYMENT.md
+    - Copilot Sync: guides/COPILOT_SYNC.md
+    - CI Monitoring: guides/CI_MONITORING_GUIDE.md
+    - Python Troubleshooting: guides/PYTHON_VERSION_TROUBLESHOOTING.md
+    - Implementation Roadmap: guides/IMPLEMENTATION_ROADMAP.md
+    - Validation Quick Reference: guides/VALIDATION_QUICK_REF.md
+
+  - Reference:
+    - CrewAI API: CREWAI_API_REFERENCE.md
+    - Agent Prompt Patterns: AGENT_PROMPT_PATTERNS.md
+    - Quality Gates: AGENT_QUALITY_GATES.md
+    - Definition of Done: DEFINITION_OF_DONE.md
+    - Defect Prevention: DEFECT_PREVENTION.md
+    - Chart Design Spec: CHART_DESIGN_SPEC.md
+
+  - Performance:
+    - Agent Velocity Analysis: AGENT_VELOCITY_ANALYSIS.md
+    - Sprint Discipline Guide: SPRINT_DISCIPLINE_GUIDE.md
+    - Changelog: CHANGELOG.md

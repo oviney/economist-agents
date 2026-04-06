@@ -14,21 +14,27 @@ Usage:
     result = flow.kickoff()
 """
 
+import logging
+import re as _re
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+import yaml as _yaml
 from crewai.flow.flow import Flow, listen, router, start
 
 from src.crews.stage3_crew import Stage3Crew
 from src.crews.stage4_crew import Stage4Crew
 from src.economist_agents.adapters import (
+    ArticleArchive,
     PublicationValidator,
     create_llm_client,
     generate_featured_image,
     run_editorial_board,
     scout_topics,
 )
+
+logger = logging.getLogger(__name__)
 
 # Editorial score threshold (0-100 scale) for publication
 PUBLISH_THRESHOLD = 80
@@ -99,6 +105,9 @@ class EconomistContentFlow(Flow):
             )
 
         print(f"   Generated {len(topics)} topic candidates")
+
+        # Dedup check: reject or flag topics already covered in the archive
+        topics = self._dedup_topics(topics)
 
         return {"topics": topics, "timestamp": datetime.now().isoformat()}
 
@@ -316,6 +325,9 @@ class EconomistContentFlow(Flow):
     def publish_article(self) -> dict[str, Any]:
         """Terminal stage (publish path): Article approved for publication.
 
+        Indexes the published article in the ChromaDB archive for future
+        duplicate detection.
+
         Returns:
             dict with status, article, editorial_score, gates_passed.
         """
@@ -323,6 +335,9 @@ class EconomistContentFlow(Flow):
 
         print("✅ Flow Complete: PUBLISHED")
         print(f"   Editorial Score: {quality_result.get('editorial_score', 0)}/100")
+
+        # Index in archive for future dedup checks
+        self._index_published_article(quality_result.get("article", ""))
 
         return {
             "status": "published",
@@ -417,6 +432,124 @@ class EconomistContentFlow(Flow):
             "validation_issues": [i["message"] for i in critical],
             "retry_count": self.state["retry_count"],
         }
+
+    # ------------------------------------------------------------------
+    # Private helpers
+    # ------------------------------------------------------------------
+
+    def _dedup_topics(self, topics: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Filter and flag topics based on similarity to published articles.
+
+        Queries the ChromaDB archive for each candidate topic and applies the
+        following rules:
+        - similarity > 0.8: reject topic (log warning)
+        - similarity 0.6–0.8: flag with ``dedup_warning`` and ``similar_articles``
+        - similarity < 0.6: pass through unchanged
+
+        If all topics are rejected the original list is returned as a fallback
+        so the pipeline never stalls.
+
+        Args:
+            topics: Normalised topic dicts from :meth:`discover_topics`.
+
+        Returns:
+            Filtered (and possibly flagged) topic list.
+        """
+        try:
+            archive = ArticleArchive()
+            kept: list[dict[str, Any]] = []
+            for t in topics:
+                query = " ".join(filter(None, [t["topic"], t.get("thesis", "")]))
+                similar = archive.find_similar_topics(query, threshold=0.6, n_results=3)
+                if similar:
+                    max_sim = max(r["similarity"] for r in similar)
+                    if max_sim > 0.8:
+                        print(
+                            f"   ⛔ Rejected (duplicate, {max_sim:.2f} similarity): "
+                            f"{t['topic']}"
+                        )
+                        logger.warning(
+                            "Topic rejected — too similar to existing article "
+                            "(%.2f): %s",
+                            max_sim,
+                            t["topic"],
+                        )
+                        continue
+                    # 0.6–0.8: flag but keep
+                    t["dedup_warning"] = True
+                    t["similar_articles"] = similar
+                    print(
+                        f"   ⚠️  Related coverage exists ({max_sim:.2f}): {t['topic']}"
+                    )
+                kept.append(t)
+
+            if not kept:
+                print(
+                    "   ⚠️  All topics matched existing coverage; "
+                    "proceeding with original list"
+                )
+                return topics
+            return kept
+        except Exception as exc:
+            print(f"   ℹ️  Dedup check unavailable ({exc}), proceeding without")
+            return topics
+
+    def _index_published_article(self, article_text: str) -> None:
+        """Index a published article in the ChromaDB archive.
+
+        Parses the YAML frontmatter to extract title, date and categories;
+        derives the thesis from the first two body paragraphs.  Errors are
+        caught and logged so that a failed index operation never blocks
+        publication.
+
+        Args:
+            article_text: Full markdown article (frontmatter + body).
+        """
+        if not article_text:
+            return
+        try:
+            fm: dict[str, Any] = {}
+            body = article_text
+            if article_text.startswith("---"):
+                parts = article_text.split("---", 2)
+                if len(parts) >= 3:
+                    try:
+                        fm = _yaml.safe_load(parts[1]) or {}
+                    except Exception:
+                        pass
+                    body = parts[2]
+
+            title = str(fm.get("title", "Untitled"))
+            date = str(fm.get("date", datetime.now().strftime("%Y-%m-%d")))
+            raw_cats = fm.get("categories", "")
+            categories = (
+                ",".join(str(c) for c in raw_cats)
+                if isinstance(raw_cats, list)
+                else str(raw_cats or "")
+            )
+
+            paragraphs = [
+                p.strip()
+                for p in body.split("\n\n")
+                if p.strip() and not p.strip().startswith("#")
+            ]
+            thesis = " ".join(paragraphs[:2])
+
+            slug = _re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")[:60]
+            file_path = f"_posts/{date}-{slug}.md"
+
+            archive = ArticleArchive()
+            archive.index_article(
+                title=title,
+                thesis=thesis,
+                summary=thesis,
+                categories=categories,
+                date=date,
+                file_path=file_path,
+            )
+            print(f"   📚 Indexed in archive: {title}")
+        except Exception as exc:
+            print(f"   ℹ️  Archive indexing failed ({exc}), skipping")
 
 
 def main() -> None:

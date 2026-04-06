@@ -7,11 +7,13 @@ Tests the Flow-based state-machine orchestration with @start/@listen/@router dec
 Test Coverage:
 1. Flow initialization and state management
 2. Topic discovery via scout_topics adapter
-3. Editorial review via run_editorial_board adapter
-4. Stage3Crew integration via generate_content()
-5. Stage4Crew + PublicationValidator routing (publish/revision)
-6. Revision loop with feedback (1 retry)
-7. Revision exhaustion
+3. Topic deduplication in discover_topics() (reject >0.8, flag 0.6-0.8, pass <0.6)
+4. Editorial review via run_editorial_board adapter
+5. Stage3Crew integration via generate_content()
+6. Stage4Crew + PublicationValidator routing (publish/revision)
+7. Revision loop with feedback (1 retry)
+8. Revision exhaustion
+9. Archive indexing after successful publication
 
 Usage:
     pytest tests/test_economist_flow.py -v
@@ -93,6 +95,163 @@ class TestEconomistFlow:
         assert result["topics"][1]["score"] == 6.0
         assert result["topics"][0]["topic"] == "AI Testing Paradox"
         mock_scout.assert_called_once()
+
+    @patch("src.economist_agents.flow.ArticleArchive")
+    @patch("src.economist_agents.flow.scout_topics")
+    @patch("src.economist_agents.flow.create_llm_client")
+    def test_discover_topics_dedup_reject(
+        self,
+        mock_create_client: Mock,
+        mock_scout: Mock,
+        mock_archive_class: Mock,
+        flow: EconomistContentFlow,
+    ) -> None:
+        """discover_topics() rejects topics with >0.8 cosine similarity."""
+        mock_create_client.return_value = Mock()
+        mock_scout.return_value = [
+            {
+                "topic": "AI Testing Paradox",
+                "total_score": 20,
+                "hook": "Hook A",
+                "thesis": "Thesis A",
+                "data_sources": [],
+                "contrarian_angle": "Angle A",
+                "talking_points": "Points A",
+            },
+            {
+                "topic": "Quality Tax",
+                "total_score": 15,
+                "hook": "Hook B",
+                "thesis": "Thesis B",
+                "data_sources": [],
+                "contrarian_angle": "Angle B",
+                "talking_points": "Points B",
+            },
+        ]
+
+        mock_archive = Mock()
+        mock_archive_class.return_value = mock_archive
+        # First topic: high similarity → should be rejected
+        # Second topic: low similarity → should pass
+        mock_archive.find_similar_topics.side_effect = [
+            [{"title": "Existing AI Article", "similarity": 0.92}],
+            [],
+        ]
+
+        result = flow.discover_topics()
+
+        assert len(result["topics"]) == 1
+        assert result["topics"][0]["topic"] == "Quality Tax"
+
+    @patch("src.economist_agents.flow.ArticleArchive")
+    @patch("src.economist_agents.flow.scout_topics")
+    @patch("src.economist_agents.flow.create_llm_client")
+    def test_discover_topics_dedup_warning(
+        self,
+        mock_create_client: Mock,
+        mock_scout: Mock,
+        mock_archive_class: Mock,
+        flow: EconomistContentFlow,
+    ) -> None:
+        """discover_topics() flags topics with 0.6-0.8 similarity as related coverage."""
+        mock_create_client.return_value = Mock()
+        mock_scout.return_value = [
+            {
+                "topic": "AI Testing Paradox",
+                "total_score": 20,
+                "hook": "Hook A",
+                "thesis": "Thesis A",
+                "data_sources": [],
+                "contrarian_angle": "Angle A",
+                "talking_points": "Points A",
+            },
+        ]
+
+        mock_archive = Mock()
+        mock_archive_class.return_value = mock_archive
+        similar = [{"title": "Related Article", "similarity": 0.72}]
+        mock_archive.find_similar_topics.return_value = similar
+
+        result = flow.discover_topics()
+
+        assert len(result["topics"]) == 1
+        topic = result["topics"][0]
+        assert topic["topic"] == "AI Testing Paradox"
+        assert topic.get("dedup_warning") is True
+        assert topic.get("similar_articles") == similar
+
+    @patch("src.economist_agents.flow.ArticleArchive")
+    @patch("src.economist_agents.flow.scout_topics")
+    @patch("src.economist_agents.flow.create_llm_client")
+    def test_discover_topics_dedup_novel(
+        self,
+        mock_create_client: Mock,
+        mock_scout: Mock,
+        mock_archive_class: Mock,
+        flow: EconomistContentFlow,
+    ) -> None:
+        """discover_topics() passes novel topics (<0.6 similarity) without modification."""
+        mock_create_client.return_value = Mock()
+        mock_scout.return_value = [
+            {
+                "topic": "Quantum QA",
+                "total_score": 18,
+                "hook": "Hook C",
+                "thesis": "Thesis C",
+                "data_sources": [],
+                "contrarian_angle": "Angle C",
+                "talking_points": "Points C",
+            },
+        ]
+
+        mock_archive = Mock()
+        mock_archive_class.return_value = mock_archive
+        mock_archive.find_similar_topics.return_value = []  # No similar articles
+
+        result = flow.discover_topics()
+
+        assert len(result["topics"]) == 1
+        topic = result["topics"][0]
+        assert topic["topic"] == "Quantum QA"
+        assert "dedup_warning" not in topic
+        assert "similar_articles" not in topic
+
+    @patch("src.economist_agents.flow.ArticleArchive")
+    @patch("src.economist_agents.flow.scout_topics")
+    @patch("src.economist_agents.flow.create_llm_client")
+    def test_discover_topics_dedup_fallback_all_rejected(
+        self,
+        mock_create_client: Mock,
+        mock_scout: Mock,
+        mock_archive_class: Mock,
+        flow: EconomistContentFlow,
+    ) -> None:
+        """discover_topics() falls back to original list when all topics are rejected."""
+        mock_create_client.return_value = Mock()
+        mock_scout.return_value = [
+            {
+                "topic": "Duplicate Topic",
+                "total_score": 20,
+                "hook": "Hook",
+                "thesis": "Thesis",
+                "data_sources": [],
+                "contrarian_angle": "Angle",
+                "talking_points": "Points",
+            },
+        ]
+
+        mock_archive = Mock()
+        mock_archive_class.return_value = mock_archive
+        # All topics above 0.8 threshold
+        mock_archive.find_similar_topics.return_value = [
+            {"title": "Identical Article", "similarity": 0.95}
+        ]
+
+        result = flow.discover_topics()
+
+        # Fallback: original list preserved
+        assert len(result["topics"]) == 1
+        assert result["topics"][0]["topic"] == "Duplicate Topic"
 
     @patch("src.economist_agents.flow.run_editorial_board")
     @patch("src.economist_agents.flow.create_llm_client")
@@ -273,12 +432,44 @@ class TestEconomistFlow:
             "gates_passed": 5,
         }
 
-        result = flow.publish_article()
+        with patch("src.economist_agents.flow.ArticleArchive") as mock_archive_class:
+            mock_archive_class.return_value = Mock()
+            result = flow.publish_article()
 
         assert result["status"] == "published"
         assert result["editorial_score"] == 92
         assert result["gates_passed"] == 5
         assert result["article"] == "# Published Article"
+
+    @patch("src.economist_agents.flow.ArticleArchive")
+    def test_publish_article_indexes_archive(
+        self, mock_archive_class: Mock, flow: EconomistContentFlow
+    ) -> None:
+        """publish_article() indexes the article in the ChromaDB archive."""
+        article = (
+            "---\nlayout: post\ntitle: \"AI Quality Shift\"\n"
+            "date: 2026-04-06\ncategories: [\"QE\"]\n"
+            "image: /assets/images/test.png\n---\n\n"
+            "First paragraph thesis.\n\nSecond paragraph detail."
+        )
+        flow.state["quality_result"] = {
+            "article": article,
+            "editorial_score": 92,
+            "gates_passed": 5,
+        }
+
+        mock_archive = Mock()
+        mock_archive_class.return_value = mock_archive
+
+        result = flow.publish_article()
+
+        assert result["status"] == "published"
+        mock_archive.index_article.assert_called_once()
+        call_kwargs = mock_archive.index_article.call_args[1]
+        assert call_kwargs["title"] == "AI Quality Shift"
+        assert call_kwargs["date"] == "2026-04-06"
+        assert "QE" in call_kwargs["categories"]
+        assert "First paragraph" in call_kwargs["thesis"]
 
     @patch("src.economist_agents.flow.PublicationValidator")
     @patch("src.economist_agents.flow.Stage3Crew")

@@ -23,10 +23,18 @@ from datetime import datetime
 # Import unified LLM client
 from llm_client import call_llm, create_llm_client
 
+# Content Intelligence: real blog performance data from GA4 ETL (ADR-0007)
+from content_intelligence import get_performance_context
+
 SCOUT_AGENT_PROMPT = """You are a Topic Scout for a quality engineering blog targeting senior engineers and engineering leaders.
 
 YOUR MISSION:
 Identify 5 high-value article topics that would resonate with this audience RIGHT NOW.
+
+IMPORTANT: Above this prompt you will see a PERFORMANCE CONTEXT block with real audience data from the last 30 days. Use it explicitly:
+- Favour topics thematically similar to the TOP PERFORMERS — those are proven to engage readers.
+- Avoid or reframe topics similar to the UNDERPERFORMERS — those got traffic but failed to hold attention. Do not propose near-duplicates.
+- If a top performer is about X and an underperformer is also about X, the difference is angle/framing — propose a sharper, more contrarian version.
 
 EVALUATION CRITERIA (score each 1-5):
 
@@ -132,6 +140,11 @@ def scout_topics(client, focus_area: str = None) -> list:
     """
     print("🔭 Topic Scout Agent: Scanning the landscape...\n")
 
+    # Load real blog performance data (ADR-0007 feedback loop).
+    # Gracefully degrades if data/performance.db is missing.
+    print("   Loading performance context from GA4 data...")
+    performance_context = get_performance_context(top_limit=5, bottom_limit=5)
+
     # First, gather current trends
     trend_prompt = TREND_RESEARCH_PROMPT
     if focus_area:
@@ -145,11 +158,17 @@ def scout_topics(client, focus_area: str = None) -> list:
         max_tokens=2000,
     )
 
-    # Then, identify topics based on trends
-    print("   Identifying high-value topics...")
-    scout_prompt = f"""Based on these current trends in quality engineering:
+    # Then, identify topics based on trends AND real blog performance
+    print("   Identifying high-value topics (informed by real audience data)...")
+    scout_prompt = f"""{performance_context}
+
+---
+
+## Current Trends in Quality Engineering
 
 {trends}
+
+---
 
 {SCOUT_AGENT_PROMPT}"""
 

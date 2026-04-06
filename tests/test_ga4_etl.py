@@ -13,6 +13,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from scripts.ga4_etl import (
+    COMPOSITE_WEIGHTS,
+    COMPOSITE_WEIGHTS_ACTIVE,
     compute_scores,
     fetch_ga4_report,
     main,
@@ -217,6 +219,100 @@ class TestComputeScores:
         ]
         scored = compute_scores(rows)
         assert scored[0]["composite_score"] == 0.0
+
+
+# ---------------------------------------------------------------------------
+# Story #187: Composite weights re-weighting (active vs canonical)
+# ---------------------------------------------------------------------------
+
+
+class TestCompositeWeights:
+    """Invariants on the canonical and active weight tables (Story #187)."""
+
+    def test_canonical_weights_sum_to_one(self) -> None:
+        """The canonical six-dimension weights should sum to exactly 1.0."""
+        total = sum(COMPOSITE_WEIGHTS.values())
+        assert abs(total - 1.0) < 1e-9, (
+            f"COMPOSITE_WEIGHTS sum {total} != 1.0 — "
+            "the canonical design must be a proper weight distribution"
+        )
+
+    def test_active_weights_sum_to_one(self) -> None:
+        """The renormalized active weights must sum to 1.0 (no dead weight)."""
+        total = sum(COMPOSITE_WEIGHTS_ACTIVE.values())
+        assert abs(total - 1.0) < 1e-9, (
+            f"COMPOSITE_WEIGHTS_ACTIVE sum {total} != 1.0 — "
+            "the active subset must not carry any dead weight"
+        )
+
+    def test_active_weights_cover_four_dimensions(self) -> None:
+        """Active weights should cover exactly the four GA4-derived dimensions."""
+        expected = {
+            "pageviews",
+            "engagement_rate",
+            "avg_engagement_time",
+            "scroll_depth_rate",
+        }
+        assert set(COMPOSITE_WEIGHTS_ACTIVE.keys()) == expected
+
+    def test_active_weights_preserve_canonical_proportions(self) -> None:
+        """Renormalization should preserve the relative proportions of the canonical weights.
+
+        If the canonical design says pageviews is 2.5x scroll_depth_rate,
+        the active re-weighting must preserve that ratio.
+        """
+        canonical_sum = sum(
+            COMPOSITE_WEIGHTS[k] for k in COMPOSITE_WEIGHTS_ACTIVE
+        )
+        for key in COMPOSITE_WEIGHTS_ACTIVE:
+            expected = COMPOSITE_WEIGHTS[key] / canonical_sum
+            assert abs(COMPOSITE_WEIGHTS_ACTIVE[key] - expected) < 1e-9, (
+                f"Active weight for {key} does not preserve canonical proportion"
+            )
+
+    def test_active_weights_do_not_include_placeholder_gsc_terms(self) -> None:
+        """Active weights must not include search_ctr or search_impressions.
+
+        The whole point of Story #187 is to eliminate the 30% dead weight
+        from the two GSC placeholder terms until GSC data is wired in.
+        """
+        assert "search_ctr" not in COMPOSITE_WEIGHTS_ACTIVE
+        assert "search_impressions" not in COMPOSITE_WEIGHTS_ACTIVE
+
+    def test_max_score_reaches_one_with_all_dimensions_maxed(self) -> None:
+        """A row that is the best on every dimension should score 1.0.
+
+        Under the old weights, the best-possible score was 0.70 (the
+        sum of active weights) because the two GSC terms contributed
+        0.0. Under the re-weighted active formula, the best-possible
+        score is 1.0 — which is what "normalized composite score"
+        should mean in the first place.
+        """
+        rows: list[dict[str, Any]] = [
+            {
+                "page_path": "/best",
+                "page_title": "Best",
+                "pageviews": 1000,  # highest
+                "engagement_rate": 1.0,  # highest
+                "avg_engagement_time": 300.0,  # highest
+                "scroll_depth_rate": 1.0,  # highest
+            },
+            {
+                "page_path": "/worst",
+                "page_title": "Worst",
+                "pageviews": 0,
+                "engagement_rate": 0.0,
+                "avg_engagement_time": 0.0,
+                "scroll_depth_rate": 0.0,
+            },
+        ]
+        scored = compute_scores(rows)
+        best = next(r for r in scored if r["page_path"] == "/best")
+        worst = next(r for r in scored if r["page_path"] == "/worst")
+        assert abs(best["composite_score"] - 1.0) < 1e-6, (
+            f"Best row should score 1.0 under active weights, got {best['composite_score']}"
+        )
+        assert worst["composite_score"] == 0.0
 
 
 # ---------------------------------------------------------------------------

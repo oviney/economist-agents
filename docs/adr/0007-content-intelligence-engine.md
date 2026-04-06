@@ -5,6 +5,20 @@
 **Decision Maker:** Ouray Viney (Engineering Lead)
 **Research:** Four parallel agents covering content intelligence platforms, sentiment-driven content, Google Analytics APIs, and current pipeline audit
 
+> **Interim re-weighting note (2026-04-06, Story #187):** The composite
+> scoring formula defined in this ADR has six weighted terms that sum
+> to 1.0. Two of those terms (`search_ctr`, `search_impressions`, 0.15
+> each) depend on Google Search Console data that takes 24-48h to
+> populate after verification and is currently unavailable. To avoid a
+> "30% dead weight" problem that would silently make the remaining
+> scores unreliable, `scripts/ga4_etl.py` temporarily uses a
+> renormalized four-dimension subset (`COMPOSITE_WEIGHTS_ACTIVE`) that
+> preserves the canonical proportions but sums to 1.0 on its own. Once
+> GSC data is populated and wired in, `compute_scores()` should be
+> switched back to the canonical six-dimension `COMPOSITE_WEIGHTS`.
+> See the invariant tests in `tests/test_ga4_etl.py::TestCompositeWeights`
+> and the audit in Story #182 / PR #185 for the rationale.
+
 ---
 
 ## Problem Statement

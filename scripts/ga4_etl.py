@@ -44,6 +44,27 @@ DB_PATH = pathlib.Path(__file__).resolve().parent.parent / "data" / "performance
 
 GA4_SCOPES = ["https://www.googleapis.com/auth/analytics.readonly"]
 
+#
+# Composite engagement score weights (ADR-0007, Story #187).
+#
+# There are two weight tables:
+#
+#   COMPOSITE_WEIGHTS       — the canonical six-dimension design
+#                             (sums to 1.0). This is the target formula
+#                             once GSC data is wired in.
+#
+#   COMPOSITE_WEIGHTS_ACTIVE — the four-dimension subset currently in
+#                              use while GSC data is unavailable. The
+#                              four active weights have been renormalized
+#                              from the canonical values so they sum to
+#                              1.0 on their own, avoiding the "30% dead
+#                              weight" problem discovered by the audit
+#                              in Story #182 / PR #185.
+#
+# When GSC data is populated (GSC data takes 24-48h after service-account
+# verification, see Story #180), compute_scores() should switch back to
+# COMPOSITE_WEIGHTS. The test suite covers both paths.
+#
 COMPOSITE_WEIGHTS: dict[str, float] = {
     "pageviews": 0.25,
     "engagement_rate": 0.20,
@@ -51,6 +72,25 @@ COMPOSITE_WEIGHTS: dict[str, float] = {
     "scroll_depth_rate": 0.10,
     "search_ctr": 0.15,  # placeholder until GSC wired
     "search_impressions": 0.15,  # placeholder until GSC wired
+}
+
+# Total canonical weight on the four currently-active dimensions.
+_ACTIVE_CANONICAL_SUM = (
+    COMPOSITE_WEIGHTS["pageviews"]
+    + COMPOSITE_WEIGHTS["engagement_rate"]
+    + COMPOSITE_WEIGHTS["avg_engagement_time"]
+    + COMPOSITE_WEIGHTS["scroll_depth_rate"]
+)  # = 0.70
+
+# Renormalized active weights: each canonical weight scaled so that
+# the four sum to 1.0 while preserving their relative proportions.
+COMPOSITE_WEIGHTS_ACTIVE: dict[str, float] = {
+    "pageviews": COMPOSITE_WEIGHTS["pageviews"] / _ACTIVE_CANONICAL_SUM,
+    "engagement_rate": COMPOSITE_WEIGHTS["engagement_rate"] / _ACTIVE_CANONICAL_SUM,
+    "avg_engagement_time": (
+        COMPOSITE_WEIGHTS["avg_engagement_time"] / _ACTIVE_CANONICAL_SUM
+    ),
+    "scroll_depth_rate": COMPOSITE_WEIGHTS["scroll_depth_rate"] / _ACTIVE_CANONICAL_SUM,
 }
 
 CREATE_TABLE_SQL = """
@@ -181,15 +221,21 @@ def parse_rows(response: RunReportResponse) -> list[dict[str, Any]]:
 def compute_scores(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Compute composite engagement scores for each row.
 
-    The composite score is a weighted sum of min-max-normalised metrics
-    per ADR-002.  GSC-based metrics (search_ctr, search_impressions)
-    default to 0.0 until GSC integration is wired.
+    Uses ``COMPOSITE_WEIGHTS_ACTIVE`` — the renormalized four-dimension
+    subset that sums to 1.0 — while GSC data is unavailable. This is the
+    interim fix from Story #187, addressing the "30% dead weight"
+    methodology issue discovered by the audit script in PR #185.
+
+    When GSC data is wired in (Story #180 follow-up), switch this
+    function to use ``COMPOSITE_WEIGHTS`` (the canonical six-dimension
+    design) so the search_ctr and search_impressions terms contribute.
 
     Args:
         rows: Parsed GA4 rows.
 
     Returns:
         The same rows, each augmented with a ``composite_score`` key.
+        Scores are in the range [0.0, 1.0] for any non-degenerate input.
     """
     if not rows:
         return rows
@@ -201,12 +247,10 @@ def compute_scores(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
     for i, row in enumerate(rows):
         score = (
-            COMPOSITE_WEIGHTS["pageviews"] * norm_pageviews[i]
-            + COMPOSITE_WEIGHTS["engagement_rate"] * norm_engagement[i]
-            + COMPOSITE_WEIGHTS["avg_engagement_time"] * norm_time[i]
-            + COMPOSITE_WEIGHTS["scroll_depth_rate"] * norm_scroll[i]
-            + COMPOSITE_WEIGHTS["search_ctr"] * 0.0  # placeholder
-            + COMPOSITE_WEIGHTS["search_impressions"] * 0.0  # placeholder
+            COMPOSITE_WEIGHTS_ACTIVE["pageviews"] * norm_pageviews[i]
+            + COMPOSITE_WEIGHTS_ACTIVE["engagement_rate"] * norm_engagement[i]
+            + COMPOSITE_WEIGHTS_ACTIVE["avg_engagement_time"] * norm_time[i]
+            + COMPOSITE_WEIGHTS_ACTIVE["scroll_depth_rate"] * norm_scroll[i]
         )
         row["composite_score"] = round(score, 6)
 

@@ -78,17 +78,32 @@ TOPIC CATEGORIES TO MONITOR:
 - Security testing integration
 - Mobile and cross-platform testing
 
+THESIS REQUIREMENTS (Rule 2 — Argue a thesis, not a topic):
+The "thesis" field MUST be a specific, debatable argument — NOT a topic description.
+- BAD (topic): "AI tools are changing test automation"
+- BAD (description): "This article covers AI test generation and its effects"
+- GOOD (thesis): "AI test generators are making maintenance costs worse, not better, because they optimise for coverage metrics that don't correlate with code quality"
+A thesis must be a claim someone could reasonably disagree with.  Every supporting point in the article must advance this argument.
+
+TITLE REQUIREMENTS (Rule 10 — Title must be provocative and memorable):
+The "title_ideas" field MUST follow these rules:
+- Use a colon to add a surprising twist (e.g., "Flaky tests: the hidden tax your CFO doesn't know about")
+- Make the reader curious — do NOT reveal the conclusion
+- BANNED starters: "Why", "How", "The Impact of", "The Role of"
+- Maximum 10 words without a colon or twist
+- Purely descriptive titles are rejected; titles must imply an argument
+
 OUTPUT FORMAT:
 Return a JSON array of exactly 5 topics:
 [
   {
     "topic": "Clear, specific article title",
     "hook": "The attention-grabbing angle or stat (1 sentence)",
-    "thesis": "The main argument we'd make (1 sentence)",
+    "thesis": "A specific, debatable argument (not a topic description) - a claim someone could disagree with",
     "data_sources": ["Where we'd get numbers for charts"],
     "timeliness_trigger": "Why now? What happened recently?",
     "contrarian_angle": "How we'd challenge conventional wisdom",
-    "title_ideas": ["Economist-style title option 1", "Option 2"],
+    "title_ideas": ["Economist-style title with colon twist", "Second option - no Why/How starters"],
     "scores": {
       "timeliness": 4,
       "data_availability": 5,
@@ -101,7 +116,7 @@ Return a JSON array of exactly 5 topics:
   }
 ]
 
-Sort by total_score descending. Be specific—not "AI in Testing" but "Why AI Test Generation Tools Are Overpromising on Maintenance Reduction".
+Sort by total_score descending. Be specific—not "AI in Testing" but "AI test generators: a maintenance debt machine in disguise".
 """
 
 TREND_RESEARCH_PROMPT = """You are researching current trends in software quality engineering.

@@ -1,21 +1,23 @@
 #!/usr/bin/env python3
 """Web Researcher MCP Server.
 
-Exposes web search (Serper API), arXiv academic search, and page-fetching
-as MCP tools so any agent in the pipeline can retrieve fresh sources.
+Exposes web search (Serper API), Google Scholar search, arXiv academic
+search, and page-fetching as MCP tools so any agent in the pipeline can
+retrieve fresh sources.
 
 Transport: stdio (default FastMCP behaviour).
 
 Required environment variable:
-    SERPER_API_KEY — API key for Serper.dev web search.
+    SERPER_API_KEY — API key for Serper.dev web search and Scholar search.
 
 Usage (stdio):
     python -m mcp_servers.web_researcher_server
 
 Tools exposed:
-    search_web(query, num_results)   — Serper-powered Google web search.
-    search_arxiv(query, max_results) — arXiv academic paper search.
-    fetch_page(url)                  — Fetch and extract plain text from URL.
+    search_web(query, num_results)            — Serper-powered Google web search.
+    search_google_scholar(query, max_results) — Google Scholar via Serper API.
+    search_arxiv(query, max_results)          — arXiv academic paper search.
+    fetch_page(url)                           — Fetch and extract plain text from URL.
 """
 
 from __future__ import annotations
@@ -36,6 +38,11 @@ try:
 except ImportError:  # pragma: no cover
     ArxivSearcher = None  # type: ignore[assignment,misc]
     search_arxiv_for_topic = None  # type: ignore[assignment]
+
+try:
+    from scripts.google_search import GoogleSearcher as _GoogleSearcher
+except ImportError:  # pragma: no cover
+    _GoogleSearcher = None  # type: ignore[assignment]
 
 mcp = FastMCP("web-researcher")
 
@@ -92,6 +99,57 @@ def search_web(query: str, num_results: int = 5) -> list[dict[str, str]]:
     except Exception as exc:  # noqa: BLE001
         logger.error("Unexpected error in search_web: %s", exc)
         return [{"error": f"Unexpected error: {exc}"}]
+
+
+# ---------------------------------------------------------------------------
+# Tool: search_google_scholar
+# ---------------------------------------------------------------------------
+
+
+@mcp.tool()
+def search_google_scholar(
+    query: str,
+    max_results: int = 5,
+    year_start: int | None = None,
+    year_end: int | None = None,
+) -> list[dict[str, Any]]:
+    """Search Google Scholar for academic papers via Serper API.
+
+    Targets recent publications so that research sources are fresh.
+    When ``year_start`` and ``year_end`` are both ``None`` the current and
+    previous calendar year are used automatically.
+
+    Args:
+        query: Search query string (academic terms work best).
+        max_results: Maximum number of results to return (default 5).
+        year_start: Filter papers published from this year onward.
+        year_end: Filter papers published up to this year.
+
+    Returns:
+        List of dicts with keys ``title``, ``url``, ``snippet``, ``year``,
+        ``authors``, ``cited_by``, ``source``.
+        Returns a single-element list with an ``error`` key on failure.
+    """
+    if _GoogleSearcher is None:
+        return [{"error": "google_search module is not available"}]
+
+    from datetime import datetime as _dt
+
+    current_year = _dt.now().year
+    effective_year_start = year_start if year_start is not None else current_year - 1
+    effective_year_end = year_end if year_end is not None else current_year
+
+    try:
+        searcher = _GoogleSearcher()
+        return searcher.search_scholar(
+            query=query,
+            num_results=max_results,
+            year_start=effective_year_start,
+            year_end=effective_year_end,
+        )
+    except Exception as exc:  # noqa: BLE001
+        logger.error("Google Scholar search failed: %s", exc)
+        return [{"error": f"Google Scholar search failed: {exc}"}]
 
 
 # ---------------------------------------------------------------------------

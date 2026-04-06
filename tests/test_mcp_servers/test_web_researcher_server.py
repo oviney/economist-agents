@@ -14,7 +14,12 @@ import pytest
 import requests
 
 import mcp_servers.web_researcher_server as web_researcher_module
-from mcp_servers.web_researcher_server import fetch_page, search_arxiv, search_web
+from mcp_servers.web_researcher_server import (
+    fetch_page,
+    search_arxiv,
+    search_google_scholar,
+    search_web,
+)
 
 # ═══════════════════════════════════════════════════════════════════════════
 # search_web
@@ -388,3 +393,95 @@ class TestFetchPage:
         assert "  " not in result
         assert "Hello" in result
         assert "World" in result
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# search_google_scholar
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+class TestSearchGoogleScholar:
+    """Tests for the search_google_scholar MCP tool."""
+
+    def _make_scholar_result(self, idx: int) -> dict[str, Any]:
+        return {
+            "title": f"Scholar Paper {idx}",
+            "url": f"https://scholar.example.com/{idx}",
+            "snippet": f"Abstract {idx}",
+            "year": "2026",
+            "authors": f"Author {idx}",
+            "cited_by": idx * 5,
+            "source": "google_scholar",
+        }
+
+    def test_returns_scholar_results_on_success(self) -> None:
+        """Returns list of scholar paper dicts on success."""
+        papers = [self._make_scholar_result(i) for i in range(1, 4)]
+        mock_searcher = MagicMock()
+        mock_searcher.search_scholar.return_value = papers
+
+        with patch.object(
+            web_researcher_module, "_GoogleSearcher", return_value=mock_searcher
+        ):
+            results = search_google_scholar("software testing AI", max_results=3)
+
+        assert len(results) == 3
+        assert results[0]["title"] == "Scholar Paper 1"
+        assert results[0]["source"] == "google_scholar"
+
+    def test_missing_google_search_module_returns_error(self) -> None:
+        """When _GoogleSearcher is None (module not available), returns error."""
+        original = web_researcher_module._GoogleSearcher
+        web_researcher_module._GoogleSearcher = None  # type: ignore[assignment]
+        try:
+            results = search_google_scholar("topic")
+        finally:
+            web_researcher_module._GoogleSearcher = original  # type: ignore[assignment]
+
+        assert len(results) == 1
+        assert "error" in results[0]
+
+    def test_defaults_to_current_and_previous_year(self) -> None:
+        """When year args are None, defaults year range to current and previous year."""
+        from datetime import datetime as _dt
+
+        current_year = _dt.now().year
+        mock_searcher = MagicMock()
+        mock_searcher.search_scholar.return_value = []
+
+        with patch.object(
+            web_researcher_module, "_GoogleSearcher", return_value=mock_searcher
+        ):
+            search_google_scholar("topic")
+
+        call_kwargs = mock_searcher.search_scholar.call_args[1]
+        assert call_kwargs["year_start"] == current_year - 1
+        assert call_kwargs["year_end"] == current_year
+
+    def test_explicit_year_params_forwarded(self) -> None:
+        """Explicit year_start and year_end are forwarded to the searcher."""
+        mock_searcher = MagicMock()
+        mock_searcher.search_scholar.return_value = []
+
+        with patch.object(
+            web_researcher_module, "_GoogleSearcher", return_value=mock_searcher
+        ):
+            search_google_scholar("topic", year_start=2024, year_end=2025)
+
+        call_kwargs = mock_searcher.search_scholar.call_args[1]
+        assert call_kwargs["year_start"] == 2024
+        assert call_kwargs["year_end"] == 2025
+
+    def test_exception_returns_structured_error(self) -> None:
+        """Unexpected exception from searcher returns structured error dict."""
+        mock_searcher = MagicMock()
+        mock_searcher.search_scholar.side_effect = RuntimeError("API down")
+
+        with patch.object(
+            web_researcher_module, "_GoogleSearcher", return_value=mock_searcher
+        ):
+            results = search_google_scholar("topic")
+
+        assert len(results) == 1
+        assert "error" in results[0]
+        assert "Google Scholar" in results[0]["error"]

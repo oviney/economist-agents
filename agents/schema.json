@@ -1,0 +1,75 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/economist-agents/agents/schema.json",
+  "title": "Agent Configuration",
+  "description": "JSON Schema for economist-agents YAML agent configuration files",
+  "type": "object",
+  "required": ["name", "role", "goal", "backstory", "system_message", "metadata"],
+  "additionalProperties": true,
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable name for the agent"
+    },
+    "role": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Short role title for the agent"
+    },
+    "goal": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Primary goal the agent pursues"
+    },
+    "backstory": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Background context that shapes the agent's persona"
+    },
+    "system_message": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Full system prompt sent to the LLM"
+    },
+    "trend_system_message": {
+      "type": "string",
+      "description": "Optional secondary prompt (used by topic_scout for trend research)"
+    },
+    "tools": {
+      "type": "array",
+      "items": {"type": "string"},
+      "default": [],
+      "description": "List of tool names available to this agent"
+    },
+    "weight": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Voting weight for editorial board agents (default 1.0)"
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["version", "created", "author", "category"],
+      "properties": {
+        "version": {
+          "type": "string",
+          "description": "Semantic version of this agent config"
+        },
+        "created": {
+          "type": "string",
+          "description": "ISO 8601 creation date (YYYY-MM-DD)"
+        },
+        "author": {
+          "type": "string",
+          "description": "Author or team that owns this agent config"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["discovery", "editorial_board", "content_generation"],
+          "description": "Pipeline stage this agent belongs to"
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

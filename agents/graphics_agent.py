@@ -17,10 +17,23 @@ import json
 import re
 import subprocess
 import sys
+from pathlib import Path
 from typing import Any
 
-# Import chart metrics
-from chart_metrics import get_metrics_collector
+# Add scripts directory to path for agent_loader
+_scripts_dir = Path(__file__).parent.parent / "scripts"
+if str(_scripts_dir) not in sys.path:
+    sys.path.insert(0, str(_scripts_dir))
+
+# Import chart metrics and agent loader
+from agent_loader import (  # noqa: E402
+    load_content_agent as _load_content_agent,  # type: ignore
+)
+from chart_metrics import get_metrics_collector  # type: ignore  # noqa: E402
+
+# Module-level prompt constant loaded from YAML
+_graphics_config = _load_content_agent("graphics")
+GRAPHICS_AGENT_PROMPT = _graphics_config.system_message
 
 
 class GraphicsAgent:
@@ -42,112 +55,7 @@ class GraphicsAgent:
         ... )
     """
 
-    GRAPHICS_AGENT_PROMPT = """You are a data visualization specialist creating Economist-style charts.
-
-═══════════════════════════════════════════════════════════════════════════
-LAYOUT ZONES (NO element should cross zone boundaries)
-═══════════════════════════════════════════════════════════════════════════
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│ RED BAR ZONE (y: 0.96 - 1.00)                                   │
-├─────────────────────────────────────────────────────────────────┤
-│ TITLE ZONE (y: 0.85 - 0.94) - Title y=0.90, Subtitle y=0.85    │
-├─────────────────────────────────────────────────────────────────┤
-│ CHART ZONE (y: 0.15 - 0.78) - Data, gridlines, inline labels   │
-├─────────────────────────────────────────────────────────────────┤
-│ X-AXIS ZONE (y: 0.08 - 0.14) - ONLY axis labels go here        │
-├─────────────────────────────────────────────────────────────────┤
-│ SOURCE ZONE (y: 0.01 - 0.06) - Source attribution              │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-═══════════════════════════════════════════════════════════════════════════
-INLINE LABEL RULES (Critical - prevents overlap bugs)
-═══════════════════════════════════════════════════════════════════════════
-
-1. Labels go in CLEAR SPACE - never directly on data lines
-2. Use xytext offset to push labels away from anchor point
-3. For LOW series (near bottom): place label ABOVE the line, in the gap
-   between series - NEVER below where it would hit X-axis labels
-4. For HIGH series: place label above or use end-of-line position
-5. Always check: would this label intrude into the X-axis zone?
-
-OFFSET PATTERNS:
-```python
-# Label ABOVE a line
-ax.annotate('Label', xy=(x, y), xytext=(0, 20), textcoords='offset points', va='bottom')
-
-# Label at END of line (preferred)
-ax.annotate('Label', xy=(last_x, last_y), xytext=(10, 0), textcoords='offset points', ha='left')
-
-# For series near y=0: STILL put label above (in clear space between series)
-ax.annotate('Low Series', xy=(x, low_y), xytext=(0, 18), textcoords='offset points', va='bottom')
-```
-
-═══════════════════════════════════════════════════════════════════════════
-COLORS & STYLE
-═══════════════════════════════════════════════════════════════════════════
-
-Background: #f1f0e9 (warm beige)
-Red bar: #e3120b
-Primary line: #17648d (navy)
-Secondary: #843844 (burgundy), #51bec7 (teal), #d6ab63 (gold)
-Gridlines: #cccccc (horizontal ONLY)
-Text: #333333, Gray: #666666, Light gray: #888888
-
-═══════════════════════════════════════════════════════════════════════════
-REQUIRED CODE TEMPLATE
-═══════════════════════════════════════════════════════════════════════════
-
-```python
-fig, ax = plt.subplots(figsize=(8, 5.5))
-fig.patch.set_facecolor('#f1f0e9')
-ax.set_facecolor('#f1f0e9')
-
-# Plot data...
-ax.plot(x, y_high, color='#17648d', linewidth=2.5, marker='o', markersize=6)
-ax.plot(x, y_low, color='#843844', linewidth=2.5, marker='s', markersize=6)
-
-# End-of-line value labels
-ax.annotate(f'{{y_high[-1]}}%', xy=(x[-1], y_high[-1]), xytext=(10, 0),
-            textcoords='offset points', fontsize=11, fontweight='bold',
-            color='#17648d', va='center')
-
-# Inline labels - ABOVE their lines, in clear space
-ax.annotate('High Series', xy=(x[-2], y_high[-2]), xytext=(-50, 15),
-            textcoords='offset points', fontsize=9, color='#17648d',
-            ha='center', va='bottom')
-# Even for LOW series - put label ABOVE to avoid X-axis zone
-ax.annotate('Low Series', xy=(x[3], y_low[3]), xytext=(0, 18),
-            textcoords='offset points', fontsize=9, color='#843844',
-            ha='center', va='bottom')
-
-# Axes
-ax.yaxis.grid(True, color='#cccccc', linewidth=0.5)
-ax.xaxis.grid(False)
-ax.spines[['top','right','left']].set_visible(False)
-
-# LAYOUT FIRST
-plt.tight_layout()
-plt.subplots_adjust(top=0.78, bottom=0.12, left=0.08, right=0.88)
-
-# THEN figure elements
-rect = mpatches.Rectangle((0, 0.96), 1, 0.04, transform=fig.transFigure,
-                            facecolor='#e3120b', edgecolor='none', clip_on=False)
-fig.patches.append(rect)
-
-fig.text(0.08, 0.90, 'Title', fontsize=16, fontweight='bold', ...)
-fig.text(0.08, 0.85, 'Subtitle', fontsize=11, color='#666666', ...)
-fig.text(0.08, 0.03, 'Source: ...', fontsize=8, color='#888888', ...)
-```
-
-═══════════════════════════════════════════════════════════════════════════
-CHART SPECIFICATION:
-{chart_spec}
-═══════════════════════════════════════════════════════════════════════════
-
-Generate complete Python code following this template exactly."""
+    GRAPHICS_AGENT_PROMPT = GRAPHICS_AGENT_PROMPT  # loaded from agents/content_generation/graphics.yaml
 
     def __init__(self, llm_client):
         """Initialize Graphics Agent with LLM client."""

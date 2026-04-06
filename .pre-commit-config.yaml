@@ -67,6 +67,16 @@ repos:
         files: ^(docs/adr/|mkdocs\.yml$|docs/ADR-.*\.md$|docs/architecture/ADR.*\.md$)
         always_run: false
 
+      # Agent YAML validation (ADR-0001)
+      - id: validate-agent-yaml
+        name: validate agent YAML configs
+        description: Validate agent YAML files against agents/schema.json
+        entry: python scripts/agent_loader.py --validate
+        language: system
+        pass_filenames: false
+        files: ^agents/.*\.yaml$
+        always_run: false
+
   # Basic file checks (check-only, no auto-fix)
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0

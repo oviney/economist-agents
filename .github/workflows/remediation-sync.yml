@@ -28,13 +28,39 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Fetch content remediation queue
+        env:
+          GH_TOKEN: ${{ secrets.BLOG_REPO_TOKEN }}
         run: |
-          curl -sf "https://raw.githubusercontent.com/oviney/blog/main/content-remediation-queue.json" \
-            -o queue.json
+          # Try to fetch the latest remediation-queue artifact from content-remediation.yml
+          RUN_ID=$(gh api repos/oviney/blog/actions/workflows/content-remediation.yml/runs \
+            --jq '.workflow_runs[] | select(.conclusion=="success") | .id' | head -1)
+
+          if [ -z "$RUN_ID" ]; then
+            echo "No successful content-remediation run found — falling back to committed file"
+            curl -sf "https://raw.githubusercontent.com/oviney/blog/main/content-remediation-queue.json" \
+              -o queue.json
+          else
+            ARTIFACT_ID=$(gh api repos/oviney/blog/actions/runs/$RUN_ID/artifacts \
+              --jq '.artifacts[] | select(.name=="remediation-queue") | .id' | head -1)
+
+            if [ -n "$ARTIFACT_ID" ]; then
+              echo "Downloading remediation-queue artifact (id=$ARTIFACT_ID) from run $RUN_ID"
+              gh api repos/oviney/blog/actions/artifacts/$ARTIFACT_ID/zip > queue.zip
+              unzip -o queue.zip -d queue-dir
+              cp queue-dir/content-remediation-queue.json queue.json
+              rm -rf queue.zip queue-dir
+            else
+              echo "Artifact not found in run $RUN_ID — falling back to committed file"
+              curl -sf "https://raw.githubusercontent.com/oviney/blog/main/content-remediation-queue.json" \
+                -o queue.json
+            fi
+          fi
+
           echo "Queue fetched:"
-          cat queue.json | python3 -c "
+          python3 -c "
           import json, sys
-          data = json.load(sys.stdin)
+          with open('queue.json') as f:
+              data = json.load(f)
           queue = data.get('queue', [])
           print(f'  Total items in queue: {len(queue)}')
           "

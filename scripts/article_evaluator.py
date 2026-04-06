@@ -28,6 +28,14 @@ logger = logging.getLogger(__name__)
 # Constants (reused from existing validators)
 # ═══════════════════════════════════════════════════════════════════════════
 
+# Source freshness: current year and valid "fresh" window (see skills/research-sourcing/SKILL.md)
+_CURRENT_YEAR = datetime.now().year
+_FRESH_YEARS = {str(_CURRENT_YEAR), str(_CURRENT_YEAR - 1)}  # e.g. {"2026", "2025"}
+_STALE_CUTOFF_YEAR = _CURRENT_YEAR - 2  # references older than this are penalised
+
+# Analyst-report vendor names that count against the max-1-per-article rule
+_ANALYST_VENDORS = ["gartner", "forrester", "capgemini", "mckinsey", "bcg", "idc", "deloitte"]
+
 _BANNED_OPENINGS = [
     r"in today's world",
     r"in today's fast-paced",
@@ -285,6 +293,22 @@ class ArticleEvaluator:
             else:
                 score -= 3
 
+        # Source freshness: penalise articles with no recent (2025-2026) citations
+        fresh_hits = sum(
+            1 for year in _FRESH_YEARS if year in body
+        )
+        if fresh_hits == 0:
+            score -= 3  # No recent sources at all
+        elif fresh_hits == 1:
+            score -= 1  # Only one recent year mentioned
+
+        # Analyst over-reliance: penalise if more than 1 analyst vendor cited
+        analyst_hits = sum(
+            1 for vendor in _ANALYST_VENDORS if vendor in body.lower()
+        )
+        if analyst_hits > 1:
+            score -= min(analyst_hits - 1, 3)  # -1 per extra vendor, max -3
+
         return max(1, min(10, score))
 
     def _detail_evidence(self, body: str) -> str:
@@ -295,7 +319,16 @@ class ArticleEvaluator:
             if ref_match
             else 0
         )
-        return f"{ref_count} references cited, {placeholders} placeholders"
+        fresh_hits = sum(1 for year in _FRESH_YEARS if year in body)
+        analyst_hits = sum(1 for vendor in _ANALYST_VENDORS if vendor in body.lower())
+        freshness_note = (
+            f"fresh citations ({'/'.join(sorted(_FRESH_YEARS, reverse=True))}): {fresh_hits}"
+        )
+        analyst_note = f"analyst vendors cited: {analyst_hits}"
+        return (
+            f"{ref_count} references cited, {placeholders} placeholders; "
+            f"{freshness_note}; {analyst_note}"
+        )
 
     # --- Dimension 3: Voice Consistency ---
 

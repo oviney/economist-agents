@@ -8,11 +8,16 @@ from __future__ import annotations
 
 import pathlib
 import sqlite3
+import sys
 from typing import Any
 
 import pytest
 
-from scripts.audit_composite_scores import (
+# Ensure scripts/ is on sys.path for direct-module imports (mirrors the
+# pattern used by the scripts themselves at runtime).
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "scripts"))
+
+from audit_composite_scores import (
     _ACTIVE_WEIGHT_SUM,
     _ZERO_WEIGHT_SUM,
     build_report,
@@ -23,7 +28,7 @@ from scripts.audit_composite_scores import (
     run_sanity_checks,
     select_sample,
 )
-from scripts.ga4_etl import COMPOSITE_WEIGHTS
+from ga4_etl import COMPOSITE_WEIGHTS
 
 # ---------------------------------------------------------------------------
 # Helpers & fixtures

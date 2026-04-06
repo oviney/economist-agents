@@ -34,6 +34,9 @@ _BANNED_OPENINGS = [
     r"it's no secret",
     r"when it comes to",
     r"^amidst\b",
+    r"the arrival of\b",
+    r"the emergence of\b",
+    r"the rise of\b",
 ]
 
 _BANNED_PHRASES = [
@@ -43,12 +46,29 @@ _BANNED_PHRASES = [
     "at the end of the day",
 ]
 
+# Hedging phrases undermine the authoritative Economist voice (SKILL.md Rule 4)
+_HEDGING_PHRASES: list[str] = [
+    "it would be misguided",
+    "one might",
+    "it is worth noting",
+    "it should be noted",
+    "it is important to",
+    "it is not a minor footnote",
+    "further complicating matters",
+    "invites closer scrutiny",
+    "in practical terms",
+]
+
 _BANNED_CLOSINGS = [
     "in conclusion",
     "to conclude",
     "in summary",
     "remains to be seen",
     "only time will tell",
+    "will rest on",
+    "depends on",
+    "the key is",
+    "to summarise",
 ]
 
 _VAGUE_ATTRIBUTION = [
@@ -58,6 +78,7 @@ _VAGUE_ATTRIBUTION = [
     "experts agree",
     "it is widely known",
     "it is well known",
+    "research indicates",
 ]
 
 _AMERICAN_SPELLINGS = [
@@ -286,6 +307,10 @@ class ArticleEvaluator:
         banned_count = sum(1 for p in _BANNED_PHRASES if p.lower() in body_lower)
         score -= banned_count * 2
 
+        # Check hedging phrases (1 point each — undermine authoritative voice)
+        hedging_count = sum(1 for p in _HEDGING_PHRASES if p.lower() in body_lower)
+        score -= hedging_count
+
         # Check American spellings
         american_count = sum(1 for w in _AMERICAN_SPELLINGS if w in body_lower)
         score -= american_count
@@ -300,10 +325,13 @@ class ArticleEvaluator:
     def _detail_voice(self, body: str) -> str:
         body_lower = body.lower()
         banned = [p for p in _BANNED_PHRASES if p.lower() in body_lower]
+        hedging = [p for p in _HEDGING_PHRASES if p.lower() in body_lower]
         american = [w for w in _AMERICAN_SPELLINGS if w in body_lower]
         parts = []
         if banned:
             parts.append(f"banned: {banned}")
+        if hedging:
+            parts.append(f"hedging: {hedging}")
         if american:
             parts.append(f"American spellings: {american}")
         return ", ".join(parts) if parts else "Clean voice"
@@ -319,12 +347,18 @@ class ArticleEvaluator:
         missing = [f for f in _REQUIRED_FRONTMATTER if f not in frontmatter]
         score -= len(missing)
 
-        # Check headings (3-4 is ideal per economist-writing skill)
+        # Check headings — too few or too many both indicate poor structure
         headings = re.findall(r"^#{2,3}\s", body, re.MULTILINE)
         if len(headings) < 2:
             score -= 2
-        elif len(headings) > 6:
-            score -= 1  # Too many headings fragments the argument
+        elif len(headings) > 5:
+            score -= 2
+
+        # Check for list formatting in prose (outside References section)
+        prose_only = re.sub(r"## References.*", "", body, flags=re.DOTALL | re.IGNORECASE)
+        list_items = re.findall(r"^[-*]\s|^\d+\.\s", prose_only, re.MULTILINE)
+        if len(list_items) > 2:
+            score -= 2
 
         # Check word count (600 minimum per economist-writing skill)
         word_count = len(body.split())
@@ -351,7 +385,11 @@ class ArticleEvaluator:
         words = len(body.split())
         missing = [f for f in _REQUIRED_FRONTMATTER if f not in frontmatter]
         has_refs = "## references" in body.lower()
+        prose_only = re.sub(r"## References.*", "", body, flags=re.DOTALL | re.IGNORECASE)
+        list_count = len(re.findall(r"^[-*]\s|^\d+\.\s", prose_only, re.MULTILINE))
         parts = [f"{headings} headings", f"{words} words"]
+        if list_count > 0:
+            parts.append(f"{list_count} list items in prose")
         if missing:
             parts.append(f"missing: {missing}")
         parts.append("references: yes" if has_refs else "references: no")

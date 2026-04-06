@@ -1,9 +1,9 @@
-# ADR-005: Agile Discipline Enforcement in Agent Registry
+# ADR-0005: Agile Discipline Enforcement in Agent Registry
 
-**Status**: Implemented
-**Date**: 2026-01-03
-**Decision Maker**: @refactor-specialist
-**Context**: Sprint 9 Story 54 - Scrum Master R&R Enhancement
+**Status:** Accepted
+**Date:** 2026-01-03
+**Decision Maker:** @refactor-specialist
+**Context:** Sprint 9 Story 54 - Scrum Master R&R Enhancement
 
 ## Context and Problem Statement
 

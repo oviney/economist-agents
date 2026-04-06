@@ -4,6 +4,11 @@
       "type": "http",
       "url": "https://api.githubcopilot.com/mcp/",
       "description": "GitHub MCP for PR management, issues, and repository operations"
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--extension"],
+      "description": "Browser automation for navigating web UIs, taking screenshots, and interacting with pages"
     }
   }
 }

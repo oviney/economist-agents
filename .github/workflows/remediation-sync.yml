@@ -1,0 +1,195 @@
+name: Remediation Sync
+
+on:
+  schedule:
+    - cron: '0 10 * * 1'  # Monday 10:00 UTC (after blog pipeline completes)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run — log posts but do not trigger pipeline'
+        required: false
+        default: 'false'
+        type: boolean
+      max_posts:
+        description: 'Max posts to process (default: 3)'
+        required: false
+        default: '3'
+        type: string
+
+jobs:
+  remediation-sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fetch content remediation queue
+        env:
+          GH_TOKEN: ${{ secrets.BLOG_REPO_TOKEN }}
+        run: |
+          # Try to fetch the latest remediation-queue artifact from content-remediation.yml
+          RUN_ID=$(gh api repos/oviney/blog/actions/workflows/content-remediation.yml/runs \
+            --jq '.workflow_runs[] | select(.conclusion=="success") | .id' | head -1)
+
+          if [ -z "$RUN_ID" ]; then
+            echo "No successful content-remediation run found — falling back to committed file"
+            curl -sf "https://raw.githubusercontent.com/oviney/blog/main/content-remediation-queue.json" \
+              -o queue.json
+          else
+            ARTIFACT_ID=$(gh api repos/oviney/blog/actions/runs/$RUN_ID/artifacts \
+              --jq '.artifacts[] | select(.name=="remediation-queue") | .id' | head -1)
+
+            if [ -n "$ARTIFACT_ID" ]; then
+              echo "Downloading remediation-queue artifact (id=$ARTIFACT_ID) from run $RUN_ID"
+              gh api repos/oviney/blog/actions/artifacts/$ARTIFACT_ID/zip > queue.zip
+              unzip -o queue.zip -d queue-dir
+              cp queue-dir/content-remediation-queue.json queue.json
+              rm -rf queue.zip queue-dir
+            else
+              echo "Artifact not found in run $RUN_ID — falling back to committed file"
+              curl -sf "https://raw.githubusercontent.com/oviney/blog/main/content-remediation-queue.json" \
+                -o queue.json
+            fi
+          fi
+
+          echo "Queue fetched:"
+          python3 -c "
+          import json, sys
+          with open('queue.json') as f:
+              data = json.load(f)
+          queue = data.get('queue', [])
+          print(f'  Total items in queue: {len(queue)}')
+          "
+
+      - name: Load idempotency log
+        run: |
+          mkdir -p logs
+          if [ ! -f logs/remediation-sync-log.json ]; then
+            echo '[]' > logs/remediation-sync-log.json
+          fi
+
+      - name: Process remediation queue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+          MAX_POSTS: ${{ inputs.max_posts || '3' }}
+        run: |
+          python3 - <<'EOF'
+          import json
+          import os
+          import subprocess
+          from datetime import datetime, timezone, timedelta
+
+          dry_run = os.environ.get("DRY_RUN", "false").lower() == "true"
+          max_posts = int(os.environ.get("MAX_POSTS", "3"))
+
+          # Load queue
+          with open("queue.json") as f:
+              data = json.load(f)
+          queue = data.get("queue", [])
+          threshold = data.get("threshold", 75)
+
+          # Filter posts below threshold (defensive — queue should already be filtered)
+          eligible = [p for p in queue if p.get("currentScore", 100) < threshold]
+          print(f"Eligible posts (score < {threshold}): {len(eligible)}")
+
+          # Load idempotency log
+          with open("logs/remediation-sync-log.json") as f:
+              log = json.load(f)
+
+          # Build set of posts triggered this week
+          now = datetime.now(timezone.utc)
+          week_start = now - timedelta(days=now.weekday())  # Monday 00:00 UTC
+          week_start = week_start.replace(hour=0, minute=0, second=0, microsecond=0)
+          triggered_this_week = {
+              entry["post_file"]
+              for entry in log
+              if datetime.fromisoformat(entry["triggeredAt"]).replace(tzinfo=timezone.utc) >= week_start
+          }
+
+          processed = []
+          skipped = []
+          failed = []
+          new_log_entries = []
+
+          for post in eligible[:max_posts]:
+              post_file = post.get("post_file", post.get("file", "unknown"))
+              title = post.get("title", post_file)
+              score = post.get("currentScore", 0)
+              actions = post.get("actionPlan", post.get("actions", []))
+              if isinstance(actions, list):
+                  str_actions = [
+                      a.get("action", str(a)) if isinstance(a, dict) else str(a)
+                      for a in actions[:3]
+                  ]
+                  action_summary = ", ".join(str_actions)
+              else:
+                  action_summary = str(actions)
+
+              if post_file in triggered_this_week:
+                  skipped.append(post_file)
+                  print(f"SKIP (already triggered this week): {post_file}")
+                  continue
+
+              topic = f"REMEDIATION: {title} | Actions: {action_summary}"
+
+              if dry_run:
+                  print(f"DRY RUN — would trigger pipeline for: {post_file}")
+                  print(f"  Topic: {topic}")
+                  processed.append(post_file)
+              else:
+                  print(f"Triggering pipeline for: {post_file} (score={score})")
+                  print(f"  Topic: {topic}")
+                  result = subprocess.run(
+                      [
+                          "gh", "workflow", "run", "content-pipeline.yml",
+                          "--ref", "main",
+                          "--field", f"topic={topic}",
+                      ],
+                      capture_output=True,
+                      text=True,
+                  )
+                  if result.returncode == 0:
+                      print(f"  ✓ Triggered successfully")
+                      processed.append(post_file)
+                      new_log_entries.append({
+                          "post_file": post_file,
+                          "title": title,
+                          "score": score,
+                          "triggeredAt": now.isoformat(),
+                      })
+                  else:
+                      print(f"  ✗ Failed: {result.stderr.strip()}")
+                      failed.append(post_file)
+
+          # Update idempotency log (skip update on dry run)
+          if not dry_run and new_log_entries:
+              log.extend(new_log_entries)
+              with open("logs/remediation-sync-log.json", "w") as f:
+                  json.dump(log, f, indent=2)
+
+          # Summary
+          print("\n=== Remediation Sync Summary ===")
+          print(f"Processed ({len(processed)}): {processed}")
+          print(f"Skipped   ({len(skipped)}):   {skipped}")
+          print(f"Failed    ({len(failed)}):   {failed}")
+          if failed:
+              raise SystemExit(1)
+          EOF
+
+      - name: Commit updated idempotency log
+        if: ${{ inputs.dry_run != 'true' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add logs/remediation-sync-log.json
+          if git diff --cached --quiet; then
+            echo "No log changes to commit."
+          else
+            git commit -m "chore: update remediation-sync-log after run [skip ci]"
+            git push
+          fi

@@ -1,9 +1,50 @@
-# ADR-002: Content Intelligence Engine — Closing the Feedback Loop
+# ADR-0007: Content Intelligence Engine — Closing the Feedback Loop
 
-**Status:** Proposed
-**Date:** 2026-04-05
+**Status:** Accepted
+**Date:** 2026-04-05 (Accepted: 2026-04-06)
 **Decision Maker:** Ouray Viney (Engineering Lead)
 **Research:** Four parallel agents covering content intelligence platforms, sentiment-driven content, Google Analytics APIs, and current pipeline audit
+
+> **Acceptance record (2026-04-06):** Transitioned from Proposed to
+> Accepted after Sprint 22 delivered the feedback loop end-to-end and
+> produced evidence via three verification scripts:
+>
+> - **PR #184** (`scripts/ab_topic_scout_comparison.py`) — A/B
+>   comparison shows Topic Scout with vs. without the performance
+>   context produces substantially different topics: Jaccard similarity
+>   0.111 (threshold 0.6), all 5 Run A topics explicitly reference top
+>   performers from the GA4 database. **Causal effect confirmed.**
+> - **PR #185** (`scripts/audit_composite_scores.py`) — methodology
+>   audit caught the "30% dead weight" problem (two GSC placeholder
+>   terms weighted 0.15 each, set to 0.0). Resolved by Story #187
+>   which introduced `COMPOSITE_WEIGHTS_ACTIVE` — a renormalized
+>   four-dimension subset that sums to 1.0 while preserving canonical
+>   proportions. Max achievable score is now 1.0 (was 0.70).
+> - **PR #186** (`scripts/topic_scout_reproducibility.py`) — 3-run
+>   reproducibility check. The exact-title Jaccard metric flagged
+>   "UNSTABLE" but qualitative inspection showed strong thematic
+>   stability across runs (all three converged on AI testing
+>   economics / maintenance burden / ROI skepticism). The metric
+>   itself is being refined in Story #188 to measure thematic rather
+>   than lexical similarity.
+>
+> All three scripts are merged to main with 110 tests passing
+> (29 + 35 + 46). The full regression suite at acceptance is 1038
+> tests passing, 1 skipped.
+
+> **Interim re-weighting note (2026-04-06, Story #187):** The composite
+> scoring formula defined in this ADR has six weighted terms that sum
+> to 1.0. Two of those terms (`search_ctr`, `search_impressions`, 0.15
+> each) depend on Google Search Console data that takes 24-48h to
+> populate after verification and is currently unavailable. To avoid a
+> "30% dead weight" problem that would silently make the remaining
+> scores unreliable, `scripts/ga4_etl.py` temporarily uses a
+> renormalized four-dimension subset (`COMPOSITE_WEIGHTS_ACTIVE`) that
+> preserves the canonical proportions but sums to 1.0 on its own. Once
+> GSC data is populated and wired in, `compute_scores()` should be
+> switched back to the canonical six-dimension `COMPOSITE_WEIGHTS`.
+> See the invariant tests in `tests/test_ga4_etl.py::TestCompositeWeights`
+> and the audit in Story #182 / PR #185 for the rationale.
 
 ---
 

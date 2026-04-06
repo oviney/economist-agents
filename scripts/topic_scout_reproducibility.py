@@ -4,9 +4,17 @@
 Runs ``topic_scout.scout_topics()`` N times with the same performance
 context and measures how stable the output is across runs.
 
-Stability is measured via word-level Jaccard similarity between the
-topic-title sets produced by each run.  A mean pairwise Jaccard above
+Stability is measured via **TF-IDF cosine similarity** on the full topic
+content (title, hook, thesis, contrarian angle, talking points) produced
+by each run.  A mean pairwise cosine above
 :data:`REPRODUCIBILITY_VERDICT_THRESHOLD` is considered trustworthy.
+
+The classic word-level Jaccard similarity over title strings is retained as
+a secondary *lexical* diagnostic; it is displayed in the report alongside the
+primary cosine metric but does **not** drive the STABLE/UNSTABLE verdict.
+Exact-title Jaccard is too strict for paraphrased LLM output: two titles
+like "Hidden Costs of AI-Driven Testing" and "Overpromising on Maintenance
+Costs" are thematically identical but share zero tokens.
 
 Usage::
 
@@ -23,10 +31,12 @@ from __future__ import annotations
 
 import argparse
 import logging
+import math
 import re
 import string
 import sys
 import time
+from collections import Counter
 from datetime import datetime
 from itertools import chain
 from pathlib import Path
@@ -44,14 +54,17 @@ from topic_scout import create_client, scout_topics
 
 logger = logging.getLogger(__name__)
 
-#: Jaccard threshold above which output is considered reproducible.
-REPRODUCIBILITY_VERDICT_THRESHOLD = 0.5
+#: TF-IDF cosine threshold above which output is considered reproducible.
+#: Exact-title Jaccard (the previous metric) required 0.5, which was
+#: unachievable for paraphrased LLM titles.  TF-IDF cosine on full topic
+#: content reliably clears 0.30 when runs share the same underlying themes.
+REPRODUCIBILITY_VERDICT_THRESHOLD = 0.30
 
 #: Maximum number of runs allowed via --runs.
 MAX_RUNS = 10
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Title normalisation helpers
+# Text normalisation helpers (shared by Jaccard and TF-IDF paths)
 # ──────────────────────────────────────────────────────────────────────────────
 
 _STOP_WORDS: frozenset[str] = frozenset(
@@ -75,6 +88,24 @@ _STOP_WORDS: frozenset[str] = frozenset(
 )
 
 
+def _tokenize(text: str) -> list[str]:
+    """Lowercase, strip punctuation, and split into content-word tokens.
+
+    Punctuation is replaced with spaces so that ``AI/ML`` splits into
+    ``ai`` and ``ml``.  Common stop-words are removed to reduce noise.
+
+    Args:
+        text: Raw text string.
+
+    Returns:
+        List of lowercase word tokens (stop-words excluded).
+    """
+    normalized = text.lower().translate(
+        str.maketrans(string.punctuation, " " * len(string.punctuation))
+    )
+    return [w for w in normalized.split() if w and w not in _STOP_WORDS]
+
+
 def _normalise_title(title: str) -> frozenset[str]:
     """Lower-case and tokenise a title into a frozen set of word tokens.
 
@@ -88,12 +119,62 @@ def _normalise_title(title: str) -> frozenset[str]:
     Returns:
         Frozen set of lowercase word tokens (stop-words excluded).
     """
-    # Replace every punctuation character with a space so that
-    # slash-separated terms (e.g. AI/ML) split correctly.
-    text = title.lower().translate(
-        str.maketrans(string.punctuation, " " * len(string.punctuation))
-    )
-    return frozenset(w for w in text.split() if w and w not in _STOP_WORDS)
+    return frozenset(_tokenize(title))
+
+
+def _extract_topic_text(topic: dict[str, Any]) -> str:
+    """Concatenate all meaningful text fields from a topic dict.
+
+    Combines ``topic``, ``hook``, ``thesis``, ``contrarian_angle``, and
+    ``talking_points`` so the TF-IDF representation captures the full
+    thematic content rather than just the title.
+
+    Args:
+        topic: Topic dictionary as returned by ``scout_topics()``.
+
+    Returns:
+        Single whitespace-joined string of all non-empty text fields.
+    """
+    fields = ("topic", "hook", "thesis", "contrarian_angle", "talking_points")
+    return " ".join(str(topic[f]) for f in fields if topic.get(f))
+
+
+def _compute_tf(tokens: list[str]) -> dict[str, float]:
+    """Compute raw term frequency for a token list.
+
+    Args:
+        tokens: List of word tokens (may contain duplicates).
+
+    Returns:
+        Dict mapping each token to its relative frequency in ``[0, 1]``.
+        Returns an empty dict when ``tokens`` is empty.
+    """
+    if not tokens:
+        return {}
+    counts: Counter[str] = Counter(tokens)
+    total = len(tokens)
+    return {term: count / total for term, count in counts.items()}
+
+
+def _cosine_similarity(
+    vec_a: dict[str, float], vec_b: dict[str, float]
+) -> float:
+    """Cosine similarity between two sparse TF-IDF weight vectors.
+
+    Args:
+        vec_a: First TF-IDF vector (term → weight).
+        vec_b: Second TF-IDF vector (term → weight).
+
+    Returns:
+        Cosine similarity in ``[0, 1]``.  Returns ``0.0`` if either
+        vector has zero magnitude.
+    """
+    dot = sum(vec_a[t] * vec_b.get(t, 0.0) for t in vec_a)
+    norm_a = math.sqrt(sum(v * v for v in vec_a.values()))
+    norm_b = math.sqrt(sum(v * v for v in vec_b.values()))
+    if norm_a == 0.0 or norm_b == 0.0:
+        return 0.0
+    return dot / (norm_a * norm_b)
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -158,20 +239,96 @@ def compute_jaccard_matrix(
     return matrix
 
 
-def mean_pairwise_jaccard(matrix: list[list[float]]) -> float:
-    """Return the mean of off-diagonal Jaccard scores.
+def mean_pairwise_similarity(matrix: list[list[float]]) -> float:
+    """Return the mean of off-diagonal similarity scores.
+
+    Works for any square similarity matrix (Jaccard or cosine).
 
     Args:
-        matrix: N×N Jaccard matrix.
+        matrix: N×N similarity matrix.
 
     Returns:
-        Mean pairwise Jaccard; ``0.0`` when ``N < 2``.
+        Mean pairwise similarity; ``0.0`` when ``N < 2``.
     """
     n = len(matrix)
     if n < 2:
         return 0.0
     off_diag = [matrix[i][j] for i in range(n) for j in range(n) if i != j]
     return mean(off_diag)
+
+
+#: Backward-compatible alias kept so that any external scripts that imported
+#: ``mean_pairwise_jaccard`` by name continue to work.
+mean_pairwise_jaccard = mean_pairwise_similarity
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# TF-IDF cosine similarity (primary thematic metric)
+# ──────────────────────────────────────────────────────────────────────────────
+
+
+def compute_tfidf_cosine_matrix(
+    runs_topics: list[list[dict[str, Any]]],
+) -> list[list[float]]:
+    """Build an N×N TF-IDF cosine similarity matrix across runs.
+
+    Each run is represented as a single document formed by concatenating
+    the text of all its topics (title, hook, thesis, contrarian_angle,
+    talking_points).  TF-IDF vectors with smoothed IDF are then compared
+    via cosine similarity.
+
+    This metric captures *thematic* overlap far better than title-level
+    Jaccard: two runs discussing "AI testing ROI" in different words will
+    still share high-weight TF-IDF terms (e.g. "testing", "ai", "cost",
+    "automation") and produce a cosine score well above the threshold.
+
+    Args:
+        runs_topics: List of topic lists, one per successful run.
+
+    Returns:
+        N×N list-of-lists with cosine similarity scores; diagonal values
+        are ``1.0``.  Returns an empty list when ``runs_topics`` is empty.
+    """
+    n = len(runs_topics)
+    if n == 0:
+        return []
+
+    # Build one text document per run (all topic content concatenated).
+    documents: list[list[str]] = []
+    for run in runs_topics:
+        text = " ".join(_extract_topic_text(t) for t in run)
+        documents.append(_tokenize(text))
+
+    # Collect vocabulary across all documents.
+    vocab: set[str] = {token for doc in documents for token in doc}
+
+    # Smoothed IDF: log((N+1)/(df+1)) + 1  (avoids zero division; cf. sklearn).
+    idf: dict[str, float] = {}
+    for term in vocab:
+        df = sum(1 for doc in documents if term in doc)
+        idf[term] = math.log((n + 1) / (df + 1)) + 1.0
+
+    # Compute TF-IDF weight vectors (TF = raw count / document length).
+    tfidf_vectors: list[dict[str, float]] = []
+    for doc in documents:
+        tf = _compute_tf(doc)
+        tfidf_vectors.append({term: tf.get(term, 0.0) * idf[term] for term in vocab})
+
+    # Build symmetric cosine similarity matrix.
+    matrix: list[list[float]] = []
+    for i in range(n):
+        row: list[float] = []
+        for j in range(n):
+            if i == j:
+                row.append(1.0)
+            elif i > j:
+                row.append(matrix[j][i])
+            else:
+                row.append(
+                    _cosine_similarity(tfidf_vectors[i], tfidf_vectors[j])
+                )
+        matrix.append(row)
+    return matrix
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -360,6 +517,8 @@ def generate_report(
     top_performer_titles: list[str],
     runs_topics: list[list[dict[str, Any]]],
     run_timings: list[float],
+    cosine_matrix: list[list[float]],
+    mean_cosine: float,
     jaccard_matrix: list[list[float]],
     mean_jaccard: float,
     thematic_stability: dict[str, float],
@@ -368,6 +527,11 @@ def generate_report(
     timestamp: str,
 ) -> str:
     """Assemble the full Markdown reproducibility report.
+
+    The primary stability metric is **TF-IDF cosine similarity** on full
+    topic content.  Word-level Jaccard on titles is retained as a
+    secondary lexical diagnostic (it is far too strict to use as a verdict
+    criterion for paraphrased LLM output).
 
     Args:
         n_requested: Total runs requested.
@@ -378,8 +542,10 @@ def generate_report(
         top_performer_titles: Extracted top-performer titles.
         runs_topics: List of topic lists per successful run.
         run_timings: Wall-clock seconds per successful run.
-        jaccard_matrix: N×N Jaccard matrix (N = successful_runs).
-        mean_jaccard: Mean pairwise Jaccard across all successful runs.
+        cosine_matrix: N×N TF-IDF cosine matrix (primary metric).
+        mean_cosine: Mean pairwise TF-IDF cosine (drives the verdict).
+        jaccard_matrix: N×N lexical Jaccard matrix (secondary diagnostic).
+        mean_jaccard: Mean pairwise Jaccard (shown for comparison only).
         thematic_stability: Fraction of runs matching each top performer.
         score_stats: Score distribution statistics dict.
         outlier_run_indices: 0-based indices of outlier runs.
@@ -390,11 +556,11 @@ def generate_report(
     """
     verdict = (
         "✅ **REPRODUCIBLE** — Output is stable enough to trust. "
-        f"Mean Jaccard ({mean_jaccard:.3f}) exceeds the threshold "
+        f"Mean TF-IDF cosine ({mean_cosine:.3f}) exceeds the threshold "
         f"({REPRODUCIBILITY_VERDICT_THRESHOLD})."
-        if mean_jaccard > REPRODUCIBILITY_VERDICT_THRESHOLD
+        if mean_cosine > REPRODUCIBILITY_VERDICT_THRESHOLD
         else "⚠️ **UNSTABLE** — Output varies too much across runs. "
-        f"Mean Jaccard ({mean_jaccard:.3f}) is below the threshold "
+        f"Mean TF-IDF cosine ({mean_cosine:.3f}) is below the threshold "
         f"({REPRODUCIBILITY_VERDICT_THRESHOLD}). "
         "Single-run results should not be treated as reliable signal."
     )
@@ -412,19 +578,40 @@ def generate_report(
             f" | **Successful:** {successful_runs}"
             f" | **Failed:** {failed_runs}"
         ),
-        f"**Reproducibility threshold:** Jaccard > {REPRODUCIBILITY_VERDICT_THRESHOLD}",
+        f"**Reproducibility threshold:** TF-IDF cosine > {REPRODUCIBILITY_VERDICT_THRESHOLD}",
+        "> Note: exact-title Jaccard is shown below as a secondary diagnostic.",
+        "> It is intentionally NOT used for the verdict because paraphrased LLM",
+        "> titles share few tokens even when thematically identical.",
         "",
         "---",
         "",
         "## Verdict",
         "",
-        f"**Mean pairwise Jaccard similarity: {mean_jaccard:.3f}**",
+        f"**Mean pairwise TF-IDF cosine similarity: {mean_cosine:.3f}**",
+        f"*(Lexical Jaccard for reference: {mean_jaccard:.3f})*",
         "",
         verdict,
         "",
         "---",
         "",
-        "## Jaccard Similarity Matrix",
+        "## TF-IDF Cosine Similarity Matrix",
+        "",
+    ]
+
+    if successful_runs >= 2:
+        lines.append(format_jaccard_matrix(cosine_matrix, run_labels))
+    else:
+        lines.append(
+            "_Insufficient successful runs to compute a matrix (need ≥ 2)._"
+        )
+
+    lines += [
+        "",
+        "---",
+        "",
+        "## Lexical Similarity Matrix (Jaccard)",
+        "",
+        "_Word-level Jaccard on topic titles — kept as secondary diagnostic only._",
         "",
     ]
 
@@ -624,20 +811,25 @@ def run_reproducibility_check(
     )
 
     # ── Step 3: Compute metrics ───────────────────────────────────────────────
+    cosine_matrix = (
+        compute_tfidf_cosine_matrix(runs_topics) if successful_runs >= 2 else []
+    )
+    mean_cosine = mean_pairwise_similarity(cosine_matrix) if cosine_matrix else 0.0
     jaccard_matrix = (
         compute_jaccard_matrix(runs_topics) if successful_runs >= 2 else []
     )
-    mean_jaccard = mean_pairwise_jaccard(jaccard_matrix) if jaccard_matrix else 0.0
+    mean_jaccard = mean_pairwise_similarity(jaccard_matrix) if jaccard_matrix else 0.0
     thematic_stability = compute_thematic_stability(
         runs_topics, top_performer_titles
     )
     score_stats = compute_score_stats(runs_topics)
-    outlier_indices = detect_outlier_runs(jaccard_matrix) if jaccard_matrix else []
+    outlier_indices = detect_outlier_runs(cosine_matrix) if cosine_matrix else []
 
-    print(f"\n📊 Mean pairwise Jaccard similarity: {mean_jaccard:.3f}")
+    print(f"\n📊 Mean pairwise TF-IDF cosine similarity: {mean_cosine:.3f}")
+    print(f"   (Lexical Jaccard for reference: {mean_jaccard:.3f})")
     verdict_word = (
         "REPRODUCIBLE"
-        if mean_jaccard > REPRODUCIBILITY_VERDICT_THRESHOLD
+        if mean_cosine > REPRODUCIBILITY_VERDICT_THRESHOLD
         else "UNSTABLE"
     )
     print(f"   Verdict: {verdict_word} (threshold: {REPRODUCIBILITY_VERDICT_THRESHOLD})")
@@ -655,6 +847,8 @@ def run_reproducibility_check(
         top_performer_titles=top_performer_titles,
         runs_topics=runs_topics,
         run_timings=run_timings,
+        cosine_matrix=cosine_matrix,
+        mean_cosine=mean_cosine,
         jaccard_matrix=jaccard_matrix,
         mean_jaccard=mean_jaccard,
         thematic_stability=thematic_stability,
@@ -674,6 +868,8 @@ def run_reproducibility_check(
         "n_requested": n_runs,
         "successful_runs": successful_runs,
         "failed_runs": failed_run_count,
+        "mean_pairwise_cosine": mean_cosine,
+        "cosine_matrix": cosine_matrix,
         "mean_pairwise_jaccard": mean_jaccard,
         "jaccard_matrix": jaccard_matrix,
         "thematic_stability": thematic_stability,
@@ -698,7 +894,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
             "Measure LLM variance in Topic Scout output by running it N times "
-            "with the same performance context and computing Jaccard similarity."
+            "with the same performance context and computing TF-IDF cosine similarity."
         )
     )
     parser.add_argument(

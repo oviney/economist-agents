@@ -2809,6 +2809,21 @@
 <strong>Date:</strong> 2026-04-05
 <strong>Decision Maker:</strong> Ouray Viney (Engineering Lead)
 <strong>Research:</strong> Four parallel agents covering content intelligence platforms, sentiment-driven content, Google Analytics APIs, and current pipeline audit</p>
+<blockquote>
+<p><strong>Interim re-weighting note (2026-04-06, Story #187):</strong> The composite
+scoring formula defined in this ADR has six weighted terms that sum
+to 1.0. Two of those terms (<code>search_ctr</code>, <code>search_impressions</code>, 0.15
+each) depend on Google Search Console data that takes 24-48h to
+populate after verification and is currently unavailable. To avoid a
+"30% dead weight" problem that would silently make the remaining
+scores unreliable, <code>scripts/ga4_etl.py</code> temporarily uses a
+renormalized four-dimension subset (<code>COMPOSITE_WEIGHTS_ACTIVE</code>) that
+preserves the canonical proportions but sums to 1.0 on its own. Once
+GSC data is populated and wired in, <code>compute_scores()</code> should be
+switched back to the canonical six-dimension <code>COMPOSITE_WEIGHTS</code>.
+See the invariant tests in <code>tests/test_ga4_etl.py::TestCompositeWeights</code>
+and the audit in Story #182 / PR #185 for the rationale.</p>
+</blockquote>
 <hr />
 <h2 id="problem-statement">Problem Statement<a class="headerlink" href="#problem-statement" title="Permanent link">&para;</a></h2>
 <p>The economist-agents pipeline generates articles but has no intelligence about what to generate. It is a content factory with no market research department.</p>

@@ -6,31 +6,37 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Multi-agent content pipeline that generates Economist-style articles with autonomous research, writing, illustration, and deployment">
+        <meta name="description" content="Rules for writing, numbering, and superseding Architectural Decision Records so the ADR tree stays coherent and auditable">
       
       
+        <meta name="author" content="ouray.viney">
       
-        <link rel="canonical" href="https://oviney.github.io/economist-agents/ADR-001-agent-configuration-extraction/">
+      
+        <link rel="canonical" href="https://oviney.github.io/economist-agents/skills/adr-governance/SKILL/">
       
       
+        <link rel="prev" href="../../agent-delegation/SKILL/">
+      
+      
+        <link rel="next" href="../../research-sourcing/SKILL/">
       
       
         
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>ADR-001: Extract Agent Definitions to YAML Configuration - Economist Agents</title>
+        <title>ADR Governance - Economist Agents</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -49,7 +55,7 @@
       
     
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -74,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#adr-001-extract-agent-definitions-to-yaml-configuration" class="md-skip">
+        <a href="#adr-governance-skill" class="md-skip">
           Skip to content
         </a>
       
@@ -88,7 +94,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="Economist Agents" class="md-header__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+    <a href="../../.." title="Economist Agents" class="md-header__button md-logo" aria-label="Economist Agents" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -108,7 +114,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              ADR-001: Extract Agent Definitions to YAML Configuration
+              ADR Governance
             
           </span>
         </div>
@@ -221,7 +227,7 @@
   
   
     <li class="md-tabs__item">
-      <a href=".." class="md-tabs__link">
+      <a href="../../.." class="md-tabs__link">
         
   
   
@@ -240,7 +246,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../getting-started/" class="md-tabs__link">
+      <a href="../../../getting-started/" class="md-tabs__link">
         
   
   
@@ -261,7 +267,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../agent-registry-spec/" class="md-tabs__link">
+        <a href="../../../agent-registry-spec/" class="md-tabs__link">
           
   
   
@@ -281,7 +287,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../adr/ADR-001-agent-framework-selection/" class="md-tabs__link">
+        <a href="../../../adr/0001-extract-agent-definitions-to-yaml/" class="md-tabs__link">
           
   
   
@@ -297,11 +303,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../skills/agent-delegation/SKILL/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../agent-delegation/SKILL/" class="md-tabs__link">
           
   
   
@@ -321,7 +329,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../guides/WORKFLOW_GUIDE/" class="md-tabs__link">
+        <a href="../../../guides/WORKFLOW_GUIDE/" class="md-tabs__link">
           
   
   
@@ -341,7 +349,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../CREWAI_API_REFERENCE/" class="md-tabs__link">
+        <a href="../../../CREWAI_API_REFERENCE/" class="md-tabs__link">
           
   
   
@@ -361,7 +369,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../AGENT_VELOCITY_ANALYSIS/" class="md-tabs__link">
+        <a href="../../../AGENT_VELOCITY_ANALYSIS/" class="md-tabs__link">
           
   
   
@@ -395,7 +403,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="Economist Agents" class="md-nav__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+    <a href="../../.." title="Economist Agents" class="md-nav__button md-logo" aria-label="Economist Agents" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -425,7 +433,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   
@@ -452,7 +460,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../getting-started/" class="md-nav__link">
+      <a href="../../../getting-started/" class="md-nav__link">
         
   
   
@@ -533,7 +541,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../agent-registry-spec/" class="md-nav__link">
+      <a href="../../../agent-registry-spec/" class="md-nav__link">
         
   
   
@@ -561,7 +569,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../FLOW_ARCHITECTURE/" class="md-nav__link">
+      <a href="../../../FLOW_ARCHITECTURE/" class="md-nav__link">
         
   
   
@@ -589,7 +597,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../AUTONOMOUS_ORCHESTRATION_STRATEGY/" class="md-nav__link">
+      <a href="../../../AUTONOMOUS_ORCHESTRATION_STRATEGY/" class="md-nav__link">
         
   
   
@@ -617,7 +625,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../CREWAI_CONTEXT_ARCHITECTURE/" class="md-nav__link">
+      <a href="../../../CREWAI_CONTEXT_ARCHITECTURE/" class="md-nav__link">
         
   
   
@@ -645,7 +653,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ARCHITECTURE_PATTERNS/" class="md-nav__link">
+      <a href="../../../ARCHITECTURE_PATTERNS/" class="md-nav__link">
         
   
   
@@ -673,7 +681,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ARCHITECTURE_REVIEW_PROCESS/" class="md-nav__link">
+      <a href="../../../ARCHITECTURE_REVIEW_PROCESS/" class="md-nav__link">
         
   
   
@@ -762,14 +770,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/ADR-001-agent-framework-selection/" class="md-nav__link">
+      <a href="../../../adr/0001-extract-agent-definitions-to-yaml/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-001 — Agent Framework Selection
+    ADR-0001 — Extract Agent Definitions to YAML
   
 
     
@@ -790,14 +798,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/ADR-002-content-intelligence-engine/" class="md-nav__link">
+      <a href="../../../adr/0002-agent-registry-pattern/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-002 — Content Intelligence Engine
+    ADR-0002 — Agent Registry Pattern
   
 
     
@@ -818,14 +826,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/ADR-003-agent-skill-governance/" class="md-nav__link">
+      <a href="../../../adr/0003-phased-crewai-migration/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-003 — Agent Skill Governance
+    ADR-0003 — Phased CrewAI Migration (Superseded)
   
 
     
@@ -846,14 +854,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../ADR-004-python-version-constraint/" class="md-nav__link">
+      <a href="../../../adr/0004-python-version-constraint/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-004 — Python Version Constraint
+    ADR-0004 — Python Version Constraint
   
 
     
@@ -874,14 +882,98 @@
   
   
     <li class="md-nav__item">
-      <a href="../ADR-005-agile-discipline-enforcement/" class="md-nav__link">
+      <a href="../../../adr/0005-agile-discipline-enforcement/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-005 — Agile Discipline Enforcement
+    ADR-0005 — Agile Discipline Enforcement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../adr/0006-agent-framework-selection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0006 — Agent Framework Selection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../adr/0007-content-intelligence-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0007 — Content Intelligence Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../adr/0008-agent-skill-governance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0008 — Agent Skill Governance
   
 
     
@@ -906,28 +998,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   
@@ -945,7 +1040,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -963,7 +1058,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/agent-delegation/SKILL/" class="md-nav__link">
+      <a href="../../agent-delegation/SKILL/" class="md-nav__link">
         
   
   
@@ -988,10 +1083,328 @@
                 
   
   
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR Governance
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR Governance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-invoke" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Invoke
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Rules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rule-1-one-canonical-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 1: One Canonical Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-2-madr-filename-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 2: MADR Filename Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-3-mandatory-header-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 3: Mandatory Header Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-4-mandatory-body-sections" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 4: Mandatory Body Sections
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-5-immutability-after-accepted" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 5: Immutability After Accepted
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-6-bidirectional-supersession" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 6: Bidirectional Supersession
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-7-not-everything-is-an-adr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 7: Not Everything Is an ADR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-8-index-in-mkdocsyml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 8: Index in mkdocs.yml
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delegation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Delegation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tooling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tooling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#anti-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Anti-Patterns
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Anti-Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-editing-an-accepted-adr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Editing an Accepted ADR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-deleting-a-rejected-or-superseded-adr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Deleting a Rejected or Superseded ADR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-duplicating-adrs-across-directories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Duplicating ADRs Across Directories
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-using-adrs-as-implementation-reports" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Using ADRs as Implementation Reports
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-vague-status-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Vague Status Values
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-sprint-21-consolidation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: Sprint 21 Consolidation
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
   
   
     <li class="md-nav__item">
-      <a href="../skills/research-sourcing/SKILL/" class="md-nav__link">
+      <a href="../../research-sourcing/SKILL/" class="md-nav__link">
         
   
   
@@ -1019,7 +1432,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/economist-writing/SKILL/" class="md-nav__link">
+      <a href="../../economist-writing/SKILL/" class="md-nav__link">
         
   
   
@@ -1047,7 +1460,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/editorial-illustration/SKILL/" class="md-nav__link">
+      <a href="../../editorial-illustration/SKILL/" class="md-nav__link">
         
   
   
@@ -1075,7 +1488,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/article-evaluation/SKILL/" class="md-nav__link">
+      <a href="../../article-evaluation/SKILL/" class="md-nav__link">
         
   
   
@@ -1103,7 +1516,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/quality-gates/SKILL/" class="md-nav__link">
+      <a href="../../quality-gates/SKILL/" class="md-nav__link">
         
   
   
@@ -1131,7 +1544,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/python-quality/SKILL/" class="md-nav__link">
+      <a href="../../python-quality/SKILL/" class="md-nav__link">
         
   
   
@@ -1159,7 +1572,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/testing/SKILL/" class="md-nav__link">
+      <a href="../../testing/SKILL/" class="md-nav__link">
         
   
   
@@ -1187,7 +1600,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/defect-prevention/SKILL/" class="md-nav__link">
+      <a href="../../defect-prevention/SKILL/" class="md-nav__link">
         
   
   
@@ -1215,7 +1628,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/devops/SKILL/" class="md-nav__link">
+      <a href="../../devops/SKILL/" class="md-nav__link">
         
   
   
@@ -1243,7 +1656,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/sprint-management/SKILL/" class="md-nav__link">
+      <a href="../../sprint-management/SKILL/" class="md-nav__link">
         
   
   
@@ -1271,7 +1684,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/scrum-master/SKILL/" class="md-nav__link">
+      <a href="../../scrum-master/SKILL/" class="md-nav__link">
         
   
   
@@ -1299,7 +1712,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/agent-traceability/SKILL/" class="md-nav__link">
+      <a href="../../agent-traceability/SKILL/" class="md-nav__link">
         
   
   
@@ -1327,7 +1740,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/observability/SKILL/" class="md-nav__link">
+      <a href="../../observability/SKILL/" class="md-nav__link">
         
   
   
@@ -1355,7 +1768,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/mcp-development/SKILL/" class="md-nav__link">
+      <a href="../../mcp-development/SKILL/" class="md-nav__link">
         
   
   
@@ -1444,7 +1857,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/WORKFLOW_GUIDE/" class="md-nav__link">
+      <a href="../../../guides/WORKFLOW_GUIDE/" class="md-nav__link">
         
   
   
@@ -1472,7 +1885,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/BLOG_DEPLOYMENT/" class="md-nav__link">
+      <a href="../../../guides/BLOG_DEPLOYMENT/" class="md-nav__link">
         
   
   
@@ -1500,7 +1913,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/COPILOT_SYNC/" class="md-nav__link">
+      <a href="../../../guides/COPILOT_SYNC/" class="md-nav__link">
         
   
   
@@ -1528,7 +1941,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/CI_MONITORING_GUIDE/" class="md-nav__link">
+      <a href="../../../guides/CI_MONITORING_GUIDE/" class="md-nav__link">
         
   
   
@@ -1556,7 +1969,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/PYTHON_VERSION_TROUBLESHOOTING/" class="md-nav__link">
+      <a href="../../../guides/PYTHON_VERSION_TROUBLESHOOTING/" class="md-nav__link">
         
   
   
@@ -1584,7 +1997,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/IMPLEMENTATION_ROADMAP/" class="md-nav__link">
+      <a href="../../../guides/IMPLEMENTATION_ROADMAP/" class="md-nav__link">
         
   
   
@@ -1612,7 +2025,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/VALIDATION_QUICK_REF/" class="md-nav__link">
+      <a href="../../../guides/VALIDATION_QUICK_REF/" class="md-nav__link">
         
   
   
@@ -1701,7 +2114,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../CREWAI_API_REFERENCE/" class="md-nav__link">
+      <a href="../../../CREWAI_API_REFERENCE/" class="md-nav__link">
         
   
   
@@ -1729,7 +2142,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../AGENT_PROMPT_PATTERNS/" class="md-nav__link">
+      <a href="../../../AGENT_PROMPT_PATTERNS/" class="md-nav__link">
         
   
   
@@ -1757,7 +2170,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../AGENT_QUALITY_GATES/" class="md-nav__link">
+      <a href="../../../AGENT_QUALITY_GATES/" class="md-nav__link">
         
   
   
@@ -1785,7 +2198,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../DEFINITION_OF_DONE/" class="md-nav__link">
+      <a href="../../../DEFINITION_OF_DONE/" class="md-nav__link">
         
   
   
@@ -1813,7 +2226,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../DEFECT_PREVENTION/" class="md-nav__link">
+      <a href="../../../DEFECT_PREVENTION/" class="md-nav__link">
         
   
   
@@ -1841,7 +2254,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../CHART_DESIGN_SPEC/" class="md-nav__link">
+      <a href="../../../CHART_DESIGN_SPEC/" class="md-nav__link">
         
   
   
@@ -1930,7 +2343,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../AGENT_VELOCITY_ANALYSIS/" class="md-nav__link">
+      <a href="../../../AGENT_VELOCITY_ANALYSIS/" class="md-nav__link">
         
   
   
@@ -1958,7 +2371,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../SPRINT_DISCIPLINE_GUIDE/" class="md-nav__link">
+      <a href="../../../SPRINT_DISCIPLINE_GUIDE/" class="md-nav__link">
         
   
   
@@ -1986,7 +2399,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../CHANGELOG/" class="md-nav__link">
+      <a href="../../../CHANGELOG/" class="md-nav__link">
         
   
   
@@ -2041,10 +2454,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#context" class="md-nav__link">
+  <a href="#purpose" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Context
+        Purpose
       
     </span>
   </a>
@@ -2052,10 +2465,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision" class="md-nav__link">
+  <a href="#when-to-invoke" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision
+        When to Invoke
       
     </span>
   </a>
@@ -2063,33 +2476,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#schema" class="md-nav__link">
+  <a href="#the-rules" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Schema
+        The Rules
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#consequences" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Consequences
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Consequences">
+    <nav class="md-nav" aria-label="The Rules">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#positive" class="md-nav__link">
+  <a href="#rule-1-one-canonical-location" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Positive
+        Rule 1: One Canonical Location
       
     </span>
   </a>
@@ -2097,10 +2499,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#negative" class="md-nav__link">
+  <a href="#rule-2-madr-filename-format" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Negative
+        Rule 2: MADR Filename Format
       
     </span>
   </a>
@@ -2108,10 +2510,65 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#neutral" class="md-nav__link">
+  <a href="#rule-3-mandatory-header-format" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Neutral
+        Rule 3: Mandatory Header Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-4-mandatory-body-sections" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 4: Mandatory Body Sections
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-5-immutability-after-accepted" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 5: Immutability After Accepted
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-6-bidirectional-supersession" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 6: Bidirectional Supersession
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-7-not-everything-is-an-adr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 7: Not Everything Is an ADR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-8-index-in-mkdocsyml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 8: Index in mkdocs.yml
       
     </span>
   </a>
@@ -2124,22 +2581,55 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#implementation-plan" class="md-nav__link">
+  <a href="#delegation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Implementation Plan
+        Delegation
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Implementation Plan">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tooling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tooling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#anti-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Anti-Patterns
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Anti-Patterns">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#phase-1-schema-loader-week-1" class="md-nav__link">
+  <a href="#1-editing-an-accepted-adr" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 1: Schema &amp; Loader (Week 1)
+        1. Editing an Accepted ADR
       
     </span>
   </a>
@@ -2147,10 +2637,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#phase-2-migration-week-2" class="md-nav__link">
+  <a href="#2-deleting-a-rejected-or-superseded-adr" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 2: Migration (Week 2)
+        2. Deleting a Rejected or Superseded ADR
       
     </span>
   </a>
@@ -2158,10 +2648,32 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#phase-3-validation-week-2" class="md-nav__link">
+  <a href="#3-duplicating-adrs-across-directories" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 3: Validation (Week 2)
+        3. Duplicating ADRs Across Directories
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-using-adrs-as-implementation-reports" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Using ADRs as Implementation Reports
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-vague-status-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Vague Status Values
       
     </span>
   </a>
@@ -2174,93 +2686,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#alternatives-considered" class="md-nav__link">
+  <a href="#example-sprint-21-consolidation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Alternatives Considered
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Alternatives Considered">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-keep-python-constants" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Keep Python Constants
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-use-json-instead-of-yaml" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Use JSON Instead of YAML
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-use-frameworks-native-format-crewai-yaml" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Use Framework's Native Format (CrewAI YAML)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-database-storage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Database Storage
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#success-metrics" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Success Metrics
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#references" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        References
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#notes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Notes
+        Example: Sprint 21 Consolidation
       
     </span>
   </a>
@@ -2287,145 +2716,209 @@
   
 
 
-<h1 id="adr-001-extract-agent-definitions-to-yaml-configuration">ADR-001: Extract Agent Definitions to YAML Configuration<a class="headerlink" href="#adr-001-extract-agent-definitions-to-yaml-configuration" title="Permanent link">&para;</a></h1>
-<p><strong>Status:</strong> Proposed
-<strong>Date:</strong> 2026-01-01
-<strong>Deciders:</strong> Ouray Viney (Agentic AI Architect)
-<strong>Context:</strong> Architecture review following discovery of multi-agent frameworks (CrewAI, AutoGen)</p>
-<h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
-<p>The economist-agents system currently has agent prompts and configurations hardcoded as Python string constants within script files (<code>topic_scout.py</code>, <code>editorial_board.py</code>, <code>economist_agent.py</code>). This creates several challenges:</p>
-<ol>
-<li><strong>Difficult to tune:</strong> Changing agent behavior requires editing code</li>
-<li><strong>No version control:</strong> Can't A/B test different agent configurations</li>
-<li><strong>Not reusable:</strong> Can't share agent definitions across projects</li>
-<li><strong>Code coupling:</strong> Agent logic mixed with orchestration logic</li>
-<li><strong>Limited collaboration:</strong> Non-technical stakeholders can't modify personas</li>
-</ol>
-<h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
-<p>We will extract all agent definitions (personas, prompts, system messages, scoring criteria) into YAML configuration files stored in an <code>agents/</code> directory structure:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>agents/
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── editorial_board/
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│   ├── vp_engineering.yaml
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   ├── senior_qe_lead.yaml
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│   ├── data_skeptic.yaml
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│   ├── career_climber.yaml
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   ├── economist_editor.yaml
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   └── busy_reader.yaml
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>├── content_generation/
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│   ├── researcher.yaml
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│   ├── writer.yaml
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│   ├── editor.yaml
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│   └── graphics.yaml
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>└── discovery/
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    └── topic_scout.yaml
+<h1 id="adr-governance-skill">ADR Governance Skill<a class="headerlink" href="#adr-governance-skill" title="Permanent link">&para;</a></h1>
+<h2 id="purpose">Purpose<a class="headerlink" href="#purpose" title="Permanent link">&para;</a></h2>
+<p>Keep the Architectural Decision Record tree coherent, auditable, and
+immutable. Every significant architectural decision in the repo lives
+in a single canonical location with a consistent format, a deterministic
+numbering scheme, and a formal supersession lifecycle.</p>
+<p>This skill codifies the rules that Sprint 21 consolidation (Story #177)
+put in place after the repo accumulated 11+ ADR files across three
+directories with colliding numbers.</p>
+<h2 id="when-to-invoke">When to Invoke<a class="headerlink" href="#when-to-invoke" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Any PR that adds or modifies a file under <code>docs/adr/</code></li>
+<li>Any architectural debate in chat that produces a decision ("should we
+  use X framework", "how should we structure Y")</li>
+<li>Any proposal to deprecate or replace an existing architectural
+  approach</li>
+<li>Any status transition on an existing ADR (Proposed → Accepted,
+  Accepted → Superseded)</li>
+</ul>
+<h2 id="the-rules">The Rules<a class="headerlink" href="#the-rules" title="Permanent link">&para;</a></h2>
+<h3 id="rule-1-one-canonical-location">Rule 1: One Canonical Location<a class="headerlink" href="#rule-1-one-canonical-location" title="Permanent link">&para;</a></h3>
+<p>All ADRs live in <code>docs/adr/</code>. No exceptions.</p>
+<p><strong>Forbidden paths:</strong>
+- <code>docs/ADR-*.md</code> (pre-consolidation legacy location)
+- <code>docs/architecture/ADR*.md</code> (pre-consolidation legacy location)
+- Any ADR in a component-specific subdirectory</p>
+<p>The CI lint (<code>scripts/lint_adrs.py</code>) enforces this automatically.</p>
+<h3 id="rule-2-madr-filename-format">Rule 2: MADR Filename Format<a class="headerlink" href="#rule-2-madr-filename-format" title="Permanent link">&para;</a></h3>
+<p>Filename pattern: <code>NNNN-kebab-case-title.md</code></p>
+<ul>
+<li><code>NNNN</code> is a 4-digit number, zero-padded, globally sequential across
+  the entire repo</li>
+<li>Title is lowercase kebab-case, descriptive of the decision</li>
+<li>Example: <code>0006-agent-framework-selection.md</code></li>
+</ul>
+<p><strong>Numbering rule:</strong> PR author claims the next available number at PR
+open time. If two PRs collide at merge, the rebaser bumps to the next
+number. Numbers are never reused, even for rejected or superseded
+ADRs.</p>
+<h3 id="rule-3-mandatory-header-format">Rule 3: Mandatory Header Format<a class="headerlink" href="#rule-3-mandatory-header-format" title="Permanent link">&para;</a></h3>
+<p>Every ADR starts with exactly these fields:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gh"># ADR-NNNN: Title</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gs">**Status:**</span> &lt;one of: Proposed | Accepted | Rejected | Deprecated | Superseded&gt;
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gs">**Date:**</span> YYYY-MM-DD
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gs">**Decision Maker:**</span> &lt;name or role&gt;
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="gs">**Supersedes:**</span> &lt;ADR-NNNN link, if applicable&gt;
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="gs">**Superseded by:**</span> &lt;ADR-NNNN link, if applicable&gt;
 </code></pre></div>
-<h2 id="schema">Schema<a class="headerlink" href="#schema" title="Permanent link">&para;</a></h2>
-<p>Each agent YAML file will follow this structure:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># agent_name.yaml</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Agent</span><span class="nv"> </span><span class="s">Name&quot;</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nt">role</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;One-line</span><span class="nv"> </span><span class="s">role</span><span class="nv"> </span><span class="s">description&quot;</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nt">goal</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;What</span><span class="nv"> </span><span class="s">this</span><span class="nv"> </span><span class="s">agent</span><span class="nv"> </span><span class="s">optimizes</span><span class="nv"> </span><span class="s">for&quot;</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="nt">backstory</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="no">Multi-line description of the agent&#39;s</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="no">perspective and expertise</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="nt">system_message</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">  </span><span class="no">The full system prompt that defines</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span><span class="no">agent behavior and constraints</span>
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="nt">tools</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span><span class="w">  </span><span class="c1"># Optional: List of tool names</span>
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="nt">scoring_criteria</span><span class="p">:</span><span class="w">  </span><span class="c1"># Optional: For voting agents</span>
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">metric_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0-10</span>
-<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">another_metric</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0-10</span>
-<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="nt">metadata</span><span class="p">:</span>
-<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.0&quot;</span>
-<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">  </span><span class="nt">created</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2026-01-01&quot;</span>
-<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">  </span><span class="nt">author</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;oviney&quot;</span>
-<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="w">  </span><span class="nt">category</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;editorial_board&quot;</span>
+<p><strong>Status values are a closed set.</strong> No "Implemented", no "Approved",
+no emoji, no "In Progress". Use only the five allowed values.</p>
+<h3 id="rule-4-mandatory-body-sections">Rule 4: Mandatory Body Sections<a class="headerlink" href="#rule-4-mandatory-body-sections" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="gu">## Context</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>Why are we making this decision? What forces are at play?
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="gu">## Decision</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>What is the decision, in one clear paragraph?
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="gu">## Alternatives Considered</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>What other options were on the table? Why rejected?
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="gu">## Consequences</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>What becomes easier? Harder? What follow-up work is implied?
 </code></pre></div>
-<h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
-<h3 id="positive">Positive<a class="headerlink" href="#positive" title="Permanent link">&para;</a></h3>
+<p>Additional sections (Research, Objectives, Risks) are welcome but
+these four are required.</p>
+<h3 id="rule-5-immutability-after-accepted">Rule 5: Immutability After Accepted<a class="headerlink" href="#rule-5-immutability-after-accepted" title="Permanent link">&para;</a></h3>
+<p>Once an ADR's status is <code>Accepted</code>, the body is immutable. Typos and
+broken links can be fixed, but the decision content, rationale, and
+consequences cannot be rewritten. If the context changes, write a new
+ADR that supersedes it.</p>
+<p><strong>Why:</strong> ADRs document <em>what was true when the decision was made</em>.
+Rewriting history defeats their purpose. Git blame should show the
+original rationale.</p>
+<h3 id="rule-6-bidirectional-supersession">Rule 6: Bidirectional Supersession<a class="headerlink" href="#rule-6-bidirectional-supersession" title="Permanent link">&para;</a></h3>
+<p>When a new ADR supersedes an old one:</p>
 <ol>
-<li><strong>Configuration as Code:</strong> Agent definitions under version control</li>
-<li><strong>Rapid Iteration:</strong> A/B test different personas without code changes</li>
-<li><strong>Reusability:</strong> Share agent configs across projects or with community</li>
-<li><strong>Separation of Concerns:</strong> Agent definitions separate from orchestration</li>
-<li><strong>Accessibility:</strong> Non-engineers can tune agent behavior</li>
-<li><strong>Foundation for Registry:</strong> Enables agent discovery and factory patterns</li>
+<li>New ADR header gets <code>Supersedes: [ADR-NNNN](link)</code></li>
+<li>New ADR body includes a supersession note explaining <em>why the
+   context changed</em> (not just "we decided differently")</li>
+<li>Old ADR status changes to <code>Superseded</code></li>
+<li>Old ADR header gets <code>Status: Superseded by [ADR-NNNN](link) as of YYYY-MM-DD</code></li>
+<li>Old ADR body gets a supersession note pointing to the replacement</li>
 </ol>
-<h3 id="negative">Negative<a class="headerlink" href="#negative" title="Permanent link">&para;</a></h3>
+<p>The CI lint verifies both sides of the link. Breaking one side fails
+the build.</p>
+<h3 id="rule-7-not-everything-is-an-adr">Rule 7: Not Everything Is an ADR<a class="headerlink" href="#rule-7-not-everything-is-an-adr" title="Permanent link">&para;</a></h3>
+<p>ADRs are for architectural decisions that are expensive to reverse:
+framework choice, data model, security model, agent delegation
+matrix, API contracts.</p>
+<p>ADRs are NOT for:
+- Implementation status reports ("REFACTORING-COMPLETE") — belong in
+  PR descriptions or CHANGELOG
+- Coding conventions — belong in <code>docs/ARCHITECTURE_PATTERNS.md</code> or
+  a skill
+- Sprint plans — belong in sprint docs
+- Bug fix rationale — belong in commit messages</p>
+<p>If you're unsure, ask: "If we reversed this in six months, would it
+cost more than a day?" If no, it's not an ADR.</p>
+<h3 id="rule-8-index-in-mkdocsyml">Rule 8: Index in mkdocs.yml<a class="headerlink" href="#rule-8-index-in-mkdocsyml" title="Permanent link">&para;</a></h3>
+<p>Every ADR must be referenced in <code>mkdocs.yml</code> under the ADRs nav
+section. Orphaned ADRs (not in the nav) fail the CI lint.</p>
+<h2 id="delegation">Delegation<a class="headerlink" href="#delegation" title="Permanent link">&para;</a></h2>
+<p>Per <a href="../../../adr/0008-agent-skill-governance/">ADR-0008 Agent Skill Governance</a>
+and <a href="../../agent-delegation/SKILL/">agent-delegation</a>:</p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Who</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Draft new ADR</td>
+<td>Any agent, typically Developer or Scrum Master</td>
+</tr>
+<tr>
+<td>Propose ADR (status: Proposed)</td>
+<td>Any agent</td>
+</tr>
+<tr>
+<td>Accept ADR (status: Accepted)</td>
+<td><strong>Engineering Lead only</strong> — human approval</td>
+</tr>
+<tr>
+<td>Reject ADR (status: Rejected)</td>
+<td><strong>Engineering Lead only</strong></td>
+</tr>
+<tr>
+<td>Supersede ADR (status: Superseded)</td>
+<td><strong>Engineering Lead only</strong> — paired with new Accepted ADR</td>
+</tr>
+<tr>
+<td>Deprecate ADR (status: Deprecated)</td>
+<td><strong>Engineering Lead only</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Status transitions to Accepted/Rejected/Deprecated/Superseded are
+architectural decisions in themselves and fall under
+<code>agent-delegation</code> Rule 6 (architecture → human approval required).</p>
+<h2 id="template">Template<a class="headerlink" href="#template" title="Permanent link">&para;</a></h2>
+<p>See <a href="../../../adr/TEMPLATE/">docs/adr/TEMPLATE.md</a> for the canonical
+starting template. Copy it to a new file, assign the next number,
+fill in the sections, and open a PR.</p>
+<h2 id="tooling">Tooling<a class="headerlink" href="#tooling" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>scripts/lint_adrs.py</code> — CI lint enforcing all rules above. Runs in
+  pre-commit and in CI on every PR touching <code>docs/adr/</code> or
+  <code>mkdocs.yml</code>.</li>
+<li>Future (issue #178): evaluate <a href="https://github.com/thomvaill/log4brains">Log4brains</a>
+  for static-site rendering of the ADR supersession graph.</li>
+</ul>
+<h2 id="anti-patterns">Anti-Patterns<a class="headerlink" href="#anti-patterns" title="Permanent link">&para;</a></h2>
+<h3 id="1-editing-an-accepted-adr">1. Editing an Accepted ADR<a class="headerlink" href="#1-editing-an-accepted-adr" title="Permanent link">&para;</a></h3>
+<p><strong>What happens:</strong> Git blame no longer shows the original rationale,
+readers can't tell what was true when the decision was made.
+<strong>Rule:</strong> Immutable after Accepted. Write a new ADR if the context
+changes.</p>
+<h3 id="2-deleting-a-rejected-or-superseded-adr">2. Deleting a Rejected or Superseded ADR<a class="headerlink" href="#2-deleting-a-rejected-or-superseded-adr" title="Permanent link">&para;</a></h3>
+<p><strong>What happens:</strong> Future teams re-litigate the same debates without
+knowing why the original choice was made or rejected.
+<strong>Rule:</strong> Never delete. Mark as Rejected or Superseded and keep the
+file.</p>
+<h3 id="3-duplicating-adrs-across-directories">3. Duplicating ADRs Across Directories<a class="headerlink" href="#3-duplicating-adrs-across-directories" title="Permanent link">&para;</a></h3>
+<p><strong>What happens:</strong> Readers get conflicting versions; status drift
+between copies (see Sprint 21 #173).
+<strong>Rule:</strong> One canonical location. CI lint blocks files outside
+<code>docs/adr/</code>.</p>
+<h3 id="4-using-adrs-as-implementation-reports">4. Using ADRs as Implementation Reports<a class="headerlink" href="#4-using-adrs-as-implementation-reports" title="Permanent link">&para;</a></h3>
+<p><strong>What happens:</strong> The ADR tree becomes a dumping ground for status
+updates, obscuring the real architectural decisions.
+<strong>Rule:</strong> ADRs document decisions, not implementation progress. Use
+PR descriptions and CHANGELOG for status.</p>
+<h3 id="5-vague-status-values">5. Vague Status Values<a class="headerlink" href="#5-vague-status-values" title="Permanent link">&para;</a></h3>
+<p><strong>What happens:</strong> "Implemented", "Approved", "In Progress" — the
+status field becomes unparseable and CI can't enforce rules.
+<strong>Rule:</strong> Closed status set only. Lint rejects anything else.</p>
+<h2 id="example-sprint-21-consolidation">Example: Sprint 21 Consolidation<a class="headerlink" href="#example-sprint-21-consolidation" title="Permanent link">&para;</a></h2>
+<p>Story #177 applied this skill to consolidate 11+ ADR files. The
+process:</p>
 <ol>
-<li><strong>Additional Abstraction:</strong> One more layer between definition and execution</li>
-<li><strong>Schema Maintenance:</strong> Need to maintain YAML schema and validation</li>
-<li><strong>Migration Effort:</strong> ~10 agents to migrate from Python to YAML</li>
-<li><strong>Loading Overhead:</strong> Parse YAML files at runtime (minimal impact)</li>
+<li>Inventory all ADR files across three directories</li>
+<li>Identify canonical vs duplicate vs not-an-ADR</li>
+<li>Renumber to global MADR sequence in <code>docs/adr/</code></li>
+<li>Add bidirectional supersession between ADR-0003 and ADR-0006</li>
+<li>Archive orphaned duplicates to <code>docs/archive/adr-pre-consolidation/</code></li>
+<li>Delete non-ADR content (ADR-002-REFACTORING-COMPLETE)</li>
+<li>Create this skill and the CI lint</li>
+<li>Update mkdocs.yml, docs/README.md, docs/index.md to match</li>
 </ol>
-<h3 id="neutral">Neutral<a class="headerlink" href="#neutral" title="Permanent link">&para;</a></h3>
-<ol>
-<li><strong>No framework lock-in:</strong> Works with custom orchestration or CrewAI/AutoGen</li>
-<li><strong>Incremental adoption:</strong> Can migrate one agent at a time</li>
-</ol>
-<h2 id="implementation-plan">Implementation Plan<a class="headerlink" href="#implementation-plan" title="Permanent link">&para;</a></h2>
-<h3 id="phase-1-schema-loader-week-1">Phase 1: Schema &amp; Loader (Week 1)<a class="headerlink" href="#phase-1-schema-loader-week-1" title="Permanent link">&para;</a></h3>
-<ul>
-<li>[ ] Create <code>agents/schema.json</code> (JSON Schema for validation)</li>
-<li>[ ] Create <code>scripts/agent_loader.py</code> (YAML → Agent object)</li>
-<li>[ ] Add unit tests for loader</li>
-<li>[ ] Document schema in <code>agents/README.md</code></li>
-</ul>
-<h3 id="phase-2-migration-week-2">Phase 2: Migration (Week 2)<a class="headerlink" href="#phase-2-migration-week-2" title="Permanent link">&para;</a></h3>
-<ul>
-<li>[ ] Extract editorial board agents (6 files)</li>
-<li>[ ] Extract content generation agents (4 files)</li>
-<li>[ ] Extract topic scout (1 file)</li>
-<li>[ ] Update scripts to use loader</li>
-<li>[ ] Verify output equivalence</li>
-</ul>
-<h3 id="phase-3-validation-week-2">Phase 3: Validation (Week 2)<a class="headerlink" href="#phase-3-validation-week-2" title="Permanent link">&para;</a></h3>
-<ul>
-<li>[ ] Add pre-commit hook for YAML validation</li>
-<li>[ ] Run full pipeline with YAML configs</li>
-<li>[ ] Compare outputs with baseline</li>
-<li>[ ] Update documentation</li>
-</ul>
-<h2 id="alternatives-considered">Alternatives Considered<a class="headerlink" href="#alternatives-considered" title="Permanent link">&para;</a></h2>
-<h3 id="1-keep-python-constants">1. Keep Python Constants<a class="headerlink" href="#1-keep-python-constants" title="Permanent link">&para;</a></h3>
-<p><strong>Pros:</strong> Simple, no new dependencies
-<strong>Cons:</strong> Technical debt, not reusable
-<strong>Verdict:</strong> Rejected - doesn't address root problems</p>
-<h3 id="2-use-json-instead-of-yaml">2. Use JSON Instead of YAML<a class="headerlink" href="#2-use-json-instead-of-yaml" title="Permanent link">&para;</a></h3>
-<p><strong>Pros:</strong> Easier to parse, more structured
-<strong>Cons:</strong> Less human-readable, can't use multi-line strings easily
-<strong>Verdict:</strong> Rejected - YAML better for prose-heavy agent prompts</p>
-<h3 id="3-use-frameworks-native-format-crewai-yaml">3. Use Framework's Native Format (CrewAI YAML)<a class="headerlink" href="#3-use-frameworks-native-format-crewai-yaml" title="Permanent link">&para;</a></h3>
-<p><strong>Pros:</strong> Direct compatibility if we migrate
-<strong>Cons:</strong> Framework lock-in, may not support our custom fields
-<strong>Verdict:</strong> Deferred - design our schema first, migrate later if needed</p>
-<h3 id="4-database-storage">4. Database Storage<a class="headerlink" href="#4-database-storage" title="Permanent link">&para;</a></h3>
-<p><strong>Pros:</strong> Queryable, supports versioning
-<strong>Cons:</strong> Overkill for ~10 agents, adds infrastructure
-<strong>Verdict:</strong> Rejected - YAML files sufficient for current scale</p>
-<h2 id="success-metrics">Success Metrics<a class="headerlink" href="#success-metrics" title="Permanent link">&para;</a></h2>
-<ul>
-<li>[ ] All 11 agents migrated to YAML without behavior changes</li>
-<li>[ ] Agent loading time &lt; 100ms per agent</li>
-<li>[ ] Zero schema validation errors in CI/CD</li>
-<li>[ ] At least one successful A/B test of agent persona tuning</li>
-<li>[ ] Community contributor submits first agent config PR</li>
-</ul>
-<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
-<ul>
-<li>CrewAI agent configuration: https://docs.crewai.com/concepts/agents</li>
-<li>AutoGen agent definition patterns: https://microsoft.github.io/autogen</li>
-<li>JSON Schema specification: https://json-schema.org/</li>
-<li>Related ADRs: ADR-002 (Agent Registry Pattern)</li>
-</ul>
-<h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">&para;</a></h2>
-<p>This ADR sets foundation for ADR-002 (Agent Registry) and ADR-003 (CrewAI Migration). The YAML schema should be designed to be framework-agnostic to avoid future lock-in.</p>
+<p>This was a one-time consolidation. Going forward, this skill prevents
+the problem from recurring.</p>
 
 
 
 
 
 
+
+  
+  
 
 
 
@@ -2475,10 +2968,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>

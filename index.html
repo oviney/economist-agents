@@ -285,7 +285,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="adr/ADR-001-agent-framework-selection/" class="md-tabs__link">
+        <a href="adr/0001-extract-agent-definitions-to-yaml/" class="md-tabs__link">
           
   
   
@@ -920,14 +920,14 @@
   
   
     <li class="md-nav__item">
-      <a href="adr/ADR-001-agent-framework-selection/" class="md-nav__link">
+      <a href="adr/0001-extract-agent-definitions-to-yaml/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-001 — Agent Framework Selection
+    ADR-0001 — Extract Agent Definitions to YAML
   
 
     
@@ -948,14 +948,14 @@
   
   
     <li class="md-nav__item">
-      <a href="adr/ADR-002-content-intelligence-engine/" class="md-nav__link">
+      <a href="adr/0002-agent-registry-pattern/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-002 — Content Intelligence Engine
+    ADR-0002 — Agent Registry Pattern
   
 
     
@@ -976,14 +976,14 @@
   
   
     <li class="md-nav__item">
-      <a href="adr/ADR-003-agent-skill-governance/" class="md-nav__link">
+      <a href="adr/0003-phased-crewai-migration/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-003 — Agent Skill Governance
+    ADR-0003 — Phased CrewAI Migration (Superseded)
   
 
     
@@ -1004,14 +1004,14 @@
   
   
     <li class="md-nav__item">
-      <a href="ADR-004-python-version-constraint/" class="md-nav__link">
+      <a href="adr/0004-python-version-constraint/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-004 — Python Version Constraint
+    ADR-0004 — Python Version Constraint
   
 
     
@@ -1032,14 +1032,98 @@
   
   
     <li class="md-nav__item">
-      <a href="ADR-005-agile-discipline-enforcement/" class="md-nav__link">
+      <a href="adr/0005-agile-discipline-enforcement/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-005 — Agile Discipline Enforcement
+    ADR-0005 — Agile Discipline Enforcement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="adr/0006-agent-framework-selection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0006 — Agent Framework Selection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="adr/0007-content-intelligence-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0007 — Content Intelligence Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="adr/0008-agent-skill-governance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0008 — Agent Skill Governance
   
 
     
@@ -1129,6 +1213,34 @@
     
   
     Agent Delegation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="skills/adr-governance/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR Governance
   
 
     
@@ -2344,7 +2456,7 @@
     F --&gt;|5-gate review| G{Pass?}
     G --&gt;|score &gt;= 80| H[Publisher]
     G --&gt;|score &lt; 80| D</code></pre>
-<p>Once published, the <strong>Content Intelligence Engine</strong> (ADR-002, planned) will close the loop: analytics data flows from GA4 and Search Console into the Analyst agent, which scores performance and surfaces content gaps back to the Scout.</p>
+<p>Once published, the <strong>Content Intelligence Engine</strong> (<a href="adr/0007-content-intelligence-engine/">ADR-0007</a>, planned) will close the loop: analytics data flows from GA4 and Search Console into the Analyst agent, which scores performance and surfaces content gaps back to the Scout.</p>
 <pre class="mermaid"><code>graph LR
     H[Published Article] --&gt;|pageviews, CTR, engagement| I[GA4 / GSC]
     I --&gt;|raw metrics| J[Analyst]
@@ -2449,24 +2561,24 @@
 <p>The Article Evaluator MCP server scores articles against fixed rubrics so that quality measurement is reproducible. The revision loop catches issues before they reach production.</p>
 </div>
 <div class="admonition example">
-<p class="admonition-title">15 Skills Codified</p>
-<p>From research sourcing to sprint management, each agent's standards are captured as versioned skill definitions that serve as system prompt context.</p>
+<p class="admonition-title">16 Skills Codified</p>
+<p>From research sourcing to ADR governance, each agent's standards are captured as versioned skill definitions that serve as system prompt context.</p>
 </div>
 <div class="admonition note">
-<p class="admonition-title">3 Canonical ADRs</p>
-<p>Architectural Decision Records govern the big calls: <a href="adr/ADR-001-agent-framework-selection/">ADR-001</a> agent framework selection, <a href="adr/ADR-002-content-intelligence-engine/">ADR-002</a> content intelligence engine, and <a href="adr/ADR-003-agent-skill-governance/">ADR-003</a> agent skill governance.</p>
+<p class="admonition-title">8 Canonical ADRs</p>
+<p>Architectural Decision Records govern the big calls. Latest: <a href="adr/0006-agent-framework-selection/">ADR-0006</a> agent framework selection, <a href="adr/0007-content-intelligence-engine/">ADR-0007</a> content intelligence engine, and <a href="adr/0008-agent-skill-governance/">ADR-0008</a> agent skill governance.</p>
 </div>
 </div>
 <hr />
 <h2 id="engineering-principles">Engineering Principles<a class="headerlink" href="#engineering-principles" title="Permanent link">&para;</a></h2>
 <h3 id="sprint-discipline">Sprint Discipline<a class="headerlink" href="#sprint-discipline" title="Permanent link">&para;</a></h3>
-<p>All work is tracked in GitHub issues with story points, acceptance criteria, and sprint milestones. No ad-hoc changes — every modification flows through the backlog. See <a href="ADR-005-agile-discipline-enforcement/">ADR-005</a>.</p>
+<p>All work is tracked in GitHub issues with story points, acceptance criteria, and sprint milestones. No ad-hoc changes — every modification flows through the backlog. See <a href="adr/0005-agile-discipline-enforcement/">ADR-0005</a>.</p>
 <h3 id="quality-gates">Quality Gates<a class="headerlink" href="#quality-gates" title="Permanent link">&para;</a></h3>
 <p>Articles pass a 5-gate editorial review (opening, evidence, voice, structure, visual). Code requires &gt;80% test coverage, type hints, and docstrings. The Definition of Ready enforces an 8-point checklist before any story enters a sprint.</p>
 <h3 id="agent-governance">Agent Governance<a class="headerlink" href="#agent-governance" title="Permanent link">&para;</a></h3>
-<p><a href="adr/ADR-003-agent-skill-governance/">ADR-003</a> defines the delegation matrix: which agents can invoke which tools, model tier assignments (Opus for quality-critical, Haiku for mechanical), and budget caps per invocation to prevent runaway costs.</p>
+<p><a href="adr/0008-agent-skill-governance/">ADR-0008</a> defines the delegation matrix: which agents can invoke which tools, model tier assignments (Opus for quality-critical, Haiku for mechanical), and budget caps per invocation to prevent runaway costs.</p>
 <h3 id="performance-linked-feedback-planned">Performance-Linked Feedback (Planned)<a class="headerlink" href="#performance-linked-feedback-planned" title="Permanent link">&para;</a></h3>
-<p>The Content Intelligence Engine (ADR-002) will connect GA4 and Google Search Console to the pipeline, so that articles with low engagement signal content gaps and high-performing topics inform future editorial direction. Sprint 20 landed the GA4/GSC ETL scripts (<code>scripts/ga4_etl.py</code>, <code>scripts/gsc_etl.py</code>); the next step is wiring their output into the topic selection flow. See <a href="adr/ADR-002-content-intelligence-engine/">ADR-002</a> for the full design.</p>
+<p>The Content Intelligence Engine (<a href="adr/0007-content-intelligence-engine/">ADR-0007</a>) will connect GA4 and Google Search Console to the pipeline, so that articles with low engagement signal content gaps and high-performing topics inform future editorial direction. Sprint 20 landed the GA4/GSC ETL scripts (<code>scripts/ga4_etl.py</code>, <code>scripts/gsc_etl.py</code>); the next step is wiring their output into the topic selection flow. See <a href="adr/0007-content-intelligence-engine/">ADR-0007</a> for the full design.</p>
 <hr />
 <h2 id="quick-links">Quick Links<a class="headerlink" href="#quick-links" title="Permanent link">&para;</a></h2>
 <div class="grid cards">
@@ -2481,7 +2593,7 @@
 <p><strong>ADRs</strong></p>
 <hr />
 <p>Architectural decision records covering framework selection, content intelligence engine, and agent skill governance.</p>
-<p><a href="adr/ADR-001-agent-framework-selection/">View ADRs →</a></p>
+<p><a href="adr/0006-agent-framework-selection/">View ADRs →</a></p>
 </li>
 <li>
 <p><strong>Skills</strong></p>

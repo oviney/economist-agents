@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://oviney.github.io/economist-agents/adr/ADR-003-agent-skill-governance/">
+        <link rel="canonical" href="https://oviney.github.io/economist-agents/adr/0007-content-intelligence-engine/">
       
       
-        <link rel="prev" href="../ADR-002-content-intelligence-engine/">
+        <link rel="prev" href="../0006-agent-framework-selection/">
       
       
-        <link rel="next" href="../../ADR-004-python-version-constraint/">
+        <link rel="next" href="../0008-agent-skill-governance/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>ADR-003 — Agent Skill Governance - Economist Agents</title>
+        <title>ADR-0007 — Content Intelligence Engine - Economist Agents</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#adr-003-agent-skill-governance-delegation-lifecycle-and-marketplace" class="md-skip">
+        <a href="#adr-0007-content-intelligence-engine-closing-the-feedback-loop" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              ADR-003 — Agent Skill Governance
+              ADR-0007 — Content Intelligence Engine
             
           </span>
         </div>
@@ -287,7 +287,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../ADR-001-agent-framework-selection/" class="md-tabs__link">
+        <a href="../0001-extract-agent-definitions-to-yaml/" class="md-tabs__link">
           
   
   
@@ -771,14 +771,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../ADR-001-agent-framework-selection/" class="md-nav__link">
+      <a href="../0001-extract-agent-definitions-to-yaml/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-001 — Agent Framework Selection
+    ADR-0001 — Extract Agent Definitions to YAML
   
 
     
@@ -799,14 +799,126 @@
   
   
     <li class="md-nav__item">
-      <a href="../ADR-002-content-intelligence-engine/" class="md-nav__link">
+      <a href="../0002-agent-registry-pattern/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-002 — Content Intelligence Engine
+    ADR-0002 — Agent Registry Pattern
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../0003-phased-crewai-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0003 — Phased CrewAI Migration (Superseded)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../0004-python-version-constraint/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0004 — Python Version Constraint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../0005-agile-discipline-enforcement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0005 — Agile Discipline Enforcement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../0006-agent-framework-selection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0006 — Agent Framework Selection
   
 
     
@@ -843,7 +955,7 @@
   <span class="md-ellipsis">
     
   
-    ADR-003 — Agent Skill Governance
+    ADR-0007 — Content Intelligence Engine
   
 
     
@@ -861,7 +973,7 @@
   <span class="md-ellipsis">
     
   
-    ADR-003 — Agent Skill Governance
+    ADR-0007 — Content Intelligence Engine
   
 
     
@@ -909,22 +1021,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision-1-agent-delegation-matrix" class="md-nav__link">
+  <a href="#current-state-audit" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision 1: Agent Delegation Matrix
+        Current State Audit
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Decision 1: Agent Delegation Matrix">
+    <nav class="md-nav" aria-label="Current State Audit">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#execution-runtimes" class="md-nav__link">
+  <a href="#topic-scout-scriptstopic_scoutpy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Execution Runtimes
+        Topic Scout (scripts/topic_scout.py)
       
     </span>
   </a>
@@ -932,10 +1044,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#assignment-rules" class="md-nav__link">
+  <a href="#editorial-board-scriptseditorial_boardpy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Assignment Rules
+        Editorial Board (scripts/editorial_board.py)
       
     </span>
   </a>
@@ -943,10 +1055,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#governance-gates" class="md-nav__link">
+  <a href="#chromadb-srctoolsstyle_memory_toolpy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Governance Gates
+        ChromaDB (src/tools/style_memory_tool.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#content-queue-content_queuejson" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Content Queue (content_queue.json)
       
     </span>
   </a>
@@ -959,22 +1082,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision-2-skill-schema" class="md-nav__link">
+  <a href="#proposed-architecture-the-content-intelligence-engine" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision 2: Skill Schema
+        Proposed Architecture: The Content Intelligence Engine
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Decision 2: Skill Schema">
+    <nav class="md-nav" aria-label="Proposed Architecture: The Content Intelligence Engine">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#current-state" class="md-nav__link">
+  <a href="#layer-1-measure-ga4-search-console" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Current State
+        Layer 1: MEASURE (GA4 + Search Console)
       
     </span>
   </a>
@@ -982,10 +1105,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#proposed-schema" class="md-nav__link">
+  <a href="#layer-2-listen-community-sentiment" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Proposed Schema
+        Layer 2: LISTEN (Community Sentiment)
       
     </span>
   </a>
@@ -993,10 +1116,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#migration-plan" class="md-nav__link">
+  <a href="#layer-3-remember-published-article-archive-dedup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Migration Plan
+        Layer 3: REMEMBER (Published Article Archive + Dedup)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#layer-4-decide-informed-topic-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Layer 4: DECIDE (Informed Topic Selection)
       
     </span>
   </a>
@@ -1009,22 +1143,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision-3-performance-linked-skill-evaluation" class="md-nav__link">
+  <a href="#implementation-plan" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision 3: Performance-Linked Skill Evaluation
+        Implementation Plan
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Decision 3: Performance-Linked Skill Evaluation">
+    <nav class="md-nav" aria-label="Implementation Plan">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#the-feedback-loop" class="md-nav__link">
+  <a href="#phase-1-remember-dedup-sprint-19-5-points" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The Feedback Loop
+        Phase 1: Remember + Dedup (Sprint 19, 5 points)
       
     </span>
   </a>
@@ -1032,10 +1166,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#evaluation-cadence" class="md-nav__link">
+  <a href="#phase-2-measure-sprint-20-5-points" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Evaluation Cadence
+        Phase 2: Measure (Sprint 20, 5 points)
       
     </span>
   </a>
@@ -1043,10 +1177,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#scorecard-output" class="md-nav__link">
+  <a href="#phase-3-listen-sprint-21-8-points" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Scorecard Output
+        Phase 3: Listen (Sprint 21, 8 points)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-4-decide-sprint-22-3-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4: Decide (Sprint 22, 3 points)
       
     </span>
   </a>
@@ -1059,22 +1204,44 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision-4-skill-marketplace-specification" class="md-nav__link">
+  <a href="#cost-implications" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision 4: Skill Marketplace Specification
+        Cost Implications
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Decision 4: Skill Marketplace Specification">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-this-enables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What This Enables
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="References">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#packaging-format" class="md-nav__link">
+  <a href="#content-intelligence" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Packaging Format
+        Content Intelligence
       
     </span>
   </a>
@@ -1082,10 +1249,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#discovery-and-import" class="md-nav__link">
+  <a href="#sentiment-analysis" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Discovery and Import
+        Sentiment Analysis
       
     </span>
   </a>
@@ -1093,10 +1260,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#import-protocol" class="md-nav__link">
+  <a href="#google-analytics-integration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Import Protocol
+        Google Analytics Integration
       
     </span>
   </a>
@@ -1104,10 +1271,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#contribution-model" class="md-nav__link">
+  <a href="#architecture" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Contribution Model
+        Architecture
       
     </span>
   </a>
@@ -1116,50 +1283,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#decision-5-governance-skill" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Decision 5: Governance Skill
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#implementation-roadmap" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Implementation Roadmap
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#risks-and-mitigations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Risks and Mitigations
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#decision-summary" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Decision Summary
-      
-    </span>
-  </a>
   
 </li>
       
@@ -1179,42 +1302,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ADR-004-python-version-constraint/" class="md-nav__link">
+      <a href="../0008-agent-skill-governance/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-004 — Python Version Constraint
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../ADR-005-agile-discipline-enforcement/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ADR-005 — Agile Discipline Enforcement
+    ADR-0008 — Agent Skill Governance
   
 
     
@@ -1304,6 +1399,34 @@
     
   
     Agent Delegation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../skills/adr-governance/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR Governance
   
 
     
@@ -2396,22 +2519,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision-1-agent-delegation-matrix" class="md-nav__link">
+  <a href="#current-state-audit" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision 1: Agent Delegation Matrix
+        Current State Audit
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Decision 1: Agent Delegation Matrix">
+    <nav class="md-nav" aria-label="Current State Audit">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#execution-runtimes" class="md-nav__link">
+  <a href="#topic-scout-scriptstopic_scoutpy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Execution Runtimes
+        Topic Scout (scripts/topic_scout.py)
       
     </span>
   </a>
@@ -2419,10 +2542,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#assignment-rules" class="md-nav__link">
+  <a href="#editorial-board-scriptseditorial_boardpy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Assignment Rules
+        Editorial Board (scripts/editorial_board.py)
       
     </span>
   </a>
@@ -2430,10 +2553,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#governance-gates" class="md-nav__link">
+  <a href="#chromadb-srctoolsstyle_memory_toolpy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Governance Gates
+        ChromaDB (src/tools/style_memory_tool.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#content-queue-content_queuejson" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Content Queue (content_queue.json)
       
     </span>
   </a>
@@ -2446,22 +2580,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision-2-skill-schema" class="md-nav__link">
+  <a href="#proposed-architecture-the-content-intelligence-engine" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision 2: Skill Schema
+        Proposed Architecture: The Content Intelligence Engine
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Decision 2: Skill Schema">
+    <nav class="md-nav" aria-label="Proposed Architecture: The Content Intelligence Engine">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#current-state" class="md-nav__link">
+  <a href="#layer-1-measure-ga4-search-console" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Current State
+        Layer 1: MEASURE (GA4 + Search Console)
       
     </span>
   </a>
@@ -2469,10 +2603,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#proposed-schema" class="md-nav__link">
+  <a href="#layer-2-listen-community-sentiment" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Proposed Schema
+        Layer 2: LISTEN (Community Sentiment)
       
     </span>
   </a>
@@ -2480,10 +2614,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#migration-plan" class="md-nav__link">
+  <a href="#layer-3-remember-published-article-archive-dedup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Migration Plan
+        Layer 3: REMEMBER (Published Article Archive + Dedup)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#layer-4-decide-informed-topic-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Layer 4: DECIDE (Informed Topic Selection)
       
     </span>
   </a>
@@ -2496,22 +2641,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision-3-performance-linked-skill-evaluation" class="md-nav__link">
+  <a href="#implementation-plan" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision 3: Performance-Linked Skill Evaluation
+        Implementation Plan
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Decision 3: Performance-Linked Skill Evaluation">
+    <nav class="md-nav" aria-label="Implementation Plan">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#the-feedback-loop" class="md-nav__link">
+  <a href="#phase-1-remember-dedup-sprint-19-5-points" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The Feedback Loop
+        Phase 1: Remember + Dedup (Sprint 19, 5 points)
       
     </span>
   </a>
@@ -2519,10 +2664,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#evaluation-cadence" class="md-nav__link">
+  <a href="#phase-2-measure-sprint-20-5-points" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Evaluation Cadence
+        Phase 2: Measure (Sprint 20, 5 points)
       
     </span>
   </a>
@@ -2530,10 +2675,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#scorecard-output" class="md-nav__link">
+  <a href="#phase-3-listen-sprint-21-8-points" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Scorecard Output
+        Phase 3: Listen (Sprint 21, 8 points)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-4-decide-sprint-22-3-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4: Decide (Sprint 22, 3 points)
       
     </span>
   </a>
@@ -2546,22 +2702,44 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#decision-4-skill-marketplace-specification" class="md-nav__link">
+  <a href="#cost-implications" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision 4: Skill Marketplace Specification
+        Cost Implications
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Decision 4: Skill Marketplace Specification">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-this-enables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What This Enables
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="References">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#packaging-format" class="md-nav__link">
+  <a href="#content-intelligence" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Packaging Format
+        Content Intelligence
       
     </span>
   </a>
@@ -2569,10 +2747,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#discovery-and-import" class="md-nav__link">
+  <a href="#sentiment-analysis" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Discovery and Import
+        Sentiment Analysis
       
     </span>
   </a>
@@ -2580,10 +2758,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#import-protocol" class="md-nav__link">
+  <a href="#google-analytics-integration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Import Protocol
+        Google Analytics Integration
       
     </span>
   </a>
@@ -2591,10 +2769,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#contribution-model" class="md-nav__link">
+  <a href="#architecture" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Contribution Model
+        Architecture
       
     </span>
   </a>
@@ -2603,50 +2781,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#decision-5-governance-skill" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Decision 5: Governance Skill
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#implementation-roadmap" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Implementation Roadmap
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#risks-and-mitigations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Risks and Mitigations
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#decision-summary" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Decision Summary
-      
-    </span>
-  </a>
   
 </li>
       
@@ -2670,82 +2804,72 @@
   
 
 
-<h1 id="adr-003-agent-skill-governance-delegation-lifecycle-and-marketplace">ADR-003: Agent Skill Governance — Delegation, Lifecycle, and Marketplace<a class="headerlink" href="#adr-003-agent-skill-governance-delegation-lifecycle-and-marketplace" title="Permanent link">&para;</a></h1>
+<h1 id="adr-0007-content-intelligence-engine-closing-the-feedback-loop">ADR-0007: Content Intelligence Engine — Closing the Feedback Loop<a class="headerlink" href="#adr-0007-content-intelligence-engine-closing-the-feedback-loop" title="Permanent link">&para;</a></h1>
 <p><strong>Status:</strong> Proposed
 <strong>Date:</strong> 2026-04-05
 <strong>Decision Maker:</strong> Ouray Viney (Engineering Lead)
-<strong>Research:</strong> Operational experience from Sprints 16-20 across Claude Code, GitHub Copilot, and Claude sub-agents; ADR-001 agent framework; ADR-002 content intelligence engine</p>
+<strong>Research:</strong> Four parallel agents covering content intelligence platforms, sentiment-driven content, Google Analytics APIs, and current pipeline audit</p>
 <hr />
 <h2 id="problem-statement">Problem Statement<a class="headerlink" href="#problem-statement" title="Permanent link">&para;</a></h2>
-<p>The economist-agents pipeline now has <strong>14 skills</strong>, <strong>12 registered agents</strong> (agent-registry-spec.md), and <strong>3 execution runtimes</strong> (Claude Code, GitHub Copilot, Claude sub-agents). Work gets done, but how it gets assigned, which skills apply, and whether skills are improving — all live in human memory, not in code.</p>
-<p><strong>What we have:</strong></p>
+<p>The economist-agents pipeline generates articles but has no intelligence about what to generate. It is a content factory with no market research department.</p>
+<p><strong>What exists:</strong>
+- Topic Scout — LLM-based, scores topics on 5 dimensions (timeliness, data availability, contrarian potential, audience fit, style fit)
+- Editorial Board — 6 weighted personas vote on topics
+- ChromaDB — style memory RAG (voice consistency only)
+- Content queue — 5-topic JSON snapshot, no history</p>
+<p><strong>What's completely missing:</strong></p>
 <table>
 <thead>
 <tr>
-<th>Asset</th>
-<th>Count</th>
+<th>Capability</th>
 <th>Status</th>
+<th>Impact</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Skills (<code>skills/*/SKILL.md</code>)</td>
-<td>14</td>
-<td>Static, unversioned, no eval metrics</td>
+<td>Topic deduplication</td>
+<td>❌ None</td>
+<td>Pipeline can regenerate articles on topics already covered</td>
 </tr>
 <tr>
-<td>Agent definitions (<code>agent-registry-spec.md</code>)</td>
-<td>12</td>
-<td>Documented but not enforced</td>
+<td>Published article archive</td>
+<td>❌ None</td>
+<td>No record of what's been published</td>
 </tr>
 <tr>
-<td>Execution runtimes</td>
-<td>3</td>
-<td>Claude Code, Copilot, sub-agents</td>
+<td>GA4 integration</td>
+<td>❌ None</td>
+<td>Zero audience engagement data</td>
 </tr>
 <tr>
-<td>Governance gates</td>
-<td>Pipeline only</td>
-<td>Approval gates between content stages</td>
+<td>Search Console integration</td>
+<td>❌ None</td>
+<td>No keyword/ranking data</td>
 </tr>
 <tr>
-<td>Delegation rules</td>
-<td>0</td>
-<td>Lives in human memory and chat history</td>
+<td>Community sentiment</td>
+<td>❌ None</td>
+<td>Reddit, HN, dev.to mentioned in prompts but never queried</td>
+</tr>
+<tr>
+<td>Performance feedback loop</td>
+<td>❌ None</td>
+<td>Article success doesn't inform future topic selection</td>
+</tr>
+<tr>
+<td>Content gap analysis</td>
+<td>❌ None</td>
+<td>No systematic way to find untapped topics</td>
+</tr>
+<tr>
+<td>Engagement prediction</td>
+<td>❌ None</td>
+<td>No model to predict which topics will perform</td>
 </tr>
 </tbody>
 </table>
-<p><strong>What's missing:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Gap</th>
-<th>Risk</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>No delegation rules</td>
-<td>Wrong agent gets assigned, destroys files (Copilot incident) or blocks on sequential work that could be parallel</td>
-</tr>
-<tr>
-<td>No skill versioning</td>
-<td>Can't tell if skill v2 produces better outcomes than v1</td>
-</tr>
-<tr>
-<td>No performance feedback</td>
-<td>GA4/GSC data exists (Sprint 20) but doesn't flow back to evaluate skills</td>
-</tr>
-<tr>
-<td>No skill discovery</td>
-<td>New skills are hand-written; no mechanism to adopt community best practices</td>
-</tr>
-<tr>
-<td>No skill evaluation</td>
-<td>No way to answer "is our research-sourcing skill actually producing fresher sources?"</td>
-</tr>
-</tbody>
-</table>
+<p>The pipeline has <strong>no brain</strong> — it generates content in a vacuum, never learning what works.</p>
 <hr />
 <h2 id="objectives">Objectives<a class="headerlink" href="#objectives" title="Permanent link">&para;</a></h2>
 <table>
@@ -2753,452 +2877,451 @@
 <tr>
 <th>Priority</th>
 <th>Objective</th>
-<th>Measure of Success</th>
+<th>Measure</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><strong>P0</strong></td>
-<td>Codified delegation — given a story, deterministic agent assignment</td>
-<td><code>skills/agent-delegation/SKILL.md</code> consulted before every story assignment</td>
+<td>Stop publishing duplicate topics</td>
+<td>Zero topic overlap &gt;0.8 similarity with published archive</td>
 </tr>
 <tr>
 <td><strong>P0</strong></td>
-<td>Skill versioning — track skill evolution with measurable outcomes</td>
-<td>Every skill has <code>version</code>, <code>last_evaluated</code>, <code>eval_criteria</code> in frontmatter</td>
+<td>Know what's working</td>
+<td>Composite performance score per article, updated weekly</td>
 </tr>
 <tr>
 <td><strong>P1</strong></td>
-<td>Performance-linked evaluation — GA4/GSC data feeds back to skill assessment</td>
-<td>Quarterly skill scorecard: which skills correlate with high-engagement articles</td>
+<td>Let audience data drive topic selection</td>
+<td>Top/bottom performer insights feed into Topic Scout prompt</td>
 </tr>
 <tr>
 <td><strong>P1</strong></td>
-<td>Skill schema — portable, self-describing, machine-readable</td>
-<td>Standard frontmatter schema adopted across all 14 skills</td>
+<td>Detect trending developer topics before competitors</td>
+<td>Sentiment signals from HN/Reddit surface in topic scoring</td>
 </tr>
 <tr>
 <td><strong>P2</strong></td>
-<td>Marketplace readiness — skills can be exported, discovered, imported</td>
-<td>Packaging spec that works with public registries</td>
+<td>Find content gaps</td>
+<td>Search Console data reveals keywords with high impressions but no matching article</td>
 </tr>
 <tr>
 <td><strong>P2</strong></td>
-<td>Continuous improvement loop — skill improvements are data-driven, not ad-hoc</td>
-<td>Improvement proposals reference performance data, not intuition</td>
+<td>Enable contrarian content strategy</td>
+<td>Sentiment consensus detection → topics where data contradicts popular opinion</td>
+</tr>
+<tr>
+<td><strong>P3</strong></td>
+<td>Predict engagement before publication</td>
+<td>Model trained on historical performance estimates article potential</td>
 </tr>
 </tbody>
 </table>
 <hr />
-<h2 id="decision-1-agent-delegation-matrix">Decision 1: Agent Delegation Matrix<a class="headerlink" href="#decision-1-agent-delegation-matrix" title="Permanent link">&para;</a></h2>
-<h3 id="execution-runtimes">Execution Runtimes<a class="headerlink" href="#execution-runtimes" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Runtime</th>
-<th>Strengths</th>
-<th>Constraints</th>
-<th>Assign When</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Claude Code (primary)</strong></td>
-<td>Full codebase context, orchestration, multi-file edits, browser automation, MCP tools</td>
-<td>Single-threaded within conversation</td>
-<td>Modifications to existing files, orchestration, architecture, debugging, multi-step workflows</td>
-</tr>
-<tr>
-<td><strong>Claude Code sub-agents</strong></td>
-<td>Parallel execution, isolated context, full tool access</td>
-<td>No shared state between agents, cannot modify same files</td>
-<td>Independent new file creation, parallel research, test writing</td>
-</tr>
-<tr>
-<td><strong>GitHub Copilot</strong></td>
-<td>Autonomous PR creation, CI integration</td>
-<td>Destroys existing files when modifying (known issue); limited context window</td>
-<td><strong>New file creation ONLY</strong> — never assign modification stories</td>
-</tr>
-<tr>
-<td><strong>Human</strong></td>
-<td>Judgment, credentials, account access, approvals</td>
-<td>Expensive, non-scalable</td>
-<td>Credentials setup, account configuration, architecture approval, PR review</td>
-</tr>
-</tbody>
-</table>
-<h3 id="assignment-rules">Assignment Rules<a class="headerlink" href="#assignment-rules" title="Permanent link">&para;</a></h3>
-<p>Given a story, apply these rules in order:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>1. REQUIRES credentials/accounts/browser login?
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>   → Assign to HUMAN (with Claude Code browser assist via Playwright MCP)
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>2. MODIFIES existing files?
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>   → Assign to CLAUDE CODE (primary)
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>   → NEVER assign to Copilot (destroys files)
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>3. CREATES new file(s) with NO dependencies between them?
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>   → Assign to CLAUDE CODE SUB-AGENTS (parallel)
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>   → Alternative: Copilot (if file is self-contained)
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>4. CREATES new file(s) with dependencies?
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>   → Assign to CLAUDE CODE (sequential)
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>5. RESEARCH or EXPLORATION task?
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>   → Assign to CLAUDE CODE SUB-AGENT (Explore type)
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>6. ARCHITECTURE decision?
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>   → Assign to CLAUDE CODE with Plan agent first
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>   → Requires HUMAN approval before implementation
-</code></pre></div>
-<h3 id="governance-gates">Governance Gates<a class="headerlink" href="#governance-gates" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Gate</th>
-<th>When</th>
-<th>Who Approves</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Sprint planning</td>
-<td>Before stories are assigned</td>
-<td>Human (engineering lead)</td>
-</tr>
-<tr>
-<td>Architecture decisions</td>
-<td>ADRs, schema changes, new agent types</td>
-<td>Human review</td>
-</tr>
-<tr>
-<td>PR review</td>
-<td>Before merge to main</td>
-<td>Human (or automated CI for test-only PRs)</td>
-</tr>
-<tr>
-<td>Skill changes</td>
-<td>Before modifying existing skills</td>
-<td>Human review of performance data justification</td>
-</tr>
-<tr>
-<td>Credential access</td>
-<td>Any new service account or API key</td>
-<td>Human executes</td>
-</tr>
-</tbody>
-</table>
+<h2 id="current-state-audit">Current State Audit<a class="headerlink" href="#current-state-audit" title="Permanent link">&para;</a></h2>
+<h3 id="topic-scout-scriptstopic_scoutpy">Topic Scout (<code>scripts/topic_scout.py</code>)<a class="headerlink" href="#topic-scout-scriptstopic_scoutpy" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Makes 2 LLM calls: trend research → topic generation</li>
+<li>Scores on 5 dimensions (1-5 scale, max 25)</li>
+<li><strong>Mentions</strong> Reddit, HN, dev.to in prompt but <strong>never fetches data</strong> from these sources</li>
+<li>No deduplication check against past articles</li>
+<li>No performance data input</li>
+</ul>
+<h3 id="editorial-board-scriptseditorial_boardpy">Editorial Board (<code>scripts/editorial_board.py</code>)<a class="headerlink" href="#editorial-board-scriptseditorial_boardpy" title="Permanent link">&para;</a></h3>
+<ul>
+<li>6 weighted personas (VP Engineering 1.2x, Economist Editor 1.3x highest)</li>
+<li>Parallel voting via ThreadPoolExecutor</li>
+<li>Consensus and dissent detection</li>
+<li><strong>No audience data</strong> — votes on perceived quality, not predicted performance</li>
+</ul>
+<h3 id="chromadb-srctoolsstyle_memory_toolpy">ChromaDB (<code>src/tools/style_memory_tool.py</code>)<a class="headerlink" href="#chromadb-srctoolsstyle_memory_toolpy" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Indexes <code>archived/*.md</code> articles for voice consistency</li>
+<li><strong>Not used</strong> for topic similarity or deduplication</li>
+<li>Could be extended with a second collection for topic embeddings</li>
+</ul>
+<h3 id="content-queue-content_queuejson">Content Queue (<code>content_queue.json</code>)<a class="headerlink" href="#content-queue-content_queuejson" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Single JSON snapshot of 5 candidate topics</li>
+<li>No publication history, no "covered on" dates, no performance metrics</li>
+</ul>
 <hr />
-<h2 id="decision-2-skill-schema">Decision 2: Skill Schema<a class="headerlink" href="#decision-2-skill-schema" title="Permanent link">&para;</a></h2>
-<h3 id="current-state">Current State<a class="headerlink" href="#current-state" title="Permanent link">&para;</a></h3>
-<p>Skills are markdown files with no standard structure. Some have sections, some don't. None have version numbers or evaluation criteria.</p>
-<h3 id="proposed-schema">Proposed Schema<a class="headerlink" href="#proposed-schema" title="Permanent link">&para;</a></h3>
-<p>Every skill MUST have this frontmatter:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nn">---</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">research-sourcing</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0.0</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">One-line purpose of this skill</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="nt">category</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">content-pipeline | content-intelligence | engineering | governance</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="nt">author</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ouray.viney</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="nt">created</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2026-01-15</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="nt">last_evaluated</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2026-04-05</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># Which agents use this skill (from agent-registry-spec.md)</span>
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="nt">agents</span><span class="p">:</span>
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Researcher</span>
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Scout</span>
-<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>
-<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="c1"># How to measure if this skill is working</span>
-<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="nt">eval_criteria</span><span class="p">:</span>
-<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">metric</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source_freshness_ratio</span>
-<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Ratio</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">sources</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">current/previous</span><span class="nv"> </span><span class="s">year&quot;</span>
-<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="w">    </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&gt;=</span><span class="nv"> </span><span class="s">0.6&quot;</span>
-<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="w">    </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">article-evaluator</span>
-<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">metric</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source_diversity_score</span>
-<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Number</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">distinct</span><span class="nv"> </span><span class="s">source</span><span class="nv"> </span><span class="s">types</span><span class="nv"> </span><span class="s">per</span><span class="nv"> </span><span class="s">article&quot;</span>
-<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="w">    </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&gt;=</span><span class="nv"> </span><span class="s">3</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">5</span><span class="nv"> </span><span class="s">types&quot;</span>
-<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="w">    </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">article-evaluator</span>
-<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a>
-<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a><span class="c1"># Skills this one depends on</span>
-<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="nt">dependencies</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
-<a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a>
-<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a><span class="c1"># Skills that should be applied alongside this one</span>
-<a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a><span class="nt">complements</span><span class="p">:</span>
-<a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">economist-writing</span>
-<a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a><span class="nn">---</span>
+<h2 id="proposed-architecture-the-content-intelligence-engine">Proposed Architecture: The Content Intelligence Engine<a class="headerlink" href="#proposed-architecture-the-content-intelligence-engine" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌─────────────────────────────────────────────────────────────┐
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│                    CONTENT INTELLIGENCE ENGINE               │
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>├──────────────┬──────────────┬───────────────┬───────────────┤
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   MEASURE    │   LISTEN     │   REMEMBER    │   DECIDE      │
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│              │              │               │               │
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│  GA4 API     │  HN API      │  Published    │  Topic Scout  │
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│  GSC API     │  Reddit API  │  Article      │  + Intelligence│
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│              │  dev.to API  │  Archive      │  Context       │
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│  Weekly ETL  │              │  (ChromaDB)   │               │
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│  → scores.db │  Sentiment   │               │  Editorial    │
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│              │  velocity    │  Topic        │  Board        │
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│  Top/bottom  │  detection   │  Similarity   │  + Performance │
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│  performers  │              │  Search       │  Data          │
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>└──────┬───────┴──────┬───────┴───────┬───────┴───────┬───────┘
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>       │              │               │               │
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>       v              v               v               v
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>  Performance    Trending         Dedup Check      Informed
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>  Insights       Topics           (&gt;0.8 reject)    Topic Selection
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>       │              │               │               │
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>       └──────────────┴───────────────┴───────────────┘
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>                              │
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>                              v
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>                    ┌─────────────────┐
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>                    │  CONTENT        │
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>                    │  PIPELINE       │
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>                    │  (Stage 3 → 4)  │
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>                    └─────────────────┘
 </code></pre></div>
-<h3 id="migration-plan">Migration Plan<a class="headerlink" href="#migration-plan" title="Permanent link">&para;</a></h3>
+<h3 id="layer-1-measure-ga4-search-console">Layer 1: MEASURE (GA4 + Search Console)<a class="headerlink" href="#layer-1-measure-ga4-search-console" title="Permanent link">&para;</a></h3>
+<p><strong>What it does:</strong> Pulls weekly performance data for every published article and computes a composite engagement score.</p>
+<p><strong>Existing MCP servers available (no build required):</strong>
+- <code>google-analytics-mcp</code> — official Google-supported, <code>pip install google-analytics-mcp</code>, v2.0.1 (March 2026)
+- <code>google-search-console-mcp-python</code> — FastMCP-based, supports search analytics and URL inspection</p>
+<p><strong>Custom ETL script</strong> (weekly cron or manual trigger):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Composite score formula (starting weights — adjust after 4-6 weeks)</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">score</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.25</span> <span class="o">*</span> <span class="n">norm</span><span class="p">(</span><span class="n">pageviews</span><span class="p">))</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>      <span class="o">+</span> <span class="p">(</span><span class="mf">0.20</span> <span class="o">*</span> <span class="n">norm</span><span class="p">(</span><span class="n">engagement_rate</span><span class="p">))</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>      <span class="o">+</span> <span class="p">(</span><span class="mf">0.15</span> <span class="o">*</span> <span class="n">norm</span><span class="p">(</span><span class="n">avg_engagement_time</span><span class="p">))</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>      <span class="o">+</span> <span class="p">(</span><span class="mf">0.10</span> <span class="o">*</span> <span class="n">norm</span><span class="p">(</span><span class="n">scroll_depth_rate</span><span class="p">))</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>      <span class="o">+</span> <span class="p">(</span><span class="mf">0.15</span> <span class="o">*</span> <span class="n">norm</span><span class="p">(</span><span class="n">search_ctr</span><span class="p">))</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>      <span class="o">+</span> <span class="p">(</span><span class="mf">0.15</span> <span class="o">*</span> <span class="n">norm</span><span class="p">(</span><span class="n">search_impressions</span><span class="p">))</span>
+</code></pre></div></p>
+<p><strong>Storage:</strong> SQLite — sufficient for single-blog scale, stays under 1MB/year.</p>
+<p><strong>Output:</strong> Top 5 and bottom 5 articles with their topics, keywords, and content attributes → feeds into Topic Scout prompt.</p>
+<p><strong>GA4 metrics available:</strong> <code>screenPageViews</code>, <code>engagementRate</code>, <code>averageSessionDuration</code>, <code>bounceRate</code>, <code>scrolledUsers</code> (fires at 90% scroll depth), <code>activeUsers</code>.</p>
+<p><strong>GSC metrics available:</strong> <code>clicks</code>, <code>impressions</code>, <code>ctr</code>, <code>position</code> — segmented by page and query.</p>
+<h3 id="layer-2-listen-community-sentiment">Layer 2: LISTEN (Community Sentiment)<a class="headerlink" href="#layer-2-listen-community-sentiment" title="Permanent link">&para;</a></h3>
+<p><strong>What it does:</strong> Monitors developer communities for trending topics and sentiment shifts. Identifies topics where opinion is strong but coverage is thin.</p>
+<p><strong>Data sources (ranked by signal quality for dev content):</strong></p>
 <table>
 <thead>
 <tr>
-<th>Phase</th>
-<th>Action</th>
-<th>Effort</th>
+<th>Platform</th>
+<th>API</th>
+<th>Signal Type</th>
+<th>Cost</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>1</td>
-<td>Add frontmatter to all 14 existing skills</td>
-<td>1 sprint, Copilot (new content at top of files)</td>
+<td>Hacker News</td>
+<td>Firebase (free)</td>
+<td>Architectural/strategic sentiment</td>
+<td>Free</td>
 </tr>
 <tr>
-<td>2</td>
-<td>Create <code>scripts/skill_evaluator.py</code> that reads eval_criteria and checks article outputs</td>
-<td>2 points</td>
+<td>Reddit</td>
+<td>PRAW (free tier: 100 req/min)</td>
+<td>Practitioner pain points</td>
+<td>Free</td>
 </tr>
 <tr>
-<td>3</td>
-<td>Wire skill evaluator into post-publish pipeline</td>
-<td>1 point</td>
+<td>dev.to</td>
+<td>REST API (free)</td>
+<td>Tutorial demand signals</td>
+<td>Free</td>
+</tr>
+<tr>
+<td>Stack Overflow</td>
+<td>Annual survey data</td>
+<td>"What's actually being used"</td>
+<td>Free</td>
+</tr>
+<tr>
+<td>Google Trends</td>
+<td>API (free)</td>
+<td>Search demand velocity</td>
+<td>Free</td>
+</tr>
+<tr>
+<td>Exploding Topics</td>
+<td>API ($99/mo)</td>
+<td>Early trend detection (12mo lead)</td>
+<td>Paid</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="decision-3-performance-linked-skill-evaluation">Decision 3: Performance-Linked Skill Evaluation<a class="headerlink" href="#decision-3-performance-linked-skill-evaluation" title="Permanent link">&para;</a></h2>
-<h3 id="the-feedback-loop">The Feedback Loop<a class="headerlink" href="#the-feedback-loop" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>┌─────────────┐    ┌─────────────┐    ┌──────────────┐    ┌─────────────┐
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>│  Skills      │───&gt;│  Agents      │───&gt;│  Articles     │───&gt;│  GA4/GSC    │
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>│  (v1.0.0)    │    │  execute     │    │  published    │    │  measures   │
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>└─────────────┘    └─────────────┘    └──────────────┘    └──────┬──────┘
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>      ^                                                          │
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>      │            ┌─────────────────────────────────────────────┘
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>      │            v
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>      │     ┌──────────────┐    ┌──────────────────┐
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>      └─────│  Skill        │&lt;───│  Quarterly        │
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>            │  Evaluator    │    │  Skill Scorecard  │
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>            └──────────────┘    └──────────────────┘
-</code></pre></div>
-<h3 id="evaluation-cadence">Evaluation Cadence<a class="headerlink" href="#evaluation-cadence" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Frequency</th>
-<th>Action</th>
-<th>Owner</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Per article</td>
-<td>Article evaluator scores against skill criteria</td>
-<td>Automated (Editor agent)</td>
-</tr>
-<tr>
-<td>Weekly</td>
-<td>GA4/GSC ETL updates performance.db</td>
-<td>Automated (scripts/ga4_etl.py, gsc_etl.py)</td>
-</tr>
-<tr>
-<td>Quarterly</td>
-<td>Skill scorecard: correlate skill criteria scores with GA4 engagement</td>
-<td>Human-triggered, agent-generated</td>
-</tr>
-<tr>
-<td>On demand</td>
-<td>Skill improvement proposal: "skill X correlates with low engagement — here's why"</td>
-<td>Agent-generated, human-approved</td>
-</tr>
-</tbody>
-</table>
-<h3 id="scorecard-output">Scorecard Output<a class="headerlink" href="#scorecard-output" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Skill Scorecard — Q2 2026
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>══════════════════════════════════════════════
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Skill                  Version  Articles  Avg Score  Avg Engagement  Correlation
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>─────────────────────  ───────  ────────  ─────────  ──────────────  ───────────
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>research-sourcing      1.0.0    12        4.2/5      0.73            +0.61 ↑
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>economist-writing      1.0.0    12        3.8/5      0.68            +0.45
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>editorial-illustration 1.0.0    12        4.5/5      0.71            +0.12
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>article-evaluation     1.0.0    12        4.0/5      0.70            +0.33
+<p><strong>Sentiment scoring approach:</strong> LLM-based (GPT-4o-mini or Claude Haiku) rather than lexicon-based (VADER). Developer language — sarcasm, irony, technical jargon — defeats traditional sentiment tools. LLM scoring handles it significantly better.</p>
+<p><strong>Key signal: Sentiment velocity</strong> — not absolute sentiment but how quickly opinion is shifting. A topic moving from neutral to strongly negative (developer frustration) is a content opportunity. A topic at peak enthusiasm is a contrarian opportunity.</p>
+<p><strong>Contrarian content strategy:</strong>
+1. Find topics where sentiment is &gt;80% one-directional across HN/Reddit
+2. Search for empirical evidence contradicting the consensus
+3. Frame: "Everyone loves X, but the data says..." — The Economist's editorial model</p>
+<h3 id="layer-3-remember-published-article-archive-dedup">Layer 3: REMEMBER (Published Article Archive + Dedup)<a class="headerlink" href="#layer-3-remember-published-article-archive-dedup" title="Permanent link">&para;</a></h3>
+<p><strong>What it does:</strong> Maintains a searchable archive of every published article with topic embeddings. Prevents duplicate content and enables topic gap analysis.</p>
+<p><strong>Implementation:</strong>
+- Second ChromaDB collection: <code>published_articles</code> (alongside existing <code>economist_style_patterns</code>)
+- Index on publish: article title, thesis, summary, categories, date, performance score
+- Dedup check: before editorial board voting, query <code>published_articles</code> for cosine similarity &gt;0.8 — reject duplicates, flag 0.6-0.8 as "related coverage exists"
+- Topic gap analysis: cluster published articles, identify underserved topic areas</p>
+<p><strong>Published article metadata schema:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="s2">&quot;thesis&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="s2">&quot;date&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>  <span class="c1"># YYYY-MM-DD</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="s2">&quot;categories&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="s2">&quot;performance_score&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>  <span class="c1"># from Layer 1</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="s2">&quot;top_keywords&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>   <span class="c1"># from GSC</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="s2">&quot;sentiment_at_publish&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>  <span class="c1"># from Layer 2</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">}</span>
+</code></pre></div></p>
+<h3 id="layer-4-decide-informed-topic-selection">Layer 4: DECIDE (Informed Topic Selection)<a class="headerlink" href="#layer-4-decide-informed-topic-selection" title="Permanent link">&para;</a></h3>
+<p><strong>What it does:</strong> Enhances Topic Scout and Editorial Board with intelligence from Layers 1-3.</p>
+<p><strong>Topic Scout prompt enhancement:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>PERFORMANCE CONTEXT:
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>Our top-performing articles this month: {top_5_articles_with_topics}
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Keywords gaining impressions but low CTR (content gaps): {high_impression_low_ctr_keywords}
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>Declining articles that need refresh: {decaying_articles}
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>COMMUNITY CONTEXT:
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>Trending developer topics (last 7 days): {trending_topics_with_sentiment}
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>Topics with strong consensus sentiment (contrarian opportunities): {consensus_topics}
 <a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>Recommendation: research-sourcing has strongest correlation with engagement.
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>                editorial-illustration scores high but weak engagement link.
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>                Consider: illustration quality may not drive engagement.
-</code></pre></div>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>COVERAGE CONTEXT:
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>Topics already published (avoid duplicates): {published_topic_summaries}
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>Underserved topic clusters: {gap_analysis_results}
+</code></pre></div></p>
+<p><strong>Editorial Board enhancement:</strong>
+- Add a 7th persona: <strong>Data Analyst</strong> (weight: 1.1) — scores based on predicted audience engagement using historical performance data
+- Feed performance data to existing personas (VP Engineering gets ROI data, Busy Reader gets engagement metrics)</p>
 <hr />
-<h2 id="decision-4-skill-marketplace-specification">Decision 4: Skill Marketplace Specification<a class="headerlink" href="#decision-4-skill-marketplace-specification" title="Permanent link">&para;</a></h2>
-<h3 id="packaging-format">Packaging Format<a class="headerlink" href="#packaging-format" title="Permanent link">&para;</a></h3>
-<p>A skill is a directory with a standard structure:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>skills/research-sourcing/
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>├── SKILL.md              # Skill definition (with frontmatter schema)
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>├── CHANGELOG.md          # Version history with rationale
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>├── examples/             # Example inputs/outputs demonstrating the skill
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>│   ├── good-example.md
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>│   └── bad-example.md
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>├── eval/                 # Evaluation fixtures
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>│   └── test_cases.yaml   # Input/expected-output pairs for benchmarking
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>└── meta.yaml             # Machine-readable metadata (mirrors SKILL.md frontmatter)
-</code></pre></div>
-<h3 id="discovery-and-import">Discovery and Import<a class="headerlink" href="#discovery-and-import" title="Permanent link">&para;</a></h3>
+<h2 id="implementation-plan">Implementation Plan<a class="headerlink" href="#implementation-plan" title="Permanent link">&para;</a></h2>
+<h3 id="phase-1-remember-dedup-sprint-19-5-points">Phase 1: Remember + Dedup (Sprint 19, 5 points)<a class="headerlink" href="#phase-1-remember-dedup-sprint-19-5-points" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
-<th>Phase</th>
-<th>Mechanism</th>
-<th>Timeline</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Now</strong></td>
-<td>Manual: browse GitHub repos tagged <code>agent-skill</code>, copy skill directory</td>
-<td>Sprint 21</td>
-</tr>
-<tr>
-<td><strong>Next</strong></td>
-<td>Registry: <code>skills.json</code> index file listing available skills with metadata</td>
-<td>Sprint 23</td>
-</tr>
-<tr>
-<td><strong>Future</strong></td>
-<td>CLI: <code>python scripts/skill_manager.py install &lt;repo&gt;/&lt;skill&gt;</code></td>
-<td>Sprint 25+</td>
-</tr>
-</tbody>
-</table>
-<h3 id="import-protocol">Import Protocol<a class="headerlink" href="#import-protocol" title="Permanent link">&para;</a></h3>
-<p>When importing a community skill:</p>
-<ol>
-<li><strong>Evaluate</strong> — run the skill's <code>eval/test_cases.yaml</code> against your pipeline</li>
-<li><strong>Benchmark</strong> — compare output quality against your current skill for the same category</li>
-<li><strong>Adapt</strong> — fork and modify for your voice/standards (skills are starting points, not rigid templates)</li>
-<li><strong>Version</strong> — imported skills get <code>version: 1.0.0-imported</code> until locally validated</li>
-<li><strong>Attribute</strong> — <code>author</code> field tracks original source</li>
-</ol>
-<h3 id="contribution-model">Contribution Model<a class="headerlink" href="#contribution-model" title="Permanent link">&para;</a></h3>
-<p>To contribute a skill back to the community:</p>
-<ol>
-<li>Skill must have complete frontmatter schema</li>
-<li>Must include at least 2 examples (good + bad)</li>
-<li>Must include eval test cases</li>
-<li>Must have been evaluated against at least 5 articles</li>
-<li>Strip any proprietary data from examples</li>
-<li>License: MIT (default) or as specified</li>
-</ol>
-<hr />
-<h2 id="decision-5-governance-skill">Decision 5: Governance Skill<a class="headerlink" href="#decision-5-governance-skill" title="Permanent link">&para;</a></h2>
-<p>A new skill <code>skills/agent-delegation/SKILL.md</code> codifies the delegation matrix as an executable reference that agents consult before story assignment. See the companion file for the full skill definition.</p>
-<hr />
-<h2 id="implementation-roadmap">Implementation Roadmap<a class="headerlink" href="#implementation-roadmap" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Sprint</th>
-<th>Stories</th>
+<th>Story</th>
 <th>Points</th>
-<th>Outcome</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>20</strong> (current)</td>
-<td>ADR-003 + delegation skill</td>
-<td>5</td>
-<td>Governance framework codified</td>
-</tr>
-<tr>
-<td><strong>21</strong></td>
-<td>Add frontmatter to 14 existing skills</td>
-<td>3</td>
-<td>All skills versioned and evaluable</td>
-</tr>
-<tr>
-<td><strong>21</strong></td>
-<td>Create skill evaluator script</td>
-<td>2</td>
-<td>Automated skill scoring</td>
-</tr>
-<tr>
-<td><strong>22</strong></td>
-<td>Wire skill evaluator into post-publish pipeline</td>
-<td>1</td>
-<td>Feedback loop operational</td>
-</tr>
-<tr>
-<td><strong>23</strong></td>
-<td>Quarterly skill scorecard generator</td>
-<td>2</td>
-<td>Performance-linked evaluation</td>
-</tr>
-<tr>
-<td><strong>25+</strong></td>
-<td>Skill marketplace CLI</td>
-<td>3</td>
-<td>Import/export/discover community skills</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="risks-and-mitigations">Risks and Mitigations<a class="headerlink" href="#risks-and-mitigations" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Risk</th>
-<th>Impact</th>
-<th>Mitigation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Over-governance slows velocity</td>
-<td>Stories take longer to assign than to implement</td>
-<td>Keep delegation rules to 6 simple rules, not a policy document</td>
-</tr>
-<tr>
-<td>Skill versioning becomes bureaucratic</td>
-<td>Teams avoid updating skills</td>
-<td>Auto-increment version on any SKILL.md change via pre-commit hook</td>
-</tr>
-<tr>
-<td>Marketplace skills don't fit our voice</td>
-<td>Imported skills produce off-brand content</td>
-<td>Mandatory adaptation step; never use community skills verbatim</td>
-</tr>
-<tr>
-<td>Correlation ≠ causation in skill scoring</td>
-<td>Bad skill changes based on spurious correlations</td>
-<td>Require 10+ articles before drawing conclusions; human approval on all skill changes</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="decision-summary">Decision Summary<a class="headerlink" href="#decision-summary" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Decision</th>
-<th>Choice</th>
+<th>Assignee</th>
 <th>Rationale</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Agent delegation</td>
-<td>6-rule assignment matrix in <code>skills/agent-delegation/SKILL.md</code></td>
-<td>Simple, deterministic, covers all current runtimes</td>
+<td>Published article archive in ChromaDB (new collection, index script)</td>
+<td>2</td>
+<td>Copilot</td>
+<td>New file</td>
 </tr>
 <tr>
-<td>Skill schema</td>
-<td>YAML frontmatter with version, eval_criteria, agents, dependencies</td>
-<td>Machine-readable, backward-compatible with existing markdown</td>
+<td>Dedup check in flow.py <code>discover_topics()</code></td>
+<td>2</td>
+<td>Claude Code</td>
+<td>Modifies existing file</td>
 </tr>
 <tr>
-<td>Feedback loop</td>
-<td>Quarterly scorecards correlating skill scores with GA4 engagement</td>
-<td>Actionable cadence without over-reacting to noise</td>
-</tr>
-<tr>
-<td>Marketplace</td>
-<td>Directory-based packaging, manual import now, CLI later</td>
-<td>Start simple, evolve based on actual community engagement</td>
-</tr>
-<tr>
-<td>Governance</td>
-<td>Human approves architecture + skill changes; agents execute within boundaries</td>
-<td>Matches existing sprint discipline and PR review model</td>
+<td>Published topics MCP server</td>
+<td>1</td>
+<td>Copilot</td>
+<td>New file</td>
 </tr>
 </tbody>
 </table>
+<p><strong>Immediate value:</strong> Stops duplicate content. No external API dependencies.</p>
+<h3 id="phase-2-measure-sprint-20-5-points">Phase 2: Measure (Sprint 20, 5 points)<a class="headerlink" href="#phase-2-measure-sprint-20-5-points" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Story</th>
+<th>Points</th>
+<th>Assignee</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GA4 + GSC weekly ETL script with composite scoring</td>
+<td>3</td>
+<td>Claude Code</td>
+<td>Complex — API auth, scoring logic</td>
+</tr>
+<tr>
+<td>Configure GA4 + GSC MCP servers for interactive querying</td>
+<td>1</td>
+<td>Copilot</td>
+<td>Config + new file</td>
+</tr>
+<tr>
+<td>Feed performance insights into Topic Scout prompt</td>
+<td>1</td>
+<td>Claude Code</td>
+<td>Modifies existing file</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Prerequisites:</strong> Google Cloud service account with GA4 Data API and Search Console API enabled. Service account added as Viewer on GA4 property and verified owner in Search Console.</p>
+<h3 id="phase-3-listen-sprint-21-8-points">Phase 3: Listen (Sprint 21, 8 points)<a class="headerlink" href="#phase-3-listen-sprint-21-8-points" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Story</th>
+<th>Points</th>
+<th>Assignee</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HN + Reddit sentiment scraper with LLM scoring</td>
+<td>3</td>
+<td>Claude Code</td>
+<td>Complex — API integration, LLM scoring</td>
+</tr>
+<tr>
+<td>Trending topic detector (sentiment velocity)</td>
+<td>3</td>
+<td>Claude Code</td>
+<td>Algorithm design</td>
+</tr>
+<tr>
+<td>Feed community signals into Topic Scout prompt</td>
+<td>1</td>
+<td>Claude Code</td>
+<td>Modifies existing file</td>
+</tr>
+<tr>
+<td>Sentiment data MCP server</td>
+<td>1</td>
+<td>Copilot</td>
+<td>New file</td>
+</tr>
+</tbody>
+</table>
+<h3 id="phase-4-decide-sprint-22-3-points">Phase 4: Decide (Sprint 22, 3 points)<a class="headerlink" href="#phase-4-decide-sprint-22-3-points" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Story</th>
+<th>Points</th>
+<th>Assignee</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Add Data Analyst persona to Editorial Board</td>
+<td>1</td>
+<td>Claude Code</td>
+<td>Modifies existing file</td>
+</tr>
+<tr>
+<td>Content gap analysis from GSC keyword data</td>
+<td>2</td>
+<td>Claude Code</td>
+<td>New analysis logic</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="cost-implications">Cost Implications<a class="headerlink" href="#cost-implications" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Cost</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GA4 Data API</td>
+<td>Free</td>
+<td>200K tokens/day quota</td>
+</tr>
+<tr>
+<td>Search Console API</td>
+<td>Free</td>
+<td>25K rows/request</td>
+</tr>
+<tr>
+<td>HN API</td>
+<td>Free</td>
+<td>Firebase, no auth required</td>
+</tr>
+<tr>
+<td>Reddit API (PRAW)</td>
+<td>Free</td>
+<td>100 requests/min free tier</td>
+</tr>
+<tr>
+<td>dev.to API</td>
+<td>Free</td>
+<td>No auth required</td>
+</tr>
+<tr>
+<td>Exploding Topics</td>
+<td>$99/mo</td>
+<td>Optional — for 12-month trend lead time</td>
+</tr>
+<tr>
+<td>LLM sentiment scoring</td>
+<td>~$2/month</td>
+<td>Haiku-tier, ~1000 comments/week</td>
+</tr>
+<tr>
+<td>SQLite storage</td>
+<td>Free</td>
+<td>&lt;1MB/year</td>
+</tr>
+<tr>
+<td>GA4 MCP server</td>
+<td>Free</td>
+<td><code>pip install google-analytics-mcp</code></td>
+</tr>
+<tr>
+<td>GSC MCP server</td>
+<td>Free</td>
+<td><code>pip install google-search-console-mcp-python</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total new cost: $0-$2/month</strong> (excluding optional Exploding Topics subscription).</p>
+<hr />
+<h2 id="what-this-enables">What This Enables<a class="headerlink" href="#what-this-enables" title="Permanent link">&para;</a></h2>
+<p><strong>Before (current state):</strong></p>
+<blockquote>
+<p>"Generate an article on a quality engineering topic" → LLM invents a topic → editorial board votes on vibes → article published → nobody knows if anyone reads it → next week, might write about the same topic again</p>
+</blockquote>
+<p><strong>After (with Content Intelligence Engine):</strong></p>
+<blockquote>
+<p>GA4 says the CrowdStrike article got 3x average engagement → GSC shows "cost of software bugs 2026" has 2,400 impressions but we have no article targeting it → Reddit r/programming is 85% negative on AI coding tools this week (contrarian opportunity) → ChromaDB confirms we haven't covered "AI code review" yet → Topic Scout generates candidates informed by all four signals → Editorial Board votes with performance data → article targets a proven audience gap</p>
+</blockquote>
+<p>The difference is the difference between a newspaper that publishes whatever its editors feel like and one that reads its circulation numbers.</p>
+<hr />
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<h3 id="content-intelligence">Content Intelligence<a class="headerlink" href="#content-intelligence" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://www.techno-pulse.com/2026/03/best-ai-seo-tools-in-2026-surfer-seo-vs.html">Surfer SEO, Clearscope, MarketMuse, Frase comparison</a></li>
+<li><a href="https://infranodus.com/docs/content-gap-analysis">InfraNodus knowledge graph content gap analysis</a></li>
+<li><a href="https://www.prnewswire.com/news-releases/presaige-debuts-at-ces-2026-302645969.html">Presaige content performance prediction (CES 2026)</a></li>
+<li><a href="https://clickport.io/blog/content-engagement-metrics">Content engagement metrics that matter (Chartbeat Q4 2025)</a></li>
+</ul>
+<h3 id="sentiment-analysis">Sentiment Analysis<a class="headerlink" href="#sentiment-analysis" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://arxiv.org/html/2506.12643v1">HN sentiment research on AI projects (arXiv)</a></li>
+<li><a href="https://survey.stackoverflow.co/2025/">Stack Overflow 2025 Developer Survey — AI favorability dropping</a></li>
+<li><a href="https://sparktoro.com/blog/audience-research-the-complete-guide-for-marketers/">SparkToro audience research platform</a></li>
+<li><a href="https://wandb.ai/byyoung3/Generative-AI/reports/Sentiment-classification-with-the-Reddit-Praw-API-and-GPT-4o-mini">Reddit PRAW + GPT-4o-mini sentiment pipeline (W&amp;B)</a></li>
+<li><a href="https://www.mdpi.com/1911-8074/18/1/16">News sentiment vs social media sentiment as contrarian indicator (MDPI)</a></li>
+</ul>
+<h3 id="google-analytics-integration">Google Analytics Integration<a class="headerlink" href="#google-analytics-integration" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://github.com/googleanalytics/python-docs-samples/blob/main/google-analytics-data/quickstart.py">GA4 Data API Python quickstart</a></li>
+<li><a href="https://developers.google.com/analytics/devguides/MCP">Google Analytics MCP server (official)</a></li>
+<li><a href="https://www.ekamoira.com/blog/google-search-console-mcp-servers-compared-complete-2025-guide">Google Search Console MCP servers compared</a></li>
+<li><a href="https://www.syptus.com/blog/metrics-for-content-engagement-scoring/">Content performance scoring methodology (Syptus)</a></li>
+<li><a href="https://sightfactory.com/data-driven-content-automating-ga4-analysis-for-wordpress/">GA4 + WordPress automation pipeline (Sightfactory)</a></li>
+</ul>
+<h3 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://www.trysight.ai/blog/ai-content-creation-at-scale">AI content creation at scale (Level 3 maturity)</a></li>
+<li><a href="https://github.com/nama1arpit/reddit-streaming-pipeline">Reddit streaming sentiment pipeline architecture</a></li>
+<li><a href="https://www.averi.ai/blog/the-state-of-ai-content-marketing-2026-benchmarks-report">Generative Engine Optimization (GEO)</a></li>
+</ul>
 
 
 

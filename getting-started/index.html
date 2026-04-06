@@ -287,7 +287,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../adr/ADR-001-agent-framework-selection/" class="md-tabs__link">
+        <a href="../adr/0001-extract-agent-definitions-to-yaml/" class="md-tabs__link">
           
   
   
@@ -892,14 +892,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/ADR-001-agent-framework-selection/" class="md-nav__link">
+      <a href="../adr/0001-extract-agent-definitions-to-yaml/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-001 — Agent Framework Selection
+    ADR-0001 — Extract Agent Definitions to YAML
   
 
     
@@ -920,14 +920,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/ADR-002-content-intelligence-engine/" class="md-nav__link">
+      <a href="../adr/0002-agent-registry-pattern/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-002 — Content Intelligence Engine
+    ADR-0002 — Agent Registry Pattern
   
 
     
@@ -948,14 +948,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/ADR-003-agent-skill-governance/" class="md-nav__link">
+      <a href="../adr/0003-phased-crewai-migration/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-003 — Agent Skill Governance
+    ADR-0003 — Phased CrewAI Migration (Superseded)
   
 
     
@@ -976,14 +976,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../ADR-004-python-version-constraint/" class="md-nav__link">
+      <a href="../adr/0004-python-version-constraint/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-004 — Python Version Constraint
+    ADR-0004 — Python Version Constraint
   
 
     
@@ -1004,14 +1004,98 @@
   
   
     <li class="md-nav__item">
-      <a href="../ADR-005-agile-discipline-enforcement/" class="md-nav__link">
+      <a href="../adr/0005-agile-discipline-enforcement/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-005 — Agile Discipline Enforcement
+    ADR-0005 — Agile Discipline Enforcement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0006-agent-framework-selection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0006 — Agent Framework Selection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0007-content-intelligence-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0007 — Content Intelligence Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0008-agent-skill-governance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0008 — Agent Skill Governance
   
 
     
@@ -1101,6 +1185,34 @@
     
   
     Agent Delegation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/adr-governance/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR Governance
   
 
     
@@ -2281,7 +2393,7 @@
 <tbody>
 <tr>
 <td><strong>Python</strong></td>
-<td>3.11, 3.12, or 3.13 (3.14 is not yet supported — see <a href="../ADR-004-python-version-constraint/">ADR-004</a>)</td>
+<td>3.11, 3.12, or 3.13 (3.14 is not yet supported — see <a href="../adr/0004-python-version-constraint/">ADR-0004</a>)</td>
 </tr>
 <tr>
 <td><strong>OpenAI API key</strong></td>
@@ -2293,7 +2405,7 @@
 </tr>
 <tr>
 <td><strong>Google credentials</strong></td>
-<td>Optional — service account JSON for GA4/GSC analytics (ADR-002)</td>
+<td>Optional — service account JSON for GA4/GSC analytics (ADR-0007)</td>
 </tr>
 </tbody>
 </table>
@@ -2399,9 +2511,9 @@
 <ul>
 <li><strong><a href="../agent-registry-spec/">Agent Registry</a></strong> — Full specification of all 12 agents, their skills, MCP tools, and model tiers</li>
 <li><strong><a href="../FLOW_ARCHITECTURE/">Flow Architecture</a></strong> — Deep dive into the CrewAI Flow state machine</li>
-<li><strong><a href="../adr/ADR-001-agent-framework-selection/">ADR-001: Agent Framework Selection</a></strong> — Why Claude Code sub-agents replaced CrewAI agents</li>
-<li><strong><a href="../adr/ADR-002-content-intelligence-engine/">ADR-002: Content Intelligence Engine</a></strong> — GA4/GSC feedback loop architecture</li>
-<li><strong><a href="../adr/ADR-003-agent-skill-governance/">ADR-003: Agent Skill Governance</a></strong> — Delegation matrix and budget controls</li>
+<li><strong><a href="../adr/0006-agent-framework-selection/">ADR-0006: Agent Framework Selection</a></strong> — Why Claude Code sub-agents replaced CrewAI agents (supersedes ADR-0003)</li>
+<li><strong><a href="../adr/0007-content-intelligence-engine/">ADR-0007: Content Intelligence Engine</a></strong> — GA4/GSC feedback loop architecture</li>
+<li><strong><a href="../adr/0008-agent-skill-governance/">ADR-0008: Agent Skill Governance</a></strong> — Delegation matrix and budget controls</li>
 <li><strong><a href="../guides/WORKFLOW_GUIDE/">Workflow Guide</a></strong> — Day-to-day development workflows</li>
 <li><strong><a href="../guides/BLOG_DEPLOYMENT/">Blog Deployment Guide</a></strong> — How articles get deployed to the live site</li>
 </ul>

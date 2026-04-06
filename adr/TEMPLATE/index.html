@@ -10,7 +10,7 @@
       
       
       
-        <link rel="canonical" href="https://oviney.github.io/economist-agents/architecture/ADR-002-REFACTORING-COMPLETE/">
+        <link rel="canonical" href="https://oviney.github.io/economist-agents/adr/TEMPLATE/">
       
       
       
@@ -23,7 +23,7 @@
     
     
       
-        <title>ADR-002 Refactoring Complete - Economist Agents</title>
+        <title>ADR-NNNN: Short Descriptive Title - Economist Agents</title>
       
     
     
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#adr-002-refactoring-complete" class="md-skip">
+        <a href="#adr-nnnn-short-descriptive-title" class="md-skip">
           Skip to content
         </a>
       
@@ -108,7 +108,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              ADR-002 Refactoring Complete
+              ADR-NNNN: Short Descriptive Title
             
           </span>
         </div>
@@ -281,7 +281,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../adr/ADR-001-agent-framework-selection/" class="md-tabs__link">
+        <a href="../0001-extract-agent-definitions-to-yaml/" class="md-tabs__link">
           
   
   
@@ -762,14 +762,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../adr/ADR-001-agent-framework-selection/" class="md-nav__link">
+      <a href="../0001-extract-agent-definitions-to-yaml/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-001 — Agent Framework Selection
+    ADR-0001 — Extract Agent Definitions to YAML
   
 
     
@@ -790,14 +790,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../adr/ADR-002-content-intelligence-engine/" class="md-nav__link">
+      <a href="../0002-agent-registry-pattern/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-002 — Content Intelligence Engine
+    ADR-0002 — Agent Registry Pattern
   
 
     
@@ -818,14 +818,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../adr/ADR-003-agent-skill-governance/" class="md-nav__link">
+      <a href="../0003-phased-crewai-migration/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-003 — Agent Skill Governance
+    ADR-0003 — Phased CrewAI Migration (Superseded)
   
 
     
@@ -846,14 +846,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ADR-004-python-version-constraint/" class="md-nav__link">
+      <a href="../0004-python-version-constraint/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-004 — Python Version Constraint
+    ADR-0004 — Python Version Constraint
   
 
     
@@ -874,14 +874,98 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ADR-005-agile-discipline-enforcement/" class="md-nav__link">
+      <a href="../0005-agile-discipline-enforcement/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-005 — Agile Discipline Enforcement
+    ADR-0005 — Agile Discipline Enforcement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../0006-agent-framework-selection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0006 — Agent Framework Selection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../0007-content-intelligence-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0007 — Content Intelligence Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../0008-agent-skill-governance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0008 — Agent Skill Governance
   
 
     
@@ -971,6 +1055,34 @@
     
   
     Agent Delegation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../skills/adr-governance/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR Governance
   
 
     
@@ -2041,10 +2153,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#summary" class="md-nav__link">
+  <a href="#context" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Summary
+        Context
       
     </span>
   </a>
@@ -2052,205 +2164,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#changes-made" class="md-nav__link">
+  <a href="#decision" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Changes Made
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Changes Made">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-visual_qapy-full-compliance" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. visual_qa.py (Full Compliance)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-featured_image_agentpy-partial-compliance-exception-documented" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. featured_image_agent.py (Partial Compliance - Exception Documented)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#quality-gates-passed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quality Gates Passed
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Quality Gates Passed">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ruff-linting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Ruff (Linting)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#mypy-type-checking" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mypy (Type Checking)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#files-createdmodified" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Files Created/Modified
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Files Created/Modified">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#new-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        New Files
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#modified-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Modified Files
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#testing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Testing
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Testing">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#static-analysis" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Static Analysis
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#functional-testing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Functional Testing
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#technical-details" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Technical Details
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Technical Details">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#agentregistry-pattern-usage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        AgentRegistry Pattern Usage
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#type-safety-improvements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Type Safety Improvements
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#lessons-learned" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Lessons Learned
+        Decision
       
     </span>
   </a>
@@ -2258,49 +2175,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
+  <a href="#alternatives-considered" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Next Steps
+        Alternatives Considered
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Next Steps">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#immediate" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Immediate
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#recommended-optional" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Recommended (Optional)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#compliance-status" class="md-nav__link">
+  <a href="#consequences" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Compliance Status
+        Consequences
       
     </span>
   </a>
@@ -2338,135 +2227,51 @@
   
 
 
-<h1 id="adr-002-refactoring-complete">ADR-002 Refactoring Complete<a class="headerlink" href="#adr-002-refactoring-complete" title="Permanent link">&para;</a></h1>
-<p><strong>Date</strong>: 2026-01-03
-<strong>Status</strong>: ✅ COMPLETE
-<strong>Decision</strong>: ADR-002 (Agent Registry Pattern)</p>
-<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
-<p>Successfully refactored <code>featured_image_agent.py</code> and <code>visual_qa.py</code> to comply with ADR-002 Agent Registry Pattern, with one documented exception.</p>
-<h2 id="changes-made">Changes Made<a class="headerlink" href="#changes-made" title="Permanent link">&para;</a></h2>
-<h3 id="1-visual_qapy-full-compliance">1. visual_qa.py (Full Compliance)<a class="headerlink" href="#1-visual_qapy-full-compliance" title="Permanent link">&para;</a></h3>
-<p><strong>Before</strong>: Direct Anthropic client instantiation
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">client</span> <span class="o">=</span> <span class="n">anthropic</span><span class="o">.</span><span class="n">Anthropic</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ANTHROPIC_API_KEY&quot;</span><span class="p">))</span>
-</code></pre></div></p>
-<p><strong>After</strong>: Agent Registry pattern
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scripts.agent_registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentRegistry</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">registry</span> <span class="o">=</span> <span class="n">AgentRegistry</span><span class="p">()</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">agent</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="n">get_agent</span><span class="p">(</span><span class="s2">&quot;visual-qa-agent&quot;</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;anthropic&quot;</span><span class="p">)</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">client</span> <span class="o">=</span> <span class="n">agent</span><span class="p">[</span><span class="s2">&quot;llm_client&quot;</span><span class="p">]</span>
-</code></pre></div></p>
-<p><strong>Agent Definition</strong>: Created <code>.github/agents/visual-qa-agent.agent.md</code>
-- Model: claude-sonnet-4-20250514
-- Provider: anthropic
-- Capabilities: vision
-- Quality Gates: 5 documented gates for chart validation</p>
-<h3 id="2-featured_image_agentpy-partial-compliance-exception-documented">2. featured_image_agent.py (Partial Compliance - Exception Documented)<a class="headerlink" href="#2-featured_image_agentpy-partial-compliance-exception-documented" title="Permanent link">&para;</a></h3>
-<p><strong>Type Safety Improvements</strong>:
-- Changed function signature to use <code>Literal</code> types for DALL-E parameters
-- Added <code>Optional</code> return type annotation
-- Added type narrowing for <code>response.data</code> indexing
-- Improved error handling with explicit checks</p>
-<p><strong>ADR-002 Exception</strong>:
-- DALL-E 3 requires specialized OpenAI endpoint (images.generate)
-- Direct client instantiation preserved with documented rationale
-- Exception noted in code comments (lines 163-165)</p>
-<p><strong>Type Annotations Added</strong>:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">generate_featured_image</span><span class="p">(</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">article_summary</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">output_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">contrarian_angle</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">size</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;1024x1024&quot;</span><span class="p">,</span> <span class="s2">&quot;1792x1024&quot;</span><span class="p">,</span> <span class="s2">&quot;1024x1792&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1024x1024&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">quality</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;standard&quot;</span><span class="p">,</span> <span class="s2">&quot;hd&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;standard&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</code></pre></div></p>
-<h2 id="quality-gates-passed">Quality Gates Passed<a class="headerlink" href="#quality-gates-passed" title="Permanent link">&para;</a></h2>
-<h3 id="ruff-linting">Ruff (Linting)<a class="headerlink" href="#ruff-linting" title="Permanent link">&para;</a></h3>
-<ul>
-<li>✅ Both files pass ruff checks</li>
-<li>Auto-fixed 9 formatting issues total (5 initial + 4 final)</li>
-</ul>
-<h3 id="mypy-type-checking">Mypy (Type Checking)<a class="headerlink" href="#mypy-type-checking" title="Permanent link">&para;</a></h3>
-<ul>
-<li>✅ visual_qa.py: 0 errors</li>
-<li>✅ featured_image_agent.py: 0 errors</li>
-<li>ℹ️ agent_registry.py: 3 errors (not part of this refactoring)</li>
-</ul>
-<h2 id="files-createdmodified">Files Created/Modified<a class="headerlink" href="#files-createdmodified" title="Permanent link">&para;</a></h2>
-<h3 id="new-files">New Files<a class="headerlink" href="#new-files" title="Permanent link">&para;</a></h3>
+<h1 id="adr-nnnn-short-descriptive-title">ADR-NNNN: Short Descriptive Title<a class="headerlink" href="#adr-nnnn-short-descriptive-title" title="Permanent link">&para;</a></h1>
+<p><strong>Status:</strong> Proposed
+<strong>Date:</strong> YYYY-MM-DD
+<strong>Decision Maker:</strong> Name or role
+<strong>Supersedes:</strong> <a href="NNNN-kebab-title.md">ADR-NNNN</a> <em>(only if applicable)</em>
+<strong>Superseded by:</strong> <em>(leave blank when writing; filled in only when a later ADR replaces this one)</em></p>
+<blockquote>
+<p>This is the canonical ADR template. Copy to <code>docs/adr/NNNN-kebab-title.md</code>
+using the next available number. See
+<a href="../../skills/adr-governance/SKILL.md">skills/adr-governance/SKILL.md</a>
+for the full ruleset.</p>
+</blockquote>
+<h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
+<p>Why are we making this decision now? What technical, business, or
+operational forces are at play? What constraints bound the choice?</p>
+<p>Keep this section focused on the problem — the solution belongs in
+Decision below.</p>
+<h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
+<p>One clear paragraph stating what we decided. Begin with
+"We will..." or "This project will...".</p>
+<h2 id="alternatives-considered">Alternatives Considered<a class="headerlink" href="#alternatives-considered" title="Permanent link">&para;</a></h2>
+<p>What other options were on the table? For each, explain why it was
+rejected. This is where the intellectual honesty of the ADR lives —
+if there were no real alternatives, the decision probably wasn't
+architecturally significant enough to warrant an ADR.</p>
 <ol>
-<li><code>.github/agents/visual-qa-agent.agent.md</code> - Agent definition with YAML frontmatter</li>
+<li><strong>Alternative A</strong> — Description. Rejected because...</li>
+<li><strong>Alternative B</strong> — Description. Rejected because...</li>
+<li><strong>Alternative C</strong> — Description. Rejected because...</li>
 </ol>
-<h3 id="modified-files">Modified Files<a class="headerlink" href="#modified-files" title="Permanent link">&para;</a></h3>
-<ol>
-<li><code>scripts/visual_qa.py</code> - Refactored to use Agent Registry</li>
-<li><code>scripts/featured_image_agent.py</code> - Type safety improvements + exception documentation</li>
-</ol>
-<h2 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">&para;</a></h2>
-<h3 id="static-analysis">Static Analysis<a class="headerlink" href="#static-analysis" title="Permanent link">&para;</a></h3>
+<h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
+<p>What becomes easier as a result of this decision? What becomes
+harder? What follow-up work is implied? What should we revisit if
+the context changes?</p>
 <ul>
-<li>✅ Ruff: All checks passed</li>
-<li>✅ Mypy: All type errors resolved in refactored files</li>
-</ul>
-<h3 id="functional-testing">Functional Testing<a class="headerlink" href="#functional-testing" title="Permanent link">&para;</a></h3>
-<ul>
-<li>⏳ Manual testing recommended:</li>
-<li>Test visual_qa.py: <code>python3 scripts/visual_qa.py &lt;chart_path&gt;</code></li>
-<li>Test featured_image_agent.py: <code>python3 scripts/featured_image_agent.py</code></li>
-</ul>
-<h2 id="technical-details">Technical Details<a class="headerlink" href="#technical-details" title="Permanent link">&para;</a></h2>
-<h3 id="agentregistry-pattern-usage">AgentRegistry Pattern Usage<a class="headerlink" href="#agentregistry-pattern-usage" title="Permanent link">&para;</a></h3>
-<p><strong>Correct Pattern</strong>:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scripts.agent_registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentRegistry</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">registry</span> <span class="o">=</span> <span class="n">AgentRegistry</span><span class="p">()</span>  <span class="c1"># Instantiate the class</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">agent</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="n">get_agent</span><span class="p">(</span><span class="s2">&quot;agent-name&quot;</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;anthropic&quot;</span><span class="p">)</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">client</span> <span class="o">=</span> <span class="n">agent</span><span class="p">[</span><span class="s2">&quot;llm_client&quot;</span><span class="p">]</span>
-</code></pre></div></p>
-<p><strong>Common Mistakes Avoided</strong>:
-- ❌ Trying to import <code>registry</code> as a singleton
-- ❌ Using module-level registry without instantiation
-- ✅ Importing <code>AgentRegistry</code> class and instantiating</p>
-<h3 id="type-safety-improvements">Type Safety Improvements<a class="headerlink" href="#type-safety-improvements" title="Permanent link">&para;</a></h3>
-<p><strong>Literal Types for DALL-E</strong>:
-- Size parameter: <code>Literal["1024x1024", "1792x1024", "1024x1792"]</code>
-- Quality parameter: <code>Literal["standard", "hd"]</code></p>
-<p><strong>Type Narrowing</strong>:
-- Added explicit check for <code>response.data</code> before indexing
-- Used <code>hasattr()</code> guards for optional attributes</p>
-<p><strong>Return Type Consistency</strong>:
-- Changed <code>str | None</code> to <code>Optional[str]</code> for clarity</p>
-<h2 id="lessons-learned">Lessons Learned<a class="headerlink" href="#lessons-learned" title="Permanent link">&para;</a></h2>
-<ol>
-<li><strong>AgentRegistry is a Class</strong>: Must be imported as class and instantiated, not a pre-existing singleton</li>
-<li><strong>Ruff Auto-Fix Caveat</strong>: May remove imports during initial scan before full type checking</li>
-<li><strong>DALL-E Type Requirements</strong>: OpenAI library expects strict <code>Literal</code> types for parameters</li>
-<li><strong>Type Narrowing Needed</strong>: Optional indexing requires explicit checks before access</li>
-<li><strong>Exception Documentation</strong>: ADR exceptions should be clearly documented in code</li>
-</ol>
-<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
-<h3 id="immediate">Immediate<a class="headerlink" href="#immediate" title="Permanent link">&para;</a></h3>
-<ul>
-<li>✅ COMPLETE: All quality gates passed</li>
-</ul>
-<h3 id="recommended-optional">Recommended (Optional)<a class="headerlink" href="#recommended-optional" title="Permanent link">&para;</a></h3>
-<ul>
-<li>[ ] Functional testing of refactored code</li>
-<li>[ ] Consider future agent definition for featured-image-agent if DALL-E endpoint supports registry pattern</li>
-</ul>
-<h2 id="compliance-status">Compliance Status<a class="headerlink" href="#compliance-status" title="Permanent link">&para;</a></h2>
-<ul>
-<li>✅ <strong>visual_qa.py</strong>: Full ADR-002 compliance</li>
-<li>✅ <strong>featured_image_agent.py</strong>: Type safety improved, ADR-002 exception documented</li>
-<li>✅ <strong>Quality Gates</strong>: All ruff and mypy checks passed</li>
-<li>✅ <strong>Documentation</strong>: Agent definition created, exception rationale documented</li>
+<li><strong>Positive:</strong> ...</li>
+<li><strong>Negative:</strong> ...</li>
+<li><strong>Follow-up:</strong> ...</li>
+<li><strong>Revisit if:</strong> ...</li>
 </ul>
 <h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="../ADR-002-agent-registry-pattern/">ADR-002: Agent Registry Pattern</a></li>
-<li><a href=".github/agents/visual-qa-agent.agent.md">Visual QA Agent Definition</a></li>
-<li><a href="scripts/agent_registry.py">Agent Registry Implementation</a></li>
+<li>Links to related ADRs</li>
+<li>External sources that informed the decision</li>
+<li>GitHub issues, PRs, or sprint stories that prompted the ADR</li>
 </ul>
 
 

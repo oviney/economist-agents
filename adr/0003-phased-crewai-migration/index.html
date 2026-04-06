@@ -10,9 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://oviney.github.io/economist-agents/architecture/ADR-003-crewai-migration-strategy/">
+        <link rel="canonical" href="https://oviney.github.io/economist-agents/adr/0003-phased-crewai-migration/">
       
       
+        <link rel="prev" href="../0002-agent-registry-pattern/">
+      
+      
+        <link rel="next" href="../0004-python-version-constraint/">
       
       
         
@@ -23,7 +27,7 @@
     
     
       
-        <title>ADR-003: Phased CrewAI Migration Strategy - Economist Agents</title>
+        <title>ADR-0003 — Phased CrewAI Migration (Superseded) - Economist Agents</title>
       
     
     
@@ -74,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#adr-003-phased-crewai-migration-strategy" class="md-skip">
+        <a href="#adr-0003-phased-crewai-migration-strategy" class="md-skip">
           Skip to content
         </a>
       
@@ -108,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              ADR-003: Phased CrewAI Migration Strategy
+              ADR-0003 — Phased CrewAI Migration (Superseded)
             
           </span>
         </div>
@@ -277,11 +281,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../adr/ADR-001-agent-framework-selection/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../0001-extract-agent-definitions-to-yaml/" class="md-tabs__link">
           
   
   
@@ -705,28 +711,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
-        
-          
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
             
   
   
@@ -744,7 +753,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -762,14 +771,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../adr/ADR-001-agent-framework-selection/" class="md-nav__link">
+      <a href="../0001-extract-agent-definitions-to-yaml/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-001 — Agent Framework Selection
+    ADR-0001 — Extract Agent Definitions to YAML
   
 
     
@@ -790,14 +799,444 @@
   
   
     <li class="md-nav__item">
-      <a href="../../adr/ADR-002-content-intelligence-engine/" class="md-nav__link">
+      <a href="../0002-agent-registry-pattern/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-002 — Content Intelligence Engine
+    ADR-0002 — Agent Registry Pattern
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0003 — Phased CrewAI Migration (Superseded)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0003 — Phased CrewAI Migration (Superseded)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decision">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#migrate-to-crewai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ MIGRATE TO CrewAI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keep-custom-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ❌ KEEP CUSTOM IMPLEMENTATION
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-after-migration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture After Migration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phased-migration-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phased Migration Plan
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phased Migration Plan">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-1-foundation-weeks-1-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1: Foundation (Weeks 1-2)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2-tool-integration-weeks-3-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2: Tool Integration (Weeks 3-4)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3-cut-over-week-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3: Cut Over (Week 5)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-4-optimization-weeks-6-8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4: Optimization (Weeks 6-8)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consequences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Consequences
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Consequences">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#positive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Positive
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#negative" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Negative
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#neutral" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Neutral
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rollback-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rollback Plan
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alternative-approaches-considered" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Alternative Approaches Considered
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Alternative Approaches Considered">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-full-pipeline-migration-to-crewai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Full Pipeline Migration to CrewAI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-autogen-instead-of-crewai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. AutoGen Instead of CrewAI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-langgraph-for-state-machine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. LangGraph for State Machine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-build-our-own-framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Build Our Own Framework
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-no-migration-status-quo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. No Migration (Status Quo)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#success-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Success Metrics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#crewai-agentsyaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CrewAI agents.yaml
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#crewai-tasksyaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CrewAI tasks.yaml
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../0004-python-version-constraint/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0004 — Python Version Constraint
   
 
     
@@ -818,14 +1257,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../adr/ADR-003-agent-skill-governance/" class="md-nav__link">
+      <a href="../0005-agile-discipline-enforcement/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-003 — Agent Skill Governance
+    ADR-0005 — Agile Discipline Enforcement
   
 
     
@@ -846,14 +1285,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ADR-004-python-version-constraint/" class="md-nav__link">
+      <a href="../0006-agent-framework-selection/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-004 — Python Version Constraint
+    ADR-0006 — Agent Framework Selection
   
 
     
@@ -874,14 +1313,42 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ADR-005-agile-discipline-enforcement/" class="md-nav__link">
+      <a href="../0007-content-intelligence-engine/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ADR-005 — Agile Discipline Enforcement
+    ADR-0007 — Content Intelligence Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../0008-agent-skill-governance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0008 — Agent Skill Governance
   
 
     
@@ -971,6 +1438,34 @@
     
   
     Agent Delegation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../skills/adr-governance/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR Governance
   
 
     
@@ -2387,11 +2882,21 @@
   
 
 
-<h1 id="adr-003-phased-crewai-migration-strategy">ADR-003: Phased CrewAI Migration Strategy<a class="headerlink" href="#adr-003-phased-crewai-migration-strategy" title="Permanent link">&para;</a></h1>
-<p><strong>Status:</strong> Proposed
+<h1 id="adr-0003-phased-crewai-migration-strategy">ADR-0003: Phased CrewAI Migration Strategy<a class="headerlink" href="#adr-0003-phased-crewai-migration-strategy" title="Permanent link">&para;</a></h1>
+<p><strong>Status:</strong> Superseded by <a href="../0006-agent-framework-selection/">ADR-0006</a> as of 2026-04-05
 <strong>Date:</strong> 2026-01-01
 <strong>Deciders:</strong> Ouray Viney (Agentic AI Architect)
-<strong>Dependencies:</strong> ADR-001, ADR-002</p>
+<strong>Dependencies:</strong> ADR-0001, ADR-0002</p>
+<blockquote>
+<p><strong>Supersession note (2026-04-05):</strong> This ADR proposed phased migration
+<em>to</em> CrewAI. Three months of operational experience and the maturation
+of the Anthropic Agent SDK and MCP ecosystem changed the cost/benefit
+calculus. CrewAI's pre-1.0 patterns proved a liability in Sprints
+16-20. The replacement decision is captured in
+<a href="../0006-agent-framework-selection/">ADR-0006: Agent Framework Selection</a>.
+This ADR is preserved for historical context — do not apply its
+recommendations.</p>
+</blockquote>
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
 <p>The economist-agents system uses a custom 3-stage pipeline with 11 agents. After reviewing multi-agent frameworks (CrewAI, AutoGen, LangGraph), we need to decide:</p>
 <ol>

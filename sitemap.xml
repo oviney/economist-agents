@@ -5,26 +5,6 @@
          <lastmod>2026-04-06</lastmod>
     </url>
     <url>
-         <loc>https://oviney.github.io/economist-agents/ADR-001-agent-configuration-extraction/</loc>
-         <lastmod>2026-04-06</lastmod>
-    </url>
-    <url>
-         <loc>https://oviney.github.io/economist-agents/ADR-002-agent-registry-pattern/</loc>
-         <lastmod>2026-04-06</lastmod>
-    </url>
-    <url>
-         <loc>https://oviney.github.io/economist-agents/ADR-003-crewai-migration-strategy/</loc>
-         <lastmod>2026-04-06</lastmod>
-    </url>
-    <url>
-         <loc>https://oviney.github.io/economist-agents/ADR-004-python-version-constraint/</loc>
-         <lastmod>2026-04-06</lastmod>
-    </url>
-    <url>
-         <loc>https://oviney.github.io/economist-agents/ADR-005-agile-discipline-enforcement/</loc>
-         <lastmod>2026-04-06</lastmod>
-    </url>
-    <url>
          <loc>https://oviney.github.io/economist-agents/AGENT_PROMPT_PATTERNS/</loc>
          <lastmod>2026-04-06</lastmod>
     </url>
@@ -505,31 +485,55 @@
          <lastmod>2026-04-06</lastmod>
     </url>
     <url>
-         <loc>https://oviney.github.io/economist-agents/adr/ADR-001-agent-framework-selection/</loc>
+         <loc>https://oviney.github.io/economist-agents/adr/0001-extract-agent-definitions-to-yaml/</loc>
          <lastmod>2026-04-06</lastmod>
     </url>
     <url>
-         <loc>https://oviney.github.io/economist-agents/adr/ADR-002-content-intelligence-engine/</loc>
+         <loc>https://oviney.github.io/economist-agents/adr/0002-agent-registry-pattern/</loc>
          <lastmod>2026-04-06</lastmod>
     </url>
     <url>
-         <loc>https://oviney.github.io/economist-agents/adr/ADR-003-agent-skill-governance/</loc>
+         <loc>https://oviney.github.io/economist-agents/adr/0003-phased-crewai-migration/</loc>
          <lastmod>2026-04-06</lastmod>
     </url>
     <url>
-         <loc>https://oviney.github.io/economist-agents/architecture/ADR-001-agent-configuration-extraction/</loc>
+         <loc>https://oviney.github.io/economist-agents/adr/0004-python-version-constraint/</loc>
          <lastmod>2026-04-06</lastmod>
     </url>
     <url>
-         <loc>https://oviney.github.io/economist-agents/architecture/ADR-002-REFACTORING-COMPLETE/</loc>
+         <loc>https://oviney.github.io/economist-agents/adr/0005-agile-discipline-enforcement/</loc>
          <lastmod>2026-04-06</lastmod>
     </url>
     <url>
-         <loc>https://oviney.github.io/economist-agents/architecture/ADR-002-agent-registry-pattern/</loc>
+         <loc>https://oviney.github.io/economist-agents/adr/0006-agent-framework-selection/</loc>
          <lastmod>2026-04-06</lastmod>
     </url>
     <url>
-         <loc>https://oviney.github.io/economist-agents/architecture/ADR-003-crewai-migration-strategy/</loc>
+         <loc>https://oviney.github.io/economist-agents/adr/0007-content-intelligence-engine/</loc>
+         <lastmod>2026-04-06</lastmod>
+    </url>
+    <url>
+         <loc>https://oviney.github.io/economist-agents/adr/0008-agent-skill-governance/</loc>
+         <lastmod>2026-04-06</lastmod>
+    </url>
+    <url>
+         <loc>https://oviney.github.io/economist-agents/adr/TEMPLATE/</loc>
+         <lastmod>2026-04-06</lastmod>
+    </url>
+    <url>
+         <loc>https://oviney.github.io/economist-agents/archive/adr-pre-consolidation/</loc>
+         <lastmod>2026-04-06</lastmod>
+    </url>
+    <url>
+         <loc>https://oviney.github.io/economist-agents/archive/adr-pre-consolidation/ADR-001-agent-configuration-extraction/</loc>
+         <lastmod>2026-04-06</lastmod>
+    </url>
+    <url>
+         <loc>https://oviney.github.io/economist-agents/archive/adr-pre-consolidation/ADR-002-agent-registry-pattern/</loc>
+         <lastmod>2026-04-06</lastmod>
+    </url>
+    <url>
+         <loc>https://oviney.github.io/economist-agents/archive/adr-pre-consolidation/ADR-003-crewai-migration-strategy/</loc>
          <lastmod>2026-04-06</lastmod>
     </url>
     <url>
@@ -826,6 +830,10 @@
     </url>
     <url>
          <loc>https://oviney.github.io/economist-agents/skills/ci_formatting_cycle_pattern/</loc>
+         <lastmod>2026-04-06</lastmod>
+    </url>
+    <url>
+         <loc>https://oviney.github.io/economist-agents/skills/adr-governance/SKILL/</loc>
          <lastmod>2026-04-06</lastmod>
     </url>
     <url>

@@ -7,7 +7,7 @@ hide:
 
 **A multi-agent content pipeline that autonomously researches, writes, illustrates, and deploys Economist-style articles.**
 
-Built with Claude Code sub-agents, MCP tool servers, and CrewAI Flows -- governed by codified skills, architectural decision records, and sprint discipline.
+Built with Claude Code sub-agents, MCP tool servers, and CrewAI Flows — governed by codified skills, architectural decision records, and sprint discipline.
 
 [Get Started](getting-started.md){ .md-button .md-button--primary }
 [View on GitHub](https://github.com/oviney/economist-agents){ .md-button }
@@ -16,30 +16,28 @@ Built with Claude Code sub-agents, MCP tool servers, and CrewAI Flows -- governe
 
 ## Architecture Overview
 
-The pipeline flows through seven stages, from topic discovery to deployment, with a performance feedback loop that informs future topic selection.
+The content pipeline flows from topic discovery to deployment, with a planned performance feedback loop (ADR-002) that will inform future topic selection.
+
+```mermaid
+graph TD
+    A[Scout] -->|trending topics| B[Editorial Board]
+    B -->|approved topic| C[Researcher]
+    C -->|sources & facts| D[Writer]
+    D -->|draft article| E[Illustrator]
+    E -->|article + image| F[Editor]
+    F -->|5-gate review| G{Pass?}
+    G -->|score >= 80| H[Publisher]
+    G -->|score < 80| D
+```
+
+Once published, the **Content Intelligence Engine** (ADR-002, planned) will close the loop: analytics data flows from GA4 and Search Console into the Analyst agent, which scores performance and surfaces content gaps back to the Scout.
 
 ```mermaid
 graph LR
-    subgraph Content Pipeline
-        A[Scout] -->|trending topics| B[Editorial Board]
-        B -->|approved topic| C[Researcher]
-        C -->|sources & facts| D[Writer]
-        D -->|draft article| E[Illustrator]
-        E -->|article + image| F[Editor]
-        F -->|5-gate review| G{Pass?}
-        G -->|score >= 80| H[Publisher]
-        G -->|score < 80| D
-    end
-
-    subgraph Content Intelligence Engine
-        I[GA4 / GSC] -->|pageviews, CTR, engagement| J[Analyst]
-        J -->|performance scores, content gaps| A
-    end
-
-    H -->|deployed article| I
+    H[Published Article] -->|pageviews, CTR, engagement| I[GA4 / GSC]
+    I -->|raw metrics| J[Analyst]
+    J -->|performance scores, content gaps| A[Scout]
 ```
-
-The **Content Intelligence Engine** (ADR-002) closes the loop: published articles generate analytics data, which the Analyst agent processes into performance scores and content gap signals that feed back into topic selection.
 
 ---
 
@@ -50,7 +48,7 @@ Twelve specialised agents, each with defined skills, model tiers, and MCP tool a
 | Agent | Category | Model | Purpose |
 |-------|----------|-------|---------|
 | **Researcher** | Content Pipeline | Sonnet | Find fresh, diverse sources (3+ from current year) via web, arXiv, and engineering blogs |
-| **Writer** | Content Pipeline | Opus | Draft Economist-style articles -- 700-1000 words, British spelling, thesis-driven |
+| **Writer** | Content Pipeline | Opus | Draft Economist-style articles — 700-1000 words, British spelling, thesis-driven |
 | **Illustrator** | Content Pipeline | Haiku | Generate DALL-E prompts following editorial illustration standards (painterly, no text) |
 | **Editor** | Content Pipeline | Sonnet | 5-gate quality review: opening, evidence, voice, structure, visual. Reject if <80 |
 | **Publisher** | Content Pipeline | Haiku | Deploy article to blog repo via PR with review checklist |
@@ -62,25 +60,25 @@ Twelve specialised agents, each with defined skills, model tiers, and MCP tool a
 | **Product Owner** | Governance | Sonnet | Generate user stories with acceptance criteria, estimate points, manage backlog |
 | **Scrum Master** | Governance | Sonnet | Validate Definition of Ready, plan sprints, enforce quality gates, run retros |
 
-See the full [Agent Registry Specification](docs/agent-registry-spec.md) for skills, MCP tools, and model tiering rationale.
+See the full [Agent Registry Specification](agent-registry-spec.md) for skills, MCP tools, and model tiering rationale.
 
 ---
 
-## Key Metrics
+## How Quality Is Enforced
 
 <div class="grid cards" markdown>
 
-!!! success "100% Publish Rate"
-    Every article that enters the pipeline passes the 5-gate editorial review and ships to the blog. The revision loop catches quality issues before they reach production.
+!!! success "5-Gate Editorial Review"
+    Every article passes through five quality gates: opening hook, evidence quality, Economist voice, structural flow, and visual integration. Articles scoring below 80 are sent back to the Writer agent for revision.
 
-!!! info "93/100 Average Quality Score"
-    The Article Evaluator MCP server scores articles across five dimensions: opening hook, evidence quality, Economist voice, structural flow, and visual integration.
+!!! info "Deterministic Scoring"
+    The Article Evaluator MCP server scores articles against fixed rubrics so that quality measurement is reproducible. The revision loop catches issues before they reach production.
 
 !!! example "15 Skills Codified"
     From research sourcing to sprint management, each agent's standards are captured as versioned skill definitions that serve as system prompt context.
 
-!!! note "5 ADRs Governing Architecture"
-    Architectural Decision Records cover framework selection, content intelligence, agent governance, Python version constraints, and agile discipline enforcement.
+!!! note "3 Canonical ADRs"
+    Architectural Decision Records govern the big calls: [ADR-001](adr/ADR-001-agent-framework-selection.md) agent framework selection, [ADR-002](adr/ADR-002-content-intelligence-engine.md) content intelligence engine, and [ADR-003](adr/ADR-003-agent-skill-governance.md) agent skill governance.
 
 </div>
 
@@ -89,16 +87,16 @@ See the full [Agent Registry Specification](docs/agent-registry-spec.md) for ski
 ## Engineering Principles
 
 ### Sprint Discipline
-All work is tracked in GitHub issues with story points, acceptance criteria, and sprint milestones. No ad-hoc changes -- every modification flows through the backlog. See [ADR-005](docs/ADR-005-agile-discipline-enforcement.md).
+All work is tracked in GitHub issues with story points, acceptance criteria, and sprint milestones. No ad-hoc changes — every modification flows through the backlog. See [ADR-005](ADR-005-agile-discipline-enforcement.md).
 
 ### Quality Gates
 Articles pass a 5-gate editorial review (opening, evidence, voice, structure, visual). Code requires >80% test coverage, type hints, and docstrings. The Definition of Ready enforces an 8-point checklist before any story enters a sprint.
 
 ### Agent Governance
-[ADR-003](docs/adr/ADR-003-agent-skill-governance.md) defines the delegation matrix: which agents can invoke which tools, model tier assignments (Opus for quality-critical, Haiku for mechanical), and budget caps per invocation to prevent runaway costs.
+[ADR-003](adr/ADR-003-agent-skill-governance.md) defines the delegation matrix: which agents can invoke which tools, model tier assignments (Opus for quality-critical, Haiku for mechanical), and budget caps per invocation to prevent runaway costs.
 
-### Performance-Linked Feedback
-The Content Intelligence Engine (GA4 + Google Search Console) feeds real performance data back into the pipeline. Articles with low engagement signal content gaps; high-performing topics inform future editorial direction.
+### Performance-Linked Feedback (Planned)
+The Content Intelligence Engine (ADR-002) will connect GA4 and Google Search Console to the pipeline, so that articles with low engagement signal content gaps and high-performing topics inform future editorial direction. Sprint 20 landed the GA4/GSC ETL scripts (`scripts/ga4_etl.py`, `scripts/gsc_etl.py`); the next step is wiring their output into the topic selection flow. See [ADR-002](adr/ADR-002-content-intelligence-engine.md) for the full design.
 
 ---
 
@@ -106,36 +104,36 @@ The Content Intelligence Engine (GA4 + Google Search Console) feeds real perform
 
 <div class="grid cards" markdown>
 
-- :material-sitemap:{ .lg .middle } **Architecture**
+- __Architecture__
 
     ---
 
     Agent registry, flow architecture, orchestration strategy, and shared context system.
 
-    [:octicons-arrow-right-24: Architecture docs](docs/agent-registry-spec.md)
+    [Architecture docs →](agent-registry-spec.md)
 
-- :material-file-document-check:{ .lg .middle } **ADRs**
+- __ADRs__
 
     ---
 
-    Five architectural decision records covering framework, intelligence engine, governance, Python version, and agile discipline.
+    Architectural decision records covering framework selection, content intelligence engine, and agent skill governance.
 
-    [:octicons-arrow-right-24: View ADRs](docs/adr/ADR-001-agent-framework-selection.md)
+    [View ADRs →](adr/ADR-001-agent-framework-selection.md)
 
-- :material-tools:{ .lg .middle } **Skills**
+- __Skills__
 
     ---
 
     15 codified skill definitions that agents follow as system prompt context.
 
-    [:octicons-arrow-right-24: Browse skills](skills/agent-delegation/SKILL.md)
+    [Browse skills →](skills/agent-delegation/SKILL.md)
 
-- :material-rocket-launch:{ .lg .middle } **Getting Started**
+- __Getting Started__
 
     ---
 
     Go from zero to generating your first article in 5 minutes.
 
-    [:octicons-arrow-right-24: Get started](getting-started.md)
+    [Get started →](getting-started.md)
 
 </div>

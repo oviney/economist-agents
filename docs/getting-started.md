@@ -8,10 +8,10 @@ Generate your first Economist-style article in 5 minutes.
 
 | Requirement | Details |
 |-------------|---------|
-| **Python** | 3.11, 3.12, or 3.13 (3.14 is not yet supported -- see [ADR-004](docs/ADR-004-python-version-constraint.md)) |
+| **Python** | 3.11, 3.12, or 3.13 (3.14 is not yet supported — see [ADR-004](ADR-004-python-version-constraint.md)) |
 | **OpenAI API key** | Required for LLM calls and DALL-E image generation |
-| **Serper API key** | Optional -- enables web search for the Research agent |
-| **Google credentials** | Optional -- service account JSON for GA4/GSC analytics (ADR-002) |
+| **Serper API key** | Optional — enables web search for the Research agent |
+| **Google credentials** | Optional — service account JSON for GA4/GSC analytics (ADR-002) |
 
 ---
 
@@ -42,7 +42,8 @@ cp .env.example .env
 ## Run Your First Article
 
 ```bash
-python -m src.economist_agents.flow
+# Run from the repo root with src on the Python path
+PYTHONPATH=src python -m economist_agents.flow
 ```
 
 This kicks off the full pipeline. The flow will:
@@ -76,7 +77,7 @@ graph TD
     G -->|PR created| H[Blog Live]
 ```
 
-The pipeline is implemented as a **CrewAI Flow** -- a deterministic state machine where each stage transitions to the next via `@start` and `@listen` decorators. There is no autonomous routing between stages; the flow is explicit and predictable.
+The pipeline is implemented as a **CrewAI Flow** — a deterministic state machine where each stage transitions to the next via `@start` and `@listen` decorators. There is no autonomous routing between stages; the flow is explicit and predictable.
 
 The Editor uses a `@router` decorator to decide whether an article publishes or returns for revision, based on the 5-gate quality score.
 
@@ -86,18 +87,18 @@ The Editor uses a `@router` decorator to decide whether an article publishes or 
 
 The system runs 12 specialised agents across four categories:
 
-- **Content Pipeline** -- Researcher, Writer, Illustrator, Editor, Publisher
-- **Content Intelligence** -- Analyst, Scout
-- **Engineering** -- Developer, Reviewer, Ops
-- **Governance** -- Product Owner, Scrum Master
+- **Content Pipeline** — Researcher, Writer, Illustrator, Editor, Publisher
+- **Content Intelligence** — Analyst, Scout
+- **Engineering** — Developer, Reviewer, Ops
+- **Governance** — Product Owner, Scrum Master
 
 Each agent has:
 
-- **A model tier** -- Opus for quality-critical work, Sonnet for structured tasks, Haiku for mechanical operations
-- **Codified skills** -- loaded as system prompt context
-- **MCP tools** -- servers like article-evaluator, publication-validator, blog-deployer, web-researcher
+- **A model tier** — Opus for quality-critical work, Sonnet for structured tasks, Haiku for mechanical operations
+- **Codified skills** — loaded as system prompt context
+- **MCP tools** — servers like article-evaluator, publication-validator, blog-deployer, web-researcher
 
-See the full [Agent Registry Specification](docs/agent-registry-spec.md) for details on every agent's skills, tools, and model assignment.
+See the full [Agent Registry Specification](agent-registry-spec.md) for details on every agent's skills, tools, and model assignment.
 
 ---
 
@@ -119,10 +120,10 @@ Skills are versioned alongside the codebase and referenced in the agent registry
 
 ## Where to Go Next
 
-- **[Agent Registry](docs/agent-registry-spec.md)** -- Full specification of all 12 agents, their skills, MCP tools, and model tiers
-- **[Flow Architecture](docs/FLOW_ARCHITECTURE.md)** -- Deep dive into the CrewAI Flow state machine
-- **[ADR-001: Agent Framework Selection](docs/adr/ADR-001-agent-framework-selection.md)** -- Why Claude Code sub-agents replaced CrewAI agents
-- **[ADR-002: Content Intelligence Engine](docs/adr/ADR-002-content-intelligence-engine.md)** -- GA4/GSC feedback loop architecture
-- **[ADR-003: Agent Skill Governance](docs/adr/ADR-003-agent-skill-governance.md)** -- Delegation matrix and budget controls
-- **[Workflow Guide](docs/guides/WORKFLOW_GUIDE.md)** -- Day-to-day development workflows
-- **[Blog Deployment Guide](docs/guides/BLOG_DEPLOYMENT.md)** -- How articles get deployed to the live site
+- **[Agent Registry](agent-registry-spec.md)** — Full specification of all 12 agents, their skills, MCP tools, and model tiers
+- **[Flow Architecture](FLOW_ARCHITECTURE.md)** — Deep dive into the CrewAI Flow state machine
+- **[ADR-001: Agent Framework Selection](adr/ADR-001-agent-framework-selection.md)** — Why Claude Code sub-agents replaced CrewAI agents
+- **[ADR-002: Content Intelligence Engine](adr/ADR-002-content-intelligence-engine.md)** — GA4/GSC feedback loop architecture
+- **[ADR-003: Agent Skill Governance](adr/ADR-003-agent-skill-governance.md)** — Delegation matrix and budget controls
+- **[Workflow Guide](guides/WORKFLOW_GUIDE.md)** — Day-to-day development workflows
+- **[Blog Deployment Guide](guides/BLOG_DEPLOYMENT.md)** — How articles get deployed to the live site

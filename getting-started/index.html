@@ -2281,7 +2281,7 @@
 <tbody>
 <tr>
 <td><strong>Python</strong></td>
-<td>3.11, 3.12, or 3.13 (3.14 is not yet supported -- see <a href="docs/ADR-004-python-version-constraint.md">ADR-004</a>)</td>
+<td>3.11, 3.12, or 3.13 (3.14 is not yet supported — see <a href="../ADR-004-python-version-constraint/">ADR-004</a>)</td>
 </tr>
 <tr>
 <td><strong>OpenAI API key</strong></td>
@@ -2289,11 +2289,11 @@
 </tr>
 <tr>
 <td><strong>Serper API key</strong></td>
-<td>Optional -- enables web search for the Research agent</td>
+<td>Optional — enables web search for the Research agent</td>
 </tr>
 <tr>
 <td><strong>Google credentials</strong></td>
-<td>Optional -- service account JSON for GA4/GSC analytics (ADR-002)</td>
+<td>Optional — service account JSON for GA4/GSC analytics (ADR-002)</td>
 </tr>
 </tbody>
 </table>
@@ -2320,7 +2320,8 @@
 </div>
 <hr />
 <h2 id="run-your-first-article">Run Your First Article<a class="headerlink" href="#run-your-first-article" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python<span class="w"> </span>-m<span class="w"> </span>src.economist_agents.flow
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Run from the repo root with src on the Python path</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nv">PYTHONPATH</span><span class="o">=</span>src<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>economist_agents.flow
 </code></pre></div>
 <p>This kicks off the full pipeline. The flow will:</p>
 <ol>
@@ -2348,24 +2349,24 @@
     F --&gt;|score &gt;= 80| G[Publisher]
     F --&gt;|score &lt; 80| D
     G --&gt;|PR created| H[Blog Live]</code></pre>
-<p>The pipeline is implemented as a <strong>CrewAI Flow</strong> -- a deterministic state machine where each stage transitions to the next via <code>@start</code> and <code>@listen</code> decorators. There is no autonomous routing between stages; the flow is explicit and predictable.</p>
+<p>The pipeline is implemented as a <strong>CrewAI Flow</strong> — a deterministic state machine where each stage transitions to the next via <code>@start</code> and <code>@listen</code> decorators. There is no autonomous routing between stages; the flow is explicit and predictable.</p>
 <p>The Editor uses a <code>@router</code> decorator to decide whether an article publishes or returns for revision, based on the 5-gate quality score.</p>
 <hr />
 <h2 id="agent-architecture">Agent Architecture<a class="headerlink" href="#agent-architecture" title="Permanent link">&para;</a></h2>
 <p>The system runs 12 specialised agents across four categories:</p>
 <ul>
-<li><strong>Content Pipeline</strong> -- Researcher, Writer, Illustrator, Editor, Publisher</li>
-<li><strong>Content Intelligence</strong> -- Analyst, Scout</li>
-<li><strong>Engineering</strong> -- Developer, Reviewer, Ops</li>
-<li><strong>Governance</strong> -- Product Owner, Scrum Master</li>
+<li><strong>Content Pipeline</strong> — Researcher, Writer, Illustrator, Editor, Publisher</li>
+<li><strong>Content Intelligence</strong> — Analyst, Scout</li>
+<li><strong>Engineering</strong> — Developer, Reviewer, Ops</li>
+<li><strong>Governance</strong> — Product Owner, Scrum Master</li>
 </ul>
 <p>Each agent has:</p>
 <ul>
-<li><strong>A model tier</strong> -- Opus for quality-critical work, Sonnet for structured tasks, Haiku for mechanical operations</li>
-<li><strong>Codified skills</strong> -- loaded as system prompt context</li>
-<li><strong>MCP tools</strong> -- servers like article-evaluator, publication-validator, blog-deployer, web-researcher</li>
+<li><strong>A model tier</strong> — Opus for quality-critical work, Sonnet for structured tasks, Haiku for mechanical operations</li>
+<li><strong>Codified skills</strong> — loaded as system prompt context</li>
+<li><strong>MCP tools</strong> — servers like article-evaluator, publication-validator, blog-deployer, web-researcher</li>
 </ul>
-<p>See the full <a href="docs/agent-registry-spec.md">Agent Registry Specification</a> for details on every agent's skills, tools, and model assignment.</p>
+<p>See the full <a href="../agent-registry-spec/">Agent Registry Specification</a> for details on every agent's skills, tools, and model assignment.</p>
 <hr />
 <h2 id="skills-system">Skills System<a class="headerlink" href="#skills-system" title="Permanent link">&para;</a></h2>
 <p>Skills are the codified standards that agents follow. Each skill is a markdown file (<code>SKILL.md</code>) that gets loaded into an agent's system prompt, giving it domain-specific instructions.</p>
@@ -2396,13 +2397,13 @@
 <hr />
 <h2 id="where-to-go-next">Where to Go Next<a class="headerlink" href="#where-to-go-next" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong><a href="docs/agent-registry-spec.md">Agent Registry</a></strong> -- Full specification of all 12 agents, their skills, MCP tools, and model tiers</li>
-<li><strong><a href="docs/FLOW_ARCHITECTURE.md">Flow Architecture</a></strong> -- Deep dive into the CrewAI Flow state machine</li>
-<li><strong><a href="docs/adr/ADR-001-agent-framework-selection.md">ADR-001: Agent Framework Selection</a></strong> -- Why Claude Code sub-agents replaced CrewAI agents</li>
-<li><strong><a href="docs/adr/ADR-002-content-intelligence-engine.md">ADR-002: Content Intelligence Engine</a></strong> -- GA4/GSC feedback loop architecture</li>
-<li><strong><a href="docs/adr/ADR-003-agent-skill-governance.md">ADR-003: Agent Skill Governance</a></strong> -- Delegation matrix and budget controls</li>
-<li><strong><a href="docs/guides/WORKFLOW_GUIDE.md">Workflow Guide</a></strong> -- Day-to-day development workflows</li>
-<li><strong><a href="docs/guides/BLOG_DEPLOYMENT.md">Blog Deployment Guide</a></strong> -- How articles get deployed to the live site</li>
+<li><strong><a href="../agent-registry-spec/">Agent Registry</a></strong> — Full specification of all 12 agents, their skills, MCP tools, and model tiers</li>
+<li><strong><a href="../FLOW_ARCHITECTURE/">Flow Architecture</a></strong> — Deep dive into the CrewAI Flow state machine</li>
+<li><strong><a href="../adr/ADR-001-agent-framework-selection/">ADR-001: Agent Framework Selection</a></strong> — Why Claude Code sub-agents replaced CrewAI agents</li>
+<li><strong><a href="../adr/ADR-002-content-intelligence-engine/">ADR-002: Content Intelligence Engine</a></strong> — GA4/GSC feedback loop architecture</li>
+<li><strong><a href="../adr/ADR-003-agent-skill-governance/">ADR-003: Agent Skill Governance</a></strong> — Delegation matrix and budget controls</li>
+<li><strong><a href="../guides/WORKFLOW_GUIDE/">Workflow Guide</a></strong> — Day-to-day development workflows</li>
+<li><strong><a href="../guides/BLOG_DEPLOYMENT/">Blog Deployment Guide</a></strong> — How articles get deployed to the live site</li>
 </ul>
 
 

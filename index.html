@@ -513,10 +513,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#key-metrics" class="md-nav__link">
+  <a href="#how-quality-is-enforced" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Key Metrics
+        How Quality Is Enforced
       
     </span>
   </a>
@@ -569,10 +569,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#performance-linked-feedback" class="md-nav__link">
+  <a href="#performance-linked-feedback-planned" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Performance-Linked Feedback
+        Performance-Linked Feedback (Planned)
       
     </span>
   </a>
@@ -2223,10 +2223,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#key-metrics" class="md-nav__link">
+  <a href="#how-quality-is-enforced" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Key Metrics
+        How Quality Is Enforced
       
     </span>
   </a>
@@ -2279,10 +2279,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#performance-linked-feedback" class="md-nav__link">
+  <a href="#performance-linked-feedback-planned" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Performance-Linked Feedback
+        Performance-Linked Feedback (Planned)
       
     </span>
   </a>
@@ -2329,31 +2329,26 @@
 
 <h1 id="economist-agents">Economist Agents<a class="headerlink" href="#economist-agents" title="Permanent link">&para;</a></h1>
 <p><strong>A multi-agent content pipeline that autonomously researches, writes, illustrates, and deploys Economist-style articles.</strong></p>
-<p>Built with Claude Code sub-agents, MCP tool servers, and CrewAI Flows -- governed by codified skills, architectural decision records, and sprint discipline.</p>
+<p>Built with Claude Code sub-agents, MCP tool servers, and CrewAI Flows — governed by codified skills, architectural decision records, and sprint discipline.</p>
 <p><a class="md-button md-button--primary" href="getting-started/">Get Started</a>
 <a class="md-button" href="https://github.com/oviney/economist-agents">View on GitHub</a></p>
 <hr />
 <h2 id="architecture-overview">Architecture Overview<a class="headerlink" href="#architecture-overview" title="Permanent link">&para;</a></h2>
-<p>The pipeline flows through seven stages, from topic discovery to deployment, with a performance feedback loop that informs future topic selection.</p>
+<p>The content pipeline flows from topic discovery to deployment, with a planned performance feedback loop (ADR-002) that will inform future topic selection.</p>
+<pre class="mermaid"><code>graph TD
+    A[Scout] --&gt;|trending topics| B[Editorial Board]
+    B --&gt;|approved topic| C[Researcher]
+    C --&gt;|sources &amp; facts| D[Writer]
+    D --&gt;|draft article| E[Illustrator]
+    E --&gt;|article + image| F[Editor]
+    F --&gt;|5-gate review| G{Pass?}
+    G --&gt;|score &gt;= 80| H[Publisher]
+    G --&gt;|score &lt; 80| D</code></pre>
+<p>Once published, the <strong>Content Intelligence Engine</strong> (ADR-002, planned) will close the loop: analytics data flows from GA4 and Search Console into the Analyst agent, which scores performance and surfaces content gaps back to the Scout.</p>
 <pre class="mermaid"><code>graph LR
-    subgraph Content Pipeline
-        A[Scout] --&gt;|trending topics| B[Editorial Board]
-        B --&gt;|approved topic| C[Researcher]
-        C --&gt;|sources &amp; facts| D[Writer]
-        D --&gt;|draft article| E[Illustrator]
-        E --&gt;|article + image| F[Editor]
-        F --&gt;|5-gate review| G{Pass?}
-        G --&gt;|score &gt;= 80| H[Publisher]
-        G --&gt;|score &lt; 80| D
-    end
-
-    subgraph Content Intelligence Engine
-        I[GA4 / GSC] --&gt;|pageviews, CTR, engagement| J[Analyst]
-        J --&gt;|performance scores, content gaps| A
-    end
-
-    H --&gt;|deployed article| I</code></pre>
-<p>The <strong>Content Intelligence Engine</strong> (ADR-002) closes the loop: published articles generate analytics data, which the Analyst agent processes into performance scores and content gap signals that feed back into topic selection.</p>
+    H[Published Article] --&gt;|pageviews, CTR, engagement| I[GA4 / GSC]
+    I --&gt;|raw metrics| J[Analyst]
+    J --&gt;|performance scores, content gaps| A[Scout]</code></pre>
 <hr />
 <h2 id="agent-registry">Agent Registry<a class="headerlink" href="#agent-registry" title="Permanent link">&para;</a></h2>
 <p>Twelve specialised agents, each with defined skills, model tiers, and MCP tool access.</p>
@@ -2377,7 +2372,7 @@
 <td><strong>Writer</strong></td>
 <td>Content Pipeline</td>
 <td>Opus</td>
-<td>Draft Economist-style articles -- 700-1000 words, British spelling, thesis-driven</td>
+<td>Draft Economist-style articles — 700-1000 words, British spelling, thesis-driven</td>
 </tr>
 <tr>
 <td><strong>Illustrator</strong></td>
@@ -2441,64 +2436,64 @@
 </tr>
 </tbody>
 </table>
-<p>See the full <a href="docs/agent-registry-spec.md">Agent Registry Specification</a> for skills, MCP tools, and model tiering rationale.</p>
+<p>See the full <a href="agent-registry-spec/">Agent Registry Specification</a> for skills, MCP tools, and model tiering rationale.</p>
 <hr />
-<h2 id="key-metrics">Key Metrics<a class="headerlink" href="#key-metrics" title="Permanent link">&para;</a></h2>
+<h2 id="how-quality-is-enforced">How Quality Is Enforced<a class="headerlink" href="#how-quality-is-enforced" title="Permanent link">&para;</a></h2>
 <div class="grid cards">
 <div class="admonition success">
-<p class="admonition-title">100% Publish Rate</p>
-<p>Every article that enters the pipeline passes the 5-gate editorial review and ships to the blog. The revision loop catches quality issues before they reach production.</p>
+<p class="admonition-title">5-Gate Editorial Review</p>
+<p>Every article passes through five quality gates: opening hook, evidence quality, Economist voice, structural flow, and visual integration. Articles scoring below 80 are sent back to the Writer agent for revision.</p>
 </div>
 <div class="admonition info">
-<p class="admonition-title">93/100 Average Quality Score</p>
-<p>The Article Evaluator MCP server scores articles across five dimensions: opening hook, evidence quality, Economist voice, structural flow, and visual integration.</p>
+<p class="admonition-title">Deterministic Scoring</p>
+<p>The Article Evaluator MCP server scores articles against fixed rubrics so that quality measurement is reproducible. The revision loop catches issues before they reach production.</p>
 </div>
 <div class="admonition example">
 <p class="admonition-title">15 Skills Codified</p>
 <p>From research sourcing to sprint management, each agent's standards are captured as versioned skill definitions that serve as system prompt context.</p>
 </div>
 <div class="admonition note">
-<p class="admonition-title">5 ADRs Governing Architecture</p>
-<p>Architectural Decision Records cover framework selection, content intelligence, agent governance, Python version constraints, and agile discipline enforcement.</p>
+<p class="admonition-title">3 Canonical ADRs</p>
+<p>Architectural Decision Records govern the big calls: <a href="adr/ADR-001-agent-framework-selection/">ADR-001</a> agent framework selection, <a href="adr/ADR-002-content-intelligence-engine/">ADR-002</a> content intelligence engine, and <a href="adr/ADR-003-agent-skill-governance/">ADR-003</a> agent skill governance.</p>
 </div>
 </div>
 <hr />
 <h2 id="engineering-principles">Engineering Principles<a class="headerlink" href="#engineering-principles" title="Permanent link">&para;</a></h2>
 <h3 id="sprint-discipline">Sprint Discipline<a class="headerlink" href="#sprint-discipline" title="Permanent link">&para;</a></h3>
-<p>All work is tracked in GitHub issues with story points, acceptance criteria, and sprint milestones. No ad-hoc changes -- every modification flows through the backlog. See <a href="docs/ADR-005-agile-discipline-enforcement.md">ADR-005</a>.</p>
+<p>All work is tracked in GitHub issues with story points, acceptance criteria, and sprint milestones. No ad-hoc changes — every modification flows through the backlog. See <a href="ADR-005-agile-discipline-enforcement/">ADR-005</a>.</p>
 <h3 id="quality-gates">Quality Gates<a class="headerlink" href="#quality-gates" title="Permanent link">&para;</a></h3>
 <p>Articles pass a 5-gate editorial review (opening, evidence, voice, structure, visual). Code requires &gt;80% test coverage, type hints, and docstrings. The Definition of Ready enforces an 8-point checklist before any story enters a sprint.</p>
 <h3 id="agent-governance">Agent Governance<a class="headerlink" href="#agent-governance" title="Permanent link">&para;</a></h3>
-<p><a href="docs/adr/ADR-003-agent-skill-governance.md">ADR-003</a> defines the delegation matrix: which agents can invoke which tools, model tier assignments (Opus for quality-critical, Haiku for mechanical), and budget caps per invocation to prevent runaway costs.</p>
-<h3 id="performance-linked-feedback">Performance-Linked Feedback<a class="headerlink" href="#performance-linked-feedback" title="Permanent link">&para;</a></h3>
-<p>The Content Intelligence Engine (GA4 + Google Search Console) feeds real performance data back into the pipeline. Articles with low engagement signal content gaps; high-performing topics inform future editorial direction.</p>
+<p><a href="adr/ADR-003-agent-skill-governance/">ADR-003</a> defines the delegation matrix: which agents can invoke which tools, model tier assignments (Opus for quality-critical, Haiku for mechanical), and budget caps per invocation to prevent runaway costs.</p>
+<h3 id="performance-linked-feedback-planned">Performance-Linked Feedback (Planned)<a class="headerlink" href="#performance-linked-feedback-planned" title="Permanent link">&para;</a></h3>
+<p>The Content Intelligence Engine (ADR-002) will connect GA4 and Google Search Console to the pipeline, so that articles with low engagement signal content gaps and high-performing topics inform future editorial direction. Sprint 20 landed the GA4/GSC ETL scripts (<code>scripts/ga4_etl.py</code>, <code>scripts/gsc_etl.py</code>); the next step is wiring their output into the topic selection flow. See <a href="adr/ADR-002-content-intelligence-engine/">ADR-002</a> for the full design.</p>
 <hr />
 <h2 id="quick-links">Quick Links<a class="headerlink" href="#quick-links" title="Permanent link">&para;</a></h2>
 <div class="grid cards">
 <ul>
 <li>
-<p><span class="twemoji lg middle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 2v6h2v3H5c-1.11 0-2 .89-2 2v3H1v6h6v-6H5v-3h6v3H9v6h6v-6h-2v-3h6v3h-2v6h6v-6h-2v-3c0-1.11-.89-2-2-2h-6V8h2V2z"/></svg></span> <strong>Architecture</strong></p>
+<p><strong>Architecture</strong></p>
 <hr />
 <p>Agent registry, flow architecture, orchestration strategy, and shared context system.</p>
-<p><a href="docs/agent-registry-spec.md"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Architecture docs</a></p>
+<p><a href="agent-registry-spec/">Architecture docs →</a></p>
 </li>
 <li>
-<p><span class="twemoji lg middle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m23.5 17-5 5-3.5-3.5 1.5-1.5 2 2 3.5-3.5zM6 2c-1.11 0-2 .89-2 2v16c0 1.11.89 2 2 2h7.81c-.53-.91-.81-1.95-.81-3 0-.33.03-.67.08-1H6v-2h7.81c.46-.8 1.1-1.5 1.87-2H6v-2h12v1.08c.33-.05.67-.08 1-.08.34 0 .67.03 1 .08V8l-6-6m-1 1.5L18.5 9H13Z"/></svg></span> <strong>ADRs</strong></p>
+<p><strong>ADRs</strong></p>
 <hr />
-<p>Five architectural decision records covering framework, intelligence engine, governance, Python version, and agile discipline.</p>
-<p><a href="docs/adr/ADR-001-agent-framework-selection.md"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> View ADRs</a></p>
+<p>Architectural decision records covering framework selection, content intelligence engine, and agent skill governance.</p>
+<p><a href="adr/ADR-001-agent-framework-selection/">View ADRs →</a></p>
 </li>
 <li>
-<p><span class="twemoji lg middle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m21.71 20.29-1.42 1.42a1 1 0 0 1-1.41 0L7 9.85A3.8 3.8 0 0 1 6 10a4 4 0 0 1-3.78-5.3l2.54 2.54.53-.53 1.42-1.42.53-.53L4.7 2.22A4 4 0 0 1 10 6a3.8 3.8 0 0 1-.15 1l11.86 11.88a1 1 0 0 1 0 1.41M2.29 18.88a1 1 0 0 0 0 1.41l1.42 1.42a1 1 0 0 0 1.41 0l5.47-5.46-2.83-2.83M20 2l-4 2v2l-2.17 2.17 2 2L18 8h2l2-4Z"/></svg></span> <strong>Skills</strong></p>
+<p><strong>Skills</strong></p>
 <hr />
 <p>15 codified skill definitions that agents follow as system prompt context.</p>
-<p><a href="skills/agent-delegation/SKILL/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Browse skills</a></p>
+<p><a href="skills/agent-delegation/SKILL/">Browse skills →</a></p>
 </li>
 <li>
-<p><span class="twemoji lg middle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m13.13 22.19-1.63-3.83c1.57-.58 3.04-1.36 4.4-2.27zM5.64 12.5l-3.83-1.63 6.1-2.77C7 9.46 6.22 10.93 5.64 12.5M21.61 2.39S16.66.269 11 5.93c-2.19 2.19-3.5 4.6-4.35 6.71-.28.75-.09 1.57.46 2.13l2.13 2.12c.55.56 1.37.74 2.12.46A19.1 19.1 0 0 0 18.07 13c5.66-5.66 3.54-10.61 3.54-10.61m-7.07 7.07c-.78-.78-.78-2.05 0-2.83s2.05-.78 2.83 0c.77.78.78 2.05 0 2.83s-2.05.78-2.83 0m-5.66 7.07-1.41-1.41zM6.24 22l3.64-3.64c-.34-.09-.67-.24-.97-.45L4.83 22zM2 22h1.41l4.77-4.76-1.42-1.41L2 20.59zm0-2.83 4.09-4.08c-.21-.3-.36-.62-.45-.97L2 17.76z"/></svg></span> <strong>Getting Started</strong></p>
+<p><strong>Getting Started</strong></p>
 <hr />
 <p>Go from zero to generating your first article in 5 minutes.</p>
-<p><a href="getting-started/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Get started</a></p>
+<p><a href="getting-started/">Get started →</a></p>
 </li>
 </ul>
 </div>

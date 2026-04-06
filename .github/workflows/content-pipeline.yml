@@ -12,6 +12,9 @@ on:
     # Run every Monday at 9am UTC
     - cron: '0 9 * * 1'
 
+  repository_dispatch:
+    types: [blog-remediation-ready]
+
 jobs:
   generate-article:
     runs-on: ubuntu-latest

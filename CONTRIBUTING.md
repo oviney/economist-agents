@@ -257,6 +257,100 @@ except:  # Too broad
     pass  # Silent failure
 ```
 
+## 📚 Contributing to the Public Skills Library
+
+The `skills/public/` directory is an open, community-maintained library of generic
+agent definitions.  Contributing a new agent or improving an existing one is one of
+the most impactful ways to help the wider agentic-AI community.
+
+### What belongs in `skills/public/`
+
+A public skills library agent should be:
+
+- **Generic** — usable outside this repository without modification.
+- **Documented** — includes `metadata.use_cases` and `metadata.customisation_notes`.
+- **Self-contained** — the `system_message` encodes all necessary instructions.
+- **Prompt-only** — no hard-coded references to internal URLs, API keys, or secrets.
+
+### Step-by-step: adding a new public agent
+
+1. **Create your YAML file** in `skills/public/<agent-name>.yaml`.
+   Follow the schema defined in `agents/schema.json`.
+
+2. **Include all required fields** (example for a "Fact Checker" agent):
+   ```yaml
+   name: "Fact Checker"
+   role: "Fact Checker"
+   goal: "Verify factual claims in draft content against authoritative sources"
+   backstory: |
+     A Fact Checker who verifies every claim in a draft before publication.
+     Traces statistics to primary sources, flags unverifiable assertions,
+     and corrects errors without changing the author's voice.
+   system_message: |
+     You are a Fact Checker. For each claim in the draft, locate the primary
+     source, confirm the figure is accurate, and flag anything unverifiable.
+     Output a JSON report with fields: claim, verdict, source, notes.
+   tools:
+     - web_search
+     - file_search
+   metadata:
+     version: "1.0"
+     created: "YYYY-MM-DD"
+     author: "your-github-username"
+     category: "content_generation"   # discovery | editorial_board | content_generation
+     visibility: "public"
+     use_cases:
+       - "Pre-publication fact verification for articles"
+       - "Compliance checking against regulatory statements"
+     customisation_notes: |
+       To adapt for a specific domain, add domain-specific authoritative sources
+       to the system_message and adjust the output schema to match your workflow.
+   ```
+
+3. **Validate** your YAML against the schema:
+   ```bash
+   python3 -c "
+   import yaml, json, jsonschema
+   schema = json.load(open('agents/schema.json'))
+   agent  = yaml.safe_load(open('skills/public/fact-checker.yaml'))
+   jsonschema.validate(agent, schema)
+   print('Valid')
+   "
+   ```
+
+4. **Update `skills/README.md`** — add a row to the *Available Agents* table.
+
+5. **Open a Pull Request** using the label `skills-library`.
+   Use the PR template below.
+
+### Skills Library PR template
+
+```markdown
+## Summary
+Adding [Agent Name] to skills/public/.
+
+## Agent Overview
+- **Role**: Short description
+- **Use cases**: Bullet list of 2–4 use cases
+- **Customisation tips**: How to adapt it
+
+## Checklist
+- [ ] YAML validates against agents/schema.json
+- [ ] metadata.visibility = "public"
+- [ ] metadata.customisation_notes is present
+- [ ] skills/README.md updated (Available Agents table)
+- [ ] No secrets, API keys, or internal URLs in system_message
+- [ ] Tested manually with at least one LLM
+```
+
+### Improving an existing public agent
+
+- Increment `metadata.version` (patch, minor, or major — see `skills/README.md`).
+- Describe the change in your PR body.
+- If the output format changes (major bump), note any migration steps.
+
+---
+
 ## 🤝 Agent-Specific Contributions
 
 ### Working with Agents

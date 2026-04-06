@@ -20,122 +20,17 @@ import json
 import os
 from datetime import datetime
 
-# Import unified LLM client
-from llm_client import call_llm, create_llm_client
+from agent_loader import load_scout_prompts as _load_scout_prompts
 
 # Content Intelligence: real blog performance data from GA4 ETL (ADR-0007)
 from content_intelligence import get_performance_context
 
-SCOUT_AGENT_PROMPT = """You are a Topic Scout for a quality engineering blog targeting senior engineers and engineering leaders.
+# Import unified LLM client
+from llm_client import call_llm, create_llm_client
 
-YOUR MISSION:
-Identify 5 high-value article topics that would resonate with this audience RIGHT NOW.
-
-IMPORTANT: Above this prompt you will see a PERFORMANCE CONTEXT block with real audience data from the last 30 days. Use it explicitly:
-- Favour topics thematically similar to the TOP PERFORMERS — those are proven to engage readers.
-- Avoid or reframe topics similar to the UNDERPERFORMERS — those got traffic but failed to hold attention. Do not propose near-duplicates.
-- If a top performer is about X and an underperformer is also about X, the difference is angle/framing — propose a sharper, more contrarian version.
-
-EVALUATION CRITERIA (score each 1-5):
-
-1. TIMELINESS (Is this relevant now?)
-   - Recent tool releases, acquisitions, or announcements
-   - Emerging practices gaining traction
-   - Industry shifts or controversies
-   - Upcoming conference themes
-
-2. DATA AVAILABILITY (Can we make charts?)
-   - Are there surveys, reports, or studies with numbers?
-   - Benchmark data available?
-   - Trend data over time?
-   - Comparison data across companies/tools?
-
-3. CONTRARIAN POTENTIAL (Can we say something different?)
-   - Is conventional wisdom wrong or incomplete?
-   - Underreported angles?
-   - Unpopular but defensible positions?
-
-4. AUDIENCE FIT (Will senior QE leaders care?)
-   - Strategic implications for QE functions
-   - Budget/headcount decisions
-   - Career-relevant for QE leaders
-   - Actionable for practitioners
-
-5. ECONOMIST STYLE FIT (Can we make this sharp and witty?)
-   - Clear thesis possible
-   - Inherent tension or paradox
-   - Good title potential (puns, wordplay)
-
-TOPIC CATEGORIES TO MONITOR:
-- Test automation economics (ROI, maintenance costs, build times)
-- AI/ML in testing (copilots, test generation, visual testing)
-- Platform engineering & developer experience
-- Shift-left/shift-right movements
-- Quality metrics and observability
-- Tool ecosystem changes (Playwright, Cypress, k6, etc.)
-- Organizational models (embedded QE, SRE, platform teams)
-- Performance and reliability engineering
-- Security testing integration
-- Mobile and cross-platform testing
-
-THESIS REQUIREMENTS (Rule 2 — Argue a thesis, not a topic):
-The "thesis" field MUST be a specific, debatable argument — NOT a topic description.
-- BAD (topic): "AI tools are changing test automation"
-- BAD (description): "This article covers AI test generation and its effects"
-- GOOD (thesis): "AI test generators are making maintenance costs worse, not better, because they optimise for coverage metrics that don't correlate with code quality"
-A thesis must be a claim someone could reasonably disagree with.  Every supporting point in the article must advance this argument.
-
-TITLE REQUIREMENTS (Rule 10 — Title must be provocative and memorable):
-The "title_ideas" field MUST follow these rules:
-- Use a colon to add a surprising twist (e.g., "Flaky tests: the hidden tax your CFO doesn't know about")
-- Make the reader curious — do NOT reveal the conclusion
-- BANNED starters: "Why", "How", "The Impact of", "The Role of"
-- Maximum 10 words without a colon or twist
-- Purely descriptive titles are rejected; titles must imply an argument
-
-OUTPUT FORMAT:
-Return a JSON array of exactly 5 topics:
-[
-  {
-    "topic": "Clear, specific article title",
-    "hook": "The attention-grabbing angle or stat (1 sentence)",
-    "thesis": "A specific, debatable argument (not a topic description) - a claim someone could disagree with",
-    "data_sources": ["Where we'd get numbers for charts"],
-    "timeliness_trigger": "Why now? What happened recently?",
-    "contrarian_angle": "How we'd challenge conventional wisdom",
-    "title_ideas": ["Economist-style title with colon twist", "Second option - no Why/How starters"],
-    "scores": {
-      "timeliness": 4,
-      "data_availability": 5,
-      "contrarian_potential": 3,
-      "audience_fit": 5,
-      "economist_fit": 4
-    },
-    "total_score": 21,
-    "talking_points": "key point 1, key point 2, key point 3"
-  }
-]
-
-Sort by total_score descending. Be specific—not "AI in Testing" but "AI test generators: a maintenance debt machine in disguise".
-"""
-
-TREND_RESEARCH_PROMPT = """You are researching current trends in software quality engineering.
-
-Search for and analyze:
-1. Recent announcements from major testing tool vendors (last 30 days)
-2. Hot discussions in QE communities
-3. New research reports or surveys on testing practices
-4. Conference talk submissions/trends (if visible)
-5. Job posting trends for QE roles
-6. Venture capital activity in testing/quality space
-
-For each finding, note:
-- What happened
-- When (be specific)
-- Why it matters to QE leaders
-- Data/numbers if available
-
-Focus on developments that would interest a senior QE leader making strategic decisions."""
+_scout_prompts = _load_scout_prompts()
+SCOUT_AGENT_PROMPT = _scout_prompts["scout"]
+TREND_RESEARCH_PROMPT = _scout_prompts["trend"]
 
 
 def create_client():

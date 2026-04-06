@@ -15,6 +15,7 @@ pytest>=7.0.0            # Testing framework (optional)
 python-dotenv>=1.0.0     # Secure .env file loading
 python-slugify>=8.0.0    # URL-safe filenames
 pyyaml>=6.0              # YAML parsing for config
+jsonschema>=4.0.0        # JSON Schema validation for agent YAML files
 orjson>=3.9.0
 redis>=4.0.0             # Optional Redis cache backend (Story #145)
 requests>=2.31.0         # HTTP requests for image generation

@@ -23,19 +23,19 @@ categories: ["Quality Engineering", "Test Automation"]
 image: /assets/images/test-automation.png
 ---
 
-According to Gartner's 2024 survey, 73% of organisations now use test automation, yet 60% report rising maintenance costs — a paradox that demands scrutiny.
+According to DORA's 2026 State of DevOps report, 73% of organisations now use test automation, yet 60% report rising maintenance costs — a paradox that demands scrutiny.
 
 ## The Maintenance Trap
 
-Test automation frameworks promise efficiency but deliver complexity. Forrester's 2024 analysis shows maintenance consumes 40% of QA budgets in large enterprises. The scripts that once saved time now demand constant updates as interfaces evolve.
+Test automation frameworks promise efficiency but deliver complexity. Google's 2025 engineering blog analysis shows maintenance consumes 40% of QA budgets in large enterprises. The scripts that once saved time now demand constant updates as interfaces evolve.
 
 ## The Skills Gap
 
-Hiring automation engineers costs 25% more than traditional QA roles, per Deloitte's 2024 technology workforce report. The talent shortage compounds the cost problem, forcing organisations to choose between expensive specialists and undertrained generalists.
+Hiring automation engineers costs 25% more than traditional QA roles, per a 2026 IEEE survey of 1,200 software teams. The talent shortage compounds the cost problem, forcing organisations to choose between expensive specialists and undertrained generalists.
 
 ## The Alternative
 
-Infrastructure-first teams report 3x faster delivery with 5x fewer production incidents, according to the IEEE Software Engineering Standards 2024 report. They invest in deterministic environments rather than brittle scripts.
+Infrastructure-first teams report 3x faster delivery with 5x fewer production incidents, according to a 2025 arXiv paper on continuous testing practices. They invest in deterministic environments rather than brittle scripts.
 
 ![Test Automation Costs](/assets/charts/test-costs.png)
 
@@ -45,11 +45,11 @@ The organisations that thrive will be those that treat test infrastructure as a 
 
 ## References
 
-1. Gartner, ["World Quality Report 2024"](https://example.com), *Gartner Research*, 2024
-2. Forrester, ["Test Automation ROI Study"](https://example.com), *Forrester*, 2024
-3. Deloitte, ["Technology Workforce Report"](https://example.com), *Deloitte*, 2024
-4. IEEE, ["Software Engineering Standards"](https://example.com), *IEEE*, 2024
-5. Capgemini, ["Digital Engineering Report"](https://example.com), *Capgemini*, 2024
+1. DORA, ["State of DevOps 2026"](https://dora.dev), *DORA Research*, 2026
+2. Google, ["Engineering Productivity at Scale"](https://example.com), *Google Engineering Blog*, 2025
+3. IEEE, ["Software Engineering Workforce Survey"](https://example.com), *IEEE*, 2026
+4. arXiv, ["Continuous Testing in CI/CD Pipelines"](https://arxiv.org), *arXiv*, 2025
+5. Gartner, ["Magic Quadrant for Test Automation"](https://example.com), *Gartner*, 2025
 """ + " ".join(["word"] * 500)
 
 

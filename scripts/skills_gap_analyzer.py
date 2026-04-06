@@ -32,6 +32,35 @@ class SkillsGapAnalyzer:
         "quality_enforcer": "DevOps Engineer",
     }
 
+    # Velocity impact constants
+    # 1 bug fix ≈ 0.5 story points based on average team velocity (10 pts/sprint, ~20 tasks)
+    STORY_POINTS_PER_FIX_DAY: float = 0.5
+    # Industry average for medium-severity bugs; used when no historical TTR data exists
+    DEFAULT_BUG_RESOLUTION_DAYS: float = 2.0
+    # 2-week sprints with capacity for ~4 bugs before quality work crowds out features
+    MAX_BUGS_PER_SPRINT: float = 4.0
+    # Minimum bug sample required for statistically reliable correlation patterns
+    MIN_BUGS_FOR_STATISTICAL_CONFIDENCE: int = 20
+
+    # Velocity risk thresholds (days of lost sprint capacity)
+    # 10 days ≈ one full sprint lost; 5 days ≈ half sprint; 2 days ≈ quarter sprint
+    VELOCITY_RISK_CRITICAL: float = 10.0
+    VELOCITY_RISK_HIGH: float = 5.0
+    VELOCITY_RISK_MEDIUM: float = 2.0
+
+    # Quality grade thresholds (skill score 0-100)
+    # Aligned with standard performance-review benchmarks used in engineering orgs
+    GRADE_A_THRESHOLD: float = 85.0  # High performer: strong signal, few defects
+    GRADE_B_THRESHOLD: float = 70.0  # Above average: occasional gaps
+    GRADE_C_THRESHOLD: float = 55.0  # Average: notable gaps needing attention
+    GRADE_D_THRESHOLD: float = 40.0  # Below average: systematic issues
+
+    # Correlation strength thresholds (skill gap % = 100 - skill_score)
+    # A gap ≥50 % means the agent is performing at half capacity → strong defect correlation
+    STRONG_CORRELATION_GAP: float = 50.0
+    # A gap ≥25 % represents a material skills deficit → moderate correlation
+    MODERATE_CORRELATION_GAP: float = 25.0
+
     # Skills rubric: Role → {skill: {junior: X, mid: Y, senior: Z}}
     SKILLS_RUBRIC = {
         "Content Writer": {
@@ -382,10 +411,16 @@ class SkillsGapAnalyzer:
             ),
         }
 
+        # Velocity/quality correlation (Critical Question #5)
+        velocity_impact = self.calculate_velocity_impact()
+        quality_correlation = self.correlate_skills_with_quality()
+
         return {
             "by_role": by_role,
             "hiring_recommendations": hiring_recs,
             "training_priorities": training_priorities,
+            "velocity_impact": velocity_impact,
+            "quality_correlation": quality_correlation,
             "summary": summary,
             "generated_at": datetime.now().isoformat(),
         }
@@ -473,6 +508,213 @@ class SkillsGapAnalyzer:
 
         return self._determine_skill_level(avg_score)
 
+    def calculate_velocity_impact(self) -> dict[str, Any]:
+        """
+        Calculate how skills gaps impact team velocity.
+
+        Uses bug resolution time and severity as proxies for lost sprint capacity.
+        Higher skill gaps → more bugs → more rework → lower effective velocity.
+
+        Returns:
+            {
+                'by_role': {
+                    agent: {
+                        'role': str,
+                        'velocity_loss_days': float,
+                        'rework_cost_points': float,
+                        'open_bugs': int,
+                        'avg_resolution_days': float,
+                        'velocity_risk': str  # 'low', 'medium', 'high', 'critical'
+                    }
+                },
+                'total_velocity_loss_days': float,
+                'total_rework_cost_points': float,
+                'highest_impact_role': str,
+            }
+        """
+        severity_weights = {"critical": 3.0, "high": 2.0, "medium": 1.0, "low": 0.5}
+
+        agents: set[str] = set()
+        for bug in self.bugs:
+            agent = bug.get("responsible_agent") or bug.get("component")
+            if agent and agent in self.ROLE_MAPPING:
+                agents.add(agent)
+
+        by_role: dict[str, Any] = {}
+        for agent in sorted(agents):
+            agent_bugs = [
+                b
+                for b in self.bugs
+                if b.get("responsible_agent") == agent or b.get("component") == agent
+            ]
+
+            open_bugs = [b for b in agent_bugs if b.get("status") == "open"]
+            fixed_bugs = [
+                b for b in agent_bugs if b.get("time_to_resolve_days") is not None
+            ]
+
+            # Average resolution time from historical fixed bugs
+            avg_resolution = (
+                sum(b["time_to_resolve_days"] for b in fixed_bugs) / len(fixed_bugs)
+                if fixed_bugs
+                else self.DEFAULT_BUG_RESOLUTION_DAYS
+            )
+
+            # Velocity loss = sum of (severity_weight * estimated_fix_days) for open bugs
+            velocity_loss = sum(
+                severity_weights.get(b.get("severity", "medium"), 1.0) * avg_resolution
+                for b in open_bugs
+            )
+
+            # Rework cost in story points
+            rework_points = round(velocity_loss * self.STORY_POINTS_PER_FIX_DAY, 1)
+
+            # Velocity risk level
+            if velocity_loss >= self.VELOCITY_RISK_CRITICAL:
+                risk = "critical"
+            elif velocity_loss >= self.VELOCITY_RISK_HIGH:
+                risk = "high"
+            elif velocity_loss >= self.VELOCITY_RISK_MEDIUM:
+                risk = "medium"
+            else:
+                risk = "low"
+
+            by_role[agent] = {
+                "role": self.ROLE_MAPPING[agent],
+                "velocity_loss_days": round(velocity_loss, 1),
+                "rework_cost_points": rework_points,
+                "open_bugs": len(open_bugs),
+                "avg_resolution_days": round(avg_resolution, 1),
+                "velocity_risk": risk,
+            }
+
+        total_velocity_loss = sum(r["velocity_loss_days"] for r in by_role.values())
+        total_rework_points = sum(r["rework_cost_points"] for r in by_role.values())
+        highest_impact = (
+            max(by_role.items(), key=lambda x: x[1]["velocity_loss_days"])[1]["role"]
+            if by_role
+            else "N/A"
+        )
+
+        return {
+            "by_role": by_role,
+            "total_velocity_loss_days": round(total_velocity_loss, 1),
+            "total_rework_cost_points": round(total_rework_points, 1),
+            "highest_impact_role": highest_impact,
+        }
+
+    def correlate_skills_with_quality(self) -> dict[str, Any]:
+        """
+        Correlate skill gap scores with quality output metrics.
+
+        Answers: "How do skills gaps correlate with team velocity/quality?"
+
+        Returns:
+            {
+                'correlations': [
+                    {
+                        'agent': str,
+                        'role': str,
+                        'skill_score': float,       # 0-100
+                        'defect_rate': float,        # bugs per sprint (estimated)
+                        'fix_rate': float,           # % bugs fixed
+                        'quality_grade': str,        # A/B/C/D/F
+                        'correlation_label': str     # 'strong', 'moderate', 'weak'
+                    }
+                ],
+                'insight': str,   # human-readable summary
+                'data_quality': str,  # 'sufficient' | 'limited' (< 20 bugs)
+            }
+        """
+        agents: set[str] = set()
+        for bug in self.bugs:
+            agent = bug.get("responsible_agent") or bug.get("component")
+            if agent and agent in self.ROLE_MAPPING:
+                agents.add(agent)
+
+        correlations = []
+        for agent in sorted(agents):
+            agent_bugs = [
+                b
+                for b in self.bugs
+                if b.get("responsible_agent") == agent or b.get("component") == agent
+            ]
+
+            if not agent_bugs:
+                continue
+
+            # Get skill score
+            analysis = self.analyze_agent_performance(agent)
+            skill_score = analysis["overall_score"]
+
+            # Quality metrics
+            total = len(agent_bugs)
+            fixed = sum(1 for b in agent_bugs if b.get("status") == "fixed")
+            fix_rate = round(fixed / total * 100, 1) if total else 0.0
+
+            # Defect rate: bugs per sprint normalised to MAX_BUGS_PER_SPRINT capacity
+            defect_rate = round(total / self.MAX_BUGS_PER_SPRINT, 2)
+
+            # Quality grade: based on skill score (standard engineering performance benchmarks)
+            if skill_score >= self.GRADE_A_THRESHOLD:
+                grade = "A"
+            elif skill_score >= self.GRADE_B_THRESHOLD:
+                grade = "B"
+            elif skill_score >= self.GRADE_C_THRESHOLD:
+                grade = "C"
+            elif skill_score >= self.GRADE_D_THRESHOLD:
+                grade = "D"
+            else:
+                grade = "F"
+
+            # Correlation strength: inverse relationship between skill gap and defect rate
+            gap = 100 - skill_score
+            if gap >= self.STRONG_CORRELATION_GAP:
+                label = "strong"  # large gap → many defects
+            elif gap >= self.MODERATE_CORRELATION_GAP:
+                label = "moderate"
+            else:
+                label = "weak"  # small gap → few defects
+
+            correlations.append(
+                {
+                    "agent": agent,
+                    "role": self.ROLE_MAPPING[agent],
+                    "skill_score": skill_score,
+                    "defect_rate": defect_rate,
+                    "fix_rate": fix_rate,
+                    "quality_grade": grade,
+                    "correlation_label": label,
+                }
+            )
+
+        # Sort by skill_score ascending (worst first)
+        correlations.sort(key=lambda x: x["skill_score"])
+
+        # Generate insight summary
+        data_quality = (
+            "sufficient"
+            if len(self.bugs) >= self.MIN_BUGS_FOR_STATISTICAL_CONFIDENCE
+            else "limited"
+        )
+        if correlations:
+            worst = correlations[0]
+            insight = (
+                f"{worst['role']} shows the strongest skills-quality correlation "
+                f"(skill score {worst['skill_score']}/100, defect rate "
+                f"{worst['defect_rate']:.1f}x per sprint). "
+                f"{'Sufficient' if data_quality == 'sufficient' else 'Limited'} "
+                f"data ({len(self.bugs)} bugs) for pattern analysis."
+            )
+        else:
+            insight = "No agent-attributed bugs found. Assign 'responsible_agent' to defects for analysis."
+
+        return {
+            "correlations": correlations,
+            "insight": insight,
+            "data_quality": data_quality,
+        }
+
     def format_team_assessment_table(
         self, assessment: dict[str, Any], format: str = "markdown"
     ) -> str:
@@ -550,6 +792,67 @@ class SkillsGapAnalyzer:
         else:
             lines.append("✅ No critical training gaps identified")
 
+        # Velocity Impact (Critical Question #5)
+        velocity = assessment.get("velocity_impact", {})
+        if velocity:
+            lines.append("\n## Velocity Impact\n")
+            lines.append(
+                f"- **Total Estimated Velocity Loss**: {velocity['total_velocity_loss_days']} days"
+            )
+            lines.append(
+                f"- **Total Rework Cost**: {velocity['total_rework_cost_points']} story points"
+            )
+            lines.append(
+                f"- **Highest Impact Role**: {velocity['highest_impact_role']}\n"
+            )
+            vel_by_role = velocity.get("by_role", {})
+            if vel_by_role:
+                lines.append(
+                    "| Role | Risk | Open Bugs | Velocity Loss (days) | Rework (pts) |"
+                )
+                lines.append(
+                    "|------|------|-----------|---------------------|--------------|"
+                )
+                risk_icons = {
+                    "critical": "🔴",
+                    "high": "🟠",
+                    "medium": "🟡",
+                    "low": "🟢",
+                }
+                for agent in sorted(vel_by_role.keys()):
+                    row = vel_by_role[agent]
+                    icon = risk_icons.get(row["velocity_risk"], "")
+                    lines.append(
+                        f"| {row['role']} | {icon} {row['velocity_risk'].title()} | "
+                        f"{row['open_bugs']} | {row['velocity_loss_days']} | "
+                        f"{row['rework_cost_points']} |"
+                    )
+
+        # Quality Correlation (Critical Question #5)
+        quality_corr = assessment.get("quality_correlation", {})
+        if quality_corr:
+            lines.append("\n## Skills-Quality Correlation\n")
+            lines.append(f"*{quality_corr.get('insight', '')}*\n")
+            data_quality = quality_corr.get("data_quality", "limited")
+            lines.append(
+                f"**Data Quality**: {data_quality.title()} "
+                f"({'≥20' if data_quality == 'sufficient' else '<20'} bugs)\n"
+            )
+            corrs = quality_corr.get("correlations", [])
+            if corrs:
+                lines.append(
+                    "| Role | Skill Score | Quality Grade | Defect Rate | Fix Rate | Correlation |"
+                )
+                lines.append(
+                    "|------|------------|--------------|-------------|----------|-------------|"
+                )
+                for c in corrs:
+                    lines.append(
+                        f"| {c['role']} | {c['skill_score']}/100 | {c['quality_grade']} | "
+                        f"{c['defect_rate']:.2f}x/sprint | {c['fix_rate']}% | "
+                        f"{c['correlation_label'].title()} |"
+                    )
+
         # Timestamp
         lines.append(f"\n---\n*Generated: {assessment['generated_at']}*")
 
@@ -618,6 +921,47 @@ class SkillsGapAnalyzer:
                 lines.append(f"   Impact: {priority['impact_score']}")
         else:
             lines.append("\nNo critical training gaps identified")
+
+        # Velocity Impact (Critical Question #5)
+        velocity = assessment.get("velocity_impact", {})
+        if velocity:
+            lines.append("\n" + "-" * 80)
+            lines.append("VELOCITY IMPACT")
+            lines.append("-" * 80)
+            lines.append(
+                f"\nTotal Velocity Loss: {velocity['total_velocity_loss_days']} days"
+            )
+            lines.append(
+                f"Total Rework Cost: {velocity['total_rework_cost_points']} story points"
+            )
+            lines.append(f"Highest Impact Role: {velocity['highest_impact_role']}")
+            for agent in sorted(velocity.get("by_role", {}).keys()):
+                row = velocity["by_role"][agent]
+                lines.append(f"\n  {row['role'].upper()}")
+                lines.append(f"    Risk: {row['velocity_risk'].upper()}")
+                lines.append(f"    Open Bugs: {row['open_bugs']}")
+                lines.append(f"    Velocity Loss: {row['velocity_loss_days']} days")
+                lines.append(f"    Rework Cost: {row['rework_cost_points']} points")
+
+        # Quality Correlation (Critical Question #5)
+        quality_corr = assessment.get("quality_correlation", {})
+        if quality_corr:
+            lines.append("\n" + "-" * 80)
+            lines.append("SKILLS-QUALITY CORRELATION")
+            lines.append("-" * 80)
+            lines.append(f"\nInsight: {quality_corr.get('insight', '')}")
+            lines.append(
+                f"Data Quality: {quality_corr.get('data_quality', 'limited').upper()}"
+            )
+            for c in quality_corr.get("correlations", []):
+                lines.append(f"\n  {c['role'].upper()}")
+                lines.append(
+                    f"    Skill Score: {c['skill_score']}/100  Grade: {c['quality_grade']}"
+                )
+                lines.append(
+                    f"    Defect Rate: {c['defect_rate']:.2f}x/sprint  Fix Rate: {c['fix_rate']}%"
+                )
+                lines.append(f"    Correlation: {c['correlation_label'].upper()}")
 
         lines.append("\n" + "=" * 80)
         lines.append(f"Generated: {assessment['generated_at']}")

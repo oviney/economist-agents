@@ -289,6 +289,201 @@ class TestSkillsGapAnalyzer:
         finally:
             Path(temp_path).unlink()
 
+    def test_calculate_velocity_impact(self):
+        """Test velocity impact calculation (Critical Question #5)"""
+        tracker_data = {
+            "version": "1.0",
+            "bugs": [
+                {
+                    "id": "BUG-V-001",
+                    "severity": "critical",
+                    "responsible_agent": "writer_agent",
+                    "status": "open",
+                    "root_cause": "prompt_engineering",
+                    "description": "Critical velocity bug",
+                    "time_to_resolve_days": None,
+                },
+                {
+                    "id": "BUG-V-002",
+                    "severity": "high",
+                    "responsible_agent": "writer_agent",
+                    "status": "fixed",
+                    "root_cause": "validation_gap",
+                    "description": "Fixed bug with TTR",
+                    "time_to_resolve_days": 3,
+                },
+                {
+                    "id": "BUG-V-003",
+                    "severity": "medium",
+                    "responsible_agent": "research_agent",
+                    "status": "open",
+                    "root_cause": "code_logic",
+                    "description": "Research bug",
+                    "time_to_resolve_days": None,
+                },
+            ],
+        }
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+            json.dump(tracker_data, f)
+            temp_path = f.name
+
+        try:
+            analyzer = SkillsGapAnalyzer(temp_path)
+            result = analyzer.calculate_velocity_impact()
+
+            # Validate top-level structure
+            assert "by_role" in result
+            assert "total_velocity_loss_days" in result
+            assert "total_rework_cost_points" in result
+            assert "highest_impact_role" in result
+
+            # writer_agent should have role, risk, open_bugs, etc.
+            by_role = result["by_role"]
+            assert "writer_agent" in by_role
+            writer = by_role["writer_agent"]
+            assert writer["role"] == "Content Writer"
+            assert "velocity_risk" in writer
+            assert writer["velocity_risk"] in ("low", "medium", "high", "critical")
+            assert writer["open_bugs"] == 1  # BUG-V-001 is open
+            assert writer["avg_resolution_days"] == 3.0  # from BUG-V-002
+
+            # research_agent open bug
+            assert "research_agent" in by_role
+            research = by_role["research_agent"]
+            assert research["open_bugs"] == 1
+
+            # Totals should be positive
+            assert result["total_velocity_loss_days"] > 0
+            assert result["total_rework_cost_points"] > 0
+
+            print("✓ test_calculate_velocity_impact PASSED")
+        finally:
+            Path(temp_path).unlink()
+
+    def test_correlate_skills_with_quality(self):
+        """Test skills-quality correlation (Critical Question #5)"""
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+            json.dump(self.test_tracker_data, f)
+            temp_path = f.name
+
+        try:
+            analyzer = SkillsGapAnalyzer(temp_path)
+            result = analyzer.correlate_skills_with_quality()
+
+            # Validate structure
+            assert "correlations" in result
+            assert "insight" in result
+            assert "data_quality" in result
+
+            # Data quality should be 'limited' with only 3 bugs
+            assert result["data_quality"] == "limited"
+
+            # Should have correlations for agents with bugs
+            corrs = result["correlations"]
+            assert len(corrs) > 0
+
+            # Validate correlation entry structure
+            c = corrs[0]
+            assert "agent" in c
+            assert "role" in c
+            assert "skill_score" in c
+            assert "defect_rate" in c
+            assert "fix_rate" in c
+            assert "quality_grade" in c
+            assert "correlation_label" in c
+
+            # Quality grades should be valid
+            for corr in corrs:
+                assert corr["quality_grade"] in ("A", "B", "C", "D", "F")
+                assert corr["correlation_label"] in ("strong", "moderate", "weak")
+                assert 0 <= corr["skill_score"] <= 100
+                assert 0 <= corr["fix_rate"] <= 100
+
+            # Correlations sorted by skill_score ascending (worst first)
+            scores = [c["skill_score"] for c in corrs]
+            assert scores == sorted(scores)
+
+            # Insight should be a non-empty string
+            assert len(result["insight"]) > 0
+
+            print("✓ test_correlate_skills_with_quality PASSED")
+        finally:
+            Path(temp_path).unlink()
+
+    def test_velocity_quality_in_team_assessment(self):
+        """Test that generate_team_assessment includes velocity and quality correlation"""
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+            json.dump(self.test_tracker_data, f)
+            temp_path = f.name
+
+        try:
+            analyzer = SkillsGapAnalyzer(temp_path)
+            assessment = analyzer.generate_team_assessment()
+
+            # New fields should be present
+            assert "velocity_impact" in assessment
+            assert "quality_correlation" in assessment
+
+            # Validate velocity_impact structure
+            vi = assessment["velocity_impact"]
+            assert "by_role" in vi
+            assert "total_velocity_loss_days" in vi
+            assert "total_rework_cost_points" in vi
+            assert "highest_impact_role" in vi
+
+            # Validate quality_correlation structure
+            qc = assessment["quality_correlation"]
+            assert "correlations" in qc
+            assert "insight" in qc
+            assert "data_quality" in qc
+
+            print("✓ test_velocity_quality_in_team_assessment PASSED")
+        finally:
+            Path(temp_path).unlink()
+
+    def test_markdown_includes_velocity_quality_sections(self):
+        """Test markdown output includes velocity impact and quality correlation"""
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+            json.dump(self.test_tracker_data, f)
+            temp_path = f.name
+
+        try:
+            analyzer = SkillsGapAnalyzer(temp_path)
+            assessment = analyzer.generate_team_assessment()
+            markdown = analyzer.format_team_assessment_table(
+                assessment, format="markdown"
+            )
+
+            assert "## Velocity Impact" in markdown
+            assert "## Skills-Quality Correlation" in markdown
+            assert "Velocity Loss" in markdown
+            assert "Defect Rate" in markdown
+
+            print("✓ test_markdown_includes_velocity_quality_sections PASSED")
+        finally:
+            Path(temp_path).unlink()
+
+    def test_text_includes_velocity_quality_sections(self):
+        """Test plain text output includes velocity impact and quality correlation"""
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+            json.dump(self.test_tracker_data, f)
+            temp_path = f.name
+
+        try:
+            analyzer = SkillsGapAnalyzer(temp_path)
+            assessment = analyzer.generate_team_assessment()
+            text = analyzer.format_team_assessment_table(assessment, format="text")
+
+            assert "VELOCITY IMPACT" in text
+            assert "SKILLS-QUALITY CORRELATION" in text
+            assert "Velocity Loss:" in text
+            assert "Defect Rate:" in text
+
+            print("✓ test_text_includes_velocity_quality_sections PASSED")
+        finally:
+            Path(temp_path).unlink()
+
 
 def run_tests():
     """Run all tests"""
@@ -305,6 +500,11 @@ def run_tests():
         "test_training_priorities",
         "test_markdown_formatting",
         "test_text_formatting",
+        "test_calculate_velocity_impact",
+        "test_correlate_skills_with_quality",
+        "test_velocity_quality_in_team_assessment",
+        "test_markdown_includes_velocity_quality_sections",
+        "test_text_includes_velocity_quality_sections",
     ]
 
     print("\n" + "=" * 70)

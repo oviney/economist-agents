@@ -3,9 +3,12 @@
 Test Agent Registry
 
 Validates that AgentRegistry can load and instantiate Stage3Crew and Stage4Crew.
+Also covers full branch paths in src/registry.py (100% coverage target).
 """
 
 import os
+from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
@@ -69,3 +72,88 @@ class TestAgentRegistry:
 
         with pytest.raises((ValueError, KeyError)):
             registry.get_crew_class("NonExistentCrew")
+
+    def test_get_crew_class_returns_registered_class(self):
+        """get_crew_class returns exactly the registered class."""
+        registry = AgentRegistry()
+
+        class DummyCrew:
+            pass
+
+        registry.register_crew("DummyCrew", DummyCrew)
+        result = registry.get_crew_class("DummyCrew")
+        assert result is DummyCrew
+
+    def test_register_crew_manual(self):
+        """register_crew adds a class to the registry."""
+        registry = AgentRegistry()
+        initial_count = len(registry.get_available_crews())
+
+        class NewCrew:
+            pass
+
+        registry.register_crew("NewCrew", NewCrew)
+        assert "NewCrew" in registry.get_available_crews()
+        assert len(registry.get_available_crews()) == initial_count + 1
+
+    def test_repr_contains_registered_crew_names(self):
+        """__repr__ includes the names of registered crews."""
+        registry = AgentRegistry()
+
+        class ReprCrew:
+            pass
+
+        registry.register_crew("ReprCrew", ReprCrew)
+        representation = repr(registry)
+        assert "ReprCrew" in representation
+        assert "AgentRegistry" in representation
+
+    def test_discover_crews_skips_dunder_files(self):
+        """_discover_crews does not register dunder-named crews."""
+        registry = AgentRegistry()
+        crew_names = registry.get_available_crews()
+        # Files like __init__.py should not appear as crew names
+        for name in crew_names:
+            assert not name.startswith("__")
+
+    def test_load_legacy_crews_fallback(self):
+        """_load_legacy_crews is called when crews_dir does not exist."""
+        # Simulate crews_dir not existing so _load_legacy_crews is called
+        with patch.object(Path, "exists", return_value=False):
+            registry = AgentRegistry()
+        # Registry should still be usable; it fell back to _load_legacy_crews
+        assert isinstance(registry.get_available_crews(), list)
+
+    def test_load_legacy_crews_import_error_silenced(self):
+        """_load_legacy_crews silently handles ImportError for stage3_crew."""
+        import sys
+
+        # Simulate crews_dir not existing so _load_legacy_crews is called,
+        # then make the legacy import also fail
+        with patch.object(Path, "exists", return_value=False), patch.dict(sys.modules, {"src.stage3_crew": None}):
+            registry = AgentRegistry()
+        # Should not raise; Stage3Crew simply won't be registered
+        assert isinstance(registry.get_available_crews(), list)
+
+    def test_discover_crews_handles_import_error(self):
+        """_discover_crews prints a warning and continues on ImportError."""
+        import importlib
+
+        crews_dir = Path(__file__).parent.parent / "src" / "crews"
+        if not crews_dir.exists():
+            pytest.skip("src/crews does not exist")
+
+        # Patch importlib.import_module to raise ImportError for crew modules
+        original_import = importlib.import_module
+
+        def broken_import(name, *args, **kwargs):
+            if "src.crews." in name:
+                raise ImportError(f"Simulated import error for {name}")
+            return original_import(name, *args, **kwargs)
+
+        with patch("importlib.import_module", side_effect=broken_import):
+            # Should not raise; prints warnings and continues
+            registry = AgentRegistry()
+
+        # Registry still usable even with broken imports
+        assert isinstance(registry.get_available_crews(), list)

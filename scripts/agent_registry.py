@@ -67,7 +67,134 @@ class LLMProvider(Protocol):
         Returns:
             LLM client instance compatible with the provider
         """
-        ...
+        ...  # pragma: no cover
+
+
+class OpenAIProvider:
+    """Concrete LLM provider for OpenAI models.
+
+    Implements the LLMProvider protocol using the OpenAI API.
+    Reads the API key from the ``OPENAI_API_KEY`` environment variable.
+
+    Args:
+        api_key: OpenAI API key.  Defaults to the ``OPENAI_API_KEY``
+            environment variable when ``None``.
+        default_model: Model name used when ``create_client`` is called
+            without an explicit *model* argument (default: ``"gpt-4o"``).
+
+    Example:
+        >>> provider = OpenAIProvider()
+        >>> client = provider.create_client()
+        >>> client.provider
+        'openai'
+    """
+
+    def __init__(
+        self,
+        api_key: str | None = None,
+        default_model: str = "gpt-4o",
+    ) -> None:
+        import os
+
+        self.api_key = api_key or os.environ.get("OPENAI_API_KEY")
+        self.default_model = default_model
+
+    def create_client(self, model: str | None = None) -> Any:
+        """Create and return an OpenAI LLM client.
+
+        Args:
+            model: Model name override.  Falls back to *default_model* when
+                ``None``.
+
+        Returns:
+            :class:`scripts.llm_client.LLMClient` configured for OpenAI.
+
+        Raises:
+            ValueError: If ``OPENAI_API_KEY`` is not set.
+            ImportError: If the ``openai`` package is not installed.
+        """
+        from scripts.llm_client import LLMClient
+
+        try:
+            from openai import OpenAI
+        except ImportError as err:
+            raise ImportError(
+                "openai package not installed. Install it: pip install openai"
+            ) from err
+
+        if not self.api_key:
+            raise ValueError(
+                "OpenAI API key not set. "
+                "Pass api_key or export OPENAI_API_KEY."
+            )
+
+        resolved_model = model or self.default_model
+        client = OpenAI(api_key=self.api_key)
+        return LLMClient("openai", client, resolved_model)
+
+
+class AnthropicProvider:
+    """Concrete LLM provider for Anthropic Claude models.
+
+    Implements the LLMProvider protocol using the Anthropic API.
+    Reads the API key from the ``ANTHROPIC_API_KEY`` environment variable.
+
+    Args:
+        api_key: Anthropic API key.  Defaults to the ``ANTHROPIC_API_KEY``
+            environment variable when ``None``.
+        default_model: Model name used when ``create_client`` is called
+            without an explicit *model* argument
+            (default: ``"claude-sonnet-4-20250514"``).
+
+    Example:
+        >>> provider = AnthropicProvider()
+        >>> client = provider.create_client()
+        >>> client.provider
+        'anthropic'
+    """
+
+    def __init__(
+        self,
+        api_key: str | None = None,
+        default_model: str = "claude-sonnet-4-20250514",
+    ) -> None:
+        import os
+
+        self.api_key = api_key or os.environ.get("ANTHROPIC_API_KEY")
+        self.default_model = default_model
+
+    def create_client(self, model: str | None = None) -> Any:
+        """Create and return an Anthropic LLM client.
+
+        Args:
+            model: Model name override.  Falls back to *default_model* when
+                ``None``.
+
+        Returns:
+            :class:`scripts.llm_client.LLMClient` configured for Anthropic.
+
+        Raises:
+            ValueError: If ``ANTHROPIC_API_KEY`` is not set.
+            ImportError: If the ``anthropic`` package is not installed.
+        """
+        from scripts.llm_client import LLMClient
+
+        try:
+            import anthropic
+        except ImportError as err:
+            raise ImportError(
+                "anthropic package not installed. Install it: pip install anthropic"
+            ) from err
+
+        if not self.api_key:
+            raise ValueError(
+                "Anthropic API key not set. "
+                "Pass api_key or export ANTHROPIC_API_KEY."
+            )
+
+        resolved_model = model or self.default_model
+        client = anthropic.Anthropic(api_key=self.api_key)
+        return LLMClient("anthropic", client, resolved_model)
 
 
 # CrewAI Tools - Optional dependency for testing
@@ -83,7 +210,7 @@ try:
     )
 
     CREWAI_TOOLS_AVAILABLE = True
-except ImportError:
+except ImportError:  # pragma: no cover
     # For testing without full CrewAI installation
     CREWAI_TOOLS_AVAILABLE = False
     CodeInterpreterTool = None
@@ -97,7 +224,7 @@ except ImportError:
 # Import existing GitHub tools
 try:
     from scripts.tools.github_project_tool import github_project_add_issue
-except ImportError as err:
+except ImportError as err:  # pragma: no cover
     logger.warning(f"GitHub Project V2 tool not available: {err}")
     github_project_add_issue = None
 

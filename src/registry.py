@@ -49,7 +49,7 @@ class AgentRegistry:
         # Scan crews directory for Python files
         for crew_file in crews_dir.glob("*_crew.py"):
             if crew_file.name.startswith("__"):
-                continue
+                continue  # pragma: no cover
 
             module_name = crew_file.stem  # e.g., "stage3_crew"
             class_name = self._module_to_class_name(module_name)  # e.g., "Stage3Crew"

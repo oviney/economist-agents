@@ -1,0 +1,1586 @@
+{
+  "version": "1.0",
+  "created": "2025-12-02T15:39:25.391403",
+  "runs": [
+    {
+      "timestamp": "2025-12-02T15:39:25.391406",
+      "agents": {
+        "research_agent": {
+          "data_points": 10,
+          "verified": 7,
+          "unverified": 3,
+          "verification_rate": 73.2,
+          "sources": [
+            "Gartner 2024",
+            "TestGuild Survey"
+          ],
+          "prediction": "High verification rate (>80%)",
+          "actual": "Needs improvement"
+        },
+        "writer_agent": {
+          "word_count": 1259,
+          "banned_phrases": 1,
+          "validation_passed": false,
+          "regenerations": 1,
+          "chart_embedded": true,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Needs improvement"
+        },
+        "editor_agent": {
+          "gates_passed": 3,
+          "gates_failed": 2,
+          "gate_pass_rate": 60.0,
+          "edits_made": 8,
+          "quality_issues": [
+            "Style",
+            "Structure"
+          ],
+          "prediction": "All gates pass (5/5)",
+          "actual": "Failed 2 gates"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 0,
+          "visual_qa_pass_rate": 0.0,
+          "zone_violations": 1,
+          "regenerations": 1,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "1 violations"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 0,
+        "success_rate": 0.0
+      }
+    },
+    {
+      "timestamp": "2025-12-07T15:39:25.391417",
+      "agents": {
+        "research_agent": {
+          "data_points": 10,
+          "verified": 8,
+          "unverified": 2,
+          "verification_rate": 79.5,
+          "sources": [
+            "Gartner 2024",
+            "TestGuild Survey"
+          ],
+          "prediction": "High verification rate (>80%)",
+          "actual": "Needs improvement"
+        },
+        "writer_agent": {
+          "word_count": 1000,
+          "banned_phrases": 1,
+          "validation_passed": false,
+          "regenerations": 1,
+          "chart_embedded": true,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Needs improvement"
+        },
+        "editor_agent": {
+          "gates_passed": 4,
+          "gates_failed": 1,
+          "gate_pass_rate": 80.0,
+          "edits_made": 10,
+          "quality_issues": [
+            "Style",
+            "Structure"
+          ],
+          "prediction": "All gates pass (5/5)",
+          "actual": "Failed 1 gates"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 1,
+          "visual_qa_pass_rate": 100.0,
+          "zone_violations": 0,
+          "regenerations": 0,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 1,
+        "success_rate": 25.0
+      }
+    },
+    {
+      "timestamp": "2025-12-12T15:39:25.391425",
+      "agents": {
+        "research_agent": {
+          "data_points": 10,
+          "verified": 8,
+          "unverified": 2,
+          "verification_rate": 82.5,
+          "sources": [
+            "Gartner 2024",
+            "TestGuild Survey"
+          ],
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "writer_agent": {
+          "word_count": 1000,
+          "banned_phrases": 0,
+          "validation_passed": true,
+          "regenerations": 0,
+          "chart_embedded": true,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Pass"
+        },
+        "editor_agent": {
+          "gates_passed": 5,
+          "gates_failed": 0,
+          "gate_pass_rate": 100.0,
+          "edits_made": 11,
+          "quality_issues": [],
+          "prediction": "All gates pass (5/5)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 1,
+          "visual_qa_pass_rate": 100.0,
+          "zone_violations": 0,
+          "regenerations": 0,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 4,
+        "success_rate": 100.0
+      }
+    },
+    {
+      "timestamp": "2025-12-17T15:39:25.391430",
+      "agents": {
+        "research_agent": {
+          "data_points": 10,
+          "verified": 9,
+          "unverified": 1,
+          "verification_rate": 85.6,
+          "sources": [
+            "Gartner 2024",
+            "TestGuild Survey"
+          ],
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "writer_agent": {
+          "word_count": 1285,
+          "banned_phrases": 0,
+          "validation_passed": true,
+          "regenerations": 0,
+          "chart_embedded": true,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Pass"
+        },
+        "editor_agent": {
+          "gates_passed": 6,
+          "gates_failed": -1,
+          "gate_pass_rate": 120.0,
+          "edits_made": 12,
+          "quality_issues": [
+            "Style",
+            "Structure"
+          ],
+          "prediction": "All gates pass (5/5)",
+          "actual": "Failed -1 gates"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 1,
+          "visual_qa_pass_rate": 100.0,
+          "zone_violations": 0,
+          "regenerations": 0,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 3,
+        "success_rate": 75.0
+      }
+    },
+    {
+      "timestamp": "2025-12-22T15:39:25.391434",
+      "agents": {
+        "research_agent": {
+          "data_points": 10,
+          "verified": 9,
+          "unverified": 1,
+          "verification_rate": 92.4,
+          "sources": [
+            "Gartner 2024",
+            "TestGuild Survey"
+          ],
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "writer_agent": {
+          "word_count": 1066,
+          "banned_phrases": 0,
+          "validation_passed": true,
+          "regenerations": 0,
+          "chart_embedded": true,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Pass"
+        },
+        "editor_agent": {
+          "gates_passed": 7,
+          "gates_failed": -2,
+          "gate_pass_rate": 140.0,
+          "edits_made": 6,
+          "quality_issues": [
+            "Style",
+            "Structure"
+          ],
+          "prediction": "All gates pass (5/5)",
+          "actual": "Failed -2 gates"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 1,
+          "visual_qa_pass_rate": 100.0,
+          "zone_violations": 0,
+          "regenerations": 0,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 3,
+        "success_rate": 75.0
+      }
+    },
+    {
+      "timestamp": "2025-12-27T15:39:25.391437",
+      "agents": {
+        "research_agent": {
+          "data_points": 10,
+          "verified": 10,
+          "unverified": 0,
+          "verification_rate": 95.0,
+          "sources": [
+            "Gartner 2024",
+            "TestGuild Survey"
+          ],
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "writer_agent": {
+          "word_count": 1223,
+          "banned_phrases": 0,
+          "validation_passed": true,
+          "regenerations": 0,
+          "chart_embedded": true,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Pass"
+        },
+        "editor_agent": {
+          "gates_passed": 5,
+          "gates_failed": 0,
+          "gate_pass_rate": 100.0,
+          "edits_made": 12,
+          "quality_issues": [],
+          "prediction": "All gates pass (5/5)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 1,
+          "visual_qa_pass_rate": 100.0,
+          "zone_violations": 0,
+          "regenerations": 0,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 4,
+        "success_rate": 100.0
+      }
+    },
+    {
+      "timestamp": "2026-01-01T16:00:48.343182",
+      "agents": {
+        "research_agent": {
+          "data_points": 3,
+          "verified": 3,
+          "unverified": 1,
+          "verification_rate": 100.0,
+          "sources": [],
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "writer_agent": {
+          "word_count": 436,
+          "banned_phrases": 0,
+          "validation_passed": false,
+          "regenerations": 1,
+          "chart_embedded": true,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Pass"
+        },
+        "editor_agent": {
+          "gates_passed": 6,
+          "gates_failed": 1,
+          "gate_pass_rate": 85.7,
+          "edits_made": -216,
+          "quality_issues": [
+            "1 gates failed"
+          ],
+          "prediction": "All gates pass (5/5)",
+          "actual": "Failed 1 gates"
+        }
+      },
+      "summary": {
+        "agents_tracked": 3,
+        "agents_successful": 2,
+        "success_rate": 66.7
+      }
+    },
+    {
+      "timestamp": "2026-01-01T19:33:54.724931",
+      "agents": {
+        "research_agent": {
+          "data_points": 10,
+          "verified": 9,
+          "unverified": 1,
+          "verification_rate": 90.0,
+          "sources": [
+            "Gartner 2024",
+            "TestGuild Survey"
+          ],
+          "validation_passed": true,
+          "quality_score": 90.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "writer_agent": {
+          "word_count": 1200,
+          "banned_phrases": 0,
+          "validation_passed": true,
+          "regenerations": 0,
+          "chart_embedded": true,
+          "quality_score": 100,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Pass"
+        },
+        "editor_agent": {
+          "gates_passed": 5,
+          "gates_failed": 0,
+          "gate_pass_rate": 100.0,
+          "edits_made": 12,
+          "quality_issues": [],
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "All gates pass (5/5)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 1,
+          "visual_qa_pass_rate": 100.0,
+          "zone_violations": 0,
+          "regenerations": 0,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 4,
+        "success_rate": 100.0
+      }
+    },
+    {
+      "timestamp": "2026-01-01T19:51:35.875005",
+      "agents": {
+        "research_agent": {
+          "data_points": 10,
+          "verified": 9,
+          "unverified": 1,
+          "verification_rate": 90.0,
+          "sources": [
+            "Gartner 2024",
+            "TestGuild Survey"
+          ],
+          "validation_passed": true,
+          "quality_score": 90.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "writer_agent": {
+          "word_count": 1200,
+          "banned_phrases": 0,
+          "validation_passed": true,
+          "regenerations": 0,
+          "chart_embedded": true,
+          "quality_score": 100,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Pass"
+        },
+        "editor_agent": {
+          "gates_passed": 5,
+          "gates_failed": 0,
+          "gate_pass_rate": 100.0,
+          "edits_made": 12,
+          "quality_issues": [],
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "All gates pass (5/5)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 1,
+          "visual_qa_pass_rate": 100.0,
+          "zone_violations": 0,
+          "regenerations": 0,
+          "validation_passed": true,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 4,
+        "success_rate": 100.0
+      }
+    },
+    {
+      "timestamp": "2026-01-01T20:23:21.848177",
+      "agents": {
+        "research_agent": {
+          "data_points": 4,
+          "verified": 3,
+          "unverified": 1,
+          "verification_rate": 75.0,
+          "sources": [],
+          "validation_passed": true,
+          "quality_score": 75.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "High verification rate (>80%)",
+          "actual": "Needs improvement"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 1,
+          "visual_qa_pass_rate": 100.0,
+          "zone_violations": 0,
+          "regenerations": 0,
+          "validation_passed": true,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "Pass"
+        },
+        "writer_agent": {
+          "word_count": 545,
+          "banned_phrases": 0,
+          "validation_passed": false,
+          "regenerations": 1,
+          "chart_embedded": true,
+          "quality_score": 70,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Pass"
+        },
+        "editor_agent": {
+          "gates_passed": 4,
+          "gates_failed": 2,
+          "gate_pass_rate": 66.7,
+          "edits_made": -177,
+          "quality_issues": [
+            "2 gates failed"
+          ],
+          "quality_score": 61.7,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "All gates pass (5/5)",
+          "actual": "Failed 2 gates"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 2,
+        "success_rate": 50.0
+      }
+    },
+    {
+      "timestamp": "2026-01-02T20:18:53.990173",
+      "agents": {
+        "research_agent": {
+          "data_points": 3,
+          "verified": 3,
+          "unverified": 2,
+          "verification_rate": 100.0,
+          "sources": [],
+          "validation_passed": true,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "writer_agent": {
+          "word_count": 557,
+          "banned_phrases": 0,
+          "validation_passed": false,
+          "regenerations": 1,
+          "chart_embedded": true,
+          "quality_score": 70,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Pass"
+        },
+        "editor_agent": {
+          "gates_passed": 5,
+          "gates_failed": 6,
+          "gate_pass_rate": 45.5,
+          "edits_made": 47,
+          "quality_issues": [
+            "6 gates failed"
+          ],
+          "quality_score": 40.5,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "All gates pass (5/5)",
+          "actual": "Failed 6 gates"
+        }
+      },
+      "summary": {
+        "agents_tracked": 3,
+        "agents_successful": 2,
+        "success_rate": 66.7
+      }
+    },
+    {
+      "timestamp": "2026-01-03T10:23:14.702031",
+      "agents": {
+        "research_agent": {
+          "data_points": 2,
+          "verified": 2,
+          "unverified": 0,
+          "verification_rate": 100.0,
+          "sources": [],
+          "validation_passed": true,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 0,
+          "visual_qa_pass_rate": 0.0,
+          "zone_violations": 1,
+          "regenerations": 0,
+          "validation_passed": false,
+          "quality_score": 0,
+          "token_usage": 0,
+          "cost_per_quality_unit": Infinity,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "1 violations"
+        },
+        "writer_agent": {
+          "word_count": 139,
+          "banned_phrases": 0,
+          "validation_passed": false,
+          "regenerations": 1,
+          "chart_embedded": false,
+          "quality_score": 50,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Needs improvement"
+        },
+        "editor_agent": {
+          "gates_passed": 5,
+          "gates_failed": 0,
+          "gate_pass_rate": 100.0,
+          "edits_made": 0,
+          "quality_issues": [],
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "All gates pass (5/5)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 2,
+        "success_rate": 50.0
+      }
+    },
+    {
+      "timestamp": "2026-01-03T10:29:28.592353",
+      "agents": {
+        "research_agent": {
+          "data_points": 2,
+          "verified": 2,
+          "unverified": 0,
+          "verification_rate": 100.0,
+          "sources": [],
+          "validation_passed": true,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 0,
+          "visual_qa_pass_rate": 0.0,
+          "zone_violations": 1,
+          "regenerations": 0,
+          "validation_passed": false,
+          "quality_score": 0,
+          "token_usage": 0,
+          "cost_per_quality_unit": Infinity,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "1 violations"
+        },
+        "writer_agent": {
+          "word_count": 139,
+          "banned_phrases": 0,
+          "validation_passed": false,
+          "regenerations": 1,
+          "chart_embedded": false,
+          "quality_score": 50,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Needs improvement"
+        },
+        "editor_agent": {
+          "gates_passed": 5,
+          "gates_failed": 0,
+          "gate_pass_rate": 100.0,
+          "edits_made": 0,
+          "quality_issues": [],
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "All gates pass (5/5)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 2,
+        "success_rate": 50.0
+      }
+    },
+    {
+      "timestamp": "2026-01-03T10:29:47.046971",
+      "agents": {
+        "research_agent": {
+          "data_points": 2,
+          "verified": 2,
+          "unverified": 0,
+          "verification_rate": 100.0,
+          "sources": [],
+          "validation_passed": true,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 0,
+          "visual_qa_pass_rate": 0.0,
+          "zone_violations": 1,
+          "regenerations": 0,
+          "validation_passed": false,
+          "quality_score": 0,
+          "token_usage": 0,
+          "cost_per_quality_unit": Infinity,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "1 violations"
+        },
+        "writer_agent": {
+          "word_count": 139,
+          "banned_phrases": 0,
+          "validation_passed": false,
+          "regenerations": 1,
+          "chart_embedded": false,
+          "quality_score": 50,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Needs improvement"
+        },
+        "editor_agent": {
+          "gates_passed": 5,
+          "gates_failed": 0,
+          "gate_pass_rate": 100.0,
+          "edits_made": 0,
+          "quality_issues": [],
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "All gates pass (5/5)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 2,
+        "success_rate": 50.0
+      }
+    },
+    {
+      "timestamp": "2026-01-03T10:32:24.741698",
+      "agents": {
+        "research_agent": {
+          "data_points": 2,
+          "verified": 2,
+          "unverified": 0,
+          "verification_rate": 100.0,
+          "sources": [],
+          "validation_passed": true,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 0,
+          "visual_qa_pass_rate": 0.0,
+          "zone_violations": 1,
+          "regenerations": 0,
+          "validation_passed": false,
+          "quality_score": 0,
+          "token_usage": 0,
+          "cost_per_quality_unit": Infinity,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "1 violations"
+        },
+        "writer_agent": {
+          "word_count": 139,
+          "banned_phrases": 0,
+          "validation_passed": false,
+          "regenerations": 1,
+          "chart_embedded": false,
+          "quality_score": 50,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Needs improvement"
+        },
+        "editor_agent": {
+          "gates_passed": 5,
+          "gates_failed": 0,
+          "gate_pass_rate": 100.0,
+          "edits_made": 0,
+          "quality_issues": [],
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "All gates pass (5/5)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 2,
+        "success_rate": 50.0
+      }
+    },
+    {
+      "timestamp": "2026-01-03T10:32:48.861286",
+      "agents": {
+        "research_agent": {
+          "data_points": 2,
+          "verified": 2,
+          "unverified": 0,
+          "verification_rate": 100.0,
+          "sources": [],
+          "validation_passed": true,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 0,
+          "visual_qa_pass_rate": 0.0,
+          "zone_violations": 1,
+          "regenerations": 0,
+          "validation_passed": false,
+          "quality_score": 0,
+          "token_usage": 0,
+          "cost_per_quality_unit": Infinity,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "1 violations"
+        },
+        "writer_agent": {
+          "word_count": 139,
+          "banned_phrases": 0,
+          "validation_passed": false,
+          "regenerations": 1,
+          "chart_embedded": false,
+          "quality_score": 50,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Needs improvement"
+        },
+        "editor_agent": {
+          "gates_passed": 5,
+          "gates_failed": 0,
+          "gate_pass_rate": 100.0,
+          "edits_made": 0,
+          "quality_issues": [],
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "All gates pass (5/5)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 2,
+        "success_rate": 50.0
+      }
+    },
+    {
+      "timestamp": "2026-01-03T10:50:44.034084",
+      "agents": {
+        "research_agent": {
+          "data_points": 2,
+          "verified": 2,
+          "unverified": 0,
+          "verification_rate": 100.0,
+          "sources": [],
+          "validation_passed": true,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 0,
+          "visual_qa_pass_rate": 0.0,
+          "zone_violations": 1,
+          "regenerations": 0,
+          "validation_passed": false,
+          "quality_score": 0,
+          "token_usage": 0,
+          "cost_per_quality_unit": Infinity,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "1 violations"
+        },
+        "writer_agent": {
+          "word_count": 139,
+          "banned_phrases": 0,
+          "validation_passed": false,
+          "regenerations": 1,
+          "chart_embedded": false,
+          "quality_score": 50,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Needs improvement"
+        },
+        "editor_agent": {
+          "gates_passed": 5,
+          "gates_failed": 0,
+          "gate_pass_rate": 100.0,
+          "edits_made": 0,
+          "quality_issues": [],
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "All gates pass (5/5)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 2,
+        "success_rate": 50.0
+      }
+    },
+    {
+      "timestamp": "2026-01-03T10:51:05.718388",
+      "agents": {
+        "research_agent": {
+          "data_points": 2,
+          "verified": 2,
+          "unverified": 0,
+          "verification_rate": 100.0,
+          "sources": [],
+          "validation_passed": true,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 0,
+          "visual_qa_pass_rate": 0.0,
+          "zone_violations": 1,
+          "regenerations": 0,
+          "validation_passed": false,
+          "quality_score": 0,
+          "token_usage": 0,
+          "cost_per_quality_unit": Infinity,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "1 violations"
+        },
+        "writer_agent": {
+          "word_count": 139,
+          "banned_phrases": 0,
+          "validation_passed": false,
+          "regenerations": 1,
+          "chart_embedded": false,
+          "quality_score": 50,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Needs improvement"
+        },
+        "editor_agent": {
+          "gates_passed": 5,
+          "gates_failed": 0,
+          "gate_pass_rate": 100.0,
+          "edits_made": 0,
+          "quality_issues": [],
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "All gates pass (5/5)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 2,
+        "success_rate": 50.0
+      }
+    },
+    {
+      "timestamp": "2026-01-03T11:49:34.563307",
+      "agents": {
+        "research_agent": {
+          "data_points": 2,
+          "verified": 2,
+          "unverified": 0,
+          "verification_rate": 100.0,
+          "sources": [],
+          "validation_passed": true,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 0,
+          "visual_qa_pass_rate": 0.0,
+          "zone_violations": 1,
+          "regenerations": 0,
+          "validation_passed": false,
+          "quality_score": 0,
+          "token_usage": 0,
+          "cost_per_quality_unit": Infinity,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "1 violations"
+        },
+        "writer_agent": {
+          "word_count": 139,
+          "banned_phrases": 0,
+          "validation_passed": false,
+          "regenerations": 1,
+          "chart_embedded": false,
+          "quality_score": 50,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Needs improvement"
+        },
+        "editor_agent": {
+          "gates_passed": 5,
+          "gates_failed": 0,
+          "gate_pass_rate": 100.0,
+          "edits_made": 0,
+          "quality_issues": [],
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "All gates pass (5/5)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 2,
+        "success_rate": 50.0
+      }
+    },
+    {
+      "timestamp": "2026-01-03T11:50:03.552321",
+      "agents": {
+        "research_agent": {
+          "data_points": 2,
+          "verified": 2,
+          "unverified": 0,
+          "verification_rate": 100.0,
+          "sources": [],
+          "validation_passed": true,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 0,
+          "visual_qa_pass_rate": 0.0,
+          "zone_violations": 1,
+          "regenerations": 0,
+          "validation_passed": false,
+          "quality_score": 0,
+          "token_usage": 0,
+          "cost_per_quality_unit": Infinity,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "1 violations"
+        },
+        "writer_agent": {
+          "word_count": 139,
+          "banned_phrases": 0,
+          "validation_passed": false,
+          "regenerations": 1,
+          "chart_embedded": false,
+          "quality_score": 50,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Needs improvement"
+        },
+        "editor_agent": {
+          "gates_passed": 5,
+          "gates_failed": 0,
+          "gate_pass_rate": 100.0,
+          "edits_made": 0,
+          "quality_issues": [],
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "All gates pass (5/5)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 2,
+        "success_rate": 50.0
+      }
+    },
+    {
+      "timestamp": "2026-01-03T12:59:41.155033",
+      "agents": {
+        "research_agent": {
+          "data_points": 2,
+          "verified": 2,
+          "unverified": 0,
+          "verification_rate": 100.0,
+          "sources": [],
+          "validation_passed": true,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 0,
+          "visual_qa_pass_rate": 0.0,
+          "zone_violations": 1,
+          "regenerations": 0,
+          "validation_passed": false,
+          "quality_score": 0,
+          "token_usage": 0,
+          "cost_per_quality_unit": Infinity,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "1 violations"
+        },
+        "writer_agent": {
+          "word_count": 139,
+          "banned_phrases": 0,
+          "validation_passed": false,
+          "regenerations": 1,
+          "chart_embedded": false,
+          "quality_score": 50,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Needs improvement"
+        },
+        "editor_agent": {
+          "gates_passed": 5,
+          "gates_failed": 0,
+          "gate_pass_rate": 100.0,
+          "edits_made": 0,
+          "quality_issues": [],
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "All gates pass (5/5)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 2,
+        "success_rate": 50.0
+      }
+    },
+    {
+      "timestamp": "2026-01-03T13:00:02.960112",
+      "agents": {
+        "research_agent": {
+          "data_points": 2,
+          "verified": 2,
+          "unverified": 0,
+          "verification_rate": 100.0,
+          "sources": [],
+          "validation_passed": true,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 0,
+          "visual_qa_pass_rate": 0.0,
+          "zone_violations": 1,
+          "regenerations": 0,
+          "validation_passed": false,
+          "quality_score": 0,
+          "token_usage": 0,
+          "cost_per_quality_unit": Infinity,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "1 violations"
+        },
+        "writer_agent": {
+          "word_count": 139,
+          "banned_phrases": 0,
+          "validation_passed": false,
+          "regenerations": 1,
+          "chart_embedded": false,
+          "quality_score": 50,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Needs improvement"
+        },
+        "editor_agent": {
+          "gates_passed": 5,
+          "gates_failed": 0,
+          "gate_pass_rate": 100.0,
+          "edits_made": 0,
+          "quality_issues": [],
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "All gates pass (5/5)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 2,
+        "success_rate": 50.0
+      }
+    },
+    {
+      "timestamp": "2026-01-03T13:00:35.837112",
+      "agents": {
+        "research_agent": {
+          "data_points": 2,
+          "verified": 2,
+          "unverified": 0,
+          "verification_rate": 100.0,
+          "sources": [],
+          "validation_passed": true,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 0,
+          "visual_qa_pass_rate": 0.0,
+          "zone_violations": 1,
+          "regenerations": 0,
+          "validation_passed": false,
+          "quality_score": 0,
+          "token_usage": 0,
+          "cost_per_quality_unit": Infinity,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "1 violations"
+        },
+        "writer_agent": {
+          "word_count": 139,
+          "banned_phrases": 0,
+          "validation_passed": false,
+          "regenerations": 1,
+          "chart_embedded": false,
+          "quality_score": 50,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Needs improvement"
+        },
+        "editor_agent": {
+          "gates_passed": 5,
+          "gates_failed": 0,
+          "gate_pass_rate": 100.0,
+          "edits_made": 0,
+          "quality_issues": [],
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "All gates pass (5/5)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 2,
+        "success_rate": 50.0
+      }
+    },
+    {
+      "timestamp": "2026-01-03T13:01:00.812887",
+      "agents": {
+        "research_agent": {
+          "data_points": 2,
+          "verified": 2,
+          "unverified": 0,
+          "verification_rate": 100.0,
+          "sources": [],
+          "validation_passed": true,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 0,
+          "visual_qa_pass_rate": 0.0,
+          "zone_violations": 1,
+          "regenerations": 0,
+          "validation_passed": false,
+          "quality_score": 0,
+          "token_usage": 0,
+          "cost_per_quality_unit": Infinity,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "1 violations"
+        },
+        "writer_agent": {
+          "word_count": 139,
+          "banned_phrases": 0,
+          "validation_passed": false,
+          "regenerations": 1,
+          "chart_embedded": false,
+          "quality_score": 50,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Needs improvement"
+        },
+        "editor_agent": {
+          "gates_passed": 5,
+          "gates_failed": 0,
+          "gate_pass_rate": 100.0,
+          "edits_made": 0,
+          "quality_issues": [],
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "All gates pass (5/5)",
+          "actual": "Pass"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 2,
+        "success_rate": 50.0
+      }
+    },
+    {
+      "timestamp": "2026-01-18T12:26:08.595826",
+      "agents": {
+        "research_agent": {
+          "data_points": 4,
+          "verified": 4,
+          "unverified": 1,
+          "verification_rate": 100.0,
+          "sources": [],
+          "validation_passed": true,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 1,
+          "visual_qa_pass_rate": 100.0,
+          "zone_violations": 0,
+          "regenerations": 0,
+          "validation_passed": true,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "Pass"
+        },
+        "writer_agent": {
+          "word_count": 715,
+          "banned_phrases": 0,
+          "validation_passed": false,
+          "regenerations": 0,
+          "chart_embedded": true,
+          "quality_score": 70,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Pass"
+        },
+        "editor_agent": {
+          "gates_passed": 2,
+          "gates_failed": 3,
+          "gate_pass_rate": 40.0,
+          "edits_made": -155,
+          "quality_issues": [
+            "3 gates failed"
+          ],
+          "quality_score": 35.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "All gates pass (5/5)",
+          "actual": "Failed 3 gates"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 3,
+        "success_rate": 75.0
+      }
+    },
+    {
+      "timestamp": "2026-01-18T12:39:07.095093",
+      "agents": {
+        "research_agent": {
+          "data_points": 4,
+          "verified": 4,
+          "unverified": 2,
+          "verification_rate": 100.0,
+          "sources": [],
+          "validation_passed": true,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 1,
+          "visual_qa_pass_rate": 100.0,
+          "zone_violations": 0,
+          "regenerations": 0,
+          "validation_passed": true,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "Pass"
+        },
+        "writer_agent": {
+          "word_count": 695,
+          "banned_phrases": 0,
+          "validation_passed": false,
+          "regenerations": 0,
+          "chart_embedded": true,
+          "quality_score": 70,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Pass"
+        },
+        "editor_agent": {
+          "gates_passed": 4,
+          "gates_failed": 1,
+          "gate_pass_rate": 80.0,
+          "edits_made": -85,
+          "quality_issues": [
+            "1 gates failed"
+          ],
+          "quality_score": 75.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "All gates pass (5/5)",
+          "actual": "Failed 1 gates"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 3,
+        "success_rate": 75.0
+      }
+    },
+    {
+      "timestamp": "2026-01-18T12:42:08.554915",
+      "agents": {
+        "research_agent": {
+          "data_points": 4,
+          "verified": 4,
+          "unverified": 2,
+          "verification_rate": 100.0,
+          "sources": [],
+          "validation_passed": true,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "High verification rate (>80%)",
+          "actual": "Pass"
+        },
+        "graphics_agent": {
+          "charts_generated": 1,
+          "visual_qa_passed": 1,
+          "visual_qa_pass_rate": 100.0,
+          "zone_violations": 0,
+          "regenerations": 0,
+          "validation_passed": true,
+          "quality_score": 100.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Pass Visual QA (100%)",
+          "actual": "Pass"
+        },
+        "writer_agent": {
+          "word_count": 626,
+          "banned_phrases": 0,
+          "validation_passed": false,
+          "regenerations": 0,
+          "chart_embedded": true,
+          "quality_score": 70,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "Clean draft (0 banned phrases, chart embedded)",
+          "actual": "Pass"
+        },
+        "editor_agent": {
+          "gates_passed": 3,
+          "gates_failed": 2,
+          "gate_pass_rate": 60.0,
+          "edits_made": 52,
+          "quality_issues": [
+            "2 gates failed"
+          ],
+          "quality_score": 55.0,
+          "token_usage": 0,
+          "cost_per_quality_unit": 0.0,
+          "prediction": "All gates pass (5/5)",
+          "actual": "Failed 2 gates"
+        }
+      },
+      "summary": {
+        "agents_tracked": 4,
+        "agents_successful": 3,
+        "success_rate": 75.0
+      }
+    }
+  ],
+  "summary": {
+    "total_runs": 27,
+    "agents": {
+      "research_agent": {
+        "total_runs": 27,
+        "avg_verification_rate": 94.9,
+        "avg_quality_score": 97.8,
+        "validation_pass_rate": 100.0,
+        "trend": "improving \u2b06\ufe0f"
+      },
+      "writer_agent": {
+        "total_runs": 27,
+        "clean_draft_rate": 92.6,
+        "avg_regenerations": 0.7,
+        "avg_quality_score": 60.0,
+        "validation_pass_rate": 22.2,
+        "rework_rate": 66.7
+      },
+      "editor_agent": {
+        "total_runs": 27,
+        "avg_gate_pass_rate": 91.8,
+        "avg_quality_score": 88.4,
+        "trend": "stable \u27a1\ufe0f"
+      },
+      "graphics_agent": {
+        "total_runs": 25,
+        "avg_qa_pass_rate": 44.0,
+        "avg_quality_score": 31.6,
+        "avg_violations": 0.6,
+        "validation_pass_rate": 48.0
+      }
+    }
+  }
+}

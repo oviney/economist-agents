@@ -1,0 +1,3124 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Multi-agent content pipeline that generates Economist-style articles with autonomous research, writing, illustration, and deployment">
+      
+      
+      
+        <link rel="canonical" href="https://oviney.github.io/economist-agents/archive/ci-reports/BACKLOG_SETUP_REPORT/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Backlog Setup Report - Economist Agents</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#backlog-setup-report" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Economist Agents" class="md-header__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Economist Agents
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Backlog Setup Report
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/oviney/economist-agents" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    oviney/economist-agents
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../agent-registry-spec/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../adr/ADR-001-agent-framework-selection/" class="md-tabs__link">
+          
+  
+  
+  ADRs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../skills/agent-delegation/SKILL/" class="md-tabs__link">
+          
+  
+  
+  Skills
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../guides/WORKFLOW_GUIDE/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../CREWAI_API_REFERENCE/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../AGENT_VELOCITY_ANALYSIS/" class="md-tabs__link">
+          
+  
+  
+  Performance
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Economist Agents" class="md-nav__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Economist Agents
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/oviney/economist-agents" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    oviney/economist-agents
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../agent-registry-spec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../FLOW_ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../AUTONOMOUS_ORCHESTRATION_STRATEGY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autonomous Orchestration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../CREWAI_CONTEXT_ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shared Context System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../ARCHITECTURE_PATTERNS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../ARCHITECTURE_REVIEW_PROCESS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Review Process
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADRs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADRs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../adr/ADR-001-agent-framework-selection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-001 — Agent Framework Selection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../adr/ADR-002-content-intelligence-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-002 — Content Intelligence Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../adr/ADR-003-agent-skill-governance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-003 — Agent Skill Governance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../ADR-004-python-version-constraint/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-004 — Python Version Constraint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../ADR-005-agile-discipline-enforcement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-005 — Agile Discipline Enforcement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skills
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Skills
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../skills/agent-delegation/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Delegation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../skills/research-sourcing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research Sourcing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../skills/economist-writing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Economist Writing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../skills/editorial-illustration/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Editorial Illustration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../skills/article-evaluation/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Article Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../skills/quality-gates/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quality Gates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../skills/python-quality/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python Quality
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../skills/testing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../skills/defect-prevention/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Defect Prevention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../skills/devops/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DevOps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../skills/sprint-management/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../skills/scrum-master/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scrum Master
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../skills/agent-traceability/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Traceability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../skills/observability/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../skills/mcp-development/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guides/WORKFLOW_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guides/BLOG_DEPLOYMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guides/COPILOT_SYNC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Copilot Sync
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guides/CI_MONITORING_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CI Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guides/PYTHON_VERSION_TROUBLESHOOTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guides/IMPLEMENTATION_ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guides/VALIDATION_QUICK_REF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation Quick Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../CREWAI_API_REFERENCE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CrewAI API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../AGENT_PROMPT_PATTERNS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Prompt Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../AGENT_QUALITY_GATES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quality Gates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../DEFINITION_OF_DONE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Definition of Done
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../DEFECT_PREVENTION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Defect Prevention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../CHART_DESIGN_SPEC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chart Design Spec
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Performance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../AGENT_VELOCITY_ANALYSIS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Velocity Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../SPRINT_DISCIPLINE_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint Discipline Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#executive-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Executive Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#issues-created" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Issues Created
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Issues Created">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#total-6-issues-github-27-32" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Total: 6 Issues (GitHub #27-#32)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#priority-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Priority Distribution
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Priority Distribution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#by-priority-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        By Priority Level
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prioritization-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prioritization Strategy
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#milestones-created" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Milestones Created
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Milestones Created">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#total-7-phase-based-milestones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Total: 7 Phase-Based Milestones
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#labels-configured" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Labels Configured
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Labels Configured">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#priority-labels-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Priority Labels (4)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#type-labels-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Type Labels (5)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#effort-labels-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Effort Labels (3)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#special-labels-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Special Labels (2)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-1-scope-for-next-sprint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1 Scope (For Next Sprint)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 1 Scope (For Next Sprint)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-goal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase Goal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issues-in-phase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Issues in Phase 1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-timeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase Timeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-1-deliverables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1 Deliverables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#definition-of-done" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition of Done
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependencies-blockers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependencies &amp; Blockers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dependencies &amp; Blockers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-status-no-blockers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Status: ✅ No Blockers
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#estimated-timeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Estimated Timeline
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Estimated Timeline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quarter-1-jan-mar-2026-foundation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quarter 1 (Jan-Mar 2026): Foundation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quarter-2-apr-jun-2026-enhancement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quarter 2 (Apr-Jun 2026): Enhancement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#velocity-assumptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Velocity Assumptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sphase-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SPhase Metrics
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SPhase Metrics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sprint-1-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sprint 1 Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project-wide-metrics-by-q2-end" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Project-Wide Metrics (by Q2 end)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#automation-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Automation &amp; Tools
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Automation &amp; Tools">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#github-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scripts-available" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scripts Available
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pre-commit-hooks-to-be-added" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pre-commit Hooks (to be added)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#immediate-before-adding-to-sprint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Immediate (Before Adding to Sprint)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-enhancements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional Enhancements
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-1-kickoff-checklist-when-adding-to-sprint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1 Kickoff Checklist (When Adding to Sprint)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#risk-assessment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Risk Assessment
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#team-communication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Team Communication
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Team Communication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#daily-updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Daily Updates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sprint-ceremonies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sprint Ceremonies
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#escalation-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Escalation Path
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reference-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reference Documentation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference Documentation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#strategic-planning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Strategic Planning
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architecture-decision-records" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Decision Records
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#process-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Process Documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conclusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conclusion
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-links" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Links
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="backlog-setup-report">Backlog Setup Report<a class="headerlink" href="#backlog-setup-report" title="Permanent link">&para;</a></h1>
+<p><strong>Date:</strong> January 1, 2026
+<strong>Scrum Master:</strong> AI Agent (autonomous)
+<strong>Project:</strong> economist-agents - Agentic Architecture Evolution</p>
+<hr />
+<h2 id="executive-summary">Executive Summary<a class="headerlink" href="#executive-summary" title="Permanent link">&para;</a></h2>
+<p>✅ <strong>Backlog setup complete and ready for Sprint 1</strong></p>
+<p>The GitHub backlog has been fully configured with 6 strategic issues, 7 phase-based milestones, comprehensive labels, and a detailed Sprint 1 plan. The project is now ready to begin the journey from custom scripts to a modular, framework-enhanced agentic architecture.</p>
+<hr />
+<h2 id="issues-created">Issues Created<a class="headerlink" href="#issues-created" title="Permanent link">&para;</a></h2>
+<h3 id="total-6-issues-github-27-32">Total: 6 Issues (GitHub #27-#32)<a class="headerlink" href="#total-6-issues-github-27-32" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Title</th>
+<th>Priority</th>
+<th>Effort</th>
+<th>Story Points</th>
+<th>Phase</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/oviney/economist-agents/issues/27">#27</a></td>
+<td>Extract Agent Configurations to YAML</td>
+<td>P1</td>
+<td>Medium</td>
+<td>8</td>
+<td>Phase 1 (Weeks 1-2)</td>
+</tr>
+<tr>
+<td><a href="https://github.com/oviney/economist-agents/issues/28">#28</a></td>
+<td>Implement Agent Registry Pattern</td>
+<td>P1</td>
+<td>Medium</td>
+<td>5</td>
+<td>Phase 2 (Weeks 3-4)</td>
+</tr>
+<tr>
+<td><a href="https://github.com/oviney/economist-agents/issues/29">#29</a></td>
+<td>Integrate MCP Tools for Research Agents</td>
+<td>P2</td>
+<td>Medium</td>
+<td>5</td>
+<td>Phase 3 (Weeks 5-6)</td>
+</tr>
+<tr>
+<td><a href="https://github.com/oviney/economist-agents/issues/30">#30</a></td>
+<td>Create Public Skills Library</td>
+<td>P2</td>
+<td>Large</td>
+<td>8</td>
+<td>Phase 5 (Weeks 12-15)</td>
+</tr>
+<tr>
+<td><a href="https://github.com/oviney/economist-agents/issues/31">#31</a></td>
+<td>Research Hierarchical Agent Patterns</td>
+<td>P3</td>
+<td>Small</td>
+<td>3</td>
+<td>Phase 7 (Weeks 21-22)</td>
+</tr>
+<tr>
+<td><a href="https://github.com/oviney/economist-agents/issues/32">#32</a></td>
+<td>Build Agent Performance Metrics Dashboard</td>
+<td>P3</td>
+<td>Medium</td>
+<td>5</td>
+<td>Phase 6 (Weeks 16-20)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total Story Points:</strong> 34 points across 6 issues</p>
+<hr />
+<h2 id="priority-distribution">Priority Distribution<a class="headerlink" href="#priority-distribution" title="Permanent link">&para;</a></h2>
+<h3 id="by-priority-level">By Priority Level<a class="headerlink" href="#by-priority-level" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>P1 (Critical/High):</strong> 2 issues (13 points, 38% of work)</li>
+<li>Foundation work (YAML extraction, Registry)</li>
+<li>
+<p><strong>Sprint 1-2 focus</strong></p>
+</li>
+<li>
+<p><strong>P2 (Medium):</strong> 2 issues (13 points, 38% of work)</p>
+</li>
+<li>Enhancement work (MCP tools, Public library)</li>
+<li>
+<p><strong>Sprint 3+ focus</strong></p>
+</li>
+<li>
+<p><strong>P3 (Low):</strong> 2 issues (8 points, 24% of work)</p>
+</li>
+<li>Research and optimization work</li>
+<li><strong>Sprint 7+ focus</strong></li>
+</ul>
+<h3 id="prioritization-strategy">Prioritization Strategy<a class="headerlink" href="#prioritization-strategy" title="Permanent link">&para;</a></h3>
+<p><strong>P1 &gt; P2 &gt; P3</strong> ensures:
+1. Foundation solidified first (YAML, Registry)
+2. Quality improvements next (MCP tools)
+3. Community and optimization last (Public library, Metrics)</p>
+<hr />
+<h2 id="milestones-created">Milestones Created<a class="headerlink" href="#milestones-created" title="Permanent link">&para;</a></h2>
+<h3 id="total-7-phase-based-milestones">Total: 7 Phase-Based Milestones<a class="headerlink" href="#total-7-phase-based-milestones" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Title</th>
+<th>Timeline</th>
+<th>Focus Area</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3</td>
+<td>Phase 1 - Foundation</td>
+<td>Jan 2-15, 2026 (2 weeks)</td>
+<td>Agent config extraction</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Phase 2 - Agent Registry</td>
+<td>Jan 16-29, 2026 (2 weeks)</td>
+<td>Registry pattern</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Phase 3 - Tool Integration</td>
+<td>Jan 30 - Feb 12, 2026 (2 weeks)</td>
+<td>MCP tools</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Phase 4 - CrewAI Migration</td>
+<td>Feb 13 - Mar 12, 2026 (4 weeks)</td>
+<td>Framework migration</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Phase 5 - Community</td>
+<td>Mar 13 - Apr 16, 2026 (5 weeks)</td>
+<td>Public skills library</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Phase 6 - Optimization</td>
+<td>Apr 17 - May 21, 2026 (5 weeks)</td>
+<td>Metrics dashboard</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Phase 7 - Advanced Features</td>
+<td>May 22 - Jun 18, 2026 (4 weeks)</td>
+<td>Hierarchical patterns</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total Timeline:</strong> 24 weeks (Q1-Q2 2026)</p>
+<hr />
+<h2 id="labels-configured">Labels Configured<a class="headerlink" href="#labels-configured" title="Permanent link">&para;</a></h2>
+<h3 id="priority-labels-4">Priority Labels (4)<a class="headerlink" href="#priority-labels-4" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>P0</code> - Critical priority (#b60205, red)</li>
+<li><code>P1</code> - High priority (#d93f0b, orange)</li>
+<li><code>P2</code> - Medium priority (#fbca04, yellow)</li>
+<li><code>P3</code> - Low priority (#0e8a16, green)</li>
+</ul>
+<h3 id="type-labels-5">Type Labels (5)<a class="headerlink" href="#type-labels-5" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>type:enhancement</code> - Enhancement (#84b6eb, blue)</li>
+<li><code>type:refactor</code> - Code refactoring (#84b6eb, blue)</li>
+<li><code>type:architecture</code> - Architectural change (#5319e7, purple)</li>
+<li><code>type:research</code> - Research spike (#84b6eb, blue)</li>
+<li><code>bug</code> - Something isn't working (#d73a4a, red)</li>
+</ul>
+<h3 id="effort-labels-3">Effort Labels (3)<a class="headerlink" href="#effort-labels-3" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>effort:small</code> - Small effort (#c2e0c6, light green)</li>
+<li><code>effort:medium</code> - Medium effort (#f9d0c4, peach)</li>
+<li><code>effort:large</code> - Large effort (#f4c2c2, light red)</li>
+</ul>
+<h3 id="special-labels-2">Special Labels (2)<a class="headerlink" href="#special-labels-2" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>sprint-story</code> - Sprint story (#0075ca, blue)</li>
+<li><code>quality</code> - Quality improvement (#d93f0b, orange)</li>
+</ul>
+<hr />
+<h2 id="phase-1-scope-for-next-sprint">Phase 1 Scope (For Next Sprint)<a class="headerlink" href="#phase-1-scope-for-next-sprint" title="Permanent link">&para;</a></h2>
+<h3 id="phase-goal">Phase Goal<a class="headerlink" href="#phase-goal" title="Permanent link">&para;</a></h3>
+<p><strong>Establish modular agent configuration system by extracting all agents to YAML</strong></p>
+<h3 id="issues-in-phase-1">Issues in Phase 1<a class="headerlink" href="#issues-in-phase-1" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Issue #27:</strong> Extract Agent Configurations to YAML (8 points)</li>
+<li>11 agents → YAML format</li>
+<li>JSON Schema for validation</li>
+<li>Agent loader implementation</li>
+<li>Pre-commit hooks</li>
+<li>Documentation</li>
+</ul>
+<h3 id="phase-timeline">Phase Timeline<a class="headerlink" href="#phase-timeline" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Target Start:</strong> When added to sprint backlog</li>
+<li><strong>Estimated Duration:</strong> 2 weeks</li>
+<li><strong>Runs During:</strong> Sprint 4 (or next available)</li>
+<li><strong>Story Points:</strong> 8 points</li>
+</ul>
+<h3 id="phase-1-deliverables">Phase 1 Deliverables<a class="headerlink" href="#phase-1-deliverables" title="Permanent link">&para;</a></h3>
+<ol>
+<li>✅ YAML schema (<code>agents/schema.json</code>)</li>
+<li>✅ Agent loader (<code>scripts/agent_loader.py</code>)</li>
+<li>✅ 11 agents in YAML format</li>
+<li>✅ Unit tests (100% coverage target)</li>
+<li>✅ Pre-commit validation hook</li>
+<li>✅ Documentation (<code>agents/README.md</code>)</li>
+</ol>
+<h3 id="definition-of-done">Definition of Done<a class="headerlink" href="#definition-of-done" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[ ] All acceptance criteria met</li>
+<li>[ ] Tests passing (unit + integration)</li>
+<li>[ ] Documentation updated</li>
+<li>[ ] No regressions in pipeline output</li>
+<li>[ ] Phase review completed</li>
+</ul>
+<hr />
+<h2 id="dependencies-blockers">Dependencies &amp; Blockers<a class="headerlink" href="#dependencies-blockers" title="Permanent link">&para;</a></h2>
+<h3 id="current-status-no-blockers">Current Status: ✅ No Blockers<a class="headerlink" href="#current-status-no-blockers" title="Permanent link">&para;</a></h3>
+<p><strong>Dependencies Documented:</strong>
+- Issue #28 depends on #27 (Registry needs YAML foundation)
+- Issue #29 depends on #28 (MCP tools need Registry)
+- All other issues are independent</p>
+<p><strong>Critical Path:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Phase 1: #27 (YAML) → Runs in Sprint 4+
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  ↓
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Phase 2: #28 (Registry) → Runs in Sprint 5+
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  ↓
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>Phase 3: #29 (MCP Tools) → Runs in Sprint 6+
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>  ↓
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>Phase 4: CrewAI Migration → Runs in Sprint 7-8
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>  ↓
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>Phase 5-7: Community + Optimization → Sprint 9+
+</code></pre></div></p>
+<p><strong>Note:</strong> Phases are scheduled into your existing sprint cadence based on capacity.</p>
+<hr />
+<h2 id="estimated-timeline">Estimated Timeline<a class="headerlink" href="#estimated-timeline" title="Permanent link">&para;</a></h2>
+<h3 id="quarter-1-jan-mar-2026-foundation">Quarter 1 (Jan-Mar 2026): Foundation<a class="headerlink" href="#quarter-1-jan-mar-2026-foundation" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Sprint 1-2:</strong> Issues #27, #28 (13 points)</li>
+<li><strong>Sprint 3:</strong> Issue #29 (5 points)</li>
+<li><strong>Sprint 4-5:</strong> CrewAI Migration (Phase 4)</li>
+<li><strong>Total Q1 Points:</strong> ~18 points delivered</li>
+</ul>
+<h3 id="quarter-2-apr-jun-2026-enhancement">Quarter 2 (Apr-Jun 2026): Enhancement<a class="headerlink" href="#quarter-2-apr-jun-2026-enhancement" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Sprint 6-7:</strong> Issue #30 (8 points)</li>
+<li><strong>Sprint 8-9:</strong> Issue #32 (5 points)</li>
+<li><strong>Sprint 10:</strong> Issue #31 (3 points)</li>
+<li><strong>Total Q2 Points:</strong> ~16 points delivered</li>
+</ul>
+<h3 id="velocity-assumptions">Velocity Assumptions<a class="headerlink" href="#velocity-assumptions" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Target Velocity:</strong> 8-10 points/sprint</li>
+<li><strong>Team Size:</strong> 1 developer (full-time)</li>
+<li><strong>Sprints per Quarter:</strong> 6 sprints (2-week sprints)</li>
+</ul>
+<hr />
+<h2 id="sphase-metrics">SPhase Metrics<a class="headerlink" href="#sphase-metrics" title="Permanent link">&para;</a></h2>
+<h3 id="sprint-1-metrics">Sprint 1 Metrics<a class="headerlink" href="#sprint-1-metrics" title="Permanent link">&para;</a></h3>
+<ul>
+<li>✅ All 11 agents extracted to YAML</li>
+<li>✅ 100% schema validation pass rate</li>
+<li>✅ 0 regressions in pipeline behavior</li>
+<li>✅ Agent load time &lt;100ms</li>
+</ul>
+<h3 id="project-wide-metrics-by-q2-end">Project-Wide Metrics (by Q2 end)<a class="headerlink" href="#project-wide-metrics-by-q2-end" title="Permanent link">&para;</a></h3>
+<ul>
+<li>34 story points completed</li>
+<li>All 6 issues closed</li>
+<li>CrewAI migration complete (Phase 4)</li>
+<li>Public skills library launched</li>
+<li>First community contribution received</li>
+</ul>
+<hr />
+<h2 id="automation-tools">Automation &amp; Tools<a class="headerlink" href="#automation-tools" title="Permanent link">&para;</a></h2>
+<h3 id="github-integration">GitHub Integration<a class="headerlink" href="#github-integration" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Repository:</strong> https://github.com/oviney/economist-agents</li>
+<li><strong>Issues:</strong> 6 issues created (#27-#32)</li>
+<li><strong>Milestones:</strong> 7 milestones configured</li>
+<li><strong>Labels:</strong> 14 labels configured</li>
+</ul>
+<h3 id="scripts-available">Scripts Available<a class="headerlink" href="#scripts-available" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>scripts/github_sprint_sync.py</code> - Sync sprint with GitHub</li>
+<li><code>scripts/sprint_validator.py</code> - Validate sprint discipline</li>
+<li><code>.github/workflows/sprint-discipline.yml</code> - CI enforcement</li>
+</ul>
+<h3 id="pre-commit-hooks-to-be-added">Pre-commit Hooks (to be added)<a class="headerlink" href="#pre-commit-hooks-to-be-added" title="Permanent link">&para;</a></h3>
+<ul>
+<li>YAML validation (<code>yamllint</code>)</li>
+<li>JSON Schema validation (<code>jsonschema</code>)</li>
+<li>Unit test execution (<code>pytest</code>)</li>
+</ul>
+<hr />
+<h3 id="immediate-before-adding-to-sprint">Immediate (Before Adding to Sprint)<a class="headerlink" href="#immediate-before-adding-to-sprint" title="Permanent link">&para;</a></h3>
+<ol>
+<li>✅ Review Phase 1 plan (<a href="AGENTIC_PHASE_1_PLAN.md">AGENTIC_PHASE_1_PLAN.md</a>)</li>
+<li>✅ Confirm Phase 1 scope (Issue #27 only)</li>
+<li>✅ Decide which sprint to add Phase 1 work (Sprint 4+ recommended)(SPRINT_1_PLAN.md))</li>
+<li>✅ Confirm Sprint 1 scope (Issue #27 only)</li>
+<li>✅ Approve Sprint 1 start (January 2, 2026)</li>
+</ol>
+<h3 id="optional-enhancements">Optional Enhancements<a class="headerlink" href="#optional-enhancements" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[ ] Create GitHub Project Board (Backlog, Sprint Ready, In Progress, Review, Done)</li>
+<li>[ ] Set up GitHub Actions for sprint automation</li>
+<li>[ ] Configure branch protection rules (require PR review)</li>
+<li>[ ] Enable GitHub Discussions for community engagement</li>
+</ul>
+<h3 id="phase-1-kickoff-checklist-when-adding-to-sprint">Phase 1 Kickoff Checklist (When Adding to Sprint)<a class="headerlink" href="#phase-1-kickoff-checklist-when-adding-to-sprint" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[ ] Phase 1 goal communicated</li>
+<li>[ ] Issue #27 moved to "Sprint Ready" column</li>
+<li>[ ] Development environment validated (Python, YAML tools)</li>
+<li>[ ] Unit test framework ready (<code>pytest</code>)</li>
+<li>[ ] Documentation template prepared</li>
+<li>[ ] Sprint capacity confirmed (8 points available)</li>
+</ul>
+<hr />
+<h2 id="risk-assessment">Risk Assessment<a class="headerlink" href="#risk-assessment" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Impact</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Schema design needs iteration</td>
+<td>Medium</td>
+<td>Start minimal, iterate based on feedback</td>
+</tr>
+<tr>
+<td>YAML extraction reveals inconsistencies</td>
+<td>Low</td>
+<td>Document and fix as discovered</td>
+</tr>
+<tr>
+<td>Solo developer velocity variance</td>
+<td>Medium</td>
+<td>Buffer 10% capacity, adjust sprint 2 if needed</td>
+</tr>
+<tr>
+<td>Pre-commit hook conflicts</td>
+<td>Low</td>
+<td>Test with existing hooks before deployment</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Overall Risk:</strong> ✅ Low (well-scoped, foundational work)</p>
+<hr />
+<h2 id="team-communication">Team Communication<a class="headerlink" href="#team-communication" title="Permanent link">&para;</a></h2>
+<h3 id="daily-updates">Daily Updates<a class="headerlink" href="#daily-updates" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Update <code>SPRINT.md</code> with progress</li>
+<li>Commit messages reference issue numbers</li>
+</ul>
+<h3 id="sprint-ceremonies">Sprint Ceremonies<a class="headerlink" href="#sprint-ceremonies" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Sprint Planning:</strong> January 2, 2026 (1 hour)</li>
+<li><strong>Daily Standups:</strong> Async via SPRINT.md updates</li>
+<li><strong>Sprint Review:</strong> January 15, 2026 (30 min)</li>
+<li><strong>Sprint Retrospective:</strong> January 15, 2026 (30 min)</li>
+</ul>
+<h3 id="escalation-path">Escalation Path<a class="headerlink" href="#escalation-path" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Blocker Identified</strong> → Document in SPRINT.md</li>
+<li><strong>Cannot Resolve in 1 day</strong> → Escalate to product owner (you)</li>
+<li><strong>Scope Change Needed</strong> → Request sprint planning adjustment</li>
+</ol>
+<hr />
+<h2 id="reference-documentation">Reference Documentation<a class="headerlink" href="#reference-documentation" title="Permanent link">&para;</a></h2>
+<p>All documentation is in place and ready:</p>
+<h3 id="strategic-planning">Strategic Planning<a class="headerlink" href="#strategic-planning" title="Permanent link">&para;</a></h3>
+<ul>
+<li>✅ <a href="IMPLEMENTATION_ROADMAP.md">IMPLEMENTATION_ROADMAP.md</a> - 24-week roadmap</li>
+<li>✅ <a href="../GITHUB_ISSUES/">GITHUB_ISSUES.md</a> - All 6 issues documented</li>
+<li>✅ <a href="SPRINT_1_PLAN.md">SPRINT_1_PLAN.md</a> - Sprint 1 detailed plan</li>
+<li>✅ This report (BACKLOG_SETUP_REPORT.md)</li>
+</ul>
+<h3 id="architecture-decision-records">Architecture Decision Records<a class="headerlink" href="#architecture-decision-records" title="Permanent link">&para;</a></h3>
+<ul>
+<li>✅ <a href="docs/ADR-001-agent-configuration-extraction.md">docs/ADR-001-agent-configuration-extraction.md</a></li>
+<li>✅ <a href="docs/ADR-002-agent-registry-pattern.md">docs/ADR-002-agent-registry-pattern.md</a></li>
+<li>✅ <a href="docs/ADR-003-crewai-migration-strategy.md">docs/ADR-003-crewai-migration-strategy.md</a></li>
+</ul>
+<h3 id="process-documentation">Process Documentation<a class="headerlink" href="#process-documentation" title="Permanent link">&para;</a></h3>
+<ul>
+<li>✅ <a href="docs/SPRINT_DISCIPLINE_GUIDE.md">docs/SPRINT_DISCIPLINE_GUIDE.md</a></li>
+</ul>
+<hr />
+<h2 id="conclusion">Conclusion<a class="headerlink" href="#conclusion" title="Permanent link">&para;</a></h2>
+<p><strong>Status: ✅ Ready for Sprint 1</strong></p>
+<p>The backlog is fully prepared with:
+- 6 strategic issues created and prioritized
+- 7 phase-based milestones configured
+- Sprint 1 detailed plan documented
+- All dependencies mapped
+- Success metrics defined
+- No blockers identified</p>
+<p><strong>The team (you) can start Sprint 1 on January 2, 2026 with confidence.</strong></p>
+<hr />
+<p><strong>Scrum Master Sign-off:</strong> AI Agent (Autonomous)
+<strong>Date:</strong> January 1, 2026
+<strong>Status:</strong> Backlog preparation complete - no escalations needed
+<strong>Next Review:</strong> Sprint 1 completion (January 15, 2026)</p>
+<hr />
+<h2 id="quick-links">Quick Links<a class="headerlink" href="#quick-links" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>GitHub Repository:</strong> https://github.com/oviney/economist-agents</li>
+<li><strong>Sprint 1 Issue:</strong> https://github.com/oviney/economist-agents/issues/27</li>
+<li><strong>Phase 1 Milestone:</strong> https://github.com/oviney/economist-agents/milestone/3</li>
+<li><strong>All Issues:</strong> https://github.com/oviney/economist-agents/issues</li>
+<li><strong>All Milestones:</strong> https://github.com/oviney/economist-agents/milestones</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

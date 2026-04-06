@@ -1,0 +1,91 @@
+{
+  "validation_date": "2026-01-02T20:55:11.658905",
+  "total_runs": 10,
+  "successful_runs": 10,
+  "failed_runs": 0,
+  "average_pass_rate": 60.0,
+  "perfect_runs": 0,
+  "objective_achieved": false,
+  "results": [
+    {
+      "test": 1,
+      "topic": "The Hidden Costs of Flaky Tests",
+      "gates_passed": 3,
+      "gates_failed": 2,
+      "total_gates": 5,
+      "pass_rate": 60.0
+    },
+    {
+      "test": 2,
+      "topic": "Self-Healing Tests: Separating Hype from Reality",
+      "gates_passed": 3,
+      "gates_failed": 2,
+      "total_gates": 5,
+      "pass_rate": 60.0
+    },
+    {
+      "test": 3,
+      "topic": "Why AI Testing Tools Overpromise on Maintenance",
+      "gates_passed": 3,
+      "gates_failed": 2,
+      "total_gates": 5,
+      "pass_rate": 60.0
+    },
+    {
+      "test": 4,
+      "topic": "The Economics of Test Automation ROI",
+      "gates_passed": 4,
+      "gates_failed": 1,
+      "total_gates": 5,
+      "pass_rate": 80.0
+    },
+    {
+      "test": 5,
+      "topic": "Quality Metrics That Actually Matter to Executives",
+      "gates_passed": 3,
+      "gates_failed": 2,
+      "total_gates": 5,
+      "pass_rate": 60.0
+    },
+    {
+      "test": 6,
+      "topic": "The Death of Manual Testing: Premature Diagnosis",
+      "gates_passed": 3,
+      "gates_failed": 2,
+      "total_gates": 5,
+      "pass_rate": 60.0
+    },
+    {
+      "test": 7,
+      "topic": "Platform Engineering's Impact on Quality Engineering",
+      "gates_passed": 3,
+      "gates_failed": 2,
+      "total_gates": 5,
+      "pass_rate": 60.0
+    },
+    {
+      "test": 8,
+      "topic": "Shift-Left vs Shift-Right: False Dichotomy",
+      "gates_passed": 3,
+      "gates_failed": 2,
+      "total_gates": 5,
+      "pass_rate": 60.0
+    },
+    {
+      "test": 9,
+      "topic": "The Technical Debt Crisis in Test Suites",
+      "gates_passed": 3,
+      "gates_failed": 2,
+      "total_gates": 5,
+      "pass_rate": 60.0
+    },
+    {
+      "test": 10,
+      "topic": "No-Code Testing's Hidden Complexity Tax",
+      "gates_passed": 2,
+      "gates_failed": 3,
+      "total_gates": 5,
+      "pass_rate": 40.0
+    }
+  ]
+}

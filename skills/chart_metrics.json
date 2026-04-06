@@ -1,0 +1,533 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-01-18T12:43:02.352199",
+  "summary": {
+    "total_charts_generated": 14,
+    "total_visual_qa_runs": 15,
+    "visual_qa_pass_count": 1,
+    "visual_qa_fail_count": 14,
+    "total_zone_violations": 2,
+    "total_regenerations": 1,
+    "total_generation_time_seconds": 36.437190532684326
+  },
+  "failure_patterns": {
+    "zone_violation": {
+      "title overlaps red bar": {
+        "count": 1,
+        "first_seen": "2026-01-01T12:39:58.818046",
+        "last_seen": "2026-01-01T12:39:58.818057"
+      },
+      "inline label intrudes into x-axis zone": {
+        "count": 1,
+        "first_seen": "2026-01-01T12:39:58.818060",
+        "last_seen": "2026-01-01T12:39:58.818063"
+      }
+    },
+    "critical_issue": {
+      "zone boundary violation: title/red bar overlap": {
+        "count": 1,
+        "first_seen": "2026-01-01T12:39:58.818065",
+        "last_seen": "2026-01-01T12:39:58.818067"
+      },
+      "zone boundary violation: label in x-axis zone": {
+        "count": 1,
+        "first_seen": "2026-01-01T12:39:58.818069",
+        "last_seen": "2026-01-01T12:39:58.818071"
+      },
+      "failed to parse qa response": {
+        "count": 13,
+        "first_seen": "2026-01-03T10:23:15.230169",
+        "last_seen": "2026-01-03T13:01:00.848786"
+      }
+    }
+  },
+  "sessions": [
+    {
+      "timestamp": "2026-01-01T12:39:58.818148",
+      "duration_seconds": 0.2801799774169922,
+      "charts_generated": 2,
+      "visual_qa_runs": 2,
+      "visual_qa_passed": 1,
+      "charts": [
+        {
+          "title": "Test Chart: AI Adoption",
+          "timestamp": "2026-01-01T12:39:58.537983",
+          "start_time": 1767289198.5379899,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 0.1047520637512207,
+          "visual_qa_run": true,
+          "visual_qa_passed": true,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        },
+        {
+          "title": "Test Chart: Failed Generation",
+          "timestamp": "2026-01-01T12:39:58.642840",
+          "start_time": 1767289198.642852,
+          "chart_type": "bar",
+          "generation_success": false,
+          "generation_time_seconds": 0.05493879318237305,
+          "visual_qa_run": false,
+          "visual_qa_passed": null,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": [
+            {
+              "type": "generation_error",
+              "message": "Invalid data: empty dataset",
+              "timestamp": "2026-01-01T12:39:58.697798"
+            }
+          ]
+        },
+        {
+          "title": "Test Chart: Zone Violations",
+          "timestamp": "2026-01-01T12:39:58.697899",
+          "start_time": 1767289198.697904,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 0.12011981010437012,
+          "visual_qa_run": true,
+          "visual_qa_passed": false,
+          "zone_violations": [
+            "Title overlaps red bar",
+            "Inline label intrudes into X-axis zone"
+          ],
+          "regeneration_count": 1,
+          "errors": [
+            {
+              "type": "regeneration",
+              "reason": "Zone violations detected",
+              "timestamp": "2026-01-01T12:39:58.818137"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-01T16:01:56.602419",
+      "duration_seconds": 60.466525077819824,
+      "charts_generated": 1,
+      "visual_qa_runs": 0,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "Impact of Flaky Tests on Developer Productivity",
+          "timestamp": "2026-01-01T16:00:56.135897",
+          "start_time": 1767301256.1359072,
+          "chart_type": "bar",
+          "generation_success": true,
+          "generation_time_seconds": 9.652874946594238,
+          "visual_qa_run": false,
+          "visual_qa_passed": null,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-01T20:24:16.517936",
+      "duration_seconds": 47.15429091453552,
+      "charts_generated": 1,
+      "visual_qa_runs": 0,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "Impact of Self-Healing Tests on Maintenance Efforts",
+          "timestamp": "2026-01-01T20:23:29.363644",
+          "start_time": 1767317009.363654,
+          "chart_type": "bar",
+          "generation_success": true,
+          "generation_time_seconds": 6.3491270542144775,
+          "visual_qa_run": false,
+          "visual_qa_passed": null,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-02T20:20:12.566537",
+      "duration_seconds": 67.98539209365845,
+      "charts_generated": 0,
+      "visual_qa_runs": 0,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "Adoption and Effectiveness of Self-Healing Tests",
+          "timestamp": "2026-01-02T20:19:04.581162",
+          "start_time": 1767403144.581171,
+          "chart_type": "bar",
+          "generation_success": false,
+          "generation_time_seconds": 9.055469989776611,
+          "visual_qa_run": false,
+          "visual_qa_passed": null,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": [
+            {
+              "type": "generation_error",
+              "message": "Traceback (most recent call last):\n  File \"/tmp/chart_gen.py\", line 24, in <module>\n    ax.bar(x, series1_values, bar_width, label='Enterprise Adoption by 2025', color='#17648d')\n    ~~~~~~^^^^^^^^^^^",
+              "timestamp": "2026-01-02T20:19:13.636649"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-03T10:23:37.722006",
+      "duration_seconds": 23.019368886947632,
+      "charts_generated": 1,
+      "visual_qa_runs": 1,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "The automation gap",
+          "timestamp": "2026-01-03T10:23:14.702654",
+          "start_time": 1767453794.702656,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 0.43432092666625977,
+          "visual_qa_run": true,
+          "visual_qa_passed": false,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-03T10:29:47.022203",
+      "duration_seconds": 18.42628312110901,
+      "charts_generated": 1,
+      "visual_qa_runs": 1,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "The automation gap",
+          "timestamp": "2026-01-03T10:29:28.595951",
+          "start_time": 1767454168.595955,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 0.5017991065979004,
+          "visual_qa_run": true,
+          "visual_qa_passed": false,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-03T10:30:03.864631",
+      "duration_seconds": 35.26871299743652,
+      "charts_generated": 1,
+      "visual_qa_runs": 1,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "The automation gap",
+          "timestamp": "2026-01-03T10:29:28.595951",
+          "start_time": 1767454168.595955,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 0.5017991065979004,
+          "visual_qa_run": true,
+          "visual_qa_passed": false,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-03T10:32:48.839068",
+      "duration_seconds": 24.09161400794983,
+      "charts_generated": 1,
+      "visual_qa_runs": 1,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "The automation gap",
+          "timestamp": "2026-01-03T10:32:24.747549",
+          "start_time": 1767454344.7475579,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 0.5098752975463867,
+          "visual_qa_run": true,
+          "visual_qa_passed": false,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-03T10:33:05.162830",
+      "duration_seconds": 40.41536903381348,
+      "charts_generated": 1,
+      "visual_qa_runs": 1,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "The automation gap",
+          "timestamp": "2026-01-03T10:32:24.747549",
+          "start_time": 1767454344.7475579,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 0.5098752975463867,
+          "visual_qa_run": true,
+          "visual_qa_passed": false,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-03T10:51:05.705946",
+      "duration_seconds": 21.67111301422119,
+      "charts_generated": 1,
+      "visual_qa_runs": 1,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "The automation gap",
+          "timestamp": "2026-01-03T10:50:44.034846",
+          "start_time": 1767455444.034848,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 0.4164159297943115,
+          "visual_qa_run": true,
+          "visual_qa_passed": false,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-03T10:51:26.230736",
+      "duration_seconds": 42.195899963378906,
+      "charts_generated": 1,
+      "visual_qa_runs": 1,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "The automation gap",
+          "timestamp": "2026-01-03T10:50:44.034846",
+          "start_time": 1767455444.034848,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 0.4164159297943115,
+          "visual_qa_run": true,
+          "visual_qa_passed": false,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-03T11:50:03.521776",
+      "duration_seconds": 28.954471111297607,
+      "charts_generated": 1,
+      "visual_qa_runs": 1,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "The automation gap",
+          "timestamp": "2026-01-03T11:49:34.567350",
+          "start_time": 1767458974.567355,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 1.6818530559539795,
+          "visual_qa_run": true,
+          "visual_qa_passed": false,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-03T11:50:25.895031",
+      "duration_seconds": 51.327725887298584,
+      "charts_generated": 1,
+      "visual_qa_runs": 1,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "The automation gap",
+          "timestamp": "2026-01-03T11:49:34.567350",
+          "start_time": 1767458974.567355,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 1.6818530559539795,
+          "visual_qa_run": true,
+          "visual_qa_passed": false,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-03T13:00:02.936688",
+      "duration_seconds": 21.780678272247314,
+      "charts_generated": 1,
+      "visual_qa_runs": 1,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "The automation gap",
+          "timestamp": "2026-01-03T12:59:41.156037",
+          "start_time": 1767463181.15604,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 0.6951169967651367,
+          "visual_qa_run": true,
+          "visual_qa_passed": false,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-03T13:00:29.036297",
+      "duration_seconds": 47.880287170410156,
+      "charts_generated": 1,
+      "visual_qa_runs": 1,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "The automation gap",
+          "timestamp": "2026-01-03T12:59:41.156037",
+          "start_time": 1767463181.15604,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 0.6951169967651367,
+          "visual_qa_run": true,
+          "visual_qa_passed": false,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-03T13:01:00.799753",
+      "duration_seconds": 24.959843158721924,
+      "charts_generated": 1,
+      "visual_qa_runs": 1,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "The automation gap",
+          "timestamp": "2026-01-03T13:00:35.839950",
+          "start_time": 1767463235.839953,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 0.5333740711212158,
+          "visual_qa_run": true,
+          "visual_qa_passed": false,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-03T13:01:28.322945",
+      "duration_seconds": 52.48303532600403,
+      "charts_generated": 1,
+      "visual_qa_runs": 1,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "The automation gap",
+          "timestamp": "2026-01-03T13:00:35.839950",
+          "start_time": 1767463235.839953,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 0.5333740711212158,
+          "visual_qa_run": true,
+          "visual_qa_passed": false,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-18T12:27:12.880212",
+      "duration_seconds": 53.81208395957947,
+      "charts_generated": 1,
+      "visual_qa_runs": 0,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "Global Spending on Software Testing",
+          "timestamp": "2026-01-18T12:26:19.068136",
+          "start_time": 1768757179.0681448,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 5.436899185180664,
+          "visual_qa_run": false,
+          "visual_qa_passed": null,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-18T12:40:19.495812",
+      "duration_seconds": 62.048683166503906,
+      "charts_generated": 1,
+      "visual_qa_runs": 0,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "Distribution of Test Automation Budget",
+          "timestamp": "2026-01-18T12:39:17.447153",
+          "start_time": 1768757957.4471629,
+          "chart_type": "bar",
+          "generation_success": true,
+          "generation_time_seconds": 5.346644163131714,
+          "visual_qa_run": false,
+          "visual_qa_passed": null,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-01-18T12:43:02.352099",
+      "duration_seconds": 43.75409293174744,
+      "charts_generated": 1,
+      "visual_qa_runs": 0,
+      "visual_qa_passed": 0,
+      "charts": [
+        {
+          "title": "Test Coverage vs. Productivity",
+          "timestamp": "2026-01-18T12:42:18.598027",
+          "start_time": 1768758138.598036,
+          "chart_type": "line",
+          "generation_success": true,
+          "generation_time_seconds": 4.654017925262451,
+          "visual_qa_run": false,
+          "visual_qa_passed": null,
+          "zone_violations": [],
+          "regeneration_count": 0,
+          "errors": []
+        }
+      ]
+    }
+  ]
+}

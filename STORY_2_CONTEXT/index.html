@@ -1,0 +1,3509 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Multi-agent content pipeline that generates Economist-style articles with autonomous research, writing, illustration, and deployment">
+      
+      
+      
+        <link rel="canonical" href="https://oviney.github.io/economist-agents/STORY_2_CONTEXT/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Story 2 Context: Shared Context System (crew.context) - Economist Agents</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#story-2-context-shared-context-system-crewcontext" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Economist Agents" class="md-header__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Economist Agents
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Story 2 Context: Shared Context System (crew.context)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/oviney/economist-agents" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    oviney/economist-agents
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../agent-registry-spec/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../adr/ADR-001-agent-framework-selection/" class="md-tabs__link">
+          
+  
+  
+  ADRs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../skills/agent-delegation/SKILL/" class="md-tabs__link">
+          
+  
+  
+  Skills
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../guides/WORKFLOW_GUIDE/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../CREWAI_API_REFERENCE/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../AGENT_VELOCITY_ANALYSIS/" class="md-tabs__link">
+          
+  
+  
+  Performance
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Economist Agents" class="md-nav__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Economist Agents
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/oviney/economist-agents" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    oviney/economist-agents
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agent-registry-spec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../FLOW_ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AUTONOMOUS_ORCHESTRATION_STRATEGY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autonomous Orchestration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CREWAI_CONTEXT_ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shared Context System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE_PATTERNS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE_REVIEW_PROCESS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Review Process
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADRs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADRs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/ADR-001-agent-framework-selection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-001 — Agent Framework Selection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/ADR-002-content-intelligence-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-002 — Content Intelligence Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/ADR-003-agent-skill-governance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-003 — Agent Skill Governance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ADR-004-python-version-constraint/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-004 — Python Version Constraint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ADR-005-agile-discipline-enforcement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-005 — Agile Discipline Enforcement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skills
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Skills
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/agent-delegation/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Delegation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/research-sourcing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research Sourcing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/economist-writing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Economist Writing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/editorial-illustration/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Editorial Illustration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/article-evaluation/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Article Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/quality-gates/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quality Gates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/python-quality/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python Quality
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/testing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/defect-prevention/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Defect Prevention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/devops/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DevOps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/sprint-management/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/scrum-master/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scrum Master
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/agent-traceability/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Traceability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/observability/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/mcp-development/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/WORKFLOW_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/BLOG_DEPLOYMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/COPILOT_SYNC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Copilot Sync
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/CI_MONITORING_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CI Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/PYTHON_VERSION_TROUBLESHOOTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/IMPLEMENTATION_ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/VALIDATION_QUICK_REF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation Quick Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CREWAI_API_REFERENCE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CrewAI API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AGENT_PROMPT_PATTERNS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Prompt Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AGENT_QUALITY_GATES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quality Gates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEFINITION_OF_DONE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Definition of Done
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEFECT_PREVENTION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Defect Prevention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHART_DESIGN_SPEC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chart Design Spec
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Performance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AGENT_VELOCITY_ANALYSIS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Velocity Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SPRINT_DISCIPLINE_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint Discipline Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#story-information" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Story Information
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#user-story" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        User Story
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="User Story">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backgroundcontext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Background/Context
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functional-acceptance-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functional Acceptance Criteria
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Functional Acceptance Criteria">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ac1-context-template-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AC1: Context Template Loading
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ac2-agent-context-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AC2: Agent Context Access
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ac3-context-propagation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AC3: Context Propagation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ac4-briefing-time-reduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AC4: Briefing Time Reduction
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quality-requirements-mandatory-sprint-7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quality Requirements ⚠️ MANDATORY (Sprint 7+)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quality Requirements ⚠️ MANDATORY (Sprint 7+)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#content-quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Content Quality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Criteria
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#accessibility-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accessibility Requirements
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seo-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SEO Requirements
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#securityprivacy-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security/Privacy Requirements
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#maintainability-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Maintainability Requirements
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#technical-prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Prerequisites
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Technical Prerequisites">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dependencies-with-versions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependencies with Versions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#environment-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Requirements
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#installation-docs-reviewed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation Docs Reviewed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prerequisite-check-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisite Check Script
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#definition-of-done" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition of Done
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Definition of Done">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#implementation-complete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Complete
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quality-gates-passed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quality Gates Passed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deployment-ready" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deployment Ready
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#three-amigos-review" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Three Amigos Review
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Three Amigos Review">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#developer-perspective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Developer Perspective
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qa-perspective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        QA Perspective
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#product-perspective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Product Perspective
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#story-points-estimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Story Points Estimation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Story Points Estimation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#functional-work-3-points-6-hours" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functional Work: 3 Points (~6 hours)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quality-work-2-points-4-hours" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quality Work: 2 Points (~4 hours)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#total-5-story-points-10-hours-functionalquality-25-hours-buffer-125-hours" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Total: 5 Story Points (~10 hours functional/quality + 2.5 hours buffer = 12.5 hours)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#risks-mitigation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Risks &amp; Mitigation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Risks &amp; Mitigation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-risks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Risks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quality-risks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quality Risks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timeline-risks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Timeline Risks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Work
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Related Work">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependencies
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#blocked-by" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Blocked By
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#blocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Blocks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#related-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes-decisions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes &amp; Decisions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Notes &amp; Decisions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#decisions-made" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decisions Made
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#open-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open Questions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#assumptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Assumptions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#validation-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validation Checklist
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Validation Checklist">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#functional-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functional Validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quality-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quality Validation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quality Validation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#content-quality_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Content Quality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#accessibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accessibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SEO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#maintainability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Maintainability
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#regression-prevention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Regression Prevention
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#appendix-task-breakdown-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Appendix: Task Breakdown (Reference)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#template-version" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template Version
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="story-2-context-shared-context-system-crewcontext">Story 2 Context: Shared Context System (crew.context)<a class="headerlink" href="#story-2-context-shared-context-system-crewcontext" title="Permanent link">&para;</a></h1>
+<p><strong>Sprint</strong>: Sprint 7 (CrewAI Migration Foundation)
+<strong>Story</strong>: Story 2 - Shared Context System
+<strong>Priority</strong>: P0
+<strong>Story Points</strong>: 5 (3 functional + 2 quality)
+<strong>Status</strong>: PLANNING
+<strong>Last Updated</strong>: 2026-01-02
+<strong>Assigned To</strong>: @refactor-specialist
+<strong>Estimated Time</strong>: 12.5 hours (750 minutes)</p>
+<hr />
+<h2 id="story-information">Story Information<a class="headerlink" href="#story-information" title="Permanent link">&para;</a></h2>
+<p><strong>Sprint Goal</strong>: Encode 5 validated patterns into CrewAI agents for self-orchestrating delivery</p>
+<p><strong>Story Dependencies</strong>:
+- <strong>Blocked by</strong>: Story 1 (CrewAI Agent Configuration) - MUST BE COMPLETE
+- <strong>Blocks</strong>: Story 3 (Agent-to-Agent Messaging), Story 4 (Documentation &amp; Validation)</p>
+<p><strong>Related ADRs</strong>:
+- ADR-003: CrewAI Migration Strategy (Stage 3 agents use shared context)</p>
+<hr />
+<h2 id="user-story">User Story<a class="headerlink" href="#user-story" title="Permanent link">&para;</a></h2>
+<p><strong>As a</strong> CrewAI Developer
+<strong>I need</strong> Shared context via <code>crew.context</code> for automatic context inheritance
+<strong>So that</strong> I eliminate 40% context duplication and reduce agent briefing time by 70% (10min → 3min)</p>
+<h3 id="backgroundcontext">Background/Context<a class="headerlink" href="#backgroundcontext" title="Permanent link">&para;</a></h3>
+<p><strong>Problem Statement</strong> (from Sprint 6 Retrospective):
+- <strong>Context Duplication</strong>: Sprint 6 manual orchestration required repeated briefings. Developer needed full story context (10 min), QE Lead needed same context + developer handoff (12 min), Scrum Master needed both + validation results (15 min). Total: 37 minutes of redundant context loading.
+- <strong>Coordination Overhead</strong>: 25% of Story 1 time spent on manual handoffs and context transfer between agents.
+- <strong>Scaling Blocker</strong>: Manual orchestration doesn't scale beyond 2 stories (observed in Sprint 6).</p>
+<p><strong>Sprint 6 Metrics</strong>:
+- Average briefing time per agent: 10 minutes
+- Context duplication rate: 40% (same information repeated across agents)
+- Manual coordination overhead: 25% of story time
+- Stories delivered: 2 (Story 1 + Story 2), proving patterns but not scalability</p>
+<p><strong>CrewAI Solution</strong>:
+CrewAI's <code>crew.context</code> provides shared memory that automatically propagates context from upstream tasks to downstream tasks. This eliminates manual context transfer and reduces briefing overhead.</p>
+<p><strong>Expected Impact</strong>:
+- Briefing time: 10 min → 3 min per agent (70% reduction)
+- Context duplication: 40% → 0% (automatic inheritance)
+- Coordination overhead: 25% → 5% (mostly automated)
+- Scalability: Supports 4-5 stories concurrently (vs 2 in Sprint 6)</p>
+<hr />
+<h2 id="functional-acceptance-criteria">Functional Acceptance Criteria<a class="headerlink" href="#functional-acceptance-criteria" title="Permanent link">&para;</a></h2>
+<h3 id="ac1-context-template-loading">AC1: Context Template Loading<a class="headerlink" href="#ac1-context-template-loading" title="Permanent link">&para;</a></h3>
+<p><strong>Given</strong> A STORY_N_CONTEXT.md file exists for Story N
+<strong>When</strong> CrewAI crew is initialized
+<strong>Then</strong> The template content is loaded into <code>crew.context</code> automatically
+<strong>And</strong> Context is accessible to all agents in the crew</p>
+<p><strong>Edge Cases</strong>:
+- Empty STORY_N_CONTEXT.md file (should fail gracefully with clear error)
+- Malformed markdown (missing sections, incorrect headers)
+- Very large context (&gt;100KB) - should handle or warn about memory
+- Missing STORY_N_CONTEXT.md file (should provide helpful error with template example)</p>
+<p><strong>Validation</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">crew</span> <span class="o">=</span> <span class="n">CrewAI</span><span class="p">(</span><span class="n">context_file</span><span class="o">=</span><span class="s2">&quot;docs/STORY_2_CONTEXT.md&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">assert</span> <span class="n">crew</span><span class="o">.</span><span class="n">context</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">assert</span> <span class="s2">&quot;Story 2 Goal&quot;</span> <span class="ow">in</span> <span class="n">crew</span><span class="o">.</span><span class="n">context</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="k">assert</span> <span class="n">crew</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;story_id&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;Story 2&quot;</span>
+</code></pre></div></p>
+<hr />
+<h3 id="ac2-agent-context-access">AC2: Agent Context Access<a class="headerlink" href="#ac2-agent-context-access" title="Permanent link">&para;</a></h3>
+<p><strong>Given</strong> A crew with loaded context
+<strong>When</strong> An agent executes a task
+<strong>Then</strong> The agent can access shared context via <code>self.crew.context</code>
+<strong>And</strong> Context includes story goal, acceptance criteria, handoff requirements</p>
+<p><strong>Edge Cases</strong>:
+- Agent modifies context incorrectly (type mismatch, invalid keys)
+- Agent attempts to access context before initialization
+- Multiple agents read context concurrently (thread safety)
+- Agent tries to delete required context keys</p>
+<p><strong>Validation</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">DeveloperAgent</span><span class="p">:</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">execute_task</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>        <span class="n">story_goal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crew</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;goal&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>        <span class="n">acceptance_criteria</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crew</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;acceptance_criteria&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>        <span class="k">assert</span> <span class="n">story_goal</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>        <span class="c1"># Use context for task execution</span>
+</code></pre></div></p>
+<hr />
+<h3 id="ac3-context-propagation">AC3: Context Propagation<a class="headerlink" href="#ac3-context-propagation" title="Permanent link">&para;</a></h3>
+<p><strong>Given</strong> A crew with sequential tasks (Developer → QE → Scrum Master)
+<strong>When</strong> Developer completes task and updates context with results
+<strong>Then</strong> QE agent automatically receives updated context with developer results
+<strong>And</strong> Scrum Master receives cumulative context with both developer and QE results
+<strong>And</strong> No manual context transfer is required</p>
+<p><strong>Edge Cases</strong>:
+- Developer task fails before updating context (what does QE receive?)
+- QE updates context while Scrum Master is reading (race condition)
+- Context grows too large with cumulative results (&gt;1MB)
+- Circular dependencies in context updates</p>
+<p><strong>Validation</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Developer task completes, updates context</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">developer_agent</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s2">&quot;developer_result&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Code complete&quot;</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># QE task starts, should see developer result</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">qe_agent</span> <span class="o">=</span> <span class="n">QEAgent</span><span class="p">(</span><span class="n">crew</span><span class="o">=</span><span class="n">crew</span><span class="p">)</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="k">assert</span> <span class="s2">&quot;developer_result&quot;</span> <span class="ow">in</span> <span class="n">qe_agent</span><span class="o">.</span><span class="n">crew</span><span class="o">.</span><span class="n">context</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="k">assert</span> <span class="n">qe_agent</span><span class="o">.</span><span class="n">crew</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s2">&quot;developer_result&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Code complete&quot;</span>
+</code></pre></div></p>
+<hr />
+<h3 id="ac4-briefing-time-reduction">AC4: Briefing Time Reduction<a class="headerlink" href="#ac4-briefing-time-reduction" title="Permanent link">&para;</a></h3>
+<p><strong>Given</strong> Baseline briefing time of 10 minutes per agent from Sprint 6
+<strong>When</strong> Story executes with shared context system
+<strong>Then</strong> Briefing time is reduced to ≤3 minutes per agent (70% reduction)
+<strong>And</strong> Context duplication is reduced from 40% to ≤5%</p>
+<p><strong>Measurement</strong>:
+- Metric: <code>context_briefing_time_seconds</code> logged per agent
+- Baseline: 600 seconds (10 min) from Sprint 6
+- Target: ≤180 seconds (3 min) in Sprint 7
+- Measurement tool: <code>scripts/measure_briefing_time.py</code></p>
+<p><strong>Edge Cases</strong>:
+- First story with no prior context (briefing may be longer)
+- Story with very complex context (acceptance criteria &gt;20 items)
+- Agent already familiar with story (briefing should be even faster)</p>
+<p><strong>Validation</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">with</span> <span class="n">measure_time</span><span class="p">()</span> <span class="k">as</span> <span class="n">timer</span><span class="p">:</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">developer_agent</span><span class="o">.</span><span class="n">load_context</span><span class="p">(</span><span class="n">crew</span><span class="o">.</span><span class="n">context</span><span class="p">)</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">assert</span> <span class="n">timer</span><span class="o">.</span><span class="n">elapsed</span> <span class="o">&lt;</span> <span class="mi">180</span>  <span class="c1"># 3 minutes</span>
+</code></pre></div></p>
+<hr />
+<h2 id="quality-requirements-mandatory-sprint-7">Quality Requirements ⚠️ MANDATORY (Sprint 7+)<a class="headerlink" href="#quality-requirements-mandatory-sprint-7" title="Permanent link">&para;</a></h2>
+<h3 id="content-quality">Content Quality<a class="headerlink" href="#content-quality" title="Permanent link">&para;</a></h3>
+<p><strong>Context Documentation Standards</strong>:
+- <strong>Format</strong>: STORY_N_CONTEXT.md must follow STORY_TEMPLATE_WITH_QUALITY.md structure (318 lines)
+- <strong>Completeness</strong>: All template sections required (Story Information, User Story, Acceptance Criteria, Quality Requirements, Technical Prerequisites, DoD, Three Amigos, Story Points, Risks, Validation Checklist)
+- <strong>Clarity</strong>: Context must be understandable by any agent without external references (self-contained)
+- <strong>Minimum Sections</strong>: 12 mandatory sections (Story Info, User Story, AC, Quality Requirements 6 categories, Technical Prerequisites, DoD, Three Amigos, Story Points, Risks)
+- <strong>Acceptable Types</strong>: Markdown format only, structured sections with headers, bullet points, code blocks
+- <strong>Source Attribution</strong>: Reference Sprint 6 Retrospective metrics (briefing time, context duplication percentage)
+- <strong>Fact-Checking Process</strong>: All metrics verified against <code>docs/RETROSPECTIVE_S6.md</code>
+- <strong>Spelling Standard</strong>: British English (organisation, favour, analyse)
+- <strong>Style Guide</strong>: Follow STORY_TEMPLATE_WITH_QUALITY.md conventions
+- <strong>Banned Phrases</strong>: None (internal documentation, no editorial style constraints)
+- <strong>Readability Target</strong>: Hemingway Grade 8 or lower for context descriptions</p>
+<hr />
+<h3 id="performance-criteria">Performance Criteria<a class="headerlink" href="#performance-criteria" title="Permanent link">&para;</a></h3>
+<p><strong>Context Load Time</strong>:
+- <strong>Target</strong>: Context loading from STORY_N_CONTEXT.md &lt; 2 seconds
+- <strong>Connection Type</strong>: Local filesystem read (no network latency)
+- <strong>Test Tool</strong>: <code>pytest</code> with timing assertions
+- <strong>Measurement</strong>: <code>time pytest tests/test_context_loading.py -v</code></p>
+<p><strong>Response Time</strong>:
+- <strong>Target</strong>: <code>crew.context.get()</code> operations &lt; 10 milliseconds
+- <strong>Test Conditions</strong>: Context size ≤500KB typical, ≤1MB maximum
+- <strong>Tools</strong>: Python <code>timeit</code> module for microbenchmarks</p>
+<p><strong>Memory Usage</strong>:
+- <strong>Target</strong>: Context in memory &lt; 10 MB per story
+- <strong>Measurement</strong>: <code>tracemalloc</code> module during crew initialization
+- <strong>Warning Threshold</strong>: Log warning if context &gt;5 MB (indicates bloat)</p>
+<p><strong>Mobile Responsiveness</strong>:
+- <strong>N/A</strong>: Internal framework feature, no mobile UI</p>
+<hr />
+<h3 id="accessibility-requirements">Accessibility Requirements<a class="headerlink" href="#accessibility-requirements" title="Permanent link">&para;</a></h3>
+<p><strong>WCAG Compliance</strong>:
+- <strong>Level</strong>: N/A (no user-facing UI)</p>
+<p><strong>Screen Reader Compatibility</strong>:
+- <strong>Documentation</strong>: STORY_N_CONTEXT.md markdown must be screen-reader compatible
+- <strong>Headers</strong>: Use proper heading hierarchy (# → ## → ###)
+- <strong>Code Blocks</strong>: Use triple backticks with language labels</p>
+<p><strong>Keyboard Navigation</strong>:
+- <strong>N/A</strong>: No UI component</p>
+<p><strong>Color Contrast</strong>:
+- <strong>Documentation</strong>: If using colored terminal output for logging, ensure 4.5:1 contrast ratio (WCAG AA)</p>
+<p><strong>Focus Indicators</strong>:
+- <strong>N/A</strong>: No interactive elements</p>
+<p><strong>Alternative Text</strong>:
+- <strong>Documentation</strong>: If diagrams added to context, provide text descriptions</p>
+<p><strong>Form Labels</strong>:
+- <strong>N/A</strong>: No forms</p>
+<hr />
+<h3 id="seo-requirements">SEO Requirements<a class="headerlink" href="#seo-requirements" title="Permanent link">&para;</a></h3>
+<p><strong>N/A</strong>: Internal framework feature, not published to web</p>
+<hr />
+<h3 id="securityprivacy-requirements">Security/Privacy Requirements<a class="headerlink" href="#securityprivacy-requirements" title="Permanent link">&para;</a></h3>
+<p><strong>Data Sanitization</strong>:
+- <strong>Context Input</strong>: Validate STORY_N_CONTEXT.md does not contain secrets (API keys, tokens, credentials)
+- <strong>Agent Updates</strong>: Sanitize context updates before storage (no PII injection)
+- <strong>Validation</strong>: Use <code>scripts/validate_context_security.py</code> before loading</p>
+<p><strong>Authentication</strong>:
+- <strong>N/A</strong>: Local tool, no authentication layer</p>
+<p><strong>Authorization</strong>:
+- <strong>Context Access Control</strong>: Only agents in the crew can access crew.context (enforce CrewAI permissions)
+- <strong>Modification Rights</strong>: All agents can read, only task-executing agent can update during task</p>
+<p><strong>PII Handling</strong>:
+- <strong>No PII in Context</strong>: Context should contain only story metadata, not user data
+- <strong>Validation</strong>: Scan for email addresses, phone numbers, SSNs before loading context</p>
+<p><strong>HTTPS</strong>:
+- <strong>N/A</strong>: Local execution, no network transport</p>
+<p><strong>CSRF Protection</strong>:
+- <strong>N/A</strong>: No web interface</p>
+<p><strong>Rate Limiting</strong>:
+- <strong>Context Access</strong>: No rate limiting needed (local operations)</p>
+<p><strong>Audit Logging</strong>:
+- <strong>Context Modifications</strong>: Log all context updates with timestamp, agent_id, keys modified
+- <strong>Log Location</strong>: <code>logs/context_audit_{story_id}.json</code>
+- <strong>Retention</strong>: Keep audit logs for 30 days or until story complete</p>
+<hr />
+<h3 id="maintainability-requirements">Maintainability Requirements<a class="headerlink" href="#maintainability-requirements" title="Permanent link">&para;</a></h3>
+<p><strong>Documentation Level</strong>:
+- <strong>Code Inline Comments</strong>: Docstrings for all context-related classes and methods (ContextManager, CrewContextWrapper)
+- <strong>External Documentation</strong>:
+  - <strong>README Update</strong>: Add "Shared Context System" section to main README.md
+  - <strong>Architecture Documentation</strong>: Create <code>docs/CREWAI_CONTEXT_ARCHITECTURE.md</code> with class diagrams
+  - <strong>API Documentation</strong>: Document <code>crew.context</code> API in <code>docs/CREWAI_API_REFERENCE.md</code>
+  - <strong>Usage Examples</strong>: Add example code in <code>examples/crew_context_usage.py</code></p>
+<p><strong>Test Coverage Target</strong>:
+- <strong>Overall Target</strong>: 80% line coverage minimum
+- <strong>Unit Tests</strong>: Cover context loading, access, propagation (target 90%)
+- <strong>Integration Tests</strong>: Multi-agent context sharing (target 70%)
+- <strong>E2E Tests</strong>: Full story execution with context (target 1 comprehensive test)</p>
+<p><strong>Code Review</strong>:
+- <strong>Required</strong>: Yes, before merge to main
+- <strong>Reviewers</strong>: Developer + QE Lead
+- <strong>Focus Areas</strong>: Thread safety, error handling, performance, API design</p>
+<p><strong>Linting/Formatting</strong>:
+- <strong>Tools</strong>: <code>ruff</code> (linting), <code>black</code> (formatting), <code>mypy</code> (type checking)
+- <strong>Pre-commit Hook</strong>: Run all linters automatically
+- <strong>CI/CD</strong>: All checks must pass in GitHub Actions</p>
+<p><strong>Type Hints</strong>:
+- <strong>Required</strong>: Yes, for all public methods and functions
+- <strong>Type Checker</strong>: <code>mypy</code> with strict mode
+- <strong>Target</strong>: 100% type coverage for context module</p>
+<p><strong>Error Handling</strong>:
+- <strong>File Not Found</strong>: Raise <code>ContextFileNotFoundError</code> with helpful message and template example
+- <strong>Parse Errors</strong>: Raise <code>ContextParseError</code> with line number and section that failed
+- <strong>Invalid Updates</strong>: Raise <code>ContextUpdateError</code> with key that was invalid and expected type
+- <strong>Memory Errors</strong>: Raise <code>ContextSizeExceededError</code> if context &gt;1MB</p>
+<p><strong>Backwards Compatibility</strong>:
+- <strong>Story 1 Compatibility</strong>: Ensure Story 1 agents can still function if they don't use crew.context (graceful degradation)
+- <strong>Migration Path</strong>: Provide <code>scripts/migrate_to_crew_context.py</code> to help existing stories adopt new system</p>
+<hr />
+<h2 id="technical-prerequisites">Technical Prerequisites<a class="headerlink" href="#technical-prerequisites" title="Permanent link">&para;</a></h2>
+<h3 id="dependencies-with-versions">Dependencies with Versions<a class="headerlink" href="#dependencies-with-versions" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Python</strong>: 3.13.11 (in .venv-py313) ✅ <strong>VALIDATED Task 0</strong></li>
+<li><strong>CrewAI</strong>: 1.7.2 ✅ <strong>VALIDATED Task 0</strong></li>
+<li><strong>crewai-tools</strong>: 0.2.0 ✅ <strong>VALIDATED Task 0</strong></li>
+<li><strong>PyYAML</strong>: 6.0+ (for parsing YAML if needed)</li>
+<li><strong>jsonschema</strong>: 4.17.0+ (for context schema validation)</li>
+</ul>
+<h3 id="environment-requirements">Environment Requirements<a class="headerlink" href="#environment-requirements" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Virtual Environment</strong>: <code>.venv-py313</code> must be active</li>
+<li><strong>Activation Command</strong>: <code>source .venv-py313/bin/activate</code></li>
+<li><strong>Verification</strong>: <code>python --version</code> should show 3.13.11</li>
+</ul>
+<h3 id="installation-docs-reviewed">Installation Docs Reviewed<a class="headerlink" href="#installation-docs-reviewed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[x] CrewAI documentation: https://docs.crewai.com/concepts/context</li>
+<li>[x] CrewAI Flows documentation (if using hierarchical crews)</li>
+<li>[x] Known issues: None identified for crew.context in CrewAI 1.7.2</li>
+</ul>
+<h3 id="prerequisite-check-script">Prerequisite Check Script<a class="headerlink" href="#prerequisite-check-script" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="ch">#!/bin/bash</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="c1"># scripts/validate_story2_prerequisites.sh</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;=== Story 2 Prerequisites Validation ===&quot;</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="c1"># 1. Check virtual environment</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$VIRTUAL_ENV</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span>*<span class="s2">&quot;.venv-py313&quot;</span>*<span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;❌ FAIL: .venv-py313 not active&quot;</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Run: source .venv-py313/bin/activate&quot;</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="k">fi</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;✅ Virtual environment: .venv-py313 active&quot;</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="c1"># 2. Check Python version</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="nv">PYTHON_VERSION</span><span class="o">=</span><span class="k">$(</span>python<span class="w"> </span>--version<span class="w"> </span><span class="p">|</span><span class="w"> </span>awk<span class="w"> </span><span class="s1">&#39;{print $2}&#39;</span><span class="k">)</span>
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PYTHON_VERSION</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;3.13.11&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;❌ FAIL: Python </span><span class="nv">$PYTHON_VERSION</span><span class="s2"> (expected 3.13.11)&quot;</span>
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="k">fi</span>
+<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;✅ Python version: </span><span class="nv">$PYTHON_VERSION</span><span class="s2">&quot;</span>
+<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>
+<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="c1"># 3. Check CrewAI</span>
+<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="nv">CREWAI_VERSION</span><span class="o">=</span><span class="k">$(</span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import crewai; print(crewai.__version__)&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="k">)</span>
+<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CREWAI_VERSION</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;❌ FAIL: CrewAI not installed&quot;</span>
+<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="k">fi</span>
+<a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;✅ CrewAI version: </span><span class="nv">$CREWAI_VERSION</span><span class="s2">&quot;</span>
+<a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a>
+<a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a><span class="c1"># 4. Check crewai-tools</span>
+<a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import crewai_tools&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null
+<a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$?</span><span class="w"> </span>-ne<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;❌ FAIL: crewai-tools not installed&quot;</span>
+<a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a><span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-4-35" name="__codelineno-4-35" href="#__codelineno-4-35"></a><span class="k">fi</span>
+<a id="__codelineno-4-36" name="__codelineno-4-36" href="#__codelineno-4-36"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;✅ crewai-tools: installed&quot;</span>
+<a id="__codelineno-4-37" name="__codelineno-4-37" href="#__codelineno-4-37"></a>
+<a id="__codelineno-4-38" name="__codelineno-4-38" href="#__codelineno-4-38"></a><span class="c1"># 5. Check Story 1 complete</span>
+<a id="__codelineno-4-39" name="__codelineno-4-39" href="#__codelineno-4-39"></a><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>!<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;scripts/crewai_agents.py&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<a id="__codelineno-4-40" name="__codelineno-4-40" href="#__codelineno-4-40"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;❌ FAIL: Story 1 not complete (crewai_agents.py missing)&quot;</span>
+<a id="__codelineno-4-41" name="__codelineno-4-41" href="#__codelineno-4-41"></a><span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-4-42" name="__codelineno-4-42" href="#__codelineno-4-42"></a><span class="k">fi</span>
+<a id="__codelineno-4-43" name="__codelineno-4-43" href="#__codelineno-4-43"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;✅ Story 1: complete (crewai_agents.py exists)&quot;</span>
+<a id="__codelineno-4-44" name="__codelineno-4-44" href="#__codelineno-4-44"></a>
+<a id="__codelineno-4-45" name="__codelineno-4-45" href="#__codelineno-4-45"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-4-46" name="__codelineno-4-46" href="#__codelineno-4-46"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;=== All prerequisites validated ✅ ===&quot;</span>
+<a id="__codelineno-4-47" name="__codelineno-4-47" href="#__codelineno-4-47"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Story 2 ready to start&quot;</span>
+</code></pre></div>
+<hr />
+<h2 id="definition-of-done">Definition of Done<a class="headerlink" href="#definition-of-done" title="Permanent link">&para;</a></h2>
+<h3 id="implementation-complete">Implementation Complete<a class="headerlink" href="#implementation-complete" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[ ] <code>ContextManager</code> class created in <code>scripts/context_manager.py</code></li>
+<li>[ ] <code>crew.context</code> wrapper implemented in CrewAI initialization</li>
+<li>[ ] STORY_N_CONTEXT.md loading mechanism implemented</li>
+<li>[ ] Agent access API implemented (<code>self.crew.context.get/set/update</code>)</li>
+<li>[ ] Context propagation implemented for sequential tasks</li>
+<li>[ ] All 4 acceptance criteria validated (AC1-AC4)</li>
+<li>[ ] All quality requirements met (content, performance, security, maintainability)</li>
+<li>[ ] Code reviewed by Developer + QE Lead</li>
+<li>[ ] Tests passing (unit, integration, e2e)</li>
+<li>[ ] Documentation updated (README, architecture docs, API reference, examples)</li>
+</ul>
+<h3 id="quality-gates-passed">Quality Gates Passed<a class="headerlink" href="#quality-gates-passed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[ ] <strong>Linting</strong>: <code>ruff check scripts/</code> passes with 0 errors</li>
+<li>[ ] <strong>Formatting</strong>: <code>black --check scripts/</code> passes</li>
+<li>[ ] <strong>Type Checking</strong>: <code>mypy scripts/context_manager.py</code> passes with 0 errors</li>
+<li>[ ] <strong>Security Scan</strong>: <code>scripts/validate_context_security.py</code> passes (no secrets in context)</li>
+<li>[ ] <strong>Performance Benchmarks</strong>:</li>
+<li>Context load time &lt; 2 seconds ✅</li>
+<li>Context access time &lt; 10ms ✅</li>
+<li>Memory usage &lt; 10MB ✅</li>
+<li>[ ] <strong>Accessibility Checks</strong>: Documentation markdown is screen-reader compatible ✅</li>
+<li>[ ] <strong>Test Coverage</strong>: ≥80% line coverage verified by <code>pytest --cov</code></li>
+</ul>
+<h3 id="deployment-ready">Deployment Ready<a class="headerlink" href="#deployment-ready" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[ ] Merged to <code>main</code> branch</li>
+<li>[ ] CI/CD pipeline passes (GitHub Actions)</li>
+<li>[ ] Staging validated (run full Sprint 7 story with shared context)</li>
+<li>[ ] Rollback plan documented (how to revert to manual context if crew.context fails)</li>
+<li>[ ] Story 3 unblocked (agent-to-agent messaging can now build on shared context)</li>
+</ul>
+<hr />
+<h2 id="three-amigos-review">Three Amigos Review<a class="headerlink" href="#three-amigos-review" title="Permanent link">&para;</a></h2>
+<h3 id="developer-perspective">Developer Perspective<a class="headerlink" href="#developer-perspective" title="Permanent link">&para;</a></h3>
+<p><strong>How will we implement this?</strong>
+1. <strong>ContextManager Class</strong> (<code>scripts/context_manager.py</code>):
+   - Parse STORY_N_CONTEXT.md markdown
+   - Extract structured sections (Story Info, User Story, AC, Quality Requirements)
+   - Store in dict-like structure for fast access
+   - Validate schema (required sections present)</p>
+<ol>
+<li><strong>CrewAI Integration</strong>:</li>
+<li>Wrap CrewAI's native <code>context</code> parameter</li>
+<li>Load ContextManager into crew initialization</li>
+<li>
+<p>Expose context to agents via <code>self.crew.context</code></p>
+</li>
+<li>
+<p><strong>Propagation Mechanism</strong>:</p>
+</li>
+<li>Use CrewAI's task <code>context</code> parameter to pass outputs</li>
+<li>Automatically append task results to crew.context</li>
+<li>Ensure downstream tasks see cumulative context</li>
+</ol>
+<p><strong>Quality implementation concerns</strong>:
+- <strong>Thread Safety</strong>: Context updates must be thread-safe (use <code>threading.Lock</code>)
+- <strong>Performance</strong>: Avoid re-parsing markdown on every access (cache parsed structure)
+- <strong>Error Handling</strong>: Graceful degradation if context file missing (provide template)</p>
+<p><strong>Technical Risks</strong>:
+- <strong>CrewAI API Changes</strong>: crew.context API may differ from assumptions (mitigation: read CrewAI docs first, Task 1)
+- <strong>Memory Leaks</strong>: Large contexts may not be garbage collected (mitigation: implement context size limits, warn at 5MB)
+- <strong>Concurrency</strong>: Multiple agents accessing context simultaneously (mitigation: use thread-safe dict, lock critical sections)</p>
+<hr />
+<h3 id="qa-perspective">QA Perspective<a class="headerlink" href="#qa-perspective" title="Permanent link">&para;</a></h3>
+<p><strong>How will we test this?</strong></p>
+<p><strong>Unit Tests</strong> (<code>tests/test_context_manager.py</code>):
+- Test context loading from valid markdown
+- Test context loading from malformed markdown (edge cases)
+- Test context access API (get/set/update methods)
+- Test context validation (missing sections raise errors)
+- Test context size limits (warn at 5MB, error at 1MB)</p>
+<p><strong>Integration Tests</strong> (<code>tests/test_crew_context_integration.py</code>):
+- Test multi-agent context sharing (Developer → QE → Scrum Master)
+- Test context propagation between tasks
+- Test concurrent context access (simulate race conditions)
+- Test context updates from different agents</p>
+<p><strong>E2E Tests</strong> (<code>tests/test_story2_end_to_end.py</code>):
+- Run full Story 2 execution with shared context
+- Measure briefing time reduction (10min → 3min target)
+- Validate no manual context transfer needed
+- Verify all agents receive correct context</p>
+<p><strong>Quality validation approach</strong>:
+- <strong>Performance</strong>: Use <code>pytest-benchmark</code> for context access timing
+- <strong>Memory</strong>: Use <code>memory_profiler</code> to track context memory usage
+- <strong>Concurrency</strong>: Use <code>pytest-xdist</code> to run tests in parallel, catch race conditions
+- <strong>Coverage</strong>: Use <code>pytest-cov</code> to ensure ≥80% coverage</p>
+<p><strong>Automation strategy</strong>:
+- All tests run in CI/CD (GitHub Actions)
+- Pre-commit hook runs unit tests locally
+- Nightly runs for e2e tests (longer execution time)</p>
+<hr />
+<h3 id="product-perspective">Product Perspective<a class="headerlink" href="#product-perspective" title="Permanent link">&para;</a></h3>
+<p><strong>Why are these quality requirements necessary?</strong></p>
+<p><strong>Content Quality</strong> (Context Documentation):
+- <strong>Why</strong>: Agents must understand story without external context. Incomplete or unclear context leads to misalignment, rework, and coordination overhead (Sprint 6 lesson).
+- <strong>Trade-offs</strong>: More documentation effort upfront (30 min per story) vs 70% briefing time savings (21 min per agent).
+- <strong>Measurable</strong>: Yes - context completeness score (12/12 mandatory sections), Hemingway Grade ≤8.</p>
+<p><strong>Performance Criteria</strong>:
+- <strong>Why</strong>: Slow context loading delays story starts. 10-second load time would negate briefing time benefits.
+- <strong>Trade-offs</strong>: Optimized parsing code complexity vs user experience (agents wait).
+- <strong>Measurable</strong>: Yes - context load time &lt; 2 seconds (verified by pytest timing).</p>
+<p><strong>Security Requirements</strong>:
+- <strong>Why</strong>: Context files are version-controlled. Accidentally committing secrets would expose credentials.
+- <strong>Trade-offs</strong>: Security validation adds pre-commit time (~1 second) vs risk of credential exposure.
+- <strong>Measurable</strong>: Yes - security scan passes (0 secrets detected).</p>
+<p><strong>Maintainability Requirements</strong>:
+- <strong>Why</strong>: Future developers (Sprint 8+) need to understand and extend context system. Poor documentation leads to fragile changes.
+- <strong>Trade-offs</strong>: Documentation effort (2 hours) vs future maintenance cost (4+ hours per change without docs).
+- <strong>Measurable</strong>: Yes - 80% test coverage, 100% type hints, all classes have docstrings.</p>
+<p><strong>Quality-first rationale</strong>:
+- Sprint 6 demonstrated that quality requirements emerge during implementation if not specified upfront (BUG-015 layout issue, BUG-016 chart embedding).
+- Explicit quality requirements prevent post-deployment "bugs" that are actually missing requirements.
+- Quality work is NOT "free" - story points include 60% functional + 40% quality (5 pts = 3 functional + 2 quality).</p>
+<hr />
+<h2 id="story-points-estimation">Story Points Estimation<a class="headerlink" href="#story-points-estimation" title="Permanent link">&para;</a></h2>
+<h3 id="functional-work-3-points-6-hours">Functional Work: 3 Points (~6 hours)<a class="headerlink" href="#functional-work-3-points-6-hours" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Context Loading</strong> (1.5 hours):</li>
+<li>Parse STORY_N_CONTEXT.md markdown</li>
+<li>Extract structured sections</li>
+<li>Validate required sections</li>
+<li>Cache parsed structure</li>
+<li>
+<p>Unit tests for loading</p>
+</li>
+<li>
+<p><strong>CrewAI Integration</strong> (2 hours):</p>
+</li>
+<li>Wrap CrewAI crew.context</li>
+<li>Load ContextManager into crew initialization</li>
+<li>Expose <code>self.crew.context</code> to agents</li>
+<li>Implement get/set/update API</li>
+<li>
+<p>Unit tests for access API</p>
+</li>
+<li>
+<p><strong>Context Propagation</strong> (2.5 hours):</p>
+</li>
+<li>Configure task dependencies (Developer → QE → Scrum Master)</li>
+<li>Automatically append task results to context</li>
+<li>Ensure downstream tasks see cumulative context</li>
+<li>Integration tests for propagation</li>
+<li>E2E test for multi-agent flow</li>
+</ol>
+<p><strong>Total Functional</strong>: 6 hours (3 story points)</p>
+<hr />
+<h3 id="quality-work-2-points-4-hours">Quality Work: 2 Points (~4 hours)<a class="headerlink" href="#quality-work-2-points-4-hours" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Comprehensive Testing</strong> (1.5 hours):</li>
+<li>Edge case unit tests (malformed markdown, empty context, invalid updates)</li>
+<li>Concurrency integration tests (race conditions, thread safety)</li>
+<li>Performance benchmarks (load time, access time, memory usage)</li>
+<li>
+<p>Security validation tests (no secrets in context)</p>
+</li>
+<li>
+<p><strong>Documentation</strong> (1.5 hours):</p>
+</li>
+<li>README.md update (Shared Context System section)</li>
+<li><code>docs/CREWAI_CONTEXT_ARCHITECTURE.md</code> (class diagrams, data flow)</li>
+<li><code>docs/CREWAI_API_REFERENCE.md</code> (crew.context API)</li>
+<li><code>examples/crew_context_usage.py</code> (usage examples)</li>
+<li>
+<p>Inline docstrings for ContextManager class</p>
+</li>
+<li>
+<p><strong>Error Handling &amp; Validation</strong> (1 hour):</p>
+</li>
+<li>Implement custom exceptions (ContextFileNotFoundError, ContextParseError, ContextUpdateError)</li>
+<li>Add helpful error messages with examples</li>
+<li>Context size validation (warn at 5MB, error at 1MB)</li>
+<li>Security scan integration (pre-commit hook)</li>
+</ol>
+<p><strong>Total Quality</strong>: 4 hours (2 story points)</p>
+<hr />
+<h3 id="total-5-story-points-10-hours-functionalquality-25-hours-buffer-125-hours">Total: 5 Story Points (~10 hours functional/quality + 2.5 hours buffer = 12.5 hours)<a class="headerlink" href="#total-5-story-points-10-hours-functionalquality-25-hours-buffer-125-hours" title="Permanent link">&para;</a></h3>
+<p><strong>Estimation Rule Validation</strong>:
+- Functional work: 6 hours (60%) ✅
+- Quality work: 4 hours (40%) ✅
+- Total: 10 hours + 2.5 hour buffer = 12.5 hours
+- Story points: 5 (matches 60/40 rule)</p>
+<p><strong>Buffer Justification</strong>:
+- CrewAI API may differ from assumptions (Task 1 research mitigates)
+- Concurrency issues may require debugging (integration tests catch early)
+- Documentation may need iteration based on team feedback</p>
+<hr />
+<h2 id="risks-mitigation">Risks &amp; Mitigation<a class="headerlink" href="#risks-mitigation" title="Permanent link">&para;</a></h2>
+<h3 id="technical-risks">Technical Risks<a class="headerlink" href="#technical-risks" title="Permanent link">&para;</a></h3>
+<p><strong>RISK-1: CrewAI crew.context API differs from assumptions</strong>
+- <strong>Likelihood</strong>: MEDIUM
+- <strong>Impact</strong>: HIGH (could invalidate entire implementation approach)
+- <strong>Mitigation</strong>:
+  - Task 1 (30 min): Read CrewAI documentation thoroughly before implementation
+  - Prototype minimal context example (15 min) to validate API
+  - Fallback: Use CrewAI task outputs instead of crew.context if API unsuitable
+- <strong>Contingency</strong>: If crew.context doesn't exist in CrewAI 1.7.2, implement custom shared memory dict</p>
+<p><strong>RISK-2: Context propagation has race conditions</strong>
+- <strong>Likelihood</strong>: MEDIUM
+- <strong>Impact</strong>: MEDIUM (agents see stale or corrupted context)
+- <strong>Mitigation</strong>:
+  - Use <code>threading.Lock</code> for context updates
+  - Integration tests with parallel agents (catch race conditions)
+  - Add audit logging for all context modifications (debugging tool)
+- <strong>Contingency</strong>: If race conditions persist, serialize agent execution (no parallelism)</p>
+<p><strong>RISK-3: Large contexts exceed memory limits</strong>
+- <strong>Likelihood</strong>: LOW
+- <strong>Impact</strong>: MEDIUM (OOM errors, slow performance)
+- <strong>Mitigation</strong>:
+  - Context size validation (warn at 5MB, error at 1MB)
+  - Performance tests with large contexts (100KB, 500KB, 1MB)
+  - Implement context compression if needed (gzip strings)
+- <strong>Contingency</strong>: If context too large, truncate older sections or split into multiple files</p>
+<hr />
+<h3 id="quality-risks">Quality Risks<a class="headerlink" href="#quality-risks" title="Permanent link">&para;</a></h3>
+<p><strong>RISK-4: Test coverage below 80% target</strong>
+- <strong>Likelihood</strong>: MEDIUM
+- <strong>Impact</strong>: HIGH (increases bug risk, fails quality gate)
+- <strong>Mitigation</strong>:
+  - Test-driven development (write tests first)
+  - Use <code>pytest-cov</code> to monitor coverage during development
+  - Add tests for uncovered branches (focus on edge cases)
+- <strong>Contingency</strong>: If 80% not achievable, document why and get QE Lead approval for lower target</p>
+<p><strong>RISK-5: Documentation incomplete or unclear</strong>
+- <strong>Likelihood</strong>: MEDIUM
+- <strong>Impact</strong>: MEDIUM (future developers struggle to extend system)
+- <strong>Mitigation</strong>:
+  - Allocate 1.5 hours for documentation (not rushed at end)
+  - QE Lead reviews documentation for clarity
+  - Include code examples in all docs
+- <strong>Contingency</strong>: If documentation rushed, schedule Story 4 followup task to improve docs</p>
+<hr />
+<h3 id="timeline-risks">Timeline Risks<a class="headerlink" href="#timeline-risks" title="Permanent link">&para;</a></h3>
+<p><strong>RISK-6: Story 1 delays block Story 2 start</strong>
+- <strong>Likelihood</strong>: LOW (Story 1 on track per STORY_1_CONTEXT.md)
+- <strong>Impact</strong>: HIGH (delays entire Sprint 7 timeline)
+- <strong>Mitigation</strong>:
+  - Monitor Story 1 progress at 4-hour checkpoint
+  - If Story 1 blocked, re-prioritize Story 2 tasks (work on documentation/tests first)
+- <strong>Contingency</strong>: If Story 1 significantly delayed, de-scope Story 3 (agent-to-agent messaging) to keep Sprint 7 on track</p>
+<p><strong>RISK-7: Estimation inaccurate (12.5 hours too optimistic)</strong>
+- <strong>Likelihood</strong>: MEDIUM
+- <strong>Impact</strong>: MEDIUM (story spills into next day, delays Story 3)
+- <strong>Mitigation</strong>:
+  - 2.5 hour buffer included in estimate (10h → 12.5h)
+  - Track time at each task checkpoint (Tasks 1-10)
+  - If overrunning, cut non-critical quality work (reduce documentation scope)
+- <strong>Contingency</strong>: If estimate way off (&gt;15 hours), re-estimate remaining work and adjust Sprint 7 scope</p>
+<hr />
+<h2 id="related-work">Related Work<a class="headerlink" href="#related-work" title="Permanent link">&para;</a></h2>
+<h3 id="dependencies">Dependencies<a class="headerlink" href="#dependencies" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Story 1 (MUST BE COMPLETE)</strong>: CrewAI agent configuration provides foundation. Without Story 1 agents, crew.context has no agents to serve.</li>
+<li><strong>Sprint 6 Retrospective</strong>: Provides baseline metrics (briefing time 10 min, context duplication 40%, coordination overhead 25%)</li>
+</ul>
+<h3 id="blocked-by">Blocked By<a class="headerlink" href="#blocked-by" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Story 1 Status</strong>: As of 2026-01-02, Story 1 is in progress (3/15 points). Story 2 cannot start until Story 1 agents validated.</li>
+</ul>
+<h3 id="blocks">Blocks<a class="headerlink" href="#blocks" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Story 3</strong>: Agent-to-agent messaging requires shared context foundation (Story 2)</li>
+<li><strong>Story 4</strong>: Documentation &amp; validation depends on all prior stories complete</li>
+</ul>
+<h3 id="related-documentation">Related Documentation<a class="headerlink" href="#related-documentation" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>docs/STORY_1_CONTEXT.md</code>: Agent configuration details</li>
+<li><code>docs/RETROSPECTIVE_S6.md</code>: Sprint 6 metrics and lessons</li>
+<li><code>docs/ADR-003-crewai-migration-strategy.md</code>: CrewAI migration decision context</li>
+<li><code>docs/STORY_TEMPLATE_WITH_QUALITY.md</code>: Template used to create this document</li>
+</ul>
+<hr />
+<h2 id="notes-decisions">Notes &amp; Decisions<a class="headerlink" href="#notes-decisions" title="Permanent link">&para;</a></h2>
+<h3 id="decisions-made">Decisions Made<a class="headerlink" href="#decisions-made" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>crew.context over custom shared memory</strong>: Leverage CrewAI's native context system rather than building custom solution. Rationale: Better integration, community support, less maintenance.</li>
+<li><strong>Markdown context format</strong>: Use STORY_N_CONTEXT.md markdown files rather than JSON or YAML. Rationale: Human-readable, already structured, version-control friendly.</li>
+<li><strong>Sequential propagation only (for now)</strong>: Story 2 implements sequential context propagation (Developer → QE → Scrum Master). Parallel agent context sharing deferred to future sprint. Rationale: Simpler implementation, matches Sprint 6 workflow.</li>
+<li><strong>80% test coverage target</strong>: Mandatory for story completion. Rationale: High-risk component (shared state, concurrency), needs comprehensive testing.</li>
+</ol>
+<h3 id="open-questions">Open Questions<a class="headerlink" href="#open-questions" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Q: Does CrewAI 1.7.2 support crew.context natively?</strong></li>
+<li><strong>Answer</strong>: Research in Task 1 will confirm. If not, fallback to custom shared memory dict.</li>
+<li><strong>Q: How large can contexts grow before performance degrades?</strong></li>
+<li><strong>Answer</strong>: Performance tests in Task 8 will establish limits. Current hypothesis: 500KB typical, 1MB maximum.</li>
+<li><strong>Q: Should context be persisted to disk for audit trail?</strong></li>
+<li><strong>Answer</strong>: Deferred to Story 4. For now, audit logging only.</li>
+</ol>
+<h3 id="assumptions">Assumptions<a class="headerlink" href="#assumptions" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Story 1 completes successfully</strong>: Agents configured, sequential tasks working. If not, Story 2 blocks.</li>
+<li><strong>CrewAI API stability</strong>: crew.context API in 1.7.2 matches documentation. If breaking changes in future versions, may need updates.</li>
+<li><strong>Context size manageable</strong>: Typical story contexts &lt; 100KB. If contexts grow larger, may need pagination/compression.</li>
+<li><strong>No security concerns with context</strong>: Contexts contain only story metadata, no secrets or PII. If assumptions wrong, need additional security layer.</li>
+</ol>
+<hr />
+<h2 id="validation-checklist">Validation Checklist<a class="headerlink" href="#validation-checklist" title="Permanent link">&para;</a></h2>
+<h3 id="functional-validation">Functional Validation<a class="headerlink" href="#functional-validation" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[ ] AC1: STORY_N_CONTEXT.md loads into crew.context successfully</li>
+<li>[ ] AC2: Agents access context via <code>self.crew.context.get()</code> without errors</li>
+<li>[ ] AC3: Context propagates from Developer → QE → Scrum Master automatically</li>
+<li>[ ] AC4: Briefing time reduced ≤3 minutes per agent (measured)</li>
+<li>[ ] Edge cases handled: empty context, malformed markdown, invalid updates, missing file</li>
+<li>[ ] Error messages helpful (include examples of correct format)</li>
+</ul>
+<h3 id="quality-validation">Quality Validation<a class="headerlink" href="#quality-validation" title="Permanent link">&para;</a></h3>
+<h4 id="content-quality_1">Content Quality<a class="headerlink" href="#content-quality_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>[ ] STORY_2_CONTEXT.md follows STORY_TEMPLATE_WITH_QUALITY.md structure (12/12 mandatory sections)</li>
+<li>[ ] Context self-contained (no external references needed)</li>
+<li>[ ] Spelling British English throughout</li>
+<li>[ ] Hemingway Grade ≤8 for context descriptions</li>
+</ul>
+<h4 id="performance">Performance<a class="headerlink" href="#performance" title="Permanent link">&para;</a></h4>
+<ul>
+<li>[ ] Context load time &lt; 2 seconds (measured by pytest)</li>
+<li>[ ] Context access time &lt; 10ms (measured by timeit)</li>
+<li>[ ] Memory usage &lt; 10MB per story (measured by tracemalloc)</li>
+</ul>
+<h4 id="accessibility">Accessibility<a class="headerlink" href="#accessibility" title="Permanent link">&para;</a></h4>
+<ul>
+<li>[ ] Documentation markdown screen-reader compatible (proper heading hierarchy)</li>
+<li>[ ] Code blocks have language labels (<code>python,</code>bash)</li>
+</ul>
+<h4 id="seo">SEO<a class="headerlink" href="#seo" title="Permanent link">&para;</a></h4>
+<ul>
+<li>[ ] N/A (internal framework feature)</li>
+</ul>
+<h4 id="security">Security<a class="headerlink" href="#security" title="Permanent link">&para;</a></h4>
+<ul>
+<li>[ ] Security scan passes (<code>scripts/validate_context_security.py</code>)</li>
+<li>[ ] No secrets in context files (API keys, tokens)</li>
+<li>[ ] No PII in context files (emails, phone numbers)</li>
+<li>[ ] Audit logging implemented (all context modifications logged)</li>
+</ul>
+<h4 id="maintainability">Maintainability<a class="headerlink" href="#maintainability" title="Permanent link">&para;</a></h4>
+<ul>
+<li>[ ] Documentation complete (README, architecture docs, API reference, examples)</li>
+<li>[ ] Test coverage ≥80% (verified by <code>pytest --cov</code>)</li>
+<li>[ ] All classes have docstrings</li>
+<li>[ ] Type hints 100% coverage for context module</li>
+<li>[ ] Linting passes (<code>ruff check</code> 0 errors)</li>
+<li>[ ] Formatting passes (<code>black --check</code>)</li>
+<li>[ ] Type checking passes (<code>mypy</code> 0 errors)</li>
+</ul>
+<h3 id="regression-prevention">Regression Prevention<a class="headerlink" href="#regression-prevention" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[ ] Baseline documented: Sprint 6 briefing time 10 min, context duplication 40%</li>
+<li>[ ] Measurements logged: Story 2 briefing time measured and compared to baseline</li>
+<li>[ ] Tests added for all edge cases (malformed context, concurrent access, size limits)</li>
+<li>[ ] Quality requirements captured in this document (all 6 categories)</li>
+<li>[ ] Future stories can reference this as pattern (STORY_N_CONTEXT template)</li>
+</ul>
+<hr />
+<h2 id="appendix-task-breakdown-reference">Appendix: Task Breakdown (Reference)<a class="headerlink" href="#appendix-task-breakdown-reference" title="Permanent link">&para;</a></h2>
+<p><strong>Note</strong>: Full task breakdown will be created after DoR validation and user approval.</p>
+<p><strong>Preliminary Estimate</strong> (for reference):
+1. Task 0: ✅ COMPLETE - Environment validation (Python 3.13.11, CrewAI 1.7.2)
+2. Task 1: Research CrewAI crew.context API (30 min)
+3. Task 2: Design ContextManager class (45 min)
+4. Task 3: Implement context loading (90 min)
+5. Task 4: Implement context access API (60 min)
+6. Task 5: Implement context propagation (90 min)
+7. Task 6: Unit tests (90 min)
+8. Task 7: Integration tests (60 min)
+9. Task 8: Performance validation (30 min)
+10. Task 9: Documentation (90 min)
+11. Task 10: Code review and refinement (45 min)</p>
+<p><strong>Total</strong>: 10.5 hours + 2 hours buffer = 12.5 hours (5 story points)</p>
+<hr />
+<h2 id="template-version">Template Version<a class="headerlink" href="#template-version" title="Permanent link">&para;</a></h2>
+<p><strong>Version</strong>: 1.0 (Sprint 7, Day 2)
+<strong>Template</strong>: STORY_TEMPLATE_WITH_QUALITY.md (318 lines)
+<strong>Last Updated</strong>: 2026-01-02
+<strong>Owner</strong>: Scrum Master + Product Owner
+<strong>Change History</strong>:
+- 2026-01-02: Initial Story 2 context created following template v1.0
+- Sprint 7 Day 2: Quality requirements made mandatory (DoR v1.2)</p>
+<hr />
+<p><strong>END OF STORY_2_CONTEXT.MD</strong></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,47 @@
+{
+  "test_date": "2026-01-03 11:54:00",
+  "backlog_size": 5,
+  "task_queue_size": 15,
+  "automation_metrics": {
+    "automated_assignments": 0,
+    "manual_interventions": 15,
+    "automation_rate_percent": 0.0,
+    "target_rate_percent": 90.0,
+    "meets_target": false
+  },
+  "quality_gate_metrics": {
+    "approve_count": 0,
+    "escalate_count": 0,
+    "reject_count": 0,
+    "total_decisions": 5
+  },
+  "performance_metrics": {
+    "queue_creation_time_seconds": 0.0,
+    "avg_time_per_story_seconds": 0.0
+  },
+  "dor_validation": {
+    "TEST-001": {
+      "valid": true,
+      "missing": []
+    },
+    "TEST-002": {
+      "valid": true,
+      "missing": []
+    },
+    "TEST-003": {
+      "valid": true,
+      "missing": []
+    },
+    "TEST-004": {
+      "valid": false,
+      "missing": [
+        "acceptance_criteria",
+        "quality_requirements"
+      ]
+    },
+    "TEST-005": {
+      "valid": true,
+      "missing": []
+    }
+  }
+}

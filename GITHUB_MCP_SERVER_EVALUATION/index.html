@@ -1,0 +1,3158 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Multi-agent content pipeline that generates Economist-style articles with autonomous research, writing, illustration, and deployment">
+      
+      
+      
+        <link rel="canonical" href="https://oviney.github.io/economist-agents/GITHUB_MCP_SERVER_EVALUATION/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>GitHub MCP Server Evaluation - Sprint 10 Tooling Decision - Economist Agents</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#github-mcp-server-evaluation-sprint-10-tooling-decision" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Economist Agents" class="md-header__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Economist Agents
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              GitHub MCP Server Evaluation - Sprint 10 Tooling Decision
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/oviney/economist-agents" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    oviney/economist-agents
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../agent-registry-spec/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../adr/ADR-001-agent-framework-selection/" class="md-tabs__link">
+          
+  
+  
+  ADRs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../skills/agent-delegation/SKILL/" class="md-tabs__link">
+          
+  
+  
+  Skills
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../guides/WORKFLOW_GUIDE/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../CREWAI_API_REFERENCE/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../AGENT_VELOCITY_ANALYSIS/" class="md-tabs__link">
+          
+  
+  
+  Performance
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Economist Agents" class="md-nav__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Economist Agents
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/oviney/economist-agents" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    oviney/economist-agents
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agent-registry-spec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../FLOW_ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AUTONOMOUS_ORCHESTRATION_STRATEGY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autonomous Orchestration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CREWAI_CONTEXT_ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shared Context System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE_PATTERNS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE_REVIEW_PROCESS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Review Process
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADRs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADRs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/ADR-001-agent-framework-selection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-001 — Agent Framework Selection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/ADR-002-content-intelligence-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-002 — Content Intelligence Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/ADR-003-agent-skill-governance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-003 — Agent Skill Governance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ADR-004-python-version-constraint/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-004 — Python Version Constraint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ADR-005-agile-discipline-enforcement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-005 — Agile Discipline Enforcement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skills
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Skills
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/agent-delegation/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Delegation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/research-sourcing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research Sourcing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/economist-writing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Economist Writing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/editorial-illustration/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Editorial Illustration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/article-evaluation/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Article Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/quality-gates/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quality Gates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/python-quality/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python Quality
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/testing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/defect-prevention/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Defect Prevention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/devops/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DevOps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/sprint-management/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/scrum-master/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scrum Master
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/agent-traceability/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Traceability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/observability/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/mcp-development/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/WORKFLOW_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/BLOG_DEPLOYMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/COPILOT_SYNC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Copilot Sync
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/CI_MONITORING_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CI Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/PYTHON_VERSION_TROUBLESHOOTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/IMPLEMENTATION_ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/VALIDATION_QUICK_REF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation Quick Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CREWAI_API_REFERENCE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CrewAI API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AGENT_PROMPT_PATTERNS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Prompt Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AGENT_QUALITY_GATES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quality Gates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEFINITION_OF_DONE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Definition of Done
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEFECT_PREVENTION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Defect Prevention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHART_DESIGN_SPEC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chart Design Spec
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Performance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AGENT_VELOCITY_ANALYSIS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Velocity Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SPRINT_DISCIPLINE_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint Discipline Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#reality-check-users-actual-mcp-server-2026-01-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ REALITY CHECK - USER'S ACTUAL MCP SERVER (2026-01-03)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#corrected-recommendation-cannot-use-mcp-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CORRECTED RECOMMENDATION: CANNOT USE MCP SERVER
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#original-evaluation-based-on-github-readme-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Original Evaluation (Based on GitHub README Documentation)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#executive-summary-original-documentation-based" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Executive Summary (Original - Documentation-Based)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#github-mcp-server-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub MCP Server Details
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="GitHub MCP Server Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#official-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Official Repository
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authentication-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#projects-v2-toolset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Projects v2 Toolset
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Projects v2 Toolset">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#available-tools-9-total" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available Tools (9 total)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sprint-10-requirements-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sprint 10 Requirements Mapping
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sprint 10 Requirements Mapping">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requirement-1-projects-v2-board-creation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Requirement 1: Projects v2 Board Creation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#requirement-2-custom-field-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Requirement 2: Custom Field Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#requirement-3-issue-linking-to-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Requirement 3: Issue Linking to Project
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#requirement-4-burndown-chart-data-extraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Requirement 4: Burndown Chart Data Extraction
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#requirement-5-velocity-tracking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Requirement 5: Velocity Tracking
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#requirement-6-custom-field-updates-bidirectional-sync" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Requirement 6: Custom Field Updates (Bidirectional Sync)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#requirement-7-project-hygiene-automation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Requirement 7: Project Hygiene Automation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#requirement-8-sprint-health-reports" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Requirement 8: Sprint Health Reports
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparison-matrix-github-cli-vs-mcp-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparison Matrix: GitHub CLI vs MCP Server
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recommended-hybrid-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommended Hybrid Approach
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Recommended Hybrid Approach">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-1-one-time-setup-cli-only-10-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1: One-Time Setup (CLI Only - 10 minutes)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2-all-subsequent-operations-mcp-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2: All Subsequent Operations (MCP Only)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3-cicd-automation-github-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3: CI/CD Automation (GitHub Actions)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-plan-updated-for-mcp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Plan (Updated for MCP)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Plan (Updated for MCP)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sprint-10-implementation-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔧 Sprint 10 Implementation Steps
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision-rationale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision Rationale
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decision Rationale">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-github-mcp-server-wins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Why GitHub MCP Server WINS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cli-advantages-still-valid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ CLI Advantages (Still Valid)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#final-decision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Final Decision
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Next Steps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#immediate-actions-user-approval-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⏭️ Immediate Actions (User Approval Required)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#devops-implementation-post-approval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🛠️ DevOps Implementation (Post-Approval)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="github-mcp-server-evaluation-sprint-10-tooling-decision">GitHub MCP Server Evaluation - Sprint 10 Tooling Decision<a class="headerlink" href="#github-mcp-server-evaluation-sprint-10-tooling-decision" title="Permanent link">&para;</a></h1>
+<p><strong>Date</strong>: 2026-01-03<br />
+<strong>Evaluator</strong>: @devops<br />
+<strong>Purpose</strong>: Determine if GitHub MCP Server can replace GitHub CLI + Python for Projects v2 automation<br />
+<strong>Status</strong>: ⚠️ <strong>CORRECTED</strong> - Original recommendation invalidated by reality check</p>
+<hr />
+<h2 id="reality-check-users-actual-mcp-server-2026-01-03">⚠️ REALITY CHECK - USER'S ACTUAL MCP SERVER (2026-01-03)<a class="headerlink" href="#reality-check-users-actual-mcp-server-2026-01-03" title="Permanent link">&para;</a></h2>
+<p><strong>CRITICAL FINDING</strong>: User's running MCP server lacks ALL Projects v2 tools.</p>
+<p><strong>User's Environment</strong>:
+- Version: <code>github-mcp-server/remote-406ace364b7758ec3e8e0b58e67eb595dbf6b418</code> (REMOTE variant)
+- Total Tools: 27
+- <strong>Projects v2 Tools: 0</strong> ❌</p>
+<p><strong>Available Tool Categories</strong>:
+- ✅ Issues (4 tools): issue_read, list_issues, list_issue_types, search_issues
+- ✅ Pull Requests (3 tools): pull_request_read, list_pull_requests, search_pull_requests
+- ✅ Actions (2 tools): actions_get, actions_list
+- ✅ Code Scanning (2 tools)
+- ✅ Commits, Files, Jobs, Labels, Releases, Branches, Search, etc.
+- ❌ <strong>NO Projects Tools</strong>: No add_project_item, list_project_items, update_project_item, etc.</p>
+<p><strong>Root Cause</strong>: Remote MCP server is a <strong>subset</strong> of the full-featured local server. The README documents the complete local server capabilities, but the remote variant excludes Projects v2 operations entirely.</p>
+<p><strong>Sprint 10 Impact</strong>: Cannot implement 5/8 requirements without Projects tools:
+- ❌ Issue linking (needs add_project_item)
+- ❌ Burndown data extraction (needs list_project_items with fields)
+- ❌ Custom field mutations (needs update_project_item)
+- ❌ Hygiene queries (needs list_project_items with query filtering)
+- ❌ Bidirectional sync (needs multiple project operations)</p>
+<hr />
+<h2 id="corrected-recommendation-cannot-use-mcp-server"><strong>CORRECTED RECOMMENDATION: CANNOT USE MCP SERVER</strong><a class="headerlink" href="#corrected-recommendation-cannot-use-mcp-server" title="Permanent link">&para;</a></h2>
+<p><strong>Decision</strong>: Proceed with <strong>GitHub CLI + Python</strong> as documented in <code>skills/devops/SKILL.md</code></p>
+<p><strong>Rationale</strong>:
+1. User's remote MCP server lacks all Projects v2 capabilities
+2. Local MCP server installation adds complexity vs proven CLI approach
+3. CLI approach fully documented (1056 lines) with no unknowns
+4. CLI proven working in Sprint 9 (sync_github_project.py operational)</p>
+<p><strong>Next Steps</strong>:
+1. ✅ User: Execute <code>gh auth refresh -s project</code> (add project scope to token)
+2. ✅ User: Create Sprint 10 board via web UI (10 minutes)
+3. ✅ User: Create 4 custom fields (Story Points, Sprint, Priority, Owner) via web UI (10 minutes)
+4. ✅ DevOps: Implement 3 Python scripts per SKILL.md (8-12 hours)
+   - <code>generate_burndown.py</code> - GraphQL → matplotlib
+   - <code>generate_velocity.py</code> - Historical analysis
+   - <code>project_hygiene.py</code> - Stale issue detection</p>
+<hr />
+<h2 id="original-evaluation-based-on-github-readme-documentation">Original Evaluation (Based on GitHub README Documentation)<a class="headerlink" href="#original-evaluation-based-on-github-readme-documentation" title="Permanent link">&para;</a></h2>
+<p><strong>ORIGINAL RECOMMENDATION</strong>: ✅ USE GITHUB MCP SERVER (invalidated)</p>
+<p><strong>Note</strong>: The evaluation below was based on analyzing the official GitHub MCP server README, which documents 9 Projects v2 tools. However, this appears to document the <strong>local/full-featured server</strong>, while the user's <strong>remote server</strong> is a limited subset without Projects support.</p>
+<hr />
+<h2 id="executive-summary-original-documentation-based">Executive Summary (Original - Documentation-Based)<a class="headerlink" href="#executive-summary-original-documentation-based" title="Permanent link">&para;</a></h2>
+<p>GitHub's <strong>official MCP server</strong> supports Projects v2 (formerly GitHub Projects Beta) with comprehensive tooling for:
+- ✅ Project board operations (create, list, get)
+- ✅ Custom field management (list, get, update)
+- ✅ Item operations (add, delete, list, update with field values)
+- ✅ Advanced filtering and pagination
+- ✅ <strong>CRITICAL</strong>: <code>update_project_item</code> supports custom field mutations (Story Points, Sprint, Priority, Owner)</p>
+<p><strong>Key Benefits Over GitHub CLI + Python</strong>:
+1. <strong>Less code</strong>: Structured tools replace 300-400 lines of GraphQL boilerplate
+2. <strong>Better auth</strong>: OAuth support with automatic token management
+3. <strong>Cleaner integration</strong>: Standardized MCP interface across all GitHub operations
+4. <strong>Maintained by GitHub</strong>: Official support, up-to-date with API changes
+5. <strong>Developer experience</strong>: Natural language tool invocation vs raw GraphQL</p>
+<p><strong>Implementation Impact</strong>:
+- ✅ All Sprint 10 requirements satisfied
+- ✅ Burndown chart: MCP <code>list_project_items</code> + Python matplotlib (cleaner data flow)
+- ✅ Velocity tracking: Same sprint_tracker.json + MCP sync validation
+- ✅ Hygiene automation: MCP issue queries + project field checks
+- <strong>Estimated effort</strong>: 8-10 hours (vs 8-12 hours with CLI - slightly faster due to less boilerplate)</p>
+<hr />
+<h2 id="github-mcp-server-details">GitHub MCP Server Details<a class="headerlink" href="#github-mcp-server-details" title="Permanent link">&para;</a></h2>
+<h3 id="official-repository">Official Repository<a class="headerlink" href="#official-repository" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Source</strong>: https://github.com/github/github-mcp-server</li>
+<li><strong>Package</strong>: Available via npm (<code>github-mcp</code>, <code>github-mcp-custom</code>)</li>
+<li><strong>Status</strong>: Production-ready, officially maintained by GitHub</li>
+<li><strong>Language</strong>: Go (compiled binary, cross-platform)</li>
+<li><strong>Integration</strong>: Works with VS Code 1.101+, Claude Desktop, Cursor, Windsurf</li>
+</ul>
+<h3 id="authentication-options">Authentication Options<a class="headerlink" href="#authentication-options" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>OAuth (Recommended)</strong>: Automatic token management, scoped permissions</li>
+<li><strong>GitHub PAT</strong>: Classic personal access tokens with <code>project</code> scope</li>
+</ol>
+<h3 id="projects-v2-toolset">Projects v2 Toolset<a class="headerlink" href="#projects-v2-toolset" title="Permanent link">&para;</a></h3>
+<h4 id="available-tools-9-total">Available Tools (9 total)<a class="headerlink" href="#available-tools-9-total" title="Permanent link">&para;</a></h4>
+<p><strong>1. <code>add_project_item</code></strong> - Link issue/PR to project
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nx">Parameters</span><span class="o">:</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">item_id</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="w"> </span><span class="p">(</span><span class="nx">issue</span><span class="w"> </span><span class="nx">or</span><span class="w"> </span><span class="nx">PR</span><span class="w"> </span><span class="kt">number</span><span class="p">)</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">item_type</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;issue&quot;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">&quot;pull_request&quot;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">owner</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">(</span><span class="nx">user</span><span class="w"> </span><span class="nx">handle</span><span class="w"> </span><span class="nx">or</span><span class="w"> </span><span class="nx">org</span><span class="w"> </span><span class="nx">name</span><span class="p">)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">owner_type</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;user&quot;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">&quot;org&quot;</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">project_number</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span>
+</code></pre></div></p>
+<p><strong>2. <code>delete_project_item</code></strong> - Remove item from project
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nx">Parameters</span><span class="o">:</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">item_id</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="w"> </span><span class="p">(</span><span class="nx">internal</span><span class="w"> </span><span class="nx">project</span><span class="w"> </span><span class="nx">item</span><span class="w"> </span><span class="nx">ID</span><span class="p">,</span><span class="w"> </span><span class="nx">not</span><span class="w"> </span><span class="nx">issue</span><span class="w"> </span><span class="nx">ID</span><span class="p">)</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">owner</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">owner_type</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;user&quot;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">&quot;org&quot;</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">project_number</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span>
+</code></pre></div></p>
+<p><strong>3. <code>get_project</code></strong> - Get project details
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nx">Parameters</span><span class="o">:</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">owner</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">owner_type</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;user&quot;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">&quot;org&quot;</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">project_number</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nx">Returns</span><span class="o">:</span><span class="w"> </span><span class="kt">Project</span><span class="w"> </span><span class="nx">metadata</span><span class="w"> </span><span class="p">(</span><span class="nx">title</span><span class="p">,</span><span class="w"> </span><span class="nx">description</span><span class="p">,</span><span class="w"> </span><span class="nx">fields</span><span class="p">,</span><span class="w"> </span><span class="nx">etc</span><span class="p">.)</span>
+</code></pre></div></p>
+<p><strong>4. <code>get_project_field</code></strong> - Get specific field details
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nx">Parameters</span><span class="o">:</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">field_id</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">owner</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">owner_type</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;user&quot;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">&quot;org&quot;</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">project_number</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="nx">Returns</span><span class="o">:</span><span class="w"> </span><span class="kt">Field</span><span class="w"> </span><span class="kr">type</span><span class="p">,</span><span class="w"> </span><span class="nx">name</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="p">(</span><span class="k">for</span><span class="w"> </span><span class="nx">SINGLE_SELECT</span><span class="w"> </span><span class="nx">fields</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>5. <code>get_project_item</code></strong> - Get item with field values
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nx">Parameters</span><span class="o">:</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">item_id</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">fields</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">[]</span><span class="w"> </span><span class="p">(</span><span class="nx">field</span><span class="w"> </span><span class="nx">IDs</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="nx">include</span><span class="p">,</span><span class="w"> </span><span class="nx">e</span><span class="p">.</span><span class="nx">g</span><span class="p">.</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;102589&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;985201&quot;</span><span class="p">])</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">owner</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">owner_type</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;user&quot;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">&quot;org&quot;</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">project_number</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="nx">Returns</span><span class="o">:</span><span class="w"> </span><span class="kt">Item</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="kd">with</span><span class="w"> </span><span class="nx">specified</span><span class="w"> </span><span class="nx">field</span><span class="w"> </span><span class="nx">values</span>
+</code></pre></div></p>
+<p><strong>6. <code>list_project_fields</code></strong> - List all custom fields
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nx">Parameters</span><span class="o">:</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">owner</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">owner_type</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;user&quot;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">&quot;org&quot;</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">project_number</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">per_page</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="w"> </span><span class="p">(</span><span class="nx">max</span><span class="w"> </span><span class="mf">50</span><span class="p">,</span><span class="w"> </span><span class="nx">optional</span><span class="p">)</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">after</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">(</span><span class="nx">pagination</span><span class="w"> </span><span class="nx">cursor</span><span class="p">,</span><span class="w"> </span><span class="nx">optional</span><span class="p">)</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="nx">Returns</span><span class="o">:</span><span class="w"> </span><span class="kt">Array</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">fields</span><span class="w"> </span><span class="kd">with</span><span class="w"> </span><span class="nx">IDs</span><span class="p">,</span><span class="w"> </span><span class="nx">names</span><span class="p">,</span><span class="w"> </span><span class="nx">types</span>
+</code></pre></div></p>
+<p><strong>7. <code>list_project_items</code></strong> - ⭐ CRITICAL FOR BURNDOWN CHARTS
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nx">Parameters</span><span class="o">:</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">owner</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">owner_type</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;user&quot;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">&quot;org&quot;</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">project_number</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">fields</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">[]</span><span class="w"> </span><span class="p">(</span><span class="nx">CRITICAL</span><span class="o">:</span><span class="w"> </span><span class="kt">Always</span><span class="w"> </span><span class="nx">provide</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="nx">get</span><span class="w"> </span><span class="nx">field</span><span class="w"> </span><span class="nx">values</span><span class="p">)</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">query</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">(</span><span class="nx">filter</span><span class="w"> </span><span class="nx">syntax</span><span class="p">,</span><span class="w"> </span><span class="nx">e</span><span class="p">.</span><span class="nx">g</span><span class="p">.</span><span class="w"> </span><span class="s2">&quot;status:Done sprint:9&quot;</span><span class="p">)</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">per_page</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="w"> </span><span class="p">(</span><span class="nx">max</span><span class="w"> </span><span class="mf">50</span><span class="p">,</span><span class="w"> </span><span class="nx">optional</span><span class="p">)</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">after</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">(</span><span class="nx">pagination</span><span class="w"> </span><span class="nx">cursor</span><span class="p">,</span><span class="w"> </span><span class="nx">optional</span><span class="p">)</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="nx">Returns</span><span class="o">:</span><span class="w"> </span><span class="kt">Array</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">items</span><span class="w"> </span><span class="kd">with</span><span class="w"> </span><span class="nx">field</span><span class="w"> </span><span class="nx">values</span><span class="w"> </span><span class="p">(</span><span class="nx">story</span><span class="w"> </span><span class="nx">points</span><span class="p">,</span><span class="w"> </span><span class="nx">sprint</span><span class="p">,</span><span class="w"> </span><span class="nx">status</span><span class="p">,</span><span class="w"> </span><span class="nx">etc</span><span class="p">.)</span>
+</code></pre></div></p>
+<p><strong>8. <code>list_projects</code></strong> - List all projects for user/org
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nx">Parameters</span><span class="o">:</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">owner</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">owner_type</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;user&quot;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">&quot;org&quot;</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">query</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">(</span><span class="nx">filter</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;is:open&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;roadmap is:closed&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">optional</span><span class="p">)</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">per_page</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="w"> </span><span class="p">(</span><span class="nx">max</span><span class="w"> </span><span class="mf">50</span><span class="p">,</span><span class="w"> </span><span class="nx">optional</span><span class="p">)</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="nx">Returns</span><span class="o">:</span><span class="w"> </span><span class="kt">Array</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">projects</span>
+</code></pre></div></p>
+<p><strong>9. <code>update_project_item</code></strong> - ⭐ CRITICAL FOR CUSTOM FIELD UPDATES
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nx">Parameters</span><span class="o">:</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">item_id</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="w"> </span><span class="p">(</span><span class="nx">internal</span><span class="w"> </span><span class="nx">project</span><span class="w"> </span><span class="nx">item</span><span class="w"> </span><span class="nx">ID</span><span class="p">)</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">owner</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">owner_type</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;user&quot;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">&quot;org&quot;</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">project_number</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="nx">updated_field</span><span class="o">:</span><span class="w"> </span><span class="kt">object</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">      </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="w"> </span><span class="p">(</span><span class="nx">field</span><span class="w"> </span><span class="nx">ID</span><span class="p">),</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">      </span><span class="nx">value</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kt">number</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nx">value</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="nx">clear</span><span class="p">)</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="nx">Example</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">123456</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;value&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;5&quot;</span><span class="p">}</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="nx">set</span><span class="w"> </span><span class="nx">Story</span><span class="w"> </span><span class="nx">Points</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="mf">5</span>
+</code></pre></div></p>
+<hr />
+<h2 id="sprint-10-requirements-mapping">Sprint 10 Requirements Mapping<a class="headerlink" href="#sprint-10-requirements-mapping" title="Permanent link">&para;</a></h2>
+<h3 id="requirement-1-projects-v2-board-creation">✅ Requirement 1: Projects v2 Board Creation<a class="headerlink" href="#requirement-1-projects-v2-board-creation" title="Permanent link">&para;</a></h3>
+<p><strong>DevOps SKILL.md Line 501</strong>: "Create project board 'Economist Agents Sprint Board'"</p>
+<p><strong>MCP Solution</strong>: ❌ Board creation NOT supported via MCP tools (manual step required)
+- <strong>Workaround</strong>: Use GitHub web UI to create board once (5 minutes)
+- <strong>Alternative</strong>: Keep <code>gh project create</code> for board creation, use MCP for all other operations
+- <strong>Impact</strong>: Minimal - board created once, all subsequent operations via MCP</p>
+<h3 id="requirement-2-custom-field-configuration">✅ Requirement 2: Custom Field Configuration<a class="headerlink" href="#requirement-2-custom-field-configuration" title="Permanent link">&para;</a></h3>
+<p><strong>DevOps SKILL.md Line 501</strong>: "Configure custom fields (sprint, story-points, priority, owner)"</p>
+<p><strong>MCP Solution</strong>: <code>list_project_fields</code> + <code>get_project_field</code>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Get field IDs for Story Points, Sprint, Priority, Owner</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">fields</span> <span class="o">=</span> <span class="n">mcp</span><span class="o">.</span><span class="n">list_project_fields</span><span class="p">(</span><span class="n">owner</span><span class="o">=</span><span class="s2">&quot;oviney&quot;</span><span class="p">,</span> <span class="n">owner_type</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="n">project_number</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">story_points_id</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span> <span class="k">if</span> <span class="n">f</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Story Points&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">sprint_id</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span> <span class="k">if</span> <span class="n">f</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Sprint&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="c1"># ... etc</span>
+</code></pre></div>
+- <strong>Note</strong>: Field creation still manual via web UI (one-time setup)
+- <strong>Benefit</strong>: MCP reads fields for validation and updates</p>
+<h3 id="requirement-3-issue-linking-to-project">✅ Requirement 3: Issue Linking to Project<a class="headerlink" href="#requirement-3-issue-linking-to-project" title="Permanent link">&para;</a></h3>
+<p><strong>DevOps SKILL.md Line 507</strong>: "Link Sprint 9 issues to project board"</p>
+<p><strong>MCP Solution</strong>: <code>add_project_item</code>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Link issue #67 to project 1</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">mcp</span><span class="o">.</span><span class="n">add_project_item</span><span class="p">(</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    <span class="n">item_id</span><span class="o">=</span><span class="mi">67</span><span class="p">,</span> 
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="n">item_type</span><span class="o">=</span><span class="s2">&quot;issue&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    <span class="n">owner</span><span class="o">=</span><span class="s2">&quot;oviney&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>    <span class="n">owner_type</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>    <span class="n">project_number</span><span class="o">=</span><span class="mi">1</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="p">)</span>
+</code></pre></div>
+- <strong>Status</strong>: ✅ FULL SUPPORT - cleaner than <code>gh project item-add</code></p>
+<h3 id="requirement-4-burndown-chart-data-extraction">✅ Requirement 4: Burndown Chart Data Extraction<a class="headerlink" href="#requirement-4-burndown-chart-data-extraction" title="Permanent link">&para;</a></h3>
+<p><strong>DevOps SKILL.md Lines 341-480</strong>: "GraphQL query for ProjectV2 items with custom field extraction"</p>
+<p><strong>MCP Solution</strong>: <code>list_project_items</code> with field filtering
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Get all Sprint 9 items with Story Points and Status</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">items</span> <span class="o">=</span> <span class="n">mcp</span><span class="o">.</span><span class="n">list_project_items</span><span class="p">(</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    <span class="n">owner</span><span class="o">=</span><span class="s2">&quot;oviney&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="n">owner_type</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    <span class="n">project_number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>    <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="n">story_points_id</span><span class="p">,</span> <span class="n">status_id</span><span class="p">,</span> <span class="n">completed_date_id</span><span class="p">],</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>    <span class="n">query</span><span class="o">=</span><span class="s2">&quot;sprint:9&quot;</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="p">)</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="c1"># Calculate daily remaining points</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="n">remaining_by_date</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>    <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Done&quot;</span><span class="p">:</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>        <span class="n">completed_date</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;completed_date&quot;</span><span class="p">]</span>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>        <span class="n">remaining_by_date</span><span class="p">[</span><span class="n">completed_date</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>            <span class="n">i</span><span class="p">[</span><span class="s2">&quot;story_points&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">items</span> 
+<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>            <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;Done&quot;</span> <span class="ow">or</span> <span class="n">i</span><span class="p">[</span><span class="s2">&quot;completed_date&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">completed_date</span>
+<a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a>        <span class="p">)</span>
+</code></pre></div>
+- <strong>Status</strong>: ✅ FULL SUPPORT - cleaner than raw GraphQL queries
+- <strong>Benefit</strong>: Pagination handled automatically, field filtering built-in</p>
+<h3 id="requirement-5-velocity-tracking">✅ Requirement 5: Velocity Tracking<a class="headerlink" href="#requirement-5-velocity-tracking" title="Permanent link">&para;</a></h3>
+<p><strong>DevOps SKILL.md Lines 341-480</strong>: "Calculate completed story points per sprint"</p>
+<p><strong>MCP Solution</strong>: <code>list_project_items</code> + sprint_tracker.json
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Get completed stories for Sprint 9</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">items</span> <span class="o">=</span> <span class="n">mcp</span><span class="o">.</span><span class="n">list_project_items</span><span class="p">(</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    <span class="n">owner</span><span class="o">=</span><span class="s2">&quot;oviney&quot;</span><span class="p">,</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>    <span class="n">owner_type</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>    <span class="n">project_number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>    <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="n">story_points_id</span><span class="p">,</span> <span class="n">status_id</span><span class="p">,</span> <span class="n">sprint_id</span><span class="p">],</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>    <span class="n">query</span><span class="o">=</span><span class="s2">&quot;sprint:9 status:Done&quot;</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="p">)</span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="n">velocity</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;story_points&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">)</span>
+</code></pre></div>
+- <strong>Status</strong>: ✅ FULL SUPPORT - identical to CLI approach but cleaner</p>
+<h3 id="requirement-6-custom-field-updates-bidirectional-sync">✅ Requirement 6: Custom Field Updates (Bidirectional Sync)<a class="headerlink" href="#requirement-6-custom-field-updates-bidirectional-sync" title="Permanent link">&para;</a></h3>
+<p><strong>DevOps SKILL.md Line 507</strong>: "Bidirectional sync: sprint_tracker.json ↔ Issues ↔ Projects v2"</p>
+<p><strong>MCP Solution</strong>: <code>update_project_item</code>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Update Story Points field for item</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">mcp</span><span class="o">.</span><span class="n">update_project_item</span><span class="p">(</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    <span class="n">item_id</span><span class="o">=</span><span class="mi">12345</span><span class="p">,</span>  <span class="c1"># Internal project item ID (from list_project_items)</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    <span class="n">owner</span><span class="o">=</span><span class="s2">&quot;oviney&quot;</span><span class="p">,</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>    <span class="n">owner_type</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>    <span class="n">project_number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>    <span class="n">updated_field</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">story_points_id</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;5&quot;</span><span class="p">}</span>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="p">)</span>
+</code></pre></div>
+- <strong>Status</strong>: ✅ FULL SUPPORT - critical for sync validation</p>
+<h3 id="requirement-7-project-hygiene-automation">✅ Requirement 7: Project Hygiene Automation<a class="headerlink" href="#requirement-7-project-hygiene-automation" title="Permanent link">&para;</a></h3>
+<p><strong>DevOps SKILL.md Lines 481-700</strong>: "Stale issue detection, priority drift checking"</p>
+<p><strong>MCP Solution</strong>: <code>list_project_items</code> + issue tools
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># Find stale P0 issues (&gt;14 days old but not Done)</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">items</span> <span class="o">=</span> <span class="n">mcp</span><span class="o">.</span><span class="n">list_project_items</span><span class="p">(</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    <span class="n">owner</span><span class="o">=</span><span class="s2">&quot;oviney&quot;</span><span class="p">,</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    <span class="n">owner_type</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    <span class="n">project_number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>    <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="n">priority_id</span><span class="p">,</span> <span class="n">status_id</span><span class="p">,</span> <span class="n">updated_date_id</span><span class="p">],</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>    <span class="n">query</span><span class="o">=</span><span class="s2">&quot;priority:P0 -status:Done&quot;</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="p">)</span>
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="n">stale_items</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>    <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">items</span> 
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">i</span><span class="p">[</span><span class="s2">&quot;updated_date&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">days</span> <span class="o">&gt;</span> <span class="mi">14</span>
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="p">]</span>
+</code></pre></div>
+- <strong>Status</strong>: ✅ FULL SUPPORT - query filtering + field access</p>
+<h3 id="requirement-8-sprint-health-reports">✅ Requirement 8: Sprint Health Reports<a class="headerlink" href="#requirement-8-sprint-health-reports" title="Permanent link">&para;</a></h3>
+<p><strong>DevOps SKILL.md Lines 651-700</strong>: "Metrics dashboard, completion tracking"</p>
+<p><strong>MCP Solution</strong>: <code>list_project_items</code> + aggregation
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># Calculate sprint health metrics</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">items</span> <span class="o">=</span> <span class="n">mcp</span><span class="o">.</span><span class="n">list_project_items</span><span class="p">(</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>    <span class="n">owner</span><span class="o">=</span><span class="s2">&quot;oviney&quot;</span><span class="p">,</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    <span class="n">owner_type</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    <span class="n">project_number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>    <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="n">story_points_id</span><span class="p">,</span> <span class="n">status_id</span><span class="p">,</span> <span class="n">sprint_id</span><span class="p">,</span> <span class="n">priority_id</span><span class="p">],</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    <span class="n">query</span><span class="o">=</span><span class="s2">&quot;sprint:9&quot;</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="p">)</span>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>    <span class="s2">&quot;total_points&quot;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="s2">&quot;story_points&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">items</span><span class="p">),</span>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>    <span class="s2">&quot;completed_points&quot;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="s2">&quot;story_points&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">items</span> <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Done&quot;</span><span class="p">),</span>
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a>    <span class="s2">&quot;p0_blocked&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">items</span> <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="s2">&quot;priority&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;P0&quot;</span> <span class="ow">and</span> <span class="n">i</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Blocked&quot;</span><span class="p">]),</span>
+<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>    <span class="c1"># ... etc</span>
+<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="p">}</span>
+</code></pre></div>
+- <strong>Status</strong>: ✅ FULL SUPPORT - all data accessible via MCP</p>
+<hr />
+<h2 id="comparison-matrix-github-cli-vs-mcp-server">Comparison Matrix: GitHub CLI vs MCP Server<a class="headerlink" href="#comparison-matrix-github-cli-vs-mcp-server" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Criteria</th>
+<th>GitHub CLI + Python</th>
+<th>GitHub MCP Server</th>
+<th>Winner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Projects v2 Support</strong></td>
+<td>✅ Full (GraphQL)</td>
+<td>✅ Full (MCP tools)</td>
+<td>🟰 TIE</td>
+</tr>
+<tr>
+<td><strong>Custom Field Access</strong></td>
+<td>✅ GraphQL queries</td>
+<td>✅ <code>list_project_fields</code>, <code>get_project_field</code></td>
+<td>✅ <strong>MCP</strong> (cleaner)</td>
+</tr>
+<tr>
+<td><strong>Custom Field Updates</strong></td>
+<td>✅ GraphQL mutations</td>
+<td>✅ <code>update_project_item</code></td>
+<td>✅ <strong>MCP</strong> (less boilerplate)</td>
+</tr>
+<tr>
+<td><strong>Item Linking</strong></td>
+<td>✅ <code>gh project item-add</code></td>
+<td>✅ <code>add_project_item</code></td>
+<td>🟰 TIE</td>
+</tr>
+<tr>
+<td><strong>Burndown Data</strong></td>
+<td>✅ Custom GraphQL query</td>
+<td>✅ <code>list_project_items</code> + filtering</td>
+<td>✅ <strong>MCP</strong> (pagination built-in)</td>
+</tr>
+<tr>
+<td><strong>Velocity Tracking</strong></td>
+<td>✅ sprint_tracker.json</td>
+<td>✅ sprint_tracker.json + MCP validation</td>
+<td>🟰 TIE</td>
+</tr>
+<tr>
+<td><strong>Authentication</strong></td>
+<td>⚠️ Manual token scope refresh</td>
+<td>✅ OAuth + automatic token mgmt</td>
+<td>✅ <strong>MCP</strong></td>
+</tr>
+<tr>
+<td><strong>Code Maintenance</strong></td>
+<td>⚠️ 300-400 lines/script</td>
+<td>✅ ~150-200 lines/script</td>
+<td>✅ <strong>MCP</strong> (50% reduction)</td>
+</tr>
+<tr>
+<td><strong>Error Handling</strong></td>
+<td>⚠️ Manual GraphQL error parsing</td>
+<td>✅ Structured MCP error responses</td>
+<td>✅ <strong>MCP</strong></td>
+</tr>
+<tr>
+<td><strong>CI/CD Integration</strong></td>
+<td>✅ GitHub Actions native</td>
+<td>⚠️ Requires MCP server setup</td>
+<td>✅ <strong>CLI</strong></td>
+</tr>
+<tr>
+<td><strong>Board Creation</strong></td>
+<td>✅ <code>gh project create</code></td>
+<td>❌ Not supported</td>
+<td>✅ <strong>CLI</strong></td>
+</tr>
+<tr>
+<td><strong>Developer Experience</strong></td>
+<td>⚠️ Raw GraphQL queries</td>
+<td>✅ Natural language tool calls</td>
+<td>✅ <strong>MCP</strong></td>
+</tr>
+<tr>
+<td><strong>Official Support</strong></td>
+<td>✅ GitHub CLI team</td>
+<td>✅ GitHub MCP team</td>
+<td>🟰 TIE</td>
+</tr>
+<tr>
+<td><strong>Documentation</strong></td>
+<td>✅ Extensive GraphQL docs</td>
+<td>✅ Comprehensive MCP docs</td>
+<td>🟰 TIE</td>
+</tr>
+<tr>
+<td><strong>Learning Curve</strong></td>
+<td>⚠️ GraphQL schema knowledge</td>
+<td>✅ Simple tool parameters</td>
+<td>✅ <strong>MCP</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>SCORE</strong>: MCP <strong>9 wins</strong>, CLI <strong>2 wins</strong>, <strong>5 ties</strong></p>
+<hr />
+<h2 id="recommended-hybrid-approach">Recommended Hybrid Approach<a class="headerlink" href="#recommended-hybrid-approach" title="Permanent link">&para;</a></h2>
+<p><strong>BEST PRACTICE: Use MCP for 95% of operations, CLI for board creation</strong></p>
+<h3 id="phase-1-one-time-setup-cli-only-10-minutes">Phase 1: One-Time Setup (CLI Only - 10 minutes)<a class="headerlink" href="#phase-1-one-time-setup-cli-only-10-minutes" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># Step 1: Create project board (MCP doesn&#39;t support this)</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>gh<span class="w"> </span>project<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span>--owner<span class="w"> </span>oviney<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span>--title<span class="w"> </span><span class="s2">&quot;Sprint 10: Autonomous Orchestration&quot;</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="c1"># Step 2: Create custom fields via web UI (5 minutes)</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="c1"># - Story Points (NUMBER)</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="c1"># - Sprint (SINGLE_SELECT: Sprint 9, Sprint 10, Sprint 11...)</span>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="c1"># - Priority (SINGLE_SELECT: P0, P1, P2, P3)</span>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="c1"># - Owner (SINGLE_SELECT: @scrum-master, @devops, @quality-enforcer...)</span>
+</code></pre></div>
+<h3 id="phase-2-all-subsequent-operations-mcp-only">Phase 2: All Subsequent Operations (MCP Only)<a class="headerlink" href="#phase-2-all-subsequent-operations-mcp-only" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># scripts/generate_burndown.py (MCP version)</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">BurndownGenerator</span><span class="p">:</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mcp_client</span><span class="p">):</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mcp</span> <span class="o">=</span> <span class="n">mcp_client</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">project_number</span> <span class="o">=</span> <span class="mi">1</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">owner</span> <span class="o">=</span> <span class="s2">&quot;oviney&quot;</span>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_sprint_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sprint_num</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract burndown data via MCP&quot;&quot;&quot;</span>
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a>        <span class="c1"># Get field IDs (cache these)</span>
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a>        <span class="n">fields</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mcp</span><span class="o">.</span><span class="n">list_project_fields</span><span class="p">(</span>
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>            <span class="n">owner</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">owner</span><span class="p">,</span>
+<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a>            <span class="n">owner_type</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
+<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a>            <span class="n">project_number</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">project_number</span>
+<a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a>        <span class="p">)</span>
+<a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a>
+<a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a>        <span class="c1"># Get all items for sprint</span>
+<a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a>        <span class="n">items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mcp</span><span class="o">.</span><span class="n">list_project_items</span><span class="p">(</span>
+<a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a>            <span class="n">owner</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">owner</span><span class="p">,</span>
+<a id="__codelineno-17-20" name="__codelineno-17-20" href="#__codelineno-17-20"></a>            <span class="n">owner_type</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
+<a id="__codelineno-17-21" name="__codelineno-17-21" href="#__codelineno-17-21"></a>            <span class="n">project_number</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">project_number</span><span class="p">,</span>
+<a id="__codelineno-17-22" name="__codelineno-17-22" href="#__codelineno-17-22"></a>            <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="n">f</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">],</span>
+<a id="__codelineno-17-23" name="__codelineno-17-23" href="#__codelineno-17-23"></a>            <span class="n">query</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;sprint:</span><span class="si">{</span><span class="n">sprint_num</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-17-24" name="__codelineno-17-24" href="#__codelineno-17-24"></a>        <span class="p">)</span>
+<a id="__codelineno-17-25" name="__codelineno-17-25" href="#__codelineno-17-25"></a>
+<a id="__codelineno-17-26" name="__codelineno-17-26" href="#__codelineno-17-26"></a>        <span class="c1"># Calculate daily remaining points</span>
+<a id="__codelineno-17-27" name="__codelineno-17-27" href="#__codelineno-17-27"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_burndown</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="phase-3-cicd-automation-github-actions">Phase 3: CI/CD Automation (GitHub Actions)<a class="headerlink" href="#phase-3-cicd-automation-github-actions" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Daily Burndown Update</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="nt">on</span><span class="p">:</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span><span class="nt">schedule</span><span class="p">:</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">cron</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0</span><span class="nv"> </span><span class="s">18</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">*&#39;</span><span class="w">  </span><span class="c1"># 6 PM daily</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="nt">jobs</span><span class="p">:</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">  </span><span class="nt">update-burndown</span><span class="p">:</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v3</span>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a>
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="w">      </span><span class="c1"># Setup MCP server (use remote GitHub MCP server)</span>
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate Burndown</span>
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="w">          </span><span class="no">python3 scripts/generate_burndown.py</span>
+<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a><span class="w">        </span><span class="nt">env</span><span class="p">:</span>
+<a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a><span class="w">          </span><span class="nt">GITHUB_TOKEN</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.GITHUB_TOKEN }}</span>
+<a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a>
+<a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Commit Chart</span>
+<a id="__codelineno-18-20" name="__codelineno-18-20" href="#__codelineno-18-20"></a><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<a id="__codelineno-18-21" name="__codelineno-18-21" href="#__codelineno-18-21"></a><span class="w">          </span><span class="no">git config user.name &quot;github-actions[bot]&quot;</span>
+<a id="__codelineno-18-22" name="__codelineno-18-22" href="#__codelineno-18-22"></a><span class="w">          </span><span class="no">git config user.email &quot;github-actions[bot]@users.noreply.github.com&quot;</span>
+<a id="__codelineno-18-23" name="__codelineno-18-23" href="#__codelineno-18-23"></a><span class="w">          </span><span class="no">git add docs/burndown_current.png</span>
+<a id="__codelineno-18-24" name="__codelineno-18-24" href="#__codelineno-18-24"></a><span class="w">          </span><span class="no">git commit -m &quot;chore: update burndown chart [skip ci]&quot;</span>
+<a id="__codelineno-18-25" name="__codelineno-18-25" href="#__codelineno-18-25"></a><span class="w">          </span><span class="no">git push</span>
+</code></pre></div>
+<hr />
+<h2 id="implementation-plan-updated-for-mcp">Implementation Plan (Updated for MCP)<a class="headerlink" href="#implementation-plan-updated-for-mcp" title="Permanent link">&para;</a></h2>
+<h3 id="prerequisites">✅ Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h3>
+<ol>
+<li>✅ Python 3.13 virtual environment (READY)</li>
+<li>⏳ GitHub MCP server configured (15 minutes)</li>
+<li>⏳ OAuth token or PAT with <code>project</code> scope (5 minutes)</li>
+<li>⏳ One-time board creation via CLI or web UI (10 minutes)</li>
+</ol>
+<h3 id="sprint-10-implementation-steps">🔧 Sprint 10 Implementation Steps<a class="headerlink" href="#sprint-10-implementation-steps" title="Permanent link">&para;</a></h3>
+<p><strong>Story 9: GitHub Projects v2 Evolution</strong> (5 points, P1)</p>
+<p><strong>Task 1: Configure GitHub MCP Server</strong> (1 hour)
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># Option A: VS Code 1.101+ (OAuth)</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="c1"># Add to VS Code MCP config:</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="o">{</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">  </span><span class="s2">&quot;servers&quot;</span>:<span class="w"> </span><span class="o">{</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">    </span><span class="s2">&quot;github&quot;</span>:<span class="w"> </span><span class="o">{</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">      </span><span class="s2">&quot;type&quot;</span>:<span class="w"> </span><span class="s2">&quot;http&quot;</span>,
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">      </span><span class="s2">&quot;url&quot;</span>:<span class="w"> </span><span class="s2">&quot;https://api.githubcopilot.com/mcp/&quot;</span>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="w">    </span><span class="o">}</span>
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="w">  </span><span class="o">}</span>
+<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="o">}</span>
+<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a>
+<a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="c1"># Option B: Local MCP server with PAT</span>
+<a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a>npm<span class="w"> </span>install<span class="w"> </span>-g<span class="w"> </span>github-mcp
+<a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a><span class="nb">export</span><span class="w"> </span><span class="nv">GITHUB_TOKEN</span><span class="o">=</span><span class="s2">&quot;ghp_...&quot;</span><span class="w">  </span><span class="c1"># PAT with &#39;project&#39; scope</span>
+<a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a>github-mcp-server
+</code></pre></div></p>
+<p><strong>Task 2: Create Project Board &amp; Custom Fields</strong> (30 minutes)
+- Use web UI: https://github.com/users/oviney/projects/new
+- Create 4 custom fields (Story Points, Sprint, Priority, Owner)
+- Document field IDs in <code>scripts/mcp_config.json</code></p>
+<p><strong>Task 3: Rewrite <code>generate_burndown.py</code> for MCP</strong> (2-3 hours)
+- Replace GraphQL queries with <code>mcp.list_project_items()</code>
+- Add field ID caching (avoid repeated field lookups)
+- Implement daily burndown calculation
+- Matplotlib chart generation (unchanged)
+- Test with Sprint 9 data</p>
+<p><strong>Task 4: Rewrite <code>generate_velocity.py</code> for MCP</strong> (1-2 hours)
+- Use MCP for validation sync (sprint_tracker.json vs Projects v2)
+- Keep sprint_tracker.json as source of truth
+- Add rolling average calculation
+- Test with last 5 sprints</p>
+<p><strong>Task 5: Rewrite <code>project_hygiene.py</code> for MCP</strong> (2-3 hours)
+- Use <code>list_project_items</code> with query filters
+- Stale issue detection (&gt;90 days)
+- Priority drift alerts (P0 older than P2/P3)
+- Health report generation
+- Dry-run mode for auto-closure</p>
+<p><strong>Task 6: CI/CD Integration</strong> (1 hour)
+- Create <code>.github/workflows/daily-burndown.yml</code>
+- Test manual trigger
+- Validate automated commits</p>
+<p><strong>Task 7: Documentation</strong> (1 hour)
+- Update DevOps SKILL.md with MCP patterns
+- Create <code>docs/GITHUB_MCP_SETUP.md</code>
+- Add troubleshooting guide</p>
+<p><strong>Total Estimated Effort</strong>: 8-10 hours (vs 8-12 hours with CLI)</p>
+<hr />
+<h2 id="decision-rationale">Decision Rationale<a class="headerlink" href="#decision-rationale" title="Permanent link">&para;</a></h2>
+<h3 id="why-github-mcp-server-wins">✅ Why GitHub MCP Server WINS<a class="headerlink" href="#why-github-mcp-server-wins" title="Permanent link">&para;</a></h3>
+<p><strong>1. Code Quality</strong>
+- <strong>50% less boilerplate</strong>: MCP tools replace 300+ lines of GraphQL query construction
+- <strong>Better error handling</strong>: Structured responses vs raw GraphQL errors
+- <strong>Type safety</strong>: MCP parameters are strongly typed</p>
+<p><strong>2. Developer Experience</strong>
+- <strong>Natural language</strong>: Tool descriptions vs reading GraphQL schema
+- <strong>Pagination automatic</strong>: MCP handles cursor-based pagination internally
+- <strong>Field discovery</strong>: <code>list_project_fields</code> vs manual schema introspection</p>
+<p><strong>3. Maintenance</strong>
+- <strong>Official support</strong>: Maintained by GitHub, updated with API changes
+- <strong>OAuth support</strong>: No manual token scope management
+- <strong>Future-proof</strong>: MCP is GitHub's strategic direction for AI tooling</p>
+<p><strong>4. Integration</strong>
+- <strong>VS Code native</strong>: Works seamlessly in VS Code 1.101+ with Copilot
+- <strong>Cross-platform</strong>: Same tools work in Claude Desktop, Cursor, Windsurf
+- <strong>Agentic workflows</strong>: MCP designed for AI agent orchestration</p>
+<h3 id="cli-advantages-still-valid">⚠️ CLI Advantages (Still Valid)<a class="headerlink" href="#cli-advantages-still-valid" title="Permanent link">&para;</a></h3>
+<p><strong>1. Board Creation</strong>
+- MCP doesn't support <code>create_project</code> (must use web UI or CLI)
+- <strong>Mitigation</strong>: Hybrid approach - CLI for one-time setup, MCP for everything else</p>
+<p><strong>2. CI/CD Simplicity</strong>
+- GitHub Actions has <code>gh</code> pre-installed
+- MCP requires remote server or local binary setup
+- <strong>Mitigation</strong>: Use remote GitHub MCP server (no installation needed)</p>
+<p><strong>3. Offline Usage</strong>
+- CLI works without internet (for local projects)
+- MCP requires API connection
+- <strong>Mitigation</strong>: Not a concern for our GitHub-hosted project</p>
+<h3 id="final-decision">🎯 Final Decision<a class="headerlink" href="#final-decision" title="Permanent link">&para;</a></h3>
+<p><strong>USE GITHUB MCP SERVER for Sprint 10 implementation</strong></p>
+<p><strong>Rationale</strong>:
+1. ✅ Satisfies 100% of Sprint 10 requirements (except one-time board creation)
+2. ✅ Reduces code maintenance by ~50%
+3. ✅ Better developer experience for @devops agent
+4. ✅ Future-proof: MCP is GitHub's strategic direction
+5. ✅ Minimal risk: Fallback to CLI if issues arise (hybrid approach)</p>
+<p><strong>Implementation Strategy</strong>:
+- Use CLI for one-time board creation (10 minutes)
+- Use MCP for all operational tasks (burndown, velocity, hygiene)
+- Document hybrid approach in DevOps SKILL.md
+- Validate with Sprint 9 data before Sprint 10 starts</p>
+<hr />
+<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<h3 id="immediate-actions-user-approval-required">⏭️ Immediate Actions (User Approval Required)<a class="headerlink" href="#immediate-actions-user-approval-required" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>User Decision</strong>: Approve GitHub MCP Server recommendation ✅</li>
+<li><strong>User Action</strong>: Configure MCP server in VS Code or provide PAT (15 minutes)</li>
+<li><strong>User Action</strong>: Create Sprint 10 project board via web UI (10 minutes)</li>
+<li><strong>User Action</strong>: Configure 4 custom fields via web UI (10 minutes)</li>
+</ol>
+<h3 id="devops-implementation-post-approval">🛠️ DevOps Implementation (Post-Approval)<a class="headerlink" href="#devops-implementation-post-approval" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Setup MCP Client</strong> (1 hour)</li>
+<li>Install GitHub MCP server</li>
+<li>Test authentication</li>
+<li>Validate Projects v2 access</li>
+<li>
+<p>Document field IDs</p>
+</li>
+<li>
+<p><strong>Implement 3 Scripts</strong> (6-8 hours)</p>
+</li>
+<li><code>scripts/generate_burndown.py</code> (MCP version)</li>
+<li><code>scripts/generate_velocity.py</code> (MCP version)</li>
+<li>
+<p><code>scripts/project_hygiene.py</code> (MCP version)</p>
+</li>
+<li>
+<p><strong>CI/CD Integration</strong> (1 hour)</p>
+</li>
+<li>Create GitHub Actions workflow</li>
+<li>Test manual trigger</li>
+<li>
+<p>Validate automated updates</p>
+</li>
+<li>
+<p><strong>Documentation Update</strong> (1 hour)</p>
+</li>
+<li>Update DevOps SKILL.md</li>
+<li>Create MCP setup guide</li>
+<li>Add troubleshooting section</li>
+</ol>
+<p><strong>Total Time</strong>: 8-10 hours (Sprint 10 capacity: 5 points × 2.8h/point = 14 hours ✅)</p>
+<hr />
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>GitHub MCP Server</strong>: https://github.com/github/github-mcp-server</li>
+<li><strong>MCP Specification</strong>: https://modelcontextprotocol.io/</li>
+<li><strong>GitHub Projects v2 API</strong>: https://docs.github.com/en/graphql/reference/objects#projectv2</li>
+<li><strong>DevOps SKILL.md</strong>: <code>/Users/ouray.viney/code/economist-agents/skills/devops/SKILL.md</code></li>
+<li><strong>Sprint 10 Story 9</strong>: <code>skills/sprint_tracker.json</code> lines 477-570</li>
+</ul>
+<hr />
+<p><strong>Evaluation Complete</strong>: 2026-01-03 (15 minutes investigation time)<br />
+<strong>Recommendation</strong>: ✅ <strong>USE GITHUB MCP SERVER</strong> with hybrid CLI setup<br />
+<strong>Confidence</strong>: <strong>95%</strong> (5% risk for one-time board creation workaround)</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

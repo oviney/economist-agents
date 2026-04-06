@@ -1,0 +1,47 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "description": "Agent status tracking for event-driven coordination",
+    "agents": [],
+    "last_poll": null,
+    "_example_agent": {
+        "agent_id": "writer_agent",
+        "current_task": "STORY-042-2",
+        "status": "complete",
+        "output": {
+            "path": "output/2026-01-02-chart-quality.md",
+            "word_count": 810,
+            "chart_embedded": true,
+            "featured_image": "output/images/chart-quality.png"
+        },
+        "self_validation": {
+            "passed": true,
+            "checks": [
+                "economist_voice",
+                "chart_embedded",
+                "word_count_800+",
+                "british_spelling"
+            ],
+            "failed_checks": []
+        },
+        "completed_at": "2026-01-02T11:30:00Z",
+        "next_agent": "editor_agent",
+        "processed": false
+    },
+    "_status_values": [
+        "idle - Agent available for work",
+        "assigned - Task assigned, not started",
+        "in_progress - Actively working",
+        "complete - Finished, ready for handoff",
+        "blocked - Waiting on dependency or escalation",
+        "error - Failed, needs intervention"
+    ],
+    "_agent_types": [
+        "research_agent - Data gathering and source verification",
+        "writer_agent - Article generation with Economist voice",
+        "editor_agent - Quality gates and style enforcement",
+        "graphics_agent - Chart creation and visual QA",
+        "qe_agent - Final validation and DoD checks",
+        "developer_agent - (Sprint 9) Consolidated R+W+G",
+        "devops_agent - (Sprint 10) Publication and deployment"
+    ]
+}

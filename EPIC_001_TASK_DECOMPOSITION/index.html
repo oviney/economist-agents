@@ -1,0 +1,3564 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Multi-agent content pipeline that generates Economist-style articles with autonomous research, writing, illustration, and deployment">
+      
+      
+      
+        <link rel="canonical" href="https://oviney.github.io/economist-agents/EPIC_001_TASK_DECOMPOSITION/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>EPIC-001: Production-Grade Agentic Evolution - Task Decomposition - Economist Agents</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#epic-001-production-grade-agentic-evolution-task-decomposition" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Economist Agents" class="md-header__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Economist Agents
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              EPIC-001: Production-Grade Agentic Evolution - Task Decomposition
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/oviney/economist-agents" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    oviney/economist-agents
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../agent-registry-spec/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../adr/ADR-001-agent-framework-selection/" class="md-tabs__link">
+          
+  
+  
+  ADRs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../skills/agent-delegation/SKILL/" class="md-tabs__link">
+          
+  
+  
+  Skills
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../guides/WORKFLOW_GUIDE/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../CREWAI_API_REFERENCE/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../AGENT_VELOCITY_ANALYSIS/" class="md-tabs__link">
+          
+  
+  
+  Performance
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Economist Agents" class="md-nav__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Economist Agents
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/oviney/economist-agents" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    oviney/economist-agents
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agent-registry-spec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../FLOW_ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AUTONOMOUS_ORCHESTRATION_STRATEGY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autonomous Orchestration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CREWAI_CONTEXT_ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shared Context System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE_PATTERNS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE_REVIEW_PROCESS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Review Process
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADRs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADRs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/ADR-001-agent-framework-selection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-001 — Agent Framework Selection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/ADR-002-content-intelligence-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-002 — Content Intelligence Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/ADR-003-agent-skill-governance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-003 — Agent Skill Governance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ADR-004-python-version-constraint/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-004 — Python Version Constraint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ADR-005-agile-discipline-enforcement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-005 — Agile Discipline Enforcement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skills
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Skills
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/agent-delegation/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Delegation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/research-sourcing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research Sourcing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/economist-writing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Economist Writing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/editorial-illustration/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Editorial Illustration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/article-evaluation/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Article Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/quality-gates/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quality Gates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/python-quality/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python Quality
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/testing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/defect-prevention/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Defect Prevention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/devops/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DevOps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/sprint-management/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/scrum-master/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scrum Master
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/agent-traceability/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Traceability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/observability/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/mcp-development/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/WORKFLOW_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/BLOG_DEPLOYMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/COPILOT_SYNC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Copilot Sync
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/CI_MONITORING_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CI Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/PYTHON_VERSION_TROUBLESHOOTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/IMPLEMENTATION_ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/VALIDATION_QUICK_REF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation Quick Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CREWAI_API_REFERENCE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CrewAI API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AGENT_PROMPT_PATTERNS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Prompt Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AGENT_QUALITY_GATES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quality Gates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEFINITION_OF_DONE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Definition of Done
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEFECT_PREVENTION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Defect Prevention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHART_DESIGN_SPEC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chart Design Spec
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Performance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AGENT_VELOCITY_ANALYSIS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Velocity Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SPRINT_DISCIPLINE_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint Discipline Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#executive-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Executive Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#story-005-shift-to-deterministic-backbone-3-points-p0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        STORY-005: Shift to Deterministic Backbone (3 points, P0)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="STORY-005: Shift to Deterministic Backbone (3 points, P0)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-breakdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task Breakdown
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Task Breakdown">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-1-flow-architecture-design-15h-p0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 1: Flow Architecture Design (1.5h, P0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-2-create-flow-class-2h-p0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 2: Create Flow Class (2h, P0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-3-migrate-economist_agentpy-3h-p0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 3: Migrate economist_agent.py (3h, P0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-4-state-transition-tests-15h-p0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 4: State Transition Tests (1.5h, P0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-5-regression-testing-1h-p0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 5: Regression Testing (1h, P0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-6-documentation-05h-p2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 6: Documentation (0.5h, P2)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#story-006-establish-style-memory-rag-3-points-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        STORY-006: Establish Style Memory RAG (3 points, P1)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="STORY-006: Establish Style Memory RAG (3 points, P1)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-breakdown_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task Breakdown
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Task Breakdown">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-1-chromadb-setup-15h-p0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 1: ChromaDB Setup (1.5h, P0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-2-article-ingestion-pipeline-2h-p0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 2: Article Ingestion Pipeline (2h, P0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-3-rag-query-tool-25h-p0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 3: RAG Query Tool (2.5h, P0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-4-agent-integration-25h-p0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 4: Agent Integration (2.5h, P0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-5-rag-integration-tests-1h-p0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 5: RAG Integration Tests (1h, P0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-6-documentation-05h-p2_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 6: Documentation (0.5h, P2)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#story-007-implement-roi-telemetry-hook-3-points-p2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        STORY-007: Implement ROI Telemetry Hook (3 points, P2)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="STORY-007: Implement ROI Telemetry Hook (3 points, P2)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-breakdown_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task Breakdown
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Task Breakdown">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-1-roi-schema-design-1h-p0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 1: ROI Schema Design (1h, P0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-2-roitracker-class-25h-p0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 2: ROITracker Class (2.5h, P0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-3-instrument-writereditor-2h-p0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 3: Instrument Writer/Editor (2h, P0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-4-integration-with-economist_agentpy-15h-p0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 4: Integration with economist_agent.py (1.5h, P0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-5-roi-telemetry-tests-15h-p0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 5: ROI Telemetry Tests (1.5h, P0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-6-documentation-1h-p2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task 6: Documentation (1h, P2)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#schema-alignment-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Schema Alignment Analysis
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Schema Alignment Analysis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#existing-schema-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Existing Schema Patterns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#roi-telemetry-schema-alignment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ROI Telemetry Schema Alignment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended-schema-enhancements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommended Schema Enhancements
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sprint-planning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sprint Planning
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sprint Planning">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sprint-13-execution-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sprint 13 Execution Strategy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#definition-of-ready-dor-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition of Ready (DoR) Checklist
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#success-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Success Metrics
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Success Metrics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#story-005-success-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        STORY-005 Success Criteria
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#story-006-success-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        STORY-006 Success Criteria
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#story-007-success-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        STORY-007 Success Criteria
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#epic-success-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Epic Success Criteria
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#appendix-task-summary-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Appendix: Task Summary Table
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="epic-001-production-grade-agentic-evolution-task-decomposition">EPIC-001: Production-Grade Agentic Evolution - Task Decomposition<a class="headerlink" href="#epic-001-production-grade-agentic-evolution-task-decomposition" title="Permanent link">&para;</a></h1>
+<p><strong>Epic Version</strong>: 2.0
+<strong>Created</strong>: 2026-01-04
+<strong>Status</strong>: Ready for Sprint 13 Kickoff
+<strong>Total Story Points</strong>: 9 (3 stories × 3 points each)</p>
+<hr />
+<h2 id="executive-summary">Executive Summary<a class="headerlink" href="#executive-summary" title="Permanent link">&para;</a></h2>
+<p>This document decomposes <strong>EPIC-001: Production-Grade Agentic Evolution</strong> into 18 detailed tasks (6 per story) with cross-references to existing validation schemas. The epic modernizes the economist-agents pipeline with:</p>
+<ol>
+<li><strong>Deterministic Orchestration</strong> (Flow-based state machines) - STORY-005</li>
+<li><strong>Quality Memory Systems</strong> (RAG with Gold Standard articles) - STORY-006</li>
+<li><strong>ROI Measurement</strong> (Token cost telemetry) - STORY-007</li>
+</ol>
+<p><strong>Key Finding</strong>: ROI Telemetry schema aligns with existing validation patterns. Recommend adding <code>schemas/execution_roi_schema.json</code> following JSON Schema Draft-07 format.</p>
+<hr />
+<h2 id="story-005-shift-to-deterministic-backbone-3-points-p0">STORY-005: Shift to Deterministic Backbone (3 points, P0)<a class="headerlink" href="#story-005-shift-to-deterministic-backbone-3-points-p0" title="Permanent link">&para;</a></h2>
+<p><strong>Goal</strong>: Replace sequential orchestration with Flow-based state-machine architecture for predictable multi-agent coordination.</p>
+<p><strong>Business Value</strong>: Eliminates unpredictable agent interactions, enables complex workflows (parallel generation, conditional routing), reduces debugging time.</p>
+<h3 id="task-breakdown">Task Breakdown<a class="headerlink" href="#task-breakdown" title="Permanent link">&para;</a></h3>
+<h4 id="task-1-flow-architecture-design-15h-p0">Task 1: Flow Architecture Design (1.5h, P0)<a class="headerlink" href="#task-1-flow-architecture-design-15h-p0" title="Permanent link">&para;</a></h4>
+<p><strong>Description</strong>: Design state transition map and create architectural documentation.</p>
+<p><strong>Deliverables</strong>:
+- <code>docs/FLOW_ARCHITECTURE.md</code> - Flow architecture with state diagram
+- State transition map: IDLE → RESEARCH → WRITE → EDIT → GRAPHICS → PUBLISH
+- Conditional routing rules (e.g., "if gate fail → rework")
+- Exit conditions and error handling</p>
+<p><strong>Acceptance Criteria</strong>:
+- State diagram shows all agent transitions
+- Conditional routing documented (3+ scenarios)
+- Error handling strategy defined
+- Documentation peer-reviewed</p>
+<p><strong>Effort</strong>: 1.5 hours
+<strong>Priority</strong>: P0 (foundation for implementation)
+<strong>Dependencies</strong>: None
+<strong>Risks</strong>: Design may need iteration after Task 2 implementation</p>
+<hr />
+<h4 id="task-2-create-flow-class-2h-p0">Task 2: Create Flow Class (2h, P0)<a class="headerlink" href="#task-2-create-flow-class-2h-p0" title="Permanent link">&para;</a></h4>
+<p><strong>Description</strong>: Implement <code>ContentGenerationFlow</code> class in <code>src/economist_agents/flow.py</code>.</p>
+<p><strong>Deliverables</strong>:
+- <code>src/economist_agents/flow.py</code> - Flow class with @start/@listen decorators
+- <code>@start</code> decorator on entry point (research phase)
+- <code>@listen</code> decorators for state transitions
+- State tracking and logging</p>
+<p><strong>Code Pattern</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">crewai.flow.flow</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flow</span><span class="p">,</span> <span class="n">listen</span><span class="p">,</span> <span class="n">start</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">ContentGenerationFlow</span><span class="p">(</span><span class="n">Flow</span><span class="p">):</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="nd">@start</span><span class="p">()</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">research_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        <span class="c1"># Research agent execution</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>        <span class="k">return</span> <span class="n">ResearchOutput</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="nd">@listen</span><span class="p">(</span><span class="n">research_phase</span><span class="p">)</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">writing_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">research_output</span><span class="p">):</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        <span class="c1"># Writer agent execution</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="k">return</span> <span class="n">WriterOutput</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="nd">@listen</span><span class="p">(</span><span class="n">writing_phase</span><span class="p">)</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">editing_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">writer_output</span><span class="p">):</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>        <span class="c1"># Editor agent execution</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>        <span class="k">return</span> <span class="n">EditorOutput</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>Acceptance Criteria</strong>:
+- Flow class imports without errors
+- @start/@listen decorators correctly placed
+- State transitions log to console
+- Type hints for all methods</p>
+<p><strong>Effort</strong>: 2 hours
+<strong>Priority</strong>: P0 (core implementation)
+<strong>Dependencies</strong>: Task 1 (design complete)
+<strong>Risks</strong>: CrewAI Flow API may differ from documentation</p>
+<hr />
+<h4 id="task-3-migrate-economist_agentpy-3h-p0">Task 3: Migrate economist_agent.py (3h, P0)<a class="headerlink" href="#task-3-migrate-economist_agentpy-3h-p0" title="Permanent link">&para;</a></h4>
+<p><strong>Description</strong>: Refactor <code>scripts/economist_agent.py</code> to use Flow instead of sequential orchestration.</p>
+<p><strong>Deliverables</strong>:
+- Refactored <code>generate_economist_post()</code> to call Flow.kickoff()
+- Remove WORKFLOW_SEQUENCE dictionary references
+- Update imports to use ContentGenerationFlow
+- Preserve all existing functionality (governance, metrics, output)</p>
+<p><strong>Code Changes</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># OLD: Sequential orchestration</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">research</span> <span class="o">=</span> <span class="n">run_research_agent</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">topic</span><span class="p">,</span> <span class="n">talking_points</span><span class="p">)</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">draft</span> <span class="o">=</span> <span class="n">run_writer_agent</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">topic</span><span class="p">,</span> <span class="n">research</span><span class="p">,</span> <span class="n">date_str</span><span class="p">)</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">edited</span> <span class="o">=</span> <span class="n">run_editor_agent</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">draft</span><span class="p">)</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="c1"># NEW: Flow-based orchestration</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">flow</span> <span class="o">=</span> <span class="n">ContentGenerationFlow</span><span class="p">()</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="n">result</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">kickoff</span><span class="p">(</span><span class="n">topic</span><span class="o">=</span><span class="n">topic</span><span class="p">,</span> <span class="n">talking_points</span><span class="o">=</span><span class="n">talking_points</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>Acceptance Criteria</strong>:
+- economist_agent.py uses Flow.kickoff()
+- No WORKFLOW_SEQUENCE references remain
+- All existing tests pass
+- Output format unchanged (markdown + charts)</p>
+<p><strong>Effort</strong>: 3 hours
+<strong>Priority</strong>: P0 (integration)
+<strong>Dependencies</strong>: Task 2 (Flow class complete)
+<strong>Risks</strong>: Governance hooks may need refactoring</p>
+<hr />
+<h4 id="task-4-state-transition-tests-15h-p0">Task 4: State Transition Tests (1.5h, P0)<a class="headerlink" href="#task-4-state-transition-tests-15h-p0" title="Permanent link">&para;</a></h4>
+<p><strong>Description</strong>: Create integration tests for Flow state transitions.</p>
+<p><strong>Deliverables</strong>:
+- <code>tests/test_flow_integration.py</code> - 3+ test cases
+- Test 1: Happy path (research → write → edit → graphics)
+- Test 2: Editor rejection (edit → write rework)
+- Test 3: Research failure (error handling)</p>
+<p><strong>Test Pattern</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_flow_happy_path</span><span class="p">():</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">flow</span> <span class="o">=</span> <span class="n">ContentGenerationFlow</span><span class="p">()</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">kickoff</span><span class="p">(</span><span class="n">topic</span><span class="o">=</span><span class="s2">&quot;Test Topic&quot;</span><span class="p">)</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">article_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">chart_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</code></pre></div></p>
+<p><strong>Acceptance Criteria</strong>:
+- 3+ integration tests passing
+- All state transitions covered
+- Error handling validated
+- Tests run in &lt;30 seconds</p>
+<p><strong>Effort</strong>: 1.5 hours
+<strong>Priority</strong>: P0 (validation)
+<strong>Dependencies</strong>: Task 3 (migration complete)
+<strong>Risks</strong>: Mocking Flow execution may be complex</p>
+<hr />
+<h4 id="task-5-regression-testing-1h-p0">Task 5: Regression Testing (1h, P0)<a class="headerlink" href="#task-5-regression-testing-1h-p0" title="Permanent link">&para;</a></h4>
+<p><strong>Description</strong>: Validate no regressions in article quality or agent metrics.</p>
+<p><strong>Deliverables</strong>:
+- Generate 3 test articles using Flow architecture
+- Compare quality metrics with baseline (gate pass rate ≥87%)
+- Validate chart embedding, categories field, frontmatter
+- Document any differences</p>
+<p><strong>Quality Metrics</strong>:
+- Editor gate pass rate: ≥87% (current baseline)
+- Chart embedding rate: 100%
+- Category field present: 100%
+- Frontmatter validation: 100%</p>
+<p><strong>Acceptance Criteria</strong>:
+- 3 test articles generated successfully
+- Quality metrics match or exceed baseline
+- No defect prevention patterns triggered
+- Metrics documented in FLOW_ARCHITECTURE.md</p>
+<p><strong>Effort</strong>: 1 hour
+<strong>Priority</strong>: P0 (quality gate)
+<strong>Dependencies</strong>: Task 4 (tests passing)
+<strong>Risks</strong>: Quality may regress during migration</p>
+<hr />
+<h4 id="task-6-documentation-05h-p2">Task 6: Documentation (0.5h, P2)<a class="headerlink" href="#task-6-documentation-05h-p2" title="Permanent link">&para;</a></h4>
+<p><strong>Description</strong>: Update README.md and create migration guide.</p>
+<p><strong>Deliverables</strong>:
+- Update README.md with Flow architecture notes
+- Add troubleshooting section to FLOW_ARCHITECTURE.md
+- Document breaking changes (if any)
+- Add usage examples</p>
+<p><strong>Content</strong>:
+- "How to run Flow-based generation"
+- "Debugging state transitions"
+- "Extending Flow with new states"
+- "Migration from sequential orchestration"</p>
+<p><strong>Acceptance Criteria</strong>:
+- README.md updated
+- FLOW_ARCHITECTURE.md contains troubleshooting
+- Examples executable
+- Documentation peer-reviewed</p>
+<p><strong>Effort</strong>: 0.5 hours
+<strong>Priority</strong>: P2 (polish)
+<strong>Dependencies</strong>: Task 5 (regression testing complete)
+<strong>Risks</strong>: None</p>
+<hr />
+<p><strong>STORY-005 Total</strong>: 9.5 hours → Capped at 3 story points (3 × 2.8h = 8.4h)</p>
+<hr />
+<h2 id="story-006-establish-style-memory-rag-3-points-p1">STORY-006: Establish Style Memory RAG (3 points, P1)<a class="headerlink" href="#story-006-establish-style-memory-rag-3-points-p1" title="Permanent link">&para;</a></h2>
+<p><strong>Goal</strong>: Build RAG system with Gold Standard articles for writer/editor style reference.</p>
+<p><strong>Business Value</strong>: Improves article consistency, reduces rework from style violations, enables writer to learn from best examples.</p>
+<h3 id="task-breakdown_1">Task Breakdown<a class="headerlink" href="#task-breakdown_1" title="Permanent link">&para;</a></h3>
+<h4 id="task-1-chromadb-setup-15h-p0">Task 1: ChromaDB Setup (1.5h, P0)<a class="headerlink" href="#task-1-chromadb-setup-15h-p0" title="Permanent link">&para;</a></h4>
+<p><strong>Description</strong>: Initialize ChromaDB vector store and test connection.</p>
+<p><strong>Deliverables</strong>:
+- <code>src/rag/chroma_store.py</code> - ChromaDB initialization and CRUD operations
+- Test connection with sample data
+- Document collection schema and metadata
+- Configure persistent storage (<code>data/chromadb/</code>)</p>
+<p><strong>Code Pattern</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">chromadb</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">chromadb.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Settings</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">init_chroma</span><span class="p">():</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">client</span> <span class="o">=</span> <span class="n">chromadb</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">Settings</span><span class="p">(</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>        <span class="n">persist_directory</span><span class="o">=</span><span class="s2">&quot;./data/chromadb&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>        <span class="n">anonymized_telemetry</span><span class="o">=</span><span class="kc">False</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="p">))</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_or_create_collection</span><span class="p">(</span><span class="s2">&quot;economist_style&quot;</span><span class="p">)</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="k">return</span> <span class="n">collection</span>
+</code></pre></div></p>
+<p><strong>Acceptance Criteria</strong>:
+- ChromaDB initializes without errors
+- Collection created with "economist_style" name
+- Sample document inserted and retrieved
+- Persistent storage working (data survives restart)</p>
+<p><strong>Effort</strong>: 1.5 hours
+<strong>Priority</strong>: P0 (foundation)
+<strong>Dependencies</strong>: None (ChromaDB in requirements.txt)
+<strong>Risks</strong>: Version compatibility with ChromaDB API</p>
+<hr />
+<h4 id="task-2-article-ingestion-pipeline-2h-p0">Task 2: Article Ingestion Pipeline (2h, P0)<a class="headerlink" href="#task-2-article-ingestion-pipeline-2h-p0" title="Permanent link">&para;</a></h4>
+<p><strong>Description</strong>: Build pipeline to ingest Gold Standard articles from <code>archived/</code> into ChromaDB.</p>
+<p><strong>Deliverables</strong>:
+- <code>scripts/ingest_gold_standard.py</code> - Ingestion script
+- Parse markdown files from archived/ directory
+- Extract chunks (300-500 words each)
+- Generate embeddings (OpenAI text-embedding-ada-002)
+- Store in ChromaDB with metadata</p>
+<p><strong>Metadata Schema</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">&quot;article_title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Self-Healing Tests: Myth vs Reality&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">&quot;chunk_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;chunk_0&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nt">&quot;section&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;introduction&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="nt">&quot;word_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">425</span><span class="p">,</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="nt">&quot;date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-12-31&quot;</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>Acceptance Criteria</strong>:
+- Script processes all .md files in archived/
+- Chunks extracted (300-500 words each)
+- Embeddings generated via OpenAI API
+- Metadata preserved (title, date, section)</p>
+<p><strong>Effort</strong>: 2 hours
+<strong>Priority</strong>: P0 (data pipeline)
+<strong>Dependencies</strong>: Task 1 (ChromaDB setup)
+<strong>Risks</strong>: OpenAI API rate limits during bulk ingestion</p>
+<hr />
+<h4 id="task-3-rag-query-tool-25h-p0">Task 3: RAG Query Tool (2.5h, P0)<a class="headerlink" href="#task-3-rag-query-tool-25h-p0" title="Permanent link">&para;</a></h4>
+<p><strong>Description</strong>: Create CrewAI tool for RAG queries accessible to agents.</p>
+<p><strong>Deliverables</strong>:
+- <code>src/rag/style_memory_tool.py</code> - CrewAI tool implementation
+- Semantic search with similarity threshold (0.7)
+- Return top 3 most relevant chunks
+- Format results for agent context</p>
+<p><strong>Code Pattern</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">crewai_tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">tool</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="nd">@tool</span><span class="p">(</span><span class="s2">&quot;Search style memory&quot;</span><span class="p">)</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">search_style_memory</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="sd">    Searches Gold Standard articles for style examples.</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="sd">    Args:</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="sd">        query: Semantic search query (e.g., &quot;opening hooks&quot;)</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="sd">        Top 3 relevant article excerpts</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="n">get_chroma_collection</span><span class="p">()</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>        <span class="n">query_texts</span><span class="o">=</span><span class="p">[</span><span class="n">query</span><span class="p">],</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>        <span class="n">n_results</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>        <span class="n">where</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;word_count&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;$gte&quot;</span><span class="p">:</span> <span class="mi">300</span><span class="p">}}</span>
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>    <span class="p">)</span>
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>    <span class="k">return</span> <span class="n">format_results</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>Acceptance Criteria</strong>:
+- Tool decorated with @tool
+- Query returns top 3 chunks
+- Similarity threshold configurable (default 0.7)
+- Results formatted with article context</p>
+<p><strong>Effort</strong>: 2.5 hours
+<strong>Priority</strong>: P0 (agent integration)
+<strong>Dependencies</strong>: Task 2 (articles ingested)
+<strong>Risks</strong>: Query latency may exceed 500ms</p>
+<hr />
+<h4 id="task-4-agent-integration-25h-p0">Task 4: Agent Integration (2.5h, P0)<a class="headerlink" href="#task-4-agent-integration-25h-p0" title="Permanent link">&para;</a></h4>
+<p><strong>Description</strong>: Add style_memory_tool to Writer and Editor agents.</p>
+<p><strong>Deliverables</strong>:
+- Update <code>agents/writer_agent.py</code> to include style_memory_tool
+- Update <code>agents/editor_agent.py</code> to include style_memory_tool
+- Update agent prompts to use tool ("Search style_memory for opening examples")
+- Test tool execution in agent workflows</p>
+<p><strong>Prompt Enhancement</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>You have access to the style_memory_tool which searches Gold Standard
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>articles for style examples. Use it when:
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>- Writing opening hooks (search &quot;compelling openings&quot;)
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>- Checking voice consistency (search &quot;Economist tone&quot;)
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>- Finding chart integration examples (search &quot;chart references&quot;)
+</code></pre></div></p>
+<p><strong>Acceptance Criteria</strong>:
+- Writer agent has style_memory_tool access
+- Editor agent has style_memory_tool access
+- Prompts instruct agents when to use tool
+- Tool execution logs show successful queries</p>
+<p><strong>Effort</strong>: 2.5 hours
+<strong>Priority</strong>: P0 (integration)
+<strong>Dependencies</strong>: Task 3 (tool complete)
+<strong>Risks</strong>: Agent prompts may not trigger tool use</p>
+<hr />
+<h4 id="task-5-rag-integration-tests-1h-p0">Task 5: RAG Integration Tests (1h, P0)<a class="headerlink" href="#task-5-rag-integration-tests-1h-p0" title="Permanent link">&para;</a></h4>
+<p><strong>Description</strong>: Create tests validating RAG system end-to-end.</p>
+<p><strong>Deliverables</strong>:
+- <code>tests/test_rag_integration.py</code> - 3+ test cases
+- Test 1: Article ingestion (archived/ → ChromaDB)
+- Test 2: Semantic search returns relevant chunks
+- Test 3: Agent uses style_memory_tool successfully</p>
+<p><strong>Test Pattern</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_rag_semantic_search</span><span class="p">():</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;opening hook examples&quot;</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">search_style_memory</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="k">assert</span> <span class="s2">&quot;opening&quot;</span> <span class="ow">in</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</code></pre></div></p>
+<p><strong>Acceptance Criteria</strong>:
+- 3+ integration tests passing
+- Query latency &lt;500ms validated
+- Tool execution in agent context tested
+- All tests run in &lt;10 seconds</p>
+<p><strong>Effort</strong>: 1 hour
+<strong>Priority</strong>: P0 (validation)
+<strong>Dependencies</strong>: Task 4 (agent integration complete)
+<strong>Risks</strong>: ChromaDB test isolation may need work</p>
+<hr />
+<h4 id="task-6-documentation-05h-p2_1">Task 6: Documentation (0.5h, P2)<a class="headerlink" href="#task-6-documentation-05h-p2_1" title="Permanent link">&para;</a></h4>
+<p><strong>Description</strong>: Create RAG_ARCHITECTURE.md with usage guide.</p>
+<p><strong>Deliverables</strong>:
+- <code>docs/RAG_ARCHITECTURE.md</code> - Architecture and usage guide
+- Document ChromaDB schema and metadata
+- Add troubleshooting section (embedding errors, query latency)
+- Update README.md with RAG setup instructions</p>
+<p><strong>Content</strong>:
+- "How to add new Gold Standard articles"
+- "Querying the style memory"
+- "Metadata schema reference"
+- "Performance tuning (chunk size, similarity threshold)"</p>
+<p><strong>Acceptance Criteria</strong>:
+- RAG_ARCHITECTURE.md created
+- README.md updated with setup instructions
+- Examples executable
+- Documentation peer-reviewed</p>
+<p><strong>Effort</strong>: 0.5 hours
+<strong>Priority</strong>: P2 (polish)
+<strong>Dependencies</strong>: Task 5 (tests passing)
+<strong>Risks</strong>: None</p>
+<hr />
+<p><strong>STORY-006 Total</strong>: 10 hours → Capped at 3 story points (3 × 2.8h = 8.4h)</p>
+<hr />
+<h2 id="story-007-implement-roi-telemetry-hook-3-points-p2">STORY-007: Implement ROI Telemetry Hook (3 points, P2)<a class="headerlink" href="#story-007-implement-roi-telemetry-hook-3-points-p2" title="Permanent link">&para;</a></h2>
+<p><strong>Goal</strong>: Add token cost tracking to measure human-hour ROI of agent operations.</p>
+<p><strong>Business Value</strong>: Quantifies efficiency gains, justifies investment in agentic architecture, identifies optimization opportunities.</p>
+<h3 id="task-breakdown_2">Task Breakdown<a class="headerlink" href="#task-breakdown_2" title="Permanent link">&para;</a></h3>
+<h4 id="task-1-roi-schema-design-1h-p0">Task 1: ROI Schema Design (1h, P0)<a class="headerlink" href="#task-1-roi-schema-design-1h-p0" title="Permanent link">&para;</a></h4>
+<p><strong>Description</strong>: Design <code>logs/execution_roi.json</code> schema with rotation policy.</p>
+<p><strong>Schema Structure</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">{</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">&quot;$schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://json-schema.org/draft-07/schema#&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Execution ROI Schema&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Token cost tracking and ROI calculation for agent executions&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;object&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="nt">&quot;required&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;executions&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;metadata&quot;</span><span class="p">],</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">    </span><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;object&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">      </span><span class="nt">&quot;required&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;schema_version&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;created&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;last_updated&quot;</span><span class="p">],</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">      </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">        </span><span class="nt">&quot;schema_version&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;pattern&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;^\\d+\\.\\d+$&quot;</span><span class="p">},</span>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">        </span><span class="nt">&quot;created&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;date-time&quot;</span><span class="p">},</span>
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">        </span><span class="nt">&quot;last_updated&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;date-time&quot;</span><span class="p">},</span>
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">        </span><span class="nt">&quot;rotation_policy&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;enum&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;30-day&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;90-day&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;manual&quot;</span><span class="p">]}</span>
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="w">    </span><span class="nt">&quot;executions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;array&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="w">      </span><span class="nt">&quot;items&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="w">        </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;object&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="w">        </span><span class="nt">&quot;required&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;execution_id&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;timestamp&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;topic&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;agents&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;totals&quot;</span><span class="p">],</span>
+<a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="w">        </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a><span class="w">          </span><span class="nt">&quot;execution_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uuid&quot;</span><span class="p">},</span>
+<a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a><span class="w">          </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;date-time&quot;</span><span class="p">},</span>
+<a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a><span class="w">          </span><span class="nt">&quot;topic&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;minLength&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">},</span>
+<a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a><span class="w">          </span><span class="nt">&quot;agents&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a><span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;array&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a><span class="w">            </span><span class="nt">&quot;items&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a><span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;object&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-31" name="__codelineno-8-31" href="#__codelineno-8-31"></a><span class="w">              </span><span class="nt">&quot;required&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;agent_name&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;tokens_used&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;model&quot;</span><span class="p">],</span>
+<a id="__codelineno-8-32" name="__codelineno-8-32" href="#__codelineno-8-32"></a><span class="w">              </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-33" name="__codelineno-8-33" href="#__codelineno-8-33"></a><span class="w">                </span><span class="nt">&quot;agent_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;enum&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;research&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;writer&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;editor&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;graphics&quot;</span><span class="p">]},</span>
+<a id="__codelineno-8-34" name="__codelineno-8-34" href="#__codelineno-8-34"></a><span class="w">                </span><span class="nt">&quot;tokens_used&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-35" name="__codelineno-8-35" href="#__codelineno-8-35"></a><span class="w">                  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;object&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-36" name="__codelineno-8-36" href="#__codelineno-8-36"></a><span class="w">                  </span><span class="nt">&quot;required&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;prompt_tokens&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;completion_tokens&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;total_tokens&quot;</span><span class="p">],</span>
+<a id="__codelineno-8-37" name="__codelineno-8-37" href="#__codelineno-8-37"></a><span class="w">                  </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-38" name="__codelineno-8-38" href="#__codelineno-8-38"></a><span class="w">                    </span><span class="nt">&quot;prompt_tokens&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;integer&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;minimum&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">},</span>
+<a id="__codelineno-8-39" name="__codelineno-8-39" href="#__codelineno-8-39"></a><span class="w">                    </span><span class="nt">&quot;completion_tokens&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;integer&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;minimum&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">},</span>
+<a id="__codelineno-8-40" name="__codelineno-8-40" href="#__codelineno-8-40"></a><span class="w">                    </span><span class="nt">&quot;total_tokens&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;integer&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;minimum&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">}</span>
+<a id="__codelineno-8-41" name="__codelineno-8-41" href="#__codelineno-8-41"></a><span class="w">                  </span><span class="p">}</span>
+<a id="__codelineno-8-42" name="__codelineno-8-42" href="#__codelineno-8-42"></a><span class="w">                </span><span class="p">},</span>
+<a id="__codelineno-8-43" name="__codelineno-8-43" href="#__codelineno-8-43"></a><span class="w">                </span><span class="nt">&quot;model&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;enum&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;gpt-4&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;gpt-3.5-turbo&quot;</span><span class="p">]},</span>
+<a id="__codelineno-8-44" name="__codelineno-8-44" href="#__codelineno-8-44"></a><span class="w">                </span><span class="nt">&quot;cost_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;number&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;minimum&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">}</span>
+<a id="__codelineno-8-45" name="__codelineno-8-45" href="#__codelineno-8-45"></a><span class="w">              </span><span class="p">}</span>
+<a id="__codelineno-8-46" name="__codelineno-8-46" href="#__codelineno-8-46"></a><span class="w">            </span><span class="p">}</span>
+<a id="__codelineno-8-47" name="__codelineno-8-47" href="#__codelineno-8-47"></a><span class="w">          </span><span class="p">},</span>
+<a id="__codelineno-8-48" name="__codelineno-8-48" href="#__codelineno-8-48"></a><span class="w">          </span><span class="nt">&quot;totals&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-49" name="__codelineno-8-49" href="#__codelineno-8-49"></a><span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;object&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-50" name="__codelineno-8-50" href="#__codelineno-8-50"></a><span class="w">            </span><span class="nt">&quot;required&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;total_tokens&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;total_cost_usd&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;human_hours_equivalent&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;roi_multiplier&quot;</span><span class="p">],</span>
+<a id="__codelineno-8-51" name="__codelineno-8-51" href="#__codelineno-8-51"></a><span class="w">            </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-52" name="__codelineno-8-52" href="#__codelineno-8-52"></a><span class="w">              </span><span class="nt">&quot;total_tokens&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;integer&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;minimum&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">},</span>
+<a id="__codelineno-8-53" name="__codelineno-8-53" href="#__codelineno-8-53"></a><span class="w">              </span><span class="nt">&quot;total_cost_usd&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;number&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;minimum&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">},</span>
+<a id="__codelineno-8-54" name="__codelineno-8-54" href="#__codelineno-8-54"></a><span class="w">              </span><span class="nt">&quot;human_hours_equivalent&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;number&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;minimum&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">},</span>
+<a id="__codelineno-8-55" name="__codelineno-8-55" href="#__codelineno-8-55"></a><span class="w">              </span><span class="nt">&quot;roi_multiplier&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;number&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;minimum&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">},</span>
+<a id="__codelineno-8-56" name="__codelineno-8-56" href="#__codelineno-8-56"></a><span class="w">              </span><span class="nt">&quot;time_saved_hours&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;number&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;minimum&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">}</span>
+<a id="__codelineno-8-57" name="__codelineno-8-57" href="#__codelineno-8-57"></a><span class="w">            </span><span class="p">}</span>
+<a id="__codelineno-8-58" name="__codelineno-8-58" href="#__codelineno-8-58"></a><span class="w">          </span><span class="p">}</span>
+<a id="__codelineno-8-59" name="__codelineno-8-59" href="#__codelineno-8-59"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-8-60" name="__codelineno-8-60" href="#__codelineno-8-60"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-8-61" name="__codelineno-8-61" href="#__codelineno-8-61"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-8-62" name="__codelineno-8-62" href="#__codelineno-8-62"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-8-63" name="__codelineno-8-63" href="#__codelineno-8-63"></a><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>Acceptance Criteria</strong>:
+- Schema follows JSON Schema Draft-07 format
+- All required fields defined with types
+- Enum constraints for agent_name and model
+- Pattern validation for schema_version
+- UUID format for execution_id
+- Date-time format for timestamps</p>
+<p><strong>Effort</strong>: 1 hour
+<strong>Priority</strong>: P0 (foundation)
+<strong>Dependencies</strong>: None
+<strong>Risks</strong>: Schema may need iteration after Task 2 implementation</p>
+<p><strong>Schema Alignment Notes</strong>:
+- ✅ Follows same JSON Schema Draft-07 pattern as <code>content_queue_schema.json</code>
+- ✅ Uses <code>required</code> arrays for mandatory fields
+- ✅ Type constraints match validation patterns
+- ✅ Nested objects with clear hierarchy (similar to <code>board_decision_schema.json</code>)
+- ✅ Format validators (date-time, uuid) align with existing patterns
+- ✅ Enum constraints for controlled vocabularies</p>
+<p><strong>Recommended Actions</strong>:
+1. Create <code>schemas/execution_roi_schema.json</code> with above structure
+2. Add validation function to <code>schemas/validate_schemas.py</code>:
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">validate_execution_roi</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate logs/execution_roi.json&quot;&quot;&quot;</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="k">if</span> <span class="n">file_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>        <span class="n">file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;logs&quot;</span> <span class="o">/</span> <span class="s2">&quot;execution_roi.json&quot;</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="n">schema_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;execution_roi_schema.json&quot;</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>    <span class="n">is_valid</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="n">validate_json_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">schema_path</span><span class="p">)</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>    <span class="c1"># ... validation logic</span>
+</code></pre></div>
+3. Update <code>validate_all()</code> to include ROI telemetry validation</p>
+<hr />
+<h4 id="task-2-roitracker-class-25h-p0">Task 2: ROITracker Class (2.5h, P0)<a class="headerlink" href="#task-2-roitracker-class-25h-p0" title="Permanent link">&para;</a></h4>
+<p><strong>Description</strong>: Create <code>src/telemetry/roi_tracker.py</code> with ROI calculation logic.</p>
+<p><strong>Deliverables</strong>:
+- <code>src/telemetry/roi_tracker.py</code> - ROITracker class
+- Methods: start_execution(), log_agent_tokens(), calculate_roi(), save_to_json()
+- Model pricing data (GPT-4: $0.03/$0.06, GPT-3.5: $0.0015/$0.002 per 1k tokens)
+- Human-hour benchmarks (writing: 2-4h/1000 words, editing: 1-2h/1000 words)</p>
+<p><strong>Code Pattern</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">ROITracker</span><span class="p">:</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="n">MODEL_PRICING</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>        <span class="s2">&quot;gpt-4&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="mf">0.03</span><span class="p">,</span> <span class="s2">&quot;completion&quot;</span><span class="p">:</span> <span class="mf">0.06</span><span class="p">},</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>        <span class="s2">&quot;gpt-3.5-turbo&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="mf">0.0015</span><span class="p">,</span> <span class="s2">&quot;completion&quot;</span><span class="p">:</span> <span class="mf">0.002</span><span class="p">}</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    <span class="p">}</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>    <span class="n">HUMAN_BENCHMARKS</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>        <span class="s2">&quot;writing&quot;</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span>  <span class="c1"># hours per 1000 words</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>        <span class="s2">&quot;editing&quot;</span><span class="p">:</span> <span class="mf">1.5</span>   <span class="c1"># hours per 1000 words</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>    <span class="p">}</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">start_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">execution_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">agents</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>
+<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">log_agent_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tokens</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>        <span class="n">cost</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_cost</span><span class="p">(</span><span class="n">tokens</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a>            <span class="s2">&quot;agent_name&quot;</span><span class="p">:</span> <span class="n">agent_name</span><span class="p">,</span>
+<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a>            <span class="s2">&quot;tokens_used&quot;</span><span class="p">:</span> <span class="n">tokens</span><span class="p">,</span>
+<a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a>            <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
+<a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a>            <span class="s2">&quot;cost_usd&quot;</span><span class="p">:</span> <span class="n">cost</span>
+<a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a>        <span class="p">})</span>
+<a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a>
+<a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_roi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">word_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<a id="__codelineno-10-27" name="__codelineno-10-27" href="#__codelineno-10-27"></a>        <span class="n">total_cost</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;cost_usd&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">)</span>
+<a id="__codelineno-10-28" name="__codelineno-10-28" href="#__codelineno-10-28"></a>        <span class="n">human_hours</span> <span class="o">=</span> <span class="p">(</span><span class="n">word_count</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">HUMAN_BENCHMARKS</span><span class="p">[</span><span class="s2">&quot;writing&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">HUMAN_BENCHMARKS</span><span class="p">[</span><span class="s2">&quot;editing&quot;</span><span class="p">])</span>
+<a id="__codelineno-10-29" name="__codelineno-10-29" href="#__codelineno-10-29"></a>        <span class="n">human_cost</span> <span class="o">=</span> <span class="n">human_hours</span> <span class="o">*</span> <span class="mi">50</span>  <span class="c1"># $50/hour baseline</span>
+<a id="__codelineno-10-30" name="__codelineno-10-30" href="#__codelineno-10-30"></a>        <span class="n">roi_multiplier</span> <span class="o">=</span> <span class="n">human_cost</span> <span class="o">/</span> <span class="n">total_cost</span> <span class="k">if</span> <span class="n">total_cost</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+<a id="__codelineno-10-31" name="__codelineno-10-31" href="#__codelineno-10-31"></a>        <span class="k">return</span> <span class="p">{</span>
+<a id="__codelineno-10-32" name="__codelineno-10-32" href="#__codelineno-10-32"></a>            <span class="s2">&quot;total_tokens&quot;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;tokens_used&quot;</span><span class="p">][</span><span class="s2">&quot;total_tokens&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">),</span>
+<a id="__codelineno-10-33" name="__codelineno-10-33" href="#__codelineno-10-33"></a>            <span class="s2">&quot;total_cost_usd&quot;</span><span class="p">:</span> <span class="n">total_cost</span><span class="p">,</span>
+<a id="__codelineno-10-34" name="__codelineno-10-34" href="#__codelineno-10-34"></a>            <span class="s2">&quot;human_hours_equivalent&quot;</span><span class="p">:</span> <span class="n">human_hours</span><span class="p">,</span>
+<a id="__codelineno-10-35" name="__codelineno-10-35" href="#__codelineno-10-35"></a>            <span class="s2">&quot;roi_multiplier&quot;</span><span class="p">:</span> <span class="n">roi_multiplier</span><span class="p">,</span>
+<a id="__codelineno-10-36" name="__codelineno-10-36" href="#__codelineno-10-36"></a>            <span class="s2">&quot;time_saved_hours&quot;</span><span class="p">:</span> <span class="n">human_hours</span>
+<a id="__codelineno-10-37" name="__codelineno-10-37" href="#__codelineno-10-37"></a>        <span class="p">}</span>
+</code></pre></div></p>
+<p><strong>Acceptance Criteria</strong>:
+- ROITracker class initialized with model pricing
+- log_agent_tokens() records prompt/completion tokens
+- calculate_roi() returns ROI multiplier
+- save_to_json() writes to logs/execution_roi.json</p>
+<p><strong>Effort</strong>: 2.5 hours
+<strong>Priority</strong>: P0 (core implementation)
+<strong>Dependencies</strong>: Task 1 (schema design)
+<strong>Risks</strong>: Token counting API may not expose detailed breakdowns</p>
+<hr />
+<h4 id="task-3-instrument-writereditor-2h-p0">Task 3: Instrument Writer/Editor (2h, P0)<a class="headerlink" href="#task-3-instrument-writereditor-2h-p0" title="Permanent link">&para;</a></h4>
+<p><strong>Description</strong>: Add ROI tracking calls to Writer and Editor agents.</p>
+<p><strong>Deliverables</strong>:
+- Update <code>agents/writer_agent.py</code> with ROITracker integration
+- Update <code>agents/editor_agent.py</code> with ROITracker integration
+- Log tokens after each LLM call
+- Calculate word count from outputs</p>
+<p><strong>Code Changes</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># In writer_agent.py</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">src.telemetry.roi_tracker</span><span class="w"> </span><span class="kn">import</span> <span class="n">ROITracker</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_writer_agent</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">topic</span><span class="p">,</span> <span class="n">research</span><span class="p">,</span> <span class="n">date_str</span><span class="p">,</span> <span class="n">tracker</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    <span class="k">if</span> <span class="n">tracker</span><span class="p">:</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>        <span class="n">tracker</span><span class="o">.</span><span class="n">start_execution</span><span class="p">(</span><span class="n">topic</span><span class="p">)</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>    <span class="n">response</span> <span class="o">=</span> <span class="n">call_llm</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">prompt</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">4000</span><span class="p">)</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>    <span class="k">if</span> <span class="n">tracker</span><span class="p">:</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>        <span class="n">tracker</span><span class="o">.</span><span class="n">log_agent_tokens</span><span class="p">(</span>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>            <span class="n">agent_name</span><span class="o">=</span><span class="s2">&quot;writer&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>            <span class="n">tokens</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">usage</span><span class="p">,</span>  <span class="c1"># {prompt_tokens, completion_tokens, total_tokens}</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>            <span class="n">model</span><span class="o">=</span><span class="n">client</span><span class="o">.</span><span class="n">model</span>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>        <span class="p">)</span>
+<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>
+<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>    <span class="k">return</span> <span class="n">draft</span>
+</code></pre></div></p>
+<p><strong>Acceptance Criteria</strong>:
+- Writer agent logs token usage
+- Editor agent logs token usage
+- Tokens captured after each LLM call
+- No performance regression (&lt;10ms overhead)</p>
+<p><strong>Effort</strong>: 2 hours
+<strong>Priority</strong>: P0 (integration)
+<strong>Dependencies</strong>: Task 2 (ROITracker complete)
+<strong>Risks</strong>: LLM client may not expose token usage metadata</p>
+<hr />
+<h4 id="task-4-integration-with-economist_agentpy-15h-p0">Task 4: Integration with economist_agent.py (1.5h, P0)<a class="headerlink" href="#task-4-integration-with-economist_agentpy-15h-p0" title="Permanent link">&para;</a></h4>
+<p><strong>Description</strong>: Wire ROITracker into main orchestration flow.</p>
+<p><strong>Deliverables</strong>:
+- Update <code>generate_economist_post()</code> to initialize ROITracker
+- Pass tracker to all agent calls
+- Call calculate_roi() at end of execution
+- Save to logs/execution_roi.json with rotation</p>
+<p><strong>Code Pattern</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">generate_economist_post</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="o">...</span><span class="p">):</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="n">tracker</span> <span class="o">=</span> <span class="n">ROITracker</span><span class="p">()</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    <span class="n">tracker</span><span class="o">.</span><span class="n">start_execution</span><span class="p">(</span><span class="n">topic</span><span class="p">)</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>    <span class="n">research</span> <span class="o">=</span> <span class="n">run_research_agent</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">topic</span><span class="p">,</span> <span class="n">talking_points</span><span class="p">,</span> <span class="n">tracker</span><span class="p">)</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>    <span class="n">draft</span> <span class="o">=</span> <span class="n">run_writer_agent</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">topic</span><span class="p">,</span> <span class="n">research</span><span class="p">,</span> <span class="n">date_str</span><span class="p">,</span> <span class="n">tracker</span><span class="p">)</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>    <span class="n">edited</span> <span class="o">=</span> <span class="n">run_editor_agent</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">draft</span><span class="p">,</span> <span class="n">tracker</span><span class="p">)</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>    <span class="n">roi_data</span> <span class="o">=</span> <span class="n">tracker</span><span class="o">.</span><span class="n">calculate_roi</span><span class="p">(</span><span class="n">word_count</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">edited</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>    <span class="n">tracker</span><span class="o">.</span><span class="n">save_to_json</span><span class="p">(</span><span class="s2">&quot;logs/execution_roi.json&quot;</span><span class="p">)</span>
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ROI: </span><span class="si">{</span><span class="n">roi_data</span><span class="p">[</span><span class="s1">&#39;roi_multiplier&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">x human efficiency&quot;</span><span class="p">)</span>
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>    <span class="k">return</span> <span class="n">result</span>
+</code></pre></div></p>
+<p><strong>Acceptance Criteria</strong>:
+- ROITracker initialized in generate_economist_post()
+- Tracker passed to all agent calls
+- ROI calculated at end of execution
+- execution_roi.json updated with new execution</p>
+<p><strong>Effort</strong>: 1.5 hours
+<strong>Priority</strong>: P0 (orchestration)
+<strong>Dependencies</strong>: Task 3 (agents instrumented)
+<strong>Risks</strong>: Flow-based orchestration (STORY-005) may complicate integration</p>
+<hr />
+<h4 id="task-5-roi-telemetry-tests-15h-p0">Task 5: ROI Telemetry Tests (1.5h, P0)<a class="headerlink" href="#task-5-roi-telemetry-tests-15h-p0" title="Permanent link">&para;</a></h4>
+<p><strong>Description</strong>: Create tests validating ROI tracking accuracy.</p>
+<p><strong>Deliverables</strong>:
+- <code>tests/test_roi_telemetry.py</code> - 3+ test cases
+- Test 1: ROI tracking logs token usage correctly
+- Test 2: Cost calculation matches model pricing (±1% error)
+- Test 3: ROI multiplier formula validates with known examples</p>
+<p><strong>Test Pattern</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_roi_calculation</span><span class="p">():</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    <span class="n">tracker</span> <span class="o">=</span> <span class="n">ROITracker</span><span class="p">()</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    <span class="n">tracker</span><span class="o">.</span><span class="n">start_execution</span><span class="p">(</span><span class="s2">&quot;Test Topic&quot;</span><span class="p">)</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>    <span class="c1"># Simulate writer tokens</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>    <span class="n">tracker</span><span class="o">.</span><span class="n">log_agent_tokens</span><span class="p">(</span><span class="s2">&quot;writer&quot;</span><span class="p">,</span> <span class="p">{</span>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>        <span class="s2">&quot;prompt_tokens&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>        <span class="s2">&quot;completion_tokens&quot;</span><span class="p">:</span> <span class="mi">2000</span><span class="p">,</span>
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>        <span class="s2">&quot;total_tokens&quot;</span><span class="p">:</span> <span class="mi">3000</span>
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>    <span class="p">},</span> <span class="s2">&quot;gpt-4&quot;</span><span class="p">)</span>
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>
+<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>    <span class="n">roi_data</span> <span class="o">=</span> <span class="n">tracker</span><span class="o">.</span><span class="n">calculate_roi</span><span class="p">(</span><span class="n">word_count</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>
+<a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a>    <span class="c1"># Expected: 3h human writing @ $50/hr = $150</span>
+<a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a>    <span class="c1"># Cost: (1000 * 0.03 + 2000 * 0.06) / 1000 = $0.15</span>
+<a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a>    <span class="c1"># ROI: $150 / $0.15 = 1000x</span>
+<a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a>    <span class="k">assert</span> <span class="n">roi_data</span><span class="p">[</span><span class="s2">&quot;roi_multiplier&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">900</span>  <span class="c1"># Allow 10% variance</span>
+</code></pre></div></p>
+<p><strong>Acceptance Criteria</strong>:
+- 3+ tests passing
+- Cost calculation validated (±1% error)
+- ROI multiplier formula tested with known examples
+- Tests run in &lt;5 seconds</p>
+<p><strong>Effort</strong>: 1.5 hours
+<strong>Priority</strong>: P0 (validation)
+<strong>Dependencies</strong>: Task 4 (integration complete)
+<strong>Risks</strong>: Human-hour benchmarks may vary significantly</p>
+<hr />
+<h4 id="task-6-documentation-1h-p2">Task 6: Documentation (1h, P2)<a class="headerlink" href="#task-6-documentation-1h-p2" title="Permanent link">&para;</a></h4>
+<p><strong>Description</strong>: Create TELEMETRY_GUIDE.md with ROI schema and usage examples.</p>
+<p><strong>Deliverables</strong>:
+- <code>docs/TELEMETRY_GUIDE.md</code> - Telemetry guide
+- Document ROI schema structure
+- Add human-hour benchmarks and assumptions
+- Update README.md with telemetry setup instructions
+- Add example queries (aggregation, filtering)</p>
+<p><strong>Content</strong>:
+- "Understanding ROI Calculation"
+- "Human-Hour Benchmarks" (writing, editing, research)
+- "Model Pricing Data" (GPT-4, GPT-3.5)
+- "Querying execution_roi.json" (jq examples)
+- "Troubleshooting" (token counting issues, cost discrepancies)</p>
+<p><strong>Acceptance Criteria</strong>:
+- TELEMETRY_GUIDE.md created
+- README.md updated with setup instructions
+- Examples executable (jq queries work)
+- Documentation peer-reviewed</p>
+<p><strong>Effort</strong>: 1 hour
+<strong>Priority</strong>: P2 (polish)
+<strong>Dependencies</strong>: Task 5 (tests passing)
+<strong>Risks</strong>: None</p>
+<hr />
+<p><strong>STORY-007 Total</strong>: 9 hours → Capped at 3 story points (3 × 2.8h = 8.4h)</p>
+<hr />
+<h2 id="schema-alignment-analysis">Schema Alignment Analysis<a class="headerlink" href="#schema-alignment-analysis" title="Permanent link">&para;</a></h2>
+<h3 id="existing-schema-patterns">Existing Schema Patterns<a class="headerlink" href="#existing-schema-patterns" title="Permanent link">&para;</a></h3>
+<p>The economist-agents project uses <strong>JSON Schema Draft-07</strong> with the following patterns:</p>
+<ol>
+<li><strong>Type Validation</strong>: All fields have explicit <code>type</code> constraints (string, integer, number, boolean, array, object)</li>
+<li><strong>Required Fields</strong>: <code>required</code> arrays enforce mandatory fields</li>
+<li><strong>Nested Objects</strong>: Complex structures use nested objects with their own <code>properties</code> and <code>required</code> arrays</li>
+<li><strong>Format Validators</strong>: Use <code>format</code> for date-time, email, uri validation</li>
+<li><strong>Constraints</strong>: Minimum/maximum for numbers, minLength/maxLength for strings, minItems for arrays</li>
+<li><strong>Enums</strong>: Controlled vocabularies use <code>enum</code> constraints</li>
+</ol>
+<p><strong>Examples from existing schemas</strong>:
+- <code>content_queue_schema.json</code>: Nested <code>scores</code> object with 5 required integer fields (1-5 range)
+- <code>board_decision_schema.json</code>: Array items with nested <code>votes</code> array, weighted_score with min/max constraints</p>
+<h3 id="roi-telemetry-schema-alignment">ROI Telemetry Schema Alignment<a class="headerlink" href="#roi-telemetry-schema-alignment" title="Permanent link">&para;</a></h3>
+<p>The proposed <code>execution_roi_schema.json</code> follows all existing patterns:</p>
+<p>✅ <strong>Type Validation</strong>: All fields have explicit types
+✅ <strong>Required Fields</strong>: <code>executions</code>, <code>metadata</code>, <code>agents</code>, <code>totals</code> all required
+✅ <strong>Nested Objects</strong>: <code>metadata</code>, <code>agents</code>, <code>totals</code> follow nested pattern
+✅ <strong>Format Validators</strong>: Uses <code>date-time</code> for timestamps, <code>uuid</code> for execution_id
+✅ <strong>Constraints</strong>: Integer minimums (≥0 for tokens), pattern validation for schema_version
+✅ <strong>Enums</strong>: <code>agent_name</code> restricted to ["research", "writer", "editor", "graphics"], <code>model</code> to ["gpt-4", "gpt-3.5-turbo"]</p>
+<p><strong>Key Alignment</strong>:
+- Schema structure mirrors <code>board_decision_schema.json</code> (top-level metadata + array of items)
+- Nested objects with required fields match <code>content_queue_schema.json</code> pattern
+- Validation functions in <code>validate_schemas.py</code> can use same <code>validate_json_file()</code> method</p>
+<h3 id="recommended-schema-enhancements">Recommended Schema Enhancements<a class="headerlink" href="#recommended-schema-enhancements" title="Permanent link">&para;</a></h3>
+<p><strong>Recommendation 1</strong>: Add <code>execution_roi_schema.json</code> to <code>schemas/</code> directory</p>
+<p><strong>Recommendation 2</strong>: Extend <code>validate_schemas.py</code> with ROI validation:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">validate_execution_roi</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate logs/execution_roi.json&quot;&quot;&quot;</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    <span class="k">if</span> <span class="n">file_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>        <span class="n">file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;logs&quot;</span> <span class="o">/</span> <span class="s2">&quot;execution_roi.json&quot;</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>    <span class="n">schema_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;execution_roi_schema.json&quot;</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>    <span class="n">is_valid</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="n">validate_json_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">schema_path</span><span class="p">)</span>
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>    <span class="k">if</span> <span class="n">is_valid</span><span class="p">:</span>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ </span><span class="si">{</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is valid&quot;</span><span class="p">)</span>
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;❌ </span><span class="si">{</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> validation failed:&quot;</span><span class="p">)</span>
+<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a>        <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
+<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   • </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a>
+<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a>    <span class="k">return</span> <span class="n">is_valid</span>
+</code></pre></div></p>
+<p><strong>Recommendation 3</strong>: Update <code>validate_all()</code> to include ROI telemetry:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">validate_all</span><span class="p">():</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate all pipeline intermediate files&quot;&quot;&quot;</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;content_queue.json&quot;</span><span class="p">,</span> <span class="n">validate_content_queue</span><span class="p">()))</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;board_decision.json&quot;</span><span class="p">,</span> <span class="n">validate_board_decision</span><span class="p">()))</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;execution_roi.json&quot;</span><span class="p">,</span> <span class="n">validate_execution_roi</span><span class="p">()))</span>  <span class="c1"># NEW</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>    <span class="c1"># ... existing code</span>
+</code></pre></div></p>
+<p><strong>Recommendation 4</strong>: Add schema validation to pre-commit hooks:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># .git/hooks/pre-commit</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>python3<span class="w"> </span>schemas/validate_schemas.py<span class="w"> </span>--all
+</code></pre></div></p>
+<hr />
+<h2 id="sprint-planning">Sprint Planning<a class="headerlink" href="#sprint-planning" title="Permanent link">&para;</a></h2>
+<h3 id="sprint-13-execution-strategy">Sprint 13 Execution Strategy<a class="headerlink" href="#sprint-13-execution-strategy" title="Permanent link">&para;</a></h3>
+<p><strong>Capacity</strong>: 13 story points
+<strong>Planned</strong>: 9 story points (3 stories × 3 points)
+<strong>Buffer</strong>: 4 points (31% reserve for quality/unknowns)</p>
+<p><strong>Parallel Execution</strong>:
+- <strong>Week 1</strong>: STORY-005 (P0) + STORY-007 (P2) in parallel
+  - STORY-005: Flow architecture (no dependencies)
+  - STORY-007: ROI telemetry (no dependencies)
+  - Both can start immediately</p>
+<ul>
+<li><strong>Week 1-2</strong>: STORY-006 (P1) after STORY-005 kickoff</li>
+<li>Soft dependency: Benefits from Flow architecture</li>
+<li>Can overlap with STORY-005 Tasks 4-6</li>
+<li>Can run fully in parallel with STORY-007</li>
+</ul>
+<p><strong>Risk Mitigation</strong>:
+- STORY-005 is P0 (highest priority) - start first
+- STORY-007 has no dependencies - ideal for parallel work
+- STORY-006 soft dependency allows flexible scheduling</p>
+<h3 id="definition-of-ready-dor-checklist">Definition of Ready (DoR) Checklist<a class="headerlink" href="#definition-of-ready-dor-checklist" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[x] <strong>Story written</strong>: All 3 stories documented with clear goals</li>
+<li>[x] <strong>Acceptance criteria defined</strong>: 5 ACs per story in Given/When/Then format</li>
+<li>[x] <strong>Quality requirements specified</strong>: 6 categories per story</li>
+<li>[x] <strong>Three Amigos review</strong>: Dev, QA, Product perspectives documented</li>
+<li>[x] <strong>Technical prerequisites validated</strong>: CrewAI 0.95.0+, ChromaDB, OpenAI API, archived/ directory</li>
+<li>[x] <strong>Dependencies identified</strong>: STORY-005 → STORY-006 soft dependency, STORY-007 independent</li>
+<li>[x] <strong>Risks documented</strong>: Breaking changes, learning curve, latency, quality regressions</li>
+<li>[x] <strong>Story points estimated</strong>: 3 pts each (9 pts total)</li>
+<li>[x] <strong>Definition of Done agreed</strong>: Tests passing, docs updated, code reviewed, no regressions</li>
+<li>[x] <strong>Schema alignment validated</strong>: ROI telemetry follows existing JSON Schema patterns</li>
+</ul>
+<p><strong>DoR Status</strong>: ✅ <strong>ALL CRITERIA MET</strong> - Ready for Sprint 13 kickoff</p>
+<hr />
+<h2 id="success-metrics">Success Metrics<a class="headerlink" href="#success-metrics" title="Permanent link">&para;</a></h2>
+<h3 id="story-005-success-criteria">STORY-005 Success Criteria<a class="headerlink" href="#story-005-success-criteria" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Flow-based orchestration operational (0 WORKFLOW_SEQUENCE references)</li>
+<li>3+ integration tests passing</li>
+<li>No regression in article quality (gate pass rate ≥87%)</li>
+<li>FLOW_ARCHITECTURE.md completed</li>
+</ul>
+<h3 id="story-006-success-criteria">STORY-006 Success Criteria<a class="headerlink" href="#story-006-success-criteria" title="Permanent link">&para;</a></h3>
+<ul>
+<li>RAG system retrieves style examples (query latency &lt;500ms)</li>
+<li>Editor has style_memory_tool access</li>
+<li>3+ integration tests passing</li>
+<li>RAG_ARCHITECTURE.md completed</li>
+</ul>
+<h3 id="story-007-success-criteria">STORY-007 Success Criteria<a class="headerlink" href="#story-007-success-criteria" title="Permanent link">&para;</a></h3>
+<ul>
+<li>execution_roi.json logs token costs accurately (±1% error)</li>
+<li>ROI multiplier calculated (expect &gt;100x human efficiency)</li>
+<li>3+ integration tests passing</li>
+<li>TELEMETRY_GUIDE.md completed</li>
+<li><strong>Schema alignment validated</strong>: execution_roi_schema.json follows existing patterns</li>
+</ul>
+<h3 id="epic-success-criteria">Epic Success Criteria<a class="headerlink" href="#epic-success-criteria" title="Permanent link">&para;</a></h3>
+<ul>
+<li>All 3 stories complete (9 story points delivered)</li>
+<li>No regressions in existing functionality</li>
+<li>Business ROI validated (telemetry shows &gt;100x efficiency)</li>
+<li>Architecture modernized (Flow-based, RAG-enabled, telemetry-instrumented)</li>
+<li><strong>Schema consistency</strong>: All pipeline outputs follow JSON Schema Draft-07 patterns</li>
+</ul>
+<hr />
+<h2 id="appendix-task-summary-table">Appendix: Task Summary Table<a class="headerlink" href="#appendix-task-summary-table" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Story</th>
+<th>Task</th>
+<th>Effort</th>
+<th>Priority</th>
+<th>Dependencies</th>
+<th>Deliverables</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>STORY-005</strong></td>
+<td>Task 1: Flow Design</td>
+<td>1.5h</td>
+<td>P0</td>
+<td>None</td>
+<td>FLOW_ARCHITECTURE.md</td>
+</tr>
+<tr>
+<td></td>
+<td>Task 2: Flow Class</td>
+<td>2h</td>
+<td>P0</td>
+<td>Task 1</td>
+<td>ContentGenerationFlow class</td>
+</tr>
+<tr>
+<td></td>
+<td>Task 3: Migrate economist_agent</td>
+<td>3h</td>
+<td>P0</td>
+<td>Task 2</td>
+<td>Refactored orchestration</td>
+</tr>
+<tr>
+<td></td>
+<td>Task 4: State Transition Tests</td>
+<td>1.5h</td>
+<td>P0</td>
+<td>Task 3</td>
+<td>test_flow_integration.py</td>
+</tr>
+<tr>
+<td></td>
+<td>Task 5: Regression Testing</td>
+<td>1h</td>
+<td>P0</td>
+<td>Task 4</td>
+<td>Quality metrics validation</td>
+</tr>
+<tr>
+<td></td>
+<td>Task 6: Documentation</td>
+<td>0.5h</td>
+<td>P2</td>
+<td>Task 5</td>
+<td>README.md update</td>
+</tr>
+<tr>
+<td><strong>STORY-006</strong></td>
+<td>Task 1: ChromaDB Setup</td>
+<td>1.5h</td>
+<td>P0</td>
+<td>None</td>
+<td>chroma_store.py</td>
+</tr>
+<tr>
+<td></td>
+<td>Task 2: Article Ingestion</td>
+<td>2h</td>
+<td>P0</td>
+<td>Task 1</td>
+<td>ingest_gold_standard.py</td>
+</tr>
+<tr>
+<td></td>
+<td>Task 3: RAG Query Tool</td>
+<td>2.5h</td>
+<td>P0</td>
+<td>Task 2</td>
+<td>style_memory_tool.py</td>
+</tr>
+<tr>
+<td></td>
+<td>Task 4: Agent Integration</td>
+<td>2.5h</td>
+<td>P0</td>
+<td>Task 3</td>
+<td>Updated writer/editor agents</td>
+</tr>
+<tr>
+<td></td>
+<td>Task 5: RAG Integration Tests</td>
+<td>1h</td>
+<td>P0</td>
+<td>Task 4</td>
+<td>test_rag_integration.py</td>
+</tr>
+<tr>
+<td></td>
+<td>Task 6: Documentation</td>
+<td>0.5h</td>
+<td>P2</td>
+<td>Task 5</td>
+<td>RAG_ARCHITECTURE.md</td>
+</tr>
+<tr>
+<td><strong>STORY-007</strong></td>
+<td>Task 1: ROI Schema Design</td>
+<td>1h</td>
+<td>P0</td>
+<td>None</td>
+<td>execution_roi_schema.json</td>
+</tr>
+<tr>
+<td></td>
+<td>Task 2: ROITracker Class</td>
+<td>2.5h</td>
+<td>P0</td>
+<td>Task 1</td>
+<td>roi_tracker.py</td>
+</tr>
+<tr>
+<td></td>
+<td>Task 3: Instrument Agents</td>
+<td>2h</td>
+<td>P0</td>
+<td>Task 2</td>
+<td>Updated writer/editor</td>
+</tr>
+<tr>
+<td></td>
+<td>Task 4: Integration</td>
+<td>1.5h</td>
+<td>P0</td>
+<td>Task 3</td>
+<td>economist_agent.py integration</td>
+</tr>
+<tr>
+<td></td>
+<td>Task 5: ROI Tests</td>
+<td>1.5h</td>
+<td>P0</td>
+<td>Task 4</td>
+<td>test_roi_telemetry.py</td>
+</tr>
+<tr>
+<td></td>
+<td>Task 6: Documentation</td>
+<td>1h</td>
+<td>P2</td>
+<td>Task 5</td>
+<td>TELEMETRY_GUIDE.md</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total Tasks</strong>: 18 (6 per story)
+<strong>Total Effort</strong>: 28.5 hours (actual) → 9 story points (capped at 3 pts per story)
+<strong>Total Story Points</strong>: 9 (3 stories × 3 points)</p>
+<hr />
+<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Create GitHub Issues</strong>: Create issues for STORY-005/006/007, get issue numbers</li>
+<li><strong>Create Schema File</strong>: Add <code>schemas/execution_roi_schema.json</code> with validated structure</li>
+<li><strong>Update Validation Utility</strong>: Extend <code>schemas/validate_schemas.py</code> with ROI validation function</li>
+<li><strong>Update SPRINT.md</strong>: Add EPIC-001 section and 3 stories to Sprint 13 backlog</li>
+<li><strong>Update sprint_tracker.json</strong>: Add Sprint 13 with planned_stories array</li>
+<li><strong>Sprint Kickoff</strong>: Begin STORY-005 implementation (Flow architecture foundation)</li>
+<li><strong>Parallel Work</strong>: Start STORY-007 (telemetry) in parallel with STORY-005</li>
+</ol>
+<hr />
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../EPIC_PRODUCTION_AGENTIC_EVOLUTION/">EPIC_PRODUCTION_AGENTIC_EVOLUTION.md</a> - Full epic definition</li>
+<li><a href="../BACKLOG_SETUP_REPORT.md">BACKLOG_SETUP_REPORT.md</a> - Sprint planning and roadmap</li>
+<li><a href="../schemas/content_queue_schema.json">schemas/content_queue_schema.json</a> - Example schema pattern</li>
+<li><a href="../schemas/board_decision_schema.json">schemas/board_decision_schema.json</a> - Example nested object pattern</li>
+<li><a href="../schemas/validate_schemas.py">schemas/validate_schemas.py</a> - Validation utility</li>
+<li><a href="https://docs.crewai.com/concepts/flows">CrewAI Flows Documentation</a> - Flow architecture reference</li>
+<li><a href="../AGENT_VELOCITY_ANALYSIS/">AGENT_VELOCITY_ANALYSIS.md</a> - 2.8h/point estimation model</li>
+</ul>
+<hr />
+<p><strong>Document Status</strong>: ✅ Complete and Ready for Sprint 13 Kickoff
+<strong>Schema Alignment</strong>: ✅ Validated - ROI telemetry follows existing JSON Schema Draft-07 patterns
+<strong>Last Updated</strong>: 2026-01-04
+<strong>Author</strong>: @po-agent</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

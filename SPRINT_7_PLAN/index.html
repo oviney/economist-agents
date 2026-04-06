@@ -1,0 +1,2549 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Multi-agent content pipeline that generates Economist-style articles with autonomous research, writing, illustration, and deployment">
+      
+      
+      
+        <link rel="canonical" href="https://oviney.github.io/economist-agents/SPRINT_7_PLAN/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Sprint 7 Plan: CrewAI Migration Foundation - Economist Agents</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#sprint-7-plan-crewai-migration-foundation" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Economist Agents" class="md-header__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Economist Agents
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Sprint 7 Plan: CrewAI Migration Foundation
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/oviney/economist-agents" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    oviney/economist-agents
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../agent-registry-spec/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../adr/ADR-001-agent-framework-selection/" class="md-tabs__link">
+          
+  
+  
+  ADRs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../skills/agent-delegation/SKILL/" class="md-tabs__link">
+          
+  
+  
+  Skills
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../guides/WORKFLOW_GUIDE/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../CREWAI_API_REFERENCE/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../AGENT_VELOCITY_ANALYSIS/" class="md-tabs__link">
+          
+  
+  
+  Performance
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Economist Agents" class="md-nav__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Economist Agents
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/oviney/economist-agents" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    oviney/economist-agents
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agent-registry-spec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../FLOW_ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AUTONOMOUS_ORCHESTRATION_STRATEGY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autonomous Orchestration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CREWAI_CONTEXT_ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shared Context System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE_PATTERNS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE_REVIEW_PROCESS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Review Process
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADRs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADRs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/ADR-001-agent-framework-selection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-001 — Agent Framework Selection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/ADR-002-content-intelligence-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-002 — Content Intelligence Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/ADR-003-agent-skill-governance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-003 — Agent Skill Governance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ADR-004-python-version-constraint/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-004 — Python Version Constraint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ADR-005-agile-discipline-enforcement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-005 — Agile Discipline Enforcement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skills
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Skills
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/agent-delegation/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Delegation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/research-sourcing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research Sourcing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/economist-writing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Economist Writing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/editorial-illustration/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Editorial Illustration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/article-evaluation/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Article Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/quality-gates/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quality Gates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/python-quality/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python Quality
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/testing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/defect-prevention/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Defect Prevention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/devops/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DevOps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/sprint-management/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/scrum-master/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scrum Master
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/agent-traceability/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Traceability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/observability/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/mcp-development/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/WORKFLOW_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/BLOG_DEPLOYMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/COPILOT_SYNC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Copilot Sync
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/CI_MONITORING_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CI Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/PYTHON_VERSION_TROUBLESHOOTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/IMPLEMENTATION_ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/VALIDATION_QUICK_REF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation Quick Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CREWAI_API_REFERENCE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CrewAI API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AGENT_PROMPT_PATTERNS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Prompt Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AGENT_QUALITY_GATES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quality Gates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEFINITION_OF_DONE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Definition of Done
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEFECT_PREVENTION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Defect Prevention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHART_DESIGN_SPEC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chart Design Spec
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Performance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AGENT_VELOCITY_ANALYSIS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Velocity Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SPRINT_DISCIPLINE_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint Discipline Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#success-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Success Criteria
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#story-1-crewai-agent-configuration-starting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Story 1: CrewAI Agent Configuration ⭐ STARTING
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#story-2-shared-context-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Story 2: Shared Context System
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#story-3-agent-to-agent-messaging-status-signals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Story 3: Agent-to-Agent Messaging &amp; Status Signals
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#story-4-documentation-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Story 4: Documentation &amp; Validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sprint-metrics-success-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sprint Metrics &amp; Success Validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sprint-8-preview-deferred-quality-diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sprint 8 Preview (Deferred Quality Diagnostics)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#risk-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Risk Management
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#team-roles-crewai-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Team Roles (CrewAI Implementation)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sprint-ceremonies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sprint Ceremonies
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#definition-of-done-sprint-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition of Done (Sprint Level)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Actions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="sprint-7-plan-crewai-migration-foundation">Sprint 7 Plan: CrewAI Migration Foundation<a class="headerlink" href="#sprint-7-plan-crewai-migration-foundation" title="Permanent link">&para;</a></h1>
+<p><strong>Sprint Goal</strong>: Encode 5 validated patterns into CrewAI agents for self-orchestrating delivery</p>
+<p><strong>Capacity</strong>: 15 story points (2 weeks, quality buffer for CrewAI learning curve)</p>
+<p><strong>Context</strong>: Sprint 6 manual orchestration revealed automation threshold. Manual coordination overhead (25%), context duplication (40%), and handoff coordination don't scale beyond 2 stories. Time to build self-orchestrating team using CrewAI.</p>
+<hr />
+<h2 id="success-criteria">Success Criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h2>
+<p><strong>Primary Objectives</strong>:
+1. <strong>Overhead Reduction</strong>: Manual coordination 25% → CrewAI automation &lt;15%
+2. <strong>Context Efficiency</strong>: Zero context duplication (automated inheritance)
+3. <strong>Sequential Flow</strong>: Agent task dependencies enforce gates without manual signaling</p>
+<p><strong>Quality Gates</strong>:
+- All 5 patterns from Sprint 6 retrospective encoded
+- CrewAI agents operational with task-based workflow
+- Validation against Sprint 6 baseline (Story 1-2 comparison)
+- Documentation complete for future sprint reuse</p>
+<hr />
+<h2 id="story-1-crewai-agent-configuration-starting">Story 1: CrewAI Agent Configuration ⭐ STARTING<a class="headerlink" href="#story-1-crewai-agent-configuration-starting" title="Permanent link">&para;</a></h2>
+<p><strong>User Story</strong>:
+As a Delivery Team Lead, I need 3 CrewAI agents configured with roles/goals/backstories, so that manual coordination is replaced with self-orchestrating task execution.</p>
+<p><strong>Acceptance Criteria</strong>:
+- [ ] Given 3 agent personas (Scrum Master, Developer, QE Lead), when configured in CrewAI, then roles/goals/backstories match retrospective definitions
+- [ ] Given sequential task dependencies, when implemented in task definitions, then agents cannot skip approval gates
+- [ ] Given test story (BUG-023 validation), when executed by CrewAI, then agents self-coordinate without manual intervention</p>
+<p><strong>Definition of Done</strong>:
+- [ ] <code>scripts/crewai_agents.py</code> created with 3 agent definitions
+- [ ] Agent roles match retrospective pattern (Scrum Master orchestrates, Developer builds, QE validates)
+- [ ] Task dependencies enforce sequential flow (Developer → QE → Scrum Master approval)
+- [ ] Test execution successful (BUG-023 validation story)
+- [ ] Documentation in <code>docs/CREWAI_AGENT_CONFIG.md</code></p>
+<p><strong>Story Points</strong>: 3</p>
+<p><strong>Priority</strong>: P0 (Foundation for all other stories)</p>
+<p><strong>Dependencies</strong>: None (first story, establishes foundation)</p>
+<p><strong>Risks</strong>:
+- <strong>Risk</strong>: CrewAI API learning curve may slow initial implementation
+- <strong>Mitigation</strong>: Use existing CrewAI examples, leverage documentation, 3pt estimate includes learning buffer
+- <strong>Risk</strong>: Agent coordination may not match manual orchestration quality
+- <strong>Mitigation</strong>: Validate against Sprint 6 baseline, iterate if quality gaps found</p>
+<p><strong>Task Breakdown</strong>:
+1. Install CrewAI dependencies (<code>pip install crewai crewai-tools</code>) (15 min)
+2. Define 3 agent personas from retrospective (roles, goals, backstories) (60 min)
+3. Create <code>scripts/crewai_agents.py</code> with agent configurations (90 min)
+4. Implement sequential task dependencies (Developer → QE → Scrum Master) (120 min)
+5. Create test harness (BUG-023 validation story as test case) (90 min)
+6. Run validation test, debug coordination issues (120 min)
+7. Document agent configuration in <code>docs/CREWAI_AGENT_CONFIG.md</code> (60 min)
+8. Commit with tests passing (30 min)</p>
+<p><strong>Total Estimate</strong>: 585 min (9.75 hours) = 3 story points</p>
+<p><strong>Implementation Notes</strong>:
+- <strong>Pattern 1 (Sequential Dependencies)</strong>: Use CrewAI <code>context</code> parameter in task definitions to enforce dependency chain
+- <strong>Pattern 4 (Explicit Status Signals)</strong>: Agents update shared state via task outputs
+- <strong>Pattern 5 (Multi-Phase Validation)</strong>: QE task depends on Developer task completion</p>
+<hr />
+<h2 id="story-2-shared-context-system">Story 2: Shared Context System<a class="headerlink" href="#story-2-shared-context-system" title="Permanent link">&para;</a></h2>
+<p><strong>User Story</strong>:
+As a Developer Agent, I need shared context inheritance via <code>crew.context</code>, so that I don't need 10-minute briefings on sprint status, story goals, and acceptance criteria.</p>
+<p><strong>Acceptance Criteria</strong>:
+- [ ] Given STORY_N_CONTEXT.md template, when loaded into <code>crew.context</code>, then all agents access shared memory
+- [ ] Given context updates during execution, when agents complete tasks, then context automatically propagates
+- [ ] Given Story 2 execution with context system, when measuring briefing time, then 70% reduction confirmed (10 min → 3 min)</p>
+<p><strong>Definition of Done</strong>:
+- [ ] <code>crew.context</code> implemented for shared memory
+- [ ] STORY_N_CONTEXT.md template loaded at crew initialization
+- [ ] Agents access context via <code>self.crew.context</code> in task execution
+- [ ] Context updates automatically propagate to downstream agents
+- [ ] Validation: 70% briefing time reduction measured
+- [ ] Documentation in <code>docs/CREWAI_CONTEXT_SYSTEM.md</code></p>
+<p><strong>Story Points</strong>: 5</p>
+<p><strong>Priority</strong>: P0 (Eliminates 40% of coordination overhead)</p>
+<p><strong>Dependencies</strong>: Story 1 (requires agent configuration foundation)</p>
+<p><strong>Risks</strong>:
+- <strong>Risk</strong>: CrewAI context API may not support dynamic updates
+- <strong>Mitigation</strong>: Research <code>crew.context</code> documentation, consider alternative shared state patterns
+- <strong>Risk</strong>: Context inheritance may not eliminate manual briefings
+- <strong>Mitigation</strong>: Measure briefing time, iterate if &lt;70% reduction</p>
+<p><strong>Task Breakdown</strong>:
+1. Research CrewAI <code>crew.context</code> API and examples (90 min)
+2. Design shared context structure (sprint status, story goal, AC, DoD) (60 min)
+3. Implement context loader (STORY_N_CONTEXT.md → <code>crew.context</code>) (120 min)
+4. Update agents to access <code>self.crew.context</code> in task execution (90 min)
+5. Implement context update mechanism (task outputs → context) (120 min)
+6. Test with Story 1 agents (validate context propagation) (90 min)
+7. Measure briefing time (baseline vs CrewAI) (60 min)
+8. Document in <code>docs/CREWAI_CONTEXT_SYSTEM.md</code> (90 min)
+9. Commit with validation metrics (30 min)</p>
+<p><strong>Total Estimate</strong>: 750 min (12.5 hours) = 5 story points</p>
+<p><strong>Implementation Notes</strong>:
+- <strong>Pattern 3 (Shared Context Inheritance)</strong>: Use <code>crew.context</code> for shared memory, eliminate context duplication
+- <strong>Pattern 2 (Conditional Approval Gates)</strong>: Context includes acceptance criteria for validation gates</p>
+<hr />
+<h2 id="story-3-agent-to-agent-messaging-status-signals">Story 3: Agent-to-Agent Messaging &amp; Status Signals<a class="headerlink" href="#story-3-agent-to-agent-messaging-status-signals" title="Permanent link">&para;</a></h2>
+<p><strong>User Story</strong>:
+As a Scrum Master Agent, I need automated agent-to-agent messaging, so that status signals (Developer→QE "Code ready for validation", QE→Scrum Master "Validation complete") trigger next tasks without manual coordination.</p>
+<p><strong>Acceptance Criteria</strong>:
+- [ ] Given Developer task completion, when Developer signals "ready for QE", then QE task auto-triggers
+- [ ] Given QE validation result (PASS/FAIL), when QE signals completion, then Scrum Master closure task auto-triggers
+- [ ] Given conditional approval gates, when QE returns CONDITIONAL_PASS, then Developer action item task auto-triggers</p>
+<p><strong>Definition of Done</strong>:
+- [ ] Task handoff triggers implemented (Developer completion → QE start)
+- [ ] Status signals encoded in task outputs (structured data: status, message, next_action)
+- [ ] Conditional branching logic (PASS → closure, FAIL → rework, CONDITIONAL_PASS → action items)
+- [ ] Notification system (agents log status changes for transparency)
+- [ ] Validation: Zero manual handoff coordination measured
+- [ ] Documentation in <code>docs/CREWAI_MESSAGING.md</code></p>
+<p><strong>Story Points</strong>: 5</p>
+<p><strong>Priority</strong>: P0 (Automates 25% coordination overhead)</p>
+<p><strong>Dependencies</strong>: Story 1 (agent config), Story 2 (context system for status tracking)</p>
+<p><strong>Risks</strong>:
+- <strong>Risk</strong>: CrewAI task sequencing may not support conditional branching
+- <strong>Mitigation</strong>: Explore CrewAI conditional tasks or implement custom logic
+- <strong>Risk</strong>: Status signals may not auto-trigger next tasks
+- <strong>Mitigation</strong>: Use CrewAI callbacks or task dependencies to chain execution</p>
+<p><strong>Task Breakdown</strong>:
+1. Design status signal schema (PASS/FAIL/CONDITIONAL_PASS, messages, next_action) (60 min)
+2. Implement task output formatting (Developer/QE/Scrum Master structured outputs) (90 min)
+3. Build task handoff triggers (Developer completion → QE start) (120 min)
+4. Implement conditional branching logic (QE result → next task routing) (150 min)
+5. Create notification system (status change logging) (90 min)
+6. Test with Story 1 agents (validate handoff automation) (120 min)
+7. Measure coordination overhead (baseline vs CrewAI) (60 min)
+8. Document in <code>docs/CREWAI_MESSAGING.md</code> (90 min)
+9. Commit with zero-coordination validation (30 min)</p>
+<p><strong>Total Estimate</strong>: 810 min (13.5 hours) = 5 story points</p>
+<p><strong>Implementation Notes</strong>:
+- <strong>Pattern 4 (Explicit Status Signals)</strong>: Task outputs include status enum, machine-readable format
+- <strong>Pattern 2 (Conditional Approval Gates)</strong>: QE CONDITIONAL_PASS routes to Developer action item task
+- <strong>Pattern 1 (Sequential Dependencies)</strong>: Handoff triggers enforce sequential flow</p>
+<hr />
+<h2 id="story-4-documentation-validation">Story 4: Documentation &amp; Validation<a class="headerlink" href="#story-4-documentation-validation" title="Permanent link">&para;</a></h2>
+<p><strong>User Story</strong>:
+As a Future Sprint Lead, I need comprehensive documentation of CrewAI patterns, so that I can reuse the self-orchestrating team for Stories 3-4 in Sprint 8 without re-learning.</p>
+<p><strong>Acceptance Criteria</strong>:
+- [ ] Given CrewAI implementation, when documenting in <code>docs/CREWAI_PATTERNS.md</code>, then 5 patterns from retrospective fully explained
+- [ ] Given Sprint 6 baseline metrics (25% overhead, 40% context duplication), when running CrewAI validation story, then improvements measured and documented
+- [ ] Given validation results, when comparing to Sprint 6, then CrewAI meets or exceeds manual orchestration quality</p>
+<p><strong>Definition of Done</strong>:
+- [ ] <code>docs/CREWAI_PATTERNS.md</code> documents all 5 patterns with code examples
+- [ ] Validation story (BUG-023 full workflow) executed by CrewAI
+- [ ] Metrics comparison: Sprint 6 baseline vs Sprint 7 CrewAI (overhead, briefing time, rework)
+- [ ] Quality assessment: CrewAI meets Sprint 6 quality standards (zero rework, sequential flow)
+- [ ] README.md updated with CrewAI usage instructions
+- [ ] Team handoff complete (all agents can run CrewAI workflows)</p>
+<p><strong>Story Points</strong>: 2</p>
+<p><strong>Priority</strong>: P1 (Documentation &amp; validation, enables future sprints)</p>
+<p><strong>Dependencies</strong>: Stories 1-3 (requires complete CrewAI implementation)</p>
+<p><strong>Risks</strong>:
+- <strong>Risk</strong>: CrewAI may not meet Sprint 6 quality standards
+- <strong>Mitigation</strong>: Iterate on agent configuration, add quality gates if needed
+- <strong>Risk</strong>: Documentation may not capture tacit knowledge
+- <strong>Mitigation</strong>: Include code examples, failure modes, troubleshooting guide</p>
+<p><strong>Task Breakdown</strong>:
+1. Document Pattern 1 (Sequential Dependencies) with code examples (45 min)
+2. Document Pattern 2 (Conditional Approval Gates) with code examples (45 min)
+3. Document Pattern 3 (Shared Context Inheritance) with code examples (45 min)
+4. Document Pattern 4 (Explicit Status Signals) with code examples (45 min)
+5. Document Pattern 5 (Multi-Phase Validation) with code examples (45 min)
+6. Run validation story (BUG-023 full workflow) with CrewAI (60 min)
+7. Collect metrics (overhead, briefing time, rework, quality) (45 min)
+8. Write comparison report (Sprint 6 vs Sprint 7) (60 min)
+9. Update README.md with CrewAI usage guide (45 min)
+10. Team handoff (review with Developer, QE Lead) (30 min)</p>
+<p><strong>Total Estimate</strong>: 465 min (7.75 hours) = 2 story points</p>
+<p><strong>Implementation Notes</strong>:
+- <strong>Validation</strong>: Use BUG-023 (hypothetical future bug) as test case for complete workflow
+- <strong>Metrics</strong>: Measure overhead (coordination time), briefing time, rework cycles, quality (gate pass rate)
+- <strong>Documentation</strong>: Include failure modes (e.g., agent gets stuck, context not propagating)</p>
+<hr />
+<h2 id="sprint-metrics-success-validation">Sprint Metrics &amp; Success Validation<a class="headerlink" href="#sprint-metrics-success-validation" title="Permanent link">&para;</a></h2>
+<p><strong>Baseline (Sprint 6 Manual Orchestration)</strong>:
+- Coordination overhead: 25%
+- Context briefing time: 10 minutes per story
+- Context duplication: 40% of briefing time
+- Rework cycles: 0 (high quality, but manual)
+- Velocity: 3 story points per day (2 stories in Sprint 6)</p>
+<p><strong>Target (Sprint 7 CrewAI Automation)</strong>:
+- Coordination overhead: &lt;15% (10% reduction)
+- Context briefing time: &lt;3 minutes per story (70% reduction)
+- Context duplication: 0% (automated inheritance)
+- Rework cycles: 0 (maintain quality)
+- Velocity: 3-4 story points per day (same or better)</p>
+<p><strong>Validation Method</strong>:
+1. Run BUG-023 validation story with CrewAI (full workflow: Scrum Master kickoff → Developer work → QE validation → Scrum Master closure)
+2. Measure time spent: total time, coordination overhead, briefing time
+3. Compare to Sprint 6 Story 1 baseline (3 story points, 8 hours total, 2 hours coordination)
+4. Quality check: Zero rework cycles, sequential flow enforced, all gates validated</p>
+<p><strong>Success Criteria</strong>:
+- ✅ All 5 patterns from retrospective encoded and operational
+- ✅ Overhead reduction: 25% → &lt;15%
+- ✅ Briefing time reduction: 10 min → &lt;3 min
+- ✅ Quality maintained: Zero rework cycles, sequential flow enforced
+- ✅ Documentation complete: Future sprints can reuse CrewAI workflows</p>
+<hr />
+<h2 id="sprint-8-preview-deferred-quality-diagnostics">Sprint 8 Preview (Deferred Quality Diagnostics)<a class="headerlink" href="#sprint-8-preview-deferred-quality-diagnostics" title="Permanent link">&para;</a></h2>
+<p><strong>Sprint 8 Goal</strong>: Investigate Editor Agent decline and strengthen quality foundations</p>
+<p><strong>Context</strong>: Sprint 7 focused on CrewAI automation. Sprint 8 returns to quality diagnostics from original Sprint 7 plan.</p>
+<p><strong>Stories</strong>:
+1. Editor Agent Diagnostic Suite (5 points, P0) - Identify root cause of declining gate pass rates
+2. Test Gap Detection Automation (5 points, P1) - Already validated in Sprint 6 Story 2, needs full implementation
+3. Prevention Effectiveness Dashboard (3 points, P2) - Visualize defect prevention system impact</p>
+<p><strong>Total</strong>: 13 story points (aligns with Sprint 6-7 velocity)</p>
+<hr />
+<h2 id="risk-management">Risk Management<a class="headerlink" href="#risk-management" title="Permanent link">&para;</a></h2>
+<p><strong>High-Priority Risks</strong>:
+1. <strong>CrewAI Learning Curve</strong>: First time using framework
+   - <strong>Mitigation</strong>: 3pt buffer in Story 1, pair programming recommended
+   - <strong>Contingency</strong>: If blocked &gt;4 hours, escalate to team for research spike</p>
+<ol>
+<li><strong>Automation Quality Gap</strong>: CrewAI may not match manual orchestration</li>
+<li><strong>Mitigation</strong>: Validate against Sprint 6 baseline, iterate if quality gaps</li>
+<li>
+<p><strong>Contingency</strong>: Fall back to hybrid approach (manual gates, automated context)</p>
+</li>
+<li>
+<p><strong>Context System Complexity</strong>: <code>crew.context</code> may not support dynamic updates</p>
+</li>
+<li><strong>Mitigation</strong>: Research API early in Story 2, explore alternatives</li>
+<li><strong>Contingency</strong>: Use file-based shared state if CrewAI API insufficient</li>
+</ol>
+<p><strong>Medium-Priority Risks</strong>:
+4. <strong>Task Dependencies</strong>: CrewAI may not support conditional branching
+   - <strong>Mitigation</strong>: Explore conditional tasks API, implement custom logic if needed</p>
+<ol>
+<li><strong>Velocity Uncertainty</strong>: First CrewAI sprint, unclear if 15 points achievable</li>
+<li><strong>Mitigation</strong>: Story 4 is P1 (can defer if needed), focus on Stories 1-3</li>
+</ol>
+<hr />
+<h2 id="team-roles-crewai-implementation">Team Roles (CrewAI Implementation)<a class="headerlink" href="#team-roles-crewai-implementation" title="Permanent link">&para;</a></h2>
+<p><strong>Developer</strong>:
+- Build <code>scripts/crewai_agents.py</code> with agent configurations
+- Implement context system and task dependencies
+- Debug agent coordination issues
+- Write unit tests for CrewAI workflows</p>
+<p><strong>QE Lead</strong>:
+- Validate CrewAI behavior matches manual orchestration
+- Test sequential flow, conditional gates, context inheritance
+- Measure metrics (overhead, briefing time, quality)
+- Document failure modes and edge cases</p>
+<p><strong>Scrum Master</strong>:
+- Monitor Sprint 7 progress (15 points, 4 stories)
+- Facilitate Story 1 kickoff with context loading
+- Track metrics comparison (Sprint 6 vs Sprint 7)
+- Document learnings in Sprint 7 retrospective</p>
+<hr />
+<h2 id="sprint-ceremonies">Sprint Ceremonies<a class="headerlink" href="#sprint-ceremonies" title="Permanent link">&para;</a></h2>
+<p><strong>Daily Standup</strong> (async, via status signals):
+- CrewAI agents report: Yesterday's work, today's plan, blockers
+- Scrum Master aggregates and tracks progress</p>
+<p><strong>Mid-Sprint Checkpoint</strong> (Day 5):
+- Validate Stories 1-2 complete (8 points delivered)
+- Assess risk: Are we on track for 15 points?
+- Adjust scope if needed (defer Story 4 if behind)</p>
+<p><strong>Sprint Review</strong> (Day 10):
+- Demo: CrewAI self-orchestrating team executing BUG-023 validation
+- Metrics: Show overhead reduction, briefing time improvement
+- Quality: Validate zero rework, sequential flow</p>
+<p><strong>Sprint Retrospective</strong> (Day 10):
+- What worked: CrewAI patterns that succeeded
+- What needs improvement: Pain points, failure modes
+- Action items: Feed learnings into Sprint 8 (quality diagnostics with CrewAI)</p>
+<hr />
+<h2 id="definition-of-done-sprint-level">Definition of Done (Sprint Level)<a class="headerlink" href="#definition-of-done-sprint-level" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[ ] All 4 stories complete (15 points delivered)</li>
+<li>[ ] CrewAI agents operational (3 agents configured)</li>
+<li>[ ] Context system implemented (shared memory working)</li>
+<li>[ ] Agent messaging automated (zero manual coordination)</li>
+<li>[ ] Documentation complete (<code>CREWAI_PATTERNS.md</code>, README.md)</li>
+<li>[ ] Validation story passed (BUG-023 workflow successful)</li>
+<li>[ ] Metrics comparison documented (Sprint 6 baseline vs Sprint 7)</li>
+<li>[ ] Sprint retrospective complete (learnings documented)</li>
+<li>[ ] CHANGELOG.md updated with Sprint 7 entry</li>
+<li>[ ] Sprint 8 ready (quality diagnostics plan reviewed)</li>
+</ul>
+<hr />
+<h2 id="next-actions">Next Actions<a class="headerlink" href="#next-actions" title="Permanent link">&para;</a></h2>
+<p><strong>Immediate (Story 1 Kickoff)</strong>:
+1. ✅ Create <code>STORY_1_CONTEXT.md</code> with sprint status, story goal, AC, DoD
+2. ⏳ Developer: Read context, install CrewAI dependencies
+3. ⏳ Developer: Define 3 agent personas from retrospective
+4. ⏳ Scrum Master: Monitor progress, flag blockers</p>
+<p><strong>Story 1 Checkpoint (4 hours)</strong>:
+- Agent configurations complete?
+- Sequential dependencies working?
+- Any blockers encountered?</p>
+<p><strong>Story 1 Completion Gate</strong>:
+- All acceptance criteria met?
+- QE validation passed?
+- Documentation complete?
+- Ready for Story 2 (context system)?</p>
+<hr />
+<p><strong>Sprint 7 Status</strong>: Story 1 (CrewAI Agent Configuration) STARTING NOW</p>
+<p><strong>Velocity Target</strong>: 15 points in 2 weeks (7.5 points/week, 1.5 points/day)</p>
+<p><strong>Quality-First</strong>: Automation must meet Sprint 6 quality standards. No velocity at expense of quality.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

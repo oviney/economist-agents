@@ -1,0 +1,707 @@
+{
+  "version": "1.0",
+  "created": "2026-01-01T00:00:00",
+  "current_sprint": 15,
+  "sprints": {
+    "sprint_6": {
+      "status": "complete",
+      "end_date": "2026-01-01T00:00:00",
+      "retrospective_done": true,
+      "backlog_refined": true,
+      "next_sprint_dor_met": true,
+      "retrospective_date": "2026-01-01T21:03:10.787054",
+      "refinement_date": "2026-01-01T21:04:31.231682"
+    },
+    "sprint_7": {
+      "status": "complete",
+      "start_date": "2026-01-01T21:10:00",
+      "backlog_refined": false,
+      "refinement_date": "2026-01-01T21:04:31.231682",
+      "next_sprint_dor_met": false,
+      "end_date": "2026-01-01T21:31:12.792422",
+      "velocity": 10,
+      "stories_completed": [
+        "Story 1: Editor Diagnostic",
+        "Story 2: Test Gap Analysis"
+      ],
+      "stories_deferred": [
+        {
+          "story": "Story 3: Prevention Dashboard",
+          "points": 3,
+          "reason": "Insufficient data (7 bugs, need 10+)",
+          "deferred_to": "sprint_8"
+        }
+      ],
+      "retrospective_done": false
+    },
+    "sprint_8": {
+      "status": "complete",
+      "start_date": "2026-01-02T00:00:00",
+      "end_date": "2026-01-02T23:59:59",
+      "capacity": 13,
+      "stories": [
+        {
+          "id": 1,
+          "name": "Create PO Agent",
+          "points": 3,
+          "priority": "P0",
+          "status": "complete",
+          "completed_date": "2026-01-02T10:00:00"
+        },
+        {
+          "id": 2,
+          "name": "Enhance SM Agent for Autonomous Coordination",
+          "points": 4,
+          "priority": "P0",
+          "status": "complete",
+          "completed_date": "2026-01-02T11:00:00"
+        },
+        {
+          "id": 3,
+          "name": "Add References Section to Articles",
+          "points": 2,
+          "priority": "P0",
+          "status": "complete",
+          "completed_date": "2026-01-02T14:00:00"
+        },
+        {
+          "id": 4,
+          "name": "Editor Agent Remediation",
+          "points": 3,
+          "priority": "P0",
+          "status": "partial",
+          "completed_date": "2026-01-02T18:00:00",
+          "points_delivered": 3,
+          "notes": "Implementation complete (3/4 pts, 75%). Validation deferred to Sprint 9 Story 1 due to file corruption blocker."
+        }
+      ],
+      "objectives": [
+        "Enable autonomous backlog refinement (PO Agent >90% AC acceptance)",
+        "Enable autonomous agent coordination (SM Agent >90% task assignment)",
+        "Enable real-time monitoring (100% agent transitions tracked)"
+      ],
+      "velocity": 12,
+      "points_delivered": 12,
+      "completion_rate": 0.92,
+      "ceremonies_complete": true,
+      "retrospective_done": true,
+      "retrospective_date": "2026-01-02T23:30:00",
+      "backlog_refined": true,
+      "refinement_date": "2026-01-02T00:00:00",
+      "next_sprint_dor_met": true,
+      "sprint_rating": "8/10",
+      "carryover_work": [
+        {
+          "story": "Story 4: Editor Agent 10-run Validation",
+          "points": 1,
+          "reason": "File corruption blocker prevented validation execution",
+          "carryover_to": "sprint_9",
+          "as_story": "Story 1: Complete Editor Agent Remediation"
+        }
+      ]
+    },
+    "sprint_9": {
+      "status": "complete",
+      "start_date": "2026-01-02T08:00:00",
+      "end_date": "2026-01-04T14:30:00",
+      "capacity": 15,
+      "committed_points": 13,
+      "unplanned_points": 2,
+      "stories": [
+        {
+          "id": 0,
+          "name": "Fix CI/CD Infrastructure Crisis",
+          "points": 2,
+          "priority": "P0",
+          "status": "complete",
+          "type": "unplanned",
+          "completed_date": "2026-01-02T12:00:00",
+          "notes": "Emergency fix: Python 3.14 incompatibility with CrewAI. Recreated .venv with Python 3.13, achieved 92.3% test pass rate (348/377). 29 failures are known issues (Sprint 8 corruption + refactoring)."
+        },
+        {
+          "id": 1,
+          "name": "Complete Editor Agent Remediation",
+          "points": 1,
+          "priority": "P0",
+          "status": "complete",
+          "completed_date": "2026-01-02T20:55:00",
+          "notes": "Reconstructed editor_agent.py (544 lines), executed 10-run validation. Achieved 60% gate pass rate (30/50 gates). Gate counting fix 100% validated."
+        },
+        {
+          "id": 2,
+          "name": "Fix Integration Tests",
+          "points": 2,
+          "priority": "P0",
+          "status": "complete",
+          "started_date": "2026-01-03T12:59:35.241571",
+          "assigned_to": "devops",
+          "notes": "Integration tests fixed! All 9/9 tests passing (100%). Improved from 56% pass rate in Sprint 8. Root cause: CI/CD infrastructure fixes from Story 0 (Python 3.13 environment) resolved mock setup and dependency issues.",
+          "completed_date": "2026-01-03T13:01:38.353273",
+          "validation": {
+            "test_pass_rate": "100%",
+            "tests_passed": 9,
+            "tests_failed": 0,
+            "tests_total": 9,
+            "improvement": "56% \u2192 100% (+44 percentage points)",
+            "test_file": "scripts/test_agent_integration.py",
+            "execution_time": "~50 seconds"
+          }
+        },
+        {
+          "id": 3,
+          "name": "Measure PO Agent Effectiveness",
+          "points": 2,
+          "priority": "P0",
+          "status": "complete",
+          "completed_date": "2026-01-03T10:11:42",
+          "notes": "Generated 10 diverse test stories. Achieved 100% AC acceptance (exceeds 90% target). Avg generation time: 6.64s (95% faster than target). 90% escalation rate validates ambiguity detection. Production-ready recommendation."
+        },
+        {
+          "id": 4,
+          "name": "Measure SM Agent Effectiveness",
+          "points": 2,
+          "priority": "P0",
+          "status": "complete",
+          "completed_date": "2026-01-03T17:45:00",
+          "notes": "Measured SM Agent automation. Results: 0% task assignment (0/15 tasks auto-assigned), 100% quality gates (4 APPROVE, 1 ESCALATE), 100% DoR validation (4/5 pass), 100% task queue (15 tasks). NOT READY - requires Sprint 10 auto-assignment implementation. 7 API bugs fixed during measurement."
+        },
+        {
+          "id": 5,
+          "name": "Sprint 9 Quality Report",
+          "points": 3,
+          "priority": "P1",
+          "status": "complete",
+          "completed_date": "2026-01-03T10:00:00",
+          "notes": "Comprehensive Sprint 9 quality report delivered. Compiled achievements, documented infrastructure crisis resolution, calculated quality metrics, created executive summary. All 5 tasks complete. Rating: 8.5/10"
+        },
+        {
+          "id": 6,
+          "name": "File Edit Safety Documentation",
+          "points": 1,
+          "priority": "P1",
+          "status": "complete",
+          "completed_date": "2026-01-03T11:16:00",
+          "notes": "Created FILE_EDIT_SAFETY.md (500 lines, 13KB). Documents multi-edit anti-patterns, safe patterns, recovery procedures, prevention checklist. References Sprint 8 corruption incident."
+        },
+        {
+          "id": 7,
+          "name": "Sprint 9 Planning & Close-Out",
+          "points": 1,
+          "priority": "P2",
+          "status": "complete",
+          "started_date": "2026-01-04T00:00:00",
+          "completed_date": "2026-01-04T14:30:00",
+          "assigned_to": "scrum-master",
+          "description": "Autonomous Sprint 9 Closure: Calculate velocity, generate retrospective, close sprint",
+          "execution_started": "2026-01-04T00:00:00",
+          "notes": "CrewAI crew execution successful. Generated docs/sprints/sprint_9_retrospective.md with Sprint 9 velocity (60/65 points, 92% completion rate). Execution log at docs/sprint_logs/story_7_log.md. All ceremony tasks complete."
+        }
+      ],
+      "objectives": [
+        "Complete Sprint 8 technical debt (Editor Agent validation)",
+        "Measure autonomous orchestration effectiveness (PO + SM Agents)",
+        "Fix CI/CD infrastructure (green build)",
+        "Improve integration test pass rate (56% \u2192 90%+)"
+      ],
+      "velocity": 13,
+      "points_delivered": 15,
+      "completion_rate": 1.0,
+      "ceremonies_complete": true,
+      "retrospective_done": true,
+      "retrospective_date": "2026-01-04T14:30:00",
+      "backlog_refined": true,
+      "refinement_date": "2026-01-02T00:00:00",
+      "next_sprint_dor_met": false,
+      "backlog_groomed": true,
+      "grooming_date": "2026-01-03T13:10:53.517850"
+    },
+    "sprint_15": {
+      "status": "in_progress",
+      "start_date": "2026-01-08T00:00:00",
+      "capacity": 13,
+      "stories": [
+        {
+          "id": 9,
+          "name": "Production Deployment",
+          "points": 5,
+          "priority": "P0",
+          "status": "complete",
+          "completed_date": "2026-01-10T11:50:34.544618",
+          "notes": "Production deployment infrastructure complete. Health monitoring, deployment state tracking, and rollback procedures operational."
+        }
+      ]
+    }
+  },
+  "sprint_10": {
+    "status": "closed",
+    "start_date": "2026-01-04",
+    "end_date": "2026-01-04T18:30:00",
+    "capacity": 15,
+    "theme": "Phase 2 Migration: Port Stage 3 Content Gen to CrewAI + Business Logic Implementation",
+    "goals": [
+      "Migrate Stage 3 logic",
+      "Enforce TDD Red-Green-Refactor",
+      "Port Stage 3 Business Logic (Phase 2)"
+    ],
+    "planned_stories": [
+      "Story 10: Stage 3 Migration with TDD Enforcement",
+      "Story 11: Port Stage 3 Business Logic (Phase 2)"
+    ],
+    "stories": [
+      {
+        "id": 10,
+        "name": "Stage 3 Migration with TDD Enforcement",
+        "points": 8,
+        "priority": "P0",
+        "status": "complete",
+        "completed_date": "2026-01-04T16:00:00",
+        "notes": "Phase 2 Migration complete. Delivered Walking Skeleton (run_story10_crew.py, 356 bytes). TDD protocol enforced with RED\u2192GREEN\u2192REFACTOR cycle. CrewAI Stage 3 implementation operational.",
+        "artifacts": [
+          {
+            "name": "run_story10_crew.py",
+            "type": "walking_skeleton",
+            "size_bytes": 356,
+            "description": "CrewAI Stage 3 crew runner - Phase 2 foundation"
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "name": "Port Stage 3 Business Logic (Phase 2)",
+        "points": 5,
+        "priority": "P0",
+        "status": "complete",
+        "started_date": "2026-01-04T16:15:00",
+        "completed_date": "2026-01-04T18:30:00",
+        "description": "Migrate prompts and execution logic from legacy src/stage3.py to src/crews/stage3_crew.py. Port business logic, implement complete logic chain in Stage3Crew.kickoff() method.",
+        "acceptance_criteria": [
+          "Legacy prompts extracted from src/stage3.py",
+          "Stage3Crew.kickoff() implements the complete logic chain",
+          "tests/reproduce_stage3.py asserts content quality (not just structure)",
+          "All acceptance criteria validated with passing tests",
+          "Documentation updated with Stage 3 implementation details"
+        ],
+        "tasks": [
+          {
+            "name": "Extract legacy prompts from src/stage3.py",
+            "effort_hours": 2,
+            "priority": "P0",
+            "status": "complete"
+          },
+          {
+            "name": "Implement Stage3Crew.kickoff() logic chain",
+            "effort_hours": 3,
+            "priority": "P0",
+            "status": "complete"
+          },
+          {
+            "name": "Add Unit Tests",
+            "effort_hours": 3,
+            "priority": "P0",
+            "status": "complete"
+          },
+          {
+            "name": "Documentation",
+            "effort_hours": 1,
+            "priority": "P1",
+            "status": "complete"
+          }
+        ],
+        "notes": "Logic transplant complete. Prompts extracted and refactored. Stage3Crew.kickoff() implements complete logic chain. tests/reproduce_stage3.py: 100% pass rate with content quality assertions. Documentation updated."
+      }
+    ],
+    "velocity": 13,
+    "points_delivered": 13,
+    "points_committed": 13,
+    "completion_rate": 1.0,
+    "ceremonies_complete": true,
+    "retrospective_done": true,
+    "retrospective_date": "2026-01-04T19:00:00",
+    "backlog_refined": true,
+    "refinement_date": "2026-01-04T19:15:00",
+    "next_sprint_dor_met": true,
+    "sprint_rating": "9.0/10",
+    "key_achievements": [
+      "Perfect sprint velocity (100% of planned work delivered)",
+      "TDD discipline maintained throughout",
+      "Phase 2 migration complete",
+      "All tests passing with quality assertions",
+      "Zero technical debt carried forward"
+    ],
+    "post_mortem": "Successfully implemented TDD-driven migration for Stage 3. Improved JSON/YAML formatting reliability. Walking Skeleton pattern validated for future CrewAI migrations. Red-Green-Refactor cycle enforced quality gates at every step. 100% test pass rate demonstrates production readiness."
+  },
+  "sprint_11": {
+    "status": "complete",
+    "start_date": "2026-01-04T20:00:00",
+    "end_date": "2026-01-04T23:59:59",
+    "capacity": 13,
+    "goal": "Phase 2 Final Stage Migration - Complete Stage 4 CrewAI port with Editorial Review & Refinement capabilities",
+    "stories": [
+      {
+        "id": 13,
+        "name": "Stage 4 Migration (Review & Refinement)",
+        "points": 5,
+        "priority": "P0",
+        "status": "complete",
+        "completed_date": "2026-01-04T22:00:00",
+        "focus": "Editorial Review & Final Refinement - Port Reviewer and Editor agents to CrewAI architecture",
+        "integration_requirement": "Stage 4 MUST successfully consume YAML/JSON output from Stage 3 Crew (src/crews/stage3_crew.py). Integration testing validates data flow through full pipeline.",
+        "artifacts": [
+          {
+            "name": "src/crews/stage4_crew.py",
+            "type": "crew_implementation",
+            "description": "Stage4Crew class with 5-gate editorial review system"
+          },
+          {
+            "name": "tests/reproduce_stage4.py",
+            "type": "integration_test",
+            "description": "Editorial quality assertions with 100% pass rate"
+          }
+        ],
+        "notes": "Successfully ported Stage 4 to CrewAI. 5-gate editorial review (Opening, Evidence, Voice, Structure, Chart) operational. 100% test pass rate. Integration with Stage 3 validated."
+      },
+      {
+        "id": 12,
+        "name": "Phase 2 Documentation",
+        "points": 3,
+        "priority": "P1",
+        "status": "complete",
+        "completed_date": "2026-01-04T23:00:00",
+        "focus": "Comprehensive documentation of Agent Registry and CrewAI crews for Phase 2 migration",
+        "artifacts": [
+          {
+            "name": "README.md",
+            "type": "documentation",
+            "description": "Agent Registry & Crews section with 12 agents and Stage 3/4 architecture"
+          }
+        ],
+        "notes": "Updated README.md with comprehensive Agent Registry documentation. Documented 12 registered agents, Stage 3/4 crew architecture, and ADR-002 Registry Pattern."
+      },
+      {
+        "id": 14,
+        "name": "Agent Registry Core",
+        "points": 5,
+        "priority": "P0",
+        "status": "complete",
+        "completed_date": "2026-01-04T23:00:00",
+        "focus": "ADR-002 Registry Pattern implementation with centralized agent definitions",
+        "artifacts": [
+          {
+            "name": ".github/agents/",
+            "type": "agent_registry",
+            "description": "12 .agent.md files with agent configurations loaded by scripts/agent_registry.py"
+          }
+        ],
+        "notes": "Implemented ADR-002 Registry Pattern with 12 agent definition files. All agents operational and integrated with Stage 3/4 crews."
+      }
+    ],
+    "points_delivered": 13,
+    "points_committed": 13,
+    "completion_rate": 1.0,
+    "velocity": 13,
+    "ceremonies_complete": true,
+    "retrospective_done": true,
+    "retrospective_date": "2026-01-04T23:30:00",
+    "sprint_rating": "9.5/10",
+    "backlog_refined": true,
+    "refinement_date": "2026-01-04T19:15:00",
+    "next_sprint_dor_met": true
+  },
+  "sprint_12": {
+    "status": "complete",
+    "start_date": "2026-01-04T18:45:00",
+    "end_date": "2026-01-04T23:59:59",
+    "capacity": 13,
+    "committed_points": 3,
+    "theme": "Quality Dashboard Data Accuracy + Validation",
+    "goals": [
+      "Fix dashboard bugs (agent metrics baseline, sprint trends rendering)",
+      "Add dashboard validation test suite (5+ tests)",
+      "Establish data accuracy foundation for predictive analytics"
+    ],
+    "planned_stories": [
+      "Story 1: Fix Dashboard Data Accuracy + Validation (3 pts, P0)"
+    ],
+    "stories": [
+      {
+        "id": 1,
+        "name": "Fix Dashboard Data Accuracy + Validation",
+        "points": 3,
+        "priority": "P0",
+        "status": "complete",
+        "started_date": "2026-01-04T18:45:00",
+        "completed_date": "2026-01-04T15:05:00",
+        "tasks": [
+          {
+            "name": "Fix Agent Metrics Integration",
+            "estimate_minutes": 90,
+            "priority": "P0",
+            "description": "Debug _build_agent_summary() method (lines 165-227). Replace baseline fallback with 'NO DATA' display when metrics unavailable.",
+            "acceptance_criteria": [
+              "Agent metrics show real data from agent_metrics.json OR display 'NO DATA'",
+              "No fake 100% baseline values displayed",
+              "Dashboard accurately reflects agent performance or explicitly shows missing data"
+            ]
+          },
+          {
+            "name": "Fix Sprint Trends Display",
+            "estimate_minutes": 45,
+            "priority": "P0",
+            "description": "Debug _render_sprint_trends() method (lines 412-568). Populate sprint_history.json with Sprint 10-11 snapshots if missing.",
+            "acceptance_criteria": [
+              "Sprint trends section renders in dashboard output",
+              "Last 3 Sprints Comparison table displays with velocity, quality score, escape rate",
+              "sprint_history.json has 2+ sprint snapshots"
+            ]
+          },
+          {
+            "name": "Add Dashboard Validation Tests",
+            "estimate_minutes": 45,
+            "priority": "P0",
+            "description": "Create tests/test_quality_dashboard.py with 5+ validation tests. Integrate with CI/CD.",
+            "acceptance_criteria": [
+              "5+ pytest tests created (metrics accuracy, sprint trends, quality score, no baseline, smoke test)",
+              "All tests passing in CI/CD pipeline",
+              "Tests validate dashboard against source files (defect_tracker.json, agent_metrics.json)"
+            ]
+          }
+        ],
+        "notes": "Phase 1 dashboard has critical bugs: fake 100% agent scores, missing sprint trends, no validation. Must fix before adding predictive analytics (Option 2)."
+      }
+    ],
+    "velocity": 3,
+    "points_delivered": 3,
+    "completion_rate": 20.0,
+    "ceremonies_complete": false,
+    "retrospective_done": false,
+    "backlog_refined": false,
+    "next_sprint_dor_met": false,
+    "backlog_groomed": false,
+    "stories_completed": [
+      {
+        "id": 1,
+        "name": "Fix Dashboard Data Accuracy + Validation",
+        "points": 3,
+        "status": "complete",
+        "completed_date": "2026-01-04T15:05:00",
+        "completion_report": "STORY_1_COMPLETE.md",
+        "acceptance_criteria_met": true,
+        "tasks_completed": 3,
+        "blockers": "NONE",
+        "quality_score": "10/10"
+      }
+    ]
+  },
+  "sprint_13": {
+    "status": "in_progress",
+    "start_date": "2026-01-05",
+    "planning_complete": "2026-01-05",
+    "end_date": null,
+    "capacity": 13,
+    "committed_points": 9,
+    "theme": "Production-Grade Agentic Evolution (v2.0) - Jo\u00e3o Moura Principles",
+    "epic": "EPIC-001",
+    "goals": [
+      "Implement Flow-based deterministic orchestration (0-agency transitions)",
+      "Establish Style Memory RAG with Gold Standard articles",
+      "Deploy ROI telemetry for business validation"
+    ],
+    "planned_stories": [
+      "STORY-005: Shift to Deterministic Backbone (3 pts, P0)",
+      "STORY-006: Establish Style Memory RAG (3 pts, P1)",
+      "STORY-007: Implement ROI Telemetry Hook (3 pts, P2)"
+    ],
+    "stories": [
+      {
+        "id": 5,
+        "name": "Shift to Deterministic Backbone",
+        "points": 3,
+        "priority": "P0",
+        "status": "ready",
+        "description": "Refactor src/ to use Flow-based state-machine orchestration with 0-agency for editorial transitions. Replace WORKFLOW_SEQUENCE dict with CrewAI @start/@listen decorators.",
+        "acceptance_criteria": [
+          "Flow class created with @start/@listen decorators for stage progression",
+          "Stage3/Stage4 crews integrated and orchestrated by Flow (not WORKFLOW_SEQUENCE)",
+          "Temperature=0 maintained for deterministic Editor evaluation",
+          "Quality gate router directs publish/revision paths",
+          "3+ integration tests passing validating Flow end-to-end"
+        ],
+        "tasks": [
+          {
+            "name": "Create Flow Architecture",
+            "effort_hours": 2,
+            "priority": "P0"
+          },
+          {
+            "name": "Integrate Stage3 Crew",
+            "effort_hours": 2,
+            "priority": "P0"
+          },
+          {
+            "name": "Integrate Stage4 Crew",
+            "effort_hours": 1.5,
+            "priority": "P0"
+          },
+          {
+            "name": "Integration Tests",
+            "effort_hours": 2,
+            "priority": "P0"
+          },
+          {
+            "name": "Documentation",
+            "effort_hours": 1.5,
+            "priority": "P1"
+          },
+          {
+            "name": "Cleanup WORKFLOW_SEQUENCE",
+            "effort_hours": 0.5,
+            "priority": "P2"
+          }
+        ],
+        "dependencies": [
+          "CrewAI Flow library (crewai>=0.95.0)",
+          "Existing Stage3Crew (src/crews/stage3_crew.py)",
+          "Existing Stage4Crew (src/crews/stage4_crew.py)"
+        ],
+        "dor_met": true
+      },
+      {
+        "id": 6,
+        "name": "Establish Style Memory RAG",
+        "points": 3,
+        "priority": "P1",
+        "status": "ready",
+        "description": "Vector-store with Gold Standard articles from archived/ accessible to Editor Agent for GATE 3 (VOICE) enhancement. Use ChromaDB with OpenAI embeddings.",
+        "acceptance_criteria": [
+          "Vector store populated with archived/*.md articles, query latency <500ms",
+          "Minimum 1 Gold Standard article indexed with relevance score >0.7",
+          "style_memory_tool integrated with Editor in Stage4Crew tools list",
+          "Editor prompt updated to suggest style_memory_tool usage for GATE 3",
+          "3+ integration tests passing validating RAG retrieval"
+        ],
+        "tasks": [
+          {
+            "name": "Vector Database Setup (ChromaDB)",
+            "effort_hours": 2,
+            "priority": "P0"
+          },
+          {
+            "name": "Embeddings Pipeline",
+            "effort_hours": 2,
+            "priority": "P0"
+          },
+          {
+            "name": "Style Memory Tool",
+            "effort_hours": 2,
+            "priority": "P0"
+          },
+          {
+            "name": "Editor Integration",
+            "effort_hours": 1.5,
+            "priority": "P0"
+          },
+          {
+            "name": "Integration Tests",
+            "effort_hours": 1.5,
+            "priority": "P1"
+          },
+          {
+            "name": "Documentation",
+            "effort_hours": 1,
+            "priority": "P2"
+          }
+        ],
+        "dependencies": [
+          "archived/ directory (may be empty initially)",
+          "Editor Agent in Stage4Crew",
+          "OpenAI API (text-embedding-ada-002)",
+          "ChromaDB library (pip install chromadb)"
+        ],
+        "dor_met": true
+      },
+      {
+        "id": 7,
+        "name": "Implement ROI Telemetry Hook",
+        "points": 3,
+        "priority": "P2",
+        "status": "ready",
+        "description": "Automated logging of token costs vs human-hour value in logs/execution_roi.json for business ROI validation. Track GPT-4 token usage with cost calculations.",
+        "acceptance_criteria": [
+          "execution_roi.json logs token usage with <10ms overhead per LLM call",
+          "Cost calculation accuracy within 1% of actual API charges",
+          "ROI multiplier shows efficiency gain (>100x expected)",
+          "Writer/Editor agents tracked with per-agent token breakdowns",
+          "3+ integration tests passing validating telemetry accuracy"
+        ],
+        "tasks": [
+          {
+            "name": "ROI Schema Design",
+            "effort_hours": 1,
+            "priority": "P0"
+          },
+          {
+            "name": "ROI Tracker Middleware",
+            "effort_hours": 2,
+            "priority": "P0"
+          },
+          {
+            "name": "LLM Call Instrumentation",
+            "effort_hours": 2,
+            "priority": "P0"
+          },
+          {
+            "name": "ROI Calculation Logic",
+            "effort_hours": 1.5,
+            "priority": "P1"
+          },
+          {
+            "name": "Integration Tests",
+            "effort_hours": 1.5,
+            "priority": "P1"
+          },
+          {
+            "name": "Documentation",
+            "effort_hours": 1,
+            "priority": "P2"
+          }
+        ],
+        "dependencies": [
+          "scripts/agent_registry.py (instrumentation point)",
+          "logs/ directory",
+          "Model pricing data (GPT-4: $0.03/$0.06 per 1k tokens)"
+        ],
+        "dor_met": true
+      }
+    ],
+    "velocity": null,
+    "points_delivered": 0,
+    "completion_rate": 0.0,
+    "ceremonies_complete": false,
+    "retrospective_done": false,
+    "backlog_refined": true,
+    "refinement_date": "2026-01-04T23:00:00",
+    "next_sprint_dor_met": true
+  },
+  "backlog": [
+    {
+      "id": 13,
+      "name": "Stage 4 Migration (Review & Refinement)",
+      "type": "feature_port",
+      "points": 5,
+      "priority": "high",
+      "status": "backlog",
+      "goal": "Port legacy logic from src/stage4.py to Stage4Crew architecture following TDD migration pattern from Stage 3",
+      "acceptance_criteria": [
+        "Skeleton: src/crews/stage4_crew.py created with Stage4Crew class",
+        "Logic: Extract Reviewer/Editor prompts from legacy stage4.py",
+        "TDD: tests/reproduce_stage4.py with editorial quality assertions",
+        "Integration: Ingest YAML/JSON from Stage 3 output"
+      ],
+      "dependencies": [
+        "Story 10: Stage 3 Migration (Phase 2 Logical Work) - complete",
+        "Story 11: Port Stage 3 Business Logic - complete"
+      ],
+      "added_date": "2026-01-04"
+    }
+  ]
+}

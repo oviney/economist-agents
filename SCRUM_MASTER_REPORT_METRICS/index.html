@@ -1,0 +1,3009 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Multi-agent content pipeline that generates Economist-style articles with autonomous research, writing, illustration, and deployment">
+      
+      
+      
+        <link rel="canonical" href="https://oviney.github.io/economist-agents/SCRUM_MASTER_REPORT_METRICS/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Scrum Master Report: Quality Metrics Implementation - Economist Agents</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#scrum-master-report-quality-metrics-implementation" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Economist Agents" class="md-header__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Economist Agents
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Scrum Master Report: Quality Metrics Implementation
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/oviney/economist-agents" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    oviney/economist-agents
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../agent-registry-spec/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../adr/ADR-001-agent-framework-selection/" class="md-tabs__link">
+          
+  
+  
+  ADRs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../skills/agent-delegation/SKILL/" class="md-tabs__link">
+          
+  
+  
+  Skills
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../guides/WORKFLOW_GUIDE/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../CREWAI_API_REFERENCE/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../AGENT_VELOCITY_ANALYSIS/" class="md-tabs__link">
+          
+  
+  
+  Performance
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Economist Agents" class="md-nav__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Economist Agents
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/oviney/economist-agents" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    oviney/economist-agents
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agent-registry-spec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../FLOW_ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AUTONOMOUS_ORCHESTRATION_STRATEGY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autonomous Orchestration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CREWAI_CONTEXT_ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shared Context System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE_PATTERNS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE_REVIEW_PROCESS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Review Process
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADRs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADRs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/ADR-001-agent-framework-selection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-001 — Agent Framework Selection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/ADR-002-content-intelligence-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-002 — Content Intelligence Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/ADR-003-agent-skill-governance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-003 — Agent Skill Governance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ADR-004-python-version-constraint/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-004 — Python Version Constraint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ADR-005-agile-discipline-enforcement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-005 — Agile Discipline Enforcement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skills
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Skills
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/agent-delegation/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Delegation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/research-sourcing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research Sourcing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/economist-writing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Economist Writing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/editorial-illustration/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Editorial Illustration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/article-evaluation/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Article Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/quality-gates/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quality Gates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/python-quality/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python Quality
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/testing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/defect-prevention/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Defect Prevention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/devops/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DevOps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/sprint-management/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/scrum-master/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scrum Master
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/agent-traceability/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Traceability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/observability/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/mcp-development/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/WORKFLOW_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/BLOG_DEPLOYMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/COPILOT_SYNC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Copilot Sync
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/CI_MONITORING_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CI Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/PYTHON_VERSION_TROUBLESHOOTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/IMPLEMENTATION_ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/VALIDATION_QUICK_REF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation Quick Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CREWAI_API_REFERENCE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CrewAI API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AGENT_PROMPT_PATTERNS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Prompt Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AGENT_QUALITY_GATES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quality Gates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEFINITION_OF_DONE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Definition of Done
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEFECT_PREVENTION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Defect Prevention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHART_DESIGN_SPEC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chart Design Spec
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Performance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AGENT_VELOCITY_ANALYSIS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Velocity Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SPRINT_DISCIPLINE_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint Discipline Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#executive-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Executive Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#immediate-actions-complete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Immediate Actions (Complete)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Immediate Actions (Complete)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-defect-tracking-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Defect Tracking System
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-known-bugs-cataloged" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Known Bugs Cataloged
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-github-issues-created" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. GitHub Issues Created
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sprint-5-updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sprint 5 Updates
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sprint 5 Updates">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scope-change" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scope Change
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updated-stories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updated Stories
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updated-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updated Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quality-metrics-dashboard-preview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quality Metrics Dashboard (Preview)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quality Metrics Dashboard (Preview)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-metrics-baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Metrics (Baseline)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#end-to-end-metrics-future-issue-24" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        End-to-End Metrics (Future - Issue #24)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#defect-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Defect Analysis
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Defect Analysis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#production-escape-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Production Escape Analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#patterns-identified" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Patterns Identified
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#improvement-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Improvement Actions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#backlog-impact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backlog Impact
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Backlog Impact">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#newly-created-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Newly Created Issues
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sprint-6-planning-preliminary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sprint 6 Planning (Preliminary)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#github-integration-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub Integration Test
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#risk-assessment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Risk Assessment
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Risk Assessment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#new-risks-introduced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Risks Introduced
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#risks-mitigated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Risks Mitigated
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stakeholder-communication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stakeholder Communication
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Stakeholder Communication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#user-feedback-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        User Feedback Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transparency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transparency
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#success-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Success Criteria
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Success Criteria">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sprint-5-success-updated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sprint 5 Success (Updated)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#long-term-quality-targets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Long-term Quality Targets
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Actions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Next Actions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#immediate-this-week-sprint-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Immediate (This Week - Sprint 5)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#short-term-sprint-6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Short-term (Sprint 6)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#long-term-sprint-7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Long-term (Sprint 7+)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lessons-learned" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lessons Learned
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Lessons Learned">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-went-well" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Went Well
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-could-be-better" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Could Be Better
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actions-taken" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Actions Taken
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="scrum-master-report-quality-metrics-implementation">Scrum Master Report: Quality Metrics Implementation<a class="headerlink" href="#scrum-master-report-quality-metrics-implementation" title="Permanent link">&para;</a></h1>
+<p><strong>Date</strong>: January 1, 2026
+<strong>Status</strong>: ✅ IMMEDIATE ACTIONS COMPLETE
+<strong>Sprint Impact</strong>: Sprint 5 updated (7 → 9 points)</p>
+<hr />
+<h2 id="executive-summary">Executive Summary<a class="headerlink" href="#executive-summary" title="Permanent link">&para;</a></h2>
+<p><strong>User Feedback Received</strong>:</p>
+<blockquote>
+<p>"I don't see any defect or bug metrics. We also need to report on bugs leaked to production. Also, what about end to end metrics like using the Google Analytics APIs?"</p>
+</blockquote>
+<p><strong>Scrum Master Response</strong>:
+1. ✅ <strong>Immediate</strong>: Implemented defect tracking system (same day)
+2. ✅ <strong>Sprint 5</strong>: Added defect dashboard integration (2 pts)
+3. ✅ <strong>Backlog</strong>: Created Google Analytics story (5 pts, Sprint 6+)
+4. ✅ <strong>Process</strong>: Updated Definition of Done and daily standup</p>
+<hr />
+<h2 id="immediate-actions-complete">Immediate Actions (Complete)<a class="headerlink" href="#immediate-actions-complete" title="Permanent link">&para;</a></h2>
+<h3 id="1-defect-tracking-system">1. Defect Tracking System<a class="headerlink" href="#1-defect-tracking-system" title="Permanent link">&para;</a></h3>
+<p><strong>Created</strong>: <code>scripts/defect_tracker.py</code> (318 lines)</p>
+<p><strong>Capabilities</strong>:
+- Log bugs with severity, discovery stage, component
+- Track production escapes vs development bugs
+- Calculate defect escape rate
+- Generate markdown reports
+- Integrate with GitHub issues</p>
+<p><strong>Current State</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Total Bugs: 4
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Fixed Bugs: 3 (75%)
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Production Escapes: 2
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Defect Escape Rate: 50%
+</code></pre></div></p>
+<p><strong>Quality Alert</strong>: 🚨 <strong>Escape rate 50% is above target (&lt;10%)</strong></p>
+<h3 id="2-known-bugs-cataloged">2. Known Bugs Cataloged<a class="headerlink" href="#2-known-bugs-cataloged" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Bug ID</th>
+<th>Severity</th>
+<th>Stage</th>
+<th>Status</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BUG-015</td>
+<td>High</td>
+<td>Production</td>
+<td>✅ Fixed</td>
+<td>Missing category tag</td>
+</tr>
+<tr>
+<td>BUG-016</td>
+<td>Critical</td>
+<td>Development</td>
+<td>✅ Fixed</td>
+<td>Charts not embedded</td>
+</tr>
+<tr>
+<td>BUG-017</td>
+<td>Medium</td>
+<td>Production</td>
+<td>✅ Fixed</td>
+<td>Duplicate charts</td>
+</tr>
+<tr>
+<td>BUG-020</td>
+<td>Critical</td>
+<td>Development</td>
+<td>🔴 Open</td>
+<td>GitHub auto-close broken</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Production Escapes</strong>:
+- BUG-015: Category tag missing (now fixed)
+- BUG-017: Duplicate chart display (now fixed)</p>
+<p><strong>Learnings</strong>:
+- 50% of bugs leaked to production (unacceptable)
+- Need better pre-production validation
+- Writer Agent responsible for 2/4 bugs (needs improvement)</p>
+<h3 id="3-github-issues-created">3. GitHub Issues Created<a class="headerlink" href="#3-github-issues-created" title="Permanent link">&para;</a></h3>
+<p><strong>Issue #24</strong>: <a href="https://github.com/oviney/economist-agents/issues/24">Google Analytics Integration</a>
+- <strong>Priority</strong>: P2
+- <strong>Story Points</strong>: 5
+- <strong>Sprint</strong>: 6 or 7
+- <strong>Goal</strong>: Track user engagement (page views, time on page, bounce rate)
+- <strong>Impact</strong>: Closes feedback loop from content → user behavior</p>
+<p><strong>Issue #25</strong>: <a href="https://github.com/oviney/economist-agents/issues/25">Defect Dashboard Integration</a>
+- <strong>Priority</strong>: P1
+- <strong>Story Points</strong>: 2
+- <strong>Sprint</strong>: 5
+- <strong>Status</strong>: ✅ <strong>AUTO-CLOSED</strong> (GitHub integration working!)
+- <strong>Goal</strong>: Make defect metrics visible in dashboard</p>
+<hr />
+<h2 id="sprint-5-updates">Sprint 5 Updates<a class="headerlink" href="#sprint-5-updates" title="Permanent link">&para;</a></h2>
+<h3 id="scope-change">Scope Change<a class="headerlink" href="#scope-change" title="Permanent link">&para;</a></h3>
+<p><strong>Original</strong>: 7 points (Stories 1-4)
+<strong>Updated</strong>: 9 points (Stories 1-5)
+<strong>Rationale</strong>: Defect tracking foundation complete, only integration remains</p>
+<h3 id="updated-stories">Updated Stories<a class="headerlink" href="#updated-stories" title="Permanent link">&para;</a></h3>
+<p><strong>Story 5 (NEW)</strong>: Add Defect Tracking to Dashboard
+- <strong>Points</strong>: 2
+- <strong>Priority</strong>: P1
+- <strong>Foundation</strong>: Complete (defect_tracker.py)
+- <strong>Remaining</strong>: Dashboard integration
+- <strong>Impact</strong>: Visibility into production quality</p>
+<h3 id="updated-metrics">Updated Metrics<a class="headerlink" href="#updated-metrics" title="Permanent link">&para;</a></h3>
+<p><strong>New Quality Targets</strong>:
+- Defect Escape Rate: <strong>&lt;10%</strong> (industry standard)
+- Current: <strong>50%</strong> (baseline established)
+- Track: All bugs by severity, stage, component</p>
+<p><strong>Updated Definition of Done</strong>:
+- ✅ Code implemented and tested
+- ✅ Commit uses correct "Closes #X" syntax
+- ✅ Issue auto-closed by GitHub
+- ✅ <strong>Defect tracker updated</strong> (NEW)
+- ✅ <strong>No production escapes during story</strong> (NEW)</p>
+<p><strong>Updated Daily Standup</strong>:
+- Did GitHub auto-close work?
+- <strong>Any bugs discovered? Logged in defect_tracker?</strong> (NEW)
+- Are metrics improving?</p>
+<hr />
+<h2 id="quality-metrics-dashboard-preview">Quality Metrics Dashboard (Preview)<a class="headerlink" href="#quality-metrics-dashboard-preview" title="Permanent link">&para;</a></h2>
+<h3 id="current-metrics-baseline">Current Metrics (Baseline)<a class="headerlink" href="#current-metrics-baseline" title="Permanent link">&para;</a></h3>
+<p><strong>Agent Performance</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Research Agent:  73% verification rate   (target: &gt;80%)
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>Writer Agent:    67% clean draft rate    (target: &gt;80%)
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>Editor Agent:    33% prediction accuracy (target: &gt;60%)
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>Graphics Agent:  83% visual QA pass      (target: &gt;90%)
+</code></pre></div></p>
+<p><strong>Defect Metrics</strong> (NEW):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Total Bugs:           4
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>Fixed Bugs:           3 (75%)
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>Production Escapes:   2 (50% escape rate)
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>By Severity:
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>  Critical:  2 (50%)
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>  High:      1 (25%)
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>  Medium:    1 (25%)
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>By Component:
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>  Writer Agent:    2 bugs (most problematic)
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>  Jekyll Layout:   1 bug
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>  Git Workflow:    1 bug
+</code></pre></div></p>
+<p><strong>Process Metrics</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>GitHub auto-close:    100% ✅ (fixed!)
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>Documentation:        100%
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Doc compliance:       60% (needs work)
+</code></pre></div></p>
+<h3 id="end-to-end-metrics-future-issue-24">End-to-End Metrics (Future - Issue #24)<a class="headerlink" href="#end-to-end-metrics-future-issue-24" title="Permanent link">&para;</a></h3>
+<p><strong>Planned</strong> (Sprint 6+):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>User Engagement:
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>  Page views per article
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>  Average time on page
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>  Bounce rate
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>  Traffic sources
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>  User demographics
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>Impact Analysis:
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>  Correlate article quality → engagement
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>  A/B test content strategies
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>  Optimize for user behavior
+</code></pre></div></p>
+<hr />
+<h2 id="defect-analysis">Defect Analysis<a class="headerlink" href="#defect-analysis" title="Permanent link">&para;</a></h2>
+<h3 id="production-escape-analysis">Production Escape Analysis<a class="headerlink" href="#production-escape-analysis" title="Permanent link">&para;</a></h3>
+<p><strong>BUG-015</strong> (Production):
+- <strong>Severity</strong>: High
+- <strong>Component</strong>: Jekyll layout
+- <strong>Root Cause</strong>: Missing category tag in post.html
+- <strong>Detection</strong>: User report after publish
+- <strong>Fix Time</strong>: 2 hours
+- <strong>Prevention</strong>: Should have been caught by:
+  - Blog QA Agent (layout validation)
+  - Manual review of layout changes
+  - Test article generation before deployment</p>
+<p><strong>BUG-017</strong> (Production):
+- <strong>Severity</strong>: Medium
+- <strong>Component</strong>: Writer Agent
+- <strong>Root Cause</strong>: Duplicate chart display (featured image + embed)
+- <strong>Detection</strong>: User noticed during review
+- <strong>Fix Time</strong>: 1 hour
+- <strong>Prevention</strong>: Should have been caught by:
+  - Publication Validator (check for duplicate images)
+  - Manual review of generated articles
+  - Better Writer Agent prompt</p>
+<h3 id="patterns-identified">Patterns Identified<a class="headerlink" href="#patterns-identified" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Writer Agent Issues</strong>: 2/4 bugs (50%)</li>
+<li>Needs prompt improvements (Story 2)</li>
+<li>Missing validation checks</li>
+<li>
+<p>Self-validation insufficient</p>
+</li>
+<li>
+<p><strong>Layout Changes</strong>: 1/4 bugs (25%)</p>
+</li>
+<li>Jekyll layout changes risky</li>
+<li>Need better testing before deployment</li>
+<li>
+<p>Blog QA Agent should validate layouts</p>
+</li>
+<li>
+<p><strong>Process Failures</strong>: 1/4 bugs (25%)</p>
+</li>
+<li>GitHub integration not tested</li>
+<li>Manual processes error-prone</li>
+<li>Automation needed (pre-commit hooks)</li>
+</ol>
+<h3 id="improvement-actions">Improvement Actions<a class="headerlink" href="#improvement-actions" title="Permanent link">&para;</a></h3>
+<p><strong>Immediate</strong> (Sprint 5):
+- ✅ Defect tracking operational
+- 📋 Dashboard integration (Story 5)
+- 📋 Writer Agent improvements (Story 2)
+- 📋 Pre-commit hooks (Story 4)</p>
+<p><strong>Long-term</strong>:
+- Expand Blog QA Agent to validate layouts
+- Add Publication Validator checks
+- Increase test coverage
+- <strong>Target</strong>: Reduce escape rate from 50% → &lt;10%</p>
+<hr />
+<h2 id="backlog-impact">Backlog Impact<a class="headerlink" href="#backlog-impact" title="Permanent link">&para;</a></h2>
+<h3 id="newly-created-issues">Newly Created Issues<a class="headerlink" href="#newly-created-issues" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Issue #24</strong>: Google Analytics Integration</li>
+<li><strong>Sprint</strong>: 6 or 7</li>
+<li><strong>Points</strong>: 5</li>
+<li><strong>Priority</strong>: P2</li>
+<li><strong>Dependencies</strong>: None</li>
+<li>
+<p><strong>Value</strong>: Complete feedback loop</p>
+</li>
+<li>
+<p><strong>Issue #25</strong>: Defect Dashboard Integration</p>
+</li>
+<li><strong>Sprint</strong>: 5</li>
+<li><strong>Points</strong>: 2</li>
+<li><strong>Priority</strong>: P1</li>
+<li><strong>Status</strong>: ✅ Closed (foundation complete)</li>
+</ol>
+<h3 id="sprint-6-planning-preliminary">Sprint 6 Planning (Preliminary)<a class="headerlink" href="#sprint-6-planning-preliminary" title="Permanent link">&para;</a></h3>
+<p><strong>Recommended Stories</strong> (12 points target):
+1. Issue #24: Google Analytics Integration (5 pts)
+2. Issue #10: Expand Skills Categories (3 pts)
+3. Issue #9: Anti-Pattern Detection (3 pts)
+4. Issue #12: CONTRIBUTING.md (1 pt)</p>
+<p><strong>Total</strong>: 12 points (ambitious but achievable if Sprint 5 successful)</p>
+<p><strong>Focus</strong>: Complete feedback loop (content → quality → engagement)</p>
+<hr />
+<h2 id="github-integration-test">GitHub Integration Test<a class="headerlink" href="#github-integration-test" title="Permanent link">&para;</a></h2>
+<p><strong>Test</strong>: Issue #25 auto-close via commit
+<strong>Commit</strong>: <a href="https://github.com/oviney/economist-agents/commit/aa7c042"><code>aa7c042</code></a>
+<strong>Result</strong>: ✅ <strong>SUCCESS</strong> - Issue closed automatically</p>
+<p><strong>Evidence</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Commit message: &quot;Add defect tracking and update Sprint 5 plan
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>...
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>Closes #25&quot;
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>GitHub Action: Issue #25 status changed from OPEN → CLOSED
+</code></pre></div></p>
+<p><strong>Validation</strong>: GitHub integration now working after Sprint 4 fix!</p>
+<hr />
+<h2 id="risk-assessment">Risk Assessment<a class="headerlink" href="#risk-assessment" title="Permanent link">&para;</a></h2>
+<h3 id="new-risks-introduced">New Risks Introduced<a class="headerlink" href="#new-risks-introduced" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Scope Creep</strong>: Added 2 points to Sprint 5</li>
+<li><strong>Mitigation</strong>: Foundation complete, only integration remains</li>
+<li>
+<p><strong>Contingency</strong>: Drop Story 4 if needed</p>
+</li>
+<li>
+<p><strong>Quality Alert</strong>: 50% defect escape rate</p>
+</li>
+<li><strong>Mitigation</strong>: Now visible and tracked</li>
+<li>
+<p><strong>Improvement Plan</strong>: Sprint 5 focus on validation</p>
+</li>
+<li>
+<p><strong>Metrics Complexity</strong>: More metrics = more overhead</p>
+</li>
+<li><strong>Mitigation</strong>: Automated collection and reporting</li>
+<li><strong>Benefit</strong>: Better visibility worth the cost</li>
+</ol>
+<h3 id="risks-mitigated">Risks Mitigated<a class="headerlink" href="#risks-mitigated" title="Permanent link">&para;</a></h3>
+<ol>
+<li>✅ <strong>Hidden Bugs</strong>: Now tracked systematically</li>
+<li>✅ <strong>Production Escapes</strong>: Now measured and visible</li>
+<li>✅ <strong>Quality Blind Spots</strong>: Defect metrics reveal weak points</li>
+</ol>
+<hr />
+<h2 id="stakeholder-communication">Stakeholder Communication<a class="headerlink" href="#stakeholder-communication" title="Permanent link">&para;</a></h2>
+<h3 id="user-feedback-integration">User Feedback Integration<a class="headerlink" href="#user-feedback-integration" title="Permanent link">&para;</a></h3>
+<p><strong>Request 1</strong>: "I don't see any defect or bug metrics"
+- ✅ <strong>Resolved</strong>: Defect tracker created and operational
+- ✅ <strong>Visibility</strong>: 4 bugs cataloged, escape rate calculated
+- ✅ <strong>Sprint 5</strong>: Dashboard integration planned</p>
+<p><strong>Request 2</strong>: "We need to report on bugs leaked to production"
+- ✅ <strong>Resolved</strong>: Production escapes tracked separately
+- ✅ <strong>Metric</strong>: Defect escape rate = 50% (2/4 bugs)
+- ✅ <strong>Target</strong>: &lt;10% (industry standard)</p>
+<p><strong>Request 3</strong>: "What about Google Analytics for user engagement?"
+- ✅ <strong>Backlog</strong>: Issue #24 created (5 pts, Sprint 6+)
+- ✅ <strong>Scope</strong>: Page views, time on page, bounce rate, sources
+- ✅ <strong>Value</strong>: Complete feedback loop</p>
+<h3 id="transparency">Transparency<a class="headerlink" href="#transparency" title="Permanent link">&para;</a></h3>
+<p><strong>Current Quality State</strong>:
+- ✅ Agent metrics tracked
+- ✅ Defect metrics tracked
+- 📋 Engagement metrics planned</p>
+<p><strong>Known Issues</strong>:
+- Defect escape rate high (50%)
+- Writer Agent needs improvement
+- Validation gaps exist</p>
+<p><strong>Improvement Plan</strong>:
+- Sprint 5: Fix validation gaps
+- Sprint 6: Add engagement metrics
+- Ongoing: Reduce escape rate</p>
+<hr />
+<h2 id="success-criteria">Success Criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h2>
+<h3 id="sprint-5-success-updated">Sprint 5 Success (Updated)<a class="headerlink" href="#sprint-5-success-updated" title="Permanent link">&para;</a></h3>
+<p><strong>Must Have</strong>:
+- ✅ GitHub auto-close: 100% (working now!)
+- ✅ Defect tracking: Operational (complete!)
+- 📋 Defect dashboard: Visible (Story 5)
+- 📋 Writer Agent: &gt;80% clean rate (Story 2)
+- 📋 Editor Agent: &gt;60% accuracy (Story 3)</p>
+<p><strong>Stretch</strong>:
+- 📋 Pre-commit validation (Story 4)
+- 📋 All 9 points delivered</p>
+<h3 id="long-term-quality-targets">Long-term Quality Targets<a class="headerlink" href="#long-term-quality-targets" title="Permanent link">&para;</a></h3>
+<p><strong>By Sprint 10</strong>:
+- Defect escape rate: &lt;10%
+- Agent accuracy: &gt;90% across all agents
+- User engagement: Tracked and optimized
+- Zero critical bugs in production</p>
+<hr />
+<h2 id="next-actions">Next Actions<a class="headerlink" href="#next-actions" title="Permanent link">&para;</a></h2>
+<h3 id="immediate-this-week-sprint-5">Immediate (This Week - Sprint 5)<a class="headerlink" href="#immediate-this-week-sprint-5" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Day 1</strong>: Story 1 - GitHub auto-close validation ✅ WORKING</li>
+<li><strong>Day 2</strong>: Story 2 - Writer Agent improvements</li>
+<li><strong>Day 3</strong>: Story 3 - Editor Agent improvements</li>
+<li><strong>Day 4</strong>: Story 5 - Defect dashboard integration</li>
+<li><strong>Day 5</strong>: Testing, validation, retrospective</li>
+</ol>
+<h3 id="short-term-sprint-6">Short-term (Sprint 6)<a class="headerlink" href="#short-term-sprint-6" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Story 6: Google Analytics integration (Issue #24)</li>
+<li>Review defect escape rate after 10 more bugs</li>
+<li>Validate quality improvements from Sprint 5</li>
+</ol>
+<h3 id="long-term-sprint-7">Long-term (Sprint 7+)<a class="headerlink" href="#long-term-sprint-7" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Expand validation coverage</li>
+<li>Automate more quality checks</li>
+<li>Optimize content based on engagement data</li>
+</ol>
+<hr />
+<h2 id="lessons-learned">Lessons Learned<a class="headerlink" href="#lessons-learned" title="Permanent link">&para;</a></h2>
+<h3 id="what-went-well">What Went Well<a class="headerlink" href="#what-went-well" title="Permanent link">&para;</a></h3>
+<ol>
+<li>✅ <strong>Rapid Response</strong>: Defect tracker built same day as feedback</li>
+<li>✅ <strong>Systematic Approach</strong>: Cataloged all known bugs immediately</li>
+<li>✅ <strong>Clear Metrics</strong>: Escape rate calculation reveals quality state</li>
+<li>✅ <strong>User-Driven</strong>: Feedback directly shaped sprint plan</li>
+</ol>
+<h3 id="what-could-be-better">What Could Be Better<a class="headerlink" href="#what-could-be-better" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Earlier Detection</strong>: 50% escape rate shows validation gaps</li>
+<li><strong>Proactive Tracking</strong>: Should have tracked bugs from Sprint 1</li>
+<li><strong>Baseline Data</strong>: No historical comparison for trends</li>
+</ol>
+<h3 id="actions-taken">Actions Taken<a class="headerlink" href="#actions-taken" title="Permanent link">&para;</a></h3>
+<ol>
+<li>✅ Created defect_tracker.py</li>
+<li>✅ Updated Sprint 5 plan</li>
+<li>✅ Created backlog issues</li>
+<li>✅ Updated Definition of Done</li>
+<li>✅ Tested GitHub integration (working!)</li>
+</ol>
+<hr />
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<p><strong>User Request</strong>: Defect metrics + engagement metrics
+<strong>Scrum Master Actions</strong>:
+- ✅ Defect tracking: Implemented immediately
+- ✅ Sprint 5: Updated with defect dashboard (2 pts)
+- ✅ Backlog: Google Analytics added (5 pts)
+- ✅ Process: Definition of Done updated
+- ✅ Quality: Escape rate baseline established (50%)</p>
+<p><strong>Sprint 5 Status</strong>: Ready to begin (9 points committed)
+<strong>Quality Focus</strong>: Fix validation gaps, improve agent accuracy
+<strong>Long-term Goal</strong>: &lt;10% defect escape rate</p>
+<p><strong>Next Milestone</strong>: Sprint 5 Day 1 - GitHub validation + Writer Agent</p>
+<hr />
+<p><strong>Report Status</strong>: Complete
+<strong>Artifacts Created</strong>:
+- <a href="https://github.com/oviney/economist-agents/blob/main/scripts/defect_tracker.py"><code>scripts/defect_tracker.py</code></a>
+- <a href="https://github.com/oviney/economist-agents/blob/main/skills/defect_tracker.json"><code>skills/defect_tracker.json</code></a>
+- <a href="https://github.com/oviney/economist-agents/blob/main/docs/SPRINT_5_PLAN_UPDATED.md"><code>docs/SPRINT_5_PLAN_UPDATED.md</code></a>
+- <a href="https://github.com/oviney/economist-agents/issues/24">Issue #24</a>: Google Analytics
+- <a href="https://github.com/oviney/economist-agents/issues/25">Issue #25</a>: Defect Dashboard (CLOSED)</p>
+<p><strong>Commit</strong>: <a href="https://github.com/oviney/economist-agents/commit/aa7c042"><code>aa7c042</code></a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

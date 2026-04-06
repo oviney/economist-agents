@@ -1,0 +1,2772 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Multi-agent content pipeline that generates Economist-style articles with autonomous research, writing, illustration, and deployment">
+      
+      
+      
+        <link rel="canonical" href="https://oviney.github.io/economist-agents/EPIC_PRODUCTION_AGENTIC_EVOLUTION/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Epic: Production-Grade Agentic Evolution (v2.0) - Economist Agents</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#epic-production-grade-agentic-evolution-v20" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Economist Agents" class="md-header__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Economist Agents
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Epic: Production-Grade Agentic Evolution (v2.0)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/oviney/economist-agents" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    oviney/economist-agents
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../agent-registry-spec/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../adr/ADR-001-agent-framework-selection/" class="md-tabs__link">
+          
+  
+  
+  ADRs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../skills/agent-delegation/SKILL/" class="md-tabs__link">
+          
+  
+  
+  Skills
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../guides/WORKFLOW_GUIDE/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../CREWAI_API_REFERENCE/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../AGENT_VELOCITY_ANALYSIS/" class="md-tabs__link">
+          
+  
+  
+  Performance
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Economist Agents" class="md-nav__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Economist Agents
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/oviney/economist-agents" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    oviney/economist-agents
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agent-registry-spec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../FLOW_ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AUTONOMOUS_ORCHESTRATION_STRATEGY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autonomous Orchestration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CREWAI_CONTEXT_ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shared Context System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE_PATTERNS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE_REVIEW_PROCESS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Review Process
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADRs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADRs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/ADR-001-agent-framework-selection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-001 — Agent Framework Selection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/ADR-002-content-intelligence-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-002 — Content Intelligence Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/ADR-003-agent-skill-governance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-003 — Agent Skill Governance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ADR-004-python-version-constraint/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-004 — Python Version Constraint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ADR-005-agile-discipline-enforcement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-005 — Agile Discipline Enforcement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skills
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Skills
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/agent-delegation/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Delegation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/research-sourcing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research Sourcing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/economist-writing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Economist Writing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/editorial-illustration/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Editorial Illustration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/article-evaluation/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Article Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/quality-gates/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quality Gates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/python-quality/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python Quality
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/testing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/defect-prevention/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Defect Prevention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/devops/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DevOps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/sprint-management/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/scrum-master/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scrum Master
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/agent-traceability/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Traceability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/observability/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/mcp-development/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/WORKFLOW_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/BLOG_DEPLOYMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/COPILOT_SYNC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Copilot Sync
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/CI_MONITORING_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CI Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/PYTHON_VERSION_TROUBLESHOOTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/IMPLEMENTATION_ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/VALIDATION_QUICK_REF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation Quick Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CREWAI_API_REFERENCE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CrewAI API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AGENT_PROMPT_PATTERNS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Prompt Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AGENT_QUALITY_GATES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quality Gates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEFINITION_OF_DONE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Definition of Done
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEFECT_PREVENTION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Defect Prevention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHART_DESIGN_SPEC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chart Design Spec
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Performance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AGENT_VELOCITY_ANALYSIS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Velocity Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SPRINT_DISCIPLINE_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint Discipline Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#epic-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Epic Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#strategic-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Strategic Context
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Strategic Context">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#joao-mouras-production-roi-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        João Moura's Production ROI Principles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-now" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Now?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stories
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Stories">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#story-005-shift-to-deterministic-backbone-p0-3-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        STORY-005: Shift to Deterministic Backbone (P0, 3 points)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#story-006-establish-style-memory-rag-p1-3-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        STORY-006: Establish Style Memory RAG (P1, 3 points)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#story-007-implement-roi-telemetry-hook-p2-3-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        STORY-007: Implement ROI Telemetry Hook (P2, 3 points)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sprint-planning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sprint Planning
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sprint Planning">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sprint-13-capacity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sprint 13 Capacity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#definition-of-ready-dor-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definition of Ready (DoR) Validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#success-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Success Metrics
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Success Metrics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#story-005-success-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        STORY-005 Success Criteria
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#story-006-success-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        STORY-006 Success Criteria
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#story-007-success-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        STORY-007 Success Criteria
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#epic-success-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Epic Success Criteria
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="epic-production-grade-agentic-evolution-v20">Epic: Production-Grade Agentic Evolution (v2.0)<a class="headerlink" href="#epic-production-grade-agentic-evolution-v20" title="Permanent link">&para;</a></h1>
+<h2 id="epic-overview">Epic Overview<a class="headerlink" href="#epic-overview" title="Permanent link">&para;</a></h2>
+<p><strong>Epic ID</strong>: EPIC-001
+<strong>Theme</strong>: João Moura's "Production ROI" Principles Integration
+<strong>Timeline</strong>: Sprint 13 (estimated 1-2 sprints depending on story splits)
+<strong>Total Story Points</strong>: 9 points (3 stories × 3 points each)
+<strong>Priority</strong>: P0 Foundation → P1 Enhancement → P2 Observability</p>
+<h2 id="strategic-context">Strategic Context<a class="headerlink" href="#strategic-context" title="Permanent link">&para;</a></h2>
+<h3 id="joao-mouras-production-roi-principles">João Moura's Production ROI Principles<a class="headerlink" href="#joao-mouras-production-roi-principles" title="Permanent link">&para;</a></h3>
+<p>Based on CrewAI founder João Moura's production-grade AI system philosophy:</p>
+<ol>
+<li><strong>Deterministic Orchestration</strong>: Replace autonomous agent routing with state-machine precision</li>
+<li><strong>Quality Memory Systems</strong>: RAG-based style/pattern memory for consistent outputs</li>
+<li><strong>ROI Measurement</strong>: Token costs vs human-hour equivalents for business validation</li>
+</ol>
+<h3 id="why-now">Why Now?<a class="headerlink" href="#why-now" title="Permanent link">&para;</a></h3>
+<p><strong>Current State</strong>:
+- Agent routing via WORKFLOW_SEQUENCE dict (brittle, not scalable)
+- No style memory system (Editor relies on prompt-only knowledge)
+- No ROI telemetry (can't prove 50x human efficiency claims)</p>
+<p><strong>Target State</strong>:
+- Flow-based deterministic orchestration (@start/@listen decorators)
+- Vector-store RAG with Gold Standard articles from archived/
+- Automated ROI logging (logs/execution_roi.json)</p>
+<p><strong>Business Impact</strong>:
+- <strong>Reliability</strong>: Eliminate agent routing failures (100% → 0% transition errors)
+- <strong>Quality</strong>: Editor consistency via style memory (87% → 95%+ gate pass rate)
+- <strong>Visibility</strong>: Prove ROI to stakeholders (anecdotal → measurable 50x efficiency)</p>
+<hr />
+<h2 id="stories">Stories<a class="headerlink" href="#stories" title="Permanent link">&para;</a></h2>
+<h3 id="story-005-shift-to-deterministic-backbone-p0-3-points">STORY-005: Shift to Deterministic Backbone (P0, 3 points)<a class="headerlink" href="#story-005-shift-to-deterministic-backbone-p0-3-points" title="Permanent link">&para;</a></h3>
+<p><strong>GitHub Issue</strong>: TBD</p>
+<p><strong>Story Goal</strong>: Refactor src/ to use Flow-based state-machine orchestration with 0-agency for editorial transitions</p>
+<p><strong>Why Now</strong>: 
+- Current WORKFLOW_SEQUENCE dict is brittle (hardcoded routing research→writer→editor→graphics→qe)
+- CrewAI Flows provide @start/@listen decorators for deterministic progression
+- Foundation for all future agentic work (STORY-006 RAG, STORY-007 telemetry)</p>
+<p><strong>Technical Approach</strong>:
+1. Create src/economist_agents/flow.py with EconomistContentFlow class
+2. Implement @start/@listen decorators for stage progression
+3. Refactor Stage3Crew/Stage4Crew for Flow orchestration
+4. Remove WORKFLOW_SEQUENCE from scripts/sm_agent.py
+5. Maintain temperature=0 for deterministic Editor evaluation</p>
+<p><strong>Tasks</strong> (18h total ≈ 6-7 points, <strong>SCOPED TO 3 POINTS</strong>):
+1. <strong>Task 1: Create Flow Architecture</strong> (4h → 2h, P0)
+   - Create src/economist_agents/flow.py with EconomistContentFlow class
+   - Implement @start() discover_topics() method
+   - Implement @listen(discover_topics) editorial_review(topics) method
+   - <strong>Scope reduction</strong>: Stub out Stage1/Stage2 integration, focus on Stage3/Stage4 Flow
+   - DoD: flow.py created, basic @start/@listen structure compiles</p>
+<ol>
+<li><strong>Task 2: Integrate Stage3 Crew</strong> (3h → 2h, P0)</li>
+<li>Implement @listen(editorial_review) generate_content(topic) method</li>
+<li>Call Stage3Crew.kickoff() from Flow (research→writer→graphics)</li>
+<li>Pass topic input via Flow state</li>
+<li><strong>Scope reduction</strong>: Use existing Stage3Crew as-is, no crew refactoring</li>
+<li>
+<p>DoD: Stage3Crew executes via Flow.generate_content(), outputs JSON</p>
+</li>
+<li>
+<p><strong>Task 3: Integrate Stage4 Crew</strong> (2h → 1.5h, P0)</p>
+</li>
+<li>Implement @router(generate_content) quality_gate(article) method</li>
+<li>Call Stage4Crew.kickoff() from router (5-gate editorial)</li>
+<li>Route based on quality score (≥8 = publish, &lt;8 = revision)</li>
+<li><strong>Scope reduction</strong>: Keep router simple (publish/revision only)</li>
+<li>
+<p>DoD: Stage4Crew executes via Flow router, routes based on quality score</p>
+</li>
+<li>
+<p><strong>Task 4: Integration Tests</strong> (3h → 2h, P0)</p>
+</li>
+<li>Create tests/test_economist_flow.py</li>
+<li>Test 1: Flow initialization and state management</li>
+<li>Test 2: Stage3 crew kickoff via Flow</li>
+<li>Test 3: Stage4 crew routing logic</li>
+<li><strong>Scope reduction</strong>: Integration tests only (no unit tests for individual Flow methods)</li>
+<li>
+<p>DoD: 3+ tests passing, Flow end-to-end validated</p>
+</li>
+<li>
+<p><strong>Task 5: Documentation</strong> (2h → 1.5h, P1)</p>
+</li>
+<li>Create docs/FLOW_ARCHITECTURE.md with Flow class diagram</li>
+<li>Update README.md with Flow usage instructions</li>
+<li>Document @start/@listen pattern for future crew additions</li>
+<li><strong>Scope reduction</strong>: Architecture diagram only (skip detailed API docs)</li>
+<li>
+<p>DoD: FLOW_ARCHITECTURE.md created, README.md updated</p>
+</li>
+<li>
+<p><strong>Task 6: Cleanup WORKFLOW_SEQUENCE</strong> (1h → 0.5h, P2)</p>
+</li>
+<li>Remove WORKFLOW_SEQUENCE dict from scripts/sm_agent.py</li>
+<li>Update any references to use Flow instead</li>
+<li><strong>Scope reduction</strong>: Deprecation notice only (don't remove, keep as fallback)</li>
+<li>DoD: Deprecation notice added, Flow preferred path documented</li>
+</ol>
+<p><strong>ACTUAL SCOPE: 9.5 hours = ~3.4 story points → FITS 3-point cap</strong></p>
+<p><strong>Acceptance Criteria</strong> (5 total):
+- [ ] <strong>AC1</strong>: Given Flow class created, When stage progression occurs, Then transitions use @start/@listen decorators
+- [ ] <strong>AC2</strong>: Given Stage3/Stage4 crews integrated, When Flow executes, Then crews orchestrated by Flow methods (not WORKFLOW_SEQUENCE dict)
+- [ ] <strong>AC3</strong>: Given temperature=0 maintained in Editor, When evaluation occurs, Then deterministic gate scoring preserved
+- [ ] <strong>AC4</strong>: Given quality gate router, When article scored, Then routing logic directs publish/revision path
+- [ ] <strong>AC5</strong>: Given 3+ integration tests, When pytest executed, Then all tests pass validating Flow end-to-end</p>
+<p><strong>Quality Requirements</strong> (6 categories):
+- <strong>Content Quality</strong>: Deterministic routing (no agent autonomy in transitions), state management correctness
+- <strong>Performance</strong>: No latency regression from Flow overhead (&lt;10% increase), memory usage &lt;500MB
+- <strong>Accessibility</strong>: Clear error messages in Flow state transitions (user-readable failures)
+- <strong>SEO</strong>: N/A
+- <strong>Security</strong>: No secrets in Flow state, sanitize inputs before crew kickoff
+- <strong>Maintainability</strong>: Flow unit tests (&gt;80% coverage), FLOW_ARCHITECTURE.md documentation, inline code comments</p>
+<p><strong>Definition of Done</strong>:
+- [ ] All 6 tasks complete with scoped deliverables
+- [ ] Flow.py created with EconomistContentFlow class
+- [ ] Stage3/Stage4 crews execute via Flow (not WORKFLOW_SEQUENCE)
+- [ ] 3+ integration tests passing
+- [ ] FLOW_ARCHITECTURE.md and README.md updated
+- [ ] Code reviewed and merged to main
+- [ ] No regression in article quality (gate pass rate ≥87%)</p>
+<p><strong>Estimated Effort</strong>: 9.5 hours = 3.4 story points → <strong>CAPPED AT 3 POINTS</strong>
+<strong>Priority</strong>: P0 (Architectural foundation, blocks STORY-006/007)
+<strong>Dependencies</strong>: 
+- CrewAI Flow library (crewai&gt;=0.95.0)
+- Existing Stage3Crew (src/crews/stage3_crew.py)
+- Existing Stage4Crew (src/crews/stage4_crew.py)
+- scripts/sm_agent.py (WORKFLOW_SEQUENCE deprecation)</p>
+<p><strong>Risk</strong>:
+- <strong>Breaking Changes</strong>: Flow refactoring could break existing crew behavior (Mitigation: Integration tests, keep WORKFLOW_SEQUENCE as fallback)
+- <strong>Flow Learning Curve</strong>: Team unfamiliar with @start/@listen patterns (Mitigation: Comprehensive docs, reference crewai-economist-agents-mapping.md)
+- <strong>Latency Overhead</strong>: Flow state management may add latency (Mitigation: Performance testing, &lt;10% threshold)</p>
+<hr />
+<h3 id="story-006-establish-style-memory-rag-p1-3-points">STORY-006: Establish Style Memory RAG (P1, 3 points)<a class="headerlink" href="#story-006-establish-style-memory-rag-p1-3-points" title="Permanent link">&para;</a></h3>
+<p><strong>GitHub Issue</strong>: TBD</p>
+<p><strong>Story Goal</strong>: Vector-store with Gold Standard articles from archived/ accessible to Editor Agent for GATE 3 (VOICE) enhancement</p>
+<p><strong>Why Now</strong>:
+- Editor GATE 3 (Voice) relies on prompt-only knowledge (87% pass rate, target 95%)
+- archived/ directory has production-quality articles (Gold Standard examples)
+- RAG retrieval provides concrete style patterns vs abstract rules</p>
+<p><strong>Technical Approach</strong>:
+1. Select vector database (ChromaDB recommended - lightweight, Python-native)
+2. Create embeddings pipeline for archived/*.md articles
+3. Build src/tools/style_memory_tool.py for Editor integration
+4. Integrate tool with Stage4Crew Editor Agent
+5. Implement style query logic with relevance scoring</p>
+<p><strong>Tasks</strong> (15h total ≈ 5-6 points, <strong>SCOPED TO 3 POINTS</strong>):
+1. <strong>Task 1: Vector Database Setup</strong> (4h → 2h, P0)
+   - Install ChromaDB dependency (pip install chromadb)
+   - Create src/rag/chroma_client.py wrapper
+   - Initialize collection "gold_standard_articles"
+   - <strong>Scope reduction</strong>: ChromaDB only (skip FAISS comparison), persistent storage only
+   - DoD: ChromaDB client initialized, collection created, persistent storage configured</p>
+<ol>
+<li><strong>Task 2: Embeddings Pipeline</strong> (4h → 2h, P0)</li>
+<li>Create src/rag/embeddings_pipeline.py</li>
+<li>Load archived/*.md articles (expect 0-10 articles initially)</li>
+<li>Extract text content (strip front matter, metadata)</li>
+<li>Generate embeddings via OpenAI text-embedding-ada-002</li>
+<li>Store embeddings in ChromaDB collection</li>
+<li><strong>Scope reduction</strong>: Batch processing only (no incremental updates), OpenAI embeddings only</li>
+<li>
+<p>DoD: Pipeline script ingests archived/*.md, stores embeddings, handles empty directory</p>
+</li>
+<li>
+<p><strong>Task 3: Style Memory Tool</strong> (3h → 2h, P0)</p>
+</li>
+<li>Create src/tools/style_memory_tool.py (CrewAI tool pattern)</li>
+<li>Implement query() method: semantic search for style examples</li>
+<li>Return top-3 relevant excerpts with relevance scores</li>
+<li><strong>Scope reduction</strong>: Top-3 results only (no configurable k), excerpt length fixed at 200 chars</li>
+<li>
+<p>DoD: Tool accepts query string, returns top-3 excerpts with scores &gt;0.7</p>
+</li>
+<li>
+<p><strong>Task 4: Editor Integration</strong> (2h → 1.5h, P0)</p>
+</li>
+<li>Update src/crews/stage4_crew.py _create_reviewer_agent()</li>
+<li>Add style_memory_tool to Editor agent's tools list</li>
+<li>Update Editor prompt to suggest tool usage for GATE 3 (VOICE)</li>
+<li><strong>Scope reduction</strong>: Prompt enhancement only (don't force tool usage)</li>
+<li>
+<p>DoD: Editor has tool access, prompt suggests usage, tool callable from Editor</p>
+</li>
+<li>
+<p><strong>Task 5: Integration Tests</strong> (3h → 1.5h, P1)</p>
+</li>
+<li>Create tests/test_style_memory_rag.py</li>
+<li>Test 1: Embeddings pipeline ingests archived/ articles</li>
+<li>Test 2: Style query returns relevant results (relevance &gt;0.7)</li>
+<li>Test 3: Editor agent can call style_memory_tool</li>
+<li><strong>Scope reduction</strong>: 3 tests only (skip query performance, edge cases)</li>
+<li>
+<p>DoD: 3+ tests passing, RAG retrieval validated</p>
+</li>
+<li>
+<p><strong>Task 6: Documentation</strong> (2h → 1h, P2)</p>
+</li>
+<li>Create docs/RAG_ARCHITECTURE.md with embeddings pipeline diagram</li>
+<li>Document Gold Standard article selection criteria</li>
+<li>Update README.md with RAG setup instructions</li>
+<li><strong>Scope reduction</strong>: Architecture overview only (skip API docs, troubleshooting)</li>
+<li>DoD: RAG_ARCHITECTURE.md created, README.md updated</li>
+</ol>
+<p><strong>ACTUAL SCOPE: 10 hours = ~3.6 story points → FITS 3-point cap</strong></p>
+<p><strong>Acceptance Criteria</strong> (5 total):
+- [ ] <strong>AC1</strong>: Given vector store populated with archived/<em>.md articles, When Editor evaluates GATE 3 (VOICE), Then style examples retrieved in &lt;500ms
+- [ ] </em><em>AC2</em><em>: Given minimum 1 Gold Standard article indexed, When query executed, Then relevance score &gt;0.7 for top-1 result
+- [ ] </em><em>AC3</em><em>: Given style_memory_tool integrated, When Stage4Crew executes, Then Editor has tool access in tools list
+- [ ] </em><em>AC4</em><em>: Given Editor prompt updated, When GATE 3 evaluation occurs, Then prompt suggests style_memory_tool usage
+- [ ] </em><em>AC5</em>*: Given 3+ integration tests, When pytest executed, Then all tests pass validating RAG retrieval</p>
+<p><strong>Quality Requirements</strong> (6 categories):
+- <strong>Content Quality</strong>: Embedding accuracy &gt;90% (semantic similarity validated), relevance scoring &gt;0.7 threshold
+- <strong>Performance</strong>: Query latency &lt;500ms (95th percentile), index size &lt;100MB, concurrent query support (3+ agents)
+- <strong>Accessibility</strong>: Clear tool descriptions for agent (how to query, what results mean)
+- <strong>SEO</strong>: N/A
+- <strong>Security</strong>: No PII in embeddings, sanitize query inputs, rate limiting on OpenAI API
+- <strong>Maintainability</strong>: Vector store versioning (track embedding model), reindexing process documented, RAG_ARCHITECTURE.md</p>
+<p><strong>Definition of Done</strong>:
+- [ ] All 6 tasks complete with scoped deliverables
+- [ ] ChromaDB initialized with "gold_standard_articles" collection
+- [ ] Embeddings pipeline ingests archived/*.md (handles 0-10 articles)
+- [ ] style_memory_tool.py created and integrated with Editor
+- [ ] 3+ integration tests passing
+- [ ] RAG_ARCHITECTURE.md and README.md updated
+- [ ] Code reviewed and merged to main
+- [ ] No regression in Editor performance (gate pass rate ≥87%)</p>
+<p><strong>Estimated Effort</strong>: 10 hours = 3.6 story points → <strong>CAPPED AT 3 POINTS</strong>
+<strong>Priority</strong>: P1 (Quality enhancement, soft dependency on STORY-005 Flow)
+<strong>Dependencies</strong>:
+- archived/ directory (Gold Standard articles - may be empty initially)
+- Editor Agent in Stage4Crew (src/crews/stage4_crew.py)
+- OpenAI API (text-embedding-ada-002 model)
+- ChromaDB library (pip install chromadb)</p>
+<p><strong>Risk</strong>:
+- <strong>Embedding Quality</strong>: OpenAI embeddings may not capture style nuances (Mitigation: Test with known good/bad style examples)
+- <strong>Relevance Tuning</strong>: 0.7 threshold may need adjustment (Mitigation: Make threshold configurable, validate with real queries)
+- <strong>Storage Costs</strong>: Vector store may grow large (Mitigation: 100MB cap, prune low-relevance entries)
+- <strong>Query Latency</strong>: Cold start performance issues (Mitigation: Pre-warm ChromaDB on startup)
+- <strong>Empty Archive</strong>: archived/ may have 0 articles initially (Mitigation: Graceful degradation, tool returns empty results)</p>
+<hr />
+<h3 id="story-007-implement-roi-telemetry-hook-p2-3-points">STORY-007: Implement ROI Telemetry Hook (P2, 3 points)<a class="headerlink" href="#story-007-implement-roi-telemetry-hook-p2-3-points" title="Permanent link">&para;</a></h3>
+<p><strong>GitHub Issue</strong>: TBD</p>
+<p><strong>Story Goal</strong>: Automated logging of token costs vs human-hour value in logs/execution_roi.json for business ROI validation</p>
+<p><strong>Why Now</strong>:
+- Current ROI claims are anecdotal ("50x faster than human")
+- No telemetry for token costs (can't optimize spend)
+- Need business justification for agentic investment</p>
+<p><strong>Technical Approach</strong>:
+1. Design execution_roi.json schema (similar to agent_metrics.json)
+2. Create src/telemetry/roi_tracker.py middleware
+3. Instrument agent LLM calls in scripts/agent_registry.py
+4. Calculate ROI metrics (token costs, human-hour equivalent, efficiency multiplier)
+5. Build aggregation queries for ROI dashboard</p>
+<p><strong>Tasks</strong> (16h total ≈ 6 points, <strong>SCOPED TO 3 POINTS</strong>):
+1. <strong>Task 1: ROI Schema Design</strong> (2h → 1h, P0)
+   - Design logs/execution_roi.json schema with rotation policy
+   - Define metrics: tokens_used, cost_usd, human_hours_equivalent, roi_multiplier
+   - Document human-hour benchmarks (writing: 2-4h/1000 words, editing: 1-2h/1000 words)
+   - <strong>Scope reduction</strong>: Simple schema only (no rotation policy implementation)
+   - DoD: Schema documented in TELEMETRY_GUIDE.md, sample JSON provided</p>
+<ol>
+<li><strong>Task 2: ROI Tracker Middleware</strong> (3h → 2h, P0)</li>
+<li>Create src/telemetry/roi_tracker.py with ROITracker class</li>
+<li>Implement log_execution() method: write to execution_roi.json</li>
+<li>Calculate cost_usd from token counts (GPT-4: $0.03/1k prompt, $0.06/1k completion)</li>
+<li><strong>Scope reduction</strong>: JSON append only (no rotation, no aggregation)</li>
+<li>
+<p>DoD: ROITracker writes to logs/execution_roi.json, costs calculated correctly</p>
+</li>
+<li>
+<p><strong>Task 3: LLM Call Instrumentation</strong> (3h → 2h, P0)</p>
+</li>
+<li>Update scripts/agent_registry.py get_agent() method</li>
+<li>Wrap LLM client with ROI tracking (token counting hook)</li>
+<li>Log token usage after each agent execution</li>
+<li><strong>Scope reduction</strong>: Track writer/editor agents only (skip research/graphics)</li>
+<li>
+<p>DoD: Writer/Editor agent calls logged to execution_roi.json with token counts</p>
+</li>
+<li>
+<p><strong>Task 4: ROI Calculation Logic</strong> (2h → 1.5h, P1)</p>
+</li>
+<li>Implement calculate_roi_multiplier() method in ROITracker</li>
+<li>Formula: roi_multiplier = human_hours_equivalent / (cost_usd / $50_per_hour)</li>
+<li>Example: 2.5h human work, $0.046 cost → 2.5 / ($0.046/$50) = 2717x efficiency</li>
+<li><strong>Scope reduction</strong>: Simple formula only (no confidence intervals, edge cases)</li>
+<li>
+<p>DoD: ROI multiplier calculated, example validation test passing</p>
+</li>
+<li>
+<p><strong>Task 5: Integration Tests</strong> (2h → 1.5h, P1)</p>
+</li>
+<li>Create tests/test_roi_telemetry.py</li>
+<li>Test 1: ROI tracking logs token usage correctly</li>
+<li>Test 2: Cost calculation matches model pricing</li>
+<li>Test 3: ROI multiplier formula validates with known examples</li>
+<li><strong>Scope reduction</strong>: 3 tests only (skip aggregation, rotation tests)</li>
+<li>
+<p>DoD: 3+ tests passing, ROI calculation validated</p>
+</li>
+<li>
+<p><strong>Task 6: Documentation</strong> (2h → 1h, P2)</p>
+</li>
+<li>Create docs/TELEMETRY_GUIDE.md with ROI schema and examples</li>
+<li>Document human-hour benchmarks and assumptions</li>
+<li>Update README.md with telemetry setup instructions</li>
+<li><strong>Scope reduction</strong>: Guide only (skip dashboard UI, troubleshooting)</li>
+<li>DoD: TELEMETRY_GUIDE.md created, README.md updated</li>
+</ol>
+<p><strong>ACTUAL SCOPE: 9 hours = ~3.2 story points → FITS 3-point cap</strong></p>
+<p><strong>Acceptance Criteria</strong> (5 total):
+- [ ] <strong>AC1</strong>: Given LLM calls instrumented, When agent executes, Then execution_roi.json logs token usage with &lt;10ms overhead
+- [ ] <strong>AC2</strong>: Given model pricing data, When costs calculated, Then accuracy within 1% of actual API charges
+- [ ] <strong>AC3</strong>: Given human-hour benchmarks, When ROI calculated, Then multiplier shows efficiency gain (&gt;100x expected)
+- [ ] <strong>AC4</strong>: Given writer/editor tracked, When articles generated, Then logs contain per-agent token breakdowns
+- [ ] <strong>AC5</strong>: Given 3+ integration tests, When pytest executed, Then all tests pass validating telemetry accuracy</p>
+<p><strong>Quality Requirements</strong> (6 categories):
+- <strong>Content Quality</strong>: Accurate cost calculation per model (GPT-4, GPT-3.5), human-hour benchmarks validated against real data
+- <strong>Performance</strong>: Minimal overhead &lt;10ms per LLM call, async logging (non-blocking), log file size &lt;50MB
+- <strong>Accessibility</strong>: N/A
+- <strong>SEO</strong>: N/A
+- <strong>Security</strong>: No PII in logs, no API keys logged, sanitize agent inputs/outputs in logs
+- <strong>Maintainability</strong>: Log rotation (30-day retention), aggregation queries documented in TELEMETRY_GUIDE.md, human-hour benchmarks documented</p>
+<p><strong>Definition of Done</strong>:
+- [ ] All 6 tasks complete with scoped deliverables
+- [ ] ROITracker class created in src/telemetry/roi_tracker.py
+- [ ] Writer/Editor agents instrumented for token tracking
+- [ ] execution_roi.json logs token usage, costs, ROI multiplier
+- [ ] 3+ integration tests passing
+- [ ] TELEMETRY_GUIDE.md and README.md updated
+- [ ] Code reviewed and merged to main
+- [ ] No performance regression (LLM calls &lt;10ms overhead)</p>
+<p><strong>Estimated Effort</strong>: 9 hours = 3.2 story points → <strong>CAPPED AT 3 POINTS</strong>
+<strong>Priority</strong>: P2 (Observability/measurement, no blockers, parallel work)
+<strong>Dependencies</strong>:
+- scripts/agent_registry.py (LLM client instrumentation point)
+- logs/ directory (write permissions)
+- Model pricing data (GPT-4: $0.03/$0.06, GPT-3.5: $0.0015/$0.002)
+- Human-hour benchmarks (writing: 2-4h/1000 words, editing: 1-2h/1000 words)</p>
+<p><strong>Risk</strong>:
+- <strong>Performance Overhead</strong>: Logging may slow LLM calls (Mitigation: Async logging, &lt;10ms threshold)
+- <strong>Cost Calculation Accuracy</strong>: Pricing changes frequently (Mitigation: Configurable pricing, document update process)
+- <strong>Human-Hour Assumptions</strong>: Benchmarks vary by writer (Mitigation: Conservative estimates, document assumptions)
+- <strong>Log File Growth</strong>: execution_roi.json may grow unbounded (Mitigation: 30-day rotation policy, defer to future story)</p>
+<hr />
+<h2 id="sprint-planning">Sprint Planning<a class="headerlink" href="#sprint-planning" title="Permanent link">&para;</a></h2>
+<h3 id="sprint-13-capacity">Sprint 13 Capacity<a class="headerlink" href="#sprint-13-capacity" title="Permanent link">&para;</a></h3>
+<p><strong>Total Capacity</strong>: 13 story points
+<strong>Planned Allocation</strong>: 9 points (3 stories × 3 points each)
+<strong>Buffer</strong>: 4 points (31% reserve for quality/unknowns)</p>
+<p><strong>Story Sequence</strong>:
+1. STORY-005 (3 pts, P0) - Week 1 focus (architectural foundation)
+2. STORY-006 (3 pts, P1) - Week 1-2 parallel (RAG system, soft dependency on STORY-005)
+3. STORY-007 (3 pts, P2) - Week 1-2 parallel (telemetry, no dependencies)</p>
+<p><strong>Parallel Execution</strong>:
+- STORY-005 and STORY-007 can run in parallel (no dependencies)
+- STORY-006 should start after STORY-005 kickoff (benefits from Flow architecture)
+- All 3 stories can overlap if team capacity allows (2-3 developers)</p>
+<h3 id="definition-of-ready-dor-validation">Definition of Ready (DoR) Validation<a class="headerlink" href="#definition-of-ready-dor-validation" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[x] <strong>Story written</strong>: All 3 stories documented with clear goals</li>
+<li>[x] <strong>Acceptance criteria defined</strong>: 5 ACs per story in Given/When/Then format</li>
+<li>[x] <strong>Quality requirements specified</strong>: 6 categories (content, performance, accessibility, SEO, security, maintainability)</li>
+<li>[x] <strong>Three Amigos review</strong>: Dev (architectural validation), QA (testability), Product (business value)</li>
+<li>[x] <strong>Technical prerequisites validated</strong>: CrewAI 0.95.0+, ChromaDB, OpenAI API, archived/ directory</li>
+<li>[x] <strong>Dependencies identified</strong>: STORY-005 → STORY-006 soft dependency, STORY-007 independent</li>
+<li>[x] <strong>Risks documented</strong>: Breaking changes, learning curve, latency, quality regressions</li>
+<li>[x] <strong>Story points estimated</strong>: 3 pts each (9 pts total), 2.8h/pt = 25.2h total</li>
+<li>[x] <strong>Definition of Done agreed</strong>: Tests passing, docs updated, code reviewed, no regressions</li>
+</ul>
+<p><strong>DoR Status</strong>: ✅ ALL CRITERIA MET - Ready for Sprint 13 kickoff</p>
+<hr />
+<h2 id="success-metrics">Success Metrics<a class="headerlink" href="#success-metrics" title="Permanent link">&para;</a></h2>
+<h3 id="story-005-success-criteria">STORY-005 Success Criteria<a class="headerlink" href="#story-005-success-criteria" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Flow-based orchestration operational (0 WORKFLOW_SEQUENCE references)</li>
+<li>3+ integration tests passing</li>
+<li>No regression in article quality (gate pass rate ≥87%)</li>
+<li>FLOW_ARCHITECTURE.md completed</li>
+</ul>
+<h3 id="story-006-success-criteria">STORY-006 Success Criteria<a class="headerlink" href="#story-006-success-criteria" title="Permanent link">&para;</a></h3>
+<ul>
+<li>RAG system retrieves style examples (query latency &lt;500ms)</li>
+<li>Editor has style_memory_tool access</li>
+<li>3+ integration tests passing</li>
+<li>RAG_ARCHITECTURE.md completed</li>
+</ul>
+<h3 id="story-007-success-criteria">STORY-007 Success Criteria<a class="headerlink" href="#story-007-success-criteria" title="Permanent link">&para;</a></h3>
+<ul>
+<li>execution_roi.json logs token costs accurately (±1% error)</li>
+<li>ROI multiplier calculated (expect &gt;100x human efficiency)</li>
+<li>3+ integration tests passing</li>
+<li>TELEMETRY_GUIDE.md completed</li>
+</ul>
+<h3 id="epic-success-criteria">Epic Success Criteria<a class="headerlink" href="#epic-success-criteria" title="Permanent link">&para;</a></h3>
+<ul>
+<li>All 3 stories complete (9 story points delivered)</li>
+<li>No regressions in existing functionality</li>
+<li>Business ROI validated (telemetry shows &gt;100x efficiency)</li>
+<li>Architecture modernized (Flow-based, RAG-enabled, telemetry-instrumented)</li>
+</ul>
+<hr />
+<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Create GitHub Issues</strong>: Create issues for STORY-005/006/007, get issue numbers</li>
+<li><strong>Update SPRINT.md</strong>: Add epic section and 3 stories to Sprint 13 backlog</li>
+<li><strong>Update sprint_tracker.json</strong>: Add Sprint 13 with planned_stories array</li>
+<li><strong>Sprint Kickoff</strong>: Begin STORY-005 implementation (Flow architecture foundation)</li>
+<li><strong>Parallel Work</strong>: Start STORY-007 (telemetry) in parallel with STORY-005</li>
+</ol>
+<hr />
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../crewai-economist-agents-mapping/">CrewAI Economist-Agents Mapping</a> - Flow architecture guidance</li>
+<li><a href="../AGENT_VELOCITY_ANALYSIS/">Agent Velocity Analysis</a> - 2.8h/point estimation model</li>
+<li><a href="../SPRINT_CEREMONY_GUIDE/">Sprint Ceremony Guide</a> - DoR/DoD checklist</li>
+<li><a href="../SCRUM_MASTER_PROTOCOL/">Scrum Master Protocol</a> - Process discipline</li>
+<li><a href="../TEST_GAP_REPORT/">Test Gap Report</a> - Integration test patterns</li>
+<li>CrewAI Flows Documentation: https://docs.crewai.com/concepts/flows</li>
+</ul>
+<hr />
+<p><strong>Document Version</strong>: 1.0
+<strong>Last Updated</strong>: 2026-01-04
+<strong>Author</strong>: @scrum-master
+<strong>Status</strong>: READY FOR SPRINT 13 KICKOFF</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -569,10 +569,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#performance-linked-feedback-planned" class="md-nav__link">
+  <a href="#performance-linked-feedback" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Performance-Linked Feedback (Planned)
+        Performance-Linked Feedback
       
     </span>
   </a>
@@ -2391,10 +2391,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#performance-linked-feedback-planned" class="md-nav__link">
+  <a href="#performance-linked-feedback" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Performance-Linked Feedback (Planned)
+        Performance-Linked Feedback
       
     </span>
   </a>
@@ -2446,7 +2446,7 @@
 <a class="md-button" href="https://github.com/oviney/economist-agents">View on GitHub</a></p>
 <hr />
 <h2 id="architecture-overview">Architecture Overview<a class="headerlink" href="#architecture-overview" title="Permanent link">&para;</a></h2>
-<p>The content pipeline flows from topic discovery to deployment, with a planned performance feedback loop (ADR-002) that will inform future topic selection.</p>
+<p>The content pipeline flows from topic discovery to deployment, with a performance feedback loop (<a href="adr/0007-content-intelligence-engine/">ADR-0007</a>) that informs future topic selection from real blog audience data.</p>
 <pre class="mermaid"><code>graph TD
     A[Scout] --&gt;|trending topics| B[Editorial Board]
     B --&gt;|approved topic| C[Researcher]
@@ -2456,7 +2456,7 @@
     F --&gt;|5-gate review| G{Pass?}
     G --&gt;|score &gt;= 80| H[Publisher]
     G --&gt;|score &lt; 80| D</code></pre>
-<p>Once published, the <strong>Content Intelligence Engine</strong> (<a href="adr/0007-content-intelligence-engine/">ADR-0007</a>, planned) will close the loop: analytics data flows from GA4 and Search Console into the Analyst agent, which scores performance and surfaces content gaps back to the Scout.</p>
+<p>Once published, the <strong>Content Intelligence Engine</strong> (<a href="adr/0007-content-intelligence-engine/">ADR-0007</a>) closes the loop: GA4 analytics data flows into <code>scripts/content_intelligence.py</code>, which aggregates top and bottom performers by composite engagement score and injects the context back into Topic Scout. Search Console data will be wired in once the property finishes its 24-48h population period.</p>
 <pre class="mermaid"><code>graph LR
     H[Published Article] --&gt;|pageviews, CTR, engagement| I[GA4 / GSC]
     I --&gt;|raw metrics| J[Analyst]
@@ -2577,8 +2577,8 @@
 <p>Articles pass a 5-gate editorial review (opening, evidence, voice, structure, visual). Code requires &gt;80% test coverage, type hints, and docstrings. The Definition of Ready enforces an 8-point checklist before any story enters a sprint.</p>
 <h3 id="agent-governance">Agent Governance<a class="headerlink" href="#agent-governance" title="Permanent link">&para;</a></h3>
 <p><a href="adr/0008-agent-skill-governance/">ADR-0008</a> defines the delegation matrix: which agents can invoke which tools, model tier assignments (Opus for quality-critical, Haiku for mechanical), and budget caps per invocation to prevent runaway costs.</p>
-<h3 id="performance-linked-feedback-planned">Performance-Linked Feedback (Planned)<a class="headerlink" href="#performance-linked-feedback-planned" title="Permanent link">&para;</a></h3>
-<p>The Content Intelligence Engine (<a href="adr/0007-content-intelligence-engine/">ADR-0007</a>) will connect GA4 and Google Search Console to the pipeline, so that articles with low engagement signal content gaps and high-performing topics inform future editorial direction. Sprint 20 landed the GA4/GSC ETL scripts (<code>scripts/ga4_etl.py</code>, <code>scripts/gsc_etl.py</code>); the next step is wiring their output into the topic selection flow. See <a href="adr/0007-content-intelligence-engine/">ADR-0007</a> for the full design.</p>
+<h3 id="performance-linked-feedback">Performance-Linked Feedback<a class="headerlink" href="#performance-linked-feedback" title="Permanent link">&para;</a></h3>
+<p>The Content Intelligence Engine (<a href="adr/0007-content-intelligence-engine/">ADR-0007</a>, Accepted 2026-04-06) connects GA4 audience data to topic selection. <code>scripts/ga4_etl.py</code> pulls real article performance metrics into <code>data/performance.db</code>; <code>scripts/content_intelligence.py</code> aggregates top and bottom performers; and <code>scripts/topic_scout.py</code> injects that context into the LLM prompt so the Scout explicitly builds on what's working and reframes what isn't. Google Search Console keyword data will be added once the property finishes its 24-48h population period. A/B verification (<a href="https://github.com/oviney/economist-agents/pull/184">PR #184</a>) confirmed the loop is causally real (Jaccard 0.111 vs threshold 0.6; all 5 Run A topics explicitly reference top performers).</p>
 <hr />
 <h2 id="quick-links">Quick Links<a class="headerlink" href="#quick-links" title="Permanent link">&para;</a></h2>
 <div class="grid cards">

@@ -2805,11 +2805,37 @@
 
 
 <h1 id="adr-0007-content-intelligence-engine-closing-the-feedback-loop">ADR-0007: Content Intelligence Engine — Closing the Feedback Loop<a class="headerlink" href="#adr-0007-content-intelligence-engine-closing-the-feedback-loop" title="Permanent link">&para;</a></h1>
-<p><strong>Status:</strong> Proposed
-<strong>Date:</strong> 2026-04-05
+<p><strong>Status:</strong> Accepted
+<strong>Date:</strong> 2026-04-05 (Accepted: 2026-04-06)
 <strong>Decision Maker:</strong> Ouray Viney (Engineering Lead)
 <strong>Research:</strong> Four parallel agents covering content intelligence platforms, sentiment-driven content, Google Analytics APIs, and current pipeline audit</p>
 <blockquote>
+<p><strong>Acceptance record (2026-04-06):</strong> Transitioned from Proposed to
+Accepted after Sprint 22 delivered the feedback loop end-to-end and
+produced evidence via three verification scripts:</p>
+<ul>
+<li><strong>PR #184</strong> (<code>scripts/ab_topic_scout_comparison.py</code>) — A/B
+  comparison shows Topic Scout with vs. without the performance
+  context produces substantially different topics: Jaccard similarity
+  0.111 (threshold 0.6), all 5 Run A topics explicitly reference top
+  performers from the GA4 database. <strong>Causal effect confirmed.</strong></li>
+<li><strong>PR #185</strong> (<code>scripts/audit_composite_scores.py</code>) — methodology
+  audit caught the "30% dead weight" problem (two GSC placeholder
+  terms weighted 0.15 each, set to 0.0). Resolved by Story #187
+  which introduced <code>COMPOSITE_WEIGHTS_ACTIVE</code> — a renormalized
+  four-dimension subset that sums to 1.0 while preserving canonical
+  proportions. Max achievable score is now 1.0 (was 0.70).</li>
+<li><strong>PR #186</strong> (<code>scripts/topic_scout_reproducibility.py</code>) — 3-run
+  reproducibility check. The exact-title Jaccard metric flagged
+  "UNSTABLE" but qualitative inspection showed strong thematic
+  stability across runs (all three converged on AI testing
+  economics / maintenance burden / ROI skepticism). The metric
+  itself is being refined in Story #188 to measure thematic rather
+  than lexical similarity.</li>
+</ul>
+<p>All three scripts are merged to main with 110 tests passing
+(29 + 35 + 46). The full regression suite at acceptance is 1038
+tests passing, 1 skipped.</p>
 <p><strong>Interim re-weighting note (2026-04-06, Story #187):</strong> The composite
 scoring formula defined in this ADR has six weighted terms that sum
 to 1.0. Two of those terms (<code>search_ctr</code>, <code>search_impressions</code>, 0.15

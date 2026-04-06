@@ -64,6 +64,7 @@ repos:
       - id: check-yaml
         name: check yaml
         description: Validate YAML files
+        args: [--unsafe]  # Allow custom tags like mkdocs !!python/name:
 
       - id: check-json
         name: check json

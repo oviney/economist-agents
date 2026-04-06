@@ -20,3 +20,6 @@ requests>=2.31.0         # HTTP requests for image generation
 arxiv>=2.1.0             # arXiv API for cutting-edge research papers
 feedparser>=6.0.0        # RSS feed parsing for additional research sources
 mcp>=1.0.0               # Model Context Protocol SDK (FastMCP server)
+google-analytics-data>=0.18.0  # GA4 Data API (ADR-002 MEASURE layer)
+google-auth>=2.0.0             # Google service account authentication
+google-api-python-client>=2.0.0  # Google Search Console API

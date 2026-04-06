@@ -21,6 +21,14 @@ output/
 .env
 *.key
 *_API_KEY*
+*.json.bak
+*-sa.json
+
+# Google credentials
+.google/
+
+# Local data (SQLite, performance metrics)
+data/
 
 # OS
 .DS_Store
@@ -38,3 +46,15 @@ Thumbs.db
 # Runtime logs (written by ROI tracker and tests — should not be tracked)
 logs/execution_roi.json
 logs/quality_dashboard.json
+
+# Playwright MCP artifacts
+.playwright-mcp/
+
+# MkDocs build output
+site/
+
+# Screenshot artifacts
+ga4-*.png
+search-console-*.png
+analytics-tab.png
+

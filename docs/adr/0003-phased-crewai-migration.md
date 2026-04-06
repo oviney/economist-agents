@@ -1,9 +1,18 @@
-# ADR-003: Phased CrewAI Migration Strategy
+# ADR-0003: Phased CrewAI Migration Strategy
 
-**Status:** Proposed
+**Status:** Superseded by [ADR-0006](0006-agent-framework-selection.md) as of 2026-04-05
 **Date:** 2026-01-01
 **Deciders:** Ouray Viney (Agentic AI Architect)
-**Dependencies:** ADR-001, ADR-002
+**Dependencies:** ADR-0001, ADR-0002
+
+> **Supersession note (2026-04-05):** This ADR proposed phased migration
+> *to* CrewAI. Three months of operational experience and the maturation
+> of the Anthropic Agent SDK and MCP ecosystem changed the cost/benefit
+> calculus. CrewAI's pre-1.0 patterns proved a liability in Sprints
+> 16-20. The replacement decision is captured in
+> [ADR-0006: Agent Framework Selection](0006-agent-framework-selection.md).
+> This ADR is preserved for historical context — do not apply its
+> recommendations.
 
 ## Context
 

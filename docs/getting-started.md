@@ -8,10 +8,10 @@ Generate your first Economist-style article in 5 minutes.
 
 | Requirement | Details |
 |-------------|---------|
-| **Python** | 3.11, 3.12, or 3.13 (3.14 is not yet supported — see [ADR-004](ADR-004-python-version-constraint.md)) |
+| **Python** | 3.11, 3.12, or 3.13 (3.14 is not yet supported — see [ADR-0004](adr/0004-python-version-constraint.md)) |
 | **OpenAI API key** | Required for LLM calls and DALL-E image generation |
 | **Serper API key** | Optional — enables web search for the Research agent |
-| **Google credentials** | Optional — service account JSON for GA4/GSC analytics (ADR-002) |
+| **Google credentials** | Optional — service account JSON for GA4/GSC analytics (ADR-0007) |
 
 ---
 
@@ -122,8 +122,8 @@ Skills are versioned alongside the codebase and referenced in the agent registry
 
 - **[Agent Registry](agent-registry-spec.md)** — Full specification of all 12 agents, their skills, MCP tools, and model tiers
 - **[Flow Architecture](FLOW_ARCHITECTURE.md)** — Deep dive into the CrewAI Flow state machine
-- **[ADR-001: Agent Framework Selection](adr/ADR-001-agent-framework-selection.md)** — Why Claude Code sub-agents replaced CrewAI agents
-- **[ADR-002: Content Intelligence Engine](adr/ADR-002-content-intelligence-engine.md)** — GA4/GSC feedback loop architecture
-- **[ADR-003: Agent Skill Governance](adr/ADR-003-agent-skill-governance.md)** — Delegation matrix and budget controls
+- **[ADR-0006: Agent Framework Selection](adr/0006-agent-framework-selection.md)** — Why Claude Code sub-agents replaced CrewAI agents (supersedes ADR-0003)
+- **[ADR-0007: Content Intelligence Engine](adr/0007-content-intelligence-engine.md)** — GA4/GSC feedback loop architecture
+- **[ADR-0008: Agent Skill Governance](adr/0008-agent-skill-governance.md)** — Delegation matrix and budget controls
 - **[Workflow Guide](guides/WORKFLOW_GUIDE.md)** — Day-to-day development workflows
 - **[Blog Deployment Guide](guides/BLOG_DEPLOYMENT.md)** — How articles get deployed to the live site

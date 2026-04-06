@@ -1,9 +1,17 @@
-# ADR-001: Agent Framework Selection for Autonomous Content Pipeline
+# ADR-0006: Agent Framework Selection for Autonomous Content Pipeline
 
 **Status:** Proposed
 **Date:** 2026-04-05
 **Decision Maker:** Ouray Viney (Engineering Lead)
 **Research:** Four parallel research agents covering Anthropic Agent SDK, MCP Protocol, CrewAI current state, and existing tool stack fit
+**Supersedes:** [ADR-0003: Phased CrewAI Migration Strategy](0003-phased-crewai-migration.md)
+
+> **Supersession note:** This ADR supersedes ADR-0003 (January 2026),
+> which proposed phased migration *to* CrewAI. The context changed:
+> Anthropic Agent SDK and MCP matured between Jan and Apr 2026, and
+> CrewAI's pre-1.0 patterns proved a liability across Sprints 16-20
+> (brittle tool wrappers, manual invocation, no built-in quality gates).
+> This ADR re-evaluates the framework question from scratch.
 
 ---
 

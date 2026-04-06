@@ -34,19 +34,20 @@ Welcome to the documentation for the Economist-Agents project -- a multi-agent c
 
 ## Architecture & Design
 
-### Architecture Decision Records (ADRs)
+### Architecture Decision Records
 
-#### Current ADRs (docs/adr/)
-- **[ADR-001: Agent Framework Selection](adr/ADR-001-agent-framework-selection.md)** - Framework choice and rationale
-- **[ADR-002: Content Intelligence Engine](adr/ADR-002-content-intelligence-engine.md)** - GA4/GSC analytics pipeline, sentiment analysis, dedup, content gaps
-- **[ADR-003: Agent Skill Governance](adr/ADR-003-agent-skill-governance.md)** - Skill lifecycle, ownership, quality standards
+All ADRs live in `docs/adr/` with a single global MADR numbering sequence. See [skills/adr-governance](../skills/adr-governance/SKILL.md) for the rules. Consolidated from three competing directories in Sprint 21 (Story #177).
 
-#### Legacy ADRs (docs/)
-- **[ADR-001: Agent Configuration Extraction](ADR-001-agent-configuration-extraction.md)**
-- **[ADR-002: Agent Registry Pattern](ADR-002-agent-registry-pattern.md)**
-- **[ADR-003: CrewAI Migration Strategy](ADR-003-crewai-migration-strategy.md)**
-- **[ADR-004: Python Version Constraint](ADR-004-python-version-constraint.md)**
-- **[ADR-005: Agile Discipline Enforcement](ADR-005-agile-discipline-enforcement.md)**
+- **[ADR-0001: Extract Agent Definitions to YAML](adr/0001-extract-agent-definitions-to-yaml.md)** — Accepted
+- **[ADR-0002: Agent Registry Pattern](adr/0002-agent-registry-pattern.md)** — Accepted
+- **[ADR-0003: Phased CrewAI Migration](adr/0003-phased-crewai-migration.md)** — **Superseded by ADR-0006**
+- **[ADR-0004: Python Version Constraint](adr/0004-python-version-constraint.md)** — Accepted
+- **[ADR-0005: Agile Discipline Enforcement](adr/0005-agile-discipline-enforcement.md)** — Accepted
+- **[ADR-0006: Agent Framework Selection](adr/0006-agent-framework-selection.md)** — Proposed (supersedes ADR-0003)
+- **[ADR-0007: Content Intelligence Engine](adr/0007-content-intelligence-engine.md)** — Proposed
+- **[ADR-0008: Agent Skill Governance](adr/0008-agent-skill-governance.md)** — Proposed
+
+Use [docs/adr/TEMPLATE.md](adr/TEMPLATE.md) when writing a new ADR.
 
 ### System Architecture
 - **[Flow-Based Orchestration](FLOW_ARCHITECTURE.md)** - Deterministic state-machine design
@@ -60,6 +61,7 @@ Welcome to the documentation for the Economist-Agents project -- a multi-agent c
 
 ### Agent Skills
 - **[Agent Delegation](../skills/agent-delegation/SKILL.md)** - Cross-agent task routing and delegation
+- **[ADR Governance](../skills/adr-governance/SKILL.md)** - ADR numbering, supersession, and lifecycle rules
 - **[MCP Development](../skills/mcp-development/SKILL.md)** - Model Context Protocol server development patterns
 - **[Research Sourcing](../skills/research-sourcing/SKILL.md)** - Data verification and sourcing
 - **[Economist Writing](../skills/economist-writing/SKILL.md)** - Economist-style article drafting
@@ -137,8 +139,8 @@ Welcome to the documentation for the Economist-Agents project -- a multi-agent c
 2. [CI/CD Guide](guides/CI_MONITORING_GUIDE.md) -- [Deployment](guides/BLOG_DEPLOYMENT.md) -- [Validation](guides/VALIDATION_QUICK_REF.md)
 
 ### For Architects
-1. [ADR-001 Framework](adr/ADR-001-agent-framework-selection.md) -- [ADR-002 Content Intelligence](adr/ADR-002-content-intelligence-engine.md) -- [ADR-003 Skill Governance](adr/ADR-003-agent-skill-governance.md)
-2. [Flow Architecture](FLOW_ARCHITECTURE.md) -- [Context System](CREWAI_CONTEXT_ARCHITECTURE.md) -- [Architecture Patterns](ARCHITECTURE_PATTERNS.md)
+1. [ADR-0006 Framework](adr/0006-agent-framework-selection.md) — [ADR-0007 Content Intelligence](adr/0007-content-intelligence-engine.md) — [ADR-0008 Skill Governance](adr/0008-agent-skill-governance.md)
+2. [Flow Architecture](FLOW_ARCHITECTURE.md) — [Context System](CREWAI_CONTEXT_ARCHITECTURE.md) — [Architecture Patterns](ARCHITECTURE_PATTERNS.md)
 
 ### For Project Managers
 1. [Current Sprint](../SPRINT.md) -- [Sprint Archive](archive/sprints/) -- [Story Archive](archive/stories/)

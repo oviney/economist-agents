@@ -67,14 +67,18 @@ nav:
     - Architecture Review Process: ARCHITECTURE_REVIEW_PROCESS.md
 
   - ADRs:
-    - ADR-001 — Agent Framework Selection: adr/ADR-001-agent-framework-selection.md
-    - ADR-002 — Content Intelligence Engine: adr/ADR-002-content-intelligence-engine.md
-    - ADR-003 — Agent Skill Governance: adr/ADR-003-agent-skill-governance.md
-    - ADR-004 — Python Version Constraint: ADR-004-python-version-constraint.md
-    - ADR-005 — Agile Discipline Enforcement: ADR-005-agile-discipline-enforcement.md
+    - ADR-0001 — Extract Agent Definitions to YAML: adr/0001-extract-agent-definitions-to-yaml.md
+    - ADR-0002 — Agent Registry Pattern: adr/0002-agent-registry-pattern.md
+    - ADR-0003 — Phased CrewAI Migration (Superseded): adr/0003-phased-crewai-migration.md
+    - ADR-0004 — Python Version Constraint: adr/0004-python-version-constraint.md
+    - ADR-0005 — Agile Discipline Enforcement: adr/0005-agile-discipline-enforcement.md
+    - ADR-0006 — Agent Framework Selection: adr/0006-agent-framework-selection.md
+    - ADR-0007 — Content Intelligence Engine: adr/0007-content-intelligence-engine.md
+    - ADR-0008 — Agent Skill Governance: adr/0008-agent-skill-governance.md
 
   - Skills:
     - Agent Delegation: skills/agent-delegation/SKILL.md
+    - ADR Governance: skills/adr-governance/SKILL.md
     - Research Sourcing: skills/research-sourcing/SKILL.md
     - Economist Writing: skills/economist-writing/SKILL.md
     - Editorial Illustration: skills/editorial-illustration/SKILL.md

@@ -1,9 +1,9 @@
-# ADR-003: Agent Skill Governance — Delegation, Lifecycle, and Marketplace
+# ADR-0008: Agent Skill Governance — Delegation, Lifecycle, and Marketplace
 
 **Status:** Proposed
 **Date:** 2026-04-05
 **Decision Maker:** Ouray Viney (Engineering Lead)
-**Research:** Operational experience from Sprints 16-20 across Claude Code, GitHub Copilot, and Claude sub-agents; ADR-001 agent framework; ADR-002 content intelligence engine
+**Research:** Operational experience from Sprints 16-20 across Claude Code, GitHub Copilot, and Claude sub-agents; [ADR-0006](0006-agent-framework-selection.md) agent framework; [ADR-0007](0007-content-intelligence-engine.md) content intelligence engine
 
 ---
 

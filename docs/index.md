@@ -30,7 +30,7 @@ graph TD
     G -->|score < 80| D
 ```
 
-Once published, the **Content Intelligence Engine** (ADR-002, planned) will close the loop: analytics data flows from GA4 and Search Console into the Analyst agent, which scores performance and surfaces content gaps back to the Scout.
+Once published, the **Content Intelligence Engine** ([ADR-0007](adr/0007-content-intelligence-engine.md), planned) will close the loop: analytics data flows from GA4 and Search Console into the Analyst agent, which scores performance and surfaces content gaps back to the Scout.
 
 ```mermaid
 graph LR
@@ -74,11 +74,11 @@ See the full [Agent Registry Specification](agent-registry-spec.md) for skills, 
 !!! info "Deterministic Scoring"
     The Article Evaluator MCP server scores articles against fixed rubrics so that quality measurement is reproducible. The revision loop catches issues before they reach production.
 
-!!! example "15 Skills Codified"
-    From research sourcing to sprint management, each agent's standards are captured as versioned skill definitions that serve as system prompt context.
+!!! example "16 Skills Codified"
+    From research sourcing to ADR governance, each agent's standards are captured as versioned skill definitions that serve as system prompt context.
 
-!!! note "3 Canonical ADRs"
-    Architectural Decision Records govern the big calls: [ADR-001](adr/ADR-001-agent-framework-selection.md) agent framework selection, [ADR-002](adr/ADR-002-content-intelligence-engine.md) content intelligence engine, and [ADR-003](adr/ADR-003-agent-skill-governance.md) agent skill governance.
+!!! note "8 Canonical ADRs"
+    Architectural Decision Records govern the big calls. Latest: [ADR-0006](adr/0006-agent-framework-selection.md) agent framework selection, [ADR-0007](adr/0007-content-intelligence-engine.md) content intelligence engine, and [ADR-0008](adr/0008-agent-skill-governance.md) agent skill governance.
 
 </div>
 
@@ -87,16 +87,16 @@ See the full [Agent Registry Specification](agent-registry-spec.md) for skills, 
 ## Engineering Principles
 
 ### Sprint Discipline
-All work is tracked in GitHub issues with story points, acceptance criteria, and sprint milestones. No ad-hoc changes — every modification flows through the backlog. See [ADR-005](ADR-005-agile-discipline-enforcement.md).
+All work is tracked in GitHub issues with story points, acceptance criteria, and sprint milestones. No ad-hoc changes — every modification flows through the backlog. See [ADR-0005](adr/0005-agile-discipline-enforcement.md).
 
 ### Quality Gates
 Articles pass a 5-gate editorial review (opening, evidence, voice, structure, visual). Code requires >80% test coverage, type hints, and docstrings. The Definition of Ready enforces an 8-point checklist before any story enters a sprint.
 
 ### Agent Governance
-[ADR-003](adr/ADR-003-agent-skill-governance.md) defines the delegation matrix: which agents can invoke which tools, model tier assignments (Opus for quality-critical, Haiku for mechanical), and budget caps per invocation to prevent runaway costs.
+[ADR-0008](adr/0008-agent-skill-governance.md) defines the delegation matrix: which agents can invoke which tools, model tier assignments (Opus for quality-critical, Haiku for mechanical), and budget caps per invocation to prevent runaway costs.
 
 ### Performance-Linked Feedback (Planned)
-The Content Intelligence Engine (ADR-002) will connect GA4 and Google Search Console to the pipeline, so that articles with low engagement signal content gaps and high-performing topics inform future editorial direction. Sprint 20 landed the GA4/GSC ETL scripts (`scripts/ga4_etl.py`, `scripts/gsc_etl.py`); the next step is wiring their output into the topic selection flow. See [ADR-002](adr/ADR-002-content-intelligence-engine.md) for the full design.
+The Content Intelligence Engine ([ADR-0007](adr/0007-content-intelligence-engine.md)) will connect GA4 and Google Search Console to the pipeline, so that articles with low engagement signal content gaps and high-performing topics inform future editorial direction. Sprint 20 landed the GA4/GSC ETL scripts (`scripts/ga4_etl.py`, `scripts/gsc_etl.py`); the next step is wiring their output into the topic selection flow. See [ADR-0007](adr/0007-content-intelligence-engine.md) for the full design.
 
 ---
 
@@ -118,7 +118,7 @@ The Content Intelligence Engine (ADR-002) will connect GA4 and Google Search Con
 
     Architectural decision records covering framework selection, content intelligence engine, and agent skill governance.
 
-    [View ADRs →](adr/ADR-001-agent-framework-selection.md)
+    [View ADRs →](adr/0006-agent-framework-selection.md)
 
 - __Skills__
 

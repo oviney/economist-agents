@@ -57,6 +57,16 @@ repos:
         files: ^(README\.md|quality_score\.json|skills/sprint_tracker\.json|.*_badge\.json)$
         always_run: false
 
+      # ADR governance lint (skills/adr-governance/SKILL.md)
+      - id: adr-lint
+        name: lint ADRs
+        description: Enforce ADR numbering, status, supersession, and location rules
+        entry: .venv/bin/python scripts/lint_adrs.py
+        language: system
+        pass_filenames: false
+        files: ^(docs/adr/|mkdocs\.yml$|docs/ADR-.*\.md$|docs/architecture/ADR.*\.md$)
+        always_run: false
+
   # Basic file checks (check-only, no auto-fix)
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0

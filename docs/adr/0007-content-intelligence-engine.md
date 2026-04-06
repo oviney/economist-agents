@@ -1,4 +1,4 @@
-# ADR-002: Content Intelligence Engine — Closing the Feedback Loop
+# ADR-0007: Content Intelligence Engine — Closing the Feedback Loop
 
 **Status:** Proposed
 **Date:** 2026-04-05

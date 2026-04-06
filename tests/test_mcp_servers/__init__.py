@@ -1,1 +1,1 @@
-"""Tests for the Article Evaluator MCP server."""
+"""Tests for MCP servers."""

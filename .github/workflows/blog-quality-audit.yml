@@ -1,0 +1,42 @@
+name: Blog Quality Audit
+
+on:
+  schedule:
+    - cron: '30 7 * * 1'  # Monday 07:30 UTC — before blog content-review at 08:00
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run — score posts but do not create issues'
+        default: 'false'
+        type: boolean
+
+jobs:
+  audit:
+    name: Weekly Blog Quality Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run blog quality audit
+        env:
+          GH_TOKEN: ${{ secrets.BLOG_REPO_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+        run: python scripts/blog_quality_audit.py
+
+      - name: Upload audit log
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: blog-audit-${{ github.run_number }}
+          path: logs/blog_audit.json
+          retention-days: 90

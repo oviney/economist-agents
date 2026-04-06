@@ -28,7 +28,9 @@ output/
 .google/
 
 # Local data (SQLite, performance metrics)
-data/
+data/*
+# Track orchestrator audit-trail (starts as empty [])
+!data/orchestrator_state.json
 
 # OS
 .DS_Store

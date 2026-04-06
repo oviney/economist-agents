@@ -21,6 +21,14 @@ output/
 .env
 *.key
 *_API_KEY*
+*.json.bak
+*-sa.json
+
+# Google credentials
+.google/
+
+# Local data (SQLite, performance metrics)
+data/
 
 # OS
 .DS_Store
@@ -39,3 +47,22 @@ Thumbs.db
 logs/execution_roi.json
 logs/quality_dashboard.json
 .coverage
+
+# Playwright MCP artifacts
+.playwright-mcp/
+
+# MkDocs build output
+site/
+
+# Screenshot artifacts
+ga4-*.png
+search-console-*.png
+analytics-tab.png
+
+
+# Temporary docs review screenshots
+docs-site-*.png
+github-pages-*.png
+
+home.png
+home-*.png

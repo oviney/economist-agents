@@ -227,6 +227,7 @@ def get_board_vote(client, member_id: str, member_info: dict, topics: list) -> d
             f"TOPIC {i + 1}: {t['topic']}\n"
             f"Hook: {t.get('hook', 'N/A')}\n"
             f"Thesis: {t.get('thesis', 'N/A')}\n"
+            f"Title ideas: {', '.join(t.get('title_ideas', ['N/A']))}\n"
             f"Data sources: {', '.join(t.get('data_sources', ['Unknown']))}\n"
             f"Contrarian angle: {t.get('contrarian_angle', 'N/A')}"
             for i, t in enumerate(topics)
@@ -238,6 +239,18 @@ def get_board_vote(client, member_id: str, member_info: dict, topics: list) -> d
 Here are the topics to evaluate:
 
 {topics_text}
+
+SCORING GUIDANCE - apply these two quality checks when scoring each topic:
+
+1. THESIS QUALITY: Does the topic have a contrarian thesis - a specific, debatable argument - or is it merely a topic description?
+   - Penalise topics whose "Thesis" is vague, descriptive, or not a position someone could disagree with.
+   - A good thesis: "AI test generators are making maintenance costs worse, not better" (debatable claim).
+   - A bad thesis: "AI is changing how teams write tests" (just a topic).
+
+2. TITLE PROVOCATIVENESS: Are the title ideas compelling and free of weak patterns?
+   - Penalise titles that start with "Why" or "How" - these telegraph the conclusion and kill curiosity.
+   - Penalise titles starting with "The Impact of" or "The Role of" - generic and forgettable.
+   - Reward titles with a colon twist that make the reader curious without revealing the answer.
 
 Respond in JSON format:
 {{

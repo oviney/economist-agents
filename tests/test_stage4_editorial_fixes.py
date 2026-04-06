@@ -100,5 +100,49 @@ class TestArticleIntegrity:
         assert "  " not in result
 
 
+class TestHedgingPhrases:
+    """Hedging phrase removal (SKILL.md Rule 4)."""
+
+    def test_it_is_worth_noting_removed(self) -> None:
+        result = _apply_editorial_fixes("It is worth noting that quality matters.")
+        assert "it is worth noting" not in result.lower()
+
+    def test_it_should_be_noted_removed(self) -> None:
+        result = _apply_editorial_fixes("It should be noted that costs have risen.")
+        assert "it should be noted" not in result.lower()
+
+    def test_one_might_removed(self) -> None:
+        result = _apply_editorial_fixes("One might expect the results to be clear.")
+        assert "one might" not in result.lower()
+
+    def test_it_would_be_misguided_removed(self) -> None:
+        result = _apply_editorial_fixes("It would be misguided to ignore these findings.")
+        assert "it would be misguided" not in result.lower()
+
+    def test_in_practical_terms_removed(self) -> None:
+        result = _apply_editorial_fixes("In practical terms, this means faster delivery.")
+        assert "in practical terms" not in result.lower()
+
+
+class TestVerbosePadding:
+    """Verbose padding removal (SKILL.md Rule 6)."""
+
+    def test_it_goes_without_saying_removed(self) -> None:
+        result = _apply_editorial_fixes("It goes without saying that testing is important.")
+        assert "it goes without saying" not in result.lower()
+
+    def test_needless_to_say_removed(self) -> None:
+        result = _apply_editorial_fixes("Needless to say, quality is paramount.")
+        assert "needless to say" not in result.lower()
+
+    def test_as_mentioned_earlier_removed(self) -> None:
+        result = _apply_editorial_fixes("As mentioned earlier, the team struggled.")
+        assert "as mentioned earlier" not in result.lower()
+
+    def test_content_retained_after_padding_removal(self) -> None:
+        result = _apply_editorial_fixes("Needless to say, the framework works well.")
+        assert "the framework works well" in result
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "--tb=short"])

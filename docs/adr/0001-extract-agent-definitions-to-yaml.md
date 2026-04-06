@@ -1,6 +1,6 @@
-# ADR-001: Extract Agent Definitions to YAML Configuration
+# ADR-0001: Extract Agent Definitions to YAML Configuration
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-01-01
 **Deciders:** Ouray Viney (Agentic AI Architect)
 **Context:** Architecture review following discovery of multi-agent frameworks (CrewAI, AutoGen)

@@ -1,1 +1,1 @@
-# MCP server modules for economist-agents
+"""MCP servers for the Economist Agents content pipeline."""

@@ -23,10 +23,18 @@ from datetime import datetime
 # Import unified LLM client
 from llm_client import call_llm, create_llm_client
 
+# Content Intelligence: real blog performance data from GA4 ETL (ADR-0007)
+from content_intelligence import get_performance_context
+
 SCOUT_AGENT_PROMPT = """You are a Topic Scout for a quality engineering blog targeting senior engineers and engineering leaders.
 
 YOUR MISSION:
 Identify 5 high-value article topics that would resonate with this audience RIGHT NOW.
+
+IMPORTANT: Above this prompt you will see a PERFORMANCE CONTEXT block with real audience data from the last 30 days. Use it explicitly:
+- Favour topics thematically similar to the TOP PERFORMERS — those are proven to engage readers.
+- Avoid or reframe topics similar to the UNDERPERFORMERS — those got traffic but failed to hold attention. Do not propose near-duplicates.
+- If a top performer is about X and an underperformer is also about X, the difference is angle/framing — propose a sharper, more contrarian version.
 
 EVALUATION CRITERIA (score each 1-5):
 
@@ -70,17 +78,32 @@ TOPIC CATEGORIES TO MONITOR:
 - Security testing integration
 - Mobile and cross-platform testing
 
+THESIS REQUIREMENTS (Rule 2 — Argue a thesis, not a topic):
+The "thesis" field MUST be a specific, debatable argument — NOT a topic description.
+- BAD (topic): "AI tools are changing test automation"
+- BAD (description): "This article covers AI test generation and its effects"
+- GOOD (thesis): "AI test generators are making maintenance costs worse, not better, because they optimise for coverage metrics that don't correlate with code quality"
+A thesis must be a claim someone could reasonably disagree with.  Every supporting point in the article must advance this argument.
+
+TITLE REQUIREMENTS (Rule 10 — Title must be provocative and memorable):
+The "title_ideas" field MUST follow these rules:
+- Use a colon to add a surprising twist (e.g., "Flaky tests: the hidden tax your CFO doesn't know about")
+- Make the reader curious — do NOT reveal the conclusion
+- BANNED starters: "Why", "How", "The Impact of", "The Role of"
+- Maximum 10 words without a colon or twist
+- Purely descriptive titles are rejected; titles must imply an argument
+
 OUTPUT FORMAT:
 Return a JSON array of exactly 5 topics:
 [
   {
     "topic": "Clear, specific article title",
     "hook": "The attention-grabbing angle or stat (1 sentence)",
-    "thesis": "The main argument we'd make (1 sentence)",
+    "thesis": "A specific, debatable argument (not a topic description) - a claim someone could disagree with",
     "data_sources": ["Where we'd get numbers for charts"],
     "timeliness_trigger": "Why now? What happened recently?",
     "contrarian_angle": "How we'd challenge conventional wisdom",
-    "title_ideas": ["Economist-style title option 1", "Option 2"],
+    "title_ideas": ["Economist-style title with colon twist", "Second option - no Why/How starters"],
     "scores": {
       "timeliness": 4,
       "data_availability": 5,
@@ -93,7 +116,7 @@ Return a JSON array of exactly 5 topics:
   }
 ]
 
-Sort by total_score descending. Be specific—not "AI in Testing" but "Why AI Test Generation Tools Are Overpromising on Maintenance Reduction".
+Sort by total_score descending. Be specific—not "AI in Testing" but "AI test generators: a maintenance debt machine in disguise".
 """
 
 TREND_RESEARCH_PROMPT = """You are researching current trends in software quality engineering.
@@ -132,6 +155,11 @@ def scout_topics(client, focus_area: str = None) -> list:
     """
     print("🔭 Topic Scout Agent: Scanning the landscape...\n")
 
+    # Load real blog performance data (ADR-0007 feedback loop).
+    # Gracefully degrades if data/performance.db is missing.
+    print("   Loading performance context from GA4 data...")
+    performance_context = get_performance_context(top_limit=5, bottom_limit=5)
+
     # First, gather current trends
     trend_prompt = TREND_RESEARCH_PROMPT
     if focus_area:
@@ -145,11 +173,17 @@ def scout_topics(client, focus_area: str = None) -> list:
         max_tokens=2000,
     )
 
-    # Then, identify topics based on trends
-    print("   Identifying high-value topics...")
-    scout_prompt = f"""Based on these current trends in quality engineering:
+    # Then, identify topics based on trends AND real blog performance
+    print("   Identifying high-value topics (informed by real audience data)...")
+    scout_prompt = f"""{performance_context}
+
+---
+
+## Current Trends in Quality Engineering
 
 {trends}
+
+---
 
 {SCOUT_AGENT_PROMPT}"""
 

@@ -70,6 +70,7 @@ def index_published_article(
     date: str,
     categories: str,
     file_path: str,
+    summary: str = "",
 ) -> dict[str, Any]:
     """
     Index a published article in the archive.
@@ -80,12 +81,29 @@ def index_published_article(
         date: Publication date (YYYY-MM-DD).
         categories: Comma-separated category tags.
         file_path: Relative path to the article file.
+        summary: Optional brief human-readable summary (one or two sentences).
 
     Returns:
         dict with success (bool), id (str), and total_indexed (int).
         On failure, includes an error (str) field instead of total_indexed.
     """
-    return _get_archive().index_article(title, thesis, date, categories, file_path)
+    try:
+        doc_id = _get_archive().index_article(
+            title=title,
+            thesis=thesis,
+            summary=summary,
+            categories=categories,
+            date=date,
+            file_path=file_path,
+        )
+        return {
+            "success": True,
+            "id": doc_id,
+            "total_indexed": _get_archive().count(),
+        }
+    except Exception as exc:
+        logger.error("index_published_article failed: %s", exc)
+        return {"success": False, "error": str(exc)}
 
 
 @mcp.tool()

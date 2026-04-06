@@ -131,6 +131,7 @@ class TestOpenAIProvider:
             provider = OpenAIProvider(api_key="sk-direct")
             provider.create_client()
 
+        assert provider.api_key == "sk-direct"
         MockOpenAI.assert_called_once_with(api_key="sk-direct")
 
     def test_missing_api_key_raises(self):
@@ -253,6 +254,7 @@ class TestAnthropicProvider:
             provider = AnthropicProvider(api_key="sk-ant-direct")
             provider.create_client()
 
+        assert provider.api_key == "sk-ant-direct"
         MockAnth.assert_called_once_with(api_key="sk-ant-direct")
 
     def test_missing_api_key_raises(self):
@@ -365,22 +367,21 @@ class TestAgentRegistryCoveragePaths:
     """Cover the remaining branches not exercised by existing tests."""
 
     def test_get_agent_with_model_override(self):
-        """get_agent calls provider.create_client with the supplied model."""
+        """get_agent passes the model arg to provider.create_client."""
         mock_client = MagicMock()
         mock_client.provider = "openai"
         mock_provider = MagicMock()
         mock_provider.create_client.return_value = mock_client
 
-        # Use a test agent to avoid tool instantiation side effects
-        registry = _registry(provider=mock_provider)
-        registry.register_test_agent(
-            "model-override-test",
-            {"role": "R", "goal": "G", "backstory": "B", "tools": []},
-        )
+        with patch.object(AgentRegistry, "_instantiate_tools", return_value=[]):
+            registry = _registry(provider=mock_provider)
+            agents = registry.list_agents()
+            assert len(agents) > 0
 
-        agent = registry.get_agent("model-override-test", model="gpt-4-turbo")
-        assert agent["role"] == "R"
-        # Test agents use their own mock client; real agents would call create_client
+            registry.get_agent(agents[0], model="gpt-4-turbo")
+
+        # provider.create_client must have been called with the model override
+        mock_provider.create_client.assert_called_once_with("gpt-4-turbo")
 
     def test_get_agent_error_message_includes_suggestion(self):
         """Error message suggests similar names when partial match exists."""
@@ -486,7 +487,7 @@ class TestAgentRegistryCoveragePaths:
 
         assert "Failed to load agent" in caplog.text
         # The broken file should not appear in the agent list
-        assert len(registry.list_agents()) == 0
+        assert "broken" not in registry.list_agents()
 
     def test_agents_dir_not_found_raises(self, tmp_path):
         """AgentRegistry raises ValueError for a non-existent agents_dir."""

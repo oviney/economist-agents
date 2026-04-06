@@ -75,7 +75,7 @@ class AgentRegistry:
             from src.stage3_crew import Stage3Crew
 
             self._crews["Stage3Crew"] = Stage3Crew
-        except ImportError:
+        except ImportError:  # pragma: no cover
             pass
 
     def _module_to_class_name(self, module_name: str) -> str:

@@ -258,6 +258,10 @@ class ArticleEvaluator:
 
     # --- Dimension 2: Evidence Sourcing ---
 
+    # Analyst firms whose reports count toward the 1-per-article cap
+    # (skills/research-sourcing/SKILL.md)
+    _ANALYST_FIRMS: list[str] = ["gartner", "forrester", "mckinsey", "bcg", "idc"]
+
     def _score_evidence(self, body: str) -> int:
         score = 10
 
@@ -277,7 +281,8 @@ class ArticleEvaluator:
         if not ref_match:
             score -= 4
         else:
-            ref_count = len(re.findall(r"^\d+\.", ref_match.group(1), re.MULTILINE))
+            refs_text = ref_match.group(1)
+            ref_count = len(re.findall(r"^\d+\.", refs_text, re.MULTILINE))
             if ref_count >= 5:
                 score += 0  # Already max
             elif ref_count >= 3:
@@ -285,17 +290,52 @@ class ArticleEvaluator:
             else:
                 score -= 3
 
+            # Source freshness check (skills/research-sourcing/SKILL.md):
+            # At least 3 of 5 references must be from current or previous year.
+            current_year = datetime.now().year
+            years_in_refs = [
+                int(y)
+                for y in re.findall(r"\b(20\d{2})\b", refs_text)
+                if int(y) <= current_year  # exclude impossible future years
+            ]
+            fresh_count = sum(1 for y in years_in_refs if y >= current_year - 1)
+            if ref_count >= 5 and fresh_count < 3:
+                score -= 2  # Penalty: fewer than 3 references are from recent years
+
+            # Analyst report cap (skills/research-sourcing/SKILL.md): max 1 per article
+            analyst_count = sum(
+                1
+                for firm in self._ANALYST_FIRMS
+                if re.search(rf"\b{firm}\b", refs_text, re.IGNORECASE)
+            )
+            if analyst_count > 1:
+                score -= analyst_count - 1  # -1 for each analyst report above the cap
+
         return max(1, min(10, score))
 
     def _detail_evidence(self, body: str) -> str:
         placeholders = len(re.findall(r"\[NEEDS SOURCE\]|\[UNVERIFIED\]", body))
         ref_match = re.search(r"## References\s*\n(.*?)(?=\n##|\Z)", body, re.DOTALL)
-        ref_count = (
-            len(re.findall(r"^\d+\.", ref_match.group(1), re.MULTILINE))
-            if ref_match
-            else 0
+        if not ref_match:
+            return f"0 references cited, {placeholders} placeholders"
+        refs_text = ref_match.group(1)
+        ref_count = len(re.findall(r"^\d+\.", refs_text, re.MULTILINE))
+        current_year = datetime.now().year
+        years_in_refs = [
+            int(y)
+            for y in re.findall(r"\b(20\d{2})\b", refs_text)
+            if int(y) <= current_year  # exclude impossible future years
+        ]
+        fresh_count = sum(1 for y in years_in_refs if y >= current_year - 1)
+        analyst_count = sum(
+            1
+            for firm in self._ANALYST_FIRMS
+            if re.search(rf"\b{firm}\b", refs_text, re.IGNORECASE)
         )
-        return f"{ref_count} references cited, {placeholders} placeholders"
+        return (
+            f"{ref_count} references cited, {placeholders} placeholders, "
+            f"{fresh_count} fresh (≥{current_year - 1}), {analyst_count} analyst reports"
+        )
 
     # --- Dimension 3: Voice Consistency ---
 

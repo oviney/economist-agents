@@ -100,6 +100,29 @@ class TestOpeningQuality:
 # ═══════════════════════════════════════════════════════════════════════════
 
 
+def make_test_article(refs: str) -> str:
+    """Helper: build a minimal well-formed article with a given references block."""
+    return (
+        "---\n"
+        "layout: post\n"
+        'title: "Test Article"\n'
+        "date: 2026-04-05\n"
+        "categories: []\n"
+        "image: x.png\n"
+        "---\n\n"
+        "According to a 2026 study by NIST, 73% of teams now use AI testing.\n\n"
+        "## The Challenge\n\n"
+        "Engineers at Google report a 40% reduction in flaky tests after adopting deterministic environments.\n\n"
+        "## The Solution\n\n"
+        "Infrastructure-first teams see 3x faster delivery according to the IEEE Software Engineering Standards 2025.\n\n"
+        "## The Outcome\n\n"
+        "Spotify's SRE team documented a 50% drop in incident response time after adopting chaos engineering.\n\n"
+        + " ".join(["word"] * 300)
+        + "\n\n## References\n\n"
+        + refs
+    )
+
+
 class TestEvidenceSourcing:
     def test_sourced_article_scores_high(self, evaluator: ArticleEvaluator) -> None:
         result = evaluator.evaluate(GOOD_ARTICLE)
@@ -108,6 +131,70 @@ class TestEvidenceSourcing:
     def test_unsourced_article_scores_low(self, evaluator: ArticleEvaluator) -> None:
         result = evaluator.evaluate(BAD_ARTICLE)
         assert result.scores["evidence_sourcing"] <= 3
+
+    def test_fresh_sources_score_higher_than_stale(
+        self, evaluator: ArticleEvaluator
+    ) -> None:
+        """Articles with 3+ references from current/previous year score higher."""
+        fresh_refs = (
+            "1. NIST, [\"NIST Report 2026\"](https://example.com), *NIST*, 2026\n"
+            "2. Google, [\"Engineering Blog Post\"](https://example.com), *Google*, 2025\n"
+            "3. IEEE, [\"Software Engineering Standards\"](https://example.com), *IEEE*, 2025\n"
+            "4. Spotify, [\"SRE Case Study\"](https://example.com), *Spotify*, 2026\n"
+            "5. arXiv, [\"Recent AI Testing Paper\"](https://example.com), *arXiv*, 2026\n"
+        )
+        stale_refs = (
+            "1. Gartner, [\"World Quality Report 2022\"](https://example.com), *Gartner*, 2022\n"
+            "2. Forrester, [\"Test Automation Study 2022\"](https://example.com), *Forrester*, 2022\n"
+            "3. McKinsey, [\"Digital Report 2021\"](https://example.com), *McKinsey*, 2021\n"
+            "4. IDC, [\"Market Analysis 2022\"](https://example.com), *IDC*, 2022\n"
+            "5. BCG, [\"Tech Trends 2021\"](https://example.com), *BCG*, 2021\n"
+        )
+        fresh_result = evaluator.evaluate(make_test_article(fresh_refs))
+        stale_result = evaluator.evaluate(make_test_article(stale_refs))
+        assert fresh_result.scores["evidence_sourcing"] > stale_result.scores["evidence_sourcing"]
+
+    def test_stale_sources_penalised(self, evaluator: ArticleEvaluator) -> None:
+        """An article whose 5 references are all >2 years old loses 2 points."""
+        stale_refs = (
+            "1. Gartner, [\"World Quality Report 2022\"](https://example.com), *Gartner*, 2022\n"
+            "2. Forrester, [\"Test Automation Study 2022\"](https://example.com), *Forrester*, 2022\n"
+            "3. NIST, [\"NIST Framework 2023\"](https://example.com), *NIST*, 2023\n"
+            "4. IEEE, [\"Standards 2023\"](https://example.com), *IEEE*, 2023\n"
+            "5. Capgemini, [\"Quality Report 2022\"](https://example.com), *Capgemini*, 2022\n"
+        )
+        result = evaluator.evaluate(make_test_article(stale_refs))
+        # 10 base - 2 (freshness penalty: 0 of 5 refs from current/prev year) = 8 max
+        assert result.scores["evidence_sourcing"] <= 8  # freshness penalty applied
+
+    def test_analyst_report_cap_enforced(self, evaluator: ArticleEvaluator) -> None:
+        """Articles citing >1 analyst firm (Gartner, Forrester, etc.) are penalised."""
+        single_analyst_refs = (
+            "1. Gartner, [\"Report 2025\"](https://example.com), *Gartner*, 2025\n"
+            "2. NIST, [\"Framework 2026\"](https://example.com), *NIST*, 2026\n"
+            "3. Google, [\"Engineering Blog 2026\"](https://example.com), *Google*, 2026\n"
+            "4. IEEE, [\"Standards 2025\"](https://example.com), *IEEE*, 2025\n"
+            "5. arXiv, [\"AI Testing 2026\"](https://example.com), *arXiv*, 2026\n"
+        )
+        multi_analyst_refs = (
+            "1. Gartner, [\"Report 2025\"](https://example.com), *Gartner*, 2025\n"
+            "2. Forrester, [\"Study 2025\"](https://example.com), *Forrester*, 2025\n"
+            "3. McKinsey, [\"Report 2026\"](https://example.com), *McKinsey*, 2026\n"
+            "4. IEEE, [\"Standards 2025\"](https://example.com), *IEEE*, 2025\n"
+            "5. BCG, [\"Trends 2025\"](https://example.com), *BCG*, 2025\n"
+        )
+        single = evaluator.evaluate(make_test_article(single_analyst_refs))
+        multi = evaluator.evaluate(make_test_article(multi_analyst_refs))
+        assert single.scores["evidence_sourcing"] > multi.scores["evidence_sourcing"]
+
+    def test_detail_includes_freshness_and_analyst_info(
+        self, evaluator: ArticleEvaluator
+    ) -> None:
+        """Detail string reports fresh reference count and analyst report count."""
+        result = evaluator.evaluate(GOOD_ARTICLE)
+        detail = result.details["evidence_sourcing"]
+        assert "fresh" in detail
+        assert "analyst" in detail
 
 
 # ═══════════════════════════════════════════════════════════════════════════

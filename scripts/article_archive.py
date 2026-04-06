@@ -387,6 +387,69 @@ class ArticleArchive:
             return 0
         return self.collection.count()
 
+    def search(
+        self,
+        query: str,
+        threshold: float = 0.6,
+        n_results: int = 5,
+    ) -> list[dict[str, Any]]:
+        """Alias for :meth:`find_similar_topics` — used by the MCP server.
+
+        Args:
+            query: Free-text topic or thesis to search for.
+            threshold: Minimum cosine similarity score (0–1).
+            n_results: Maximum number of results to return.
+
+        Returns:
+            List of matching article dicts with a ``similarity`` key.
+        """
+        return self.find_similar_topics(query, threshold=threshold, n_results=n_results)
+
+    def get_stats(self) -> dict[str, Any]:
+        """Return summary statistics about the archive.
+
+        Returns:
+            dict with ``available`` (bool), ``total_articles`` (int),
+            ``date_range`` (dict with ``earliest``/``latest`` str),
+            and ``category_distribution`` (dict mapping category to count).
+        """
+        if self.collection is None:
+            return {"available": False, "total_articles": 0}
+
+        total = self.collection.count()
+        stats: dict[str, Any] = {
+            "available": True,
+            "total_articles": total,
+            "date_range": {"earliest": None, "latest": None},
+            "category_distribution": {},
+        }
+
+        if total == 0:
+            return stats
+
+        try:
+            all_items = self.collection.get(include=["metadatas"])
+            dates: list[str] = []
+            categories: dict[str, int] = {}
+            for meta in all_items.get("metadatas", []):
+                if meta.get("date"):
+                    dates.append(meta["date"])
+                for cat in (meta.get("categories") or "").split(","):
+                    cat = cat.strip()
+                    if cat:
+                        categories[cat] = categories.get(cat, 0) + 1
+            if dates:
+                dates_sorted = sorted(dates)
+                stats["date_range"] = {
+                    "earliest": dates_sorted[0],
+                    "latest": dates_sorted[-1],
+                }
+            stats["category_distribution"] = categories
+        except Exception as exc:
+            logger.warning("get_stats metadata fetch failed: %s", exc)
+
+        return stats
+
 
 # ---------------------------------------------------------------------------
 # Module-level helpers

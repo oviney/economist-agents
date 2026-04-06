@@ -1277,6 +1277,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#google-search-scholar-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Google Search &amp; Scholar Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2458,6 +2469,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#google-search-scholar-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Google Search &amp; Scholar Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2573,6 +2595,23 @@ same citations repeated — destroying credibility.</p>
 The Research Agent should use this tool to find papers from the past
 12 months on the article's topic.  arXiv papers provide cutting-edge
 data that analyst reports lag by 6-12 months.</p>
+<h3 id="google-search-scholar-integration">Google Search &amp; Scholar Integration<a class="headerlink" href="#google-search-scholar-integration" title="Permanent link">&para;</a></h3>
+<p>The pipeline now has <code>scripts/google_search.py</code> for live Google Web Search
+and Google Scholar via the Serper API.  The Research Agent calls
+<code>search_google_for_topic()</code> automatically when <code>SERPER_API_KEY</code> is set.</p>
+<p>Key behaviour:
+- <strong>Year targeting</strong> — queries are automatically scoped to the current year
+  and the previous year (e.g., 2025–2026) to maximise source freshness.
+- <strong>Google Scholar</strong> — academic papers with author and citation metadata are
+  retrieved via Serper's <code>/scholar</code> endpoint.
+- <strong>MCP tool</strong> — the <code>search_google_scholar</code> tool in
+  <code>mcp_servers/web_researcher_server.py</code> exposes the same capability to any
+  MCP-aware agent in the pipeline.</p>
+<p>To enable:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>export SERPER_API_KEY=&lt;your-key&gt;   # https://serper.dev
+</code></pre></div></p>
+<p>When the key is absent the agent falls back to arXiv-only search and LLM
+training-data knowledge without error.</p>
 <h2 id="verification-requirements">Verification Requirements<a class="headerlink" href="#verification-requirements" title="Permanent link">&para;</a></h2>
 <p>Every cited statistic must include:
 - <strong>Who</strong> collected the data (named organisation)

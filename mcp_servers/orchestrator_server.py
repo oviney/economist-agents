@@ -63,7 +63,7 @@ def check_pr_ready_tool(pr_url: str) -> dict[str, Any]:
         return check_pr_ready(pr_url)
     except Exception as exc:
         logger.exception("check_pr_ready_tool failed: %s", exc)
-        return {"error": str(exc), "promote": False, "reason": str(exc), "details": {}}
+        return {"error": str(exc), "promote": False, "reason": "Failed to check PR readiness", "details": {}}
 
 
 @mcp.tool()
@@ -91,7 +91,7 @@ def triage_duplicates_tool(pr_a_url: str, pr_b_url: str) -> dict[str, Any]:
         return triage_duplicates(pr_a_url, pr_b_url)
     except Exception as exc:
         logger.exception("triage_duplicates_tool failed: %s", exc)
-        return {"error": str(exc), "keep": None, "close": None, "reason": str(exc)}
+        return {"error": str(exc), "keep": None, "close": None, "reason": "Failed to triage duplicate PRs"}
 
 
 @mcp.tool()
@@ -117,7 +117,7 @@ def check_dispatch_safe_tool(issue_url: str) -> dict[str, Any]:
         return check_dispatch_safe(issue_url)
     except Exception as exc:
         logger.exception("check_dispatch_safe_tool failed: %s", exc)
-        return {"error": str(exc), "dispatch": False, "reason": str(exc), "details": {}}
+        return {"error": str(exc), "dispatch": False, "reason": "Failed to check dispatch safety", "details": {}}
 
 
 @mcp.tool()
@@ -144,7 +144,7 @@ def check_stalled_tool(pr_url: str, idle_minutes: int) -> dict[str, Any]:
         return check_stalled(pr_url, idle_minutes)
     except Exception as exc:
         logger.exception("check_stalled_tool failed: %s", exc)
-        return {"error": str(exc), "stalled": False, "reason": str(exc), "details": {}}
+        return {"error": str(exc), "stalled": False, "reason": "Failed to check stall status", "details": {}}
 
 
 if __name__ == "__main__":

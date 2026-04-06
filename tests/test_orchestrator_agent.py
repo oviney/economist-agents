@@ -544,7 +544,7 @@ class TestCheckStalled:
 
 class TestMcpServerImportable:
     def test_orchestrator_server_importable(self) -> None:
-        from mcp_servers import orchestrator_server  # noqa: F401
+        from mcp_servers import orchestrator_server
 
         assert orchestrator_server.mcp is not None
 

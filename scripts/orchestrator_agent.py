@@ -17,7 +17,6 @@ Exposes a --mode CLI interface callable from GitHub Actions:
 """
 
 import argparse
-import json
 import logging
 import os
 import re
@@ -124,7 +123,7 @@ def _log_decision(action: str, data: dict[str, Any]) -> None:
     """
     state = _load_state()
     entry: dict[str, Any] = {
-        "ts": datetime.now(UTC).strftime("%Y-%m-%dT%H:%MZ"),
+        "ts": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "action": action,
         **data,
     }
@@ -561,11 +560,11 @@ Examples:
                 parser.error("--pr-url is required for --mode stall-check")
             result = check_stalled(args.pr_url, args.idle_minutes)
 
-        print(json.dumps(result, indent=2))
+        print(orjson.dumps(result, option=orjson.OPT_INDENT_2).decode())
 
     except Exception as exc:
         logger.error("Orchestrator failed: %s", exc)
-        print(json.dumps({"error": str(exc)}, indent=2))
+        print(orjson.dumps({"error": str(exc)}, option=orjson.OPT_INDENT_2).decode())
         sys.exit(1)
 
 

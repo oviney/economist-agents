@@ -16,16 +16,22 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
 from topic_scout_reproducibility import (  # noqa: E402
+    _cosine_similarity,
+    _compute_tf,
+    _extract_topic_text,
     _extract_top_performer_keywords,
     _normalise_title,
+    _tokenize,
     compute_jaccard_matrix,
     compute_score_stats,
     compute_thematic_stability,
+    compute_tfidf_cosine_matrix,
     compute_title_jaccard,
     detect_outlier_runs,
     format_jaccard_matrix,
     generate_report,
     mean_pairwise_jaccard,
+    mean_pairwise_similarity,
     run_reproducibility_check,
 )
 
@@ -71,6 +77,8 @@ def sample_report_kwargs() -> dict:
             [{"topic": "Flaky Tests", "hook": "Flakiness hurts", "total_score": 19}],
         ],
         "run_timings": [5.0, 6.0],
+        "cosine_matrix": [[1.0, 0.2], [0.2, 1.0]],
+        "mean_cosine": 0.2,
         "jaccard_matrix": [[1.0, 0.3], [0.3, 1.0]],
         "mean_jaccard": 0.3,
         "thematic_stability": {"Great Article": 0.5},
@@ -195,22 +203,22 @@ def test_jaccard_matrix_empty_input_gives_empty() -> None:
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# mean_pairwise_jaccard
+# mean_pairwise_similarity (and backward-compat alias mean_pairwise_jaccard)
 # ──────────────────────────────────────────────────────────────────────────────
 
 
 def test_mean_pairwise_returns_zero_for_single_run() -> None:
-    assert mean_pairwise_jaccard([[1.0]]) == pytest.approx(0.0)
+    assert mean_pairwise_similarity([[1.0]]) == pytest.approx(0.0)
 
 
 def test_mean_pairwise_returns_zero_for_empty_matrix() -> None:
-    assert mean_pairwise_jaccard([]) == pytest.approx(0.0)
+    assert mean_pairwise_similarity([]) == pytest.approx(0.0)
 
 
 def test_mean_pairwise_on_known_matrix() -> None:
     # 2×2 with off-diagonal = 0.5
     matrix = [[1.0, 0.5], [0.5, 1.0]]
-    assert mean_pairwise_jaccard(matrix) == pytest.approx(0.5)
+    assert mean_pairwise_similarity(matrix) == pytest.approx(0.5)
 
 
 def test_mean_pairwise_3x3_symmetric() -> None:
@@ -219,9 +227,15 @@ def test_mean_pairwise_3x3_symmetric() -> None:
         [0.6, 1.0, 0.8],
         [0.4, 0.8, 1.0],
     ]
-    result = mean_pairwise_jaccard(matrix)
+    result = mean_pairwise_similarity(matrix)
     # Off-diagonal values: 0.6, 0.4, 0.6, 0.8, 0.4, 0.8 → mean = 0.6
     assert result == pytest.approx(0.6)
+
+
+def test_mean_pairwise_jaccard_alias_works() -> None:
+    """Backward-compat alias resolves to the same function."""
+    matrix = [[1.0, 0.5], [0.5, 1.0]]
+    assert mean_pairwise_jaccard(matrix) == mean_pairwise_similarity(matrix)
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -405,20 +419,26 @@ def test_format_jaccard_matrix_correct_row_count() -> None:
 def test_generate_report_unstable_verdict(sample_report_kwargs: dict) -> None:
     report = generate_report(**sample_report_kwargs)
     assert "## Verdict" in report
-    assert "UNSTABLE" in report  # mean_jaccard=0.3 < threshold
+    assert "UNSTABLE" in report  # mean_cosine=0.2 < threshold (0.25)
 
 
 def test_generate_report_reproducible_verdict(sample_report_kwargs: dict) -> None:
     kwargs = dict(sample_report_kwargs)
-    kwargs["mean_jaccard"] = 0.8
+    kwargs["mean_cosine"] = 0.8  # primary metric drives verdict
     report = generate_report(**kwargs)
     assert "REPRODUCIBLE" in report
 
 
 def test_generate_report_contains_jaccard_matrix(sample_report_kwargs: dict) -> None:
     report = generate_report(**sample_report_kwargs)
-    assert "Jaccard Similarity Matrix" in report
+    assert "Lexical Similarity Matrix (Jaccard)" in report
     assert "0.300" in report
+
+
+def test_generate_report_contains_cosine_matrix(sample_report_kwargs: dict) -> None:
+    report = generate_report(**sample_report_kwargs)
+    assert "TF-IDF Cosine Similarity Matrix" in report
+    assert "0.200" in report
 
 
 def test_generate_report_contains_model_name(sample_report_kwargs: dict) -> None:
@@ -443,6 +463,8 @@ def test_generate_report_insufficient_runs_message(
         [{"topic": "Only Topic", "hook": "Only hook", "total_score": 20}]
     ]
     kwargs["run_timings"] = [4.0]
+    kwargs["cosine_matrix"] = []
+    kwargs["mean_cosine"] = 0.0
     kwargs["jaccard_matrix"] = []
     kwargs["mean_jaccard"] = 0.0
     kwargs["thematic_stability"] = {}
@@ -465,6 +487,8 @@ def test_generate_report_with_zero_successful_runs(
     kwargs["successful_runs"] = 0
     kwargs["runs_topics"] = []
     kwargs["run_timings"] = []
+    kwargs["cosine_matrix"] = []
+    kwargs["mean_cosine"] = 0.0
     kwargs["jaccard_matrix"] = []
     kwargs["mean_jaccard"] = 0.0
     kwargs["thematic_stability"] = {}
@@ -490,6 +514,12 @@ def test_generate_report_outlier_section(sample_report_kwargs: dict) -> None:
         [{"topic": "Quantum Zymurgy", "hook": "hook", "total_score": 10}],
     ]
     kwargs["run_timings"] = [5.0, 6.0, 7.0]
+    kwargs["cosine_matrix"] = [
+        [1.0, 0.9, 0.1],
+        [0.9, 1.0, 0.1],
+        [0.1, 0.1, 1.0],
+    ]
+    kwargs["mean_cosine"] = 0.4
     kwargs["jaccard_matrix"] = [
         [1.0, 0.9, 0.1],
         [0.9, 1.0, 0.1],
@@ -609,3 +639,167 @@ def test_run_reproducibility_check_creates_output_dir(tmp_path: Path) -> None:
         run_reproducibility_check(n_runs=1, output_dir=nested, client=mock_client)
 
     assert nested.exists()
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# _tokenize
+# ──────────────────────────────────────────────────────────────────────────────
+
+
+def test_tokenize_splits_on_punctuation() -> None:
+    tokens = _tokenize("AI/ML testing: future?")
+    assert "ai" in tokens
+    assert "ml" in tokens
+    assert "testing" in tokens
+    assert "future" in tokens
+
+
+def test_tokenize_removes_stop_words() -> None:
+    tokens = _tokenize("the art of testing")
+    assert "the" not in tokens
+    assert "of" not in tokens
+    assert "art" in tokens
+
+
+def test_tokenize_empty_string() -> None:
+    assert _tokenize("") == []
+
+
+def test_tokenize_returns_list_with_duplicates() -> None:
+    tokens = _tokenize("testing testing one two testing")
+    assert tokens.count("testing") == 3
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# _extract_topic_text
+# ──────────────────────────────────────────────────────────────────────────────
+
+
+def test_extract_topic_text_combines_fields() -> None:
+    topic = {
+        "topic": "AI Testing",
+        "hook": "AI changes everything",
+        "thesis": "Costs are hidden",
+        "contrarian_angle": "Automation is oversold",
+        "talking_points": "ROI metrics matter",
+    }
+    text = _extract_topic_text(topic)
+    assert "AI Testing" in text
+    assert "AI changes everything" in text
+    assert "Costs are hidden" in text
+    assert "Automation is oversold" in text
+    assert "ROI metrics matter" in text
+
+
+def test_extract_topic_text_skips_missing_fields() -> None:
+    topic = {"topic": "Testing", "hook": "Test hook"}
+    text = _extract_topic_text(topic)
+    assert "Testing" in text
+    assert "Test hook" in text
+
+
+def test_extract_topic_text_empty_topic() -> None:
+    assert _extract_topic_text({}) == ""
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# _compute_tf
+# ──────────────────────────────────────────────────────────────────────────────
+
+
+def test_compute_tf_basic() -> None:
+    tf = _compute_tf(["a", "b", "a"])
+    assert tf["a"] == pytest.approx(2 / 3)
+    assert tf["b"] == pytest.approx(1 / 3)
+
+
+def test_compute_tf_empty_returns_empty() -> None:
+    assert _compute_tf([]) == {}
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# _cosine_similarity
+# ──────────────────────────────────────────────────────────────────────────────
+
+
+def test_cosine_similarity_identical_vectors() -> None:
+    vec = {"a": 0.5, "b": 0.5}
+    assert _cosine_similarity(vec, vec) == pytest.approx(1.0)
+
+
+def test_cosine_similarity_orthogonal_vectors() -> None:
+    assert _cosine_similarity({"a": 1.0}, {"b": 1.0}) == pytest.approx(0.0)
+
+
+def test_cosine_similarity_zero_vector() -> None:
+    assert _cosine_similarity({"a": 0.0}, {"a": 1.0}) == pytest.approx(0.0)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# compute_tfidf_cosine_matrix
+# ──────────────────────────────────────────────────────────────────────────────
+
+
+def test_tfidf_matrix_diagonal_is_one() -> None:
+    runs = [
+        [_make_topic(0), _make_topic(1)],
+        [_make_topic(2), _make_topic(3)],
+    ]
+    matrix = compute_tfidf_cosine_matrix(runs)
+    assert matrix[0][0] == pytest.approx(1.0)
+    assert matrix[1][1] == pytest.approx(1.0)
+
+
+def test_tfidf_matrix_is_symmetric() -> None:
+    runs = [
+        [{"topic": "AI Testing ROI", "hook": "costs are hidden", "thesis": "t", "contrarian_angle": "c", "talking_points": "p"}],
+        [{"topic": "Automation Myths", "hook": "maintenance burden", "thesis": "t", "contrarian_angle": "c", "talking_points": "p"}],
+        [{"topic": "Developer Experience", "hook": "roi illusion", "thesis": "t", "contrarian_angle": "c", "talking_points": "p"}],
+    ]
+    matrix = compute_tfidf_cosine_matrix(runs)
+    n = len(matrix)
+    for i in range(n):
+        for j in range(n):
+            assert matrix[i][j] == pytest.approx(matrix[j][i], abs=1e-9)
+
+
+def test_tfidf_matrix_shape() -> None:
+    runs = [[_make_topic(i)] for i in range(4)]
+    matrix = compute_tfidf_cosine_matrix(runs)
+    assert len(matrix) == 4
+    assert all(len(row) == 4 for row in matrix)
+
+
+def test_tfidf_matrix_empty_input_gives_empty() -> None:
+    assert compute_tfidf_cosine_matrix([]) == []
+
+
+def test_tfidf_matrix_single_run_gives_1x1() -> None:
+    matrix = compute_tfidf_cosine_matrix([[_make_topic(0)]])
+    assert len(matrix) == 1
+    assert matrix[0][0] == pytest.approx(1.0)
+
+
+def test_tfidf_thematic_runs_exceed_threshold() -> None:
+    """Thematically similar runs should produce mean cosine >= 0.25."""
+    # Mirror the 2026-04-06 live-run evidence from the issue.
+    run1 = [
+        {"topic": "Illusion of Speed", "hook": "AI testing faster but costlier", "thesis": "Hidden costs outweigh gains", "contrarian_angle": "Speed metrics mislead teams", "talking_points": "ROI automation testing cost"},
+        {"topic": "Hidden Costs of AI-Driven Testing", "hook": "Maintenance burden rises", "thesis": "AI test tools create debt", "contrarian_angle": "Automation is not free", "talking_points": "maintenance automation testing cost"},
+        {"topic": "Embedded QE", "hook": "Quality shifted left", "thesis": "QE embedded in teams", "contrarian_angle": "Centralised QA still has value", "talking_points": "quality engineering embedded team"},
+    ]
+    run2 = [
+        {"topic": "Myth of Complete Automation", "hook": "Automation cannot cover all", "thesis": "Human testing still needed", "contrarian_angle": "100 percent automation is a myth", "talking_points": "automation testing manual coverage"},
+        {"topic": "Overpromising on Maintenance Costs", "hook": "Vendors hide maintenance costs", "thesis": "Long term cost of AI testing high", "contrarian_angle": "Automation creates debt not savings", "talking_points": "maintenance cost automation testing ROI"},
+        {"topic": "Security Testing", "hook": "Security gaps in AI pipelines", "thesis": "Automation misses security flaws", "contrarian_angle": "Automated security is insufficient", "talking_points": "security testing automation gaps"},
+    ]
+    run3 = [
+        {"topic": "Developer Experience", "hook": "DX drives quality", "thesis": "Happy developers write better tests", "contrarian_angle": "Tooling without culture fails", "talking_points": "developer experience quality testing"},
+        {"topic": "ROI Illusion", "hook": "ROI of AI testing inflated", "thesis": "Hidden costs erode ROI", "contrarian_angle": "Automation ROI is overstated", "talking_points": "ROI automation testing cost illusion"},
+        {"topic": "Debunking the AI-Driven Test Automation Revolution", "hook": "Hype exceeds reality", "thesis": "AI testing needs calibration", "contrarian_angle": "Revolution overstated automation AI testing", "talking_points": "AI automation testing debunking ROI cost"},
+    ]
+    matrix = compute_tfidf_cosine_matrix([run1, run2, run3])
+    mean_cosine = mean_pairwise_similarity(matrix)
+    assert mean_cosine >= 0.25, (
+        f"Expected mean cosine >= 0.25 for thematically similar runs, got {mean_cosine:.3f}"
+    )

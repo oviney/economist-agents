@@ -16,7 +16,7 @@ Built with Claude Code sub-agents, MCP tool servers, and CrewAI Flows — govern
 
 ## Architecture Overview
 
-The content pipeline flows from topic discovery to deployment, with a planned performance feedback loop (ADR-002) that will inform future topic selection.
+The content pipeline flows from topic discovery to deployment, with a performance feedback loop ([ADR-0007](adr/0007-content-intelligence-engine.md)) that informs future topic selection from real blog audience data.
 
 ```mermaid
 graph TD
@@ -30,7 +30,7 @@ graph TD
     G -->|score < 80| D
 ```
 
-Once published, the **Content Intelligence Engine** ([ADR-0007](adr/0007-content-intelligence-engine.md), planned) will close the loop: analytics data flows from GA4 and Search Console into the Analyst agent, which scores performance and surfaces content gaps back to the Scout.
+Once published, the **Content Intelligence Engine** ([ADR-0007](adr/0007-content-intelligence-engine.md)) closes the loop: GA4 analytics data flows into `scripts/content_intelligence.py`, which aggregates top and bottom performers by composite engagement score and injects the context back into Topic Scout. Search Console data will be wired in once the property finishes its 24-48h population period.
 
 ```mermaid
 graph LR
@@ -95,8 +95,8 @@ Articles pass a 5-gate editorial review (opening, evidence, voice, structure, vi
 ### Agent Governance
 [ADR-0008](adr/0008-agent-skill-governance.md) defines the delegation matrix: which agents can invoke which tools, model tier assignments (Opus for quality-critical, Haiku for mechanical), and budget caps per invocation to prevent runaway costs.
 
-### Performance-Linked Feedback (Planned)
-The Content Intelligence Engine ([ADR-0007](adr/0007-content-intelligence-engine.md)) will connect GA4 and Google Search Console to the pipeline, so that articles with low engagement signal content gaps and high-performing topics inform future editorial direction. Sprint 20 landed the GA4/GSC ETL scripts (`scripts/ga4_etl.py`, `scripts/gsc_etl.py`); the next step is wiring their output into the topic selection flow. See [ADR-0007](adr/0007-content-intelligence-engine.md) for the full design.
+### Performance-Linked Feedback
+The Content Intelligence Engine ([ADR-0007](adr/0007-content-intelligence-engine.md), Accepted 2026-04-06) connects GA4 audience data to topic selection. `scripts/ga4_etl.py` pulls real article performance metrics into `data/performance.db`; `scripts/content_intelligence.py` aggregates top and bottom performers; and `scripts/topic_scout.py` injects that context into the LLM prompt so the Scout explicitly builds on what's working and reframes what isn't. Google Search Console keyword data will be added once the property finishes its 24-48h population period. A/B verification ([PR #184](https://github.com/oviney/economist-agents/pull/184)) confirmed the loop is causally real (Jaccard 0.111 vs threshold 0.6; all 5 Run A topics explicitly reference top performers).
 
 ---
 

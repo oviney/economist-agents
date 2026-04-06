@@ -121,7 +121,14 @@ jobs:
               title = post.get("title", post_file)
               score = post.get("currentScore", 0)
               actions = post.get("actionPlan", post.get("actions", []))
-              action_summary = ", ".join(actions[:3]) if isinstance(actions, list) else str(actions)
+              if isinstance(actions, list):
+                  str_actions = [
+                      a.get("action", str(a)) if isinstance(a, dict) else str(a)
+                      for a in actions[:3]
+                  ]
+                  action_summary = ", ".join(str_actions)
+              else:
+                  action_summary = str(actions)
 
               if post_file in triggered_this_week:
                   skipped.append(post_file)

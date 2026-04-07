@@ -108,6 +108,38 @@ jobs:
           python scripts/quality_metrics.py
           echo "Dashboard updated: logs/quality_dashboard.json"
 
+      # Agent performance metrics — appends one row to data/metrics.db
+      # so the Streamlit dashboard can track quality, cost, and run outcomes
+      # over time. Runs regardless of article generation success/failure.
+      - name: Record Pipeline Metrics
+        if: success() || failure()
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          # Derive status and scores from pipeline outputs.
+          # editorial_score and gates_passed use placeholder values here
+          # because the flow currently emits them only to stdout; a future
+          # improvement is to write a structured JSON result file and read
+          # it here for accurate per-run metrics.
+          TOPIC="${{ github.event.inputs.topic }}"
+          STATUS="failed"
+          SCORE=0   # placeholder: updated to 80 when article_path.txt exists
+          GATES=0   # placeholder: updated to 5  when article_path.txt exists
+
+          if [ -f article_path.txt ]; then
+            STATUS="published"
+            SCORE=80
+            GATES=5
+          fi
+
+          python scripts/record_metrics.py \
+            --agent "flow_pipeline" \
+            --topic "${TOPIC:-auto}" \
+            --editorial-score "${SCORE}" \
+            --gates-passed "${GATES}" \
+            --status "${STATUS}"
+          echo "Metrics recorded to data/metrics.db"
+
       - name: Upload generated content
         uses: actions/upload-artifact@v4
         with:

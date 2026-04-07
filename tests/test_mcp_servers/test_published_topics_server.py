@@ -28,6 +28,8 @@ from mcp_servers.published_topics_server import (
     _get_archive,
     get_archive_stats,
     index_published_article,
+    is_topic_duplicate,
+    query_published_topics,
     search_published_topics,
 )
 
@@ -546,3 +548,184 @@ class TestMCPServerTools:
 
         assert result["success"] is False
         assert result["error"] == "ChromaDB unavailable"
+
+
+# ---------------------------------------------------------------------------
+# MCP tool: query_published_topics
+# ---------------------------------------------------------------------------
+
+
+class TestQueryPublishedTopics:
+    """Tests for the query_published_topics MCP tool."""
+
+    @pytest.fixture(autouse=True)
+    def reset_archive(self) -> Iterator[None]:
+        """Reset the module-level _archive singleton between tests."""
+        import mcp_servers.published_topics_server as srv
+
+        original = srv._archive
+        srv._archive = None
+        yield
+        srv._archive = original
+
+    def _mock_archive(self) -> MagicMock:
+        return MagicMock(spec=ArticleArchive)
+
+    def test_query_returns_results(self) -> None:
+        """query_published_topics returns results from archive.search."""
+        mock_arc = self._mock_archive()
+        mock_arc.search.return_value = [
+            {"title": "Inflation", "similarity": 0.75},
+            {"title": "Trade War", "similarity": 0.62},
+        ]
+
+        with patch("mcp_servers.published_topics_server._get_archive", return_value=mock_arc):
+            results = query_published_topics("monetary policy")
+
+        mock_arc.search.assert_called_once_with("monetary policy", threshold=0.0, n_results=5)
+        assert len(results) == 2
+        assert results[0]["title"] == "Inflation"
+
+    def test_query_default_n_results(self) -> None:
+        """query_published_topics defaults to n_results=5."""
+        mock_arc = self._mock_archive()
+        mock_arc.search.return_value = []
+
+        with patch("mcp_servers.published_topics_server._get_archive", return_value=mock_arc):
+            query_published_topics("some topic")
+
+        mock_arc.search.assert_called_once_with("some topic", threshold=0.0, n_results=5)
+
+    def test_query_custom_n_results(self) -> None:
+        """query_published_topics passes custom n_results to archive.search."""
+        mock_arc = self._mock_archive()
+        mock_arc.search.return_value = []
+
+        with patch("mcp_servers.published_topics_server._get_archive", return_value=mock_arc):
+            query_published_topics("AI automation", n_results=10)
+
+        mock_arc.search.assert_called_once_with("AI automation", threshold=0.0, n_results=10)
+
+    def test_query_uses_zero_threshold(self) -> None:
+        """query_published_topics uses threshold=0.0 (returns all results)."""
+        mock_arc = self._mock_archive()
+        mock_arc.search.return_value = [{"title": "Low sim", "similarity": 0.1}]
+
+        with patch("mcp_servers.published_topics_server._get_archive", return_value=mock_arc):
+            results = query_published_topics("obscure niche")
+
+        # threshold=0.0 means even low-similarity results come through
+        assert results[0]["similarity"] == 0.1
+
+    def test_query_empty_archive_returns_empty_list(self) -> None:
+        """query_published_topics returns [] when no articles are indexed."""
+        mock_arc = self._mock_archive()
+        mock_arc.search.return_value = []
+
+        with patch("mcp_servers.published_topics_server._get_archive", return_value=mock_arc):
+            results = query_published_topics("anything")
+
+        assert results == []
+
+
+# ---------------------------------------------------------------------------
+# MCP tool: is_topic_duplicate
+# ---------------------------------------------------------------------------
+
+
+class TestIsTopicDuplicate:
+    """Tests for the is_topic_duplicate MCP tool."""
+
+    @pytest.fixture(autouse=True)
+    def reset_archive(self) -> Iterator[None]:
+        """Reset the module-level _archive singleton between tests."""
+        import mcp_servers.published_topics_server as srv
+
+        original = srv._archive
+        srv._archive = None
+        yield
+        srv._archive = original
+
+    def _mock_archive(self) -> MagicMock:
+        return MagicMock(spec=ArticleArchive)
+
+    def test_duplicate_when_similarity_above_0_8(self) -> None:
+        """is_duplicate=True when best match similarity exceeds 0.8."""
+        mock_arc = self._mock_archive()
+        mock_arc.search.return_value = [
+            {"title": "Inflation Outlook", "similarity": 0.9},
+        ]
+
+        with patch("mcp_servers.published_topics_server._get_archive", return_value=mock_arc):
+            result = is_topic_duplicate("Central bank inflation forecast")
+
+        assert result["is_duplicate"] is True
+        assert result["confidence"] == pytest.approx(0.9)
+        assert result["warning"] is False
+        assert len(result["similar_articles"]) == 1
+
+    def test_warning_when_similarity_between_0_6_and_0_8(self) -> None:
+        """warning=True when best match is in the 0.6-0.8 zone."""
+        mock_arc = self._mock_archive()
+        mock_arc.search.return_value = [
+            {"title": "Trade Policy", "similarity": 0.7},
+        ]
+
+        with patch("mcp_servers.published_topics_server._get_archive", return_value=mock_arc):
+            result = is_topic_duplicate("Trade tariffs impact")
+
+        assert result["is_duplicate"] is False
+        assert result["warning"] is True
+        assert result["confidence"] == pytest.approx(0.7)
+
+    def test_safe_when_no_similar_articles(self) -> None:
+        """is_duplicate=False and warning=False when archive is empty."""
+        mock_arc = self._mock_archive()
+        mock_arc.search.return_value = []
+
+        with patch("mcp_servers.published_topics_server._get_archive", return_value=mock_arc):
+            result = is_topic_duplicate("Completely new topic")
+
+        assert result["is_duplicate"] is False
+        assert result["warning"] is False
+        assert result["confidence"] == 0.0
+        assert result["similar_articles"] == []
+
+    def test_boundary_exactly_0_8_is_not_duplicate(self) -> None:
+        """similarity == 0.8 is in the warning zone, not a duplicate."""
+        mock_arc = self._mock_archive()
+        mock_arc.search.return_value = [
+            {"title": "Edge Case", "similarity": 0.8},
+        ]
+
+        with patch("mcp_servers.published_topics_server._get_archive", return_value=mock_arc):
+            result = is_topic_duplicate("Edge case topic")
+
+        assert result["is_duplicate"] is False
+        assert result["warning"] is True
+
+    def test_uses_threshold_0_6_for_search(self) -> None:
+        """is_topic_duplicate searches with threshold=0.6."""
+        mock_arc = self._mock_archive()
+        mock_arc.search.return_value = []
+
+        with patch("mcp_servers.published_topics_server._get_archive", return_value=mock_arc):
+            is_topic_duplicate("some topic")
+
+        mock_arc.search.assert_called_once_with("some topic", threshold=0.6, n_results=5)
+
+    def test_returns_all_similar_articles_in_result(self) -> None:
+        """similar_articles in result includes all returned matches."""
+        mock_arc = self._mock_archive()
+        articles = [
+            {"title": "A", "similarity": 0.85},
+            {"title": "B", "similarity": 0.72},
+            {"title": "C", "similarity": 0.65},
+        ]
+        mock_arc.search.return_value = articles
+
+        with patch("mcp_servers.published_topics_server._get_archive", return_value=mock_arc):
+            result = is_topic_duplicate("broad topic")
+
+        assert result["similar_articles"] == articles
+        assert result["is_duplicate"] is True  # best match 0.85 > 0.8

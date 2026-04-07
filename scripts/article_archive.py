@@ -31,6 +31,7 @@ Usage:
 
 import logging
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -194,36 +195,39 @@ class ArticleArchive:
         self,
         title: str,
         thesis: str,
-        summary: str,
-        categories: str,
         date: str,
+        categories: str,
         file_path: str,
-    ) -> str:
+        *,
+        summary: str = "",
+    ) -> dict[str, Any]:
         """Index a single article into the archive.
 
-        The document text stored in ChromaDB is ``"<title>\\n\\n<thesis>\\n\\n<summary>"``.
+        The document text stored in ChromaDB is the ``thesis``.
         If an article with the same ``file_path`` already exists it is replaced.
 
         Args:
             title: Article headline.
             thesis: Core argument extracted from the first two body paragraphs.
-            summary: Brief human-readable summary (one or two sentences).
-            categories: Comma-separated category tags.
+                Used as the embedding document text.
             date: Publication date in ``YYYY-MM-DD`` format.
+            categories: Comma-separated category tags.
             file_path: Relative or absolute path to the source ``.md`` file.
+            summary: Optional brief human-readable summary (one or two sentences).
 
         Returns:
-            The document ID used in ChromaDB (derived from ``file_path``).
-
-        Raises:
-            RuntimeError: If ChromaDB is unavailable or the collection is not
-                initialised.
+            dict with ``success`` (bool), ``id`` (str), and ``total_indexed``
+            (int) on success.  On failure returns ``success=False`` with an
+            ``error`` (str) field and ``id=""`` instead.
         """
         if self.collection is None:
-            raise RuntimeError("ArticleArchive is not available (ChromaDB missing).")
+            return {
+                "success": False,
+                "error": "ArticleArchive is not available (ChromaDB missing).",
+                "id": "",
+            }
 
-        doc_id = _make_doc_id(file_path)
-        document_text = f"{title}\n\n{thesis}\n\n{summary}"
+        doc_id = _make_doc_id(title, date, file_path)
 
         metadata: dict[str, str] = {
             "title": title,
@@ -231,21 +235,26 @@ class ArticleArchive:
             "date": date,
             "categories": categories,
             "file_path": file_path,
+            "indexed_at": datetime.now(tz=timezone.utc).isoformat(),
         }
 
         try:
             # upsert so re-indexing the same article is idempotent
             self.collection.upsert(
-                documents=[document_text],
+                documents=[thesis],
                 metadatas=[metadata],
                 ids=[doc_id],
             )
             logger.debug("Indexed article '%s' (id=%s).", title, doc_id)
         except Exception as exc:
             logger.error("Failed to index article '%s': %s", title, exc)
-            raise
+            return {"success": False, "error": str(exc), "id": ""}
 
-        return doc_id
+        return {
+            "success": True,
+            "id": doc_id,
+            "total_indexed": self.collection.count(),
+        }
 
     def find_similar_topics(
         self,
@@ -299,16 +308,19 @@ class ArticleArchive:
         metadatas = raw["metadatas"][0]
         distances = raw.get("distances", [[]])[0]
 
-        for _doc, meta, distance in zip(documents, metadatas, distances, strict=False):
-            # _doc is the stored document text; we return metadata fields instead
+        for i, (doc, meta) in enumerate(zip(documents, metadatas, strict=False)):
+            # Use stored distance; default 0.0 (similarity 1.0) when missing
+            distance = float(distances[i]) if i < len(distances) else 0.0
             # ChromaDB cosine distance is in [0, 2]; similarity = 1 - distance
-            similarity = round(1.0 - float(distance), 4)
+            similarity = round(1.0 - distance, 4)
             if similarity < threshold:
                 continue
+            # doc is the stored thesis text; fall back to metadata thesis if empty
+            thesis = doc if doc else meta.get("thesis", "")
             results.append(
                 {
                     "title": meta.get("title", ""),
-                    "thesis": meta.get("thesis", ""),
+                    "thesis": thesis,
                     "date": meta.get("date", ""),
                     "categories": meta.get("categories", ""),
                     "file_path": meta.get("file_path", ""),
@@ -360,10 +372,10 @@ class ArticleArchive:
                 self.index_article(
                     title=title,
                     thesis=thesis,
-                    summary=summary,
-                    categories=categories,
                     date=date,
+                    categories=categories,
                     file_path=str(md_file),
+                    summary=summary,
                 )
                 indexed += 1
             except Exception as exc:
@@ -419,7 +431,7 @@ class ArticleArchive:
         total = self.collection.count()
         stats: dict[str, Any] = {
             "available": True,
-            "total_articles": total,
+            "total_articles": 0,
             "date_range": {"earliest": None, "latest": None},
             "category_distribution": {},
         }
@@ -445,6 +457,7 @@ class ArticleArchive:
                     "latest": dates_sorted[-1],
                 }
             stats["category_distribution"] = categories
+            stats["total_articles"] = total
         except Exception as exc:
             logger.warning("get_stats metadata fetch failed: %s", exc)
 
@@ -456,18 +469,20 @@ class ArticleArchive:
 # ---------------------------------------------------------------------------
 
 
-def _make_doc_id(file_path: str) -> str:
-    """Derive a stable document ID from a file path.
+def _make_doc_id(title: str, date: str, file_path: str) -> str:
+    """Derive a stable document ID from a file path or title+date.
 
     Args:
+        title: Article headline (used as fallback when file_path is empty).
+        date: Publication date (used as fallback when file_path is empty).
         file_path: Relative or absolute path to the article file.
 
     Returns:
-        A URL-safe string suitable for use as a ChromaDB document ID.
+        The file_path when non-empty; otherwise ``"<title>_<date>"``.
     """
-    stem = Path(file_path).stem
-    # Replace characters that may cause issues with some ChromaDB backends
-    return re.sub(r"[^a-zA-Z0-9_-]", "_", stem)
+    if file_path:
+        return file_path
+    return f"{title}_{date}"
 
 
 # ---------------------------------------------------------------------------

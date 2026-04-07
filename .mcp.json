@@ -14,6 +14,11 @@
       "command": "python3",
       "args": ["mcp_servers/article_evaluator_server.py"],
       "description": "Scores article drafts across 5 quality dimensions and returns a pass/fail verdict before publishing"
+    },
+    "published-topics": {
+      "command": "python3",
+      "args": ["mcp_servers/published_topics_server.py"],
+      "description": "Query the published article archive for topic similarity and duplicate detection before commissioning new content"
     }
   }
 }

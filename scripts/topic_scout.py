@@ -18,9 +18,53 @@ Output: Ranked list of topics with data availability scores
 
 import json
 import os
+import re
 from datetime import datetime
 
 from agent_loader import load_scout_prompts as _load_scout_prompts
+
+# ---------------------------------------------------------------------------
+# Theme keyword map for diversity classification.
+# Keys are canonical theme labels used by check_topic_diversity().
+# ---------------------------------------------------------------------------
+THEME_KEYWORDS: dict[str, list[str]] = {
+    "ai_testing": [
+        "ai", "ml", "machine learning", "test generation", "copilot",
+        "llm", "generative", "ai-powered", "ai testing",
+    ],
+    "security": [
+        "security", "vulnerability", "devsecops", "sast", "dast", "owasp",
+        "penetration", "supply-chain", "exploit", "cve",
+    ],
+    "devops": [
+        "devops", "ci/cd", "cicd", "deployment", "pipeline", "gitops",
+        "docker", "kubernetes", "release engineering", "continuous delivery",
+    ],
+    "platform_engineering": [
+        "platform engineering", "internal developer platform", "idp",
+        "backstage", "paved path", "golden path", "developer portal",
+    ],
+    "observability": [
+        "observability", "opentelemetry", "distributed tracing", "tracing",
+        "logging", "metrics", "slo", "sla", "alerting", "monitoring",
+    ],
+    "developer_experience": [
+        "developer experience", "dx", "developer productivity", "onboarding",
+        "cognitive load", "inner loop", "developer satisfaction", "devex",
+    ],
+    "software_architecture": [
+        "architecture", "microservices", "monolith", "design pattern",
+        "technical debt", "refactoring", "modular", "domain-driven",
+    ],
+    "quality_economics": [
+        "roi", "cost", "economics", "budget", "maintenance cost",
+        "investment", "total cost", "productivity", "velocity",
+    ],
+    "test_automation": [
+        "test automation", "flaky test", "test suite", "playwright", "cypress",
+        "selenium", "shift-left", "shift-right", "e2e", "unit test",
+    ],
+}
 
 # Content Intelligence: real blog performance data from GA4 ETL (ADR-0007)
 from content_intelligence import get_performance_context
@@ -31,6 +75,104 @@ from llm_client import call_llm, create_llm_client
 _scout_prompts = _load_scout_prompts()
 SCOUT_AGENT_PROMPT = _scout_prompts["scout"]
 TREND_RESEARCH_PROMPT = _scout_prompts["trend"]
+
+
+def classify_topic_theme(topic: dict) -> str:
+    """Classify a topic into its primary theme using keyword matching.
+
+    If the topic already has a ``theme`` field (set by the LLM), that value is
+    returned directly so the model's own categorisation is honoured.  Otherwise,
+    keyword matching across the topic's text fields is used as a fallback.
+
+    Args:
+        topic: Topic dict as returned by ``scout_topics()``.
+
+    Returns:
+        Theme string (e.g. ``"security"``, ``"ai_testing"``).
+        Falls back to ``"other"`` when no keywords match.
+    """
+    # Prefer the LLM-supplied theme field when present.
+    if topic.get("theme"):
+        return str(topic["theme"]).strip().lower()
+
+    # Build a combined text blob from all descriptive fields.
+    text = " ".join(
+        [
+            topic.get("topic", ""),
+            topic.get("hook", ""),
+            topic.get("thesis", ""),
+            topic.get("contrarian_angle", ""),
+            topic.get("talking_points", ""),
+        ]
+    ).lower()
+
+    theme_scores: dict[str, int] = {}
+    for theme, keywords in THEME_KEYWORDS.items():
+        score = sum(
+            1
+            for kw in keywords
+            if re.search(r"\b" + re.escape(kw) + r"\b", text)
+        )
+        if score > 0:
+            theme_scores[theme] = score
+
+    if not theme_scores:
+        return "other"
+
+    return max(theme_scores, key=lambda k: theme_scores[k])
+
+
+def check_topic_diversity(topics: list) -> tuple[bool, str]:
+    """Check whether generated topics are sufficiently diverse.
+
+    A set of topics is considered diverse when no single theme accounts for
+    more than 40 % of the topics.
+
+    Args:
+        topics: List of topic dicts from ``scout_topics()``.
+
+    Returns:
+        A tuple ``(is_diverse, dominant_theme)`` where:
+        - ``is_diverse`` is ``True`` when the threshold is not exceeded.
+        - ``dominant_theme`` is the theme that appears most often (empty string
+          when *topics* is empty).
+    """
+    if not topics:
+        return True, ""
+
+    theme_counts: dict[str, int] = {}
+    for topic in topics:
+        theme = classify_topic_theme(topic)
+        theme_counts[theme] = theme_counts.get(theme, 0) + 1
+
+    dominant_theme = max(theme_counts, key=lambda k: theme_counts[k])
+    dominant_ratio = theme_counts[dominant_theme] / len(topics)
+
+    return dominant_ratio <= 0.4, dominant_theme
+
+
+def _parse_topics_json(response_text: str, label: str = "") -> list | None:
+    """Extract and parse a JSON array from an LLM response string.
+
+    Args:
+        response_text: Raw text returned by the LLM.
+        label: Optional label used in printed warning messages (e.g. ``"on retry"``).
+
+    Returns:
+        Parsed list of topic dicts, or ``None`` when parsing fails (the caller
+        should treat ``None`` as an empty result and return ``[]``).
+    """
+    suffix = f" {label}" if label else ""
+    try:
+        start = response_text.find("[")
+        end = response_text.rfind("]") + 1
+        if start != -1 and end > start:
+            return json.loads(response_text[start:end])
+        print(f"   ⚠ Could not parse topic list{suffix}")
+        return None
+    except json.JSONDecodeError as exc:
+        print(f"   ⚠ JSON parse error{suffix}: {exc}")
+        return None
 
 
 def create_client():
@@ -89,18 +231,34 @@ def scout_topics(client, focus_area: str = None) -> list:
         max_tokens=3000,
     )
 
-    # Parse JSON from response
-    try:
-        start = response_text.find("[")
-        end = response_text.rfind("]") + 1
-        if start != -1 and end > start:
-            topics = json.loads(response_text[start:end])
-        else:
-            print("   ⚠ Could not parse topic list")
-            return []
-    except json.JSONDecodeError as e:
-        print(f"   ⚠ JSON parse error: {e}")
+    topics = _parse_topics_json(response_text)
+    if topics is None:
         return []
+
+    # Diversity check: if >40% of topics share the same theme, regenerate once.
+    # Requires at least 3 topics to be meaningful (with 2, any split is ≥50%).
+    is_diverse, dominant_theme = check_topic_diversity(topics)
+    if len(topics) >= 3 and not is_diverse:
+        print(
+            f"   ⚠ Diversity check failed: too many '{dominant_theme}' topics "
+            f"(>{int(0.4 * 100)}% threshold). Regenerating with diversity hint..."
+        )
+        diversity_hint = (
+            f"\n\nDIVERSITY ALERT: Your previous response contained too many topics "
+            f"about '{dominant_theme}'. You MUST now produce topics that span at least "
+            f"4 different categories. Do NOT include more than 1 topic from "
+            f"'{dominant_theme}'."
+        )
+        retry_response = call_llm(
+            client,
+            "",
+            scout_prompt + diversity_hint,
+            max_tokens=3000,
+        )
+        retry_topics = _parse_topics_json(retry_response, label="on retry")
+        if retry_topics is None:
+            return []
+        topics = retry_topics
 
     # Sort by score
     topics.sort(key=lambda x: x.get("total_score", 0), reverse=True)

@@ -49,14 +49,22 @@ system_message: |
   TOPIC CATEGORIES TO MONITOR:
   - Test automation economics (ROI, maintenance costs, build times)
   - AI/ML in testing (copilots, test generation, visual testing)
-  - Platform engineering & developer experience
+  - Platform engineering (internal developer platforms, paved paths, Backstage, IDP)
+  - Developer experience (DX, cognitive load, onboarding, productivity metrics)
   - Shift-left/shift-right movements
-  - Quality metrics and observability
-  - Tool ecosystem changes (Playwright, Cypress, k6, etc.)
+  - Quality metrics and observability (OpenTelemetry, distributed tracing, SLOs, alerting)
+  - DevOps and CI/CD (pipelines, GitOps, deployment strategies, release engineering)
+  - Security and DevSecOps (SAST, DAST, supply-chain security, OWASP, vulnerability management)
+  - Software architecture (microservices, monolith migration, technical debt, design patterns)
+  - Tool ecosystem changes (Playwright, Cypress, k6, Grafana, etc.)
   - Organizational models (embedded QE, SRE, platform teams)
   - Performance and reliability engineering
-  - Security testing integration
   - Mobile and cross-platform testing
+
+  DIVERSITY REQUIREMENT:
+  You MUST spread the 5 topics across AT LEAST 4 different categories from the list above.
+  Do NOT return more than 2 topics from any single category (e.g. no more than 2 AI-testing topics).
+  Each topic should have a "theme" field identifying its primary category from the list above.
 
   THESIS REQUIREMENTS (Rule 2 — Argue a thesis, not a topic):
   The "thesis" field MUST be a specific, debatable argument — NOT a topic description.
@@ -78,6 +86,7 @@ system_message: |
   [
     {
       "topic": "Clear, specific article title",
+      "theme": "primary category from TOPIC CATEGORIES (e.g. security, devops, platform_engineering)",
       "hook": "The attention-grabbing angle or stat (1 sentence)",
       "thesis": "A specific, debatable argument (not a topic description) - a claim someone could disagree with",
       "data_sources": ["Where we'd get numbers for charts"],
@@ -98,15 +107,19 @@ system_message: |
 
   Sort by total_score descending. Be specific—not "AI in Testing" but "AI test generators: a maintenance debt machine in disguise".
 trend_system_message: |
-  You are researching current trends in software quality engineering.
+  You are researching current trends in software engineering and quality engineering.
 
   Search for and analyze:
   1. Recent announcements from major testing tool vendors (last 30 days)
   2. Hot discussions in QE communities
   3. New research reports or surveys on testing practices
   4. Conference talk submissions/trends (if visible)
-  5. Job posting trends for QE roles
-  6. Venture capital activity in testing/quality space
+  5. Job posting trends for QE and platform engineering roles
+  6. Venture capital activity in testing/quality/observability/DevOps space
+  7. Security and DevSecOps developments affecting engineering teams
+  8. Platform engineering and developer experience news (Backstage, IDPs, DX metrics)
+  9. Observability ecosystem updates (OpenTelemetry, distributed tracing, SLOs)
+  10. Software architecture debates (monolith-to-microservices, technical debt management)
 
   For each finding, note:
   - What happened
@@ -115,6 +128,8 @@ trend_system_message: |
   - Data/numbers if available
 
   Focus on developments that would interest a senior QE leader making strategic decisions.
+  Cover a BROAD range of topics — not just AI testing. Include Security, DevOps, Platform Engineering,
+  Observability, Developer Experience, and Software Architecture trends.
 metadata:
   version: "1.0"
   created: "2026-01-01"

@@ -18,6 +18,7 @@ import binascii
 import logging
 import os
 from pathlib import Path
+from typing import Literal
 
 import openai
 import requests
@@ -243,6 +244,59 @@ def generate_editorial_image(
             "path": None,
             "size_bytes": 0,
         }
+
+
+@mcp.tool()
+def generate_image(
+    prompt: str,
+    size: Literal["1024x1024", "1792x1024", "1024x1792"] = "1792x1024",
+) -> dict:
+    """Generate an image using DALL-E 3 and return its URL.
+
+    A lightweight wrapper around the DALL-E 3 API that accepts a raw prompt
+    and returns the hosted image URL together with the revised prompt that
+    OpenAI used.
+
+    Args:
+        prompt: Text description of the image to generate.
+        size: Image dimensions — one of ``"1792x1024"`` (default, landscape),
+              ``"1024x1024"`` (square), or ``"1024x1792"`` (portrait).
+
+    Returns:
+        A dictionary with keys:
+
+        - ``url`` (str): HTTPS URL to the generated image.
+        - ``revised_prompt`` (str): The prompt OpenAI actually used
+          (may differ from the input if DALL-E rewrote it for safety).
+
+    Raises:
+        ValueError: If ``OPENAI_API_KEY`` is not set in the environment.
+        openai.OpenAIError: If the API call fails.
+    """
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        raise ValueError(
+            "OPENAI_API_KEY environment variable is not set. "
+            "Please export OPENAI_API_KEY=<your-key> before using this tool."
+        )
+
+    client = openai.OpenAI(api_key=api_key)
+    logger.info("Calling DALL-E 3 for prompt (first 60 chars): %r", prompt[:60])
+
+    response = client.images.generate(
+        model="dall-e-3",
+        prompt=prompt,
+        size=size,
+        quality="hd",
+        n=1,
+    )
+
+    image_data = response.data[0]
+    url = image_data.url or ""
+    revised_prompt = image_data.revised_prompt or prompt
+
+    logger.info("Image generated: url=%r", url[:80] if url else "(empty)")
+    return {"url": url, "revised_prompt": revised_prompt}
 
 
 if __name__ == "__main__":

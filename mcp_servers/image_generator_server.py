@@ -18,6 +18,7 @@ import binascii
 import logging
 import os
 from pathlib import Path
+from typing import Literal
 
 import openai
 import requests
@@ -246,7 +247,10 @@ def generate_editorial_image(
 
 
 @mcp.tool()
-def generate_image(prompt: str, size: str = "1792x1024") -> dict:
+def generate_image(
+    prompt: str,
+    size: Literal["1024x1024", "1792x1024", "1024x1792"] = "1792x1024",
+) -> dict:
     """Generate an image using DALL-E 3 and return its URL.
 
     A lightweight wrapper around the DALL-E 3 API that accepts a raw prompt
@@ -255,8 +259,8 @@ def generate_image(prompt: str, size: str = "1792x1024") -> dict:
 
     Args:
         prompt: Text description of the image to generate.
-        size: Image dimensions, e.g. ``"1792x1024"`` (default),
-              ``"1024x1024"``, or ``"1024x1792"``.
+        size: Image dimensions — one of ``"1792x1024"`` (default, landscape),
+              ``"1024x1024"`` (square), or ``"1024x1792"`` (portrait).
 
     Returns:
         A dictionary with keys:
@@ -282,14 +286,14 @@ def generate_image(prompt: str, size: str = "1792x1024") -> dict:
     response = client.images.generate(
         model="dall-e-3",
         prompt=prompt,
-        size=size,  # type: ignore[arg-type]
+        size=size,
         quality="hd",
         n=1,
     )
 
     image_data = response.data[0]
     url = image_data.url or ""
-    revised_prompt = getattr(image_data, "revised_prompt", None) or prompt
+    revised_prompt = image_data.revised_prompt or prompt
 
     logger.info("Image generated: url=%r", url[:80] if url else "(empty)")
     return {"url": url, "revised_prompt": revised_prompt}

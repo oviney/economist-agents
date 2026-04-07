@@ -18,7 +18,6 @@ Usage:
     archive.index_article(
         title="Why AI Testing is Broken",
         thesis="Automated test generation raises quality illusions.",
-        summary="Survey of 500 teams reveals divergence between coverage and defects.",
         categories="testing,ai",
         date="2026-04-05",
         file_path="_posts/2026-04-05-why-ai-testing-is-broken.md",
@@ -31,6 +30,7 @@ Usage:
 
 import logging
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -194,36 +194,37 @@ class ArticleArchive:
         self,
         title: str,
         thesis: str,
-        summary: str,
-        categories: str,
         date: str,
+        categories: str,
         file_path: str,
-    ) -> str:
+    ) -> dict[str, Any]:
         """Index a single article into the archive.
 
-        The document text stored in ChromaDB is ``"<title>\\n\\n<thesis>\\n\\n<summary>"``.
+        The document text stored in ChromaDB is the ``thesis``.
         If an article with the same ``file_path`` already exists it is replaced.
 
         Args:
             title: Article headline.
             thesis: Core argument extracted from the first two body paragraphs.
-            summary: Brief human-readable summary (one or two sentences).
-            categories: Comma-separated category tags.
             date: Publication date in ``YYYY-MM-DD`` format.
+            categories: Comma-separated category tags.
             file_path: Relative or absolute path to the source ``.md`` file.
+                When empty, the doc ID falls back to ``"{title}_{date}"``.
 
         Returns:
-            The document ID used in ChromaDB (derived from ``file_path``).
-
-        Raises:
-            RuntimeError: If ChromaDB is unavailable or the collection is not
-                initialised.
+            dict with ``success`` (bool), ``id`` (str), and ``total_indexed``
+            (int) on success, or ``success`` (bool) and ``error`` (str) on
+            failure.  The stored metadata includes an ``indexed_at`` ISO-8601
+            UTC timestamp added automatically on each upsert.
         """
         if self.collection is None:
-            raise RuntimeError("ArticleArchive is not available (ChromaDB missing).")
+            return {
+                "success": False,
+                "error": "ArticleArchive is not available (ChromaDB missing).",
+                "id": "",
+            }
 
-        doc_id = _make_doc_id(file_path)
-        document_text = f"{title}\n\n{thesis}\n\n{summary}"
+        doc_id = file_path if file_path else f"{title}_{date}"
 
         metadata: dict[str, str] = {
             "title": title,
@@ -231,21 +232,22 @@ class ArticleArchive:
             "date": date,
             "categories": categories,
             "file_path": file_path,
+            "indexed_at": datetime.now(timezone.utc).isoformat(),
         }
 
         try:
             # upsert so re-indexing the same article is idempotent
             self.collection.upsert(
-                documents=[document_text],
+                documents=[thesis],
                 metadatas=[metadata],
                 ids=[doc_id],
             )
             logger.debug("Indexed article '%s' (id=%s).", title, doc_id)
         except Exception as exc:
             logger.error("Failed to index article '%s': %s", title, exc)
-            raise
+            return {"success": False, "error": str(exc), "id": doc_id}
 
-        return doc_id
+        return {"success": True, "id": doc_id, "total_indexed": self.collection.count()}
 
     def find_similar_topics(
         self,
@@ -297,9 +299,16 @@ class ArticleArchive:
 
         documents = raw["documents"][0]
         metadatas = raw["metadatas"][0]
-        distances = raw.get("distances", [[]])[0]
+        raw_distances = raw.get("distances", [[]])[0]
+        # Pad missing distances with 0.0 (→ similarity 1.0) so every document
+        # in the response has a corresponding distance value.  ChromaDB
+        # guarantees a distances list when include=["distances"] is requested,
+        # but guard defensively; the calling test documents this expectation.
+        distances: list[float] = list(raw_distances) + [0.0] * max(
+            0, len(documents) - len(raw_distances)
+        )
 
-        for _doc, meta, distance in zip(documents, metadatas, distances, strict=False):
+        for doc, meta, distance in zip(documents, metadatas, distances, strict=False):
             # _doc is the stored document text; we return metadata fields instead
             # ChromaDB cosine distance is in [0, 2]; similarity = 1 - distance
             similarity = round(1.0 - float(distance), 4)
@@ -308,7 +317,7 @@ class ArticleArchive:
             results.append(
                 {
                     "title": meta.get("title", ""),
-                    "thesis": meta.get("thesis", ""),
+                    "thesis": doc,
                     "date": meta.get("date", ""),
                     "categories": meta.get("categories", ""),
                     "file_path": meta.get("file_path", ""),
@@ -354,13 +363,10 @@ class ArticleArchive:
                 categories = _categories_to_str(raw_categories)
 
                 thesis = _extract_thesis(body)
-                # Use thesis as summary too when no dedicated summary field exists
-                summary = thesis
 
                 self.index_article(
                     title=title,
                     thesis=thesis,
-                    summary=summary,
                     categories=categories,
                     date=date,
                     file_path=str(md_file),
@@ -447,6 +453,7 @@ class ArticleArchive:
             stats["category_distribution"] = categories
         except Exception as exc:
             logger.warning("get_stats metadata fetch failed: %s", exc)
+            stats["total_articles"] = 0
 
         return stats
 

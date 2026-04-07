@@ -77,6 +77,19 @@ repos:
         files: ^agents/.*\.yaml$
         always_run: false
 
+      # Architecture review - catches anti-patterns before CI (issue: pre-commit-arch-review)
+      - id: arch-review
+        name: architecture review
+        description: >
+          Check staged Python files for architectural anti-patterns:
+          ADR-002 (direct LLM imports), unprotected json.loads, hardcoded
+          secrets, and print() used for error reporting.
+          Fails commit if error-level violations are found.
+        entry: python scripts/pre_commit_arch_check.py
+        language: system
+        types: [python]
+        pass_filenames: true
+
   # Basic file checks (check-only, no auto-fix)
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0

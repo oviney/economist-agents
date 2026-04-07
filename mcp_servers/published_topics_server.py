@@ -80,8 +80,13 @@ def query_published_topics(
     Returns:
         List of matching articles, each with title, thesis, date,
         categories, file_path, and similarity score.
+        On failure returns an empty list.
     """
-    return _get_archive().search(query, threshold=0.0, n_results=n_results)
+    try:
+        return _get_archive().search(query, threshold=0.0, n_results=n_results)
+    except Exception as exc:
+        logger.error("query_published_topics failed: %s", exc)
+        return []
 
 
 @mcp.tool()
@@ -103,15 +108,26 @@ def is_topic_duplicate(topic: str) -> dict[str, Any]:
           - confidence (float): Similarity score of the closest match (0-1).
           - similar_articles (list): Up to 5 similar articles with metadata.
           - warning (bool): True when 0.6 <= confidence <= 0.8.
+        On failure, returns is_duplicate=False, confidence=0.0 with an error key.
     """
-    similar = _get_archive().search(topic, threshold=0.6, n_results=5)
-    confidence = similar[0]["similarity"] if similar else 0.0
-    return {
-        "is_duplicate": confidence > 0.8,
-        "confidence": confidence,
-        "similar_articles": similar,
-        "warning": 0.6 <= confidence <= 0.8,
-    }
+    try:
+        similar = _get_archive().search(topic, threshold=0.6, n_results=5)
+        confidence = similar[0]["similarity"] if similar else 0.0
+        return {
+            "is_duplicate": confidence > 0.8,
+            "confidence": confidence,
+            "similar_articles": similar,
+            "warning": 0.6 <= confidence <= 0.8,
+        }
+    except Exception as exc:
+        logger.error("is_topic_duplicate failed: %s", exc)
+        return {
+            "is_duplicate": False,
+            "confidence": 0.0,
+            "similar_articles": [],
+            "warning": False,
+            "error": str(exc),
+        }
 
 
 @mcp.tool()
@@ -131,8 +147,13 @@ def search_published_topics(
     Returns:
         List of matching articles, each with title, thesis, date,
         categories, file_path, and similarity score.
+        On failure returns an empty list.
     """
-    return _get_archive().search(query, threshold=threshold, n_results=n_results)
+    try:
+        return _get_archive().search(query, threshold=threshold, n_results=n_results)
+    except Exception as exc:
+        logger.error("search_published_topics failed: %s", exc)
+        return []
 
 
 @mcp.tool()
@@ -142,7 +163,6 @@ def index_published_article(
     date: str,
     categories: str,
     file_path: str,
-    summary: str = "",
 ) -> dict[str, Any]:
     """
     Index a published article in the archive.
@@ -153,13 +173,19 @@ def index_published_article(
         date: Publication date (YYYY-MM-DD).
         categories: Comma-separated category tags.
         file_path: Relative path to the article file.
-        summary: Optional brief human-readable summary (one or two sentences).
 
     Returns:
         dict with success (bool), id (str), and total_indexed (int).
         On failure, includes an error (str) field instead of total_indexed.
     """
-    return _get_archive().index_article(title, thesis, date, categories, file_path)
+    try:
+        # index_article returns a success/error dict rather than raising, so
+        # this try/except specifically guards _get_archive() initialisation
+        # failures (e.g. import errors) that would otherwise propagate.
+        return _get_archive().index_article(title, thesis, date, categories, file_path)
+    except Exception as exc:
+        logger.error("index_published_article failed: %s", exc)
+        return {"success": False, "error": str(exc), "id": ""}
 
 
 @mcp.tool()
@@ -171,8 +197,13 @@ def get_archive_stats() -> dict[str, Any]:
         dict with available (bool), total_articles (int),
         date_range (dict with earliest/latest), and
         category_distribution (dict mapping category to count).
+        On failure, returns available=False with an error key.
     """
-    return _get_archive().get_stats()
+    try:
+        return _get_archive().get_stats()
+    except Exception as exc:
+        logger.error("get_archive_stats failed: %s", exc)
+        return {"available": False, "total_articles": 0, "error": str(exc)}
 
 
 if __name__ == "__main__":

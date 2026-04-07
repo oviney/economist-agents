@@ -138,7 +138,14 @@ agent_df = (
     .rename(columns={"agent_name": "Agent"})
 )
 
-for col in ["avg_editorial_score", "avg_cost_usd", "avg_duration_s", "avg_gates_passed"]:
+_ROUNDED_COLS = [
+    "avg_editorial_score",
+    "avg_cost_usd",
+    "avg_duration_s",
+    "avg_gates_passed",
+]
+
+for col in _ROUNDED_COLS:
     agent_df[col] = agent_df[col].round(2)
 
 st.dataframe(agent_df, use_container_width=True, hide_index=True)

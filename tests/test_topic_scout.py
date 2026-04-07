@@ -14,7 +14,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
 from topic_scout import (
     SCOUT_AGENT_PROMPT,
+    THEME_KEYWORDS,
     TREND_RESEARCH_PROMPT,
+    check_topic_diversity,
+    classify_topic_theme,
     create_client,
     format_for_workflow,
     scout_topics,
@@ -978,6 +981,389 @@ def test_get_performance_context_called_once_per_scout_run(
         scout_topics(mock_client)
 
     assert call_count["n"] == 1, f"expected 1 call, got {call_count['n']}"
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# TESTS: classify_topic_theme() — Theme Classification
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+def test_classify_topic_theme_uses_theme_field():
+    """Honour the LLM-supplied 'theme' field when present."""
+    topic = {"topic": "Some AI story", "theme": "security"}
+    assert classify_topic_theme(topic) == "security"
+
+
+def test_classify_topic_theme_normalises_theme_field():
+    """LLM theme field is lower-cased and stripped."""
+    topic = {"topic": "Observability tale", "theme": "  Observability  "}
+    assert classify_topic_theme(topic) == "observability"
+
+
+def test_classify_topic_theme_security():
+    """Topics mentioning security keywords map to 'security'."""
+    topic = {
+        "topic": "DAST vs SAST: the hidden cost of shifting left too far",
+        "hook": "DevSecOps teams spend more on OWASP tooling than on fixes",
+        "thesis": "Automated vulnerability scanning creates false confidence",
+        "contrarian_angle": "More scanners = more noise, not less risk",
+        "talking_points": "CVE triage overhead, supply-chain security, SAST false positives",
+    }
+    assert classify_topic_theme(topic) == "security"
+
+
+def test_classify_topic_theme_devops():
+    """Topics mentioning DevOps/CI-CD keywords map to 'devops'."""
+    topic = {
+        "topic": "GitOps is eating Kubernetes deployments",
+        "hook": "80% of teams report pipeline confusion with GitOps",
+        "thesis": "CI/CD pipelines are now the bottleneck, not the code",
+        "contrarian_angle": "Continuous delivery promised speed; it delivered debt",
+        "talking_points": "release engineering, deployment frequency, rollback culture",
+    }
+    assert classify_topic_theme(topic) == "devops"
+
+
+def test_classify_topic_theme_platform_engineering():
+    """Topics mentioning platform engineering keywords map to 'platform_engineering'."""
+    topic = {
+        "topic": "Backstage and the illusion of the internal developer platform",
+        "hook": "Teams spend 18 months building an IDP that 3 people use",
+        "thesis": "Internal developer platforms solve org problems, not tech ones",
+        "contrarian_angle": "Paved paths become paved cages",
+        "talking_points": "developer portal adoption, golden path maintenance, IDP ROI",
+    }
+    assert classify_topic_theme(topic) == "platform_engineering"
+
+
+def test_classify_topic_theme_observability():
+    """Topics mentioning observability keywords map to 'observability'."""
+    topic = {
+        "topic": "OpenTelemetry: the standard nobody implements correctly",
+        "hook": "Distributed tracing adoption is up 60% but alert noise is up 200%",
+        "thesis": "SLOs without SLAs are just expensive dashboards",
+        "contrarian_angle": "More metrics, less understanding",
+        "talking_points": "OpenTelemetry, distributed tracing, alerting fatigue, SLO budgets",
+    }
+    assert classify_topic_theme(topic) == "observability"
+
+
+def test_classify_topic_theme_developer_experience():
+    """Topics mentioning developer experience keywords map to 'developer_experience'."""
+    topic = {
+        "topic": "Developer experience surveys: the metric engineering leaders ignore",
+        "hook": "SPACE framework adoption is up, but cognitive load is too",
+        "thesis": "Measuring DX without acting on it makes things worse",
+        "contrarian_angle": "More developer productivity tools increase inner-loop complexity",
+        "talking_points": "developer experience, DevEx scores, onboarding time, cognitive load",
+    }
+    assert classify_topic_theme(topic) == "developer_experience"
+
+
+def test_classify_topic_theme_software_architecture():
+    """Topics mentioning architecture keywords map to 'software_architecture'."""
+    topic = {
+        "topic": "Microservices migration: the technical debt that keeps giving",
+        "hook": "60% of teams regret their monolith-to-microservices migration",
+        "thesis": "Domain-driven design solves organisational problems, not scaling ones",
+        "contrarian_angle": "Refactoring a monolith is usually the better investment",
+        "talking_points": "software architecture, technical debt, design patterns, modular monolith",
+    }
+    assert classify_topic_theme(topic) == "software_architecture"
+
+
+def test_classify_topic_theme_fallback_to_other():
+    """Topics with no matching keywords return 'other'."""
+    topic = {
+        "topic": "Random unrelated topic",
+        "hook": "Something happened",
+        "thesis": "Things are different",
+        "contrarian_angle": "Nothing matches",
+        "talking_points": "completely unrelated words here",
+    }
+    assert classify_topic_theme(topic) == "other"
+
+
+def test_classify_topic_theme_no_theme_field_uses_keywords():
+    """Without a 'theme' field, keyword matching is the fallback."""
+    topic = {
+        "topic": "Kubernetes deployments and GitOps pipelines",
+        "hook": "CI/CD complexity grows with team size",
+        "thesis": "Continuous delivery is overengineered for most teams",
+        "contrarian_angle": "Simpler release engineering beats fancy pipelines",
+        "talking_points": "devops, pipeline optimisation, release frequency",
+    }
+    assert classify_topic_theme(topic) == "devops"
+
+
+def test_classify_topic_theme_empty_topic():
+    """An empty topic dict returns 'other' without raising."""
+    assert classify_topic_theme({}) == "other"
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# TESTS: check_topic_diversity() — Diversity Enforcement
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+def test_check_topic_diversity_empty_list():
+    """Empty topic list is considered diverse (no violation possible)."""
+    is_diverse, dominant = check_topic_diversity([])
+    assert is_diverse is True
+    assert dominant == ""
+
+
+def test_check_topic_diversity_single_topic():
+    """Single topic: check_topic_diversity reports the raw 100% ratio (is_diverse=False)."""
+    topics = [{"topic": "AI test generation", "theme": "ai_testing"}]
+    is_diverse, dominant = check_topic_diversity(topics)
+    # 1/1 = 100% > 40% → raw function returns False.
+    # The 3-topic guard in scout_topics prevents regeneration for tiny lists.
+    assert is_diverse is False
+    assert dominant == "ai_testing"
+
+
+def test_check_topic_diversity_passes_with_diverse_topics():
+    """Five topics across 4+ themes should pass the 40% threshold."""
+    topics = [
+        {"topic": "AI test generators", "theme": "ai_testing"},
+        {"topic": "OWASP supply chain risks", "theme": "security"},
+        {"topic": "OpenTelemetry adoption", "theme": "observability"},
+        {"topic": "Platform engineering ROI", "theme": "platform_engineering"},
+        {"topic": "GitOps and deployment complexity", "theme": "devops"},
+    ]
+    is_diverse, dominant = check_topic_diversity(topics)
+    assert is_diverse is True
+
+
+def test_check_topic_diversity_fails_when_theme_exceeds_40_percent():
+    """Three AI-testing topics in five total (60%) triggers the diversity alarm."""
+    topics = [
+        {"topic": "AI test generation", "theme": "ai_testing"},
+        {"topic": "LLM-based visual testing", "theme": "ai_testing"},
+        {"topic": "Copilot for test maintenance", "theme": "ai_testing"},
+        {"topic": "OWASP supply chain risks", "theme": "security"},
+        {"topic": "OpenTelemetry adoption", "theme": "observability"},
+    ]
+    is_diverse, dominant = check_topic_diversity(topics)
+    assert is_diverse is False
+    assert dominant == "ai_testing"
+
+
+def test_check_topic_diversity_exactly_at_40_percent_passes():
+    """Exactly 40% (2/5) of a single theme is NOT a violation (threshold is strict >40%)."""
+    topics = [
+        {"topic": "AI test generation", "theme": "ai_testing"},
+        {"topic": "Copilot for tests", "theme": "ai_testing"},
+        {"topic": "OWASP supply chain risks", "theme": "security"},
+        {"topic": "OpenTelemetry adoption", "theme": "observability"},
+        {"topic": "GitOps and pipelines", "theme": "devops"},
+    ]
+    is_diverse, dominant = check_topic_diversity(topics)
+    assert is_diverse is True
+
+
+def test_check_topic_diversity_returns_correct_dominant_theme():
+    """The dominant theme returned matches the most frequent one."""
+    topics = [
+        {"topic": "Security topic 1", "theme": "security"},
+        {"topic": "Security topic 2", "theme": "security"},
+        {"topic": "Security topic 3", "theme": "security"},
+        {"topic": "AI testing", "theme": "ai_testing"},
+        {"topic": "DevOps thing", "theme": "devops"},
+    ]
+    is_diverse, dominant = check_topic_diversity(topics)
+    assert is_diverse is False
+    assert dominant == "security"
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# TESTS: scout_topics() — Diversity-Triggered Regeneration
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+def _make_topics_with_theme(theme: str, count: int, start_score: int = 20) -> list:
+    """Build minimal topic dicts all sharing the same theme."""
+    return [
+        {
+            "topic": f"{theme.title()} topic {i}",
+            "theme": theme,
+            "hook": f"Hook {i}",
+            "thesis": f"Thesis {i}",
+            "data_sources": [],
+            "timeliness_trigger": "Now",
+            "contrarian_angle": "Contrarian",
+            "title_ideas": [],
+            "scores": {
+                "timeliness": 4,
+                "data_availability": 4,
+                "contrarian_potential": 4,
+                "audience_fit": 4,
+                "economist_fit": 4,
+            },
+            "total_score": start_score - i,
+            "talking_points": f"point {i}",
+        }
+        for i in range(count)
+    ]
+
+
+def test_scout_topics_diversity_check_triggers_regeneration(capsys):
+    """When initial topics fail diversity, a 2nd LLM call is made with a diversity hint."""
+    mock_client = Mock()
+
+    # First batch: 3 AI-testing + 1 security + 1 observability (3/5 = 60% > 40%)
+    non_diverse_topics = (
+        _make_topics_with_theme("ai_testing", 3, start_score=24)
+        + _make_topics_with_theme("security", 1, start_score=20)
+        + _make_topics_with_theme("observability", 1, start_score=18)
+    )
+    # Second batch (after diversity hint): properly diverse
+    diverse_topics = (
+        _make_topics_with_theme("ai_testing", 1, start_score=22)
+        + _make_topics_with_theme("security", 1, start_score=21)
+        + _make_topics_with_theme("observability", 1, start_score=20)
+        + _make_topics_with_theme("devops", 1, start_score=19)
+        + _make_topics_with_theme("platform_engineering", 1, start_score=18)
+    )
+
+    call_responses = iter(
+        [
+            "trend data",
+            json.dumps(non_diverse_topics),
+            json.dumps(diverse_topics),
+        ]
+    )
+
+    with patch("topic_scout.call_llm", side_effect=lambda *a, **kw: next(call_responses)) as mock_call:
+        topics = scout_topics(mock_client)
+
+    # Three LLM calls: trends + initial topics + regeneration
+    assert mock_call.call_count == 3
+
+    # Diversity hint was injected in the 3rd call
+    regen_prompt = mock_call.call_args_list[2][0][2]
+    assert "DIVERSITY ALERT" in regen_prompt
+    assert "ai_testing" in regen_prompt
+
+    # Final output is the diverse set
+    assert len(topics) == 5
+
+    captured = capsys.readouterr()
+    assert "Diversity check failed" in captured.out
+
+
+def test_scout_topics_diversity_check_skipped_for_two_topics():
+    """Diversity check is not applied when fewer than 3 topics are returned."""
+    mock_client = Mock()
+    # Both topics share the same theme — normally a violation, but too few to check
+    two_same_theme = _make_topics_with_theme("ai_testing", 2, start_score=20)
+
+    with patch(
+        "topic_scout.call_llm",
+        side_effect=["trends", json.dumps(two_same_theme)],
+    ) as mock_call:
+        topics = scout_topics(mock_client)
+
+    # Only 2 LLM calls — no regeneration triggered
+    assert mock_call.call_count == 2
+    assert len(topics) == 2
+
+
+def test_scout_topics_diversity_passes_no_extra_call():
+    """When topics are diverse from the first try, no regeneration call is made."""
+    mock_client = Mock()
+    diverse = (
+        _make_topics_with_theme("ai_testing", 1, start_score=22)
+        + _make_topics_with_theme("security", 1, start_score=21)
+        + _make_topics_with_theme("observability", 1, start_score=20)
+        + _make_topics_with_theme("devops", 1, start_score=19)
+        + _make_topics_with_theme("platform_engineering", 1, start_score=18)
+    )
+
+    with patch(
+        "topic_scout.call_llm",
+        side_effect=["trends", json.dumps(diverse)],
+    ) as mock_call:
+        topics = scout_topics(mock_client)
+
+    # Exactly 2 LLM calls — no regeneration
+    assert mock_call.call_count == 2
+    assert len(topics) == 5
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# TESTS: SCOUT_AGENT_PROMPT — Expanded Focus Areas
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+def test_scout_prompt_includes_security_category():
+    """Security must be in the topic categories to monitor."""
+    assert "Security" in SCOUT_AGENT_PROMPT or "security" in SCOUT_AGENT_PROMPT.lower()
+
+
+def test_scout_prompt_includes_devops_category():
+    """DevOps must be in the topic categories to monitor."""
+    assert "DevOps" in SCOUT_AGENT_PROMPT or "devops" in SCOUT_AGENT_PROMPT.lower()
+
+
+def test_scout_prompt_includes_platform_engineering_category():
+    """Platform Engineering must be in the topic categories to monitor."""
+    assert (
+        "Platform Engineering" in SCOUT_AGENT_PROMPT
+        or "platform engineering" in SCOUT_AGENT_PROMPT.lower()
+    )
+
+
+def test_scout_prompt_includes_observability_category():
+    """Observability must be in the topic categories to monitor."""
+    assert (
+        "Observability" in SCOUT_AGENT_PROMPT
+        or "observability" in SCOUT_AGENT_PROMPT.lower()
+    )
+
+
+def test_scout_prompt_includes_developer_experience_category():
+    """Developer Experience must be in the topic categories to monitor."""
+    assert (
+        "Developer Experience" in SCOUT_AGENT_PROMPT
+        or "developer experience" in SCOUT_AGENT_PROMPT.lower()
+    )
+
+
+def test_scout_prompt_includes_software_architecture_category():
+    """Software Architecture must be in the topic categories to monitor."""
+    assert (
+        "Software Architecture" in SCOUT_AGENT_PROMPT
+        or "software architecture" in SCOUT_AGENT_PROMPT.lower()
+    )
+
+
+def test_scout_prompt_includes_diversity_requirement():
+    """The scout prompt must instruct the LLM to spread topics across categories."""
+    assert "DIVERSITY" in SCOUT_AGENT_PROMPT or "diversity" in SCOUT_AGENT_PROMPT.lower()
+
+
+def test_theme_keywords_covers_all_required_themes():
+    """THEME_KEYWORDS must include entries for all 6 required new categories."""
+    required_themes = {
+        "security",
+        "devops",
+        "platform_engineering",
+        "observability",
+        "developer_experience",
+        "software_architecture",
+    }
+    assert required_themes.issubset(THEME_KEYWORDS.keys())
+
+
+def test_trend_prompt_covers_broader_landscape():
+    """Trend research prompt must reference each key area of the expanded landscape."""
+    required_keywords = ["Security", "Platform", "Observability", "Developer"]
+    for keyword in required_keywords:
+        assert keyword.lower() in TREND_RESEARCH_PROMPT.lower(), (
+            f"TREND_RESEARCH_PROMPT is missing '{keyword}'"
+        )
 
 
 if __name__ == "__main__":

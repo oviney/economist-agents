@@ -257,6 +257,58 @@ except:  # Too broad
     pass  # Silent failure
 ```
 
+## 🧠 Agent Development: Edit Prompts First
+
+A core architectural principle in this project is **Prompts as Code**: agent behaviour is defined by large prompt constants at the top of Python files, not by procedural logic. When modifying any agent's behaviour, **edit the prompt constants first** — they are the source of truth.
+
+### Why Prompts Are First-Class Code
+
+Agent prompt constants (e.g., `RESEARCH_AGENT_PROMPT`, `WRITER_AGENT_PROMPT`) are:
+- **Versionable**: Every behaviour change is captured in git history
+- **Reviewable**: PRs show exactly what changed in agent instructions
+- **Testable**: Prompt constraints can be validated by automated tests
+- **Explicit**: Intent is readable without running the code
+
+### Finding the Right Prompt
+
+| Agent | File | Prompt Constant |
+|-------|------|----------------|
+| Research Agent | `scripts/economist_agent.py` | `RESEARCH_AGENT_PROMPT` |
+| Writer Agent | `scripts/economist_agent.py` | `WRITER_AGENT_PROMPT` |
+| Topic Scout | `scripts/topic_scout.py` | `SCOUT_AGENT_PROMPT` |
+| Editorial Board | `scripts/editorial_board.py` | Per-persona prompt strings |
+
+> **Note**: The Agent Registry Pattern (ADR-0002) externalises newer agents to `.agent.md` files in `.github/agents/`. Both styles are in use; prompts-as-code applies equally to both.
+
+### Workflow for Agent Changes
+
+```bash
+# 1. Identify the prompt constant that controls the behaviour
+grep -n "PROMPT\|system_message" scripts/economist_agent.py
+
+# 2. Edit the prompt in the source file
+# e.g., add a new constraint to WRITER_AGENT_PROMPT
+
+# 3. Update any related tests that validate prompt content
+pytest tests/test_economist_agent.py -v
+
+# 4. Run quality checks
+make quality
+```
+
+### Banned Patterns in the Writer Agent
+
+The `WRITER_AGENT_PROMPT` enforces strict Economist voice rules. When contributing to writer-related code, preserve these constraints:
+
+**Forbidden openings:** "In today's world...", "It's no secret that...", "In recent years..."
+**Banned phrases:** "game-changer", "paradigm shift", "leverage" (as verb)
+**Forbidden closings:** "Only time will tell...", "In conclusion..."
+**Mandatory style:** British spelling (organisation, favour, analyse), no exclamation points
+
+See [`docs/ARCHITECTURE_PATTERNS.md`](docs/ARCHITECTURE_PATTERNS.md) for the full list of architectural patterns enforced across agents.
+
+---
+
 ## 📚 Contributing to the Public Skills Library
 
 The `skills/public/` directory is an open, community-maintained library of generic
@@ -505,16 +557,51 @@ We track these quality metrics:
 
 ## 📚 Additional Resources
 
-### Documentation
-- **Architecture**: [docs/FLOW_ARCHITECTURE.md](docs/FLOW_ARCHITECTURE.md)
-- **Agent System**: [AGENTS.md](AGENTS.md)
-- **API Reference**: [docs/CREWAI_API_REFERENCE.md](docs/CREWAI_API_REFERENCE.md)
-- **Quality System**: [docs/DEFINITION_OF_DONE.md](docs/DEFINITION_OF_DONE.md)
+### 📖 Documentation Hub
+
+**[Complete Documentation Hub](docs/README.md)** — navigation to all guides, architecture, and references.
+
+### Getting Started
+- **[README](README.md)** — Project overview and quick start
+- **[Agent System](AGENTS.md)** — Multi-agent architecture and usage
+- **[Installation Guide](docs/guides/CONTINUE_SETUP.md)** — Detailed setup instructions
+
+### Architecture & Design Decisions
+
+All Architecture Decision Records (ADRs) live in `docs/adr/` and record major design choices with their rationale:
+
+| ADR | Title | Status |
+|-----|-------|--------|
+| [ADR-0001](docs/adr/0001-extract-agent-definitions-to-yaml.md) | Extract Agent Definitions to YAML | Accepted |
+| [ADR-0002](docs/adr/0002-agent-registry-pattern.md) | Agent Registry Pattern | Accepted |
+| [ADR-0003](docs/adr/0003-phased-crewai-migration.md) | Phased CrewAI Migration | Superseded by ADR-0006 |
+| [ADR-0004](docs/adr/0004-python-version-constraint.md) | Python Version Constraint | Accepted |
+| [ADR-0005](docs/adr/0005-agile-discipline-enforcement.md) | Agile Discipline Enforcement | Accepted |
+| [ADR-0006](docs/adr/0006-agent-framework-selection.md) | Agent Framework Selection | Proposed |
+| [ADR-0007](docs/adr/0007-content-intelligence-engine.md) | Content Intelligence Engine | Proposed |
+| [ADR-0008](docs/adr/0008-agent-skill-governance.md) | Agent Skill Governance | Proposed |
+
+Use [`docs/adr/TEMPLATE.md`](docs/adr/TEMPLATE.md) when proposing a new ADR.
+
+- **[Architecture Patterns](docs/ARCHITECTURE_PATTERNS.md)** — Prompts-as-code, persona voting, sequential orchestration
+- **[Flow Architecture](docs/FLOW_ARCHITECTURE.md)** — Deterministic state-machine design
+- **[CrewAI Context Architecture](docs/CREWAI_CONTEXT_ARCHITECTURE.md)** — Shared context system
 
 ### Skills and Standards
-- **Python Quality**: [skills/python-quality/SKILL.md](skills/python-quality/SKILL.md)
-- **Testing Patterns**: [skills/testing/](skills/testing/)
-- **Architecture Patterns**: [docs/ADR-*.md](docs/)
+- **[Python Quality](skills/python-quality/SKILL.md)** — Type hints, docstrings, `orjson`, logging
+- **[Testing Patterns](skills/testing/SKILL.md)** — TDD workflow, coverage, mocking
+- **[Quality Gates](skills/quality-gates/SKILL.md)** — Automated validation checkpoints
+- **[Economist Writing](skills/economist-writing/SKILL.md)** — Voice, style, and banned patterns
+- **[Defect Prevention](skills/defect-prevention/SKILL.md)** — Bug history and prevention strategies
+- **[MCP Development](skills/mcp-development/SKILL.md)** — Model Context Protocol server patterns
+- **[ADR Governance](skills/adr-governance/SKILL.md)** — ADR numbering and lifecycle rules
+
+### Quality & Process
+- **[Quality System](docs/DEFINITION_OF_DONE.md)** — Definition of Done and quality gates
+- **[Quality Dashboard](docs/QUALITY_DASHBOARD.md)** — Metrics and quality tracking
+- **[Skills Learning System](docs/SKILLS_LEARNING.md)** — Self-improving validation documentation
+- **[Agent Prompt Patterns](docs/AGENT_PROMPT_PATTERNS.md)** — Prompt engineering patterns
+- **[Chart Design Spec](docs/CHART_DESIGN_SPEC.md)** — Economist visual style rules
 
 ### Commands Reference
 
@@ -535,7 +622,85 @@ git push --no-verify  # Emergency bypass
 # Pre-commit
 pre-commit run --all-files  # Manual hook run
 pre-commit install          # Enable hooks
+
+# Skills / Architecture
+python3 scripts/architecture_review.py --full-review --export-docs
+python3 scripts/blog_qa_agent.py --blog-dir /path/to/blog --show-skills
+python3 scripts/sync_copilot_context.py  # Sync patterns to Copilot
 ```
+
+## 🔄 Skills Learning System
+
+The project has a **self-improving validation system** built around accumulated skills patterns. Understanding it helps contributors avoid introducing known anti-patterns and enables them to extend the knowledge base.
+
+### How Skills Work
+
+Skills are structured knowledge patterns stored in JSON files under `skills/`. Each entry records:
+- **Pattern name and category** (e.g., `banned_openings`, `chart_not_embedded`)
+- **Severity** (critical / high / medium / low)
+- **Detection check** (what the validator looks for)
+- **Auto-fix** if applicable
+
+### Key Skills Files
+
+| File | Purpose |
+|------|---------|
+| `skills/blog_qa_skills.json` | Blog validation patterns — grows with each QA run |
+| `skills/defect_tracker.json` | Bug history with root-cause analysis |
+| `skills/copilot_behavior_patterns.json` | Anti-patterns for GitHub Copilot to avoid |
+| `skills/python-quality/SKILL.md` | Python coding standards (type hints, docstrings, `orjson`) |
+| `skills/testing/SKILL.md` | TDD workflow and coverage requirements |
+| `skills/economist-writing/SKILL.md` | Economist voice and style rules |
+
+### Self-Learning Validation
+
+`scripts/blog_qa_agent.py` automatically learns from each validation run:
+
+```bash
+# Run with learning enabled (default)
+python3 scripts/blog_qa_agent.py --blog-dir /path/to/blog
+
+# View all learned patterns
+python3 scripts/blog_qa_agent.py --blog-dir /path/to/blog --show-skills
+```
+
+Each run:
+1. **Applies** known patterns to catch issues faster
+2. **Records** new patterns when novel issues are detected
+3. **Persists** knowledge to `skills/blog_qa_skills.json` for future runs
+
+### Adding New Patterns
+
+When you fix a recurring bug, persist the knowledge so it won't regress:
+
+```python
+from scripts.skills_manager import SkillsManager
+
+manager = SkillsManager("skills/blog_qa_skills.json")
+manager.learn_pattern(
+    category="content_quality",
+    issue="missing_chart_embed",
+    severity="critical",
+    check="Verify article body contains <img> tag for generated chart",
+    example="Chart file created but markdown embed line absent",
+)
+```
+
+### Architecture Review
+
+`scripts/architecture_review.py` analyses the codebase and updates `docs/ARCHITECTURE_PATTERNS.md`:
+
+```bash
+# Full review — learns 12+ architectural patterns and exports docs
+python3 scripts/architecture_review.py --full-review --export-docs
+
+# View currently learned patterns
+python3 scripts/architecture_review.py --show-skills
+```
+
+See [`docs/SKILLS_LEARNING.md`](docs/SKILLS_LEARNING.md) for complete documentation on the learning system.
+
+---
 
 ## 🤝 Getting Help
 

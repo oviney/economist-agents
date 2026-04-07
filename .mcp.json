@@ -9,6 +9,14 @@
       "command": "npx",
       "args": ["@playwright/mcp@latest", "--extension"],
       "description": "Browser automation for navigating web UIs, taking screenshots, and interacting with pages"
+    },
+    "web-researcher": {
+      "command": "python3",
+      "args": ["mcp_servers/web_researcher_server.py"],
+      "env": {
+        "SERPER_API_KEY": "${SERPER_API_KEY}"
+      },
+      "description": "Web search (Serper/Google), Google Scholar, arXiv academic search, and page fetching as MCP tools"
     }
   }
 }

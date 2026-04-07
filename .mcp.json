@@ -7,18 +7,59 @@
     },
     "playwright": {
       "command": "npx",
-      "args": ["@playwright/mcp@latest", "--extension"],
+      "args": [
+        "@playwright/mcp@latest",
+        "--extension"
+      ],
       "description": "Browser automation for navigating web UIs, taking screenshots, and interacting with pages"
     },
     "article-evaluator": {
       "command": "python3",
-      "args": ["mcp_servers/article_evaluator_server.py"],
+      "args": [
+        "mcp_servers/article_evaluator_server.py"
+      ],
       "description": "Scores article drafts across 5 quality dimensions and returns a pass/fail verdict before publishing"
     },
     "style-memory": {
       "command": "python3",
-      "args": ["mcp_servers/style_memory_server.py"],
+      "args": [
+        "mcp_servers/style_memory_server.py"
+      ],
       "description": "Query and update the ChromaDB-backed style memory store for Economist voice consistency"
+    },
+    "publication-validator": {
+      "command": "python3",
+      "args": [
+        "mcp_servers/publication_validator_server.py"
+      ],
+      "description": "Publication validation \u2014 checks front-matter fields (layout, title, date, author, categories, image) and image-path existence before a post is published"
+    },
+    "web-researcher": {
+      "command": "python3",
+      "args": [
+        "mcp_servers/web_researcher_server.py"
+      ],
+      "env": {
+        "SERPER_API_KEY": "${SERPER_API_KEY}"
+      },
+      "description": "Web search (Serper/Google), Google Scholar, arXiv academic search, and page fetching as MCP tools"
+    },
+    "image-generator": {
+      "command": "python3",
+      "args": [
+        "mcp_servers/image_generator_server.py"
+      ],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
+      },
+      "description": "DALL-E 3 image generation for the content pipeline"
+    },
+    "published-topics": {
+      "command": "python3",
+      "args": [
+        "mcp_servers/published_topics_server.py"
+      ],
+      "description": "Query the published article archive for topic similarity and duplicate detection before commissioning new content"
     }
   }
 }

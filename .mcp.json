@@ -9,6 +9,11 @@
       "command": "npx",
       "args": ["@playwright/mcp@latest", "--extension"],
       "description": "Browser automation for navigating web UIs, taking screenshots, and interacting with pages"
+    },
+    "publication-validator": {
+      "command": "python",
+      "args": ["mcp_servers/publication_validator_server.py"],
+      "description": "Publication validation — checks front-matter fields (layout, title, date, author, categories, image) and image-path existence before a post is published"
     }
   }
 }

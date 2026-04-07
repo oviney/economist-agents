@@ -14,6 +14,11 @@
       "command": "python3",
       "args": ["mcp_servers/article_evaluator_server.py"],
       "description": "Scores article drafts across 5 quality dimensions and returns a pass/fail verdict before publishing"
+    },
+    "style-memory": {
+      "command": "python3",
+      "args": ["mcp_servers/style_memory_server.py"],
+      "description": "Query and update the ChromaDB-backed style memory store for Economist voice consistency"
     }
   }
 }

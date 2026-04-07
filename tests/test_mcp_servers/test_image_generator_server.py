@@ -16,6 +16,7 @@ import pytest
 from mcp_servers.image_generator_server import (
     _build_dalle_prompt,
     generate_editorial_image,
+    generate_image,
     mcp,
 )
 
@@ -573,3 +574,146 @@ class TestMcpServerRegistration:
         assert "article_title" in schema_props
         assert "article_summary" in schema_props
         assert "output_path" in schema_props
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# generate_image — happy path
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+class TestGenerateImage:
+    """Tests for the simpler generate_image(prompt, size) tool."""
+
+    @pytest.mark.unit
+    def test_returns_url_and_revised_prompt(self) -> None:
+        """Success path: should return url and revised_prompt keys."""
+        image_data = Mock()
+        image_data.url = "https://dalle.example.com/img.png"
+        image_data.revised_prompt = "A revised prompt text"
+        response = Mock()
+        response.data = [image_data]
+
+        with (
+            patch.dict("os.environ", {"OPENAI_API_KEY": "sk-test"}),
+            patch("openai.OpenAI") as mock_cls,
+        ):
+            mock_cls.return_value.images.generate.return_value = response
+            result = generate_image("A futuristic city", size="1792x1024")
+
+        assert result["url"] == "https://dalle.example.com/img.png"
+        assert result["revised_prompt"] == "A revised prompt text"
+
+    @pytest.mark.unit
+    def test_uses_default_size(self) -> None:
+        """Default size parameter must be 1792x1024."""
+        image_data = Mock()
+        image_data.url = "https://example.com/img.png"
+        image_data.revised_prompt = "rp"
+        response = Mock()
+        response.data = [image_data]
+
+        with (
+            patch.dict("os.environ", {"OPENAI_API_KEY": "sk-test"}),
+            patch("openai.OpenAI") as mock_cls,
+        ):
+            mock_client = mock_cls.return_value
+            mock_client.images.generate.return_value = response
+            generate_image("A prompt")
+            call_kwargs = mock_client.images.generate.call_args.kwargs
+        assert call_kwargs["size"] == "1792x1024"
+
+    @pytest.mark.unit
+    def test_custom_size_forwarded(self) -> None:
+        """Custom size should be forwarded to the DALL-E API."""
+        image_data = Mock()
+        image_data.url = "https://example.com/img.png"
+        image_data.revised_prompt = "rp"
+        response = Mock()
+        response.data = [image_data]
+
+        with (
+            patch.dict("os.environ", {"OPENAI_API_KEY": "sk-test"}),
+            patch("openai.OpenAI") as mock_cls,
+        ):
+            mock_client = mock_cls.return_value
+            mock_client.images.generate.return_value = response
+            generate_image("A prompt", size="1024x1024")
+            call_kwargs = mock_client.images.generate.call_args.kwargs
+        assert call_kwargs["size"] == "1024x1024"
+
+    @pytest.mark.unit
+    def test_raises_value_error_when_api_key_missing(self) -> None:
+        """ValueError must be raised when OPENAI_API_KEY is not set."""
+        env_without_key = {k: v for k, v in os.environ.items() if k != "OPENAI_API_KEY"}
+        with patch.dict("os.environ", env_without_key, clear=True):
+            with pytest.raises(ValueError, match="OPENAI_API_KEY"):
+                generate_image("A prompt")
+
+    @pytest.mark.unit
+    def test_raises_value_error_with_descriptive_message(self) -> None:
+        """ValueError message must be clear about how to fix the problem."""
+        env_without_key = {k: v for k, v in os.environ.items() if k != "OPENAI_API_KEY"}
+        with patch.dict("os.environ", env_without_key, clear=True):
+            with pytest.raises(ValueError) as exc_info:
+                generate_image("A prompt")
+        assert "OPENAI_API_KEY" in str(exc_info.value)
+
+    @pytest.mark.unit
+    def test_fallback_when_revised_prompt_is_none(self) -> None:
+        """If DALL-E does not return a revised_prompt, input prompt is echoed back."""
+        image_data = Mock(spec=["url", "revised_prompt"])
+        image_data.url = "https://example.com/img.png"
+        image_data.revised_prompt = None
+        response = Mock()
+        response.data = [image_data]
+
+        with (
+            patch.dict("os.environ", {"OPENAI_API_KEY": "sk-test"}),
+            patch("openai.OpenAI") as mock_cls,
+        ):
+            mock_cls.return_value.images.generate.return_value = response
+            result = generate_image("original prompt text")
+
+        assert result["revised_prompt"] == "original prompt text"
+
+    @pytest.mark.unit
+    def test_uses_dalle3_model_and_hd_quality(self) -> None:
+        """API call must use dall-e-3 model, hd quality, n=1."""
+        image_data = Mock()
+        image_data.url = "https://example.com/img.png"
+        image_data.revised_prompt = "rp"
+        response = Mock()
+        response.data = [image_data]
+
+        with (
+            patch.dict("os.environ", {"OPENAI_API_KEY": "sk-test"}),
+            patch("openai.OpenAI") as mock_cls,
+        ):
+            mock_client = mock_cls.return_value
+            mock_client.images.generate.return_value = response
+            generate_image("test prompt")
+            call_kwargs = mock_client.images.generate.call_args.kwargs
+
+        assert call_kwargs["model"] == "dall-e-3"
+        assert call_kwargs["quality"] == "hd"
+        assert call_kwargs["n"] == 1
+
+    @pytest.mark.unit
+    def test_generate_image_registered_as_mcp_tool(self) -> None:
+        """generate_image must be registered as an MCP tool on the server."""
+        import asyncio
+
+        tools = asyncio.run(mcp.list_tools())
+        tool_names = [t.name for t in tools]
+        assert "generate_image" in tool_names
+
+    @pytest.mark.unit
+    def test_generate_image_tool_schema(self) -> None:
+        """Tool schema must expose prompt (required) and size (optional)."""
+        import asyncio
+
+        tools = asyncio.run(mcp.list_tools())
+        tool = next(t for t in tools if t.name == "generate_image")
+        schema_props = tool.inputSchema.get("properties", {})
+        assert "prompt" in schema_props
+        assert "size" in schema_props

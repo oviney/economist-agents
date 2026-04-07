@@ -9,6 +9,14 @@
       "command": "npx",
       "args": ["@playwright/mcp@latest", "--extension"],
       "description": "Browser automation for navigating web UIs, taking screenshots, and interacting with pages"
+    },
+    "image-generator": {
+      "command": "python3",
+      "args": ["mcp_servers/image_generator_server.py"],
+      "description": "DALL-E 3 image generation for the content pipeline",
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
+      }
     }
   }
 }

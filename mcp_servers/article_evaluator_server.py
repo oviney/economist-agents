@@ -5,11 +5,15 @@ Exposes ArticleEvaluator.evaluate() as an MCP tool so that any agent
 (CrewAI, Claude Code, or future framework) can score articles without
 importing Python modules directly.
 
-Usage (stdio transport):
+Usage (stdio transport — default):
     python3 mcp_servers/article_evaluator_server.py
+
+Usage (HTTP transport):
+    MCP_TRANSPORT=http python3 mcp_servers/article_evaluator_server.py
 """
 
 import logging
+import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -29,73 +33,73 @@ mcp = FastMCP("article-evaluator")
 
 _evaluator = ArticleEvaluator()
 
+# Passing score threshold (percentage).
+_PASS_THRESHOLD: float = 60.0
+
 
 @mcp.tool()
-def evaluate_article(content: str) -> dict[str, Any]:
-    """Evaluate an article across 5 quality dimensions.
+def evaluate_article(content: str, title: str = "") -> dict[str, Any]:
+    """Evaluate an article and return a quality score.
 
-    Scores the supplied article markdown deterministically on:
-    - opening_quality   (1–10)
-    - evidence_sourcing (1–10)
-    - voice_consistency (1–10)
-    - structure         (1–10)
-    - visual_engagement (1–10)
+    Scores the supplied article markdown deterministically on 5 quality
+    dimensions and returns a simplified pass/fail verdict suitable for
+    pipeline gate decisions.
 
     Args:
         content: Full article text, optionally with YAML frontmatter.
+        title: Optional article title.  Included in feedback when provided
+               and frontmatter is absent; does not affect numeric scoring.
 
     Returns:
         Dictionary containing:
-            scores      – per-dimension scores (dict[str, int])
-            total_score – sum of all dimension scores (int)
-            max_score   – maximum possible score, always 50 (int)
-            percentage  – total_score / max_score * 100, rounded (int)
-            details     – per-dimension textual feedback (dict[str, str])
+            score    – quality percentage as a float (0.0 – 100.0)
+            feedback – per-dimension feedback messages (list[str])
+            pass     – True when score >= 60.0 (bool)
 
         On invalid input an ``error`` key is added to the returned dict
-        and all numeric fields are set to zero.  This function never raises.
+        and all numeric fields are reset to zero.  This function never raises.
     """
     if not isinstance(content, str):
         return {
             "error": "content must be a string",
-            "scores": {},
-            "total_score": 0,
-            "max_score": 50,
-            "percentage": 0,
-            "details": {},
+            "score": 0.0,
+            "feedback": [],
+            "pass": False,
         }
 
     stripped = content.strip()
     if not stripped:
         return {
             "error": "content must not be empty",
-            "scores": {},
-            "total_score": 0,
-            "max_score": 50,
-            "percentage": 0,
-            "details": {},
+            "score": 0.0,
+            "feedback": [],
+            "pass": False,
         }
 
     try:
         result = _evaluator.evaluate(stripped)
+        score = float(result.percentage)
+
+        feedback: list[str] = list(result.details.values())
+        clean_title = title.strip()
+        if clean_title:
+            feedback.insert(0, f"Title: {clean_title}")
+
         return {
-            "scores": result.scores,
-            "total_score": result.total_score,
-            "max_score": result.max_score,
-            "percentage": result.percentage,
-            "details": result.details,
+            "score": score,
+            "feedback": feedback,
+            "pass": score >= _PASS_THRESHOLD,
         }
     except Exception as exc:
         logger.exception("evaluate_article failed: %s", exc)
         return {
             "error": str(exc),
-            "scores": {},
-            "total_score": 0,
-            "max_score": 50,
-            "percentage": 0,
-            "details": {},
+            "score": 0.0,
+            "feedback": [],
+            "pass": False,
         }
 
 
 if __name__ == "__main__":
-    mcp.run(transport="stdio")
+    transport = os.getenv("MCP_TRANSPORT", "stdio")
+    mcp.run(transport=transport)

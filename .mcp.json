@@ -9,6 +9,11 @@
       "command": "npx",
       "args": ["@playwright/mcp@latest", "--extension"],
       "description": "Browser automation for navigating web UIs, taking screenshots, and interacting with pages"
+    },
+    "article-evaluator": {
+      "command": "python3",
+      "args": ["mcp_servers/article_evaluator_server.py"],
+      "description": "Scores article drafts across 5 quality dimensions and returns a pass/fail verdict before publishing"
     }
   }
 }

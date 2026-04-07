@@ -32,6 +32,7 @@ Usage:
 import logging
 import re
 from datetime import datetime, timezone
+from itertools import zip_longest
 from pathlib import Path
 from typing import Any
 
@@ -308,11 +309,13 @@ class ArticleArchive:
         metadatas = raw["metadatas"][0]
         distances = raw.get("distances", [[]])[0]
 
-        for i, (doc, meta) in enumerate(zip(documents, metadatas, strict=False)):
+        for doc, meta, distance in zip_longest(documents, metadatas, distances, fillvalue=None):
+            if doc is None or meta is None:
+                break
             # Use stored distance; default 0.0 (similarity 1.0) when missing
-            distance = float(distances[i]) if i < len(distances) else 0.0
+            dist = float(distance) if distance is not None else 0.0
             # ChromaDB cosine distance is in [0, 2]; similarity = 1 - distance
-            similarity = round(1.0 - distance, 4)
+            similarity = round(1.0 - dist, 4)
             if similarity < threshold:
                 continue
             # doc is the stored thesis text; fall back to metadata thesis if empty
@@ -369,7 +372,7 @@ class ArticleArchive:
                 # Use thesis as summary too when no dedicated summary field exists
                 summary = thesis
 
-                self.index_article(
+                result = self.index_article(
                     title=title,
                     thesis=thesis,
                     date=date,
@@ -377,7 +380,10 @@ class ArticleArchive:
                     file_path=str(md_file),
                     summary=summary,
                 )
-                indexed += 1
+                if result["success"]:
+                    indexed += 1
+                else:
+                    logger.warning("Failed to index %s: %s", md_file.name, result.get("error"))
             except Exception as exc:
                 logger.warning("Skipping %s: %s", md_file.name, exc)
                 continue

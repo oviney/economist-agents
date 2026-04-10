@@ -31,6 +31,11 @@ def mock_openai_client():
     mock_client = Mock()
     mock_response = Mock()
     mock_response.choices = [Mock(message=Mock(content="Test response from GPT"))]
+    mock_usage = Mock()
+    mock_usage.prompt_tokens = 100
+    mock_usage.completion_tokens = 50
+    mock_usage.total_tokens = 150
+    mock_response.usage = mock_usage
     mock_client.chat.completions.create.return_value = mock_response
     return mock_client
 

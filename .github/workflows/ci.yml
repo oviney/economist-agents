@@ -100,6 +100,16 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
+      - name: Token usage summary
+        if: always()
+        run: |
+          python - <<'EOF'
+          import sys
+          sys.path.insert(0, "scripts")
+          from token_usage import print_ci_summary
+          print_ci_summary()
+          EOF
+
       - name: Upload coverage reports
         if: matrix.python-version == '3.11'
         continue-on-error: true

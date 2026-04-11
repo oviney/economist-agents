@@ -10,8 +10,8 @@ Covers:
 """
 
 import re
-from contextlib import contextmanager
 from datetime import datetime
+from pathlib import Path as RealPath
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -66,11 +66,6 @@ def _setup_blog_dir(tmp_path: Path) -> Path:
     (blog_dir / "_posts").mkdir(parents=True, exist_ok=True)
     (blog_dir / "assets" / "charts").mkdir(parents=True, exist_ok=True)
     return blog_dir
-
-
-@contextmanager
-def _noop():
-    yield
 
 
 # ---------------------------------------------------------------------------
@@ -144,7 +139,6 @@ class TestDeployToBlogMain:
         self, tmp_path: Path, stale_article_file: Path
     ) -> None:
         """validate_file must be called with today's date as expected_date."""
-        from pathlib import Path as RealPath
 
         today = datetime.now().strftime("%Y-%m-%d")
         blog_dir = _setup_blog_dir(tmp_path)
@@ -176,7 +170,6 @@ class TestDeployToBlogMain:
         self, tmp_path: Path, stale_article_file: Path
     ) -> None:
         """The article written to the blog clone must carry today's date."""
-        from pathlib import Path as RealPath
 
         today = datetime.now().strftime("%Y-%m-%d")
         blog_dir = _setup_blog_dir(tmp_path)
@@ -213,7 +206,6 @@ class TestDeployToBlogMain:
         self, tmp_path: Path, stale_article_file: Path
     ) -> None:
         """On validation failure, sys.exit(1) must be called."""
-        from pathlib import Path as RealPath
 
         blog_dir = _setup_blog_dir(tmp_path)
         exit_codes: list[int] = []
@@ -241,7 +233,6 @@ class TestDeployToBlogMain:
         self, tmp_path: Path, stale_article_file: Path
     ) -> None:
         """When validation fails, gh pr create must NOT be invoked."""
-        from pathlib import Path as RealPath
 
         blog_dir = _setup_blog_dir(tmp_path)
         pr_commands: list[str] = []
@@ -270,7 +261,6 @@ class TestDeployToBlogMain:
         self, tmp_path: Path, stale_article_file: Path
     ) -> None:
         """The PR body must contain the validation report text."""
-        from pathlib import Path as RealPath
 
         blog_dir = _setup_blog_dir(tmp_path)
         pr_commands: list[str] = []

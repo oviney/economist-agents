@@ -11,6 +11,7 @@ Usage:
 import argparse
 import os
 import re
+import shutil
 import subprocess
 import sys
 from datetime import datetime
@@ -99,7 +100,7 @@ def main():
     # Clone blog repository
     blog_dir = Path("temp_blog_repo")
     if blog_dir.exists():
-        run_command(f"rm -rf {blog_dir}")
+        shutil.rmtree(blog_dir)
 
     print(f"📥 Cloning {args.blog_repo}...")
     run_command(
@@ -139,7 +140,6 @@ def main():
 
     # 2. Fix chart paths to match Jekyll assets structure
     content = content.replace("output/charts/", "/assets/charts/")
-    content = content.replace("![", "![")  # Ensure proper markdown
     target_article.write_text(content)
 
     # Copy charts
@@ -158,7 +158,7 @@ def main():
 
     if not is_valid:
         print("❌ Pre-deploy validation failed — aborting PR creation")
-        run_command(f"rm -rf {blog_dir}")
+        shutil.rmtree(blog_dir, ignore_errors=True)
         sys.exit(1)
 
     print("✅ Pre-deploy validation passed — creating PR")
@@ -208,7 +208,7 @@ def main():
     print(f"🔗 View at: https://github.com/{args.blog_repo}/pulls")
 
     # Cleanup
-    run_command(f"rm -rf {blog_dir}")
+    shutil.rmtree(blog_dir, ignore_errors=True)
     print("🧹 Cleaned up temporary files")
 
 

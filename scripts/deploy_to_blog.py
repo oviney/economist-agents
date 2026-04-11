@@ -131,7 +131,7 @@ def main():
 
     # 1. Inject deploy date into YAML front matter
     content = re.sub(
-        r"(^date:\s*)[\d-]+",
+        r"(^date:\s*)\d{4}-\d{2}-\d{2}",
         rf"\g<1>{deploy_date}",
         content,
         flags=re.MULTILINE,

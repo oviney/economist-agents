@@ -17,11 +17,22 @@ Output: Ranked list of topics with data availability scores
 """
 
 import json
+import logging
 import os
 import re
+import sys
 from datetime import datetime
+from pathlib import Path
 
-from agent_loader import load_scout_prompts as _load_scout_prompts
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
+from agent_loader import load_scout_prompts as _load_scout_prompts  # noqa: E402
+
+from src.tools.topic_deduplicator import TopicDeduplicator  # noqa: E402
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Theme keyword map for diversity classification.
@@ -29,48 +40,111 @@ from agent_loader import load_scout_prompts as _load_scout_prompts
 # ---------------------------------------------------------------------------
 THEME_KEYWORDS: dict[str, list[str]] = {
     "ai_testing": [
-        "ai", "ml", "machine learning", "test generation", "copilot",
-        "llm", "generative", "ai-powered", "ai testing",
+        "ai",
+        "ml",
+        "machine learning",
+        "test generation",
+        "copilot",
+        "llm",
+        "generative",
+        "ai-powered",
+        "ai testing",
     ],
     "security": [
-        "security", "vulnerability", "devsecops", "sast", "dast", "owasp",
-        "penetration", "supply-chain", "exploit", "cve",
+        "security",
+        "vulnerability",
+        "devsecops",
+        "sast",
+        "dast",
+        "owasp",
+        "penetration",
+        "supply-chain",
+        "exploit",
+        "cve",
     ],
     "devops": [
-        "devops", "ci/cd", "cicd", "deployment", "pipeline", "gitops",
-        "docker", "kubernetes", "release engineering", "continuous delivery",
+        "devops",
+        "ci/cd",
+        "cicd",
+        "deployment",
+        "pipeline",
+        "gitops",
+        "docker",
+        "kubernetes",
+        "release engineering",
+        "continuous delivery",
     ],
     "platform_engineering": [
-        "platform engineering", "internal developer platform", "idp",
-        "backstage", "paved path", "golden path", "developer portal",
+        "platform engineering",
+        "internal developer platform",
+        "idp",
+        "backstage",
+        "paved path",
+        "golden path",
+        "developer portal",
     ],
     "observability": [
-        "observability", "opentelemetry", "distributed tracing", "tracing",
-        "logging", "metrics", "slo", "sla", "alerting", "monitoring",
+        "observability",
+        "opentelemetry",
+        "distributed tracing",
+        "tracing",
+        "logging",
+        "metrics",
+        "slo",
+        "sla",
+        "alerting",
+        "monitoring",
     ],
     "developer_experience": [
-        "developer experience", "dx", "developer productivity", "onboarding",
-        "cognitive load", "inner loop", "developer satisfaction", "devex",
+        "developer experience",
+        "dx",
+        "developer productivity",
+        "onboarding",
+        "cognitive load",
+        "inner loop",
+        "developer satisfaction",
+        "devex",
     ],
     "software_architecture": [
-        "architecture", "microservices", "monolith", "design pattern",
-        "technical debt", "refactoring", "modular", "domain-driven",
+        "architecture",
+        "microservices",
+        "monolith",
+        "design pattern",
+        "technical debt",
+        "refactoring",
+        "modular",
+        "domain-driven",
     ],
     "quality_economics": [
-        "roi", "cost", "economics", "budget", "maintenance cost",
-        "investment", "total cost", "productivity", "velocity",
+        "roi",
+        "cost",
+        "economics",
+        "budget",
+        "maintenance cost",
+        "investment",
+        "total cost",
+        "productivity",
+        "velocity",
     ],
     "test_automation": [
-        "test automation", "flaky test", "test suite", "playwright", "cypress",
-        "selenium", "shift-left", "shift-right", "e2e", "unit test",
+        "test automation",
+        "flaky test",
+        "test suite",
+        "playwright",
+        "cypress",
+        "selenium",
+        "shift-left",
+        "shift-right",
+        "e2e",
+        "unit test",
     ],
 }
 
 # Content Intelligence: real blog performance data from GA4 ETL (ADR-0007)
-from content_intelligence import get_performance_context
+from content_intelligence import get_performance_context  # noqa: E402
 
 # Import unified LLM client
-from llm_client import call_llm, create_llm_client
+from llm_client import call_llm, create_llm_client  # noqa: E402
 
 _scout_prompts = _load_scout_prompts()
 SCOUT_AGENT_PROMPT = _scout_prompts["scout"]
@@ -109,9 +183,7 @@ def classify_topic_theme(topic: dict) -> str:
     theme_scores: dict[str, int] = {}
     for theme, keywords in THEME_KEYWORDS.items():
         score = sum(
-            1
-            for kw in keywords
-            if re.search(r"\b" + re.escape(kw) + r"\b", text)
+            1 for kw in keywords if re.search(r"\b" + re.escape(kw) + r"\b", text)
         )
         if score > 0:
             theme_scores[theme] = score
@@ -180,15 +252,29 @@ def create_client():
     return create_llm_client()
 
 
-def scout_topics(client, focus_area: str = None) -> list:
+def scout_topics(
+    client,
+    focus_area: str = None,
+    *,
+    allow_empty_archive: bool = False,
+) -> list:
     """
     Scout for high-value topics.
 
     Args:
         focus_area: Optional filter (e.g., "test automation", "AI", "performance")
+        allow_empty_archive: If False (default), raise RuntimeError when the
+            `published_articles` ChromaDB collection is missing or empty. This
+            fail-closed behavior prevents publishing dedup-blind (issue #237).
+            Set to True only for bootstrap runs before any articles exist.
 
     Returns:
-        List of scored topic recommendations
+        List of scored topic recommendations, filtered against the
+        published_articles archive (near-duplicates removed).
+
+    Raises:
+        RuntimeError: If the ChromaDB archive is unavailable or empty and
+            `allow_empty_archive` is False.
     """
     print("🔭 Topic Scout Agent: Scanning the landscape...\n")
 
@@ -263,6 +349,33 @@ def scout_topics(client, focus_area: str = None) -> list:
     # Sort by score
     topics.sort(key=lambda x: x.get("total_score", 0), reverse=True)
 
+    # Deduplicate against the published-articles archive (issue #237).
+    # Fail-closed: if the archive is unavailable or empty, abort rather
+    # than publish dedup-blind. Callers can opt out via allow_empty_archive.
+    print("\n   Running dedup check against published_articles archive...")
+    deduplicator = TopicDeduplicator()
+    archive_ok = (
+        deduplicator.collection is not None and deduplicator.collection.count() > 0
+    )
+    if not archive_ok:
+        msg = (
+            "TopicDeduplicator archive unavailable or empty — refusing to "
+            "publish dedup-blind. Run scripts/index_published_articles.py "
+            "to backfill the published_articles collection, or re-run with "
+            "TOPIC_SCOUT_ALLOW_EMPTY_ARCHIVE=1 for a bootstrap run."
+        )
+        if not allow_empty_archive:
+            raise RuntimeError(msg)
+        logger.warning("%s (allow_empty_archive=True, proceeding)", msg)
+
+    kept, rejected = deduplicator.filter_topics(topics)
+    if rejected:
+        print(
+            f"   🚫 Dropped {len(rejected)} near-duplicate topic(s) "
+            f"against the published archive."
+        )
+    topics = kept
+
     print(f"\n✅ Found {len(topics)} high-value topics:\n")
     for i, t in enumerate(topics, 1):
         score = t.get("total_score", 0)
@@ -301,7 +414,15 @@ def main():
     # Optional focus area from environment
     focus = os.environ.get("FOCUS_AREA", "").strip()
 
-    topics = scout_topics(client, focus if focus else None)
+    # Bootstrap escape hatch for dedup fail-closed (issue #237). Only set
+    # this for the very first run, before any articles exist in the archive.
+    allow_empty = bool(os.environ.get("TOPIC_SCOUT_ALLOW_EMPTY_ARCHIVE", "").strip())
+
+    topics = scout_topics(
+        client,
+        focus if focus else None,
+        allow_empty_archive=allow_empty,
+    )
 
     if topics:
         # Save to queue

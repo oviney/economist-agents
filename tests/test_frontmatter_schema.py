@@ -19,6 +19,7 @@ VALID_FRONTMATTER = {
     "date": "2026-04-04",
     "categories": ["Quality Engineering"],
     "image": "/assets/images/test-automation.png",
+    "description": "How test automation reshapes engineering economics",
 }
 
 
@@ -47,7 +48,7 @@ class TestRequiredFields:
 
     @pytest.mark.parametrize(
         "missing_field",
-        ["layout", "title", "date", "categories", "image"],
+        ["layout", "title", "date", "categories", "image", "description"],
     )
     def test_each_required_field_enforced(
         self, schema: FrontmatterSchema, missing_field: str
@@ -183,7 +184,7 @@ class TestArticleValidation:
     """End-to-end: validate a raw article string."""
 
     def test_valid_article_passes(self, schema: FrontmatterSchema) -> None:
-        article = '---\nlayout: post\ntitle: "Test"\ndate: 2026-04-04\ncategories: ["QE"]\nimage: /assets/images/test.png\n---\n\nBody'
+        article = '---\nlayout: post\ntitle: "Test"\ndate: 2026-04-04\ncategories: ["QE"]\nimage: /assets/images/test.png\ndescription: "A short summary"\n---\n\nBody'
         result = schema.validate_article(article)
         assert result.is_valid
 

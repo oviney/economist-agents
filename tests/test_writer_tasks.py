@@ -20,7 +20,8 @@ def valid_article() -> str:
     return (
         '---\nlayout: post\ntitle: "Test Article Title Here"\n'
         'date: 2026-04-03\nauthor: "The Economist"\n'
-        'categories: ["quality-engineering"]\n---\n\n'
+        'categories: ["quality-engineering"]\n'
+        'description: "A short summary for SEO"\n---\n\n'
         f"## Section One\n\n{body}\n\n## Section Two\n\nMore content.\n"
     )
 
@@ -64,6 +65,7 @@ class TestValidateArticleStructure:
         assert result["has_title"] is True
         assert result["has_date"] is True
         assert result["has_layout"] is True
+        assert result["has_description"] is True
         assert result["word_count"] >= 800
         assert result["section_count"] >= 1
 
@@ -100,6 +102,14 @@ class TestValidateArticleStructure:
         )
         result = validate_article_structure(article)
         assert result["has_layout"] is False
+
+    def test_missing_description_field(self) -> None:
+        article = '---\nlayout: post\ntitle: "Test"\ndate: 2026-04-03\n---\n\n' + " ".join(
+            ["word"] * 850
+        )
+        result = validate_article_structure(article)
+        assert result["has_description"] is False
+        assert any("Missing description" in i for i in result["issues"])
 
     def test_long_article_flagged(self) -> None:
         body = " ".join(["word"] * 1300)

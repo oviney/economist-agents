@@ -34,6 +34,11 @@ from src.tools.topic_deduplicator import TopicDeduplicator  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
+# Trend grounding: live web search replaces plain LLM trend research.
+from topic_trend_grounding import build_grounded_trend_context
+
+logger = logging.getLogger(__name__)
+
 # ---------------------------------------------------------------------------
 # Theme keyword map for diversity classification.
 # Keys are canonical theme labels used by check_topic_diversity().
@@ -283,18 +288,21 @@ def scout_topics(
     print("   Loading performance context from GA4 data...")
     performance_context = get_performance_context(top_limit=5, bottom_limit=5)
 
-    # First, gather current trends
-    trend_prompt = TREND_RESEARCH_PROMPT
-    if focus_area:
-        trend_prompt += f"\n\nFocus especially on: {focus_area}"
-
-    print("   Researching current trends...")
-    trends = call_llm(
-        client,
-        "",  # No system prompt for this call
-        trend_prompt,
-        max_tokens=2000,
-    )
+    # First, gather current trends from live web search (grounded evidence).
+    print("   Researching current trends (live web search)...")
+    try:
+        trends = build_grounded_trend_context(
+            focus_area=focus_area,
+        )
+    except Exception as exc:
+        logger.warning(
+            "Trend grounding failed (%s); falling back to unverified mode", exc
+        )
+        trends = (
+            "## Live Trend Evidence\n\n"
+            "_Trend grounding encountered an error. Rely on your training "
+            "knowledge but flag any claims as [UNVERIFIED]._\n"
+        )
 
     # Then, identify topics based on trends AND real blog performance
     print("   Identifying high-value topics (informed by real audience data)...")

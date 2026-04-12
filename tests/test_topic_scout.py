@@ -131,7 +131,7 @@ def mock_llm_client(mock_llm_response_trends, mock_llm_response_topics):
     """Create mock LLM client with realistic responses.
 
     Args:
-        mock_llm_response_trends: Trend research response
+        mock_llm_response_trends: Trend research response (unused after grounding)
         mock_llm_response_topics: Topic scouting response
 
     Returns:
@@ -139,16 +139,14 @@ def mock_llm_client(mock_llm_response_trends, mock_llm_response_topics):
     """
     mock_client = Mock()
 
-    # Create a side effect that returns different responses for different calls
+    # call_llm is now only used for the topic-scouting step (and optional
+    # diversity retry).  Trend research is handled by
+    # build_grounded_trend_context().
     def call_llm_side_effect(client, system_prompt, user_prompt, max_tokens=2000):
-        # First call is trend research (has TREND_RESEARCH_PROMPT)
-        if "Search for and analyze" in user_prompt:
-            return mock_llm_response_trends
-        # Second call is topic scouting. Detect by the SCOUT_AGENT_PROMPT
-        # marker "YOUR MISSION" which is unique to that prompt and stable
-        # across structural changes to the wrapping prose (ADR-0007 wired
-        # the Performance Context block in above the trends section).
-        elif "YOUR MISSION" in user_prompt:
+        # Topic scouting: detect by the SCOUT_AGENT_PROMPT marker
+        # "YOUR MISSION" which is unique to that prompt and stable
+        # across structural changes.
+        if "YOUR MISSION" in user_prompt:
             return mock_llm_response_topics
         # Fallback
         return '{"error": "unexpected prompt"}'
@@ -174,7 +172,10 @@ def test_scout_topics_success(
     """
     mock_client, call_llm_side_effect = mock_llm_client
 
-    with patch("topic_scout.call_llm", side_effect=call_llm_side_effect):
+    with (
+        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
+    ):
         topics = scout_topics(mock_client)
 
     # Validate results
@@ -202,19 +203,20 @@ def test_scout_topics_with_focus_area(
     """Test scout_topics() with focus_area parameter.
 
     Validates:
-    - Focus area appended to trend research prompt
+    - Focus area passed to build_grounded_trend_context
     - Topics still returned successfully
     """
     mock_client, call_llm_side_effect = mock_llm_client
     focus_area = "test automation"
 
-    with patch("topic_scout.call_llm", side_effect=call_llm_side_effect) as mock_call:
+    with (
+        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends") as mock_ground,
+        patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
+    ):
         topics = scout_topics(mock_client, focus_area)
 
-    # Validate focus area in prompt
-    calls = mock_call.call_args_list
-    trend_call = calls[0]
-    assert "test automation" in trend_call[0][2]  # user_prompt is 3rd arg
+    # Validate focus area passed to grounding module
+    mock_ground.assert_called_once_with(focus_area=focus_area)
 
     # Validate results
     assert len(topics) == 2
@@ -230,7 +232,10 @@ def test_scout_topics_empty_results(mock_llm_client, mock_dedup_passthrough):
     """
     mock_client, _ = mock_llm_client
 
-    with patch("topic_scout.call_llm", side_effect=["trends", "invalid json response"]):
+    with (
+        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch("topic_scout.call_llm", side_effect=["invalid json response"]),
+    ):
         topics = scout_topics(mock_client)
 
     assert topics == []
@@ -252,8 +257,11 @@ def test_scout_topics_json_parse_error(mock_llm_client, mock_dedup_passthrough, 
     mock_client, _ = mock_llm_client
 
     # Return valid trends but malformed JSON for topics
-    with patch("topic_scout.call_llm") as mock_call:
-        mock_call.side_effect = ["trends", '[{"bad": json}']
+    with (
+        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch("topic_scout.call_llm") as mock_call,
+    ):
+        mock_call.side_effect = ['[{"bad": json}']
         topics = scout_topics(mock_client)
 
     assert topics == []
@@ -272,7 +280,10 @@ def test_scout_topics_no_json_array(mock_llm_client, mock_dedup_passthrough, cap
     """
     mock_client, _ = mock_llm_client
 
-    with patch("topic_scout.call_llm", side_effect=["trends", "No array here"]):
+    with (
+        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch("topic_scout.call_llm", side_effect=["No array here"]),
+    ):
         topics = scout_topics(mock_client)
 
     assert topics == []
@@ -290,6 +301,7 @@ def test_scout_topics_api_exception(mock_llm_client):
     mock_client, _ = mock_llm_client
 
     with (
+        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
         patch("topic_scout.call_llm", side_effect=Exception("API Error")),
         pytest.raises(Exception, match="API Error"),
     ):
@@ -306,8 +318,11 @@ def test_scout_topics_partial_json(mock_llm_client, mock_dedup_passthrough):
     mock_client, _ = mock_llm_client
     partial_topics = [{"topic": "Test", "total_score": 15}]
 
-    with patch(
-        "topic_scout.call_llm", side_effect=["trends", json.dumps(partial_topics)]
+    with (
+        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch(
+            "topic_scout.call_llm", side_effect=[json.dumps(partial_topics)]
+        ),
     ):
         topics = scout_topics(mock_client)
 
@@ -671,6 +686,7 @@ def test_main_success_flow(
 
     with (
         patch("topic_scout.create_client", return_value=mock_client),
+        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
         patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
     ):
         from topic_scout import main
@@ -701,15 +717,15 @@ def test_main_with_focus_area(
 
     with (
         patch("topic_scout.create_client", return_value=mock_client),
-        patch("topic_scout.call_llm", side_effect=call_llm_side_effect) as mock_call,
+        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends") as mock_ground,
+        patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
     ):
         from topic_scout import main
 
         main()
 
-    # Validate focus area used in prompt
-    calls = [str(call) for call in mock_call.call_args_list]
-    assert any("performance testing" in str(call) for call in calls)
+    # Validate focus area passed to grounding module
+    mock_ground.assert_called_once_with(focus_area="performance testing")
 
 
 def test_main_github_actions_output(
@@ -729,6 +745,7 @@ def test_main_github_actions_output(
 
     with (
         patch("topic_scout.create_client", return_value=mock_client),
+        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
         patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
     ):
         from topic_scout import main
@@ -916,8 +933,11 @@ def test_scout_topics_single_topic(mock_llm_client, mock_dedup_passthrough):
     mock_client, _ = mock_llm_client
     single_topic = [{"topic": "Test", "total_score": 15}]
 
-    with patch(
-        "topic_scout.call_llm", side_effect=["trends", json.dumps(single_topic)]
+    with (
+        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch(
+            "topic_scout.call_llm", side_effect=[json.dumps(single_topic)]
+        ),
     ):
         topics = scout_topics(mock_client)
 
@@ -937,7 +957,10 @@ def test_scout_topics_unsorted_input(
     # Reverse order (lower score first)
     unsorted = [sample_topics[1], sample_topics[0]]
 
-    with patch("topic_scout.call_llm", side_effect=["trends", json.dumps(unsorted)]):
+    with (
+        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch("topic_scout.call_llm", side_effect=[json.dumps(unsorted)]),
+    ):
         topics = scout_topics(mock_client)
 
     # Should be sorted by total_score descending
@@ -995,6 +1018,7 @@ def test_scout_topics_network_timeout(mock_llm_client):
     mock_client, _ = mock_llm_client
 
     with (
+        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
         patch("topic_scout.call_llm", side_effect=TimeoutError("Request timeout")),
         pytest.raises(TimeoutError),
     ):
@@ -1028,11 +1052,14 @@ def test_performance_context_injected_into_scout_prompt(
         "topic_scout.get_performance_context", lambda **kwargs: fake_context
     )
 
-    with patch("topic_scout.call_llm", side_effect=call_llm_side_effect) as mock_call:
+    with (
+        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch("topic_scout.call_llm", side_effect=call_llm_side_effect) as mock_call,
+    ):
         scout_topics(mock_client)
 
-    # Second LLM call is the scout prompt
-    scout_call = mock_call.call_args_list[1]
+    # First LLM call is the scout prompt (trends are now grounded)
+    scout_call = mock_call.call_args_list[0]
     scout_prompt = scout_call[0][2]  # user_prompt is the 3rd positional arg
     assert "Performance Context" in scout_prompt
     assert "Fake Top Article" in scout_prompt
@@ -1058,7 +1085,10 @@ def test_performance_context_fallback_when_db_missing(
         "topic_scout.get_performance_context", lambda **kwargs: fallback
     )
 
-    with patch("topic_scout.call_llm", side_effect=call_llm_side_effect):
+    with (
+        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
+    ):
         topics = scout_topics(mock_client)
 
     # Scout should still succeed with the fallback context
@@ -1080,10 +1110,13 @@ def test_scout_prompt_explicitly_references_performance_data(
         lambda **kwargs: "## Performance Context\n\nfake data\n",
     )
 
-    with patch("topic_scout.call_llm", side_effect=call_llm_side_effect) as mock_call:
+    with (
+        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch("topic_scout.call_llm", side_effect=call_llm_side_effect) as mock_call,
+    ):
         scout_topics(mock_client)
 
-    scout_prompt = mock_call.call_args_list[1][0][2]
+    scout_prompt = mock_call.call_args_list[0][0][2]
     # The prompt must explicitly reference the performance context
     assert "TOP PERFORMERS" in scout_prompt or "top performers" in scout_prompt.lower()
     assert "UNDERPERFORMERS" in scout_prompt or "underperformer" in scout_prompt.lower()
@@ -1102,7 +1135,10 @@ def test_get_performance_context_called_once_per_scout_run(
 
     monkeypatch.setattr("topic_scout.get_performance_context", counting_fake)
 
-    with patch("topic_scout.call_llm", side_effect=call_llm_side_effect):
+    with (
+        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
+    ):
         scout_topics(mock_client)
 
     assert call_count["n"] == 1, f"expected 1 call, got {call_count['n']}"
@@ -1356,22 +1392,22 @@ def test_scout_topics_diversity_check_triggers_regeneration(
 
     call_responses = iter(
         [
-            "trend data",
             json.dumps(non_diverse_topics),
             json.dumps(diverse_topics),
         ]
     )
 
-    with patch(
-        "topic_scout.call_llm", side_effect=lambda *a, **kw: next(call_responses)
-    ) as mock_call:
+    with (
+        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch("topic_scout.call_llm", side_effect=lambda *a, **kw: next(call_responses)) as mock_call,
+    ):
         topics = scout_topics(mock_client)
 
-    # Three LLM calls: trends + initial topics + regeneration
-    assert mock_call.call_count == 3
+    # Two LLM calls: initial topics + regeneration (trends are grounded)
+    assert mock_call.call_count == 2
 
-    # Diversity hint was injected in the 3rd call
-    regen_prompt = mock_call.call_args_list[2][0][2]
+    # Diversity hint was injected in the 2nd call
+    regen_prompt = mock_call.call_args_list[1][0][2]
     assert "DIVERSITY ALERT" in regen_prompt
     assert "ai_testing" in regen_prompt
 
@@ -1388,14 +1424,17 @@ def test_scout_topics_diversity_check_skipped_for_two_topics(mock_dedup_passthro
     # Both topics share the same theme — normally a violation, but too few to check
     two_same_theme = _make_topics_with_theme("ai_testing", 2, start_score=20)
 
-    with patch(
-        "topic_scout.call_llm",
-        side_effect=["trends", json.dumps(two_same_theme)],
-    ) as mock_call:
+    with (
+        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch(
+            "topic_scout.call_llm",
+            side_effect=[json.dumps(two_same_theme)],
+        ) as mock_call,
+    ):
         topics = scout_topics(mock_client)
 
-    # Only 2 LLM calls — no regeneration triggered
-    assert mock_call.call_count == 2
+    # Only 1 LLM call — no regeneration triggered (trends are grounded)
+    assert mock_call.call_count == 1
     assert len(topics) == 2
 
 
@@ -1410,14 +1449,17 @@ def test_scout_topics_diversity_passes_no_extra_call(mock_dedup_passthrough):
         + _make_topics_with_theme("platform_engineering", 1, start_score=18)
     )
 
-    with patch(
-        "topic_scout.call_llm",
-        side_effect=["trends", json.dumps(diverse)],
-    ) as mock_call:
+    with (
+        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch(
+            "topic_scout.call_llm",
+            side_effect=[json.dumps(diverse)],
+        ) as mock_call,
+    ):
         topics = scout_topics(mock_client)
 
-    # Exactly 2 LLM calls — no regeneration
-    assert mock_call.call_count == 2
+    # Exactly 1 LLM call — no regeneration (trends are grounded)
+    assert mock_call.call_count == 1
     assert len(topics) == 5
 
 

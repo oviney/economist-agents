@@ -278,11 +278,11 @@ image: {featured_image}
                     ]
                 )
 
-                # Regenerate with fix instructions
+                # Regenerate with fix instructions, passing original draft for context
                 draft = call_llm(
                     self.client,
                     system_prompt + "\n\n" + fix_instructions,
-                    f"Fix the issues and regenerate: {topic}",
+                    f"Fix the issues in this draft and return the complete corrected article:\n\n{draft}",
                     max_tokens=3000,
                 )
                 # Deterministic fix for BUG-028 on regenerated output

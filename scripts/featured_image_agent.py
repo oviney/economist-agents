@@ -33,6 +33,9 @@ from typing import Literal
 
 ImageMood = Literal["satirical", "contemplative", "urgent", "ironic", "wry"]
 
+# DALL-E 3 rejects prompts over 4000 characters; use 3900 as a safety margin.
+DALLE_MAX_PROMPT_LENGTH = 3900
+
 # ═══════════════════════════════════════════════════════════════════════════
 # ECONOMIST VISUAL STYLE SPECIFICATION
 # ═══════════════════════════════════════════════════════════════════════════
@@ -158,6 +161,9 @@ not just its topic.
 
 CRITICAL: ZERO text, words, letters, numbers, or symbols in the image.
 """
+
+    if len(prompt) > DALLE_MAX_PROMPT_LENGTH:
+        prompt = prompt[:DALLE_MAX_PROMPT_LENGTH]
 
     return prompt
 

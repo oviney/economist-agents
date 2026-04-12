@@ -229,9 +229,9 @@ image: {featured_image}
 Example:
 ---
 layout: post
-title: "Article Title"
+title: "Article Title In Title Case"
 date: {current_date}
-author: "The Economist"
+author: "Ouray Viney"
 categories: ["quality-engineering"]
 description: "Brief SEO summary ≤160 chars"
 image: {featured_image}

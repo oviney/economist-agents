@@ -17,6 +17,7 @@ VALID_FRONTMATTER = {
     "layout": "post",
     "title": "The Economics of Test Automation",
     "date": "2026-04-04",
+    "author": "Ouray Viney",
     "categories": ["Quality Engineering"],
     "image": "/assets/images/test-automation.png",
     "description": "How test automation reshapes engineering economics",
@@ -184,7 +185,7 @@ class TestArticleValidation:
     """End-to-end: validate a raw article string."""
 
     def test_valid_article_passes(self, schema: FrontmatterSchema) -> None:
-        article = '---\nlayout: post\ntitle: "Test"\ndate: 2026-04-04\ncategories: ["QE"]\nimage: /assets/images/test.png\ndescription: "A short summary"\n---\n\nBody'
+        article = '---\nlayout: post\ntitle: "Test"\ndate: 2026-04-04\nauthor: "Ouray Viney"\ncategories: ["QE"]\nimage: /assets/images/test.png\ndescription: "A short summary"\n---\n\nBody'
         result = schema.validate_article(article)
         assert result.is_valid
 

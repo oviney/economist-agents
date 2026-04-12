@@ -231,7 +231,7 @@ layout: post
 title: "Article Title"
 date: {current_date}
 author: "The Economist"
-categories: ["Quality Engineering"]
+categories: ["quality-engineering"]
 image: {featured_image}
 ---
 """

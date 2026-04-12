@@ -182,7 +182,7 @@ def _apply_editorial_fixes(article: str, current_date: str | None = None) -> str
             if "layout:" not in fm:
                 fm = "\nlayout: post" + fm
             if "categories:" not in fm:
-                fm = fm.rstrip() + '\ncategories: ["Quality Engineering"]\n'
+                fm = fm.rstrip() + '\ncategories: ["quality-engineering"]\n'
             text = "---" + fm + "---" + parts[2]
 
     # 9. Clean up double spaces from phrase/placeholder removal

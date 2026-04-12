@@ -157,12 +157,12 @@ layout: post
 title: "Your Title"
 date: YYYY-MM-DD
 author: "The Economist"
-categories: ["Quality Engineering"]
+categories: ["quality-engineering"]
 image: /assets/images/SLUG.png
 summary: "One-sentence summary of the article"
 ---
 
-IMPORTANT for categories: Choose 1-3 from: Quality Engineering, Test Automation, AI Testing, Software Engineering, DevOps, Performance.
+IMPORTANT for categories: Choose 1-3 from: quality-engineering, software-engineering, test-automation, security. Categories MUST be kebab-case.
 IMPORTANT for image: Replace SLUG with a lowercase-hyphenated version of the title (e.g., "ai-testing-costs").
 
 Then the full article body (minimum 800 words) following these MANDATORY rules:

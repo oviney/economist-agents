@@ -268,7 +268,9 @@ description: "Testing references validation"
 
 # Article content
 
-This is a proper article with citations. {padding}
+This is a proper article with citations. As the chart shows, the data reveals a clear trend. {padding}
+
+![Data Chart](/assets/charts/test-chart.png)
 
 ## References
 
@@ -445,6 +447,10 @@ The gap between promise and reality reveals something important about automation
 ## The reality check
 
 Forrester's 2024 study shows that self-healing tests reduce maintenance time by 18%, not 80%. The discrepancy comes from vendor marketing overselling capabilities.
+
+As the chart shows, the gap between promise and delivery remains wide.
+
+![Automation Gap](/assets/charts/self-healing-tests.png)
 
 IEEE research confirms these findings. Their September 2024 standards document shows that most "self-healing" features are simple retry logic. {padding}
 

@@ -20,6 +20,11 @@ VALID_REFERENCES = """## References
 3. IEEE, ["Software Testing Practices"](https://example.com/ieee), *IEEE*, 2024
 """
 
+VALID_CHART_EMBED = (
+    "\n\nAs the chart shows, the data reveals a clear trend."
+    "\n\n![Data Chart](/assets/charts/test-chart.png)\n"
+)
+
 VALID_BODY = " ".join(["word"] * 850)
 
 
@@ -33,6 +38,7 @@ def _make_article(
     description: str | None = "A concise test description for SEO purposes",
     body: str | None = None,
     references: str | None = None,
+    chart_embed: str | None = None,
     frontmatter_open: str = "---",
     frontmatter_close: str = "---",
 ) -> str:
@@ -41,6 +47,8 @@ def _make_article(
         body = VALID_BODY
     if references is None:
         references = VALID_REFERENCES
+    if chart_embed is None:
+        chart_embed = VALID_CHART_EMBED
     fields = []
     if layout:
         fields.append(f"layout: {layout}")
@@ -55,7 +63,7 @@ def _make_article(
     if description is not None:
         fields.append(f'description: "{description}"')
     fm = "\n".join(fields)
-    return f"{frontmatter_open}\n{fm}\n{frontmatter_close}\n\n{body}\n\n{references}\n"
+    return f"{frontmatter_open}\n{fm}\n{frontmatter_close}\n\n{body}\n{chart_embed}\n{references}\n"
 
 
 # ---------------------------------------------------------------------------

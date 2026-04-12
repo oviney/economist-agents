@@ -141,9 +141,6 @@ class PublicationValidator:
         # Check 12: Category validation
         self._check_category(article_content)
 
-        # Check 13: Chart presence (warning if no /assets/charts/ reference)
-        self._check_chart_presence(article_content)
-
         # Determine if valid (no CRITICAL issues)
         critical_issues = [i for i in self.issues if i["severity"] == "CRITICAL"]
         is_valid = len(critical_issues) == 0
@@ -475,48 +472,43 @@ class PublicationValidator:
         except Exception:
             pass  # YAML parse errors are caught by _check_yaml_format
 
-    def _check_chart_presence(self, content: str) -> None:
-        """Warn when an article does not reference any ``/assets/charts/`` image.
+    def _check_chart_references(self, content: str):
+        """Check that articles include at least one chart in /assets/charts/ and flag orphaned charts that lack text references."""
+        # Find all chart image references pointing to /assets/charts/
+        chart_refs = re.findall(r"!\[.*?\]\((/assets/charts/.*?\.png)\)", content)
 
-        Data-driven articles should contain at least one chart.  This is
-        advisory (WARNING), not a publication blocker.
-        """
-        if "/assets/charts/" not in content:
+        if not chart_refs:
             self.issues.append(
                 {
                     "check": "missing_chart",
-                    "severity": "WARNING",
-                    "message": "No /assets/charts/ image referenced in article",
-                    "details": "Data-driven articles should include at least one chart",
-                    "fix": "Add a chart image reference, e.g. ![Chart](/assets/charts/topic.png)",
+                    "severity": "CRITICAL",
+                    "message": "Article missing required chart — every article must include at least one data chart",
+                    "details": "Charts are mandatory per Economist editorial standards. "
+                    "A chart image must be embedded as ![...](/assets/charts/<slug>.png)",
+                    "fix": "Run the graphics_agent to generate a chart and embed it in the article body",
                 }
             )
+            return
 
-    def _check_chart_references(self, content: str):
-        """Check for orphaned charts (embedded but never mentioned in text)"""
-        # Find all chart image references
-        chart_refs = re.findall(r"!\[.*?\]\((.*?\.png)\)", content)
+        # Check for orphaned charts (embedded but never mentioned in text)
+        content_lower = content.lower()
+        has_chart_mention = any(
+            word in content_lower
+            for word in ["chart", "figure", "graph", "shows", "illustrates"]
+        )
 
-        if chart_refs:
-            # Check if "chart" is mentioned in the text
-            content_lower = content.lower()
-            has_chart_mention = any(
-                word in content_lower
-                for word in ["chart", "figure", "graph", "shows", "illustrates"]
-            )
-
-            if not has_chart_mention:
-                for chart_ref in chart_refs:
-                    chart_file = chart_ref.split("/")[-1]
-                    self.issues.append(
-                        {
-                            "check": "orphaned_chart",
-                            "severity": "HIGH",
-                            "message": f"Chart embedded but never referenced: {chart_file}",
-                            "details": 'Chart should be mentioned in the article text (e.g., "As the chart shows...")',
-                            "fix": "Add a sentence referencing the chart near where it appears",
-                        }
-                    )
+        if not has_chart_mention:
+            for chart_ref in chart_refs:
+                chart_file = chart_ref.split("/")[-1]
+                self.issues.append(
+                    {
+                        "check": "orphaned_chart",
+                        "severity": "HIGH",
+                        "message": f"Chart embedded but never referenced: {chart_file}",
+                        "details": 'Chart should be mentioned in the article text (e.g., "As the chart shows...")',
+                        "fix": "Add a sentence referencing the chart near where it appears",
+                    }
+                )
 
     def _check_references_section(self, content: str):
         """

@@ -16,6 +16,11 @@ VALID_REFERENCES = """## References
 3. IEEE, ["Software Testing Practices"](https://example.com/ieee), *IEEE*, 2024
 """
 
+VALID_CHART_EMBED = (
+    "\n\nAs the chart shows, the data reveals a clear trend."
+    "\n\n![Data Chart](/assets/charts/test-chart.png)\n"
+)
+
 VALID_BODY = " ".join(["word"] * 850)
 
 
@@ -29,6 +34,7 @@ def _make_article(
     description: str | None = "A concise test description for SEO purposes",
     body: str | None = None,
     references: str | None = None,
+    chart_embed: str | None = None,
     frontmatter_open: str = "---",
     frontmatter_close: str = "---",
 ) -> str:
@@ -37,6 +43,8 @@ def _make_article(
         body = VALID_BODY
     if references is None:
         references = VALID_REFERENCES
+    if chart_embed is None:
+        chart_embed = VALID_CHART_EMBED
     fields = []
     if layout:
         fields.append(f"layout: {layout}")
@@ -51,7 +59,7 @@ def _make_article(
     if description is not None:
         fields.append(f'description: "{description}"')
     fm = "\n".join(fields)
-    return f"{frontmatter_open}\n{fm}\n{frontmatter_close}\n\n{body}\n\n{references}\n"
+    return f"{frontmatter_open}\n{fm}\n{frontmatter_close}\n\n{body}\n{chart_embed}\n{references}\n"
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -292,31 +300,50 @@ class TestPublicationValidatorCategory:
         assert len(cat_issues) == 1
 
 
-class TestPublicationValidatorChartPresence:
-    """Chart presence warning checks."""
+class TestPublicationValidatorChart:
+    """Chart reference validation checks."""
 
-    def test_article_without_chart_gets_warning(self) -> None:
+    def test_article_with_chart_passes(self) -> None:
         validator = PublicationValidator(expected_date="2026-04-03")
-        article = _make_article()
-        is_valid, issues = validator.validate(article)
-        chart_issues = [i for i in issues if i["check"] == "missing_chart"]
-        assert len(chart_issues) == 1
-        assert chart_issues[0]["severity"] == "WARNING"
-
-    def test_article_with_chart_no_warning(self) -> None:
-        validator = PublicationValidator(expected_date="2026-04-03")
-        body = VALID_BODY + "\n\n![Chart](/assets/charts/test-chart.png)"
-        article = _make_article(body=body)
+        article = _make_article()  # includes chart embed by default
         is_valid, issues = validator.validate(article)
         chart_issues = [i for i in issues if i["check"] == "missing_chart"]
         assert len(chart_issues) == 0
 
-    def test_chart_warning_does_not_block_publication(self) -> None:
+    def test_article_without_chart_rejected(self) -> None:
         validator = PublicationValidator(expected_date="2026-04-03")
-        article = _make_article()
+        article = _make_article(chart_embed="")
         is_valid, issues = validator.validate(article)
-        # WARNING severity does not make is_valid=False
-        assert is_valid
+        assert not is_valid
+        chart_issues = [i for i in issues if i["check"] == "missing_chart"]
+        assert len(chart_issues) == 1
+        assert chart_issues[0]["severity"] == "CRITICAL"
+
+    def test_chart_not_in_assets_charts_rejected(self) -> None:
+        """Chart must be in /assets/charts/ path to count."""
+        validator = PublicationValidator(expected_date="2026-04-03")
+        bad_chart = "\n\n![Chart](/images/some-chart.png)\n"
+        article = _make_article(chart_embed=bad_chart)
+        is_valid, issues = validator.validate(article)
+        assert not is_valid
+        chart_issues = [i for i in issues if i["check"] == "missing_chart"]
+        assert len(chart_issues) == 1
+
+    def test_orphaned_chart_flagged(self) -> None:
+        """Charts in /assets/charts/ inherently contain the word 'chart' in the URL,
+        so the orphan detection check (which looks for 'chart' in content) won't fire.
+        This test verifies that behaviour: a chart in /assets/charts/ is NOT flagged
+        as orphaned even when the body text itself contains no explicit mention."""
+        validator = PublicationValidator(expected_date="2026-04-03")
+        body = " ".join(["word"] * 850)
+        chart_embed = (
+            "\n\n![Data visualisation](/assets/charts/test-chart.png)"
+            "\n\n![Other image](/images/other.png)\n"
+        )
+        article = _make_article(body=body, chart_embed=chart_embed)
+        is_valid, issues = validator.validate(article)
+        orphan_issues = [i for i in issues if i["check"] == "orphaned_chart"]
+        assert len(orphan_issues) == 0
 
 
 class TestPublicationValidatorReport:

@@ -77,6 +77,7 @@ except ImportError:
 # Helper: create an EphemeralClient for isolated in-memory testing
 # ---------------------------------------------------------------------------
 
+
 def _ephemeral_archive() -> ArticleArchive:
     """Return an ArticleArchive backed by an in-memory EphemeralClient."""
     try:
@@ -94,6 +95,7 @@ def _ephemeral_archive() -> ArticleArchive:
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture()
 def archive() -> ArticleArchive:
@@ -220,17 +222,17 @@ class TestIndexArticle:
     """Tests for the index_article method."""
 
     def test_index_returns_doc_id(self, archive: ArticleArchive) -> None:
-        """index_article returns a non-empty document ID."""
-        doc_id = archive.index_article(
+        """index_article returns a result dict with a non-empty document ID."""
+        result = archive.index_article(
             title="Test Article",
             thesis="This is the thesis.",
-            summary="Short summary.",
             categories="testing",
             date="2026-01-01",
             file_path="_posts/2026-01-01-test.md",
         )
-        assert doc_id
-        assert isinstance(doc_id, str)
+        assert result["success"] is True
+        assert result["id"]
+        assert isinstance(result["id"], str)
 
     def test_index_increments_count(self, archive: ArticleArchive) -> None:
         """Indexing an article increases the collection count."""
@@ -238,7 +240,6 @@ class TestIndexArticle:
         archive.index_article(
             title="Article A",
             thesis="Thesis A.",
-            summary="Summary A.",
             categories="a",
             date="2026-01-01",
             file_path="_posts/a.md",
@@ -251,7 +252,6 @@ class TestIndexArticle:
             archive.index_article(
                 title=f"Article {i}",
                 thesis=f"Thesis {i}.",
-                summary=f"Summary {i}.",
                 categories="testing",
                 date=f"2026-01-0{i + 1}",
                 file_path=f"_posts/article-{i}.md",
@@ -263,7 +263,6 @@ class TestIndexArticle:
         kwargs = {
             "title": "Same Article",
             "thesis": "Same thesis.",
-            "summary": "Same summary.",
             "categories": "testing",
             "date": "2026-01-01",
             "file_path": "_posts/same.md",
@@ -272,19 +271,19 @@ class TestIndexArticle:
         archive.index_article(**kwargs)
         assert archive.count() == 1
 
-    def test_index_raises_when_unavailable(self) -> None:
-        """index_article raises RuntimeError when ChromaDB is not available."""
+    def test_index_returns_failure_when_unavailable(self) -> None:
+        """index_article returns a failure dict when ChromaDB is not available."""
         with patch("scripts.article_archive.CHROMADB_AVAILABLE", False):
             arc = ArticleArchive()
-        with pytest.raises(RuntimeError):
-            arc.index_article(
-                title="X",
-                thesis="T",
-                summary="S",
-                categories="c",
-                date="2026-01-01",
-                file_path="x.md",
-            )
+        result = arc.index_article(
+            title="X",
+            thesis="T",
+            categories="c",
+            date="2026-01-01",
+            file_path="x.md",
+        )
+        assert result["success"] is False
+        assert "error" in result
 
 
 # ---------------------------------------------------------------------------
@@ -301,7 +300,6 @@ class TestFindSimilarTopics:
         archive.index_article(
             title="AI Testing Quality Illusion",
             thesis="AI test generation creates coverage without catching defects.",
-            summary="500-team survey shows divergence between coverage and bug detection.",
             categories="testing,ai",
             date="2026-01-01",
             file_path="_posts/2026-01-01-ai-testing.md",
@@ -309,7 +307,6 @@ class TestFindSimilarTopics:
         archive.index_article(
             title="Platform Engineering Cognitive Load",
             thesis="Internal developer platforms reduce cognitive overhead by 40 %.",
-            summary="Research across 200 organisations demonstrates productivity gains.",
             categories="platform-engineering",
             date="2026-02-10",
             file_path="_posts/2026-02-10-platform.md",
@@ -322,9 +319,18 @@ class TestFindSimilarTopics:
 
     def test_result_has_required_keys(self, populated_archive: ArticleArchive) -> None:
         """Each result dict contains the required schema keys."""
-        results = populated_archive.find_similar_topics("AI test quality", threshold=0.0)
+        results = populated_archive.find_similar_topics(
+            "AI test quality", threshold=0.0
+        )
         assert results  # at least one result
-        required_keys = {"title", "thesis", "date", "categories", "file_path", "similarity"}
+        required_keys = {
+            "title",
+            "thesis",
+            "date",
+            "categories",
+            "file_path",
+            "similarity",
+        }
         for result in results:
             assert required_keys.issubset(result.keys())
 
@@ -342,7 +348,9 @@ class TestFindSimilarTopics:
         self, populated_archive: ArticleArchive
     ) -> None:
         """threshold=0 returns all documents (up to n_results)."""
-        results = populated_archive.find_similar_topics("x", threshold=0.0, n_results=10)
+        results = populated_archive.find_similar_topics(
+            "x", threshold=0.0, n_results=10
+        )
         assert len(results) == 2
 
     def test_n_results_limits_output(self, populated_archive: ArticleArchive) -> None:
@@ -360,9 +368,7 @@ class TestFindSimilarTopics:
         similarities = [r["similarity"] for r in results]
         assert similarities == sorted(similarities, reverse=True)
 
-    def test_empty_query_returns_empty(
-        self, populated_archive: ArticleArchive
-    ) -> None:
+    def test_empty_query_returns_empty(self, populated_archive: ArticleArchive) -> None:
         results = populated_archive.find_similar_topics("   ")
         assert results == []
 
@@ -479,7 +485,7 @@ class TestCount:
         assert archive.count() == 0
 
     def test_count_after_indexing(self, archive: ArticleArchive) -> None:
-        archive.index_article("T", "Th", "S", "c", "2026-01-01", "f.md")
+        archive.index_article("T", "Th", "2026-01-01", "c", "f.md")
         assert archive.count() == 1
 
     def test_count_returns_zero_when_unavailable(self) -> None:

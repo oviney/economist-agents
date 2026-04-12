@@ -42,6 +42,7 @@ def _get_shared_client() -> tuple[object, object]:
             import hashlib
 
             import chromadb
+            import chromadb.api.shared_system_client
             from chromadb.api.types import Documents, Embeddings
             from chromadb.utils.embedding_functions import EmbeddingFunction
 
@@ -62,6 +63,7 @@ def _get_shared_client() -> tuple[object, object]:
                         result.append(vec)
                     return result
 
+            chromadb.api.shared_system_client.SharedSystemClient.clear_system_cache()
             _chroma_client = chromadb.EphemeralClient()
             _fake_ef = _FakeEmbedding()
         except ImportError:

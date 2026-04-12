@@ -217,6 +217,10 @@ class TestRunResearchAgent:
                 "agents.research_agent.ResearchAgent._gather_arxiv_research",
                 return_value=None,
             ),
+            patch(
+                "agents.research_agent.ResearchAgent._gather_web_research",
+                return_value=None,
+            ),
         ):
             # Return the properly structured mock response
             mock_call_llm.return_value = json.dumps(sample_research_output)
@@ -308,6 +312,10 @@ class TestRunResearchAgent:
             patch("agents.research_agent.review_agent_output") as mock_review,
             patch(
                 "agents.research_agent.ResearchAgent._gather_arxiv_research",
+                return_value=None,
+            ),
+            patch(
+                "agents.research_agent.ResearchAgent._gather_web_research",
                 return_value=None,
             ),
         ):

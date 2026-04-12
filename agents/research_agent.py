@@ -153,6 +153,19 @@ class ResearchAgent:
         if web_research:
             research_data["web_research"] = web_research
 
+        # Verify citations: fetch URLs and confirm stats appear in source text
+        try:
+            from citation_verifier import verify_citations
+
+            research_data = verify_citations(research_data)
+            cv = research_data.get("citation_verification", {})
+            print(
+                f"   🔍 Citation verification: {cv.get('verified', 0)} verified, "
+                f"{cv.get('failed', 0)} failed"
+            )
+        except ImportError:
+            logger.warning("citation_verifier not available — skipping verification")
+
         # Log metrics
         self._log_metrics(research_data, topic, arxiv_insights, web_research)
 

@@ -146,6 +146,17 @@ class TestCreateImagePrompt:
         assert isinstance(result, str)
         assert len(result) > 100  # should be a substantial prompt
 
+    def test_prompt_truncated_to_dalle_max_length(self) -> None:
+        """Prompt must never exceed DALLE_MAX_PROMPT_LENGTH (3900 chars)."""
+        from featured_image_agent import DALLE_MAX_PROMPT_LENGTH
+
+        # Use an extremely long summary to trigger truncation
+        long_summary = "A" * 5000
+        prompt = create_image_prompt(self.TOPIC, long_summary)
+        assert len(prompt) <= DALLE_MAX_PROMPT_LENGTH, (
+            f"Prompt length {len(prompt)} exceeds DALLE_MAX_PROMPT_LENGTH {DALLE_MAX_PROMPT_LENGTH}"
+        )
+
 
 # ===========================================================================
 # generate_featured_image()

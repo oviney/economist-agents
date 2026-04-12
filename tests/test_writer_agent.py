@@ -266,6 +266,35 @@ class TestWriterAgent:
 
     @patch("agents.writer_agent.call_llm")
     @patch("agents.writer_agent.review_agent_output")
+    def test_regeneration_user_message_includes_draft(
+        self, mock_review, mock_call_llm, mock_client, sample_research_brief
+    ):
+        """Regeneration call must include original draft in user message (fix for #270)."""
+        bad_article = "---\ntitle: Bad\n---\nIn conclusion, game-changer!"
+        good_article = "---\nlayout: post\ntitle: Good\ndate: 2026-01-02\n---\nContent"
+
+        mock_call_llm.side_effect = [bad_article, good_article]
+        mock_review.side_effect = [
+            (False, ["CRITICAL: Article too short", "BANNED: in conclusion"]),
+            (True, []),
+        ]
+
+        agent = WriterAgent(mock_client)
+        agent.write(
+            topic="Security Debt",
+            research_brief=sample_research_brief,
+            current_date="2026-01-02",
+        )
+
+        # Second call is the regeneration; its user message must contain the original draft
+        assert mock_call_llm.call_count == 2
+        regen_user_msg = mock_call_llm.call_args_list[1][0][2]
+        assert bad_article in regen_user_msg, (
+            "Regeneration user message must include original draft so the LLM has content to fix"
+        )
+
+    @patch("agents.writer_agent.call_llm")
+    @patch("agents.writer_agent.review_agent_output")
     def test_write_with_governance_logging(
         self,
         mock_review,

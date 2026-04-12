@@ -177,6 +177,27 @@ jobs:
           cp "../output/charts/${ARTICLE_BASENAME}.png" assets/charts/ 2>/dev/null || true
           cp "../output/images/${ARTICLE_BASENAME}.png" assets/images/ 2>/dev/null || true
 
+          # Generate WebP versions so blog's responsive-image include doesn't break HTML-Proofer
+          BASENAME="$ARTICLE_BASENAME" python3 -c "
+import os, pathlib
+try:
+    from PIL import Image
+    basename = os.environ['BASENAME']
+    for src_path in [
+        pathlib.Path(f'assets/images/{basename}.png'),
+        pathlib.Path(f'assets/charts/{basename}.png'),
+    ]:
+        if src_path.exists():
+            dst = src_path.with_suffix('.webp')
+            with Image.open(src_path) as im:
+                im.save(dst, 'WebP', quality=85)
+            print(f'Generated {dst}')
+        else:
+            print(f'Skipped (not found): {src_path}')
+except Exception as e:
+    print(f'Warning: WebP generation failed: {e} -- continuing without WebP')
+"
+
           # Commit and push directly to main
           git add "_posts/$(basename "$ARTICLE_PATH")" assets/charts/ assets/images/
           ARTICLE_TITLE=$(cat ../article_title.txt 2>/dev/null || echo "Generated Article")

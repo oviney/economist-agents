@@ -16,9 +16,12 @@ Usage:
     response = call_llm(client, system_prompt, user_prompt)
 """
 
+import logging
 import os
 import time
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 # Try to load from .env file (secure)
 try:
@@ -156,6 +159,22 @@ def _call_openai(
             {"role": "user", "content": user_prompt},
         ],
     )
+
+    # Log token usage and estimated cost for every call
+    try:
+        from token_usage import log_token_usage  # noqa: PLC0415
+
+        usage = response.usage
+        if usage is not None:
+            log_token_usage(
+                model=model,
+                prompt_tokens=usage.prompt_tokens,
+                completion_tokens=usage.completion_tokens,
+                total_tokens=usage.total_tokens,
+            )
+    except (ImportError, AttributeError, OSError) as exc:
+        logger.warning("Could not log token usage: %s", exc)
+
     return response.choices[0].message.content
 
 

@@ -28,6 +28,7 @@ from scripts.record_metrics import (  # noqa: E402
     fetch_all_runs,
     get_db_path,
 )
+from scripts.token_usage import read_usage_log, summarise_usage  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Page config
@@ -155,3 +156,53 @@ with st.expander("🗄️ Raw run data"):
     display_df = df.copy()
     display_df["timestamp"] = display_df["timestamp"].dt.strftime("%Y-%m-%d %H:%M:%S")
     st.dataframe(display_df, use_container_width=True, hide_index=True)
+
+# ---------------------------------------------------------------------------
+# Token usage section
+# ---------------------------------------------------------------------------
+
+st.divider()
+st.subheader("🪙 OpenAI Token Usage (cumulative)")
+
+_token_records = read_usage_log()
+if not _token_records:
+    st.info(
+        "No token-usage records found. "
+        "Records are written to `~/.economist-agents/token-usage.jsonl` "
+        "whenever `llm_client.call_llm` is invoked."
+    )
+else:
+    _by_model = summarise_usage(_token_records)
+    _total_cost = sum(s["estimated_cost_usd"] for s in _by_model.values())
+
+    _tok_col1, _tok_col2, _tok_col3 = st.columns(3)
+    _tok_col1.metric("Total calls logged", sum(s["calls"] for s in _by_model.values()))
+    _tok_col2.metric(
+        "Total tokens", f"{sum(s['total_tokens'] for s in _by_model.values()):,}"
+    )
+    _tok_col3.metric("Est. total cost", f"${_total_cost:.4f}")
+
+    if _HAS_PANDAS:
+        _tok_df = pd.DataFrame(
+            [
+                {
+                    "Model": model,
+                    "Calls": stats["calls"],
+                    "Prompt tokens": stats["prompt_tokens"],
+                    "Completion tokens": stats["completion_tokens"],
+                    "Total tokens": stats["total_tokens"],
+                    "Est. cost (USD)": f"${stats['estimated_cost_usd']:.4f}",
+                }
+                for model, stats in sorted(_by_model.items())
+            ]
+        )
+        st.dataframe(_tok_df, use_container_width=True, hide_index=True)
+
+        # Cost-per-model bar chart
+        _cost_df = pd.DataFrame(
+            [
+                {"Model": model, "Est. cost (USD)": stats["estimated_cost_usd"]}
+                for model, stats in sorted(_by_model.items())
+            ]
+        ).set_index("Model")
+        st.bar_chart(_cost_df, use_container_width=True)

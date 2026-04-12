@@ -95,7 +95,7 @@ class TestFlowOrchestration:
         flow = EconomistContentFlow()
         # quality_gate expects dict with valid frontmatter (schema gate fires first)
         article_draft = {
-            "article": '---\nlayout: post\ntitle: "AI Testing"\ndate: 2026-04-04\ncategories: ["QE"]\nimage: /assets/images/test.png\ndescription: "AI testing overview"\n---\n\nHigh quality content...',
+            "article": '---\nlayout: post\ntitle: "AI Testing"\ndate: 2026-04-04\nauthor: "The Economist"\ncategories: ["quality-engineering"]\nimage: /assets/images/test.png\ndescription: "AI testing overview"\n---\n\nHigh quality content...',
             "chart_path": None,
             "word_count": 100,
         }

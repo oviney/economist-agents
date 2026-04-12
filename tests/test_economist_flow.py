@@ -30,7 +30,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.economist_agents.flow import EconomistContentFlow
 
 # Valid article stub for tests that need to pass schema validation
-_VALID_ARTICLE = '---\nlayout: post\ntitle: "Test"\ndate: 2026-04-04\ncategories: ["QE"]\nimage: /assets/images/test.png\n---\n\nBody'
+_VALID_ARTICLE = '---\nlayout: post\ntitle: "Test"\ndate: 2026-04-04\nauthor: "The Economist"\ndescription: "Test article for quality gate validation"\ncategories: ["quality-engineering"]\nimage: /assets/images/test.png\n---\n\nBody'
 
 
 @pytest.mark.skipif(

@@ -117,8 +117,10 @@ def main():
     # Setup blog directories
     posts_dir = blog_dir / "_posts"
     assets_dir = blog_dir / "assets" / "charts"
+    images_dir = blog_dir / "assets" / "images"
     posts_dir.mkdir(parents=True, exist_ok=True)
     assets_dir.mkdir(parents=True, exist_ok=True)
+    images_dir.mkdir(parents=True, exist_ok=True)
 
     # Determine the deploy date and rename article file accordingly
     deploy_date = datetime.now().strftime("%Y-%m-%d")
@@ -148,6 +150,28 @@ def main():
         target_chart = assets_dir / f"{slug}.png"
         print(f"📊 Copying chart: {chart_file} → {target_chart}")
         run_command(f"cp {chart_file} {target_chart}")
+
+    # Copy featured image (PNG + WebP) — required by responsive-image.html include
+    # The blog's _includes/responsive-image.html always emits a <picture><source srcset="...webp">
+    # for every .png, so htmlproofer will fail if the .webp is absent.
+    featured_image_dir = Path("output") / "posts" / "images"
+    featured_png = featured_image_dir / f"{slug}.png"
+    if featured_png.exists():
+        target_png = images_dir / f"{slug}.png"
+        shutil.copy2(featured_png, target_png)
+        print(f"🖼️  Copied featured image: {featured_png} → {target_png}")
+
+        # Generate WebP alongside PNG
+        target_webp = images_dir / f"{slug}.webp"
+        try:
+            from PIL import Image  # type: ignore
+            img = Image.open(target_png)
+            img.save(str(target_webp), "WEBP", quality=85)
+            print(f"🖼️  Generated webp: {target_webp}")
+        except ImportError:
+            print("⚠️  Pillow not available — skipping webp generation (htmlproofer may fail)")
+    else:
+        print(f"   ℹ No featured image at {featured_png} — skipping image copy")
 
     # -----------------------------------------------------------------------
     # Pre-deploy validation gate

@@ -452,7 +452,9 @@ class EconomistContentFlow(Flow):
         import pathlib
         import re as _re_q
 
-        slug = _re_q.sub(r"[^a-z0-9]+", "-", edited_article[:80].lower()).strip("-")[:60]
+        title_match = _re_q.search(r'title:\s*["\']?(.+?)["\']?\s*$', edited_article, _re_q.MULTILINE)
+        slug_source = title_match.group(1) if title_match else edited_article[:80]
+        slug = _re_q.sub(r"[^a-z0-9]+", "-", slug_source.lower()).strip("-")[:60]
         quarantine_dir = pathlib.Path("output") / "quarantine"
         quarantine_dir.mkdir(parents=True, exist_ok=True)
         quarantine_path = quarantine_dir / f"{datetime.now().strftime('%Y-%m-%d')}-{slug}.md"

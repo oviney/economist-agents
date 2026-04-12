@@ -37,6 +37,8 @@ logger = logging.getLogger(__name__)
 # Trend grounding: live web search replaces plain LLM trend research.
 from topic_trend_grounding import build_grounded_trend_context
 
+logger = logging.getLogger(__name__)
+
 # ---------------------------------------------------------------------------
 # Theme keyword map for diversity classification.
 # Keys are canonical theme labels used by check_topic_diversity().
@@ -288,9 +290,19 @@ def scout_topics(
 
     # First, gather current trends from live web search (grounded evidence).
     print("   Researching current trends (live web search)...")
-    trends = build_grounded_trend_context(
-        focus_area=focus_area,
-    )
+    try:
+        trends = build_grounded_trend_context(
+            focus_area=focus_area,
+        )
+    except Exception as exc:
+        logger.warning(
+            "Trend grounding failed (%s); falling back to unverified mode", exc
+        )
+        trends = (
+            "## Live Trend Evidence\n\n"
+            "_Trend grounding encountered an error. Rely on your training "
+            "knowledge but flag any claims as [UNVERIFIED]._\n"
+        )
 
     # Then, identify topics based on trends AND real blog performance
     print("   Identifying high-value topics (informed by real audience data)...")

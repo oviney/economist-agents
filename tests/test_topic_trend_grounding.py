@@ -18,9 +18,9 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
 from topic_trend_grounding import (
-    _DEFAULT_QUERIES,
     EvidenceItem,
     TrendEvidence,
+    _default_queries,
     _fetch_hn_top_stories,
     _get_searcher,
     _run_query,
@@ -138,13 +138,15 @@ class TestRunQuery:
         items = _run_query(mock_searcher, "test query")
         assert items == []
 
-    def test_handles_missing_fields_gracefully(
-        self, mock_searcher: MagicMock
-    ) -> None:
+    def test_returns_empty_on_search_exception(self, mock_searcher: MagicMock) -> None:
+        """Returns empty list when searcher.search_web raises an exception."""
+        mock_searcher.search_web.side_effect = RuntimeError("network error")
+        items = _run_query(mock_searcher, "test query")
+        assert items == []
+
+    def test_handles_missing_fields_gracefully(self, mock_searcher: MagicMock) -> None:
         """Missing optional fields default to empty strings."""
-        mock_searcher.search_web.return_value = [
-            {"title": "Only title"}
-        ]
+        mock_searcher.search_web.return_value = [{"title": "Only title"}]
         items = _run_query(mock_searcher, "q")
         assert len(items) == 1
         assert items[0]["url"] == ""
@@ -162,13 +164,15 @@ class TestFetchHnTopStories:
 
     def test_returns_stories_on_success(self) -> None:
         """Returns list of EvidenceItem dicts with HN stories."""
+        import orjson
+
         mock_top_resp = MagicMock()
-        mock_top_resp.json.return_value = _make_hn_api_response(3)
+        mock_top_resp.content = orjson.dumps(_make_hn_api_response(3))
         mock_top_resp.raise_for_status = MagicMock()
 
         items_map = {
             sid: MagicMock(
-                json=MagicMock(return_value=_make_hn_item(sid)),
+                content=orjson.dumps(_make_hn_item(sid)),
                 raise_for_status=MagicMock(),
             )
             for sid in range(100, 103)
@@ -203,12 +207,42 @@ class TestFetchHnTopStories:
 
     def test_skips_null_items(self) -> None:
         """Skips HN items that return None/empty."""
+        import orjson
+
         mock_top_resp = MagicMock()
-        mock_top_resp.json.return_value = [100]
+        mock_top_resp.content = orjson.dumps([100])
         mock_top_resp.raise_for_status = MagicMock()
 
         mock_item_resp = MagicMock()
-        mock_item_resp.json.return_value = None
+        mock_item_resp.content = orjson.dumps(None)
+        mock_item_resp.raise_for_status = MagicMock()
+
+        def get_side_effect(url: str, **kwargs: Any) -> MagicMock:
+            if "topstories" in url:
+                return mock_top_resp
+            return mock_item_resp
+
+        with patch("topic_trend_grounding.requests.get", side_effect=get_side_effect):
+            stories = _fetch_hn_top_stories()
+        assert stories == []
+
+    def test_skips_items_with_zero_timestamp(self) -> None:
+        """Skips HN items with missing/zero timestamps (would be 1970-01-01)."""
+        import orjson
+
+        mock_top_resp = MagicMock()
+        mock_top_resp.content = orjson.dumps([100])
+        mock_top_resp.raise_for_status = MagicMock()
+
+        # Item with time=0 should be skipped
+        item_no_time = {
+            "id": 100,
+            "title": "No Time",
+            "url": "https://x.com",
+            "time": 0,
+        }
+        mock_item_resp = MagicMock()
+        mock_item_resp.content = orjson.dumps(item_no_time)
         mock_item_resp.raise_for_status = MagicMock()
 
         def get_side_effect(url: str, **kwargs: Any) -> MagicMock:
@@ -222,8 +256,10 @@ class TestFetchHnTopStories:
 
     def test_respects_max_items(self) -> None:
         """Only fetches up to max_items stories."""
+        import orjson
+
         mock_top_resp = MagicMock()
-        mock_top_resp.json.return_value = list(range(200, 220))
+        mock_top_resp.content = orjson.dumps(list(range(200, 220)))
         mock_top_resp.raise_for_status = MagicMock()
 
         def get_side_effect(url: str, **kwargs: Any) -> MagicMock:
@@ -232,7 +268,7 @@ class TestFetchHnTopStories:
             # Extract item ID from URL
             item_id = int(url.split("/")[-1].split(".")[0])
             mock_item = MagicMock()
-            mock_item.json.return_value = _make_hn_item(item_id)
+            mock_item.content = orjson.dumps(_make_hn_item(item_id))
             mock_item.raise_for_status = MagicMock()
             return mock_item
 
@@ -249,9 +285,7 @@ class TestFetchHnTopStories:
 class TestGatherTrendEvidence:
     """Tests for gather_trend_evidence()."""
 
-    def test_returns_evidence_per_query(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_returns_evidence_per_query(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Returns one TrendEvidence per query plus HN."""
         monkeypatch.setenv("SERPER_API_KEY", "fake-key")
 
@@ -259,25 +293,17 @@ class TestGatherTrendEvidence:
         mock_searcher.search_web.return_value = _make_web_results(2)
 
         with (
-            patch(
-                "topic_trend_grounding._get_searcher", return_value=mock_searcher
-            ),
-            patch(
-                "topic_trend_grounding._fetch_hn_top_stories", return_value=[]
-            ),
+            patch("topic_trend_grounding._get_searcher", return_value=mock_searcher),
+            patch("topic_trend_grounding._fetch_hn_top_stories", return_value=[]),
         ):
-            evidence = gather_trend_evidence(
-                queries=["q1", "q2"], include_hn=True
-            )
+            evidence = gather_trend_evidence(queries=["q1", "q2"], include_hn=True)
 
         assert len(evidence) == 2  # 2 queries, no HN results
         assert evidence[0]["query"] == "q1"
         assert evidence[1]["query"] == "q2"
         assert len(evidence[0]["results"]) == 2
 
-    def test_includes_hn_when_enabled(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_includes_hn_when_enabled(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Appends HN evidence when include_hn=True and stories exist."""
         monkeypatch.setenv("SERPER_API_KEY", "fake-key")
 
@@ -289,32 +315,26 @@ class TestGatherTrendEvidence:
             source="hacker_news",
         )
 
+        mock_searcher = MagicMock()
+        mock_searcher.search_web.return_value = []
+
         with (
             patch(
-                "topic_trend_grounding._get_searcher", return_value=MagicMock()
-            ) as _,
+                "topic_trend_grounding._get_searcher",
+                return_value=mock_searcher,
+            ),
             patch(
                 "topic_trend_grounding._fetch_hn_top_stories",
                 return_value=[hn_item],
             ),
         ):
-            mock_searcher = MagicMock()
-            mock_searcher.search_web.return_value = []
-            with patch(
-                "topic_trend_grounding._get_searcher",
-                return_value=mock_searcher,
-            ):
-                evidence = gather_trend_evidence(
-                    queries=["q1"], include_hn=True
-                )
+            evidence = gather_trend_evidence(queries=["q1"], include_hn=True)
 
         # q1 + HN
         assert len(evidence) == 2
         assert evidence[-1]["query"] == "Hacker News front page"
 
-    def test_skips_hn_when_disabled(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_skips_hn_when_disabled(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Does not include HN when include_hn=False."""
         monkeypatch.setenv("SERPER_API_KEY", "fake-key")
 
@@ -326,13 +346,9 @@ class TestGatherTrendEvidence:
                 "topic_trend_grounding._get_searcher",
                 return_value=mock_searcher,
             ),
-            patch(
-                "topic_trend_grounding._fetch_hn_top_stories"
-            ) as mock_hn,
+            patch("topic_trend_grounding._fetch_hn_top_stories") as mock_hn,
         ):
-            evidence = gather_trend_evidence(
-                queries=["q1"], include_hn=False
-            )
+            evidence = gather_trend_evidence(queries=["q1"], include_hn=False)
 
         mock_hn.assert_not_called()
         assert len(evidence) == 1
@@ -340,7 +356,7 @@ class TestGatherTrendEvidence:
     def test_uses_default_queries_when_none(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """Uses _DEFAULT_QUERIES when queries=None."""
+        """Uses _default_queries() when queries=None."""
         monkeypatch.setenv("SERPER_API_KEY", "fake-key")
 
         mock_searcher = MagicMock()
@@ -351,17 +367,13 @@ class TestGatherTrendEvidence:
                 "topic_trend_grounding._get_searcher",
                 return_value=mock_searcher,
             ),
-            patch(
-                "topic_trend_grounding._fetch_hn_top_stories", return_value=[]
-            ),
+            patch("topic_trend_grounding._fetch_hn_top_stories", return_value=[]),
         ):
             evidence = gather_trend_evidence(queries=None, include_hn=False)
 
-        assert len(evidence) == len(_DEFAULT_QUERIES)
+        assert len(evidence) == len(_default_queries())
 
-    def test_degrades_without_api_key(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_degrades_without_api_key(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Returns only HN evidence when SERPER_API_KEY is missing."""
         monkeypatch.delenv("SERPER_API_KEY", raising=False)
 
@@ -377,9 +389,7 @@ class TestGatherTrendEvidence:
             "topic_trend_grounding._fetch_hn_top_stories",
             return_value=[hn_item],
         ):
-            evidence = gather_trend_evidence(
-                queries=["q1"], include_hn=True
-            )
+            evidence = gather_trend_evidence(queries=["q1"], include_hn=True)
 
         assert len(evidence) == 1
         assert evidence[0]["query"] == "Hacker News front page"
@@ -425,9 +435,7 @@ class TestFormatEvidenceAsPrompt:
 
     def test_returns_fallback_when_results_empty(self) -> None:
         """Returns fallback when evidence entries have zero results."""
-        evidence: list[TrendEvidence] = [
-            TrendEvidence(query="q1", results=[])
-        ]
+        evidence: list[TrendEvidence] = [TrendEvidence(query="q1", results=[])]
         output = format_evidence_as_prompt(evidence)
         assert "[UNVERIFIED]" in output
 
@@ -521,9 +529,7 @@ class TestFormatEvidenceAsPrompt:
 class TestBuildGroundedTrendContext:
     """Tests for build_grounded_trend_context()."""
 
-    def test_returns_formatted_string(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_returns_formatted_string(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Returns a non-empty formatted string."""
         monkeypatch.setenv("SERPER_API_KEY", "fake-key")
 
@@ -550,9 +556,7 @@ class TestBuildGroundedTrendContext:
         assert len(context) > 0
         assert "Article" in context
 
-    def test_adds_focus_area_queries(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_adds_focus_area_queries(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Extra queries are added when focus_area is provided."""
         monkeypatch.setenv("SERPER_API_KEY", "fake-key")
 
@@ -581,9 +585,7 @@ class TestBuildGroundedTrendContext:
         """Returns fallback text when no evidence collected."""
         monkeypatch.delenv("SERPER_API_KEY", raising=False)
 
-        with patch(
-            "topic_trend_grounding.gather_trend_evidence", return_value=[]
-        ):
+        with patch("topic_trend_grounding.gather_trend_evidence", return_value=[]):
             context = build_grounded_trend_context()
 
         assert "[UNVERIFIED]" in context
@@ -608,4 +610,4 @@ class TestBuildGroundedTrendContext:
         ):
             build_grounded_trend_context(focus_area=None)
 
-        assert len(captured_queries[0]) == len(_DEFAULT_QUERIES)
+        assert len(captured_queries[0]) == len(_default_queries())

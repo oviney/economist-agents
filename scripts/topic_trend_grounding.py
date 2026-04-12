@@ -26,9 +26,10 @@ from __future__ import annotations
 
 import logging
 import os
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any, TypedDict
 
+import orjson
 import requests
 
 logger = logging.getLogger(__name__)
@@ -59,22 +60,30 @@ class TrendEvidence(TypedDict):
 # Constants – default search queries
 # ---------------------------------------------------------------------------
 
-_CURRENT_YEAR: int = datetime.now().year
 
-_DEFAULT_QUERIES: list[str] = [
-    f"quality engineering {_CURRENT_YEAR} announcements",
-    f"AI testing tool release {_CURRENT_YEAR}",
-    f"DevSecOps survey {_CURRENT_YEAR}",
-    f"platform engineering Backstage release {_CURRENT_YEAR}",
-    f"SRE conference {_CURRENT_YEAR}",
-    f"software testing trends {_CURRENT_YEAR}",
-    f"observability OpenTelemetry {_CURRENT_YEAR}",
-]
+def _current_year() -> int:
+    """Return the current year at call time (avoids stale module-level constant)."""
+    return datetime.now(tz=UTC).year
+
+
+def _default_queries() -> list[str]:
+    """Build default search queries using the current year."""
+    year = _current_year()
+    return [
+        f"quality engineering {year} announcements",
+        f"AI testing tool release {year}",
+        f"DevSecOps survey {year}",
+        f"platform engineering Backstage release {year}",
+        f"SRE conference {year}",
+        f"software testing trends {year}",
+        f"observability OpenTelemetry {year}",
+    ]
+
 
 _HN_TOP_STORIES_URL = "https://hacker-news.firebaseio.com/v0/topstories.json"
 _HN_ITEM_URL = "https://hacker-news.firebaseio.com/v0/item/{item_id}.json"
-_HN_MAX_ITEMS = 10
-_HN_TIMEOUT = 10
+_HN_MAX_ITEMS = 5
+_HN_TIMEOUT = 5
 
 
 # ---------------------------------------------------------------------------
@@ -86,16 +95,32 @@ def _get_searcher() -> Any:
     """Create a ``GoogleSearcher`` instance.
 
     Returns ``None`` when the ``SERPER_API_KEY`` environment variable is not
-    set (the caller should log a warning and skip web search).
+    set, or when the ``google_search`` module cannot be imported or
+    initialised. Callers can then log a warning and skip web search.
     """
     if not os.environ.get("SERPER_API_KEY"):
         return None
 
     # Import lazily to keep module importable even when google_search has
     # heavy optional deps.
-    from google_search import GoogleSearcher  # noqa: E402
+    try:
+        from google_search import GoogleSearcher  # noqa: E402
+    except ImportError as exc:
+        logger.warning(
+            "SERPER_API_KEY is set but google_search is unavailable; "
+            "skipping web search: %s",
+            exc,
+        )
+        return None
 
-    return GoogleSearcher()
+    try:
+        return GoogleSearcher()
+    except Exception as exc:
+        logger.warning(
+            "Failed to initialise GoogleSearcher; skipping web search: %s",
+            exc,
+        )
+        return None
 
 
 def _run_query(searcher: Any, query: str, num_results: int = 5) -> list[EvidenceItem]:
@@ -109,11 +134,15 @@ def _run_query(searcher: Any, query: str, num_results: int = 5) -> list[Evidence
     Returns:
         List of :class:`EvidenceItem` dicts (may be empty on error).
     """
-    raw = searcher.search_web(
-        query=query,
-        num_results=num_results,
-        year_start=_CURRENT_YEAR,
-    )
+    try:
+        raw = searcher.search_web(
+            query=query,
+            num_results=num_results,
+            year_start=_current_year(),
+        )
+    except Exception as exc:
+        logger.warning("Search failed for '%s': %s", query, exc)
+        return []
 
     items: list[EvidenceItem] = []
     for r in raw:
@@ -147,7 +176,7 @@ def _fetch_hn_top_stories(max_items: int = _HN_MAX_ITEMS) -> list[EvidenceItem]:
     try:
         resp = requests.get(_HN_TOP_STORIES_URL, timeout=_HN_TIMEOUT)
         resp.raise_for_status()
-        story_ids: list[int] = resp.json()[:max_items]
+        story_ids: list[int] = orjson.loads(resp.content)[:max_items]
 
         items: list[EvidenceItem] = []
         for sid in story_ids:
@@ -155,17 +184,20 @@ def _fetch_hn_top_stories(max_items: int = _HN_MAX_ITEMS) -> list[EvidenceItem]:
                 _HN_ITEM_URL.format(item_id=sid), timeout=_HN_TIMEOUT
             )
             item_resp.raise_for_status()
-            story = item_resp.json()
+            story = orjson.loads(item_resp.content)
             if not story:
+                continue
+            # Skip items with missing or zero timestamps (would format as
+            # 1970-01-01 and pollute evidence with incorrect dates).
+            ts = story.get("time", 0)
+            if not ts:
                 continue
             items.append(
                 EvidenceItem(
                     title=story.get("title", ""),
                     url=story.get("url", ""),
                     snippet="",
-                    date=datetime.fromtimestamp(
-                        story.get("time", 0)
-                    ).strftime("%Y-%m-%d"),
+                    date=datetime.fromtimestamp(ts, tz=UTC).strftime("%Y-%m-%d"),
                     source="hacker_news",
                 )
             )
@@ -199,7 +231,7 @@ def gather_trend_evidence(
         and a ``results`` list of :class:`EvidenceItem`.
     """
     if queries is None:
-        queries = list(_DEFAULT_QUERIES)
+        queries = _default_queries()
 
     evidence: list[TrendEvidence] = []
 
@@ -213,9 +245,7 @@ def gather_trend_evidence(
         for q in queries:
             results = _run_query(searcher, q, num_results=num_results_per_query)
             evidence.append(TrendEvidence(query=q, results=results))
-            logger.info(
-                "Query '%s' returned %d evidence items", q, len(results)
-            )
+            logger.info("Query '%s' returned %d evidence items", q, len(results))
 
     if include_hn:
         hn_stories = _fetch_hn_top_stories()
@@ -248,14 +278,17 @@ def build_grounded_trend_context(
         injection into an LLM prompt.  Returns a fallback message when no
         evidence could be collected.
     """
-    queries = list(_DEFAULT_QUERIES)
+    queries = _default_queries()
 
     # Add focus-specific queries when a focus area is provided.
     if focus_area:
+        # Strip and truncate to avoid injecting unexpected content into queries.
+        safe_focus = focus_area.strip()[:100]
+        year = _current_year()
         queries.extend(
             [
-                f"{focus_area} {_CURRENT_YEAR} trends",
-                f"{focus_area} {_CURRENT_YEAR} announcements",
+                f"{safe_focus} {year} trends",
+                f"{safe_focus} {year} announcements",
             ]
         )
 
@@ -288,10 +321,14 @@ def format_evidence_as_prompt(evidence: list[TrendEvidence]) -> str:
             "[UNVERIFIED]._\n"
         )
 
+    # Determine which sources contributed evidence.
+    sources = {item["source"] for e in evidence for item in e["results"]}
+    source_label = ", ".join(sorted(sources)) if sources else "live search"
+
     lines: list[str] = [
-        "## Live Trend Evidence (Web Search Results)\n",
+        f"## Live Trend Evidence ({source_label})\n",
         f"_Collected {total_items} items on "
-        f"{datetime.now().strftime('%Y-%m-%d')}.  "
+        f"{datetime.now(tz=UTC).strftime('%Y-%m-%d')}.  "
         "Use these DATED sources to ground your topic recommendations. "
         "Cite specific titles, dates, and URLs when proposing topics._\n",
     ]

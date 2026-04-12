@@ -85,6 +85,32 @@ TONE:
 
 logger = logging.getLogger(__name__)
 
+# DALL-E 3 rejects prompts longer than 4000 characters.  We cap at 3900 to
+# leave a small safety margin and avoid silent generation failures.
+DALLE_MAX_PROMPT_LENGTH = 3900
+
+
+def _truncate_prompt(prompt: str, context: str = "DALL-E") -> str:
+    """Truncate *prompt* to :data:`DALLE_MAX_PROMPT_LENGTH` if necessary.
+
+    Args:
+        prompt: The prompt string to check and possibly truncate.
+        context: Label used in the warning log message.
+
+    Returns:
+        The original prompt (unchanged) when it is within the limit,
+        or a truncated copy otherwise.
+    """
+    if len(prompt) > DALLE_MAX_PROMPT_LENGTH:
+        logger.warning(
+            "%s prompt length %d exceeds %d chars; truncating",
+            context,
+            len(prompt),
+            DALLE_MAX_PROMPT_LENGTH,
+        )
+        return prompt[:DALLE_MAX_PROMPT_LENGTH]
+    return prompt
+
 mcp = FastMCP(
     name="image-generator",
     instructions=(
@@ -116,7 +142,7 @@ def _build_dalle_prompt(article_title: str, article_summary: str) -> str:
         "not just its topic.\n\n"
         "CRITICAL: ZERO text, words, letters, numbers, or symbols in the image."
     )
-    return prompt
+    return _truncate_prompt(prompt)
 
 
 @mcp.tool()
@@ -285,6 +311,7 @@ def generate_image(
         )
 
     client = openai.OpenAI(api_key=api_key)
+    prompt = _truncate_prompt(prompt, context="Raw DALL-E")
     logger.info("Calling DALL-E 3 for prompt (first 60 chars): %r", prompt[:60])
 
     response = client.images.generate(

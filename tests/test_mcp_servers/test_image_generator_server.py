@@ -14,6 +14,7 @@ from unittest.mock import MagicMock, Mock, patch
 import pytest
 
 from mcp_servers.image_generator_server import (
+    DALLE_MAX_PROMPT_LENGTH,
     _build_dalle_prompt,
     generate_editorial_image,
     mcp,
@@ -102,6 +103,29 @@ class TestBuildDallePrompt:
         prompt = _build_dalle_prompt("T", "S")
         assert "#3b6d8f" in prompt or "#a34054" in prompt
         assert "#E3120B" in prompt  # Economist red
+
+    @pytest.mark.unit
+    def test_prompt_within_dalle_limit(self) -> None:
+        """Prompt must not exceed DALLE_MAX_PROMPT_LENGTH even with short inputs."""
+        prompt = _build_dalle_prompt("Short Title", "Short summary.")
+        assert len(prompt) <= DALLE_MAX_PROMPT_LENGTH
+
+    @pytest.mark.unit
+    def test_long_inputs_truncated_to_limit(self) -> None:
+        """When title + summary push the prompt past the limit, it must be truncated."""
+        long_title = "A" * 2000
+        long_summary = "B" * 2000
+        prompt = _build_dalle_prompt(long_title, long_summary)
+        assert len(prompt) <= DALLE_MAX_PROMPT_LENGTH
+
+    @pytest.mark.unit
+    def test_truncated_prompt_is_string(self) -> None:
+        """Truncated prompt must still be a valid string."""
+        long_title = "X" * 3000
+        long_summary = "Y" * 3000
+        prompt = _build_dalle_prompt(long_title, long_summary)
+        assert isinstance(prompt, str)
+        assert len(prompt) == DALLE_MAX_PROMPT_LENGTH
 
 
 # ─────────────────────────────────────────────────────────────────────────────

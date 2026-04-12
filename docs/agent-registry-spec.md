@@ -49,7 +49,7 @@ This replaces the previous CrewAI-based agent definitions.
 - **Skills:** editorial-illustration
 - **MCP Tools:** image-generator (DALL-E)
 - **Model:** haiku
-- **Purpose:** Generate DALL-E prompt following editorial illustration skill (painterly, human figures, no text, muted colours). Call image-generator MCP to produce PNG.
+- **Purpose:** Generate DALL-E prompt following editorial illustration skill (bold graphic illustration, human figures, no text, limited colour palette). Call image-generator MCP to produce PNG.
 
 ### Editor
 

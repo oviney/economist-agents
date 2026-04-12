@@ -259,12 +259,16 @@ image: {featured_image}
 
         critical_issues = []
         regenerated = False  # Track whether regeneration occurred
-        # If validation fails and issues are critical, attempt one regeneration
+        # If validation fails and issues are critical, attempt up to 2 regenerations
         if not is_valid:
             critical_issues = [i for i in issues if "CRITICAL" in i or "BANNED" in i]
-            if critical_issues:
+            for attempt in range(2):
+                if not critical_issues:
+                    break
+
                 print(
-                    f"   ⚠️  {len(critical_issues)} critical issues found, regenerating..."
+                    f"   ⚠️  {len(critical_issues)} critical issues found, regenerating"
+                    f" (attempt {attempt + 1}/2)..."
                 )
 
                 # Create fix instructions — targeted guidance for word count failures
@@ -312,15 +316,20 @@ image: {featured_image}
                 is_valid, issues = review_agent_output(
                     "writer_agent", draft, context={"chart_filename": chart_filename}
                 )
+                critical_issues = [
+                    i for i in issues if "CRITICAL" in i or "BANNED" in i
+                ]
 
-                if not is_valid:
+                if not is_valid and critical_issues:
                     print(
-                        f"   ⚠️  Draft still has {len(issues)} issues after regeneration"
+                        f"   ⚠️  Draft still has {len(issues)} issues after attempt {attempt + 1}"
                     )
                 else:
-                    print("   ✅ Regenerated draft passed validation")
-            else:
-                print(f"   ⚠️  Draft has {len(issues)} warnings (non-critical)")
+                    if is_valid:
+                        print("   ✅ Regenerated draft passed validation")
+                    else:
+                        print(f"   ⚠️  Draft has {len(issues)} warnings (non-critical)")
+                    break
         else:
             print("   ✅ Draft passed self-validation")
 

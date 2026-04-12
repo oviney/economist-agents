@@ -34,7 +34,21 @@ def run_command(cmd, cwd=None):
 
 
 def find_latest_article():
-    """Find the most recent generated article"""
+    """Find the most recent generated article.
+
+    Prefers article_path.txt written by content-pipeline.yml (precise).
+    Falls back to mtime scan of output/*.md with a warning (fragile).
+    """
+    article_path_file = Path("article_path.txt")
+    if article_path_file.exists():
+        candidate = Path(article_path_file.read_text().strip())
+        if candidate.exists():
+            print(f"📄 Using article from article_path.txt: {candidate}")
+            return candidate
+        print(
+            f"⚠️  article_path.txt points to missing file: {candidate} — falling back to mtime scan"
+        )
+
     output_dir = Path("output")
     articles = list(output_dir.glob("*.md"))
     if not articles:
@@ -42,9 +56,10 @@ def find_latest_article():
         print("💡 Run: python scripts/economist_agent.py")
         sys.exit(1)
 
-    # Sort by modification time, get latest
     latest = sorted(articles, key=lambda p: p.stat().st_mtime)[-1]
-    print(f"📄 Found latest article: {latest}")
+    print(
+        f"⚠️  article_path.txt not found — using most recently modified file: {latest}"
+    )
     return latest
 
 
@@ -165,11 +180,14 @@ def main():
         target_webp = images_dir / f"{slug}.webp"
         try:
             from PIL import Image  # type: ignore
+
             img = Image.open(target_png)
             img.save(str(target_webp), "WEBP", quality=85)
             print(f"🖼️  Generated webp: {target_webp}")
         except ImportError:
-            print("⚠️  Pillow not available — skipping webp generation (htmlproofer may fail)")
+            print(
+                "⚠️  Pillow not available — skipping webp generation (htmlproofer may fail)"
+            )
     else:
         print(f"   ℹ No featured image at {featured_png} — skipping image copy")
 

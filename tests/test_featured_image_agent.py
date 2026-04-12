@@ -38,10 +38,14 @@ from featured_image_agent import (
 class TestEconomistImageStyle:
     """Validate the style specification constant against SKILL.md requirements."""
 
-    def test_painterly_style_required(self) -> None:
-        """Style must demand painterly/textured illustration, not flat vector."""
-        assert "Painterly" in ECONOMIST_IMAGE_STYLE or "painterly" in ECONOMIST_IMAGE_STYLE
-        assert "NOT flat vector" in ECONOMIST_IMAGE_STYLE
+    def test_bold_graphic_style_required(self) -> None:
+        """Style must demand bold graphic editorial illustration, not painterly."""
+        assert "bold" in ECONOMIST_IMAGE_STYLE.lower()
+        assert "graphic" in ECONOMIST_IMAGE_STYLE.lower()
+        assert "editorial illustration" in ECONOMIST_IMAGE_STYLE.lower()
+        assert "NOT watercolour" in ECONOMIST_IMAGE_STYLE
+        assert "NOT oil painting" in ECONOMIST_IMAGE_STYLE
+        assert "NOT photorealism" in ECONOMIST_IMAGE_STYLE
 
     def test_human_element_mandatory(self) -> None:
         """Human figures must be explicitly required."""
@@ -49,11 +53,11 @@ class TestEconomistImageStyle:
         assert "human figure" in ECONOMIST_IMAGE_STYLE
 
     def test_expanded_colour_palette(self) -> None:
-        """Colour palette must include blues, dusty red, ochre, and sage green."""
+        """Colour palette must include Economist red, blues, and accent colours."""
+        assert "#E3120B" in ECONOMIST_IMAGE_STYLE  # Economist red
         assert "#3b6d8f" in ECONOMIST_IMAGE_STYLE
         assert "#a34054" in ECONOMIST_IMAGE_STYLE  # dusty red
         assert "#c4953a" in ECONOMIST_IMAGE_STYLE  # ochre
-        assert "#7a9a6f" in ECONOMIST_IMAGE_STYLE  # sage green
 
     def test_no_text_instruction(self) -> None:
         """Style must explicitly forbid text/labels in the image."""
@@ -83,7 +87,8 @@ class TestCreateImagePrompt:
     def test_prompt_contains_economist_style(self) -> None:
         """Prompt must embed the ECONOMIST_IMAGE_STYLE constant."""
         prompt = create_image_prompt(self.TOPIC, self.SUMMARY)
-        assert "Painterly" in prompt or "painterly" in prompt
+        assert "Bold" in prompt or "bold" in prompt
+        assert "graphic" in prompt.lower()
 
     def test_prompt_contains_scene_section(self) -> None:
         """Prompt must contain a SCENE section as required by SKILL.md template."""

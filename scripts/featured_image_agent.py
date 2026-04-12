@@ -4,9 +4,9 @@ Featured Image Generation Agent for Economist-Style Articles
 
 Generates DALL-E 3 editorial illustrations that match The Economist's visual style
 as defined in skills/editorial-illustration/SKILL.md:
-- Painterly, textured illustration with visible brushstrokes (NOT flat vector art)
-- Human figures in contextual scenes (offices, boardrooms, laboratories)
-- Expanded muted colour palette: blues, warm greys, dusty reds, ochres, skin tones
+- Bold, high-contrast graphic editorial illustration (NOT painterly or oil painting)
+- Human figures or symbolic objects as conceptual metaphors
+- Bold colour palette with Economist red #E3120B, strong blues, high contrast
 - Editorial wit — subtle satire and intelligent visual storytelling
 - Image size 1792x1024 (landscape hero) at HD quality
 - Absolutely no text, words, or labels
@@ -39,50 +39,54 @@ ImageMood = Literal["satirical", "contemplative", "urgent", "ironic", "wry"]
 
 ECONOMIST_IMAGE_STYLE = """
 Create an editorial illustration in the style of The Economist magazine's
-commissioned artwork — the kind by David Parkins or Kevin "KAL" Kallaugher.
+bold, graphic cover art and editorial imagery.
 
 STYLE:
-- Painterly, textured illustration with visible brushstrokes
-- Think oil painting meets political cartoon
-- Rich, layered composition with depth and dimension
-- NOT flat vector art, NOT minimalist icons, NOT stock photography
-- Cross-hatching, colour washes, and artistic texture throughout
+- Bold, high-contrast graphic editorial illustration
+- Strong geometric compositions with confident lines and shapes
+- Conceptual metaphor: human figures or symbolic objects representing ideas
+- Clear dominant foreground subject against a minimal or abstract background
+- NOT watercolour, NOT oil painting, NOT photorealism, NOT soft brushstrokes
+- NOT pastel, NOT painterly, NOT textured canvas
 
 CRITICAL - NO TEXT:
 - ABSOLUTELY NO TEXT, WORDS, LETTERS, NUMBERS, OR SYMBOLS ANYWHERE
 - No labels, captions, signs, or written content of any kind
 
 HUMAN ELEMENT (MANDATORY):
-- Always include at least one human figure
+- Always include at least one human figure or symbolic object representing a person
 - Stylised but expressive — body language tells the story
 - People in suits, at desks, in boardrooms, on factory floors
 - Show emotion: frustration, curiosity, determination, bemusement
 
-COLOUR PALETTE (RICH AND MUTED):
-- Blues: #3b6d8f, #17648d, steel blue
-- Warm greys: #8a8a8a, charcoal shadows
-- Accents: dusty red #a34054, ochre #c4953a, sage green #7a9a6f
-- Natural skin tones, varied
-- Background: cream #f4f0e6, warm grey #d9d3c7, parchment
-- Avoid pure black, neon, or oversaturated colours
+COLOUR PALETTE (BOLD AND LIMITED):
+- Economist red: #E3120B as a primary accent
+- Strong blues: #3b6d8f, #17648d, navy
+- High-contrast darks: charcoal #333333, deep navy #1a1a2e
+- Accents: dusty red #a34054, ochre #c4953a
+- Background: clean white, off-white #f4f0e6, or flat colour blocks
+- Use bold colour blocking — large areas of flat, saturated colour
+- Avoid gradients, soft washes, or muted pastel tones
 
 COMPOSITION:
-- Asymmetric, with a clear focal point
+- Strong geometric composition with clear visual hierarchy
+- Clear dominant foreground subject
+- Minimal or abstract background — NOT busy, NOT detailed environments
 - Use scale exaggeration for editorial effect (tiny person, enormous machine)
-- Overlapping elements create depth and dimension
-- Environmental context — place subjects in real settings (offices, cities)
 - Generous negative space on one side for text overlay
 
 AVOID:
 - Technology clichés: lightbulbs, upward arrows, gears, puzzle pieces
 - Generic abstract shapes that could represent anything
-- Flat design or icon-like simplicity
+- Watercolour, oil painting, or any fine-art painting aesthetic
 - Photorealism or stock photo aesthetics
+- Soft gradients, pastel colours, or delicate brushwork
+- Busy, cluttered compositions
 
 TONE:
+- Confident and authoritative
 - Intelligent and thought-provoking
 - Slightly satirical or wry
-- Confident editorial voice
 - Timeless, not trendy
 """
 
@@ -97,8 +101,8 @@ def create_image_prompt(
     Generate DALL-E 3 prompt for Economist-style featured image.
 
     Follows the template defined in skills/editorial-illustration/SKILL.md,
-    producing painterly, textured editorial illustrations with human figures,
-    expanded colour palette, and editorial wit.
+    producing bold, high-contrast graphic editorial illustrations with
+    conceptual metaphors, human figures, and limited colour palette.
 
     Args:
         topic: Article headline/title
@@ -134,19 +138,20 @@ def create_image_prompt(
         f"colour temperature reinforce this tone.\n\n"
     )
     prompt += """
-TASK: Create a SCENE, not a symbol. Show a specific moment that captures
+TASK: Create a bold, graphic SCENE with a conceptual metaphor that captures
 the article's argument.
 
-Think: "What would a photograph of this article's thesis look like, if
-drawn by a political cartoonist with a paintbrush?"
+Think: "What single striking image would The Economist put on its cover
+to represent this article's thesis?"
 
 Examples of good scenes:
 - Article about AI failure → A person in a suit staring at a massive
-  computer screen showing gibberish, painted in frustrated oil strokes
+  computer screen showing gibberish, rendered in bold graphic style with
+  strong colour blocking and Economist red accents
 - Article about testing costs → An engineer buried under a towering pile
-  of paper test reports, rendered in watercolour with dusty red accents
+  of paper test reports, depicted as a high-contrast graphic illustration
 - Article about security → A figure holding a cracked umbrella while
-  digital rain pours through, in textured blue-grey tones
+  digital rain pours through, in bold navy and red tones
 
 The viewer should understand the article's ARGUMENT from the image,
 not just its topic.
@@ -169,7 +174,7 @@ def generate_featured_image(
     """
     Generate a featured image using DALL-E 3.
 
-    Produces a painterly, Economist-style editorial illustration as defined
+    Produces a bold, graphic Economist-style editorial illustration as defined
     in skills/editorial-illustration/SKILL.md.  Images are 1792x1024 landscape
     at HD quality by default.
 

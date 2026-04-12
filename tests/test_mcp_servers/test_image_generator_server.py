@@ -89,16 +89,19 @@ class TestBuildDallePrompt:
         assert "human" in prompt.lower() or "HUMAN" in prompt
 
     @pytest.mark.unit
-    def test_painterly_style_present(self) -> None:
-        """Prompt must reference the painterly / oil-painting style."""
+    def test_bold_graphic_style_present(self) -> None:
+        """Prompt must reference the bold graphic editorial illustration style."""
         prompt = _build_dalle_prompt("T", "S")
-        assert "painterly" in prompt.lower() or "oil painting" in prompt.lower()
+        assert "bold" in prompt.lower()
+        assert "graphic" in prompt.lower()
+        assert "editorial illustration" in prompt.lower()
 
     @pytest.mark.unit
     def test_colour_palette_present(self) -> None:
-        """Prompt must include muted colour palette codes from the skill."""
+        """Prompt must include colour palette codes from the skill."""
         prompt = _build_dalle_prompt("T", "S")
         assert "#3b6d8f" in prompt or "#a34054" in prompt
+        assert "#E3120B" in prompt  # Economist red
 
 
 # ─────────────────────────────────────────────────────────────────────────────

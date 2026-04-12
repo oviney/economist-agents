@@ -49,7 +49,7 @@ Twelve specialised agents, each with defined skills, model tiers, and MCP tool a
 |-------|----------|-------|---------|
 | **Researcher** | Content Pipeline | Sonnet | Find fresh, diverse sources (3+ from current year) via web, arXiv, and engineering blogs |
 | **Writer** | Content Pipeline | Opus | Draft Economist-style articles — 700-1000 words, British spelling, thesis-driven |
-| **Illustrator** | Content Pipeline | Haiku | Generate DALL-E prompts following editorial illustration standards (painterly, no text) |
+| **Illustrator** | Content Pipeline | Haiku | Generate DALL-E prompts following editorial illustration standards (bold graphic, no text) |
 | **Editor** | Content Pipeline | Sonnet | 5-gate quality review: opening, evidence, voice, structure, visual. Reject if <80 |
 | **Publisher** | Content Pipeline | Haiku | Deploy article to blog repo via PR with review checklist |
 | **Analyst** | Content Intelligence | Sonnet | Pull GA4/GSC data, compute engagement scores, identify content gaps |

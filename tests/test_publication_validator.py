@@ -26,6 +26,7 @@ def _make_article(
     date: str = "2026-04-03",
     author: str = "The Economist",
     categories: str = '["quality-engineering"]',
+    description: str | None = "A concise test description for SEO purposes",
     body: str | None = None,
     references: str | None = None,
     frontmatter_open: str = "---",
@@ -47,6 +48,8 @@ def _make_article(
         fields.append(f'author: "{author}"')
     if categories:
         fields.append(f"categories: {categories}")
+    if description is not None:
+        fields.append(f'description: "{description}"')
     fm = "\n".join(fields)
     return f"{frontmatter_open}\n{fm}\n{frontmatter_close}\n\n{body}\n\n{references}\n"
 
@@ -204,6 +207,116 @@ class TestPublicationValidatorWordCount:
         is_valid, issues = validator.validate(article)
         wc_issues = [i for i in issues if i["check"] == "word_count"]
         assert len(wc_issues) == 0
+
+
+class TestPublicationValidatorDescription:
+    """Description front-matter validation checks."""
+
+    def test_valid_description_passes(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(description="A valid SEO description")
+        is_valid, issues = validator.validate(article)
+        desc_issues = [
+            i
+            for i in issues
+            if i["check"] in ("missing_description", "description_too_long")
+        ]
+        assert len(desc_issues) == 0
+
+    def test_missing_description_rejected(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(description=None)
+        is_valid, issues = validator.validate(article)
+        assert not is_valid
+        desc_issues = [i for i in issues if i["check"] == "missing_description"]
+        assert len(desc_issues) == 1
+        assert desc_issues[0]["severity"] == "CRITICAL"
+
+    def test_description_over_160_chars_rejected(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        long_desc = "a" * 161
+        article = _make_article(description=long_desc)
+        is_valid, issues = validator.validate(article)
+        assert not is_valid
+        desc_issues = [i for i in issues if i["check"] == "description_too_long"]
+        assert len(desc_issues) == 1
+        assert desc_issues[0]["severity"] == "CRITICAL"
+
+    def test_description_exactly_160_chars_passes(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        desc = "a" * 160
+        article = _make_article(description=desc)
+        is_valid, issues = validator.validate(article)
+        desc_issues = [
+            i
+            for i in issues
+            if i["check"] in ("missing_description", "description_too_long")
+        ]
+        assert len(desc_issues) == 0
+
+
+class TestPublicationValidatorCategory:
+    """Category validation checks."""
+
+    def test_valid_category_passes(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(categories='["quality-engineering"]')
+        is_valid, issues = validator.validate(article)
+        cat_issues = [
+            i for i in issues if i["check"] in ("missing_category", "invalid_category")
+        ]
+        assert len(cat_issues) == 0
+
+    def test_all_valid_categories_accepted(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        for cat in PublicationValidator.VALID_CATEGORIES:
+            article = _make_article(categories=f'["{cat}"]')
+            _, issues = validator.validate(article)
+            cat_issues = [i for i in issues if i["check"] == "invalid_category"]
+            assert len(cat_issues) == 0, f"Category '{cat}' should be valid"
+
+    def test_invalid_category_rejected(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(categories='["not-a-real-category"]')
+        is_valid, issues = validator.validate(article)
+        assert not is_valid
+        cat_issues = [i for i in issues if i["check"] == "invalid_category"]
+        assert len(cat_issues) == 1
+        assert cat_issues[0]["severity"] == "CRITICAL"
+
+    def test_missing_categories_rejected(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(categories="")
+        is_valid, issues = validator.validate(article)
+        cat_issues = [i for i in issues if i["check"] == "missing_category"]
+        assert len(cat_issues) == 1
+
+
+class TestPublicationValidatorChartPresence:
+    """Chart presence warning checks."""
+
+    def test_article_without_chart_gets_warning(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article()
+        is_valid, issues = validator.validate(article)
+        chart_issues = [i for i in issues if i["check"] == "missing_chart"]
+        assert len(chart_issues) == 1
+        assert chart_issues[0]["severity"] == "WARNING"
+
+    def test_article_with_chart_no_warning(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        body = VALID_BODY + "\n\n![Chart](/assets/charts/test-chart.png)"
+        article = _make_article(body=body)
+        is_valid, issues = validator.validate(article)
+        chart_issues = [i for i in issues if i["check"] == "missing_chart"]
+        assert len(chart_issues) == 0
+
+    def test_chart_warning_does_not_block_publication(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article()
+        is_valid, issues = validator.validate(article)
+        # WARNING severity does not make is_valid=False
+        assert is_valid
 
 
 class TestPublicationValidatorReport:

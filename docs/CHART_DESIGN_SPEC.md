@@ -198,6 +198,7 @@ COLORS = {
     'tertiary': '#51bec7',   # Teal
     'quaternary': '#d6ab63', # Gold
     'highlight': '#e3120b',  # Red (use sparingly)
+    'economist_red': '#a34054',  # Economist red accent
 }
 
 # Label color matches line color

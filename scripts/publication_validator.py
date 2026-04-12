@@ -452,12 +452,13 @@ class PublicationValidator:
                         )
                         return
 
-                    if isinstance(categories, str):
-                        categories = [categories]
-                    if not isinstance(categories, list):
+                    category_list = (
+                        [categories] if isinstance(categories, str) else categories
+                    )
+                    if not isinstance(category_list, list):
                         return  # non-list handled elsewhere
 
-                    for cat in categories:
+                    for cat in category_list:
                         if cat not in self.VALID_CATEGORIES:
                             self.issues.append(
                                 {
@@ -472,7 +473,7 @@ class PublicationValidator:
                                 }
                             )
         except Exception:
-            pass
+            pass  # YAML parse errors are caught by _check_yaml_format
 
     def _check_chart_presence(self, content: str) -> None:
         """Warn when an article does not reference any ``/assets/charts/`` image.

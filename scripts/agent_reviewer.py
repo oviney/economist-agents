@@ -143,7 +143,7 @@ class AgentReviewer:
             return False, issues
 
         # Check 1: Required front matter fields
-        required_fields = ["layout", "title", "date", "categories"]
+        required_fields = ["layout", "title", "date", "categories", "description"]
         for field in required_fields:
             if field not in front_matter:
                 issues.append(
@@ -407,6 +407,7 @@ layout: post
 title: "Self-Healing Tests: The 80% Maintenance Gap"
 date: 2026-01-01
 categories: [quality-engineering, test-automation]
+description: "Self-healing tests promise 80% maintenance savings but few deliver"
 ---
 
 Self-healing tests promise an 80% cut in maintenance costs. According to

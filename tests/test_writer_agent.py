@@ -77,6 +77,7 @@ layout: post
 title: "Testing Times"
 date: 2026-01-02
 author: "The Economist"
+description: "AI test generation surges but productivity gains remain elusive"
 ---
 
 AI test generation adoption grew 300% in 2024, according to the World Quality Report. But beneath the hype lies a more complex reality.

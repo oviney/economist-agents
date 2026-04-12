@@ -21,7 +21,7 @@ from typing import Any
 import yaml
 
 # Required frontmatter fields and their validation rules
-REQUIRED_FIELDS = ["layout", "title", "date", "categories", "image"]
+REQUIRED_FIELDS = ["layout", "title", "date", "categories", "image", "description"]
 
 # Sensitive patterns that should never appear in frontmatter values
 _SENSITIVE_PATTERNS = [

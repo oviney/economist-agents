@@ -164,6 +164,7 @@ def validate_article_structure(article: str) -> dict[str, Any]:
         "has_title": False,
         "has_date": False,
         "has_layout": False,
+        "has_description": False,
         "word_count": 0,
         "section_count": 0,
         "issues": [],
@@ -193,6 +194,11 @@ def validate_article_structure(article: str) -> dict[str, Any]:
                     results["has_layout"] = True
                 else:
                     results["issues"].append("Missing layout in frontmatter")
+
+                if "description:" in frontmatter:
+                    results["has_description"] = True
+                else:
+                    results["issues"].append("Missing description in frontmatter")
         except Exception as e:
             results["issues"].append(f"Error parsing frontmatter: {e}")
     else:

@@ -115,7 +115,8 @@ class WriterAgent:
 
         # Heuristic: looks like YAML fields without the opening ---
         yaml_field_pattern = re.compile(
-            r"^(layout|title|date|author|categories|image)\s*:", re.MULTILINE
+            r"^(layout|title|date|author|categories|description|image)\s*:",
+            re.MULTILINE,
         )
         if yaml_field_pattern.match(text):
             logger.warning("Frontmatter missing opening '---' — prepending delimiter")
@@ -232,6 +233,7 @@ title: "Article Title"
 date: {current_date}
 author: "The Economist"
 categories: ["Quality Engineering"]
+description: "Brief SEO summary of the article"
 image: {featured_image}
 ---
 """

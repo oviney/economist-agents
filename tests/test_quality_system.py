@@ -454,6 +454,7 @@ date: 2026-01-01
 categories: [quality-engineering, test-automation]
 author: "The Economist"
 ai_assisted: true
+description: "Self-healing tests promise 80% savings but few companies deliver"
 ---
 
 Self-healing tests promise an 80% cut in maintenance costs. According to

@@ -1,3 +1,7 @@
+# Agent state
+.claude/
+.gemini/
+
 # Python
 __pycache__/
 *.py[cod]

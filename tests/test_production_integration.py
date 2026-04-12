@@ -34,23 +34,42 @@ class TestFlowOrchestration:
         assert hasattr(flow, "generate_content")
         assert hasattr(flow, "quality_gate")
 
-    @pytest.mark.skipif(
-        not os.environ.get("OPENAI_API_KEY"),
-        reason="OPENAI_API_KEY required for CrewAI agent initialization",
-    )
-    def test_flow_topic_discovery(self):
+    @patch("src.economist_agents.flow.create_llm_client")
+    @patch("src.economist_agents.flow.scout_topics")
+    def test_flow_topic_discovery(self, mock_scout_topics, mock_create_llm_client):
         """Test Flow can discover topics via Stage 1"""
-        # Stage1Crew not yet integrated - test stub implementation
+        mock_create_llm_client.return_value = MagicMock()
+        mock_scout_topics.return_value = [
+            {
+                "topic": "AI in Quality Engineering",
+                "total_score": 90,
+                "hook": "AI transforms QE",
+                "thesis": "AI enables better testing",
+                "data_sources": ["McKinsey 2024"],
+                "contrarian_angle": "Not all teams benefit",
+                "talking_points": ["automation", "coverage"],
+            },
+            {
+                "topic": "Test Automation ROI",
+                "total_score": 85,
+                "hook": "Automation pays off",
+                "thesis": "ROI is measurable",
+                "data_sources": ["Gartner 2024"],
+                "contrarian_angle": "Upfront costs are real",
+                "talking_points": ["cost", "speed"],
+            },
+        ]
+
         flow = EconomistContentFlow()
         result = flow.discover_topics()
 
         assert result is not None
         assert "topics" in result
         assert len(result["topics"]) >= 2
-        # Verify mock data structure
         for topic in result["topics"]:
             assert "topic" in topic
             assert "score" in topic
+        mock_scout_topics.assert_called_once()
 
     @pytest.mark.skip(reason="Stage2Crew not yet implemented in flow.py")
     def test_flow_editorial_review_skip(self):
@@ -95,7 +114,7 @@ class TestFlowOrchestration:
         flow = EconomistContentFlow()
         # quality_gate expects dict with valid frontmatter (schema gate fires first)
         article_draft = {
-            "article": '---\nlayout: post\ntitle: "AI Testing"\ndate: 2026-04-04\nauthor: "The Economist"\ncategories: ["quality-engineering"]\nimage: /assets/images/test.png\ndescription: "AI testing overview"\n---\n\nHigh quality content...',
+            "article": '---\nlayout: post\ntitle: "AI Testing"\ndate: 2026-04-04\nauthor: "Ouray Viney"\ncategories: ["quality-engineering"]\nimage: /assets/images/test.png\ndescription: "AI testing overview"\n---\n\nHigh quality content...',
             "chart_path": None,
             "word_count": 100,
         }

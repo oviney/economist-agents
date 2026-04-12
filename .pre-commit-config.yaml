@@ -71,7 +71,7 @@ repos:
       - id: validate-agent-yaml
         name: validate agent YAML configs
         description: Validate agent YAML files against agents/schema.json
-        entry: python scripts/agent_loader.py --validate
+        entry: .venv/bin/python scripts/agent_loader.py --validate
         language: system
         pass_filenames: false
         files: ^agents/.*\.yaml$

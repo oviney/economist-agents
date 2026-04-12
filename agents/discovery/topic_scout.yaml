@@ -93,6 +93,8 @@ system_message: |
       "timeliness_trigger": "Why now? What happened recently?",
       "contrarian_angle": "How we'd challenge conventional wisdom",
       "title_ideas": ["Economist-style title with colon twist", "Second option - no Why/How starters"],
+      "source_url": "https://example.com/article-that-inspired-this-topic",
+      "source_date": "2026-04-10",
       "scores": {
         "timeliness": 4,
         "data_availability": 5,
@@ -104,6 +106,11 @@ system_message: |
       "talking_points": "key point 1, key point 2, key point 3"
     }
   ]
+
+  FRESHNESS REQUIREMENT (mandatory):
+  Every topic MUST include:
+  - "source_url": A real URL from the Live Trend Evidence provided above that inspired this topic. Do NOT invent URLs.
+  - "source_date": The date of that source in YYYY-MM-DD format. Topics without a dated source will be rejected.
 
   Sort by total_score descending. Be specific—not "AI in Testing" but "AI test generators: a maintenance debt machine in disguise".
 trend_system_message: |

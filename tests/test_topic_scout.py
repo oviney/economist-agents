@@ -5,6 +5,7 @@ import os
 
 # Import functions from topic_scout
 import sys
+from datetime import datetime, timedelta
 from pathlib import Path
 from unittest.mock import Mock, patch
 
@@ -22,6 +23,7 @@ from topic_scout import (
     format_for_workflow,
     scout_topics,
     update_content_queue,
+    validate_topic_freshness,
 )
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -36,6 +38,7 @@ def sample_topics() -> list:
     Returns:
         List of topic dictionaries matching scout_topics output schema
     """
+    today = datetime.now().strftime("%Y-%m-%d")
     return [
         {
             "topic": "The AI Testing Paradox",
@@ -45,6 +48,8 @@ def sample_topics() -> list:
             "timeliness_trigger": "Major vendor announcements in Q4 2024",
             "contrarian_angle": "Industry hype vs actual ROI",
             "title_ideas": ["Testing times", "The automation gap"],
+            "source_url": "https://example.com/ai-testing-2026",
+            "source_date": today,
             "scores": {
                 "timeliness": 5,
                 "data_availability": 4,
@@ -63,6 +68,8 @@ def sample_topics() -> list:
             "timeliness_trigger": "Recent platform outages blamed on tests",
             "contrarian_angle": "Problem worse than acknowledged",
             "title_ideas": ["Trust issues", "The reliability gap"],
+            "source_url": "https://example.com/flaky-tests-2026",
+            "source_date": today,
             "scores": {
                 "timeliness": 4,
                 "data_availability": 4,
@@ -173,7 +180,9 @@ def test_scout_topics_success(
     mock_client, call_llm_side_effect = mock_llm_client
 
     with (
-        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch(
+            "topic_scout.build_grounded_trend_context", return_value="grounded trends"
+        ),
         patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
     ):
         topics = scout_topics(mock_client)
@@ -210,7 +219,9 @@ def test_scout_topics_with_focus_area(
     focus_area = "test automation"
 
     with (
-        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends") as mock_ground,
+        patch(
+            "topic_scout.build_grounded_trend_context", return_value="grounded trends"
+        ) as mock_ground,
         patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
     ):
         topics = scout_topics(mock_client, focus_area)
@@ -233,7 +244,9 @@ def test_scout_topics_empty_results(mock_llm_client, mock_dedup_passthrough):
     mock_client, _ = mock_llm_client
 
     with (
-        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch(
+            "topic_scout.build_grounded_trend_context", return_value="grounded trends"
+        ),
         patch("topic_scout.call_llm", side_effect=["invalid json response"]),
     ):
         topics = scout_topics(mock_client)
@@ -258,7 +271,9 @@ def test_scout_topics_json_parse_error(mock_llm_client, mock_dedup_passthrough, 
 
     # Return valid trends but malformed JSON for topics
     with (
-        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch(
+            "topic_scout.build_grounded_trend_context", return_value="grounded trends"
+        ),
         patch("topic_scout.call_llm") as mock_call,
     ):
         mock_call.side_effect = ['[{"bad": json}']
@@ -281,7 +296,9 @@ def test_scout_topics_no_json_array(mock_llm_client, mock_dedup_passthrough, cap
     mock_client, _ = mock_llm_client
 
     with (
-        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch(
+            "topic_scout.build_grounded_trend_context", return_value="grounded trends"
+        ),
         patch("topic_scout.call_llm", side_effect=["No array here"]),
     ):
         topics = scout_topics(mock_client)
@@ -301,7 +318,9 @@ def test_scout_topics_api_exception(mock_llm_client):
     mock_client, _ = mock_llm_client
 
     with (
-        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch(
+            "topic_scout.build_grounded_trend_context", return_value="grounded trends"
+        ),
         patch("topic_scout.call_llm", side_effect=Exception("API Error")),
         pytest.raises(Exception, match="API Error"),
     ):
@@ -316,13 +335,21 @@ def test_scout_topics_partial_json(mock_llm_client, mock_dedup_passthrough):
     - Missing fields handled gracefully
     """
     mock_client, _ = mock_llm_client
-    partial_topics = [{"topic": "Test", "total_score": 15}]
+    today = datetime.now().strftime("%Y-%m-%d")
+    partial_topics = [
+        {
+            "topic": "Test",
+            "total_score": 15,
+            "source_url": "https://example.com/test",
+            "source_date": today,
+        }
+    ]
 
     with (
-        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
         patch(
-            "topic_scout.call_llm", side_effect=[json.dumps(partial_topics)]
+            "topic_scout.build_grounded_trend_context", return_value="grounded trends"
         ),
+        patch("topic_scout.call_llm", side_effect=[json.dumps(partial_topics)]),
     ):
         topics = scout_topics(mock_client)
 
@@ -424,6 +451,115 @@ def test_scout_topics_allow_empty_archive_override(mock_llm_client, sample_topic
         topics = scout_topics(mock_client, allow_empty_archive=True)
 
     assert len(topics) == 2  # sample_topics pass through untouched
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# TESTS: Issue #239 — Topic freshness enforcement
+#
+# validate_topic_freshness() rejects topics missing source_url/source_date
+# or with a source_date older than FRESHNESS_MAX_DAYS.
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+def _make_dated_topic(
+    title: str, source_url: str = "https://example.com/article", source_date: str = ""
+) -> dict:
+    """Helper to build a topic dict with freshness fields."""
+    return {
+        "topic": title,
+        "hook": "hook",
+        "thesis": "thesis",
+        "source_url": source_url,
+        "source_date": source_date,
+        "scores": {
+            "timeliness": 4,
+            "data_availability": 4,
+            "contrarian_potential": 4,
+            "audience_fit": 4,
+            "economist_fit": 4,
+        },
+        "total_score": 20,
+        "talking_points": "point 1",
+    }
+
+
+def test_validate_freshness_keeps_recent_topics():
+    """Topics with valid source_url and recent source_date pass through."""
+    today = datetime.now().strftime("%Y-%m-%d")
+    topics = [_make_dated_topic("Recent Topic", source_date=today)]
+    fresh, stale = validate_topic_freshness(topics)
+    assert len(fresh) == 1
+    assert len(stale) == 0
+
+
+def test_validate_freshness_rejects_missing_url():
+    """Topics without source_url are rejected."""
+    today = datetime.now().strftime("%Y-%m-%d")
+    topics = [_make_dated_topic("No URL", source_url="", source_date=today)]
+    fresh, stale = validate_topic_freshness(topics)
+    assert len(fresh) == 0
+    assert len(stale) == 1
+
+
+def test_validate_freshness_rejects_missing_date():
+    """Topics without source_date are rejected."""
+    topics = [_make_dated_topic("No Date", source_date="")]
+    fresh, stale = validate_topic_freshness(topics)
+    assert len(fresh) == 0
+    assert len(stale) == 1
+
+
+def test_validate_freshness_rejects_old_date():
+    """Topics with source_date older than max_days are rejected."""
+    old_date = (datetime.now() - timedelta(days=60)).strftime("%Y-%m-%d")
+    topics = [_make_dated_topic("Old Topic", source_date=old_date)]
+    fresh, stale = validate_topic_freshness(topics, max_days=30)
+    assert len(fresh) == 0
+    assert len(stale) == 1
+
+
+def test_validate_freshness_rejects_bad_date_format():
+    """Topics with unparseable source_date are rejected."""
+    topics = [_make_dated_topic("Bad Date", source_date="April 2026")]
+    fresh, stale = validate_topic_freshness(topics)
+    assert len(fresh) == 0
+    assert len(stale) == 1
+
+
+def test_validate_freshness_mixed_batch():
+    """Mixed batch: one fresh, one stale, one missing fields."""
+    today = datetime.now().strftime("%Y-%m-%d")
+    old = (datetime.now() - timedelta(days=90)).strftime("%Y-%m-%d")
+    topics = [
+        _make_dated_topic("Fresh", source_date=today),
+        _make_dated_topic("Stale", source_date=old),
+        _make_dated_topic("Missing", source_url="", source_date=""),
+    ]
+    fresh, stale = validate_topic_freshness(topics, max_days=30)
+    assert len(fresh) == 1
+    assert fresh[0]["topic"] == "Fresh"
+    assert len(stale) == 2
+
+
+def test_validate_freshness_empty_list():
+    """Empty input returns empty output."""
+    fresh, stale = validate_topic_freshness([])
+    assert fresh == []
+    assert stale == []
+
+
+def test_validate_freshness_custom_max_days():
+    """Custom max_days is respected."""
+    date_8_days_ago = (datetime.now() - timedelta(days=8)).strftime("%Y-%m-%d")
+    topics = [_make_dated_topic("Edge Case", source_date=date_8_days_ago)]
+
+    # 7 days: should reject (8 > 7)
+    fresh_7, stale_7 = validate_topic_freshness(topics, max_days=7)
+    assert len(fresh_7) == 0
+
+    # 10 days: should keep (8 < 10)
+    fresh_10, stale_10 = validate_topic_freshness(topics, max_days=10)
+    assert len(fresh_10) == 1
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -686,7 +822,9 @@ def test_main_success_flow(
 
     with (
         patch("topic_scout.create_client", return_value=mock_client),
-        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch(
+            "topic_scout.build_grounded_trend_context", return_value="grounded trends"
+        ),
         patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
     ):
         from topic_scout import main
@@ -717,7 +855,9 @@ def test_main_with_focus_area(
 
     with (
         patch("topic_scout.create_client", return_value=mock_client),
-        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends") as mock_ground,
+        patch(
+            "topic_scout.build_grounded_trend_context", return_value="grounded trends"
+        ) as mock_ground,
         patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
     ):
         from topic_scout import main
@@ -745,7 +885,9 @@ def test_main_github_actions_output(
 
     with (
         patch("topic_scout.create_client", return_value=mock_client),
-        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch(
+            "topic_scout.build_grounded_trend_context", return_value="grounded trends"
+        ),
         patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
     ):
         from topic_scout import main
@@ -931,13 +1073,21 @@ def test_scout_topics_single_topic(mock_llm_client, mock_dedup_passthrough):
     - No sorting issues with length=1
     """
     mock_client, _ = mock_llm_client
-    single_topic = [{"topic": "Test", "total_score": 15}]
+    today = datetime.now().strftime("%Y-%m-%d")
+    single_topic = [
+        {
+            "topic": "Test",
+            "total_score": 15,
+            "source_url": "https://example.com/test",
+            "source_date": today,
+        }
+    ]
 
     with (
-        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
         patch(
-            "topic_scout.call_llm", side_effect=[json.dumps(single_topic)]
+            "topic_scout.build_grounded_trend_context", return_value="grounded trends"
         ),
+        patch("topic_scout.call_llm", side_effect=[json.dumps(single_topic)]),
     ):
         topics = scout_topics(mock_client)
 
@@ -958,7 +1108,9 @@ def test_scout_topics_unsorted_input(
     unsorted = [sample_topics[1], sample_topics[0]]
 
     with (
-        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch(
+            "topic_scout.build_grounded_trend_context", return_value="grounded trends"
+        ),
         patch("topic_scout.call_llm", side_effect=[json.dumps(unsorted)]),
     ):
         topics = scout_topics(mock_client)
@@ -1018,7 +1170,9 @@ def test_scout_topics_network_timeout(mock_llm_client):
     mock_client, _ = mock_llm_client
 
     with (
-        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch(
+            "topic_scout.build_grounded_trend_context", return_value="grounded trends"
+        ),
         patch("topic_scout.call_llm", side_effect=TimeoutError("Request timeout")),
         pytest.raises(TimeoutError),
     ):
@@ -1053,7 +1207,9 @@ def test_performance_context_injected_into_scout_prompt(
     )
 
     with (
-        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch(
+            "topic_scout.build_grounded_trend_context", return_value="grounded trends"
+        ),
         patch("topic_scout.call_llm", side_effect=call_llm_side_effect) as mock_call,
     ):
         scout_topics(mock_client)
@@ -1086,7 +1242,9 @@ def test_performance_context_fallback_when_db_missing(
     )
 
     with (
-        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch(
+            "topic_scout.build_grounded_trend_context", return_value="grounded trends"
+        ),
         patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
     ):
         topics = scout_topics(mock_client)
@@ -1111,7 +1269,9 @@ def test_scout_prompt_explicitly_references_performance_data(
     )
 
     with (
-        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch(
+            "topic_scout.build_grounded_trend_context", return_value="grounded trends"
+        ),
         patch("topic_scout.call_llm", side_effect=call_llm_side_effect) as mock_call,
     ):
         scout_topics(mock_client)
@@ -1136,7 +1296,9 @@ def test_get_performance_context_called_once_per_scout_run(
     monkeypatch.setattr("topic_scout.get_performance_context", counting_fake)
 
     with (
-        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch(
+            "topic_scout.build_grounded_trend_context", return_value="grounded trends"
+        ),
         patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
     ):
         scout_topics(mock_client)
@@ -1364,6 +1526,8 @@ def _make_topics_with_theme(theme: str, count: int, start_score: int = 20) -> li
             },
             "total_score": start_score - i,
             "talking_points": f"point {i}",
+            "source_url": f"https://example.com/{theme}-{i}",
+            "source_date": datetime.now().strftime("%Y-%m-%d"),
         }
         for i in range(count)
     ]
@@ -1398,8 +1562,12 @@ def test_scout_topics_diversity_check_triggers_regeneration(
     )
 
     with (
-        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
-        patch("topic_scout.call_llm", side_effect=lambda *a, **kw: next(call_responses)) as mock_call,
+        patch(
+            "topic_scout.build_grounded_trend_context", return_value="grounded trends"
+        ),
+        patch(
+            "topic_scout.call_llm", side_effect=lambda *a, **kw: next(call_responses)
+        ) as mock_call,
     ):
         topics = scout_topics(mock_client)
 
@@ -1425,7 +1593,9 @@ def test_scout_topics_diversity_check_skipped_for_two_topics(mock_dedup_passthro
     two_same_theme = _make_topics_with_theme("ai_testing", 2, start_score=20)
 
     with (
-        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch(
+            "topic_scout.build_grounded_trend_context", return_value="grounded trends"
+        ),
         patch(
             "topic_scout.call_llm",
             side_effect=[json.dumps(two_same_theme)],
@@ -1450,7 +1620,9 @@ def test_scout_topics_diversity_passes_no_extra_call(mock_dedup_passthrough):
     )
 
     with (
-        patch("topic_scout.build_grounded_trend_context", return_value="grounded trends"),
+        patch(
+            "topic_scout.build_grounded_trend_context", return_value="grounded trends"
+        ),
         patch(
             "topic_scout.call_llm",
             side_effect=[json.dumps(diverse)],

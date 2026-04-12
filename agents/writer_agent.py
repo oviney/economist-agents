@@ -267,23 +267,42 @@ image: {featured_image}
                     f"   ⚠️  {len(critical_issues)} critical issues found, regenerating..."
                 )
 
-                # Create fix instructions from issues
-                fix_instructions = "\n".join(
-                    [
-                        "CRITICAL FIXES REQUIRED:",
-                        *[
-                            f"- {issue}" for issue in critical_issues[:5]
-                        ],  # Top 5 issues
-                        "\nRegenerate the article with these fixes applied.",
-                    ]
+                # Create fix instructions — targeted guidance for word count failures
+                word_count_issues = [
+                    i for i in critical_issues if "too short" in i.lower()
+                ]
+                current_words = 0
+                if word_count_issues:
+                    import re as _re
+
+                    m = _re.search(r"(\d+) words", word_count_issues[0])
+                    current_words = int(m.group(1)) if m else 0
+
+                fix_lines = ["CRITICAL FIXES REQUIRED:"]
+                for issue in critical_issues[:5]:
+                    if "too short" in issue.lower() and current_words:
+                        needed = max(900 - current_words, 150)
+                        fix_lines.append(
+                            f"- WORD COUNT: Article is only {current_words} words. "
+                            f"You MUST add at least {needed} more words. "
+                            "Expand by: (1) adding a concrete real-world example or case study, "
+                            "(2) deepening the economic analysis with specific figures, "
+                            "or (3) adding a new ## section exploring implications. "
+                            "Do NOT pad with filler — add substantive content."
+                        )
+                    else:
+                        fix_lines.append(f"- {issue}")
+                fix_lines.append(
+                    "\nReturn the COMPLETE corrected article with ALL fixes applied."
                 )
+                fix_instructions = "\n".join(fix_lines)
 
                 # Regenerate with fix instructions, passing original draft for context
                 draft = call_llm(
                     self.client,
                     system_prompt + "\n\n" + fix_instructions,
                     f"Fix the issues in this draft and return the complete corrected article:\n\n{draft}",
-                    max_tokens=3000,
+                    max_tokens=4000,
                 )
                 # Deterministic fix for BUG-028 on regenerated output
                 draft = self._ensure_frontmatter(draft)

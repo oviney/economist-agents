@@ -21,7 +21,7 @@ import logging
 import os
 import re
 import sys
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -252,6 +252,79 @@ def _parse_topics_json(response_text: str, label: str = "") -> list | None:
         return None
 
 
+# ---------------------------------------------------------------------------
+# Freshness enforcement (issue #239)
+# ---------------------------------------------------------------------------
+
+# Default maximum age for topic sources in days.
+FRESHNESS_MAX_DAYS: int = 30
+
+
+def validate_topic_freshness(
+    topics: list[dict],
+    max_days: int = FRESHNESS_MAX_DAYS,
+) -> tuple[list[dict], list[dict]]:
+    """Validate that each topic has a dated source citation.
+
+    Topics must contain both ``source_url`` (non-empty string) and
+    ``source_date`` (ISO date within the last *max_days* days).  Topics
+    that fail either check are rejected.
+
+    Args:
+        topics: List of topic dicts from ``_parse_topics_json()``.
+        max_days: Maximum age (in days) of the source date.  Topics
+            older than this are rejected.
+
+    Returns:
+        Tuple of ``(fresh_topics, stale_topics)``.
+    """
+    cutoff = datetime.now(tz=UTC) - timedelta(days=max_days)
+    fresh: list[dict] = []
+    stale: list[dict] = []
+
+    for topic in topics:
+        source_url = (topic.get("source_url") or "").strip()
+        source_date_str = (topic.get("source_date") or "").strip()
+
+        # Must have both fields.
+        if not source_url or not source_date_str:
+            logger.info(
+                "Freshness REJECT (missing fields): '%s'",
+                topic.get("topic", "?"),
+            )
+            stale.append(topic)
+            continue
+
+        # Parse the date.
+        try:
+            source_date = datetime.strptime(source_date_str, "%Y-%m-%d").replace(
+                tzinfo=UTC
+            )
+        except ValueError:
+            logger.info(
+                "Freshness REJECT (bad date '%s'): '%s'",
+                source_date_str,
+                topic.get("topic", "?"),
+            )
+            stale.append(topic)
+            continue
+
+        # Must be within the freshness window.
+        if source_date < cutoff:
+            logger.info(
+                "Freshness REJECT (date %s older than %d days): '%s'",
+                source_date_str,
+                max_days,
+                topic.get("topic", "?"),
+            )
+            stale.append(topic)
+            continue
+
+        fresh.append(topic)
+
+    return fresh, stale
+
+
 def create_client():
     """Create unified LLM client (supports Anthropic Claude and OpenAI)"""
     return create_llm_client()
@@ -353,6 +426,40 @@ def scout_topics(
         if retry_topics is None:
             return []
         topics = retry_topics
+
+    # Freshness enforcement (issue #239): reject topics without a dated source
+    # citation or with a source older than FRESHNESS_MAX_DAYS.
+    print("   Checking topic freshness (source_url + source_date)...")
+    fresh, stale_topics = validate_topic_freshness(topics)
+    if stale_topics:
+        print(
+            f"   ⚠ {len(stale_topics)} topic(s) rejected for missing or stale "
+            f"source citation."
+        )
+    # Regenerate once if more than half were rejected.
+    if len(stale_topics) > len(topics) / 2 and topics:
+        print(
+            "   ⚠ Majority of topics lack fresh sources. "
+            "Regenerating with freshness hint..."
+        )
+        freshness_hint = (
+            "\n\nFRESHNESS ALERT: Your previous response had topics without "
+            "valid source_url and source_date fields. Every topic MUST include "
+            "a real URL from the Live Trend Evidence above and its date in "
+            "YYYY-MM-DD format. Topics without these fields will be rejected."
+        )
+        retry_response = call_llm(
+            client,
+            "",
+            scout_prompt + freshness_hint,
+            max_tokens=3000,
+        )
+        retry_topics = _parse_topics_json(retry_response, label="on freshness retry")
+        if retry_topics is not None:
+            fresh, extra_stale = validate_topic_freshness(retry_topics)
+            if extra_stale:
+                print(f"   ⚠ {len(extra_stale)} topic(s) still stale after retry.")
+    topics = fresh
 
     # Sort by score
     topics.sort(key=lambda x: x.get("total_score", 0), reverse=True)

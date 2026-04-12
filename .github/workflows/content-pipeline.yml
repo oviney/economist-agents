@@ -165,14 +165,20 @@ jobs:
           git clone https://x-access-token:${BLOG_TOKEN}@github.com/${BLOG_OWNER}/${BLOG_REPO}.git blog-repo
           cd blog-repo
 
-          # Copy generated files to Jekyll structure
+          # Copy only the validated article (not all output/*.md)
           mkdir -p _posts assets/charts assets/images
-          cp ../output/*.md _posts/ 2>/dev/null || true
-          cp ../output/charts/*.png assets/charts/ 2>/dev/null || true
-          cp ../output/images/*.png assets/images/ 2>/dev/null || true
+          ARTICLE_PATH=$(cat ../article_path.txt 2>/dev/null || echo "")
+          if [ -z "$ARTICLE_PATH" ] || [ ! -f "$ARTICLE_PATH" ]; then
+            echo "❌ No article_path.txt or file not found — aborting deploy"
+            exit 1
+          fi
+          cp "$ARTICLE_PATH" _posts/
+          ARTICLE_BASENAME=$(basename "$ARTICLE_PATH" .md)
+          cp "../output/charts/${ARTICLE_BASENAME}.png" assets/charts/ 2>/dev/null || true
+          cp "../output/images/${ARTICLE_BASENAME}.png" assets/images/ 2>/dev/null || true
 
           # Commit and push directly to main
-          git add _posts/*.md assets/charts/*.png assets/images/*.png
+          git add "_posts/$(basename "$ARTICLE_PATH")" assets/charts/ assets/images/
           ARTICLE_TITLE=$(cat ../article_title.txt 2>/dev/null || echo "Generated Article")
           git commit -m "content: ${ARTICLE_TITLE}
 

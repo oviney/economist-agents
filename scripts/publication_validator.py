@@ -367,30 +367,42 @@ class PublicationValidator:
             )
 
     def _check_chart_references(self, content: str):
-        """Check for orphaned charts (embedded but never mentioned in text)"""
-        # Find all chart image references
-        chart_refs = re.findall(r"!\[.*?\]\((.*?\.png)\)", content)
+        """Check that articles include at least one chart and reference it in text."""
+        # Find all chart image references pointing to /assets/charts/
+        chart_refs = re.findall(r"!\[.*?\]\((/assets/charts/.*?\.png)\)", content)
 
-        if chart_refs:
-            # Check if "chart" is mentioned in the text
-            content_lower = content.lower()
-            has_chart_mention = any(
-                word in content_lower
-                for word in ["chart", "figure", "graph", "shows", "illustrates"]
+        if not chart_refs:
+            self.issues.append(
+                {
+                    "check": "missing_chart",
+                    "severity": "CRITICAL",
+                    "message": "Article missing required chart — every article must include at least one data chart",
+                    "details": "Charts are mandatory per Economist editorial standards. "
+                    "A chart image must be embedded as ![...](/assets/charts/<slug>.png)",
+                    "fix": "Run the graphics_agent to generate a chart and embed it in the article body",
+                }
             )
+            return
 
-            if not has_chart_mention:
-                for chart_ref in chart_refs:
-                    chart_file = chart_ref.split("/")[-1]
-                    self.issues.append(
-                        {
-                            "check": "orphaned_chart",
-                            "severity": "HIGH",
-                            "message": f"Chart embedded but never referenced: {chart_file}",
-                            "details": 'Chart should be mentioned in the article text (e.g., "As the chart shows...")',
-                            "fix": "Add a sentence referencing the chart near where it appears",
-                        }
-                    )
+        # Check for orphaned charts (embedded but never mentioned in text)
+        content_lower = content.lower()
+        has_chart_mention = any(
+            word in content_lower
+            for word in ["chart", "figure", "graph", "shows", "illustrates"]
+        )
+
+        if not has_chart_mention:
+            for chart_ref in chart_refs:
+                chart_file = chart_ref.split("/")[-1]
+                self.issues.append(
+                    {
+                        "check": "orphaned_chart",
+                        "severity": "HIGH",
+                        "message": f"Chart embedded but never referenced: {chart_file}",
+                        "details": 'Chart should be mentioned in the article text (e.g., "As the chart shows...")',
+                        "fix": "Add a sentence referencing the chart near where it appears",
+                    }
+                )
 
     def _check_references_section(self, content: str):
         """

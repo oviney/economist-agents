@@ -737,12 +737,25 @@ def generate_economist_post(
             return {"status": "rejected", "stage": "research"}
 
     # Stage 2: Graphics (with regeneration on Visual QA failure)
+    # Chart generation is MANDATORY — pipeline fails if research has no chart_data
     chart_path = None
     chart_record = None
     visual_qa_passed = True
     visual_qa_result = None
     max_chart_attempts = 3  # Try up to 2 regenerations if QA fails
     chart_attempts = 0
+
+    if not research.get("chart_data"):
+        print("\n" + "=" * 70)
+        print("❌ BLOCKED: Research agent did not produce chart data")
+        print("   Chart generation is mandatory for all articles.")
+        print("   Ensure the research agent provides chart_data in its output.")
+        print("=" * 70 + "\n")
+        return {
+            "status": "rejected",
+            "reason": "missing_chart_data",
+            "stage": "graphics",
+        }
 
     if research.get("chart_data"):
         chart_filename = str(charts_dir / f"{slug}.png")

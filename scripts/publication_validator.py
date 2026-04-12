@@ -34,6 +34,14 @@ except ImportError:
 class PublicationValidator:
     """Final quality gate before publication"""
 
+    #: Blog categories accepted by the publication pipeline.
+    VALID_CATEGORIES: list[str] = [
+        "quality-engineering",
+        "software-engineering",
+        "test-automation",
+        "security",
+    ]
+
     CRITICAL_FAILURES = {
         "VERIFICATION_FLAGS": {
             "severity": "CRITICAL",
@@ -114,7 +122,7 @@ class PublicationValidator:
         # Check 6: Weak endings (CRITICAL - blocks publication)
         self._check_weak_endings(article_content)
 
-        # Check 7: Chart references
+        # Check 7: Chart references (orphaned charts)
         self._check_chart_references(article_content)
 
         # Check 8: References section (FEATURE-001)
@@ -126,6 +134,15 @@ class PublicationValidator:
         # Check 10: Historical defect patterns (v2)
         if self.defect_checker:
             self._check_defect_patterns(article_content, article_path)
+
+        # Check 11: Description front matter
+        self._check_description(article_content)
+
+        # Check 12: Category validation
+        self._check_category(article_content)
+
+        # Check 13: Chart presence (warning if no /assets/charts/ reference)
+        self._check_chart_presence(article_content)
 
         # Determine if valid (no CRITICAL issues)
         critical_issues = [i for i in self.issues if i["severity"] == "CRITICAL"]
@@ -363,6 +380,115 @@ class PublicationValidator:
                     "message": f"Article too short: {word_count} words (minimum 800 required)",
                     "details": "Economist-style articles require 800-1200 words for adequate depth",
                     "fix": "Expand article with additional examples, data points, or deeper analysis",
+                }
+            )
+
+    def _check_description(self, content: str) -> None:
+        """Validate ``description`` front-matter field.
+
+        The ``description`` field is used for SEO meta-description and social
+        previews.  It must be present and no longer than 160 characters.
+        """
+        try:
+            if content.startswith("---"):
+                parts = content.split("---", 2)
+                if len(parts) >= 2:
+                    front_matter = yaml.safe_load(parts[1])
+                    if not isinstance(front_matter, dict):
+                        return  # YAML parsing handled elsewhere
+
+                    description = front_matter.get("description")
+                    if description is None or (
+                        isinstance(description, str) and not description.strip()
+                    ):
+                        self.issues.append(
+                            {
+                                "check": "missing_description",
+                                "severity": "CRITICAL",
+                                "message": "Front matter missing 'description' field",
+                                "details": "description is required for SEO and social sharing",
+                                "fix": "Add description: '<summary ≤160 chars>' to front matter",
+                            }
+                        )
+                    elif isinstance(description, str) and len(description) > 160:
+                        self.issues.append(
+                            {
+                                "check": "description_too_long",
+                                "severity": "CRITICAL",
+                                "message": (
+                                    f"description is {len(description)} chars "
+                                    f"(max 160 allowed)"
+                                ),
+                                "details": "Search engines truncate descriptions beyond 160 characters",
+                                "fix": "Shorten description to ≤160 characters",
+                            }
+                        )
+        except Exception:
+            pass  # YAML parse errors are caught by _check_yaml_format
+
+    def _check_category(self, content: str) -> None:
+        """Validate that ``categories`` maps to one of the allowed blog categories."""
+        try:
+            if content.startswith("---"):
+                parts = content.split("---", 2)
+                if len(parts) >= 2:
+                    front_matter = yaml.safe_load(parts[1])
+                    if not isinstance(front_matter, dict):
+                        return
+
+                    categories = front_matter.get("categories")
+                    if categories is None:
+                        self.issues.append(
+                            {
+                                "check": "missing_category",
+                                "severity": "CRITICAL",
+                                "message": "Front matter missing 'categories' field",
+                                "details": "Every article must have a category",
+                                "fix": (
+                                    "Add categories: [<category>] with one of: "
+                                    + ", ".join(self.VALID_CATEGORIES)
+                                ),
+                            }
+                        )
+                        return
+
+                    category_list = (
+                        [categories] if isinstance(categories, str) else categories
+                    )
+                    if not isinstance(category_list, list):
+                        return  # non-list handled elsewhere
+
+                    for cat in category_list:
+                        if cat not in self.VALID_CATEGORIES:
+                            self.issues.append(
+                                {
+                                    "check": "invalid_category",
+                                    "severity": "CRITICAL",
+                                    "message": (
+                                        f"Invalid category '{cat}'. "
+                                        f"Must be one of: {', '.join(self.VALID_CATEGORIES)}"
+                                    ),
+                                    "details": "Category must map to a valid blog category",
+                                    "fix": "Use one of: " + ", ".join(self.VALID_CATEGORIES),
+                                }
+                            )
+        except Exception:
+            pass  # YAML parse errors are caught by _check_yaml_format
+
+    def _check_chart_presence(self, content: str) -> None:
+        """Warn when an article does not reference any ``/assets/charts/`` image.
+
+        Data-driven articles should contain at least one chart.  This is
+        advisory (WARNING), not a publication blocker.
+        """
+        if "/assets/charts/" not in content:
+            self.issues.append(
+                {
+                    "check": "missing_chart",
+                    "severity": "WARNING",
+                    "message": "No /assets/charts/ image referenced in article",
+                    "details": "Data-driven articles should include at least one chart",
+                    "fix": "Add a chart image reference, e.g. ![Chart](/assets/charts/topic.png)",
                 }
             )
 

@@ -262,6 +262,8 @@ This is an article.
 layout: post
 title: "Test Article: Proper References"
 date: 2026-01-02
+categories: ["quality-engineering"]
+description: "Testing references validation"
 ---
 
 # Article content
@@ -430,6 +432,8 @@ layout: post
 title: "Self-Healing Tests: Myth vs Reality"
 date: 2026-01-02
 author: "The Economist"
+categories: ["quality-engineering"]
+description: "Testing end-to-end references validation"
 ---
 
 # The automation paradox

@@ -29,15 +29,14 @@ from scripts.publication_validator import PublicationValidator  # noqa: E402
 # ---------------------------------------------------------------------------
 
 #: Categories accepted by the publication pipeline.
-#: Keep in sync with the ``categories`` enum in ``scripts/schema_validator.py``
-#: (``FRONT_MATTER_SCHEMA["properties"]["categories"]["items"]["enum"]``).
+#: Keep in sync with ``PublicationValidator.VALID_CATEGORIES`` in
+#: ``scripts/publication_validator.py`` and the ``categories`` enum in
+#: ``scripts/schema_validator.py``.
 VALID_CATEGORIES: list[str] = [
     "quality-engineering",
-    "test-automation",
-    "performance",
-    "ai-testing",
     "software-engineering",
-    "devops",
+    "test-automation",
+    "security",
 ]
 
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")

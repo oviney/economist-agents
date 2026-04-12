@@ -30,6 +30,7 @@ def _make_article(
     date: str = "2026-04-05",
     author: str = "The Economist",
     categories: str = '["quality-engineering"]',
+    description: str | None = "A concise test description for SEO purposes",
     body: str | None = None,
     references: str | None = None,
     frontmatter_open: str = "---",
@@ -51,6 +52,8 @@ def _make_article(
         fields.append(f'author: "{author}"')
     if categories:
         fields.append(f"categories: {categories}")
+    if description is not None:
+        fields.append(f'description: "{description}"')
     fm = "\n".join(fields)
     return f"{frontmatter_open}\n{fm}\n{frontmatter_close}\n\n{body}\n\n{references}\n"
 

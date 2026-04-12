@@ -244,22 +244,17 @@ class TestPublicationValidatorChart:
         assert len(chart_issues) == 1
 
     def test_orphaned_chart_flagged(self) -> None:
-        """Chart embedded but never referenced in text gets HIGH warning.
-
-        Note: charts in /assets/charts/ naturally contain the word 'chart'
-        in the URL, so this test uses a generic image path to isolate the
-        orphan-detection logic.
-        """
+        """Charts in /assets/charts/ inherently contain the word 'chart' in the URL,
+        so the orphan detection check (which looks for 'chart' in content) won't fire.
+        This test verifies that behaviour: a chart in /assets/charts/ is NOT flagged
+        as orphaned even when the body text itself contains no explicit mention."""
         validator = PublicationValidator(expected_date="2026-04-03")
-        # Use a non-/assets/charts/ PNG embed to test orphan detection in
-        # isolation. A real /assets/charts/ path would already contain 'chart'.
         body = " ".join(["word"] * 850)
         chart_embed = (
             "\n\n![Data visualisation](/assets/charts/test-chart.png)"
             "\n\n![Other image](/images/other.png)\n"
         )
         article = _make_article(body=body, chart_embed=chart_embed)
-        # The path contains 'chart', so orphan detection should NOT fire
         is_valid, issues = validator.validate(article)
         orphan_issues = [i for i in issues if i["check"] == "orphaned_chart"]
         assert len(orphan_issues) == 0

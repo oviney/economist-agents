@@ -367,7 +367,7 @@ class PublicationValidator:
             )
 
     def _check_chart_references(self, content: str):
-        """Check that articles include at least one chart and reference it in text."""
+        """Check that articles include at least one chart in /assets/charts/ and flag orphaned charts that lack text references."""
         # Find all chart image references pointing to /assets/charts/
         chart_refs = re.findall(r"!\[.*?\]\((/assets/charts/.*?\.png)\)", content)
 

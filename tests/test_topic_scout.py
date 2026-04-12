@@ -110,6 +110,23 @@ def mock_llm_response_topics(sample_topics) -> str:
 
 
 @pytest.fixture
+def mock_dedup_passthrough():
+    """Mock TopicDeduplicator that passes all topics through.
+
+    Simulates a non-empty published_articles archive (count=19) and
+    returns the input topics unchanged from filter_topics(). Use this
+    in tests that don't care about dedup logic — it satisfies the
+    fail-closed check added for issue #237 without rejecting anything.
+    """
+    with patch("topic_scout.TopicDeduplicator") as MockDedup:
+        instance = MockDedup.return_value
+        instance.collection = Mock()
+        instance.collection.count = Mock(return_value=19)
+        instance.filter_topics = Mock(side_effect=lambda topics: (topics, []))
+        yield instance
+
+
+@pytest.fixture
 def mock_llm_client(mock_llm_response_trends, mock_llm_response_topics):
     """Create mock LLM client with realistic responses.
 
@@ -144,7 +161,9 @@ def mock_llm_client(mock_llm_response_trends, mock_llm_response_topics):
 # ═══════════════════════════════════════════════════════════════════════════
 
 
-def test_scout_topics_success(mock_llm_client, sample_topics, capsys):
+def test_scout_topics_success(
+    mock_llm_client, mock_dedup_passthrough, sample_topics, capsys
+):
     """Test scout_topics() with successful API responses.
 
     Validates:
@@ -177,7 +196,9 @@ def test_scout_topics_success(mock_llm_client, sample_topics, capsys):
     assert "[23/25]" in captured.out
 
 
-def test_scout_topics_with_focus_area(mock_llm_client, sample_topics):
+def test_scout_topics_with_focus_area(
+    mock_llm_client, mock_dedup_passthrough, sample_topics
+):
     """Test scout_topics() with focus_area parameter.
 
     Validates:
@@ -199,7 +220,7 @@ def test_scout_topics_with_focus_area(mock_llm_client, sample_topics):
     assert len(topics) == 2
 
 
-def test_scout_topics_empty_results(mock_llm_client):
+def test_scout_topics_empty_results(mock_llm_client, mock_dedup_passthrough):
     """Test scout_topics() when LLM returns no valid topics.
 
     Validates:
@@ -220,7 +241,7 @@ def test_scout_topics_empty_results(mock_llm_client):
 # ═══════════════════════════════════════════════════════════════════════════
 
 
-def test_scout_topics_json_parse_error(mock_llm_client, capsys):
+def test_scout_topics_json_parse_error(mock_llm_client, mock_dedup_passthrough, capsys):
     """Test scout_topics() with malformed JSON response.
 
     Validates:
@@ -241,7 +262,7 @@ def test_scout_topics_json_parse_error(mock_llm_client, capsys):
     assert "parse error" in captured.out or "Could not parse" in captured.out
 
 
-def test_scout_topics_no_json_array(mock_llm_client, capsys):
+def test_scout_topics_no_json_array(mock_llm_client, mock_dedup_passthrough, capsys):
     """Test scout_topics() when response has no JSON array.
 
     Validates:
@@ -275,7 +296,7 @@ def test_scout_topics_api_exception(mock_llm_client):
         scout_topics(mock_client)
 
 
-def test_scout_topics_partial_json(mock_llm_client):
+def test_scout_topics_partial_json(mock_llm_client, mock_dedup_passthrough):
     """Test scout_topics() with incomplete topic objects.
 
     Validates:
@@ -293,6 +314,101 @@ def test_scout_topics_partial_json(mock_llm_client):
     assert len(topics) == 1
     assert topics[0]["topic"] == "Test"
     assert topics[0]["total_score"] == 15
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# TESTS: Issue #237 — Dedup bypass regression guard
+#
+# These tests pin the behavior added to scout_topics() to fix the dedup
+# bypass bug: topic_scout must run TopicDeduplicator.filter_topics() against
+# the published_articles archive AND fail-closed when that archive is
+# unavailable or empty (with an explicit allow_empty_archive opt-out for
+# bootstrap runs). See issue #237.
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+def test_scout_topics_runs_filter_topics(mock_llm_client, mock_dedup_passthrough):
+    """scout_topics() must call TopicDeduplicator.filter_topics() on every run."""
+    mock_client, call_llm_side_effect = mock_llm_client
+
+    with patch("topic_scout.call_llm", side_effect=call_llm_side_effect):
+        scout_topics(mock_client)
+
+    assert mock_dedup_passthrough.filter_topics.called, (
+        "scout_topics() must invoke TopicDeduplicator.filter_topics() — "
+        "skipping dedup lets near-duplicate topics reach the pipeline."
+    )
+
+
+def test_scout_topics_drops_rejected_duplicates(mock_llm_client, sample_topics):
+    """Topics rejected by filter_topics() must not appear in the returned list."""
+    mock_client, call_llm_side_effect = mock_llm_client
+
+    # Mock dedup to reject the first topic and keep the second.
+    with (
+        patch("topic_scout.TopicDeduplicator") as MockDedup,
+        patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
+    ):
+        instance = MockDedup.return_value
+        instance.collection = Mock()
+        instance.collection.count = Mock(return_value=19)
+        instance.filter_topics = Mock(
+            side_effect=lambda topics: (
+                [t for t in topics if t["topic"] != "The AI Testing Paradox"],
+                [t for t in topics if t["topic"] == "The AI Testing Paradox"],
+            )
+        )
+        topics = scout_topics(mock_client)
+
+    returned_titles = {t["topic"] for t in topics}
+    assert "The AI Testing Paradox" not in returned_titles
+    assert "Flaky Tests: The Hidden Tax" in returned_titles
+
+
+def test_scout_topics_fail_closed_when_collection_missing(mock_llm_client):
+    """Missing ChromaDB collection must raise RuntimeError by default."""
+    mock_client, call_llm_side_effect = mock_llm_client
+
+    with (
+        patch("topic_scout.TopicDeduplicator") as MockDedup,
+        patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
+    ):
+        instance = MockDedup.return_value
+        instance.collection = None  # ChromaDB unavailable
+        with pytest.raises(RuntimeError, match="archive unavailable or empty"):
+            scout_topics(mock_client)
+
+
+def test_scout_topics_fail_closed_when_collection_empty(mock_llm_client):
+    """Empty published_articles collection must raise RuntimeError by default."""
+    mock_client, call_llm_side_effect = mock_llm_client
+
+    with (
+        patch("topic_scout.TopicDeduplicator") as MockDedup,
+        patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
+    ):
+        instance = MockDedup.return_value
+        instance.collection = Mock()
+        instance.collection.count = Mock(return_value=0)
+        with pytest.raises(RuntimeError, match="archive unavailable or empty"):
+            scout_topics(mock_client)
+
+
+def test_scout_topics_allow_empty_archive_override(mock_llm_client, sample_topics):
+    """allow_empty_archive=True must downgrade empty archive to a warning and proceed."""
+    mock_client, call_llm_side_effect = mock_llm_client
+
+    with (
+        patch("topic_scout.TopicDeduplicator") as MockDedup,
+        patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
+    ):
+        instance = MockDedup.return_value
+        instance.collection = Mock()
+        instance.collection.count = Mock(return_value=0)
+        instance.filter_topics = Mock(side_effect=lambda topics: (topics, []))
+        topics = scout_topics(mock_client, allow_empty_archive=True)
+
+    assert len(topics) == 2  # sample_topics pass through untouched
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -533,7 +649,12 @@ def test_create_client_propagates_exceptions():
 
 
 def test_main_success_flow(
-    mock_llm_client, sample_topics, tmp_path, monkeypatch, capsys
+    mock_llm_client,
+    mock_dedup_passthrough,
+    sample_topics,
+    tmp_path,
+    monkeypatch,
+    capsys,
 ):
     """Test main() executes full scout workflow.
 
@@ -565,7 +686,9 @@ def test_main_success_flow(
     assert "The AI Testing Paradox" in captured.out
 
 
-def test_main_with_focus_area(mock_llm_client, sample_topics, tmp_path, monkeypatch):
+def test_main_with_focus_area(
+    mock_llm_client, mock_dedup_passthrough, sample_topics, tmp_path, monkeypatch
+):
     """Test main() respects FOCUS_AREA environment variable.
 
     Validates:
@@ -590,7 +713,7 @@ def test_main_with_focus_area(mock_llm_client, sample_topics, tmp_path, monkeypa
 
 
 def test_main_github_actions_output(
-    mock_llm_client, sample_topics, tmp_path, monkeypatch
+    mock_llm_client, mock_dedup_passthrough, sample_topics, tmp_path, monkeypatch
 ):
     """Test main() writes GitHub Actions output file.
 
@@ -783,7 +906,7 @@ def test_trend_research_prompt_structure():
 # ═══════════════════════════════════════════════════════════════════════════
 
 
-def test_scout_topics_single_topic(mock_llm_client):
+def test_scout_topics_single_topic(mock_llm_client, mock_dedup_passthrough):
     """Test scout_topics() with single topic (edge case).
 
     Validates:
@@ -801,7 +924,9 @@ def test_scout_topics_single_topic(mock_llm_client):
     assert len(topics) == 1
 
 
-def test_scout_topics_unsorted_input(mock_llm_client, sample_topics):
+def test_scout_topics_unsorted_input(
+    mock_llm_client, mock_dedup_passthrough, sample_topics
+):
     """Test scout_topics() sorts topics by total_score.
 
     Validates:
@@ -882,7 +1007,7 @@ def test_scout_topics_network_timeout(mock_llm_client):
 
 
 def test_performance_context_injected_into_scout_prompt(
-    mock_llm_client, monkeypatch
+    mock_llm_client, mock_dedup_passthrough, monkeypatch
 ):
     """Performance context from content_intelligence must appear in the scout prompt.
 
@@ -916,7 +1041,7 @@ def test_performance_context_injected_into_scout_prompt(
 
 
 def test_performance_context_fallback_when_db_missing(
-    mock_llm_client, monkeypatch
+    mock_llm_client, mock_dedup_passthrough, monkeypatch
 ):
     """When content_intelligence reports no data, scout must still run.
 
@@ -941,7 +1066,7 @@ def test_performance_context_fallback_when_db_missing(
 
 
 def test_scout_prompt_explicitly_references_performance_data(
-    mock_llm_client, monkeypatch
+    mock_llm_client, mock_dedup_passthrough, monkeypatch
 ):
     """The scout prompt must tell the LLM to *use* the performance data.
 
@@ -965,7 +1090,7 @@ def test_scout_prompt_explicitly_references_performance_data(
 
 
 def test_get_performance_context_called_once_per_scout_run(
-    mock_llm_client, monkeypatch
+    mock_llm_client, mock_dedup_passthrough, monkeypatch
 ):
     """Verify the feedback loop query happens exactly once per scout invocation."""
     mock_client, call_llm_side_effect = mock_llm_client
@@ -1208,7 +1333,9 @@ def _make_topics_with_theme(theme: str, count: int, start_score: int = 20) -> li
     ]
 
 
-def test_scout_topics_diversity_check_triggers_regeneration(capsys):
+def test_scout_topics_diversity_check_triggers_regeneration(
+    mock_dedup_passthrough, capsys
+):
     """When initial topics fail diversity, a 2nd LLM call is made with a diversity hint."""
     mock_client = Mock()
 
@@ -1235,7 +1362,9 @@ def test_scout_topics_diversity_check_triggers_regeneration(capsys):
         ]
     )
 
-    with patch("topic_scout.call_llm", side_effect=lambda *a, **kw: next(call_responses)) as mock_call:
+    with patch(
+        "topic_scout.call_llm", side_effect=lambda *a, **kw: next(call_responses)
+    ) as mock_call:
         topics = scout_topics(mock_client)
 
     # Three LLM calls: trends + initial topics + regeneration
@@ -1253,7 +1382,7 @@ def test_scout_topics_diversity_check_triggers_regeneration(capsys):
     assert "Diversity check failed" in captured.out
 
 
-def test_scout_topics_diversity_check_skipped_for_two_topics():
+def test_scout_topics_diversity_check_skipped_for_two_topics(mock_dedup_passthrough):
     """Diversity check is not applied when fewer than 3 topics are returned."""
     mock_client = Mock()
     # Both topics share the same theme — normally a violation, but too few to check
@@ -1270,7 +1399,7 @@ def test_scout_topics_diversity_check_skipped_for_two_topics():
     assert len(topics) == 2
 
 
-def test_scout_topics_diversity_passes_no_extra_call():
+def test_scout_topics_diversity_passes_no_extra_call(mock_dedup_passthrough):
     """When topics are diverse from the first try, no regeneration call is made."""
     mock_client = Mock()
     diverse = (
@@ -1341,7 +1470,9 @@ def test_scout_prompt_includes_software_architecture_category():
 
 def test_scout_prompt_includes_diversity_requirement():
     """The scout prompt must instruct the LLM to spread topics across categories."""
-    assert "DIVERSITY" in SCOUT_AGENT_PROMPT or "diversity" in SCOUT_AGENT_PROMPT.lower()
+    assert (
+        "DIVERSITY" in SCOUT_AGENT_PROMPT or "diversity" in SCOUT_AGENT_PROMPT.lower()
+    )
 
 
 def test_theme_keywords_covers_all_required_themes():

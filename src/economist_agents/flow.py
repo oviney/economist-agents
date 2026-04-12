@@ -447,12 +447,25 @@ class EconomistContentFlow(Flow):
         print(
             f"   ⚠️  Revision still failing (score: {editorial_score}, issues: {len(critical)})"
         )
+
+        # Persist quarantined article so it can be reviewed/fixed manually.
+        import pathlib
+        import re as _re_q
+
+        slug = _re_q.sub(r"[^a-z0-9]+", "-", edited_article[:80].lower()).strip("-")[:60]
+        quarantine_dir = pathlib.Path("output") / "quarantine"
+        quarantine_dir.mkdir(parents=True, exist_ok=True)
+        quarantine_path = quarantine_dir / f"{datetime.now().strftime('%Y-%m-%d')}-{slug}.md"
+        quarantine_path.write_text(edited_article)
+        print(f"   📄 Quarantined article saved: {quarantine_path}")
+
         return {
             "status": "needs_revision",
             "editorial_score": editorial_score,
             "gates_passed": gates_passed,
             "validation_issues": [i["message"] for i in critical],
             "retry_count": self.state["retry_count"],
+            "quarantine_path": str(quarantine_path),
         }
 
 

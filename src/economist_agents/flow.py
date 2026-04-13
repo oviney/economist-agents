@@ -264,6 +264,12 @@ class EconomistContentFlow(Flow):
                     fm = _re.sub(r"image:.*", f"image: {featured_image}", fm)
                 else:
                     fm = fm.rstrip() + f"\nimage: {featured_image}\n"
+
+                # Fix Writer's persistent summary→description confusion.
+                # gpt-4o outputs "summary:" despite prompt saying "description:".
+                if "summary:" in fm and "description:" not in fm:
+                    fm = fm.replace("summary:", "description:", 1)
+
                 article_text = "---" + fm + "---" + parts[2]
 
         # Gate 0: Frontmatter schema validation (Story #117 boundary)

@@ -120,8 +120,7 @@ def _get_imports(source: str, filename: str) -> list[tuple[int, str]]:
         if isinstance(node, ast.Import):
             for alias in node.names:
                 results.append((node.lineno, alias.name.split(".")[0]))
-        elif isinstance(node, ast.ImportFrom):
-            if node.module:
+        elif isinstance(node, ast.ImportFrom) and node.module:
                 results.append((node.lineno, node.module.split(".")[0]))
 
     return results
@@ -149,8 +148,7 @@ def _find_bare_json_loads(source: str, filename: str) -> list[int]:
     # Collect ranges covered by try-body blocks
     try_ranges: list[tuple[int, int]] = []
     for node in ast.walk(tree):
-        if isinstance(node, ast.Try):
-            if node.body:
+        if isinstance(node, ast.Try) and node.body:
                 start = node.body[0].lineno
                 end = node.body[-1].end_lineno or node.body[-1].lineno
                 try_ranges.append((start, end))
@@ -437,9 +435,7 @@ def format_report(result: CheckResult) -> str:
         )
     else:
         lines.append("")
-        lines.append(
-            "Warnings are informational only; commit is allowed to proceed."
-        )
+        lines.append("Warnings are informational only; commit is allowed to proceed.")
 
     lines.append("=" * 72)
     return "\n".join(lines)

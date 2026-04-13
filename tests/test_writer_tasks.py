@@ -104,8 +104,9 @@ class TestValidateArticleStructure:
         assert result["has_layout"] is False
 
     def test_missing_description_field(self) -> None:
-        article = '---\nlayout: post\ntitle: "Test"\ndate: 2026-04-03\n---\n\n' + " ".join(
-            ["word"] * 850
+        article = (
+            '---\nlayout: post\ntitle: "Test"\ndate: 2026-04-03\n---\n\n'
+            + " ".join(["word"] * 850)
         )
         result = validate_article_structure(article)
         assert result["has_description"] is False

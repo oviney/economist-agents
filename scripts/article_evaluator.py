@@ -34,7 +34,15 @@ _FRESH_YEARS = {str(_CURRENT_YEAR), str(_CURRENT_YEAR - 1)}  # e.g. {"2026", "20
 _STALE_CUTOFF_YEAR = _CURRENT_YEAR - 2  # references older than this are penalised
 
 # Analyst-report vendor names that count against the max-1-per-article rule
-_ANALYST_VENDORS = ["gartner", "forrester", "capgemini", "mckinsey", "bcg", "idc", "deloitte"]
+_ANALYST_VENDORS = [
+    "gartner",
+    "forrester",
+    "capgemini",
+    "mckinsey",
+    "bcg",
+    "idc",
+    "deloitte",
+]
 
 _BANNED_OPENINGS = [
     r"in today's world",
@@ -294,18 +302,14 @@ class ArticleEvaluator:
                 score -= 3
 
         # Source freshness: penalise articles with no recent (2025-2026) citations
-        fresh_hits = sum(
-            1 for year in _FRESH_YEARS if year in body
-        )
+        fresh_hits = sum(1 for year in _FRESH_YEARS if year in body)
         if fresh_hits == 0:
             score -= 3  # No recent sources at all
         elif fresh_hits == 1:
             score -= 1  # Only one recent year mentioned
 
         # Analyst over-reliance: penalise if more than 1 analyst vendor cited
-        analyst_hits = sum(
-            1 for vendor in _ANALYST_VENDORS if vendor in body.lower()
-        )
+        analyst_hits = sum(1 for vendor in _ANALYST_VENDORS if vendor in body.lower())
         if analyst_hits > 1:
             score -= min(analyst_hits - 1, 3)  # -1 per extra vendor, max -3
 
@@ -321,9 +325,7 @@ class ArticleEvaluator:
         )
         fresh_hits = sum(1 for year in _FRESH_YEARS if year in body)
         analyst_hits = sum(1 for vendor in _ANALYST_VENDORS if vendor in body.lower())
-        freshness_note = (
-            f"fresh citations ({'/'.join(sorted(_FRESH_YEARS, reverse=True))}): {fresh_hits}"
-        )
+        freshness_note = f"fresh citations ({'/'.join(sorted(_FRESH_YEARS, reverse=True))}): {fresh_hits}"
         analyst_note = f"analyst vendors cited: {analyst_hits}"
         return (
             f"{ref_count} references cited, {placeholders} placeholders; "
@@ -382,13 +384,13 @@ class ArticleEvaluator:
 
         # Check headings — too few or too many both indicate poor structure
         headings = re.findall(r"^#{2,3}\s", body, re.MULTILINE)
-        if len(headings) < 2:
-            score -= 2
-        elif len(headings) > 5:
+        if len(headings) < 2 or len(headings) > 5:
             score -= 2
 
         # Check for list formatting in prose (outside References section)
-        prose_only = re.sub(r"## References.*", "", body, flags=re.DOTALL | re.IGNORECASE)
+        prose_only = re.sub(
+            r"## References.*", "", body, flags=re.DOTALL | re.IGNORECASE
+        )
         list_items = re.findall(r"^[-*]\s|^\d+\.\s", prose_only, re.MULTILINE)
         if len(list_items) > 2:
             score -= 2
@@ -418,7 +420,9 @@ class ArticleEvaluator:
         words = len(body.split())
         missing = [f for f in _REQUIRED_FRONTMATTER if f not in frontmatter]
         has_refs = "## references" in body.lower()
-        prose_only = re.sub(r"## References.*", "", body, flags=re.DOTALL | re.IGNORECASE)
+        prose_only = re.sub(
+            r"## References.*", "", body, flags=re.DOTALL | re.IGNORECASE
+        )
         list_count = len(re.findall(r"^[-*]\s|^\d+\.\s", prose_only, re.MULTILINE))
         parts = [f"{headings} headings", f"{words} words"]
         if list_count > 0:

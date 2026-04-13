@@ -774,9 +774,7 @@ def generate_economist_post(
                     "critical_issues"
                 ]
 
-        chart_path = run_graphics_agent(
-            client, research["chart_data"], chart_filename
-        )
+        chart_path = run_graphics_agent(client, research["chart_data"], chart_filename)
 
         if not chart_path:
             break  # Chart generation failed entirely
@@ -870,7 +868,9 @@ def generate_economist_post(
             # DALL-E failed but image field is still required by validate-posts.sh.
             # Always set the expected path so writer includes it in front matter.
             featured_image_blog_path = f"/assets/images/{slug}.png"
-            print("   ℹ DALL-E failed — image path set to expected fallback (no file generated)")
+            print(
+                "   ℹ DALL-E failed — image path set to expected fallback (no file generated)"
+            )
     else:
         # No OpenAI key — still set the expected image path for front matter compliance.
         featured_image_blog_path = f"/assets/images/{slug}.png"

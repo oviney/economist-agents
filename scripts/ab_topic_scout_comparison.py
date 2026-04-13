@@ -141,7 +141,7 @@ def score_deltas(
         per_topic_deltas: list[float] = []
         for t in topics_a:
             score_a = float(t.get("scores", {}).get(dim, 0))
-        # Compare to the nearest-named topic in B or fall back to avg_b.
+            # Compare to the nearest-named topic in B or fall back to avg_b.
             # NOTE: when there is no matching topic by title the fallback
             # uses avg_b (the run-level mean), which makes the comparison
             # asymmetric.  This is intentional: Run A topics that have no
@@ -198,7 +198,13 @@ def qualitative_notes(
         """Return a set of whole lower-cased words from key topic fields."""
         raw = " ".join(
             str(topic.get(field, "")).lower()
-            for field in ("hook", "thesis", "contrarian_angle", "timeliness_trigger", "topic")
+            for field in (
+                "hook",
+                "thesis",
+                "contrarian_angle",
+                "timeliness_trigger",
+                "topic",
+            )
         )
         return set(re.findall(r"\b\w+\b", raw))
 
@@ -262,8 +268,7 @@ def verdict(
         + ("✅ < 0.6 (runs diverge)" if criteria_1 else "❌ ≥ 0.6 (runs too similar)")
     )
     reasons.append(
-        "Run A references a top performer: "
-        + ("✅ YES" if criteria_2 else "❌ NO")
+        "Run A references a top performer: " + ("✅ YES" if criteria_2 else "❌ NO")
     )
 
     conclusion = (
@@ -411,8 +416,8 @@ def render_report(
         lines += [
             "## Summary Statistics",
             "",
-            f"| Metric | Value |",
-            f"|--------|-------|",
+            "| Metric | Value |",
+            "|--------|-------|",
             f"| Jaccard similarity | {jac:.3f} |",
         ]
         overall_avg = (
@@ -536,9 +541,7 @@ def save_raw_json(pairs: list[dict[str, Any]], output_dir: Path) -> Path:
                 "deltas": pair["deltas"],
                 "notes": pair["notes"],
                 "verdict_is_real": pair["verdict_is_real"],
-                "top_performers": [
-                    _serialisable(p) for p in pair["top_performers"]
-                ],
+                "top_performers": [_serialisable(p) for p in pair["top_performers"]],
                 "bottom_performers": [
                     _serialisable(p) for p in pair["bottom_performers"]
                 ],

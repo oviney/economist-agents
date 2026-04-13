@@ -84,7 +84,9 @@ class TestOpeningQuality:
         result = evaluator.evaluate(BAD_ARTICLE)
         assert result.scores["opening_quality"] <= 3
 
-    def test_abstract_noun_opening_scores_low(self, evaluator: ArticleEvaluator) -> None:
+    def test_abstract_noun_opening_scores_low(
+        self, evaluator: ArticleEvaluator
+    ) -> None:
         article = "---\nlayout: post\ntitle: Test\ndate: 2026-04-05\ncategories: []\nimage: x.png\n---\n\nThe arrival of AI tools has changed testing.\n\nMore content here."
         result = evaluator.evaluate(article)
         assert result.scores["opening_quality"] <= 3
@@ -147,17 +149,28 @@ class TestStructure:
     def test_excessive_headings_penalised(self, evaluator: ArticleEvaluator) -> None:
         headings = "\n\n".join(f"## Section {i}\n\nParagraph {i}." for i in range(1, 8))
         body = f"Opening sentence with data: 42% of teams fail.\n\n{headings}\n\n## References\n\n1. Source A\n2. Source B\n3. Source C\n4. Source D\n5. Source E\n"
-        article = f"---\nlayout: post\ntitle: Test\ndate: 2026-04-05\ncategories: []\nimage: x.png\n---\n\n{body}" + " ".join(["word"] * 600)
+        article = (
+            f"---\nlayout: post\ntitle: Test\ndate: 2026-04-05\ncategories: []\nimage: x.png\n---\n\n{body}"
+            + " ".join(["word"] * 600)
+        )
         result_many = evaluator.evaluate(article)
         # 7 headings (>5) → -2 penalty vs same article with 4 headings
-        few_headings = "\n\n".join(f"## Section {i}\n\nParagraph {i}." for i in range(1, 4))
-        article_few = f"---\nlayout: post\ntitle: Test\ndate: 2026-04-05\ncategories: []\nimage: x.png\n---\n\nOpening sentence with data: 42% of teams fail.\n\n{few_headings}\n\n## References\n\n1. Source A\n2. Source B\n3. Source C\n4. Source D\n5. Source E\n" + " ".join(["word"] * 600)
+        few_headings = "\n\n".join(
+            f"## Section {i}\n\nParagraph {i}." for i in range(1, 4)
+        )
+        article_few = (
+            f"---\nlayout: post\ntitle: Test\ndate: 2026-04-05\ncategories: []\nimage: x.png\n---\n\nOpening sentence with data: 42% of teams fail.\n\n{few_headings}\n\n## References\n\n1. Source A\n2. Source B\n3. Source C\n4. Source D\n5. Source E\n"
+            + " ".join(["word"] * 600)
+        )
         result_few = evaluator.evaluate(article_few)
         assert result_many.scores["structure"] < result_few.scores["structure"]
 
     def test_list_formatting_penalised(self, evaluator: ArticleEvaluator) -> None:
         list_body = "Opening with 42% data.\n\n## Section One\n\nHere are the steps:\n\n- Step one\n- Step two\n- Step three\n- Step four\n\n## Section Two\n\nMore content.\n\n## References\n\n1. Ref A\n2. Ref B\n3. Ref C\n"
-        article = f"---\nlayout: post\ntitle: Test\ndate: 2026-04-05\ncategories: []\nimage: x.png\n---\n\n{list_body}" + " ".join(["word"] * 600)
+        article = (
+            f"---\nlayout: post\ntitle: Test\ndate: 2026-04-05\ncategories: []\nimage: x.png\n---\n\n{list_body}"
+            + " ".join(["word"] * 600)
+        )
         result = evaluator.evaluate(article)
         # 4 list items in prose → -2 penalty
         assert result.scores["structure"] <= 8

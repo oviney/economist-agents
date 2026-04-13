@@ -209,8 +209,7 @@ def recompute_score(
     }
 
     contributions: dict[str, float] = {
-        term: weight * norm_map[term]
-        for term, weight in COMPOSITE_WEIGHTS.items()
+        term: weight * norm_map[term] for term, weight in COMPOSITE_WEIGHTS.items()
     }
 
     zero_terms = [t for t, c in contributions.items() if c == 0.0]
@@ -310,9 +309,7 @@ def render_url_section(
     lines.append("")
 
     # Zero-term flags
-    active_zero = [
-        t for t in math["zero_terms"] if COMPOSITE_WEIGHTS.get(t, 0.0) > 0.0
-    ]
+    active_zero = [t for t in math["zero_terms"] if COMPOSITE_WEIGHTS.get(t, 0.0) > 0.0]
     if active_zero:
         lines.append(
             f"> ⚠️ **{len(active_zero)} term(s) with positive weight are zeroed:** "

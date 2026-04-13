@@ -51,18 +51,72 @@ def synthetic_db(tmp_path: Path) -> Path:
     # with multiple date rows to test aggregation.
     rows = [
         # High-performing article, single day
-        ("/2026/01/01/great-article/", "Great Article", 500, 0.85, 240.0, 0.9, 0.900, "2026-04-06"),
+        (
+            "/2026/01/01/great-article/",
+            "Great Article",
+            500,
+            0.85,
+            240.0,
+            0.9,
+            0.900,
+            "2026-04-06",
+        ),
         # Low-performing article, high pageviews (the viral-but-shallow case)
-        ("/2026/01/15/viral-dud/", "Viral Dud", 10000, 0.15, 45.0, 0.2, 0.100, "2026-04-06"),
+        (
+            "/2026/01/15/viral-dud/",
+            "Viral Dud",
+            10000,
+            0.15,
+            45.0,
+            0.2,
+            0.100,
+            "2026-04-06",
+        ),
         # Medium article with two date rows — tests aggregation
-        ("/2025/12/20/split-rows/", "Split Rows", 100, 0.60, 120.0, 0.5, 0.500, "2026-04-05"),
-        ("/2025/12/20/split-rows/", "Split Rows", 50, 0.70, 150.0, 0.6, 0.600, "2026-04-06"),
+        (
+            "/2025/12/20/split-rows/",
+            "Split Rows",
+            100,
+            0.60,
+            120.0,
+            0.5,
+            0.500,
+            "2026-04-05",
+        ),
+        (
+            "/2025/12/20/split-rows/",
+            "Split Rows",
+            50,
+            0.70,
+            150.0,
+            0.6,
+            0.600,
+            "2026-04-06",
+        ),
         # Below min_pageviews threshold — should be excluded from top
-        ("/2026/02/01/tiny/", "Tiny Article", 2, 0.99, 300.0, 0.95, 0.999, "2026-04-06"),
+        (
+            "/2026/02/01/tiny/",
+            "Tiny Article",
+            2,
+            0.99,
+            300.0,
+            0.95,
+            0.999,
+            "2026-04-06",
+        ),
         # Non-article index pages — should be filtered out
         ("/", "Home", 5000, 0.5, 60.0, 0.3, 0.400, "2026-04-06"),
         ("/blog/", "Blog Archive", 200, 0.3, 30.0, 0.2, 0.200, "2026-04-06"),
-        ("/software-engineering/", "Software Engineering", 300, 0.4, 45.0, 0.25, 0.250, "2026-04-06"),
+        (
+            "/software-engineering/",
+            "Software Engineering",
+            300,
+            0.4,
+            45.0,
+            0.25,
+            0.250,
+            "2026-04-06",
+        ),
     ]
     conn.executemany(
         "INSERT INTO article_performance VALUES (?, ?, ?, ?, ?, ?, ?, ?)", rows
@@ -129,9 +183,7 @@ class TestGetTopPerformers:
 
     def test_respects_min_pageviews(self, synthetic_db: Path) -> None:
         """Tiny article (2 pageviews) should be excluded even though it has the highest score."""
-        top = get_top_performers(
-            limit=10, min_pageviews=5, db_path=synthetic_db
-        )
+        top = get_top_performers(limit=10, min_pageviews=5, db_path=synthetic_db)
         paths = [a.page_path for a in top]
         assert "/2026/02/01/tiny/" not in paths
 
@@ -159,17 +211,13 @@ class TestGetBottomPerformers:
     """Tests for get_bottom_performers."""
 
     def test_returns_ascending_by_score(self, synthetic_db: Path) -> None:
-        bottom = get_bottom_performers(
-            limit=5, min_pageviews=5, db_path=synthetic_db
-        )
+        bottom = get_bottom_performers(limit=5, min_pageviews=5, db_path=synthetic_db)
         assert len(bottom) >= 2
         assert bottom[0].avg_composite_score <= bottom[-1].avg_composite_score
 
     def test_captures_viral_but_shallow(self, synthetic_db: Path) -> None:
         """The viral dud (10k views, 0.1 score) should be at the top of the bottom list."""
-        bottom = get_bottom_performers(
-            limit=5, min_pageviews=5, db_path=synthetic_db
-        )
+        bottom = get_bottom_performers(limit=5, min_pageviews=5, db_path=synthetic_db)
         assert bottom[0].page_path == "/2026/01/15/viral-dud/"
         assert bottom[0].total_pageviews == 10000
 

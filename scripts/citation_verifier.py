@@ -86,7 +86,9 @@ def _stat_appears_in_text(stat: str, page_text: str) -> bool:
     # Numbers are present — check if at least one contextual word from
     # the stat also appears near a number (within 200 chars)
     context_words = [
-        w for w in re.findall(r"[a-z]{4,}", norm_stat) if w not in {"that", "than", "with", "from", "this", "have", "been"}
+        w
+        for w in re.findall(r"[a-z]{4,}", norm_stat)
+        if w not in {"that", "than", "with", "from", "this", "have", "been"}
     ]
     if not context_words:
         return True  # numbers match, no context words to check
@@ -144,7 +146,9 @@ def verify_citations(
         if page_text is None:
             # Couldn't fetch — mark unverified but don't penalise
             # (network issues shouldn't block the pipeline)
-            logger.info("Could not fetch %s — leaving verified=%s", url, dp.get("verified"))
+            logger.info(
+                "Could not fetch %s — leaving verified=%s", url, dp.get("verified")
+            )
             continue
 
         if _stat_appears_in_text(stat, page_text):
@@ -166,7 +170,9 @@ def verify_citations(
         page_text = fetch(headline_url)
         if page_text and not _stat_appears_in_text(headline_stat, page_text):
             headline["verified"] = False
-            unverified.append(f"HEADLINE: {headline_stat} (not found in {headline_url})")
+            unverified.append(
+                f"HEADLINE: {headline_stat} (not found in {headline_url})"
+            )
             failed_count += 1
             logger.warning("❌ Headline unverified: '%s'", headline_stat[:60])
 
@@ -179,7 +185,9 @@ def verify_citations(
 
     logger.info(
         "Citation verification: %d verified, %d failed, %d total",
-        verified_count, failed_count, verified_count + failed_count,
+        verified_count,
+        failed_count,
+        verified_count + failed_count,
     )
 
     return research_data

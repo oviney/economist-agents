@@ -209,9 +209,7 @@ def check_pr_ready(pr_url: str) -> dict[str, Any]:
     # Check description quality
     body = pr.body or ""
     has_description = len(body.strip()) > 50
-    has_issue_ref = bool(
-        re.search(r"#\d+|closes|fixes|resolves", body, re.IGNORECASE)
-    )
+    has_issue_ref = bool(re.search(r"#\d+|closes|fixes|resolves", body, re.IGNORECASE))
 
     # Check for test files
     test_files = [f for f in files if re.search(r"test", f.filename, re.IGNORECASE)]
@@ -228,12 +226,7 @@ def check_pr_ready(pr_url: str) -> dict[str, Any]:
         for c in commits
     )
 
-    promote = (
-        file_count > 0
-        and not has_todo
-        and has_description
-        and not all_initial
-    )
+    promote = file_count > 0 and not has_todo and has_description and not all_initial
 
     reason_parts: list[str] = []
     if file_count > 0:
@@ -265,7 +258,9 @@ def check_pr_ready(pr_url: str) -> dict[str, Any]:
             "commit_count": len(commits),
         },
     }
-    _log_decision("pr_ready_check", {"pr": pr_url, "promote": promote, "reason": reason})
+    _log_decision(
+        "pr_ready_check", {"pr": pr_url, "promote": promote, "reason": reason}
+    )
     return result
 
 
@@ -288,9 +283,7 @@ def _score_pr(pr: Any, files: list[Any]) -> tuple[int, dict[str, Any]]:
     file_count = len(files)
     score = min(file_count * 2, 20)
 
-    test_count = sum(
-        1 for f in files if re.search(r"test", f.filename, re.IGNORECASE)
-    )
+    test_count = sum(1 for f in files if re.search(r"test", f.filename, re.IGNORECASE))
     score += test_count * 3
 
     body = pr.body or ""
@@ -342,10 +335,14 @@ def triage_duplicates(pr_a_url: str, pr_b_url: str) -> dict[str, Any]:
 
     if score_a >= score_b:
         keep, close, kept_url = "pr-a", "pr-b", pr_a_url
-        reason = f"PR-A scores higher ({score_a} vs {score_b}): more complete implementation"
+        reason = (
+            f"PR-A scores higher ({score_a} vs {score_b}): more complete implementation"
+        )
     else:
         keep, close, kept_url = "pr-b", "pr-a", pr_b_url
-        reason = f"PR-B scores higher ({score_b} vs {score_a}): more complete implementation"
+        reason = (
+            f"PR-B scores higher ({score_b} vs {score_a}): more complete implementation"
+        )
 
     result: dict[str, Any] = {
         "keep": keep,
@@ -408,7 +405,9 @@ def check_dispatch_safe(issue_url: str) -> dict[str, Any]:
 
     reason_parts: list[str] = []
     if is_blocked:
-        blocking = [lbl for lbl in labels if lbl in ("blocked", "needs-human-review", "on-hold")]
+        blocking = [
+            lbl for lbl in labels if lbl in ("blocked", "needs-human-review", "on-hold")
+        ]
         reason_parts.append(f"has blocking label(s): {', '.join(blocking)}")
     if not capacity_available:
         reason_parts.append(
@@ -434,7 +433,9 @@ def check_dispatch_safe(issue_url: str) -> dict[str, Any]:
             "has_blocking_dependency": has_blocking_dependency,
         },
     }
-    _log_decision("dispatch_check", {"issue": issue_url, "dispatch": dispatch, "reason": reason})
+    _log_decision(
+        "dispatch_check", {"issue": issue_url, "dispatch": dispatch, "reason": reason}
+    )
     return result
 
 
@@ -497,7 +498,12 @@ def check_stalled(pr_url: str, idle_minutes: int = 60) -> dict[str, Any]:
     }
     _log_decision(
         "stall_check",
-        {"pr": pr_url, "stalled": stalled, "idle_minutes": idle_minutes, "reason": reason},
+        {
+            "pr": pr_url,
+            "stalled": stalled,
+            "idle_minutes": idle_minutes,
+            "reason": reason,
+        },
     )
     return result
 
@@ -547,7 +553,9 @@ Examples:
 
         elif args.mode == "duplicate-triage":
             if not args.pr_a or not args.pr_b:
-                parser.error("--pr-a and --pr-b are required for --mode duplicate-triage")
+                parser.error(
+                    "--pr-a and --pr-b are required for --mode duplicate-triage"
+                )
             result = triage_duplicates(args.pr_a, args.pr_b)
 
         elif args.mode == "dispatch-check":

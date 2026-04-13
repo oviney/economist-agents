@@ -95,8 +95,7 @@ except ImportError:  # pragma: no cover
 
 if not _HAS_PANDAS:
     st.error(
-        "pandas is required for chart rendering. "
-        "Install it with `pip install pandas`."
+        "pandas is required for chart rendering. Install it with `pip install pandas`."
     )
     st.stop()
 

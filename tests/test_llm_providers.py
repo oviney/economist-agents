@@ -26,11 +26,7 @@ from scripts.llm_client import LLMClient
 # Helper: minimal AgentRegistry pointing at the real .github/agents/ dir
 # ---------------------------------------------------------------------------
 
-AGENTS_DIR_PATH = (
-    Path(__file__).parent.parent
-    / ".github"
-    / "agents"
-)
+AGENTS_DIR_PATH = Path(__file__).parent.parent / ".github" / "agents"
 
 
 def _registry(provider=None) -> AgentRegistry:
@@ -86,7 +82,10 @@ class TestOpenAIProvider:
         """create_client should return an LLMClient wrapping an OpenAI client."""
         mock_openai_instance = MagicMock()
 
-        with patch.dict(os.environ, {"OPENAI_API_KEY": "sk-test"}), patch("openai.OpenAI", return_value=mock_openai_instance):
+        with (
+            patch.dict(os.environ, {"OPENAI_API_KEY": "sk-test"}),
+            patch("openai.OpenAI", return_value=mock_openai_instance),
+        ):
             provider = OpenAIProvider()
             client = provider.create_client()
 
@@ -97,7 +96,10 @@ class TestOpenAIProvider:
         """Default model is gpt-4o when no model arg given."""
         mock_openai_instance = MagicMock()
 
-        with patch.dict(os.environ, {"OPENAI_API_KEY": "sk-test"}), patch("openai.OpenAI", return_value=mock_openai_instance):
+        with (
+            patch.dict(os.environ, {"OPENAI_API_KEY": "sk-test"}),
+            patch("openai.OpenAI", return_value=mock_openai_instance),
+        ):
             provider = OpenAIProvider()
             client = provider.create_client()
 
@@ -107,7 +109,10 @@ class TestOpenAIProvider:
         """Passing a model arg overrides the default."""
         mock_openai_instance = MagicMock()
 
-        with patch.dict(os.environ, {"OPENAI_API_KEY": "sk-test"}), patch("openai.OpenAI", return_value=mock_openai_instance):
+        with (
+            patch.dict(os.environ, {"OPENAI_API_KEY": "sk-test"}),
+            patch("openai.OpenAI", return_value=mock_openai_instance),
+        ):
             provider = OpenAIProvider()
             client = provider.create_client(model="gpt-4-turbo")
 
@@ -117,7 +122,10 @@ class TestOpenAIProvider:
         """Constructor default_model is respected."""
         mock_openai_instance = MagicMock()
 
-        with patch.dict(os.environ, {"OPENAI_API_KEY": "sk-test"}), patch("openai.OpenAI", return_value=mock_openai_instance):
+        with (
+            patch.dict(os.environ, {"OPENAI_API_KEY": "sk-test"}),
+            patch("openai.OpenAI", return_value=mock_openai_instance),
+        ):
             provider = OpenAIProvider(default_model="gpt-3.5-turbo")
             client = provider.create_client()
 
@@ -155,7 +163,10 @@ class TestOpenAIProvider:
 
         with patch.dict(os.environ, {"OPENAI_API_KEY": "sk-test"}):
             provider = OpenAIProvider()
-            with patch("builtins.__import__", side_effect=mock_import), pytest.raises(ImportError, match="openai package not installed"):
+            with (
+                patch("builtins.__import__", side_effect=mock_import),
+                pytest.raises(ImportError, match="openai package not installed"),
+            ):
                 provider.create_client()
 
 
@@ -188,7 +199,10 @@ class TestAnthropicProvider:
         fake_module = types.ModuleType("anthropic")
         fake_module.Anthropic = MagicMock(return_value=mock_anthropic_instance)  # type: ignore[attr-defined]
 
-        with patch.dict(os.environ, {"ANTHROPIC_API_KEY": "sk-ant-test"}), patch.dict(sys.modules, {"anthropic": fake_module}):
+        with (
+            patch.dict(os.environ, {"ANTHROPIC_API_KEY": "sk-ant-test"}),
+            patch.dict(sys.modules, {"anthropic": fake_module}),
+        ):
             provider = AnthropicProvider()
             client = provider.create_client()
 
@@ -204,7 +218,10 @@ class TestAnthropicProvider:
         fake_module = types.ModuleType("anthropic")
         fake_module.Anthropic = MagicMock(return_value=mock_anthropic_instance)  # type: ignore[attr-defined]
 
-        with patch.dict(os.environ, {"ANTHROPIC_API_KEY": "sk-ant-test"}), patch.dict(sys.modules, {"anthropic": fake_module}):
+        with (
+            patch.dict(os.environ, {"ANTHROPIC_API_KEY": "sk-ant-test"}),
+            patch.dict(sys.modules, {"anthropic": fake_module}),
+        ):
             provider = AnthropicProvider()
             client = provider.create_client()
 
@@ -219,7 +236,10 @@ class TestAnthropicProvider:
         fake_module = types.ModuleType("anthropic")
         fake_module.Anthropic = MagicMock(return_value=mock_anthropic_instance)  # type: ignore[attr-defined]
 
-        with patch.dict(os.environ, {"ANTHROPIC_API_KEY": "sk-ant-test"}), patch.dict(sys.modules, {"anthropic": fake_module}):
+        with (
+            patch.dict(os.environ, {"ANTHROPIC_API_KEY": "sk-ant-test"}),
+            patch.dict(sys.modules, {"anthropic": fake_module}),
+        ):
             provider = AnthropicProvider()
             client = provider.create_client(model="claude-3-haiku-20240307")
 
@@ -234,7 +254,10 @@ class TestAnthropicProvider:
         fake_module = types.ModuleType("anthropic")
         fake_module.Anthropic = MagicMock(return_value=mock_anthropic_instance)  # type: ignore[attr-defined]
 
-        with patch.dict(os.environ, {"ANTHROPIC_API_KEY": "sk-ant-test"}), patch.dict(sys.modules, {"anthropic": fake_module}):
+        with (
+            patch.dict(os.environ, {"ANTHROPIC_API_KEY": "sk-ant-test"}),
+            patch.dict(sys.modules, {"anthropic": fake_module}),
+        ):
             provider = AnthropicProvider(default_model="claude-3-opus-20240229")
             client = provider.create_client()
 
@@ -268,7 +291,10 @@ class TestAnthropicProvider:
         env_without_key = {
             k: v for k, v in os.environ.items() if k != "ANTHROPIC_API_KEY"
         }
-        with patch.dict(os.environ, env_without_key, clear=True), patch.dict(sys.modules, {"anthropic": fake_module}):
+        with (
+            patch.dict(os.environ, env_without_key, clear=True),
+            patch.dict(sys.modules, {"anthropic": fake_module}),
+        ):
             provider = AnthropicProvider()
             with pytest.raises(ValueError, match="API key not set"):
                 provider.create_client()
@@ -286,7 +312,10 @@ class TestAnthropicProvider:
 
         with patch.dict(os.environ, {"ANTHROPIC_API_KEY": "sk-ant-test"}):
             provider = AnthropicProvider()
-            with patch("builtins.__import__", side_effect=mock_import), pytest.raises(ImportError, match="anthropic package not installed"):
+            with (
+                patch("builtins.__import__", side_effect=mock_import),
+                pytest.raises(ImportError, match="anthropic package not installed"),
+            ):
                 provider.create_client()
 
 
@@ -577,7 +606,10 @@ class TestGetAgentWithDefaultProvider:
 
         mock_client = LLMClient("openai", MagicMock(), "gpt-4o")
 
-        with patch("scripts.agent_registry.create_llm_client", return_value=mock_client), patch.object(AgentRegistry, "_instantiate_tools", return_value=[]):
+        with (
+            patch("scripts.agent_registry.create_llm_client", return_value=mock_client),
+            patch.object(AgentRegistry, "_instantiate_tools", return_value=[]),
+        ):
             registry = _registry(provider=None)
             agents = registry.list_agents()
             assert len(agents) > 0
@@ -591,7 +623,10 @@ class TestGetAgentWithDefaultProvider:
         mock_underlying = MagicMock()
         mock_client = LLMClient("openai", mock_underlying, "gpt-4o")
 
-        with patch("scripts.agent_registry.create_llm_client", return_value=mock_client), patch.object(AgentRegistry, "_instantiate_tools", return_value=[]):
+        with (
+            patch("scripts.agent_registry.create_llm_client", return_value=mock_client),
+            patch.object(AgentRegistry, "_instantiate_tools", return_value=[]),
+        ):
             registry = _registry(provider=None)
             agents = registry.list_agents()
             agent = registry.get_agent(agents[0], model="gpt-4-turbo")
@@ -630,7 +665,11 @@ class TestMainCLI:
         registry = _registry(provider=None)
         first_agent = registry.list_agents()[0]
 
-        with patch.object(sys, "argv", ["agent_registry.py", first_agent]), patch("scripts.agent_registry.create_llm_client", return_value=mock_client), patch.object(AgentRegistry, "_instantiate_tools", return_value=[]):
+        with (
+            patch.object(sys, "argv", ["agent_registry.py", first_agent]),
+            patch("scripts.agent_registry.create_llm_client", return_value=mock_client),
+            patch.object(AgentRegistry, "_instantiate_tools", return_value=[]),
+        ):
             main()
 
         captured = capsys.readouterr()
@@ -642,7 +681,10 @@ class TestMainCLI:
 
         from scripts.agent_registry import main
 
-        with patch.object(sys, "argv", ["agent_registry.py", "no-such-agent-xyz"]), pytest.raises(SystemExit) as exc:
+        with (
+            patch.object(sys, "argv", ["agent_registry.py", "no-such-agent-xyz"]),
+            pytest.raises(SystemExit) as exc,
+        ):
             main()
 
         assert exc.value.code == 1

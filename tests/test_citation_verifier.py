@@ -4,8 +4,6 @@ import sys
 from pathlib import Path
 from typing import Any
 
-import pytest
-
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
 from citation_verifier import (
@@ -13,7 +11,6 @@ from citation_verifier import (
     _stat_appears_in_text,
     verify_citations,
 )
-
 
 # ═══════════════════════════════════════════════════════════════════════════
 # Tests: _normalize()
@@ -50,11 +47,15 @@ class TestStatAppearsInText:
 
     def test_number_with_context_match(self) -> None:
         page = "The survey showed that 72% of teams reported reduced cognitive load."
-        assert _stat_appears_in_text("72% of teams reported reduced cognitive load", page)
+        assert _stat_appears_in_text(
+            "72% of teams reported reduced cognitive load", page
+        )
 
     def test_number_present_but_wrong_context(self) -> None:
         page = "The year 2025 saw 72% growth in cloud spending."
-        assert not _stat_appears_in_text("72% of teams reported reduced cognitive load", page)
+        assert not _stat_appears_in_text(
+            "72% of teams reported reduced cognitive load", page
+        )
 
     def test_number_absent(self) -> None:
         page = "The survey found significant improvements."
@@ -105,9 +106,11 @@ class TestVerifyCitations:
             ],
             "unverified_claims": [],
         }
-        fetch = _mock_fetch({
-            "https://example.com/report": "The report found a 50% reduction in maintenance costs across 200 teams."
-        })
+        fetch = _mock_fetch(
+            {
+                "https://example.com/report": "The report found a 50% reduction in maintenance costs across 200 teams."
+            }
+        )
         result = verify_citations(research, fetch_fn=fetch)
         assert result["data_points"][0]["verified"] is True
         assert result["citation_verification"]["verified"] == 1
@@ -126,9 +129,11 @@ class TestVerifyCitations:
             ],
             "unverified_claims": [],
         }
-        fetch = _mock_fetch({
-            "https://example.com/gartner": "This paper discusses cloud infrastructure trends and cost optimization."
-        })
+        fetch = _mock_fetch(
+            {
+                "https://example.com/gartner": "This paper discusses cloud infrastructure trends and cost optimization."
+            }
+        )
         result = verify_citations(research, fetch_fn=fetch)
         assert result["data_points"][0]["verified"] is False
         assert result["citation_verification"]["failed"] == 1
@@ -138,7 +143,12 @@ class TestVerifyCitations:
         """Data points without a URL are marked unverified."""
         research: dict[str, Any] = {
             "data_points": [
-                {"stat": "60% of teams struggle", "source": "Unknown", "url": "", "verified": True}
+                {
+                    "stat": "60% of teams struggle",
+                    "source": "Unknown",
+                    "url": "",
+                    "verified": True,
+                }
             ],
             "unverified_claims": [],
         }
@@ -150,7 +160,12 @@ class TestVerifyCitations:
         """Network failures don't change the verified flag (benefit of doubt)."""
         research: dict[str, Any] = {
             "data_points": [
-                {"stat": "50% reduction", "source": "Report", "url": "https://down.example.com", "verified": True}
+                {
+                    "stat": "50% reduction",
+                    "source": "Report",
+                    "url": "https://down.example.com",
+                    "verified": True,
+                }
             ],
             "unverified_claims": [],
         }
@@ -171,9 +186,11 @@ class TestVerifyCitations:
             "data_points": [],
             "unverified_claims": [],
         }
-        fetch = _mock_fetch({
-            "https://example.com/headline": "This page discusses vendor management strategies."
-        })
+        fetch = _mock_fetch(
+            {
+                "https://example.com/headline": "This page discusses vendor management strategies."
+            }
+        )
         result = verify_citations(research, fetch_fn=fetch)
         assert result["headline_stat"]["verified"] is False
         assert any("HEADLINE" in c for c in result["unverified_claims"])
@@ -188,16 +205,26 @@ class TestVerifyCitations:
         """Mix of verified, fabricated, and URL-less data points."""
         research: dict[str, Any] = {
             "data_points": [
-                {"stat": "50% reduction", "url": "https://example.com/real", "verified": True},
-                {"stat": "99% adoption", "url": "https://example.com/fake", "verified": True},
+                {
+                    "stat": "50% reduction",
+                    "url": "https://example.com/real",
+                    "verified": True,
+                },
+                {
+                    "stat": "99% adoption",
+                    "url": "https://example.com/fake",
+                    "verified": True,
+                },
                 {"stat": "Unknown stat", "url": "", "verified": True},
             ],
             "unverified_claims": [],
         }
-        fetch = _mock_fetch({
-            "https://example.com/real": "The study found a 50% reduction in costs.",
-            "https://example.com/fake": "This page is about gardening tips.",
-        })
+        fetch = _mock_fetch(
+            {
+                "https://example.com/real": "The study found a 50% reduction in costs.",
+                "https://example.com/fake": "This page is about gardening tips.",
+            }
+        )
         result = verify_citations(research, fetch_fn=fetch)
         assert result["data_points"][0]["verified"] is True
         assert result["data_points"][1]["verified"] is False

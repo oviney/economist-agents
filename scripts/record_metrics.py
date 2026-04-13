@@ -193,9 +193,7 @@ def fetch_all_runs(db_path: Path | None = None) -> list[dict[str, Any]]:
     """
     conn = init_db(db_path)
     try:
-        cursor = conn.execute(
-            "SELECT * FROM pipeline_runs ORDER BY timestamp DESC"
-        )
+        cursor = conn.execute("SELECT * FROM pipeline_runs ORDER BY timestamp DESC")
         return [dict(row) for row in cursor.fetchall()]
     finally:
         conn.close()
@@ -266,37 +264,63 @@ def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Append a pipeline-run row to data/metrics.db",
     )
-    parser.add_argument("--agent", dest="agent_name", default="unknown",
-                        help="Agent name (default: unknown)")
-    parser.add_argument("--topic", default="",
-                        help="Article topic")
-    parser.add_argument("--editorial-score", type=float, default=0.0,
-                        metavar="SCORE",
-                        help="Editorial score 0-100 (default: 0)")
-    parser.add_argument("--gates-passed", type=int, default=0,
-                        metavar="N",
-                        help="Number of gates passed (default: 0)")
-    parser.add_argument("--token-count", type=int, default=0,
-                        metavar="N",
-                        help="Total tokens consumed (default: 0)")
-    parser.add_argument("--cost-usd", type=float, default=0.0,
-                        metavar="COST",
-                        help="Cost in USD (default: 0)")
-    parser.add_argument("--duration-s", type=float, default=0.0,
-                        metavar="SECS",
-                        help="Duration in seconds (default: 0)")
-    parser.add_argument("--status", default="unknown",
-                        choices=sorted(_VALID_STATUSES),
-                        help="Run status (default: unknown)")
-    parser.add_argument("--db-path", default=None,
-                        help="Override DB path (default: data/metrics.db)")
+    parser.add_argument(
+        "--agent",
+        dest="agent_name",
+        default="unknown",
+        help="Agent name (default: unknown)",
+    )
+    parser.add_argument("--topic", default="", help="Article topic")
+    parser.add_argument(
+        "--editorial-score",
+        type=float,
+        default=0.0,
+        metavar="SCORE",
+        help="Editorial score 0-100 (default: 0)",
+    )
+    parser.add_argument(
+        "--gates-passed",
+        type=int,
+        default=0,
+        metavar="N",
+        help="Number of gates passed (default: 0)",
+    )
+    parser.add_argument(
+        "--token-count",
+        type=int,
+        default=0,
+        metavar="N",
+        help="Total tokens consumed (default: 0)",
+    )
+    parser.add_argument(
+        "--cost-usd",
+        type=float,
+        default=0.0,
+        metavar="COST",
+        help="Cost in USD (default: 0)",
+    )
+    parser.add_argument(
+        "--duration-s",
+        type=float,
+        default=0.0,
+        metavar="SECS",
+        help="Duration in seconds (default: 0)",
+    )
+    parser.add_argument(
+        "--status",
+        default="unknown",
+        choices=sorted(_VALID_STATUSES),
+        help="Run status (default: unknown)",
+    )
+    parser.add_argument(
+        "--db-path", default=None, help="Override DB path (default: data/metrics.db)"
+    )
     return parser
 
 
 def main() -> None:
     """CLI entry-point: parse arguments and call :func:`record_run`."""
-    logging.basicConfig(level=logging.INFO,
-                        format="%(levelname)s %(message)s")
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     parser = _build_parser()
     args = parser.parse_args()
 

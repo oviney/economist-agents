@@ -20,9 +20,7 @@ if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 
 import topic_scout  # noqa: E402
-
 from ab_topic_scout_comparison import (  # noqa: E402
-    _EMPTY_CONTEXT,
     _topic_title_set,
     jaccard_similarity,
     qualitative_notes,
@@ -313,30 +311,40 @@ class TestQualitativeNotes:
 
 class TestVerdict:
     def test_real_when_jaccard_low_and_top_ref(self) -> None:
-        notes = ['✅ Run A topic **"X"** references top-performer **"Y"** (keywords: testing)']
+        notes = [
+            '✅ Run A topic **"X"** references top-performer **"Y"** (keywords: testing)'
+        ]
         is_real, text = verdict(0.2, notes)
         assert is_real is True
         assert "VERDICT: Feedback loop is causally real" in text
 
     def test_not_real_when_jaccard_high(self) -> None:
-        notes = ['✅ Run A topic **"X"** references top-performer **"Y"** (keywords: testing)']
+        notes = [
+            '✅ Run A topic **"X"** references top-performer **"Y"** (keywords: testing)'
+        ]
         is_real, text = verdict(0.7, notes)
         assert is_real is False
         assert "NOT confirmed" in text
 
     def test_not_real_when_no_top_ref(self) -> None:
-        notes = ["ℹ️  No Run A topic explicitly matched keywords from the top/bottom performers."]
+        notes = [
+            "ℹ️  No Run A topic explicitly matched keywords from the top/bottom performers."
+        ]
         is_real, text = verdict(0.1, notes)
         assert is_real is False
         assert "NOT confirmed" in text
 
     def test_boundary_jaccard_0_59_is_real(self) -> None:
-        notes = ['✅ Run A topic **"X"** references top-performer **"Y"** (keywords: test)']
+        notes = [
+            '✅ Run A topic **"X"** references top-performer **"Y"** (keywords: test)'
+        ]
         is_real, _ = verdict(0.59, notes)
         assert is_real is True
 
     def test_boundary_jaccard_0_6_not_real(self) -> None:
-        notes = ['✅ Run A topic **"X"** references top-performer **"Y"** (keywords: test)']
+        notes = [
+            '✅ Run A topic **"X"** references top-performer **"Y"** (keywords: test)'
+        ]
         is_real, _ = verdict(0.6, notes)
         assert is_real is False
 
@@ -491,9 +499,18 @@ class TestRunAbPair:
         mock_client = MagicMock()
 
         with (
-            patch("ab_topic_scout_comparison.topic_scout.scout_topics", side_effect=fake_scout_topics),
-            patch("ab_topic_scout_comparison.content_intelligence.get_top_performers", return_value=[]),
-            patch("ab_topic_scout_comparison.content_intelligence.get_bottom_performers", return_value=[]),
+            patch(
+                "ab_topic_scout_comparison.topic_scout.scout_topics",
+                side_effect=fake_scout_topics,
+            ),
+            patch(
+                "ab_topic_scout_comparison.content_intelligence.get_top_performers",
+                return_value=[],
+            ),
+            patch(
+                "ab_topic_scout_comparison.content_intelligence.get_bottom_performers",
+                return_value=[],
+            ),
         ):
             result = run_ab_pair(mock_client, pair_index=1)
 
@@ -528,9 +545,18 @@ class TestRunAbPair:
         mock_client = MagicMock()
 
         with (
-            patch("ab_topic_scout_comparison.topic_scout.scout_topics", return_value=sample_topics),
-            patch("ab_topic_scout_comparison.content_intelligence.get_top_performers", return_value=[]),
-            patch("ab_topic_scout_comparison.content_intelligence.get_bottom_performers", return_value=[]),
+            patch(
+                "ab_topic_scout_comparison.topic_scout.scout_topics",
+                return_value=sample_topics,
+            ),
+            patch(
+                "ab_topic_scout_comparison.content_intelligence.get_top_performers",
+                return_value=[],
+            ),
+            patch(
+                "ab_topic_scout_comparison.content_intelligence.get_bottom_performers",
+                return_value=[],
+            ),
         ):
             result = run_ab_pair(mock_client, pair_index=1)
 

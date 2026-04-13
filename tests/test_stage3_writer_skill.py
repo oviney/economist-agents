@@ -92,7 +92,9 @@ class TestWriterBackstoryNameNames:
 
     def test_backstory_requires_named_companies(self, stage3_source: str) -> None:
         """Backstory must require at least 2 named companies or individuals."""
-        assert "named companies" in stage3_source or "named individuals" in stage3_source
+        assert (
+            "named companies" in stage3_source or "named individuals" in stage3_source
+        )
 
     def test_backstory_bans_generic_attribution(self, stage3_source: str) -> None:
         """Backstory must ban generic attribution like 'organisations', 'experts say'."""

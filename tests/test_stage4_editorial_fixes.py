@@ -116,11 +116,15 @@ class TestHedgingPhrases:
         assert "one might" not in result.lower()
 
     def test_it_would_be_misguided_removed(self) -> None:
-        result = _apply_editorial_fixes("It would be misguided to ignore these findings.")
+        result = _apply_editorial_fixes(
+            "It would be misguided to ignore these findings."
+        )
         assert "it would be misguided" not in result.lower()
 
     def test_in_practical_terms_removed(self) -> None:
-        result = _apply_editorial_fixes("In practical terms, this means faster delivery.")
+        result = _apply_editorial_fixes(
+            "In practical terms, this means faster delivery."
+        )
         assert "in practical terms" not in result.lower()
 
 
@@ -128,7 +132,9 @@ class TestVerbosePadding:
     """Verbose padding removal (SKILL.md Rule 6)."""
 
     def test_it_goes_without_saying_removed(self) -> None:
-        result = _apply_editorial_fixes("It goes without saying that testing is important.")
+        result = _apply_editorial_fixes(
+            "It goes without saying that testing is important."
+        )
         assert "it goes without saying" not in result.lower()
 
     def test_needless_to_say_removed(self) -> None:

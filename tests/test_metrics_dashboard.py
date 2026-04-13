@@ -125,8 +125,9 @@ class TestRecordRun:
     def test_custom_run_id_is_preserved(self, tmp_db: Path) -> None:
         """A caller-supplied run_id is stored verbatim."""
         custom_id = str(uuid.uuid4())
-        returned_id = record_run("editor", "Test Topic",
-                                 run_id=custom_id, db_path=tmp_db)
+        returned_id = record_run(
+            "editor", "Test Topic", run_id=custom_id, db_path=tmp_db
+        )
         assert returned_id == custom_id
         rows = fetch_all_runs(tmp_db)
         assert rows[0]["run_id"] == custom_id
@@ -173,14 +174,14 @@ class TestRecordRun:
     def test_invalid_status_raises(self, tmp_db: Path) -> None:
         """An unrecognised status value raises ValueError."""
         with pytest.raises(ValueError, match="Invalid status"):
-            record_run("researcher", "Bad Status Topic",
-                       status="nonsense", db_path=tmp_db)
+            record_run(
+                "researcher", "Bad Status Topic", status="nonsense", db_path=tmp_db
+            )
 
     def test_valid_statuses(self, tmp_db: Path) -> None:
         """All valid status values are accepted without error."""
         for status in ("published", "revision", "failed", "unknown"):
-            record_run("agent", f"Topic for {status}",
-                       status=status, db_path=tmp_db)
+            record_run("agent", f"Topic for {status}", status=status, db_path=tmp_db)
         rows = fetch_all_runs(tmp_db)
         assert len(rows) == 4
 
@@ -224,10 +225,8 @@ class TestFetchAllRuns:
 
     def test_newest_first_ordering(self, tmp_db: Path) -> None:
         """Rows are ordered newest timestamp first."""
-        record_run("a", "old", timestamp="2025-01-01T00:00:00+00:00",
-                   db_path=tmp_db)
-        record_run("a", "new", timestamp="2026-01-01T00:00:00+00:00",
-                   db_path=tmp_db)
+        record_run("a", "old", timestamp="2025-01-01T00:00:00+00:00", db_path=tmp_db)
+        record_run("a", "new", timestamp="2026-01-01T00:00:00+00:00", db_path=tmp_db)
         rows = fetch_all_runs(tmp_db)
         assert rows[0]["topic"] == "new"
         assert rows[1]["topic"] == "old"
@@ -251,10 +250,18 @@ class TestComputeSummary:
     def test_total_runs(self) -> None:
         """total_runs equals the number of input rows."""
         runs = [
-            {"status": "published", "editorial_score": 80,
-             "cost_usd": 0.01, "duration_s": 10},
-            {"status": "failed", "editorial_score": 40,
-             "cost_usd": 0.02, "duration_s": 20},
+            {
+                "status": "published",
+                "editorial_score": 80,
+                "cost_usd": 0.01,
+                "duration_s": 10,
+            },
+            {
+                "status": "failed",
+                "editorial_score": 40,
+                "cost_usd": 0.02,
+                "duration_s": 20,
+            },
         ]
         s = compute_summary(runs)
         assert s["total_runs"] == 2
@@ -262,14 +269,30 @@ class TestComputeSummary:
     def test_status_counts(self) -> None:
         """Published / revision / failed counts are correct."""
         runs = [
-            {"status": "published", "editorial_score": 90,
-             "cost_usd": 0.01, "duration_s": 5},
-            {"status": "published", "editorial_score": 85,
-             "cost_usd": 0.02, "duration_s": 6},
-            {"status": "revision", "editorial_score": 60,
-             "cost_usd": 0.01, "duration_s": 8},
-            {"status": "failed", "editorial_score": 20,
-             "cost_usd": 0.005, "duration_s": 3},
+            {
+                "status": "published",
+                "editorial_score": 90,
+                "cost_usd": 0.01,
+                "duration_s": 5,
+            },
+            {
+                "status": "published",
+                "editorial_score": 85,
+                "cost_usd": 0.02,
+                "duration_s": 6,
+            },
+            {
+                "status": "revision",
+                "editorial_score": 60,
+                "cost_usd": 0.01,
+                "duration_s": 8,
+            },
+            {
+                "status": "failed",
+                "editorial_score": 20,
+                "cost_usd": 0.005,
+                "duration_s": 3,
+            },
         ]
         s = compute_summary(runs)
         assert s["published_count"] == 2
@@ -279,14 +302,30 @@ class TestComputeSummary:
     def test_success_rate_calculation(self) -> None:
         """success_rate_pct = published / total × 100."""
         runs = [
-            {"status": "published", "editorial_score": 80,
-             "cost_usd": 0.01, "duration_s": 10},
-            {"status": "failed", "editorial_score": 30,
-             "cost_usd": 0.01, "duration_s": 5},
-            {"status": "failed", "editorial_score": 20,
-             "cost_usd": 0.01, "duration_s": 4},
-            {"status": "failed", "editorial_score": 15,
-             "cost_usd": 0.01, "duration_s": 3},
+            {
+                "status": "published",
+                "editorial_score": 80,
+                "cost_usd": 0.01,
+                "duration_s": 10,
+            },
+            {
+                "status": "failed",
+                "editorial_score": 30,
+                "cost_usd": 0.01,
+                "duration_s": 5,
+            },
+            {
+                "status": "failed",
+                "editorial_score": 20,
+                "cost_usd": 0.01,
+                "duration_s": 4,
+            },
+            {
+                "status": "failed",
+                "editorial_score": 15,
+                "cost_usd": 0.01,
+                "duration_s": 3,
+            },
         ]
         s = compute_summary(runs)
         assert s["success_rate_pct"] == pytest.approx(25.0)
@@ -294,10 +333,18 @@ class TestComputeSummary:
     def test_avg_editorial_score(self) -> None:
         """avg_editorial_score is the arithmetic mean."""
         runs = [
-            {"status": "published", "editorial_score": 80,
-             "cost_usd": 0.01, "duration_s": 10},
-            {"status": "published", "editorial_score": 60,
-             "cost_usd": 0.01, "duration_s": 10},
+            {
+                "status": "published",
+                "editorial_score": 80,
+                "cost_usd": 0.01,
+                "duration_s": 10,
+            },
+            {
+                "status": "published",
+                "editorial_score": 60,
+                "cost_usd": 0.01,
+                "duration_s": 10,
+            },
         ]
         s = compute_summary(runs)
         assert s["avg_editorial_score"] == pytest.approx(70.0)
@@ -305,10 +352,18 @@ class TestComputeSummary:
     def test_total_cost(self) -> None:
         """total_cost_usd sums all cost_usd values."""
         runs = [
-            {"status": "published", "editorial_score": 70,
-             "cost_usd": 0.10, "duration_s": 10},
-            {"status": "published", "editorial_score": 80,
-             "cost_usd": 0.20, "duration_s": 15},
+            {
+                "status": "published",
+                "editorial_score": 70,
+                "cost_usd": 0.10,
+                "duration_s": 10,
+            },
+            {
+                "status": "published",
+                "editorial_score": 80,
+                "cost_usd": 0.20,
+                "duration_s": 15,
+            },
         ]
         s = compute_summary(runs)
         assert s["total_cost_usd"] == pytest.approx(0.30)
@@ -316,10 +371,18 @@ class TestComputeSummary:
     def test_avg_cost(self) -> None:
         """avg_cost_usd is total / count."""
         runs = [
-            {"status": "published", "editorial_score": 70,
-             "cost_usd": 0.10, "duration_s": 10},
-            {"status": "published", "editorial_score": 80,
-             "cost_usd": 0.20, "duration_s": 15},
+            {
+                "status": "published",
+                "editorial_score": 70,
+                "cost_usd": 0.10,
+                "duration_s": 10,
+            },
+            {
+                "status": "published",
+                "editorial_score": 80,
+                "cost_usd": 0.20,
+                "duration_s": 15,
+            },
         ]
         s = compute_summary(runs)
         assert s["avg_cost_usd"] == pytest.approx(0.15)
@@ -327,10 +390,18 @@ class TestComputeSummary:
     def test_avg_duration(self) -> None:
         """avg_duration_s is the arithmetic mean of duration_s."""
         runs = [
-            {"status": "published", "editorial_score": 70,
-             "cost_usd": 0.01, "duration_s": 10},
-            {"status": "published", "editorial_score": 80,
-             "cost_usd": 0.01, "duration_s": 30},
+            {
+                "status": "published",
+                "editorial_score": 70,
+                "cost_usd": 0.01,
+                "duration_s": 10,
+            },
+            {
+                "status": "published",
+                "editorial_score": 80,
+                "cost_usd": 0.01,
+                "duration_s": 30,
+            },
         ]
         s = compute_summary(runs)
         assert s["avg_duration_s"] == pytest.approx(20.0)
@@ -338,8 +409,12 @@ class TestComputeSummary:
     def test_all_published_100_percent_success(self) -> None:
         """If every run is published, success rate is 100%."""
         runs = [
-            {"status": "published", "editorial_score": 90,
-             "cost_usd": 0.01, "duration_s": 10}
+            {
+                "status": "published",
+                "editorial_score": 90,
+                "cost_usd": 0.01,
+                "duration_s": 10,
+            }
             for _ in range(3)
         ]
         s = compute_summary(runs)
@@ -358,21 +433,39 @@ class TestEndToEnd:
 
     def test_round_trip(self, tmp_db: Path) -> None:
         """Data recorded survives fetch and summary unchanged."""
-        record_run("researcher", "Alpha",
-                   editorial_score=85, gates_passed=5,
-                   token_count=10000, cost_usd=0.03,
-                   duration_s=50, status="published",
-                   db_path=tmp_db)
-        record_run("writer", "Beta",
-                   editorial_score=55, gates_passed=2,
-                   token_count=8000, cost_usd=0.024,
-                   duration_s=40, status="revision",
-                   db_path=tmp_db)
-        record_run("editor", "Gamma",
-                   editorial_score=20, gates_passed=1,
-                   token_count=5000, cost_usd=0.015,
-                   duration_s=30, status="failed",
-                   db_path=tmp_db)
+        record_run(
+            "researcher",
+            "Alpha",
+            editorial_score=85,
+            gates_passed=5,
+            token_count=10000,
+            cost_usd=0.03,
+            duration_s=50,
+            status="published",
+            db_path=tmp_db,
+        )
+        record_run(
+            "writer",
+            "Beta",
+            editorial_score=55,
+            gates_passed=2,
+            token_count=8000,
+            cost_usd=0.024,
+            duration_s=40,
+            status="revision",
+            db_path=tmp_db,
+        )
+        record_run(
+            "editor",
+            "Gamma",
+            editorial_score=20,
+            gates_passed=1,
+            token_count=5000,
+            cost_usd=0.015,
+            duration_s=30,
+            status="failed",
+            db_path=tmp_db,
+        )
 
         rows = fetch_all_runs(tmp_db)
         assert len(rows) == 3
@@ -383,5 +476,7 @@ class TestEndToEnd:
         assert summary["revision_count"] == 1
         assert summary["failed_count"] == 1
         assert summary["success_rate_pct"] == pytest.approx(100 / 3, rel=0.01)
-        assert summary["avg_editorial_score"] == pytest.approx((85 + 55 + 20) / 3, abs=0.01)
+        assert summary["avg_editorial_score"] == pytest.approx(
+            (85 + 55 + 20) / 3, abs=0.01
+        )
         assert summary["total_cost_usd"] == pytest.approx(0.03 + 0.024 + 0.015)

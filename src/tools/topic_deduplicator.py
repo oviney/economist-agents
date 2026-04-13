@@ -31,8 +31,8 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 # Similarity thresholds (spec from issue #157)
-REJECT_THRESHOLD = 0.8   # cosine similarity above this → reject
-WARN_THRESHOLD = 0.6     # cosine similarity above this (but ≤ REJECT) → warn
+REJECT_THRESHOLD = 0.8  # cosine similarity above this → reject
+WARN_THRESHOLD = 0.6  # cosine similarity above this (but ≤ REJECT) → warn
 
 # Minimum topics to retain after filtering (fallback: lower threshold if all dropped)
 MIN_TOPICS_AFTER_FILTER = 1
@@ -99,7 +99,9 @@ class TopicDeduplicator:
         self.collection: Any = None
 
         if not CHROMADB_AVAILABLE:
-            logger.warning("ChromaDB unavailable — TopicDeduplicator in pass-through mode")
+            logger.warning(
+                "ChromaDB unavailable — TopicDeduplicator in pass-through mode"
+            )
             return
 
         try:
@@ -112,7 +114,9 @@ class TopicDeduplicator:
             )
             self.collection = self.client.get_or_create_collection(
                 name=collection_name,
-                metadata={"description": "Published article titles and summaries for deduplication"},
+                metadata={
+                    "description": "Published article titles and summaries for deduplication"
+                },
             )
             logger.info(
                 "TopicDeduplicator ready — %d articles in archive",
@@ -187,7 +191,13 @@ class TopicDeduplicator:
                     self.reject_threshold,
                     matched_title,
                 )
-                rejected.append({**topic_dict, "dedup_similarity": similarity, "dedup_matched": matched_title})
+                rejected.append(
+                    {
+                        **topic_dict,
+                        "dedup_similarity": similarity,
+                        "dedup_matched": matched_title,
+                    }
+                )
             elif similarity > self.warn_threshold:
                 logger.warning(
                     "⚠️  DEDUP WARN: '%s' (similarity=%.2f, related to '%s') — passed to editorial with flag",
@@ -219,7 +229,9 @@ class TopicDeduplicator:
 
         return kept, rejected
 
-    def index_article(self, title: str, content: str, article_id: str | None = None) -> bool:
+    def index_article(
+        self, title: str, content: str, article_id: str | None = None
+    ) -> bool:
         """
         Index a newly published article in the archive collection.
 
@@ -235,7 +247,9 @@ class TopicDeduplicator:
             True if indexing succeeded, False on error.
         """
         if self.collection is None:
-            logger.warning("TopicDeduplicator: cannot index article — ChromaDB unavailable")
+            logger.warning(
+                "TopicDeduplicator: cannot index article — ChromaDB unavailable"
+            )
             return False
 
         try:
@@ -328,7 +342,11 @@ class TopicDeduplicator:
             best.get("topic", "unknown"),
             best.get("dedup_similarity", 0.0),
         )
-        rescued = {k: v for k, v in best.items() if k not in ("dedup_similarity", "dedup_matched")}
+        rescued = {
+            k: v
+            for k, v in best.items()
+            if k not in ("dedup_similarity", "dedup_matched")
+        }
         rescued["dedup_warning"] = (
             f"Rescued from rejection (all topics filtered); "
             f"original similarity={best.get('dedup_similarity', 0):.2f}"

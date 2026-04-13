@@ -29,13 +29,9 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from agent_loader import load_scout_prompts as _load_scout_prompts  # noqa: E402
+from topic_trend_grounding import build_grounded_trend_context  # noqa: E402
 
 from src.tools.topic_deduplicator import TopicDeduplicator  # noqa: E402
-
-logger = logging.getLogger(__name__)
-
-# Trend grounding: live web search replaces plain LLM trend research.
-from topic_trend_grounding import build_grounded_trend_context
 
 logger = logging.getLogger(__name__)
 

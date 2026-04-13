@@ -75,7 +75,9 @@ def _load_schema() -> dict[str, Any] | None:
         import jsonschema  # noqa: F401 — just checking availability
 
         if not SCHEMA_PATH.exists():
-            logger.warning("Schema file not found at %s — skipping validation", SCHEMA_PATH)
+            logger.warning(
+                "Schema file not found at %s — skipping validation", SCHEMA_PATH
+            )
             return None
 
         with SCHEMA_PATH.open() as f:
@@ -137,9 +139,7 @@ def load_agent(yaml_path: Path | str) -> AgentConfig:
     required = ("name", "role", "goal", "backstory", "system_message")
     missing = [k for k in required if not data.get(k)]
     if missing:
-        raise ValueError(
-            f"Agent config '{path}' is missing required fields: {missing}"
-        )
+        raise ValueError(f"Agent config '{path}' is missing required fields: {missing}")
 
     _validate_against_schema(data, path)
 
@@ -207,9 +207,7 @@ def load_scout_prompts() -> dict[str, str]:
     yaml_path = AGENTS_DIR / "discovery" / "topic_scout.yaml"
 
     if not yaml_path.exists():
-        raise FileNotFoundError(
-            f"Topic scout YAML not found: {yaml_path}"
-        )
+        raise FileNotFoundError(f"Topic scout YAML not found: {yaml_path}")
 
     with yaml_path.open() as f:
         data: dict[str, Any] = yaml.safe_load(f) or {}
@@ -242,8 +240,7 @@ def load_content_agent(agent_name: str) -> AgentConfig:
     valid_names = ("researcher", "writer", "editor", "graphics")
     if agent_name not in valid_names:
         raise ValueError(
-            f"Unknown content agent '{agent_name}'. "
-            f"Valid names: {valid_names}"
+            f"Unknown content agent '{agent_name}'. Valid names: {valid_names}"
         )
 
     yaml_path = AGENTS_DIR / "content_generation" / f"{agent_name}.yaml"

@@ -86,9 +86,7 @@ class GoogleSearcher:
         """
         self.api_key = api_key or os.environ.get("SERPER_API_KEY", "")
         self.current_year = current_year or datetime.now().year
-        logger.info(
-            "GoogleSearcher initialised (current_year=%d)", self.current_year
-        )
+        logger.info("GoogleSearcher initialised (current_year=%d)", self.current_year)
 
     # ------------------------------------------------------------------
     # Public methods
@@ -334,9 +332,7 @@ def search_google_for_topic(
         }
 
     except Exception as exc:  # noqa: BLE001
-        logger.error(
-            "Google search failed for topic '%s': %s", topic, exc
-        )
+        logger.error("Google search failed for topic '%s': %s", topic, exc)
         return {
             "success": False,
             "topic": topic,

@@ -124,8 +124,7 @@ class OpenAIProvider:
 
         if not self.api_key:
             raise ValueError(
-                "OpenAI API key not set. "
-                "Pass api_key or export OPENAI_API_KEY."
+                "OpenAI API key not set. Pass api_key or export OPENAI_API_KEY."
             )
 
         resolved_model = model or self.default_model
@@ -188,8 +187,7 @@ class AnthropicProvider:
 
         if not self.api_key:
             raise ValueError(
-                "Anthropic API key not set. "
-                "Pass api_key or export ANTHROPIC_API_KEY."
+                "Anthropic API key not set. Pass api_key or export ANTHROPIC_API_KEY."
             )
 
         resolved_model = model or self.default_model
@@ -423,8 +421,12 @@ class AgentRegistry:
                     directory=str(src_dir),  # Limit to src/ directory only
                     chunk_size=500,  # Smaller chunks to prevent token limit issues
                 ),  # Map file_search to directory_search
-                "bash": lambda: CodeInterpreterTool(),  # Map bash commands to code interpreter
-                "pytest": lambda: CodeInterpreterTool(),  # Map pytest to code interpreter
+                "bash": lambda: (
+                    CodeInterpreterTool()
+                ),  # Map bash commands to code interpreter
+                "pytest": lambda: (
+                    CodeInterpreterTool()
+                ),  # Map pytest to code interpreter
                 "txt_search": lambda: TXTSearchTool(),
                 # GitHub tools using existing integrations
                 "github_search": lambda: GithubSearchTool(),

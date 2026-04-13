@@ -3,12 +3,11 @@
 
 import json
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
 import scripts.blog_quality_audit as audit
-
 
 # ── Fixtures ──────────────────────────────────────────────────────────────────
 
@@ -62,20 +61,37 @@ Studies show this is important. [NEEDS SOURCE]
 """
 
 MOCK_POSTS = [
-    {"filename": "2026-04-01-good-post.md", "path": "_posts/2026-04-01-good-post.md", "content": GOOD_POST_CONTENT},
-    {"filename": "2026-04-01-bad-post.md", "path": "_posts/2026-04-01-bad-post.md", "content": BAD_POST_CONTENT},
+    {
+        "filename": "2026-04-01-good-post.md",
+        "path": "_posts/2026-04-01-good-post.md",
+        "content": GOOD_POST_CONTENT,
+    },
+    {
+        "filename": "2026-04-01-bad-post.md",
+        "path": "_posts/2026-04-01-bad-post.md",
+        "content": BAD_POST_CONTENT,
+    },
 ]
 
 
 # ── fetch_posts ───────────────────────────────────────────────────────────────
+
 
 class TestFetchPosts:
     def test_filters_non_markdown_files(self) -> None:
         import base64
 
         contents_response = [
-            {"name": "2026-04-01-post.md", "path": "_posts/2026-04-01-post.md", "url": "https://api.github.com/repos/oviney/blog/contents/_posts/2026-04-01-post.md"},
-            {"name": "README.txt", "path": "_posts/README.txt", "url": "https://api.github.com/repos/oviney/blog/contents/_posts/README.txt"},
+            {
+                "name": "2026-04-01-post.md",
+                "path": "_posts/2026-04-01-post.md",
+                "url": "https://api.github.com/repos/oviney/blog/contents/_posts/2026-04-01-post.md",
+            },
+            {
+                "name": "README.txt",
+                "path": "_posts/README.txt",
+                "url": "https://api.github.com/repos/oviney/blog/contents/_posts/README.txt",
+            },
         ]
         file_response = {
             "content": base64.b64encode(GOOD_POST_CONTENT.encode()).decode() + "\n"
@@ -98,17 +114,24 @@ class TestFetchPosts:
 
         raw = "# Hello\nThis is a post."
         contents_response = [
-            {"name": "2026-04-01-post.md", "path": "_posts/2026-04-01-post.md", "url": "https://example.com/file"},
+            {
+                "name": "2026-04-01-post.md",
+                "path": "_posts/2026-04-01-post.md",
+                "url": "https://example.com/file",
+            },
         ]
         file_response = {"content": base64.b64encode(raw.encode()).decode() + "\n"}
 
-        with patch.object(audit, "_gh_get", side_effect=[contents_response, file_response]):
+        with patch.object(
+            audit, "_gh_get", side_effect=[contents_response, file_response]
+        ):
             posts = audit.fetch_posts()
 
         assert posts[0]["content"] == raw
 
 
 # ── existing_issue_title ──────────────────────────────────────────────────────
+
 
 class TestExistingIssueTitle:
     def test_returns_true_when_issue_exists(self) -> None:
@@ -131,6 +154,7 @@ class TestExistingIssueTitle:
 
 # ── recommendations ───────────────────────────────────────────────────────────
 
+
 class TestRecommendations:
     def test_low_opening_quality_recommendation(self) -> None:
         from scripts.article_evaluator import ArticleEvaluator
@@ -144,7 +168,12 @@ class TestRecommendations:
 
         result = ArticleEvaluator().evaluate(BAD_POST_CONTENT, filename="bad.md")
         recs = audit._recommendations(result)
-        assert "Evidence" in recs or "References" in recs or "recommendations" in recs.lower() or "required" in recs.lower()
+        assert (
+            "Evidence" in recs
+            or "References" in recs
+            or "recommendations" in recs.lower()
+            or "required" in recs.lower()
+        )
 
     def test_good_article_no_recommendations_needed(self) -> None:
         from scripts.article_evaluator import ArticleEvaluator
@@ -156,6 +185,7 @@ class TestRecommendations:
 
 
 # ── run_audit (dry run) ───────────────────────────────────────────────────────
+
 
 class TestRunAuditDryRun:
     def test_dry_run_writes_audit_log(self, tmp_path: Path, monkeypatch) -> None:
@@ -173,7 +203,11 @@ class TestRunAuditDryRun:
         monkeypatch.setattr(audit, "ensure_label", lambda: None)
 
         issue_calls: list = []
-        monkeypatch.setattr(audit, "create_issue", lambda *a, **kw: issue_calls.append(a) or "http://example.com")
+        monkeypatch.setattr(
+            audit,
+            "create_issue",
+            lambda *a, **kw: issue_calls.append(a) or "http://example.com",
+        )
 
         audit.run_audit(dry_run=True)
 
@@ -197,15 +231,24 @@ class TestRunAuditDryRun:
 
 # ── run_audit (live, mocked) ──────────────────────────────────────────────────
 
+
 class TestRunAuditLive:
-    def test_creates_issue_for_low_scoring_post(self, tmp_path: Path, monkeypatch) -> None:
+    def test_creates_issue_for_low_scoring_post(
+        self, tmp_path: Path, monkeypatch
+    ) -> None:
         monkeypatch.setattr(audit, "AUDIT_LOG", tmp_path / "blog_audit.json")
-        monkeypatch.setattr(audit, "fetch_posts", lambda: [MOCK_POSTS[1]])  # bad post only
+        monkeypatch.setattr(
+            audit, "fetch_posts", lambda: [MOCK_POSTS[1]]
+        )  # bad post only
         monkeypatch.setattr(audit, "ensure_label", lambda: None)
         monkeypatch.setattr(audit, "existing_issue_title", lambda t: False)
 
         created: list = []
-        monkeypatch.setattr(audit, "create_issue", lambda title, fn, res: created.append(title) or "http://example.com/1")
+        monkeypatch.setattr(
+            audit,
+            "create_issue",
+            lambda title, fn, res: created.append(title) or "http://example.com/1",
+        )
 
         audit.run_audit(dry_run=False)
 
@@ -215,10 +258,14 @@ class TestRunAuditLive:
         monkeypatch.setattr(audit, "AUDIT_LOG", tmp_path / "blog_audit.json")
         monkeypatch.setattr(audit, "fetch_posts", lambda: [MOCK_POSTS[1]])
         monkeypatch.setattr(audit, "ensure_label", lambda: None)
-        monkeypatch.setattr(audit, "existing_issue_title", lambda t: True)  # already exists
+        monkeypatch.setattr(
+            audit, "existing_issue_title", lambda t: True
+        )  # already exists
 
         created: list = []
-        monkeypatch.setattr(audit, "create_issue", lambda *a, **kw: created.append(a) or "http://x")
+        monkeypatch.setattr(
+            audit, "create_issue", lambda *a, **kw: created.append(a) or "http://x"
+        )
 
         audit.run_audit(dry_run=False)
 
@@ -231,7 +278,9 @@ class TestRunAuditLive:
         monkeypatch.setattr(audit, "existing_issue_title", lambda t: False)
 
         created: list = []
-        monkeypatch.setattr(audit, "create_issue", lambda *a, **kw: created.append(a) or "http://x")
+        monkeypatch.setattr(
+            audit, "create_issue", lambda *a, **kw: created.append(a) or "http://x"
+        )
 
         audit.run_audit(dry_run=False)
 

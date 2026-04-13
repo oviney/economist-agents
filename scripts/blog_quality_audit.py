@@ -20,7 +20,7 @@ import base64
 import logging
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import orjson
@@ -48,7 +48,10 @@ QUALITY_LABEL = "quality-audit"
 
 def _gh_headers() -> dict[str, str]:
     token = os.environ.get("GH_TOKEN", "")
-    headers = {"Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"}
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
     if token:
         headers["Authorization"] = f"Bearer {token}"
     return headers
@@ -85,7 +88,11 @@ def ensure_label() -> None:
     if resp.status_code == 200:
         return
 
-    payload = {"name": QUALITY_LABEL, "color": "e11d48", "description": "Post flagged by weekly quality audit"}
+    payload = {
+        "name": QUALITY_LABEL,
+        "color": "e11d48",
+        "description": "Post flagged by weekly quality audit",
+    }
     create_resp = requests.post(
         f"https://api.github.com/repos/{BLOG_REPO}/labels",
         headers=_gh_headers(),
@@ -123,10 +130,9 @@ def create_issue(post_title: str, filename: str, result) -> str:
         f"**Post**: `{filename}`  \n"
         f"**Score**: {result.percentage}% ({result.total_score}/{result.max_score})  \n"
         f"**Threshold**: {QUALITY_THRESHOLD}%  \n"
-        f"**Audited**: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}\n\n"
+        f"**Audited**: {datetime.now(UTC).strftime('%Y-%m-%d %H:%M UTC')}\n\n"
         f"### Dimension Scores\n\n{dimensions}\n\n"
-        f"### Recommendations\n\n"
-        + _recommendations(result)
+        f"### Recommendations\n\n" + _recommendations(result)
     )
 
     payload = {
@@ -147,16 +153,30 @@ def create_issue(post_title: str, filename: str, result) -> str:
 def _recommendations(result) -> str:
     recs = []
     if result.scores.get("opening_quality", 10) < 7:
-        recs.append("- **Opening**: Lead with a specific data point (e.g. '73% of organisations…'). Avoid banned openings like 'In today's world'.")
+        recs.append(
+            "- **Opening**: Lead with a specific data point (e.g. '73% of organisations…'). Avoid banned openings like 'In today's world'."
+        )
     if result.scores.get("evidence_sourcing", 10) < 7:
-        recs.append("- **Evidence**: Add a `## References` section with ≥5 numbered citations. Remove `[NEEDS SOURCE]` placeholders.")
+        recs.append(
+            "- **Evidence**: Add a `## References` section with ≥5 numbered citations. Remove `[NEEDS SOURCE]` placeholders."
+        )
     if result.scores.get("voice_consistency", 10) < 7:
-        recs.append("- **Voice**: Replace American spellings with British equivalents (organisation, behaviour). Remove clichés like 'game-changer' and 'paradigm shift'.")
+        recs.append(
+            "- **Voice**: Replace American spellings with British equivalents (organisation, behaviour). Remove clichés like 'game-changer' and 'paradigm shift'."
+        )
     if result.scores.get("structure", 10) < 7:
-        recs.append("- **Structure**: Ensure front matter includes `layout`, `title`, `date`, `categories`, and `image`. Keep 2–5 `##` headings; aim for 600–1500 words.")
+        recs.append(
+            "- **Structure**: Ensure front matter includes `layout`, `title`, `date`, `categories`, and `image`. Keep 2–5 `##` headings; aim for 600–1500 words."
+        )
     if result.scores.get("visual_engagement", 10) < 7:
-        recs.append("- **Visuals**: Add a featured `image:` in front matter. Embed at least one chart with a reference ('As the chart shows…').")
-    return "\n".join(recs) if recs else "- General improvement required across multiple dimensions."
+        recs.append(
+            "- **Visuals**: Add a featured `image:` in front matter. Embed at least one chart with a reference ('As the chart shows…')."
+        )
+    return (
+        "\n".join(recs)
+        if recs
+        else "- General improvement required across multiple dimensions."
+    )
 
 
 # ── Audit logic ───────────────────────────────────────────────────────────────
@@ -196,7 +216,11 @@ def run_audit(dry_run: bool = False) -> None:
             post_title = fm.get("title", post["filename"])
 
             if dry_run:
-                logger.info("[DRY RUN] Would create issue for '%s' (%d%%)", post_title, eval_result.percentage)
+                logger.info(
+                    "[DRY RUN] Would create issue for '%s' (%d%%)",
+                    post_title,
+                    eval_result.percentage,
+                )
             elif existing_issue_title(post_title):
                 logger.info("Issue already exists for '%s' — skipping.", post_title)
             else:
@@ -209,12 +233,14 @@ def run_audit(dry_run: bool = False) -> None:
         results.append(entry)
 
     summary = {
-        "audit_timestamp": datetime.now(timezone.utc).isoformat(),
+        "audit_timestamp": datetime.now(UTC).isoformat(),
         "blog_repo": BLOG_REPO,
         "threshold_percent": QUALITY_THRESHOLD,
         "dry_run": dry_run,
         "total_posts": len(posts),
-        "posts_below_threshold": sum(1 for r in results if r["percentage"] < QUALITY_THRESHOLD),
+        "posts_below_threshold": sum(
+            1 for r in results if r["percentage"] < QUALITY_THRESHOLD
+        ),
         "issues_created": issues_created,
         "results": results,
     }

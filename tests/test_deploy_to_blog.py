@@ -9,10 +9,11 @@ Covers:
 - Validation report included in PR body
 """
 
+import contextlib
 import re
 from datetime import datetime
-from pathlib import Path as RealPath
 from pathlib import Path
+from pathlib import Path as RealPath
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -144,24 +145,30 @@ class TestDeployToBlogMain:
         blog_dir = _setup_blog_dir(tmp_path)
         captured: dict = {}
 
-        def fake_validate(file_path: str, expected_date: str | None = None) -> tuple[bool, str]:
+        def fake_validate(
+            file_path: str, expected_date: str | None = None
+        ) -> tuple[bool, str]:
             captured["expected_date"] = expected_date
             return True, "✅ All checks passed"
 
         with (
             patch.object(dtb, "run_command", return_value=""),
             patch("scripts.deploy_to_blog.validate_file", side_effect=fake_validate),
-            patch("argparse.ArgumentParser.parse_args", return_value=_fake_args(tmp_path, stale_article_file)),
+            patch(
+                "argparse.ArgumentParser.parse_args",
+                return_value=_fake_args(tmp_path, stale_article_file),
+            ),
             patch("sys.exit"),
             patch.object(
-                dtb, "Path",
-                side_effect=lambda *a, **kw: blog_dir if a == ("temp_blog_repo",) else RealPath(*a, **kw),
+                dtb,
+                "Path",
+                side_effect=lambda *a, **kw: (
+                    blog_dir if a == ("temp_blog_repo",) else RealPath(*a, **kw)
+                ),
             ),
+            contextlib.suppress(SystemExit, Exception),
         ):
-            try:
-                dtb.main()
-            except (SystemExit, Exception):
-                pass
+            dtb.main()
 
         assert "expected_date" in captured, "validate_file was never called"
         assert captured["expected_date"] == today
@@ -175,27 +182,31 @@ class TestDeployToBlogMain:
         blog_dir = _setup_blog_dir(tmp_path)
         captured: dict = {}
 
-        def fake_validate(file_path: str, expected_date: str | None = None) -> tuple[bool, str]:
-            try:
+        def fake_validate(
+            file_path: str, expected_date: str | None = None
+        ) -> tuple[bool, str]:
+            with contextlib.suppress(FileNotFoundError):
                 captured["content"] = RealPath(file_path).read_text()
-            except FileNotFoundError:
-                pass
             return True, "✅ All checks passed"
 
         with (
             patch.object(dtb, "run_command", return_value=""),
             patch("scripts.deploy_to_blog.validate_file", side_effect=fake_validate),
-            patch("argparse.ArgumentParser.parse_args", return_value=_fake_args(tmp_path, stale_article_file)),
+            patch(
+                "argparse.ArgumentParser.parse_args",
+                return_value=_fake_args(tmp_path, stale_article_file),
+            ),
             patch("sys.exit"),
             patch.object(
-                dtb, "Path",
-                side_effect=lambda *a, **kw: blog_dir if a == ("temp_blog_repo",) else RealPath(*a, **kw),
+                dtb,
+                "Path",
+                side_effect=lambda *a, **kw: (
+                    blog_dir if a == ("temp_blog_repo",) else RealPath(*a, **kw)
+                ),
             ),
+            contextlib.suppress(SystemExit, Exception),
         ):
-            try:
-                dtb.main()
-            except (SystemExit, Exception):
-                pass
+            dtb.main()
 
         assert "content" in captured, "validate_file was not given a readable file"
         assert f"date: {today}" in captured["content"], (
@@ -216,16 +227,25 @@ class TestDeployToBlogMain:
 
         with (
             patch.object(dtb, "run_command", return_value=""),
-            patch("scripts.deploy_to_blog.validate_file", return_value=(False, "❌ date_mismatch")),
-            patch("argparse.ArgumentParser.parse_args", return_value=_fake_args(tmp_path, stale_article_file)),
+            patch(
+                "scripts.deploy_to_blog.validate_file",
+                return_value=(False, "❌ date_mismatch"),
+            ),
+            patch(
+                "argparse.ArgumentParser.parse_args",
+                return_value=_fake_args(tmp_path, stale_article_file),
+            ),
             patch("sys.exit", side_effect=fake_exit),
             patch.object(
-                dtb, "Path",
-                side_effect=lambda *a, **kw: blog_dir if a == ("temp_blog_repo",) else RealPath(*a, **kw),
+                dtb,
+                "Path",
+                side_effect=lambda *a, **kw: (
+                    blog_dir if a == ("temp_blog_repo",) else RealPath(*a, **kw)
+                ),
             ),
+            pytest.raises(SystemExit),
         ):
-            with pytest.raises(SystemExit):
-                dtb.main()
+            dtb.main()
 
         assert 1 in exit_codes, "Expected sys.exit(1) on validation failure"
 
@@ -244,16 +264,25 @@ class TestDeployToBlogMain:
 
         with (
             patch.object(dtb, "run_command", side_effect=fake_run_command),
-            patch("scripts.deploy_to_blog.validate_file", return_value=(False, "❌ date_mismatch")),
-            patch("argparse.ArgumentParser.parse_args", return_value=_fake_args(tmp_path, stale_article_file)),
+            patch(
+                "scripts.deploy_to_blog.validate_file",
+                return_value=(False, "❌ date_mismatch"),
+            ),
+            patch(
+                "argparse.ArgumentParser.parse_args",
+                return_value=_fake_args(tmp_path, stale_article_file),
+            ),
             patch("sys.exit", side_effect=SystemExit),
             patch.object(
-                dtb, "Path",
-                side_effect=lambda *a, **kw: blog_dir if a == ("temp_blog_repo",) else RealPath(*a, **kw),
+                dtb,
+                "Path",
+                side_effect=lambda *a, **kw: (
+                    blog_dir if a == ("temp_blog_repo",) else RealPath(*a, **kw)
+                ),
             ),
+            pytest.raises(SystemExit),
         ):
-            with pytest.raises(SystemExit):
-                dtb.main()
+            dtb.main()
 
         assert pr_commands == [], "gh pr create must not run when validation fails"
 
@@ -273,18 +302,25 @@ class TestDeployToBlogMain:
 
         with (
             patch.object(dtb, "run_command", side_effect=fake_run_command),
-            patch("scripts.deploy_to_blog.validate_file", return_value=(True, validation_report)),
-            patch("argparse.ArgumentParser.parse_args", return_value=_fake_args(tmp_path, stale_article_file)),
+            patch(
+                "scripts.deploy_to_blog.validate_file",
+                return_value=(True, validation_report),
+            ),
+            patch(
+                "argparse.ArgumentParser.parse_args",
+                return_value=_fake_args(tmp_path, stale_article_file),
+            ),
             patch("sys.exit"),
             patch.object(
-                dtb, "Path",
-                side_effect=lambda *a, **kw: blog_dir if a == ("temp_blog_repo",) else RealPath(*a, **kw),
+                dtb,
+                "Path",
+                side_effect=lambda *a, **kw: (
+                    blog_dir if a == ("temp_blog_repo",) else RealPath(*a, **kw)
+                ),
             ),
+            contextlib.suppress(SystemExit, Exception),
         ):
-            try:
-                dtb.main()
-            except (SystemExit, Exception):
-                pass
+            dtb.main()
 
         assert pr_commands, "gh pr create was not called on successful validation"
         assert validation_report in pr_commands[0], (

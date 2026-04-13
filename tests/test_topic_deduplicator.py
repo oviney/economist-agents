@@ -35,10 +35,10 @@ from src.tools.topic_deduplicator import (
     TopicDeduplicator,
 )
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _make_deduplicator(distances: list[float] | None = None) -> TopicDeduplicator:
     """Return a TopicDeduplicator whose ChromaDB collection is fully mocked.
@@ -104,13 +104,18 @@ class TestFilterTopicsSimilarityTiers:
         """Topics with 0.6 < similarity ≤ 0.8 pass with a dedup_warning."""
         # distance = 0.5 → similarity = 1 - 0.5/2 = 0.75
         dedup = _make_deduplicator(distances=[0.5])
-        kept, rejected = dedup.filter_topics(_topics(["Related Topic"]))[0], \
-            dedup.filter_topics(_topics(["Related Topic"]))[1]
+        kept, rejected = (
+            dedup.filter_topics(_topics(["Related Topic"]))[0],
+            dedup.filter_topics(_topics(["Related Topic"]))[1],
+        )
 
         assert len(kept) == 1
         assert len(rejected) == 0
         assert "dedup_warning" in kept[0]
-        assert "Related" in kept[0]["dedup_warning"] or "Existing" in kept[0]["dedup_warning"]
+        assert (
+            "Related" in kept[0]["dedup_warning"]
+            or "Existing" in kept[0]["dedup_warning"]
+        )
 
     def test_duplicate_topic_is_rejected(self) -> None:
         """Topics with similarity > REJECT_THRESHOLD are rejected.
@@ -256,7 +261,11 @@ class TestIndexArticle:
         dedup.collection.upsert.assert_called_once()
         call_kwargs = dedup.collection.upsert.call_args
         # metadatas should include the title
-        metadatas = call_kwargs.kwargs.get("metadatas") or call_kwargs.args[2] if call_kwargs.args else call_kwargs.kwargs["metadatas"]
+        metadatas = (
+            call_kwargs.kwargs.get("metadatas") or call_kwargs.args[2]
+            if call_kwargs.args
+            else call_kwargs.kwargs["metadatas"]
+        )
         assert metadatas[0]["title"] == "My Article"
 
     def test_index_article_no_collection_returns_false(self) -> None:
@@ -315,8 +324,15 @@ class TestDiscoverTopicsDeduplication:
         """Novel topics (<0.6 sim) are returned to the editorial board."""
         mock_client.return_value = Mock()
         mock_scout.return_value = [
-            {"topic": "Novel AI Insight", "total_score": 20, "hook": "", "thesis": "",
-             "data_sources": [], "contrarian_angle": "", "talking_points": ""}
+            {
+                "topic": "Novel AI Insight",
+                "total_score": 20,
+                "hook": "",
+                "thesis": "",
+                "data_sources": [],
+                "contrarian_angle": "",
+                "talking_points": "",
+            }
         ]
         # distance = 1.4 → similarity = 0.3 (novel)
         flow = self._build_flow(distances=[1.4])
@@ -336,8 +352,15 @@ class TestDiscoverTopicsDeduplication:
         """
         mock_client.return_value = Mock()
         mock_scout.return_value = [
-            {"topic": "Duplicate Topic", "total_score": 20, "hook": "", "thesis": "",
-             "data_sources": [], "contrarian_angle": "", "talking_points": ""}
+            {
+                "topic": "Duplicate Topic",
+                "total_score": 20,
+                "hook": "",
+                "thesis": "",
+                "data_sources": [],
+                "contrarian_angle": "",
+                "talking_points": "",
+            }
         ]
         # distance = 0.1 → similarity = 0.95 (reject)
         flow = self._build_flow(distances=[0.1])
@@ -354,8 +377,15 @@ class TestDiscoverTopicsDeduplication:
         """Related topics (0.6–0.8 sim) pass but carry a dedup_warning."""
         mock_client.return_value = Mock()
         mock_scout.return_value = [
-            {"topic": "Related Topic", "total_score": 18, "hook": "", "thesis": "",
-             "data_sources": [], "contrarian_angle": "", "talking_points": ""}
+            {
+                "topic": "Related Topic",
+                "total_score": 18,
+                "hook": "",
+                "thesis": "",
+                "data_sources": [],
+                "contrarian_angle": "",
+                "talking_points": "",
+            }
         ]
         # distance = 0.5 → similarity = 0.75 (warn tier)
         flow = self._build_flow(distances=[0.5])

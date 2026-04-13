@@ -187,7 +187,9 @@ class TestEstimateComplexity:
 
 
 class TestStatePersistence:
-    def test_load_empty_when_missing(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_load_empty_when_missing(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         monkeypatch.setattr(oa, "STATE_FILE", tmp_path / "missing.json")
         assert oa._load_state() == []
 
@@ -198,7 +200,9 @@ class TestStatePersistence:
         assert len(loaded) == 1
         assert loaded[0]["action"] == "test"
 
-    def test_log_decision_appends(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_log_decision_appends(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         monkeypatch.setattr(oa, "STATE_FILE", tmp_path / "state.json")
         oa._log_decision("promoted", {"pr": "blog#1"})
         oa._log_decision("promoted", {"pr": "blog#2"})
@@ -207,7 +211,9 @@ class TestStatePersistence:
         assert state[0]["action"] == "promoted"
         assert "ts" in state[0]
 
-    def test_corrupted_state_returns_empty(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_corrupted_state_returns_empty(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         bad = tmp_path / "bad.json"
         bad.write_text("not json{{{{")
         monkeypatch.setattr(oa, "STATE_FILE", bad)
@@ -238,7 +244,9 @@ class TestCheckPrReady:
             ],
             commits=[_make_commit("feat: add feature")],
         )
-        with patch.object(oa, "_get_github_client", return_value=_github_client_for_pr(pr)):
+        with patch.object(
+            oa, "_get_github_client", return_value=_github_client_for_pr(pr)
+        ):
             result = oa.check_pr_ready(PR_URL)
         assert result["promote"] is True
         assert "2 file(s) changed" in result["reason"]
@@ -247,7 +255,9 @@ class TestCheckPrReady:
 
     def test_promote_false_for_empty_pr(self) -> None:
         pr = _make_pr(files=[], commits=[_make_commit("feat: start")])
-        with patch.object(oa, "_get_github_client", return_value=_github_client_for_pr(pr)):
+        with patch.object(
+            oa, "_get_github_client", return_value=_github_client_for_pr(pr)
+        ):
             result = oa.check_pr_ready(PR_URL)
         assert result["promote"] is False
         assert result["details"]["file_count"] == 0
@@ -257,7 +267,9 @@ class TestCheckPrReady:
             body="Closes #5. Partial implementation.",
             files=[_make_file("src/x.py", "+    # TODO: finish this")],
         )
-        with patch.object(oa, "_get_github_client", return_value=_github_client_for_pr(pr)):
+        with patch.object(
+            oa, "_get_github_client", return_value=_github_client_for_pr(pr)
+        ):
             result = oa.check_pr_ready(PR_URL)
         assert result["promote"] is False
         assert result["details"]["has_todo_markers"] is True
@@ -268,7 +280,9 @@ class TestCheckPrReady:
             files=[_make_file("src/f.py", "+pass")],
             commits=[_make_commit("Initial plan"), _make_commit("initial commit")],
         )
-        with patch.object(oa, "_get_github_client", return_value=_github_client_for_pr(pr)):
+        with patch.object(
+            oa, "_get_github_client", return_value=_github_client_for_pr(pr)
+        ):
             result = oa.check_pr_ready(PR_URL)
         assert result["promote"] is False
 
@@ -277,21 +291,27 @@ class TestCheckPrReady:
             body="fix",  # too short
             files=[_make_file("a.py", "+x=1")],
         )
-        with patch.object(oa, "_get_github_client", return_value=_github_client_for_pr(pr)):
+        with patch.object(
+            oa, "_get_github_client", return_value=_github_client_for_pr(pr)
+        ):
             result = oa.check_pr_ready(PR_URL)
         assert result["promote"] is False
         assert result["details"]["has_description"] is False
 
     def test_result_has_required_keys(self) -> None:
         pr = _make_pr()
-        with patch.object(oa, "_get_github_client", return_value=_github_client_for_pr(pr)):
+        with patch.object(
+            oa, "_get_github_client", return_value=_github_client_for_pr(pr)
+        ):
             result = oa.check_pr_ready(PR_URL)
         for key in ("promote", "reason", "details"):
             assert key in result
 
     def test_decision_logged_to_state(self) -> None:
         pr = _make_pr(files=[_make_file("f.py", "+x=1")])
-        with patch.object(oa, "_get_github_client", return_value=_github_client_for_pr(pr)):
+        with patch.object(
+            oa, "_get_github_client", return_value=_github_client_for_pr(pr)
+        ):
             oa.check_pr_ready(PR_URL)
         state = oa._load_state()
         assert len(state) == 1
@@ -480,7 +500,9 @@ class TestCheckStalled:
             labels=[_make_label("effort:large")],
             files=[_make_file(f"f{i}.py") for i in range(8)],
         )
-        with patch.object(oa, "_get_github_client", return_value=_github_client_for_stall(pr)):
+        with patch.object(
+            oa, "_get_github_client", return_value=_github_client_for_stall(pr)
+        ):
             result = oa.check_stalled(PR_URL, idle_minutes=60)
         assert result["stalled"] is False
         assert result["details"]["complexity"] == "high"
@@ -491,47 +513,61 @@ class TestCheckStalled:
             labels=[_make_label("effort:small")],
             files=[_make_file("tiny.py")],
         )
-        with patch.object(oa, "_get_github_client", return_value=_github_client_for_stall(pr)):
+        with patch.object(
+            oa, "_get_github_client", return_value=_github_client_for_stall(pr)
+        ):
             result = oa.check_stalled(PR_URL, idle_minutes=45)
         assert result["stalled"] is True
         assert result["details"]["stall_threshold_minutes"] == 30
 
     def test_stalled_for_medium_task_at_90_min(self) -> None:
         pr = _make_pr(files=[_make_file("a.py"), _make_file("b.py")])
-        with patch.object(oa, "_get_github_client", return_value=_github_client_for_stall(pr)):
+        with patch.object(
+            oa, "_get_github_client", return_value=_github_client_for_stall(pr)
+        ):
             result = oa.check_stalled(PR_URL, idle_minutes=90)
         assert result["stalled"] is True
 
     def test_not_stalled_within_threshold(self) -> None:
         pr = _make_pr(files=[_make_file("a.py"), _make_file("b.py")])
-        with patch.object(oa, "_get_github_client", return_value=_github_client_for_stall(pr)):
+        with patch.object(
+            oa, "_get_github_client", return_value=_github_client_for_stall(pr)
+        ):
             result = oa.check_stalled(PR_URL, idle_minutes=30)
         assert result["stalled"] is False
 
     def test_default_idle_minutes_is_60(self) -> None:
         pr = _make_pr(files=[_make_file("a.py"), _make_file("b.py")])
-        with patch.object(oa, "_get_github_client", return_value=_github_client_for_stall(pr)):
+        with patch.object(
+            oa, "_get_github_client", return_value=_github_client_for_stall(pr)
+        ):
             result = oa.check_stalled(PR_URL)
         # medium complexity threshold is 60 min; idle=60 means stalled
         assert result["details"]["idle_minutes"] == 60
 
     def test_result_has_required_keys(self) -> None:
         pr = _make_pr()
-        with patch.object(oa, "_get_github_client", return_value=_github_client_for_stall(pr)):
+        with patch.object(
+            oa, "_get_github_client", return_value=_github_client_for_stall(pr)
+        ):
             result = oa.check_stalled(PR_URL, 30)
         for key in ("stalled", "reason", "details"):
             assert key in result
 
     def test_decision_logged_to_state(self) -> None:
         pr = _make_pr()
-        with patch.object(oa, "_get_github_client", return_value=_github_client_for_stall(pr)):
+        with patch.object(
+            oa, "_get_github_client", return_value=_github_client_for_stall(pr)
+        ):
             oa.check_stalled(PR_URL, 30)
         state = oa._load_state()
         assert state[0]["action"] == "stall_check"
 
     def test_p1_label_sets_high_complexity(self) -> None:
         pr = _make_pr(labels=[_make_label("p1")])
-        with patch.object(oa, "_get_github_client", return_value=_github_client_for_stall(pr)):
+        with patch.object(
+            oa, "_get_github_client", return_value=_github_client_for_stall(pr)
+        ):
             result = oa.check_stalled(PR_URL, 60)
         assert result["details"]["complexity"] == "high"
         assert result["stalled"] is False  # 60 < 90 threshold
@@ -569,7 +605,12 @@ class TestMcpServerImportable:
             triage_duplicates_tool,
         )
 
-        for fn in (check_pr_ready_tool, triage_duplicates_tool, check_dispatch_safe_tool, check_stalled_tool):
+        for fn in (
+            check_pr_ready_tool,
+            triage_duplicates_tool,
+            check_dispatch_safe_tool,
+            check_stalled_tool,
+        ):
             assert fn.__doc__ is not None and len(fn.__doc__) > 10
 
     def test_mcp_tool_error_handling(self) -> None:

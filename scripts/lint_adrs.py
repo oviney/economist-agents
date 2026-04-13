@@ -60,9 +60,7 @@ def find_canonical_adrs(repo_root: Path) -> list[Path]:
     adr_dir = repo_root / CANONICAL_DIR
     if not adr_dir.exists():
         return []
-    return sorted(
-        p for p in adr_dir.glob("*.md") if p.name != TEMPLATE_FILENAME
-    )
+    return sorted(p for p in adr_dir.glob("*.md") if p.name != TEMPLATE_FILENAME)
 
 
 def find_forbidden_adrs(repo_root: Path) -> list[Path]:
@@ -78,9 +76,7 @@ def parse_adr(path: Path) -> tuple[AdrFile | None, list[str]]:
     errors: list[str] = []
     filename_match = ADR_FILENAME_PATTERN.match(path.name)
     if not filename_match:
-        errors.append(
-            f"{path}: filename does not match NNNN-kebab-case.md pattern"
-        )
+        errors.append(f"{path}: filename does not match NNNN-kebab-case.md pattern")
         return None, errors
 
     number = int(filename_match.group(1))
@@ -104,9 +100,7 @@ def parse_adr(path: Path) -> tuple[AdrFile | None, list[str]]:
             f"{path}: status '{status_word}' not in allowed set {sorted(ALLOWED_STATUSES)}"
         )
 
-    supersedes_match = re.search(
-        r"\*\*Supersedes:\*\*\s*\[?ADR-(\d{4})\]?", content
-    )
+    supersedes_match = re.search(r"\*\*Supersedes:\*\*\s*\[?ADR-(\d{4})\]?", content)
     superseded_by_match = re.search(
         r"\*\*Superseded by\*\*[:]?\s*\[?ADR-(\d{4})\]?", content
     )
@@ -237,9 +231,7 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    logging.basicConfig(
-        level=logging.INFO, format="%(levelname)s: %(message)s"
-    )
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
     errors = lint(args.repo_root)
     if errors:

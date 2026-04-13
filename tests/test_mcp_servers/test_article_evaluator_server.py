@@ -211,9 +211,7 @@ class TestEvaluateArticleErrorHandling:
 
     def test_no_frontmatter_content(self) -> None:
         """Bare markdown without YAML frontmatter is valid input."""
-        article = (
-            "## Overview\n\nOrganisations are investing in quality.\n\n## Summary\n\nResults vary."
-        )
+        article = "## Overview\n\nOrganisations are investing in quality.\n\n## Summary\n\nResults vary."
         result = evaluate_article(article)
         assert "error" not in result
         assert isinstance(result["feedback"], list)

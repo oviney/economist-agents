@@ -16,16 +16,16 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
 from topic_scout_reproducibility import (  # noqa: E402
-    _cosine_similarity,
     _compute_tf,
-    _extract_topic_text,
+    _cosine_similarity,
     _extract_top_performer_keywords,
+    _extract_topic_text,
     _normalise_title,
     _tokenize,
     compute_jaccard_matrix,
     compute_score_stats,
-    compute_thematic_stability,
     compute_tfidf_cosine_matrix,
+    compute_thematic_stability,
     compute_title_jaccard,
     detect_outlier_runs,
     format_jaccard_matrix,
@@ -550,9 +550,7 @@ def test_run_reproducibility_check_writes_report(tmp_path: Path) -> None:
     mock_client.model = "gpt-4o-mock"
 
     with (
-        patch(
-            "topic_scout_reproducibility.get_performance_context"
-        ) as mock_ctx,
+        patch("topic_scout_reproducibility.get_performance_context") as mock_ctx,
         patch("topic_scout_reproducibility.scout_topics") as mock_scout,
     ):
         mock_ctx.return_value = "## Performance Context\n\nSome data\n"
@@ -579,9 +577,7 @@ def test_run_reproducibility_check_counts_failed_run(tmp_path: Path) -> None:
     mock_client.model = "gpt-4o"
 
     with (
-        patch(
-            "topic_scout_reproducibility.get_performance_context"
-        ) as mock_ctx,
+        patch("topic_scout_reproducibility.get_performance_context") as mock_ctx,
         patch("topic_scout_reproducibility.scout_topics") as mock_scout,
     ):
         mock_ctx.return_value = "## Performance Context\n\nSome data\n"
@@ -605,9 +601,7 @@ def test_run_reproducibility_check_handles_exception(tmp_path: Path) -> None:
     mock_client.model = "gpt-4o"
 
     with (
-        patch(
-            "topic_scout_reproducibility.get_performance_context"
-        ) as mock_ctx,
+        patch("topic_scout_reproducibility.get_performance_context") as mock_ctx,
         patch("topic_scout_reproducibility.scout_topics") as mock_scout,
     ):
         mock_ctx.return_value = "## Performance Context\n\nSome data\n"
@@ -628,9 +622,7 @@ def test_run_reproducibility_check_creates_output_dir(tmp_path: Path) -> None:
     nested = tmp_path / "deep" / "nested" / "output"
 
     with (
-        patch(
-            "topic_scout_reproducibility.get_performance_context"
-        ) as mock_ctx,
+        patch("topic_scout_reproducibility.get_performance_context") as mock_ctx,
         patch("topic_scout_reproducibility.scout_topics") as mock_scout,
     ):
         mock_ctx.return_value = "## Performance Context\n\nSome data\n"
@@ -752,9 +744,33 @@ def test_tfidf_matrix_diagonal_is_one() -> None:
 
 def test_tfidf_matrix_is_symmetric() -> None:
     runs = [
-        [{"topic": "AI Testing ROI", "hook": "costs are hidden", "thesis": "t", "contrarian_angle": "c", "talking_points": "p"}],
-        [{"topic": "Automation Myths", "hook": "maintenance burden", "thesis": "t", "contrarian_angle": "c", "talking_points": "p"}],
-        [{"topic": "Developer Experience", "hook": "roi illusion", "thesis": "t", "contrarian_angle": "c", "talking_points": "p"}],
+        [
+            {
+                "topic": "AI Testing ROI",
+                "hook": "costs are hidden",
+                "thesis": "t",
+                "contrarian_angle": "c",
+                "talking_points": "p",
+            }
+        ],
+        [
+            {
+                "topic": "Automation Myths",
+                "hook": "maintenance burden",
+                "thesis": "t",
+                "contrarian_angle": "c",
+                "talking_points": "p",
+            }
+        ],
+        [
+            {
+                "topic": "Developer Experience",
+                "hook": "roi illusion",
+                "thesis": "t",
+                "contrarian_angle": "c",
+                "talking_points": "p",
+            }
+        ],
     ]
     matrix = compute_tfidf_cosine_matrix(runs)
     n = len(matrix)
@@ -784,19 +800,73 @@ def test_tfidf_thematic_runs_exceed_threshold() -> None:
     """Thematically similar runs should produce mean cosine >= 0.25."""
     # Mirror the 2026-04-06 live-run evidence from the issue.
     run1 = [
-        {"topic": "Illusion of Speed", "hook": "AI testing faster but costlier", "thesis": "Hidden costs outweigh gains", "contrarian_angle": "Speed metrics mislead teams", "talking_points": "ROI automation testing cost"},
-        {"topic": "Hidden Costs of AI-Driven Testing", "hook": "Maintenance burden rises", "thesis": "AI test tools create debt", "contrarian_angle": "Automation is not free", "talking_points": "maintenance automation testing cost"},
-        {"topic": "Embedded QE", "hook": "Quality shifted left", "thesis": "QE embedded in teams", "contrarian_angle": "Centralised QA still has value", "talking_points": "quality engineering embedded team"},
+        {
+            "topic": "Illusion of Speed",
+            "hook": "AI testing faster but costlier",
+            "thesis": "Hidden costs outweigh gains",
+            "contrarian_angle": "Speed metrics mislead teams",
+            "talking_points": "ROI automation testing cost",
+        },
+        {
+            "topic": "Hidden Costs of AI-Driven Testing",
+            "hook": "Maintenance burden rises",
+            "thesis": "AI test tools create debt",
+            "contrarian_angle": "Automation is not free",
+            "talking_points": "maintenance automation testing cost",
+        },
+        {
+            "topic": "Embedded QE",
+            "hook": "Quality shifted left",
+            "thesis": "QE embedded in teams",
+            "contrarian_angle": "Centralised QA still has value",
+            "talking_points": "quality engineering embedded team",
+        },
     ]
     run2 = [
-        {"topic": "Myth of Complete Automation", "hook": "Automation cannot cover all", "thesis": "Human testing still needed", "contrarian_angle": "100 percent automation is a myth", "talking_points": "automation testing manual coverage"},
-        {"topic": "Overpromising on Maintenance Costs", "hook": "Vendors hide maintenance costs", "thesis": "Long term cost of AI testing high", "contrarian_angle": "Automation creates debt not savings", "talking_points": "maintenance cost automation testing ROI"},
-        {"topic": "Security Testing", "hook": "Security gaps in AI pipelines", "thesis": "Automation misses security flaws", "contrarian_angle": "Automated security is insufficient", "talking_points": "security testing automation gaps"},
+        {
+            "topic": "Myth of Complete Automation",
+            "hook": "Automation cannot cover all",
+            "thesis": "Human testing still needed",
+            "contrarian_angle": "100 percent automation is a myth",
+            "talking_points": "automation testing manual coverage",
+        },
+        {
+            "topic": "Overpromising on Maintenance Costs",
+            "hook": "Vendors hide maintenance costs",
+            "thesis": "Long term cost of AI testing high",
+            "contrarian_angle": "Automation creates debt not savings",
+            "talking_points": "maintenance cost automation testing ROI",
+        },
+        {
+            "topic": "Security Testing",
+            "hook": "Security gaps in AI pipelines",
+            "thesis": "Automation misses security flaws",
+            "contrarian_angle": "Automated security is insufficient",
+            "talking_points": "security testing automation gaps",
+        },
     ]
     run3 = [
-        {"topic": "Developer Experience", "hook": "DX drives quality", "thesis": "Happy developers write better tests", "contrarian_angle": "Tooling without culture fails", "talking_points": "developer experience quality testing"},
-        {"topic": "ROI Illusion", "hook": "ROI of AI testing inflated", "thesis": "Hidden costs erode ROI", "contrarian_angle": "Automation ROI is overstated", "talking_points": "ROI automation testing cost illusion"},
-        {"topic": "Debunking the AI-Driven Test Automation Revolution", "hook": "Hype exceeds reality", "thesis": "AI testing needs calibration", "contrarian_angle": "Revolution overstated automation AI testing", "talking_points": "AI automation testing debunking ROI cost"},
+        {
+            "topic": "Developer Experience",
+            "hook": "DX drives quality",
+            "thesis": "Happy developers write better tests",
+            "contrarian_angle": "Tooling without culture fails",
+            "talking_points": "developer experience quality testing",
+        },
+        {
+            "topic": "ROI Illusion",
+            "hook": "ROI of AI testing inflated",
+            "thesis": "Hidden costs erode ROI",
+            "contrarian_angle": "Automation ROI is overstated",
+            "talking_points": "ROI automation testing cost illusion",
+        },
+        {
+            "topic": "Debunking the AI-Driven Test Automation Revolution",
+            "hook": "Hype exceeds reality",
+            "thesis": "AI testing needs calibration",
+            "contrarian_angle": "Revolution overstated automation AI testing",
+            "talking_points": "AI automation testing debunking ROI cost",
+        },
     ]
     matrix = compute_tfidf_cosine_matrix([run1, run2, run3])
     mean_cosine = mean_pairwise_similarity(matrix)

@@ -111,6 +111,7 @@ def _truncate_prompt(prompt: str, context: str = "DALL-E") -> str:
         return prompt[:DALLE_MAX_PROMPT_LENGTH]
     return prompt
 
+
 mcp = FastMCP(
     name="image-generator",
     instructions=(
@@ -136,8 +137,8 @@ def _build_dalle_prompt(article_title: str, article_summary: str) -> str:
     prompt += (
         "TASK: Create a bold, graphic SCENE with a conceptual metaphor that captures "
         "the article's argument.\n\n"
-        "Think: \"What single striking image would The Economist put on its cover "
-        'to represent this article\'s thesis?"\n\n'
+        'Think: "What single striking image would The Economist put on its cover '
+        "to represent this article's thesis?\"\n\n"
         "The viewer should understand the article's ARGUMENT from the image, "
         "not just its topic.\n\n"
         "CRITICAL: ZERO text, words, letters, numbers, or symbols in the image."

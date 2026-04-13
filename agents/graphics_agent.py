@@ -55,7 +55,9 @@ class GraphicsAgent:
         ... )
     """
 
-    GRAPHICS_AGENT_PROMPT = GRAPHICS_AGENT_PROMPT  # loaded from agents/content_generation/graphics.yaml
+    GRAPHICS_AGENT_PROMPT = (
+        GRAPHICS_AGENT_PROMPT  # loaded from agents/content_generation/graphics.yaml
+    )
 
     def __init__(self, llm_client):
         """Initialize Graphics Agent with LLM client."""

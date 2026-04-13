@@ -61,15 +61,24 @@ class TestEconomistImageStyle:
 
     def test_no_text_instruction(self) -> None:
         """Style must explicitly forbid text/labels in the image."""
-        assert "NO TEXT" in ECONOMIST_IMAGE_STYLE or "ABSOLUTELY NO TEXT" in ECONOMIST_IMAGE_STYLE
+        assert (
+            "NO TEXT" in ECONOMIST_IMAGE_STYLE
+            or "ABSOLUTELY NO TEXT" in ECONOMIST_IMAGE_STYLE
+        )
 
     def test_avoids_cliches(self) -> None:
         """Style must explicitly avoid technology clichés."""
-        assert "lightbulbs" in ECONOMIST_IMAGE_STYLE or "cliché" in ECONOMIST_IMAGE_STYLE.lower()
+        assert (
+            "lightbulbs" in ECONOMIST_IMAGE_STYLE
+            or "cliché" in ECONOMIST_IMAGE_STYLE.lower()
+        )
 
     def test_composition_includes_scale_exaggeration(self) -> None:
         """Composition rules must include scale exaggeration guidance."""
-        assert "scale exaggeration" in ECONOMIST_IMAGE_STYLE or "exaggeration" in ECONOMIST_IMAGE_STYLE
+        assert (
+            "scale exaggeration" in ECONOMIST_IMAGE_STYLE
+            or "exaggeration" in ECONOMIST_IMAGE_STYLE
+        )
 
 
 # ===========================================================================
@@ -81,7 +90,9 @@ class TestCreateImagePrompt:
     """Unit tests for prompt construction."""
 
     TOPIC = "The Economics of Flaky Tests"
-    SUMMARY = "QA teams spend 30% of time on unreliable tests, costing $50k per engineer."
+    SUMMARY = (
+        "QA teams spend 30% of time on unreliable tests, costing $50k per engineer."
+    )
     CONTRARIAN = "Flaky tests are a culture problem, not a technical one."
 
     def test_prompt_contains_economist_style(self) -> None:
@@ -122,7 +133,9 @@ class TestCreateImagePrompt:
 
     def test_contrarian_angle_included_when_provided(self) -> None:
         """Contrarian angle must appear in prompt when supplied."""
-        prompt = create_image_prompt(self.TOPIC, self.SUMMARY, contrarian_angle=self.CONTRARIAN)
+        prompt = create_image_prompt(
+            self.TOPIC, self.SUMMARY, contrarian_angle=self.CONTRARIAN
+        )
         assert self.CONTRARIAN in prompt
 
     def test_contrarian_angle_omitted_when_empty(self) -> None:

@@ -16,7 +16,6 @@ import requests
 import scripts.google_search as google_search_module
 from scripts.google_search import GoogleSearcher, search_google_for_topic
 
-
 # ═══════════════════════════════════════════════════════════════════════════
 # Fixtures
 # ═══════════════════════════════════════════════════════════════════════════
@@ -190,9 +189,7 @@ class TestGoogleSearcherSearchWeb:
 class TestGoogleSearcherSearchScholar:
     """Tests for GoogleSearcher.search_scholar()."""
 
-    def test_returns_scholar_results_on_success(
-        self, searcher: GoogleSearcher
-    ) -> None:
+    def test_returns_scholar_results_on_success(self, searcher: GoogleSearcher) -> None:
         """Returns list of dicts with expected keys on successful API response."""
         mock_response = MagicMock()
         mock_response.json.return_value = _make_scholar_response(2)
@@ -208,9 +205,7 @@ class TestGoogleSearcherSearchScholar:
         assert "authors" in results[0]
         assert "cited_by" in results[0]
 
-    def test_year_start_and_end_sent_in_payload(
-        self, searcher: GoogleSearcher
-    ) -> None:
+    def test_year_start_and_end_sent_in_payload(self, searcher: GoogleSearcher) -> None:
         """year_start and year_end are forwarded as yearLow/yearHigh to Serper."""
         mock_response = MagicMock()
         mock_response.json.return_value = {"organic": []}
@@ -225,9 +220,7 @@ class TestGoogleSearcherSearchScholar:
         assert payload["yearLow"] == 2025
         assert payload["yearHigh"] == 2026
 
-    def test_no_year_params_not_sent_when_none(
-        self, searcher: GoogleSearcher
-    ) -> None:
+    def test_no_year_params_not_sent_when_none(self, searcher: GoogleSearcher) -> None:
         """yearLow/yearHigh are absent from payload when year args are None."""
         mock_response = MagicMock()
         mock_response.json.return_value = {"organic": []}
@@ -320,8 +313,23 @@ class TestSearchGoogleForTopic:
         monkeypatch.setenv("SERPER_API_KEY", "fake-key")
         mock_response = MagicMock()
         mock_response.json.side_effect = [
-            {"organic": [{"title": "W1", "link": "https://w1.com", "snippet": "", "date": ""}]},
-            {"organic": [{"title": "S1", "link": "https://s1.com", "snippet": "", "year": 2026, "authors": "A", "citedBy": 5}]},
+            {
+                "organic": [
+                    {"title": "W1", "link": "https://w1.com", "snippet": "", "date": ""}
+                ]
+            },
+            {
+                "organic": [
+                    {
+                        "title": "S1",
+                        "link": "https://s1.com",
+                        "snippet": "",
+                        "year": 2026,
+                        "authors": "A",
+                        "citedBy": 5,
+                    }
+                ]
+            },
         ]
         mock_response.raise_for_status = MagicMock()
 
@@ -346,7 +354,9 @@ class TestSearchGoogleForTopic:
         current_year = datetime.now().year
 
         mock_instance = self._patch_searcher([], [])
-        with patch.object(google_search_module, "GoogleSearcher", return_value=mock_instance):
+        with patch.object(
+            google_search_module, "GoogleSearcher", return_value=mock_instance
+        ):
             result = search_google_for_topic("topic")
 
         assert result["current_year"] == current_year
@@ -359,7 +369,9 @@ class TestSearchGoogleForTopic:
         monkeypatch.setenv("SERPER_API_KEY", "fake-key")
         mock_instance = self._patch_searcher([], [])
 
-        with patch.object(google_search_module, "GoogleSearcher", return_value=mock_instance):
+        with patch.object(
+            google_search_module, "GoogleSearcher", return_value=mock_instance
+        ):
             result = search_google_for_topic("topic", include_scholar=False)
 
         mock_instance.search_scholar.assert_not_called()
@@ -391,10 +403,14 @@ class TestSearchGoogleForTopic:
         current_year = datetime.now().year
         mock_instance = self._patch_searcher([], [])
 
-        with patch.object(google_search_module, "GoogleSearcher", return_value=mock_instance):
+        with patch.object(
+            google_search_module, "GoogleSearcher", return_value=mock_instance
+        ):
             search_google_for_topic("AI testing")
 
         call_args = mock_instance.search_web.call_args
-        query_used = call_args[1]["query"] if "query" in call_args[1] else call_args[0][0]
+        query_used = (
+            call_args[1]["query"] if "query" in call_args[1] else call_args[0][0]
+        )
         assert str(current_year) in query_used
         assert str(current_year - 1) in query_used

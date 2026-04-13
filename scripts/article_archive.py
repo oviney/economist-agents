@@ -30,7 +30,7 @@ Usage:
 
 import logging
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -77,7 +77,7 @@ def _parse_frontmatter(content: str) -> tuple[dict[str, Any], str]:
         logger.warning("Failed to parse frontmatter YAML: %s", exc)
         frontmatter = {}
 
-    body = content[match.end():]
+    body = content[match.end() :]
     return frontmatter, body
 
 
@@ -232,7 +232,7 @@ class ArticleArchive:
             "date": date,
             "categories": categories,
             "file_path": file_path,
-            "indexed_at": datetime.now(timezone.utc).isoformat(),
+            "indexed_at": datetime.now(UTC).isoformat(),
         }
 
         try:
@@ -376,7 +376,9 @@ class ArticleArchive:
                 logger.warning("Skipping %s: %s", md_file.name, exc)
                 continue
 
-        logger.info("Backfill complete — %d/%d articles indexed.", indexed, len(md_files))
+        logger.info(
+            "Backfill complete — %d/%d articles indexed.", indexed, len(md_files)
+        )
         return indexed
 
     # ------------------------------------------------------------------
@@ -499,8 +501,6 @@ if __name__ == "__main__":
         results = archive.find_similar_topics(query, threshold=0.5, n_results=5)
         if results:
             for i, r in enumerate(results, 1):
-                print(
-                    f"{i}. [{r['similarity']:.2f}] {r['title']} ({r['date']})"
-                )
+                print(f"{i}. [{r['similarity']:.2f}] {r['title']} ({r['date']})")
         else:
             print("No similar articles found.")

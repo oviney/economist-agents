@@ -466,7 +466,8 @@ class PublicationValidator:
                                         f"Must be one of: {', '.join(self.VALID_CATEGORIES)}"
                                     ),
                                     "details": "Category must map to a valid blog category",
-                                    "fix": "Use one of: " + ", ".join(self.VALID_CATEGORIES),
+                                    "fix": "Use one of: "
+                                    + ", ".join(self.VALID_CATEGORIES),
                                 }
                             )
         except Exception:

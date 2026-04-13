@@ -341,9 +341,7 @@ def main() -> None:
         default=DEFAULT_DB_PATH,
         help="Path to the performance database",
     )
-    parser.add_argument(
-        "--top", type=int, default=5, help="Number of top performers"
-    )
+    parser.add_argument("--top", type=int, default=5, help="Number of top performers")
     parser.add_argument(
         "--bottom", type=int, default=5, help="Number of bottom performers"
     )

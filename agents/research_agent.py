@@ -137,7 +137,9 @@ class ResearchAgent:
         web_research = self._gather_web_research(topic)
 
         # Build user prompt with arXiv and web context
-        user_prompt = self._build_user_prompt(topic, talking_points, arxiv_insights, web_research)
+        user_prompt = self._build_user_prompt(
+            topic, talking_points, arxiv_insights, web_research
+        )
 
         # Call LLM
         response_text = self._call_llm(user_prompt)
@@ -164,7 +166,7 @@ class ResearchAgent:
                 f"{cv.get('failed', 0)} failed"
             )
         except ImportError:
-            logger.warning("citation_verifier not available — skipping verification")
+            print("citation_verifier not available — skipping verification")
 
         # Log metrics
         self._log_metrics(research_data, topic, arxiv_insights, web_research)
@@ -312,7 +314,9 @@ Academic Citations:
         year_start = web_research.get("year_start", "")
         current_year = web_research.get("current_year", "")
         context = f"\n\nLIVE GOOGLE SEARCH RESULTS ({year_start}–{current_year}):\n"
-        context += "These are real-time sources — integrate them as primary references.\n"
+        context += (
+            "These are real-time sources — integrate them as primary references.\n"
+        )
 
         web_results = [
             r for r in web_research.get("web_results", []) if "error" not in r

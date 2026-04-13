@@ -261,9 +261,7 @@ class TestCompositeWeights:
         If the canonical design says pageviews is 2.5x scroll_depth_rate,
         the active re-weighting must preserve that ratio.
         """
-        canonical_sum = sum(
-            COMPOSITE_WEIGHTS[k] for k in COMPOSITE_WEIGHTS_ACTIVE
-        )
+        canonical_sum = sum(COMPOSITE_WEIGHTS[k] for k in COMPOSITE_WEIGHTS_ACTIVE)
         for key in COMPOSITE_WEIGHTS_ACTIVE:
             expected = COMPOSITE_WEIGHTS[key] / canonical_sum
             assert abs(COMPOSITE_WEIGHTS_ACTIVE[key] - expected) < 1e-9, (

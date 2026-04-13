@@ -173,8 +173,16 @@ class TestLoadAllRows:
     def test_returns_latest_snapshot_only(self, tmp_path: pathlib.Path) -> None:
         """Only the most recent fetched_at row is returned per page_path."""
         db = tmp_path / "dup.db"
-        old = {**_SAMPLE_ROWS[0], "composite_score": 0.1, "fetched_at": "2026-01-01T00:00:00+00:00"}
-        new = {**_SAMPLE_ROWS[0], "composite_score": 0.7, "fetched_at": "2026-04-01T12:00:00+00:00"}
+        old = {
+            **_SAMPLE_ROWS[0],
+            "composite_score": 0.1,
+            "fetched_at": "2026-01-01T00:00:00+00:00",
+        }
+        new = {
+            **_SAMPLE_ROWS[0],
+            "composite_score": 0.7,
+            "fetched_at": "2026-04-01T12:00:00+00:00",
+        }
         _populate_db(db, [old, new])
         rows = load_all_rows(db)
         assert len(rows) == 1
@@ -259,7 +267,14 @@ class TestRecomputeScore:
         """All expected keys are returned."""
         rows = load_all_rows(tmp_db)
         math = recompute_score(rows[0], rows)
-        for key in ("raw", "normalized", "contributions", "recomputed_score", "stored_score", "zero_terms"):
+        for key in (
+            "raw",
+            "normalized",
+            "contributions",
+            "recomputed_score",
+            "stored_score",
+            "zero_terms",
+        ):
             assert key in math
 
     def test_contributions_sum_to_recomputed_score(self, tmp_db: pathlib.Path) -> None:
@@ -411,12 +426,13 @@ class TestBuildReport:
         rows = load_all_rows(tmp_db)
         report1, _ = build_report(rows, tmp_db)
         report2, _ = build_report(rows, tmp_db)
+
         # Strip timestamp lines before comparing
         def strip_ts(text: str) -> str:
             return "\n".join(
-                line for line in text.splitlines()
-                if "Generated:" not in line
+                line for line in text.splitlines() if "Generated:" not in line
             )
+
         assert strip_ts(report1) == strip_ts(report2)
 
     def test_url_walkthroughs_present(self, tmp_db: pathlib.Path) -> None:

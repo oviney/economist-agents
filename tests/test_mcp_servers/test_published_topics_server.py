@@ -23,14 +23,13 @@ import pytest
 # Ensure repo root is on path so that 'scripts' and 'mcp_servers' are importable
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from scripts.article_archive import ArticleArchive
 from mcp_servers.published_topics_server import (
     _get_archive,
     get_archive_stats,
     index_published_article,
     search_published_topics,
 )
-
+from scripts.article_archive import ArticleArchive
 
 # ---------------------------------------------------------------------------
 # Shared helpers
@@ -144,7 +143,9 @@ class TestArticleArchiveSearch:
         mock_coll = _make_mock_collection(count=1)
         mock_coll.query.return_value = {
             "documents": [["Unrelated article text"]],
-            "metadatas": [[{"title": "Unrelated", "date": "", "categories": "", "file_path": ""}]],
+            "metadatas": [
+                [{"title": "Unrelated", "date": "", "categories": "", "file_path": ""}]
+            ],
             "distances": [[0.9]],  # similarity = 0.1 < 0.6
         }
 
@@ -207,7 +208,9 @@ class TestArticleArchiveSearch:
         mock_coll = _make_mock_collection(count=1)
         mock_coll.query.return_value = {
             "documents": [["Some article"]],
-            "metadatas": [[{"title": "X", "date": "", "categories": "", "file_path": ""}]],
+            "metadatas": [
+                [{"title": "X", "date": "", "categories": "", "file_path": ""}]
+            ],
             # no 'distances' key
         }
 
@@ -225,8 +228,18 @@ class TestArticleArchiveSearch:
             "documents": [["Doc A", "Doc B"]],
             "metadatas": [
                 [
-                    {"title": "A", "date": "2026-01-01", "categories": "cat", "file_path": "a.md"},
-                    {"title": "B", "date": "2026-02-01", "categories": "cat", "file_path": "b.md"},
+                    {
+                        "title": "A",
+                        "date": "2026-01-01",
+                        "categories": "cat",
+                        "file_path": "a.md",
+                    },
+                    {
+                        "title": "B",
+                        "date": "2026-02-01",
+                        "categories": "cat",
+                        "file_path": "b.md",
+                    },
                 ]
             ],
             "distances": [[0.1, 0.3]],
@@ -412,7 +425,9 @@ class TestArticleArchiveGetStats:
         """Category strings with extra whitespace are trimmed correctly."""
         mock_coll = _make_mock_collection(count=1)
         mock_coll.get.return_value = {
-            "metadatas": [{"title": "A", "date": "2026-01-01", "categories": " tech , economics "}]
+            "metadatas": [
+                {"title": "A", "date": "2026-01-01", "categories": " tech , economics "}
+            ]
         }
 
         archive = _make_archive(mock_coll)
@@ -448,7 +463,9 @@ class TestMCPServerTools:
         mock_arc = self._mock_archive()
         mock_arc.search.return_value = [{"title": "Inflation", "similarity": 0.85}]
 
-        with patch("mcp_servers.published_topics_server._get_archive", return_value=mock_arc):
+        with patch(
+            "mcp_servers.published_topics_server._get_archive", return_value=mock_arc
+        ):
             results = search_published_topics("inflation", threshold=0.5, n_results=3)
 
         mock_arc.search.assert_called_once_with("inflation", threshold=0.5, n_results=3)
@@ -463,7 +480,9 @@ class TestMCPServerTools:
             "total_indexed": 1,
         }
 
-        with patch("mcp_servers.published_topics_server._get_archive", return_value=mock_arc):
+        with patch(
+            "mcp_servers.published_topics_server._get_archive", return_value=mock_arc
+        ):
             result = index_published_article(
                 title="Test",
                 thesis="A test article",
@@ -487,7 +506,9 @@ class TestMCPServerTools:
             "category_distribution": {"tech": 3, "economics": 2},
         }
 
-        with patch("mcp_servers.published_topics_server._get_archive", return_value=mock_arc):
+        with patch(
+            "mcp_servers.published_topics_server._get_archive", return_value=mock_arc
+        ):
             stats = get_archive_stats()
 
         mock_arc.get_stats.assert_called_once()
@@ -517,17 +538,23 @@ class TestMCPServerTools:
         mock_arc = self._mock_archive()
         mock_arc.search.return_value = []
 
-        with patch("mcp_servers.published_topics_server._get_archive", return_value=mock_arc):
+        with patch(
+            "mcp_servers.published_topics_server._get_archive", return_value=mock_arc
+        ):
             search_published_topics("some query")
 
-        mock_arc.search.assert_called_once_with("some query", threshold=0.6, n_results=5)
+        mock_arc.search.assert_called_once_with(
+            "some query", threshold=0.6, n_results=5
+        )
 
     def test_search_returns_empty_list_when_no_results(self) -> None:
         """search_published_topics returns [] when archive finds nothing."""
         mock_arc = self._mock_archive()
         mock_arc.search.return_value = []
 
-        with patch("mcp_servers.published_topics_server._get_archive", return_value=mock_arc):
+        with patch(
+            "mcp_servers.published_topics_server._get_archive", return_value=mock_arc
+        ):
             results = search_published_topics("obscure topic")
 
         assert results == []
@@ -541,7 +568,9 @@ class TestMCPServerTools:
             "id": "",
         }
 
-        with patch("mcp_servers.published_topics_server._get_archive", return_value=mock_arc):
+        with patch(
+            "mcp_servers.published_topics_server._get_archive", return_value=mock_arc
+        ):
             result = index_published_article("T", "thesis", "2026-01-01", "cat", "")
 
         assert result["success"] is False

@@ -17,8 +17,8 @@ SCRIPTS_DIR = Path(__file__).parent.parent / "scripts"
 sys.path.insert(0, str(SCRIPTS_DIR))
 
 from pre_commit_arch_check import (  # noqa: E402
-    CheckResult,
     LLM_IMPORT_EXCEPTIONS,
+    CheckResult,
     Violation,
     check_file,
     check_hardcoded_secrets,
@@ -29,7 +29,6 @@ from pre_commit_arch_check import (  # noqa: E402
     get_staged_python_files,
     run_checks,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -115,10 +114,7 @@ class TestCheckUnprotectedJsonLoads:
     """Bare json.loads() calls should be flagged as warnings."""
 
     def test_bare_json_loads_flagged(self, tmp_py):
-        source = (
-            "import json\n"
-            "data = json.loads(response)\n"
-        )
+        source = "import json\ndata = json.loads(response)\n"
         path = tmp_py(source)
         violations = check_unprotected_json_loads(path, source)
         assert len(violations) == 1
@@ -145,10 +141,7 @@ class TestCheckUnprotectedJsonLoads:
 
     def test_orjson_loads_not_flagged(self, tmp_py):
         """orjson.loads uses a different AST node (different variable name)."""
-        source = (
-            "import orjson\n"
-            "data = orjson.loads(response)\n"
-        )
+        source = "import orjson\ndata = orjson.loads(response)\n"
         path = tmp_py(source)
         # orjson.loads uses 'orjson', not 'json' — should NOT be flagged
         violations = check_unprotected_json_loads(path, source)
@@ -274,11 +267,7 @@ class TestCheckFile:
         assert violations == []
 
     def test_multiple_violations_detected(self, tmp_py):
-        source = (
-            "import anthropic\n"
-            "import json\n"
-            "data = json.loads(response)\n"
-        )
+        source = "import anthropic\nimport json\ndata = json.loads(response)\n"
         path = tmp_py(source)
         violations = check_file(path)
         # Should catch ADR-002 and bare json.loads
@@ -319,10 +308,7 @@ class TestRunChecks:
         assert result.error_count == 2
 
     def test_has_errors_false_for_warnings_only(self, tmp_py):
-        source = (
-            "import json\n"
-            "data = json.loads(response)\n"
-        )
+        source = "import json\ndata = json.loads(response)\n"
         path = tmp_py(source)
         result = run_checks([path])
         # Only warning (unprotected json.loads), no errors
@@ -384,9 +370,7 @@ class TestFormatReport:
 
     def test_warning_only_not_blocked(self):
         result = CheckResult(
-            violations=[
-                Violation("warn.py", 3, "use-logger", "Use logger", "warning")
-            ],
+            violations=[Violation("warn.py", 3, "use-logger", "Use logger", "warning")],
             files_checked=1,
         )
         report = format_report(result)

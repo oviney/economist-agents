@@ -23,6 +23,7 @@ from agent_loader import (
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_yaml(tmp_path: Path, extra: dict | None = None) -> Path:
     """Create a minimal valid agent YAML file in tmp_path."""
     data: dict = {
@@ -48,6 +49,7 @@ def _make_yaml(tmp_path: Path, extra: dict | None = None) -> Path:
 # ---------------------------------------------------------------------------
 # test_load_agent_valid
 # ---------------------------------------------------------------------------
+
 
 def test_load_agent_valid(tmp_path: Path) -> None:
     """Loading a valid YAML file returns a populated AgentConfig."""
@@ -75,6 +77,7 @@ def test_load_agent_with_optional_fields(tmp_path: Path) -> None:
 # test_load_agent_invalid_missing_required_field
 # ---------------------------------------------------------------------------
 
+
 def test_load_agent_invalid_missing_required_field(tmp_path: Path) -> None:
     """YAML missing a required field raises ValueError."""
     data = {
@@ -98,6 +101,7 @@ def test_load_agent_file_not_found() -> None:
 # test_load_board_members_returns_all_six
 # ---------------------------------------------------------------------------
 
+
 def test_load_board_members_returns_all_six() -> None:
     """load_board_members returns exactly 6 board member entries."""
     members = load_board_members()
@@ -107,6 +111,7 @@ def test_load_board_members_returns_all_six() -> None:
 # ---------------------------------------------------------------------------
 # test_load_board_members_has_correct_keys
 # ---------------------------------------------------------------------------
+
 
 def test_load_board_members_has_correct_keys() -> None:
     """Each board member dict has name, weight, and prompt keys."""
@@ -144,6 +149,7 @@ def test_load_board_members_weights_correct() -> None:
 # test_load_scout_prompts_returns_both
 # ---------------------------------------------------------------------------
 
+
 def test_load_scout_prompts_returns_both() -> None:
     """load_scout_prompts returns both 'scout' and 'trend' keys."""
     prompts = load_scout_prompts()
@@ -164,6 +170,7 @@ def test_load_scout_prompts_content() -> None:
 # ---------------------------------------------------------------------------
 # test_load_content_agent_researcher
 # ---------------------------------------------------------------------------
+
 
 def test_load_content_agent_researcher() -> None:
     """load_content_agent('researcher') returns a valid AgentConfig."""
@@ -205,6 +212,7 @@ def test_load_content_agent_invalid_name() -> None:
 # test_schema_validation_rejects_invalid
 # ---------------------------------------------------------------------------
 
+
 def test_schema_validation_rejects_invalid(tmp_path: Path) -> None:
     """Schema validation rejects a YAML missing the metadata object."""
     data = {
@@ -225,6 +233,7 @@ def test_schema_validation_rejects_invalid(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 # test_all_eleven_agents_load
 # ---------------------------------------------------------------------------
+
 
 def test_all_eleven_agents_load() -> None:
     """All 11 agent YAML files can be loaded without error."""
@@ -255,6 +264,7 @@ def test_all_eleven_agents_load() -> None:
 # validate_all integration test
 # ---------------------------------------------------------------------------
 
+
 def test_validate_all_succeeds() -> None:
     """validate_all() returns True when all YAML files are valid."""
     result = validate_all()
@@ -264,6 +274,7 @@ def test_validate_all_succeeds() -> None:
 # ---------------------------------------------------------------------------
 # Backward-compatibility checks
 # ---------------------------------------------------------------------------
+
 
 def test_board_members_backward_compatible() -> None:
     """Board member prompts contain personas matching original hardcoded content."""

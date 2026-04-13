@@ -9,6 +9,7 @@ Usage::
 
     pytest tests/test_fresh_sources.py -v
 """
+
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -18,10 +19,10 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from scripts.article_evaluator import (
-    ArticleEvaluator,
     _ANALYST_VENDORS,
     _FRESH_YEARS,
     _STALE_CUTOFF_YEAR,
+    ArticleEvaluator,
 )
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -111,38 +112,44 @@ class TestFreshnessConstants:
 class TestEvidenceFreshness:
     """Test the freshness checks added to _score_evidence."""
 
-    def test_article_with_fresh_sources_scores_well(self, evaluator: ArticleEvaluator) -> None:
+    def test_article_with_fresh_sources_scores_well(
+        self, evaluator: ArticleEvaluator
+    ) -> None:
         """An article with multiple current-year references should not lose freshness points."""
         references = (
-            f"1. DORA, [\"State of DevOps {_CURRENT_YEAR}\"](https://dora.dev), DORA, {_CURRENT_YEAR}\n"
-            f"2. Google, [\"Testing at Scale\"](https://eng.google), Google Engineering, {_CURRENT_YEAR}\n"
-            f"3. arXiv, [\"Neural test generation\"](https://arxiv.org/), arXiv, {_PREV_YEAR}\n"
+            f'1. DORA, ["State of DevOps {_CURRENT_YEAR}"](https://dora.dev), DORA, {_CURRENT_YEAR}\n'
+            f'2. Google, ["Testing at Scale"](https://eng.google), Google Engineering, {_CURRENT_YEAR}\n'
+            f'3. arXiv, ["Neural test generation"](https://arxiv.org/), arXiv, {_PREV_YEAR}\n'
         )
-        body_extra = f"DORA {_CURRENT_YEAR} survey. Google Engineering {_CURRENT_YEAR} report."
+        body_extra = (
+            f"DORA {_CURRENT_YEAR} survey. Google Engineering {_CURRENT_YEAR} report."
+        )
         article = _make_article(references=references, body_extra=body_extra)
         result = evaluator.evaluate(article)
         # Fresh sources should not deduct freshness points
         detail = result.details.get("evidence_sourcing", "")
-        assert f"fresh citations" in detail
+        assert "fresh citations" in detail
         # Score should not have freshness penalty (no deduction for fresh)
         score = result.scores["evidence_sourcing"]
         assert score >= 5  # Should be healthy
 
-    def test_article_with_no_recent_sources_is_penalised(self, evaluator: ArticleEvaluator) -> None:
+    def test_article_with_no_recent_sources_is_penalised(
+        self, evaluator: ArticleEvaluator
+    ) -> None:
         """An article citing only stale 2023 sources should score lower."""
         stale_article = _make_article(
             references=(
-                "1. Gartner, [\"Magic Quadrant 2023\"](https://gartner.com), Gartner, 2023\n"
-                "2. Forrester, [\"Test ROI 2023\"](https://forrester.com), Forrester, 2023\n"
-                "3. Capgemini, [\"WQR 2022\"](https://cap.com), Capgemini, 2022\n"
+                '1. Gartner, ["Magic Quadrant 2023"](https://gartner.com), Gartner, 2023\n'
+                '2. Forrester, ["Test ROI 2023"](https://forrester.com), Forrester, 2023\n'
+                '3. Capgemini, ["WQR 2022"](https://cap.com), Capgemini, 2022\n'
             ),
             body_extra="Gartner 2023 said 73%. Forrester 2023 analysis. Capgemini 2022 survey.",
         )
         fresh_article = _make_article(
             references=(
-                f"1. DORA, [\"Report {_CURRENT_YEAR}\"](https://dora.dev), DORA, {_CURRENT_YEAR}\n"
-                f"2. Google, [\"Blog post\"](https://eng.google), Google, {_CURRENT_YEAR}\n"
-                f"3. arXiv, [\"Paper\"](https://arxiv.org), arXiv, {_PREV_YEAR}\n"
+                f'1. DORA, ["Report {_CURRENT_YEAR}"](https://dora.dev), DORA, {_CURRENT_YEAR}\n'
+                f'2. Google, ["Blog post"](https://eng.google), Google, {_CURRENT_YEAR}\n'
+                f'3. arXiv, ["Paper"](https://arxiv.org), arXiv, {_PREV_YEAR}\n'
             ),
             body_extra=f"DORA {_CURRENT_YEAR} data. Google {_CURRENT_YEAR} findings.",
         )
@@ -158,7 +165,7 @@ class TestEvidenceFreshness:
     def test_detail_includes_freshness_info(self, evaluator: ArticleEvaluator) -> None:
         """_detail_evidence must report fresh citation count in detail string."""
         article = _make_article(
-            references=f"1. DORA, [\"State {_CURRENT_YEAR}\"](https://dora.dev), {_CURRENT_YEAR}\n",
+            references=f'1. DORA, ["State {_CURRENT_YEAR}"](https://dora.dev), {_CURRENT_YEAR}\n',
             body_extra=f"DORA {_CURRENT_YEAR} survey data.",
         )
         result = evaluator.evaluate(article)
@@ -175,13 +182,15 @@ class TestEvidenceFreshness:
 class TestAnalystDiversity:
     """Test penalisation when more than 1 analyst vendor is cited."""
 
-    def test_single_analyst_vendor_not_penalised(self, evaluator: ArticleEvaluator) -> None:
+    def test_single_analyst_vendor_not_penalised(
+        self, evaluator: ArticleEvaluator
+    ) -> None:
         """Citing exactly one analyst vendor should not trigger the diversity penalty."""
         article = _make_article(
             references=(
-                f"1. Gartner, [\"Magic Quadrant {_CURRENT_YEAR}\"](https://gartner.com), Gartner, {_CURRENT_YEAR}\n"
-                f"2. DORA, [\"State of DevOps {_CURRENT_YEAR}\"](https://dora.dev), {_CURRENT_YEAR}\n"
-                f"3. arXiv, [\"Paper\"](https://arxiv.org), arXiv, {_PREV_YEAR}\n"
+                f'1. Gartner, ["Magic Quadrant {_CURRENT_YEAR}"](https://gartner.com), Gartner, {_CURRENT_YEAR}\n'
+                f'2. DORA, ["State of DevOps {_CURRENT_YEAR}"](https://dora.dev), {_CURRENT_YEAR}\n'
+                f'3. arXiv, ["Paper"](https://arxiv.org), arXiv, {_PREV_YEAR}\n'
             ),
             body_extra=f"Gartner {_CURRENT_YEAR} data. DORA survey.",
         )
@@ -189,21 +198,23 @@ class TestAnalystDiversity:
         detail = result.details["evidence_sourcing"]
         assert "analyst vendors cited: 1" in detail
 
-    def test_multiple_analyst_vendors_are_penalised(self, evaluator: ArticleEvaluator) -> None:
+    def test_multiple_analyst_vendors_are_penalised(
+        self, evaluator: ArticleEvaluator
+    ) -> None:
         """Citing 3 different analyst vendors should reduce the evidence score."""
         single_vendor_article = _make_article(
             references=(
-                f"1. Gartner, [\"Report {_CURRENT_YEAR}\"](https://gartner.com), {_CURRENT_YEAR}\n"
-                f"2. DORA, [\"State of DevOps {_CURRENT_YEAR}\"](https://dora.dev), {_CURRENT_YEAR}\n"
-                f"3. arXiv, [\"Paper\"](https://arxiv.org), {_PREV_YEAR}\n"
+                f'1. Gartner, ["Report {_CURRENT_YEAR}"](https://gartner.com), {_CURRENT_YEAR}\n'
+                f'2. DORA, ["State of DevOps {_CURRENT_YEAR}"](https://dora.dev), {_CURRENT_YEAR}\n'
+                f'3. arXiv, ["Paper"](https://arxiv.org), {_PREV_YEAR}\n'
             ),
             body_extra=f"Gartner data. DORA report {_CURRENT_YEAR}.",
         )
         multi_vendor_article = _make_article(
             references=(
-                f"1. Gartner, [\"Magic Quadrant {_CURRENT_YEAR}\"](https://g.com), {_CURRENT_YEAR}\n"
-                "2. Forrester, [\"Wave Report 2023\"](https://f.com), 2023\n"
-                "3. Capgemini, [\"WQR 2023\"](https://c.com), 2023\n"
+                f'1. Gartner, ["Magic Quadrant {_CURRENT_YEAR}"](https://g.com), {_CURRENT_YEAR}\n'
+                '2. Forrester, ["Wave Report 2023"](https://f.com), 2023\n'
+                '3. Capgemini, ["WQR 2023"](https://c.com), 2023\n'
             ),
             body_extra="Gartner data. Forrester analysis. Capgemini survey.",
         )
@@ -216,7 +227,9 @@ class TestAnalystDiversity:
             f"Single-vendor ({single_score}) should score >= multi-vendor ({multi_score})"
         )
 
-    def test_detail_shows_analyst_vendor_count(self, evaluator: ArticleEvaluator) -> None:
+    def test_detail_shows_analyst_vendor_count(
+        self, evaluator: ArticleEvaluator
+    ) -> None:
         """Detail string should include the number of analyst vendors cited."""
         article = _make_article(
             body_extra="Gartner report. Forrester analysis. Capgemini data.",
@@ -253,14 +266,19 @@ class TestResearchAgentPrompt:
         """RESEARCH_AGENT_PROMPT must limit analyst reports to max 1."""
         from agents.research_agent import RESEARCH_AGENT_PROMPT
 
-        assert "MAX 1" in RESEARCH_AGENT_PROMPT or "max 1" in RESEARCH_AGENT_PROMPT.lower()
+        assert (
+            "MAX 1" in RESEARCH_AGENT_PROMPT or "max 1" in RESEARCH_AGENT_PROMPT.lower()
+        )
 
     def test_prompt_includes_source_diversity_types(self) -> None:
         """RESEARCH_AGENT_PROMPT must mention source diversity types."""
         from agents.research_agent import RESEARCH_AGENT_PROMPT
 
         assert "arXiv" in RESEARCH_AGENT_PROMPT
-        assert "case study" in RESEARCH_AGENT_PROMPT.lower() or "case_study" in RESEARCH_AGENT_PROMPT
+        assert (
+            "case study" in RESEARCH_AGENT_PROMPT.lower()
+            or "case_study" in RESEARCH_AGENT_PROMPT
+        )
 
     def test_prompt_includes_source_freshness_summary_field(self) -> None:
         """RESEARCH_AGENT_PROMPT output structure must request freshness summary."""

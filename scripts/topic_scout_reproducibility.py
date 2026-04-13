@@ -156,9 +156,7 @@ def _compute_tf(tokens: list[str]) -> dict[str, float]:
     return {term: count / total for term, count in counts.items()}
 
 
-def _cosine_similarity(
-    vec_a: dict[str, float], vec_b: dict[str, float]
-) -> float:
+def _cosine_similarity(vec_a: dict[str, float], vec_b: dict[str, float]) -> float:
     """Cosine similarity between two sparse TF-IDF weight vectors.
 
     Args:
@@ -232,9 +230,7 @@ def compute_jaccard_matrix(
             elif i > j:
                 row.append(matrix[j][i])
             else:
-                row.append(
-                    compute_title_jaccard(titles_per_run[i], titles_per_run[j])
-                )
+                row.append(compute_title_jaccard(titles_per_run[i], titles_per_run[j]))
         matrix.append(row)
     return matrix
 
@@ -324,9 +320,7 @@ def compute_tfidf_cosine_matrix(
             elif i > j:
                 row.append(matrix[j][i])
             else:
-                row.append(
-                    _cosine_similarity(tfidf_vectors[i], tfidf_vectors[j])
-                )
+                row.append(_cosine_similarity(tfidf_vectors[i], tfidf_vectors[j]))
         matrix.append(row)
     return matrix
 
@@ -471,8 +465,7 @@ def detect_outlier_runs(
     if n < 3:
         return []
     avg_per_run = [
-        mean([jaccard_matrix[i][j] for j in range(n) if j != i])
-        for i in range(n)
+        mean([jaccard_matrix[i][j] for j in range(n) if j != i]) for i in range(n)
     ]
     grand_mean = mean(avg_per_run)
     grand_std = stdev(avg_per_run) if len(avg_per_run) > 1 else 0.0
@@ -601,9 +594,7 @@ def generate_report(
     if successful_runs >= 2:
         lines.append(format_jaccard_matrix(cosine_matrix, run_labels))
     else:
-        lines.append(
-            "_Insufficient successful runs to compute a matrix (need ≥ 2)._"
-        )
+        lines.append("_Insufficient successful runs to compute a matrix (need ≥ 2)._")
 
     lines += [
         "",
@@ -618,9 +609,7 @@ def generate_report(
     if successful_runs >= 2:
         lines.append(format_jaccard_matrix(jaccard_matrix, run_labels))
     else:
-        lines.append(
-            "_Insufficient successful runs to compute a matrix (need ≥ 2)._"
-        )
+        lines.append("_Insufficient successful runs to compute a matrix (need ≥ 2)._")
 
     lines += [
         "",
@@ -643,9 +632,7 @@ def generate_report(
                 f"| {title[:60]} | {mentions}/{successful_runs} | {frac:.0%} |"
             )
     else:
-        lines.append(
-            "_No top-performer data available (database may be empty)._"
-        )
+        lines.append("_No top-performer data available (database may be empty)._")
 
     lines += [
         "",
@@ -714,9 +701,7 @@ def generate_report(
         lines += [f"### {run_labels[i]}{timing_str}", ""]
         for topic in run:
             score = topic.get("total_score", "N/A")
-            lines.append(
-                f"- **{topic.get('topic', '(unknown)')}** (score: {score})"
-            )
+            lines.append(f"- **{topic.get('topic', '(unknown)')}** (score: {score})")
             hook = topic.get("hook", "")
             if hook:
                 lines.append(f"  > {hook}")
@@ -805,23 +790,16 @@ def run_reproducibility_check(
         print(f"   ✅ {len(topics)} topics in {elapsed:.1f}s")
 
     successful_runs = len(runs_topics)
-    print(
-        f"\n📈 {successful_runs}/{n_runs} runs succeeded,"
-        f" {failed_run_count} failed"
-    )
+    print(f"\n📈 {successful_runs}/{n_runs} runs succeeded, {failed_run_count} failed")
 
     # ── Step 3: Compute metrics ───────────────────────────────────────────────
     cosine_matrix = (
         compute_tfidf_cosine_matrix(runs_topics) if successful_runs >= 2 else []
     )
     mean_cosine = mean_pairwise_similarity(cosine_matrix) if cosine_matrix else 0.0
-    jaccard_matrix = (
-        compute_jaccard_matrix(runs_topics) if successful_runs >= 2 else []
-    )
+    jaccard_matrix = compute_jaccard_matrix(runs_topics) if successful_runs >= 2 else []
     mean_jaccard = mean_pairwise_similarity(jaccard_matrix) if jaccard_matrix else 0.0
-    thematic_stability = compute_thematic_stability(
-        runs_topics, top_performer_titles
-    )
+    thematic_stability = compute_thematic_stability(runs_topics, top_performer_titles)
     score_stats = compute_score_stats(runs_topics)
     outlier_indices = detect_outlier_runs(cosine_matrix) if cosine_matrix else []
 
@@ -832,7 +810,9 @@ def run_reproducibility_check(
         if mean_cosine > REPRODUCIBILITY_VERDICT_THRESHOLD
         else "UNSTABLE"
     )
-    print(f"   Verdict: {verdict_word} (threshold: {REPRODUCIBILITY_VERDICT_THRESHOLD})")
+    print(
+        f"   Verdict: {verdict_word} (threshold: {REPRODUCIBILITY_VERDICT_THRESHOLD})"
+    )
 
     # ── Step 4: Generate and save report ─────────────────────────────────────
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -873,9 +853,7 @@ def run_reproducibility_check(
         "mean_pairwise_jaccard": mean_jaccard,
         "jaccard_matrix": jaccard_matrix,
         "thematic_stability": thematic_stability,
-        "score_stats": {
-            k: v for k, v in score_stats.items() if k != "all_scores"
-        },
+        "score_stats": {k: v for k, v in score_stats.items() if k != "all_scores"},
         "runs_topics": runs_topics,
     }
     json_path.write_bytes(orjson.dumps(raw_data, option=orjson.OPT_INDENT_2))

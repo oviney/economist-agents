@@ -121,7 +121,7 @@ def _get_imports(source: str, filename: str) -> list[tuple[int, str]]:
             for alias in node.names:
                 results.append((node.lineno, alias.name.split(".")[0]))
         elif isinstance(node, ast.ImportFrom) and node.module:
-                results.append((node.lineno, node.module.split(".")[0]))
+            results.append((node.lineno, node.module.split(".")[0]))
 
     return results
 
@@ -149,9 +149,9 @@ def _find_bare_json_loads(source: str, filename: str) -> list[int]:
     try_ranges: list[tuple[int, int]] = []
     for node in ast.walk(tree):
         if isinstance(node, ast.Try) and node.body:
-                start = node.body[0].lineno
-                end = node.body[-1].end_lineno or node.body[-1].lineno
-                try_ranges.append((start, end))
+            start = node.body[0].lineno
+            end = node.body[-1].end_lineno or node.body[-1].lineno
+            try_ranges.append((start, end))
 
     def _in_try(lineno: int) -> bool:
         return any(start <= lineno <= end for start, end in try_ranges)

@@ -165,7 +165,8 @@ class TestDeployToBlogMain:
                 side_effect=lambda *a, **kw: (
                     blog_dir if a == ("temp_blog_repo",) else RealPath(*a, **kw)
                 ),
-            ),contextlib.suppress(SystemExit, Exception)
+            ),
+            contextlib.suppress(SystemExit, Exception),
         ):
             dtb.main()
 
@@ -202,7 +203,8 @@ class TestDeployToBlogMain:
                 side_effect=lambda *a, **kw: (
                     blog_dir if a == ("temp_blog_repo",) else RealPath(*a, **kw)
                 ),
-            ),contextlib.suppress(SystemExit, Exception)
+            ),
+            contextlib.suppress(SystemExit, Exception),
         ):
             dtb.main()
 
@@ -240,7 +242,8 @@ class TestDeployToBlogMain:
                 side_effect=lambda *a, **kw: (
                     blog_dir if a == ("temp_blog_repo",) else RealPath(*a, **kw)
                 ),
-            ),pytest.raises(SystemExit)
+            ),
+            pytest.raises(SystemExit),
         ):
             dtb.main()
 
@@ -276,7 +279,8 @@ class TestDeployToBlogMain:
                 side_effect=lambda *a, **kw: (
                     blog_dir if a == ("temp_blog_repo",) else RealPath(*a, **kw)
                 ),
-            ),pytest.raises(SystemExit)
+            ),
+            pytest.raises(SystemExit),
         ):
             dtb.main()
 
@@ -313,7 +317,8 @@ class TestDeployToBlogMain:
                 side_effect=lambda *a, **kw: (
                     blog_dir if a == ("temp_blog_repo",) else RealPath(*a, **kw)
                 ),
-            ),contextlib.suppress(SystemExit, Exception)
+            ),
+            contextlib.suppress(SystemExit, Exception),
         ):
             dtb.main()
 

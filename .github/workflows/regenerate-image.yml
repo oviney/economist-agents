@@ -1,0 +1,109 @@
+name: Regenerate Featured Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: 'Post image slug (e.g. understanding-qa-qc-quality-engineering)'
+        required: true
+        type: string
+      topic:
+        description: 'Article headline / topic'
+        required: true
+        type: string
+      summary:
+        description: 'One-sentence article summary (for DALL-E prompt)'
+        required: true
+        type: string
+      mood:
+        description: 'Image mood'
+        required: false
+        default: 'contemplative'
+        type: choice
+        options:
+          - contemplative
+          - satirical
+          - urgent
+          - ironic
+          - wry
+
+jobs:
+  regenerate-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          pip install openai pillow
+
+      - name: Generate featured image via DALL-E 3
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          mkdir -p output/images
+          python scripts/featured_image_agent.py \
+            --topic "${{ inputs.topic }}" \
+            --summary "${{ inputs.summary }}" \
+            --mood "${{ inputs.mood }}" \
+            --output "output/images/${{ inputs.slug }}.png"
+
+      - name: Convert PNG to WebP
+        run: |
+          python3 -c "
+          from PIL import Image
+          src = 'output/images/${{ inputs.slug }}.png'
+          dst = 'output/images/${{ inputs.slug }}.webp'
+          Image.open(src).save(dst, 'WebP', quality=85)
+          print(f'WebP written: {dst}')
+          "
+
+      - name: Validate output dimensions
+        run: |
+          python3 -c "
+          from PIL import Image
+          img = Image.open('output/images/${{ inputs.slug }}.png')
+          w, h = img.size
+          assert w >= 800 and h >= 400, f'Image too small: {w}x{h}'
+          print(f'OK: {w}x{h}')
+          import os
+          sz = os.path.getsize('output/images/${{ inputs.slug }}.png')
+          assert sz > 100_000, f'Suspiciously small ({sz} bytes) — likely not a real DALL-E image'
+          print(f'File size OK: {sz/1024:.0f} KB')
+          "
+
+      - name: Push image to blog repository
+        env:
+          BLOG_DEPLOY_TOKEN: ${{ secrets.BLOG_DEPLOY_TOKEN }}
+        run: |
+          git clone --depth=1 https://x-access-token:${BLOG_DEPLOY_TOKEN}@github.com/oviney/blog.git blog-repo
+          cp output/images/${{ inputs.slug }}.png blog-repo/assets/images/${{ inputs.slug }}.png
+          cp output/images/${{ inputs.slug }}.webp blog-repo/assets/images/${{ inputs.slug }}.webp
+          cd blog-repo
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b fix/regenerate-image-${{ inputs.slug }}
+          git add assets/images/${{ inputs.slug }}.png assets/images/${{ inputs.slug }}.webp
+          git commit -m "fix: regenerate featured image for ${{ inputs.slug }}
+
+          DALL-E 3 HD 1792x1024 image generated via regenerate-image workflow.
+          Replaces stub/placeholder image.
+
+          Closes #802"
+          git push origin fix/regenerate-image-${{ inputs.slug }}
+          gh pr create \
+            --repo oviney/blog \
+            --title "fix: regenerate featured image — ${{ inputs.slug }}" \
+            --base main \
+            --head fix/regenerate-image-${{ inputs.slug }} \
+            --label "bug,type:content,P2:medium" \
+            --body "Regenerated via \`regenerate-image\` workflow using DALL-E 3 HD.
+
+          Closes #802" || true
+        env:
+          GH_TOKEN: ${{ secrets.BLOG_DEPLOY_TOKEN }}

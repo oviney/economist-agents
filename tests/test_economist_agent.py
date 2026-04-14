@@ -221,6 +221,7 @@ class TestRunResearchAgent:
                 "agents.research_agent.ResearchAgent._gather_web_research",
                 return_value=None,
             ),
+            patch("citation_verifier.verify_citations", side_effect=lambda x: x),
         ):
             # Return the properly structured mock response
             mock_call_llm.return_value = json.dumps(sample_research_output)
@@ -275,6 +276,7 @@ class TestRunResearchAgent:
         with (
             patch("agents.research_agent.call_llm") as mock_call_llm,
             patch("agents.research_agent.review_agent_output") as mock_review,
+            patch("citation_verifier.verify_citations", side_effect=lambda x: x),
         ):
             mock_call_llm.return_value = json.dumps(sample_research_output)
             mock_review.return_value = (True, [])
@@ -318,6 +320,7 @@ class TestRunResearchAgent:
                 "agents.research_agent.ResearchAgent._gather_web_research",
                 return_value=None,
             ),
+            patch("citation_verifier.verify_citations", side_effect=lambda x: x),
         ):
             mock_call_llm.return_value = json.dumps(sample_research_output)
             mock_review.return_value = (

@@ -78,11 +78,14 @@ jobs:
           "
 
       - name: Push image to blog repository
+        if: vars.BLOG_REPO_OWNER && vars.BLOG_REPO_NAME
         env:
-          BLOG_DEPLOY_TOKEN: ${{ secrets.BLOG_DEPLOY_TOKEN }}
-          GH_TOKEN: ${{ secrets.BLOG_DEPLOY_TOKEN }}
+          BLOG_TOKEN: ${{ secrets.BLOG_REPO_TOKEN }}
+          BLOG_OWNER: ${{ vars.BLOG_REPO_OWNER }}
+          BLOG_REPO: ${{ vars.BLOG_REPO_NAME }}
+          GH_TOKEN: ${{ secrets.BLOG_REPO_TOKEN }}
         run: |
-          git clone --depth=1 https://x-access-token:${BLOG_DEPLOY_TOKEN}@github.com/oviney/blog.git blog-repo
+          git clone --depth=1 https://x-access-token:${BLOG_TOKEN}@github.com/${BLOG_OWNER}/${BLOG_REPO}.git blog-repo
           cp output/images/${{ inputs.slug }}.png blog-repo/assets/images/${{ inputs.slug }}.png
           cp output/images/${{ inputs.slug }}.webp blog-repo/assets/images/${{ inputs.slug }}.webp
           cd blog-repo
@@ -98,7 +101,7 @@ jobs:
           Closes #802"
           git push origin fix/regenerate-image-${{ inputs.slug }}
           gh pr create \
-            --repo oviney/blog \
+            --repo ${BLOG_OWNER}/${BLOG_REPO} \
             --title "fix: regenerate featured image — ${{ inputs.slug }}" \
             --base main \
             --head fix/regenerate-image-${{ inputs.slug }} \

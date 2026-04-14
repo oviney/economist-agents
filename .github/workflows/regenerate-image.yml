@@ -80,6 +80,7 @@ jobs:
       - name: Push image to blog repository
         env:
           BLOG_DEPLOY_TOKEN: ${{ secrets.BLOG_DEPLOY_TOKEN }}
+          GH_TOKEN: ${{ secrets.BLOG_DEPLOY_TOKEN }}
         run: |
           git clone --depth=1 https://x-access-token:${BLOG_DEPLOY_TOKEN}@github.com/oviney/blog.git blog-repo
           cp output/images/${{ inputs.slug }}.png blog-repo/assets/images/${{ inputs.slug }}.png
@@ -105,5 +106,3 @@ jobs:
             --body "Regenerated via \`regenerate-image\` workflow using DALL-E 3 HD.
 
           Closes #802" || true
-        env:
-          GH_TOKEN: ${{ secrets.BLOG_DEPLOY_TOKEN }}

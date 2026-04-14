@@ -40,7 +40,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install openai pillow
+          pip install openai pillow requests
 
       - name: Generate featured image via DALL-E 3
         env:

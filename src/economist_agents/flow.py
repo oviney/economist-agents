@@ -431,6 +431,10 @@ class EconomistContentFlow(Flow):
         gates_passed = result.get("gates_passed", 0)
         edited_article = result.get("article", new_draft.get("article", ""))
 
+        # Apply summary→description fixup (same as quality_gate first pass).
+        if "summary:" in edited_article and "description:" not in edited_article:
+            edited_article = edited_article.replace("summary:", "description:", 1)
+
         self.state["quality_result"] = result
 
         # Run publication validator

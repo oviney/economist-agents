@@ -89,7 +89,7 @@ For stories involving new dependencies or frameworks:
 
 **BEFORE creating ANY GitHub issue:**
 
-□ Check skills/defect_tracker.json for existing bug ID
+□ Check data/skills_state/defect_tracker.json for existing bug ID
 □ If bug exists AND github_issue field != null → REUSE existing issue number
 □ If bug exists AND github_issue == null → CREATE new issue, update tracker
 □ If bug doesn't exist → CREATE bug entry + GitHub issue together
@@ -255,7 +255,7 @@ Weekly (30 min):
 - Add missing priority labels (P0-P4) to bugs and stories
 - Add effort labels (effort:small/medium/large) for estimation
 - Archive stale issues (>90 days no activity, low priority)
-- Validate: skills/defect_tracker.json bugs have GitHub issues
+- Validate: data/skills_state/defect_tracker.json bugs have GitHub issues
 - Target: All open issues properly labeled and categorized
 
 Monthly (60 min):
@@ -520,7 +520,7 @@ If ANY checkbox is empty → STOP, complete it first
 
 ### How It Works
 
-**State Tracking** (`skills/sprint_tracker.json`):
+**State Tracking** (`data/skills_state/sprint_tracker.json`):
 ```json
 {
   "current_sprint": 6,

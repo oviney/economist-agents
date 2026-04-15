@@ -400,7 +400,13 @@ class TestIntegrationScenarios:
     @patch("agents.research_agent.review_agent_output")
     @patch("citation_verifier.verify_citations", side_effect=lambda x: x)
     def test_full_research_pipeline(
-        self, mock_verify, mock_review, mock_call_llm, mock_client, sample_research_response, capsys
+        self,
+        mock_verify,
+        mock_review,
+        mock_call_llm,
+        mock_client,
+        sample_research_response,
+        capsys,
     ):
         """Test complete research pipeline from input to output."""
         # Setup

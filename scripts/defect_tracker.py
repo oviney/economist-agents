@@ -531,7 +531,7 @@ class DefectTracker:
 
         # Note: Caller should update feature_registry.json separately
         print(
-            f"\n⚠️  ACTION REQUIRED: Update skills/feature_registry.json with {feature_id} details"
+            f"\n⚠️  ACTION REQUIRED: Update data/skills_state/feature_registry.json with {feature_id} details"
         )
 
     def save(self) -> None:

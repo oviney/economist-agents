@@ -20,14 +20,14 @@ class RealDebugStoryTest:
                 "Given dashboard generation, when agent metrics are unavailable, then display 'NO DATA' not fake 100%",
                 "Given dashboard generation, when agent_metrics.json has real data, then display actual percentages",
                 "Given quality_dashboard.py, when _build_agent_summary() is called, then never shows baseline fallback values",
-                "Quality: Dashboard validated against source files (skills/agent_metrics.json)",
+                "Quality: Dashboard validated against source files (data/skills_state/agent_metrics.json)",
                 "Quality: 5+ validation tests passing in CI/CD pipeline",
             ],
             "implementation_context": {
                 "bug_location": "scripts/quality_dashboard.py:165-227 (_build_agent_summary method)",
                 "source_files": [
-                    "skills/agent_metrics.json",
-                    "skills/defect_tracker.json",
+                    "data/skills_state/agent_metrics.json",
+                    "data/skills_state/defect_tracker.json",
                 ],
                 "existing_tests": "None - need to create test suite",
                 "complexity": "Medium - requires data flow investigation",
@@ -42,16 +42,16 @@ class RealDebugStoryTest:
             "bug_analysis": {
                 "symptom": "Dashboard shows 100% fake baseline values instead of real metrics",
                 "location": "_build_agent_summary() method lines 165-227",
-                "root_cause": "Fallback logic defaults to baseline when skills/agent_metrics.json is empty or missing",
+                "root_cause": "Fallback logic defaults to baseline when data/skills_state/agent_metrics.json is empty or missing",
                 "data_flow": [
-                    "quality_dashboard.py loads skills/agent_metrics.json",
+                    "quality_dashboard.py loads data/skills_state/agent_metrics.json",
                     "If file empty/missing, falls back to baseline_metrics dict",
                     "baseline_metrics contains fake 100% values for all agents",
                     "Dashboard renders baseline instead of 'NO DATA' message",
                 ],
             },
             "investigation_findings": [
-                "skills/agent_metrics.json exists but may be empty {}",
+                "data/skills_state/agent_metrics.json exists but may be empty {}",
                 "baseline_metrics dict hardcoded with 100% success rates",
                 "No validation that metrics are real vs baseline",
                 "No 'NO DATA' display option in current code",
@@ -59,7 +59,7 @@ class RealDebugStoryTest:
         }
 
         print("   🔍 Analyzed _build_agent_summary() method")
-        print("   📊 Traced data flow through skills/agent_metrics.json")
+        print("   📊 Traced data flow through data/skills_state/agent_metrics.json")
         print("   ⚠️  Found baseline fallback causing fake 100% values")
         print("   ✅ Root cause identified: Missing 'NO DATA' handling")
 
@@ -124,7 +124,7 @@ class TestDashboardDataAccuracy:
         dashboard = QualityDashboard()
 
         # Load real source files
-        metrics_file = Path("skills/agent_metrics.json")
+        metrics_file = Path("data/skills_state/agent_metrics.json")
         if metrics_file.exists():
             with open(metrics_file) as f:
                 source_metrics = json.load(f)
@@ -176,7 +176,7 @@ def _build_agent_summary(self, metrics_data: dict = None) -> str:
     """Build agent performance summary with accurate data handling.
 
     Args:
-        metrics_data: Dictionary of agent metrics from skills/agent_metrics.json
+        metrics_data: Dictionary of agent metrics from data/skills_state/agent_metrics.json
 
     Returns:
         Formatted summary string with real data or 'NO DATA' indicators
@@ -231,7 +231,7 @@ def _is_baseline_data(self, metrics_data: dict) -> bool:
 # Remove or modify baseline fallback logic
 def load_agent_metrics(self) -> dict:
     """Load agent metrics with proper NO DATA handling."""
-    metrics_file = Path("skills/agent_metrics.json")
+    metrics_file = Path("data/skills_state/agent_metrics.json")
 
     if not metrics_file.exists():
         return {}  # Return empty dict, not baseline

@@ -145,7 +145,7 @@ class SkillsGapAnalyzer:
         },
     }
 
-    def __init__(self, tracker_file: str = "skills/defect_tracker.json"):
+    def __init__(self, tracker_file: str = "data/skills_state/defect_tracker.json"):
         """Initialize analyzer with defect tracker data"""
         self.tracker_file = Path(tracker_file)
         self.tracker_data = self._load_tracker()
@@ -992,7 +992,7 @@ Examples:
     )
     parser.add_argument(
         "--tracker",
-        default="skills/defect_tracker.json",
+        default="data/skills_state/defect_tracker.json",
         help="Path to defect tracker JSON file",
     )
     parser.add_argument(

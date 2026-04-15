@@ -8,20 +8,20 @@
 3. ✅ **Use agent delegation**: CI fixes → @code-quality-specialist, tests → @test-specialist
 4. ✅ **Verify context**: Check terminal history for recent command results
 5. ✅ **Apply learned patterns**: Review skills/*.json for similar past issues
-6. ✅ **Review behavior patterns**: Check skills/copilot_behavior_patterns.json for anti-patterns to avoid
+6. ✅ **Review behavior patterns**: Check data/skills_state/copilot_behavior_patterns.json for anti-patterns to avoid
 
 **NEVER:**
 - ❌ Run commands without checking if tool is available
 - ❌ Retry failed commands without fixing root cause
 - ❌ Ignore CI error messages that tell you exactly what to fix
 - ❌ Waste tokens on trial-and-error when clear instructions exist
-- ❌ Repeat patterns documented in skills/copilot_behavior_patterns.json
+- ❌ Repeat patterns documented in data/skills_state/copilot_behavior_patterns.json
 
 **Cost Optimization:**
 - Each failed command = wasted tokens
 - Read first, act second
 - One correct action > five failed attempts
-- **Pattern violations tracked in skills/copilot_behavior_patterns.json**
+- **Pattern violations tracked in data/skills_state/copilot_behavior_patterns.json**
 
 ## Project Purpose
 Multi-agent content generation pipeline that produces publication-quality blog posts in The Economist's signature style. This is NOT a blog—it's a content factory with specialized AI agents for topic discovery, editorial voting, research, writing, editing, and chart generation.
@@ -86,7 +86,7 @@ When writing prompts or editing agent behavior, preserve these constraints. Brit
 ## Skills Learning System
 
 [blog_qa_agent.py](../scripts/blog_qa_agent.py) + [skills_manager.py](../scripts/skills_manager.py) implement continuous improvement:
-- Validation errors are stored as "learned patterns" in `skills/blog_qa_skills.json`
+- Validation errors are stored as "learned patterns" in `data/skills_state/blog_qa_skills.json`
 - `SkillsManager.learn_pattern()` records issue category, severity, check, and example
 - Future runs use accumulated patterns for smarter validation
 
@@ -196,7 +196,7 @@ This project uses a **Claude-style skills approach** for continuous improvement:
 **Self-Learning Validation:**
 - `blog_qa_agent.py` learns from each blog validation run
 - `architecture_review.py` learns from codebase analysis
-- Patterns stored in `skills/blog_qa_skills.json`
+- Patterns stored in `data/skills_state/blog_qa_skills.json`
 - Skills persist across runs for zero-config improvement
 
 **Running Architecture Review:**

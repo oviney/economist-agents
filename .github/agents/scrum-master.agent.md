@@ -284,7 +284,7 @@ Enforced by `.github/workflows/sprint-discipline.yml`:
 
 ## Metrics Tracked
 
-In `skills/sprint_history.json`:
+In `data/skills_state/sprint_history.json`:
 - Sprint velocity (story points per sprint)
 - Completion rate (% stories done)
 - Defect escape rate (% bugs to production)

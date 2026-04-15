@@ -21,7 +21,7 @@ Consult the skills framework for learned patterns:
 ```python
 from skills_manager import SkillsManager
 
-ci_skills = SkillsManager("skills/ci_health_patterns.json")
+ci_skills = SkillsManager("data/skills_state/ci_health_patterns.json")
 patterns = ci_skills.get_patterns()
 ```
 

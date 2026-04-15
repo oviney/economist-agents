@@ -3,7 +3,7 @@
 Agent Performance Metrics Tracker
 
 Tracks per-agent predictions vs actuals to identify improvement opportunities.
-Stores metrics in skills/agent_metrics.json with historical trends.
+Stores metrics in data/skills_state/agent_metrics.json with historical trends.
 
 Usage:
     from agent_metrics import AgentMetrics

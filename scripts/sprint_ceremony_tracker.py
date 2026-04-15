@@ -55,7 +55,7 @@ class SprintCeremonyTracker:
     def __init__(self, tracker_file: str = None):
         if tracker_file is None:
             script_dir = Path(__file__).parent.parent
-            tracker_file = script_dir / "skills" / "sprint_tracker.json"
+            tracker_file = script_dir / "data" / "skills_state" / "sprint_tracker.json"
 
         self.tracker_file = Path(tracker_file)
         self.tracker = self._load_tracker()

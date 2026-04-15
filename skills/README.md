@@ -8,24 +8,26 @@ public (generic) and private (organisation-specific) directories.
 ## Directory Structure
 
 ```
-skills/
+agents/skills_configs/             # Agent YAML configs (formerly skills/public, skills/private)
+├── README.md
+├── research-analyst.yaml          # Research Analyst — verified data briefs
+├── content-writer.yaml            # Content Writer — evidence-based articles
+├── data-analyst.yaml              # Data Analyst — insight summaries and chart specs
+└── editor-reviewer.yaml           # Editor Reviewer — structured quality review
+
+skills/                            # Domain skill definitions (SKILL.md files)
 ├── README.md                      # This file
-├── public/                        # Generic agents — freely reusable by the community
-│   ├── research-analyst.yaml      # Research Analyst — verified data briefs
-│   ├── content-writer.yaml        # Content Writer — evidence-based articles
-│   ├── data-analyst.yaml          # Data Analyst — insight summaries and chart specs
-│   └── editor-reviewer.yaml       # Editor Reviewer — structured quality review
-├── private/                       # Organisation-specific agents — not for public sharing
-│   └── README.md
-└── <domain>/                      # Domain-specific skill directories (e.g., python-quality)
+└── <domain>/                      # e.g., python-quality, testing, devops, observability
     └── SKILL.md
+
+data/skills_state/                 # Runtime state JSON (metrics, trackers, history)
 ```
 
 ---
 
 ## Public Skills Library
 
-`skills/public/` contains **generic, domain-agnostic agent templates** that any team
+`agents/skills_configs/` contains **generic, domain-agnostic agent templates** that any team
 can adopt without modification, or customise to their specific context.
 
 ### Available Agents
@@ -65,7 +67,7 @@ All agents follow the schema defined in `agents/schema.json`.
 
 ### Quick Start
 
-1. **Browse** the agents in `skills/public/` and pick the one closest to your need.
+1. **Browse** the agents in `agents/skills_configs/` and pick the one closest to your need.
 2. **Copy** the YAML file into your project's agent directory.
 3. **Customise** using the `customisation_notes` in the `metadata` section as a guide.
 4. **Validate** the YAML against `agents/schema.json`:
@@ -73,7 +75,7 @@ All agents follow the schema defined in `agents/schema.json`.
    python3 -c "
    import yaml, json, jsonschema
    schema = json.load(open('agents/schema.json'))
-   agent  = yaml.safe_load(open('skills/public/research-analyst.yaml'))
+   agent  = yaml.safe_load(open('agents/skills_configs/research-analyst.yaml'))
    jsonschema.validate(agent, schema)
    print('Valid')
    "
@@ -84,8 +86,8 @@ All agents follow the schema defined in `agents/schema.json`.
 
 ## Private Skills
 
-`skills/private/` is reserved for organisation-specific configurations that should
-not be shared publicly.  See [`skills/private/README.md`](private/README.md) for details.
+Organisation-specific configurations live alongside the public agents under
+`agents/skills_configs/`. See [`agents/skills_configs/README.md`](../agents/skills_configs/README.md) for details.
 
 ---
 
@@ -116,7 +118,7 @@ We welcome community contributions to the public skills library. To add a new ag
    ```bash
    git checkout -b skills/add-my-agent-name
    ```
-3. **Create** your agent YAML in `skills/public/<agent-name>.yaml`.
+3. **Create** your agent YAML in `agents/skills_configs/<agent-name>.yaml`.
 4. **Follow the schema** — ensure all required fields are present.
 5. **Add `customisation_notes`** — tell others how to adapt the agent.
 6. **Open a Pull Request** with the `skills-library` label.
@@ -152,5 +154,5 @@ in your PR description.
 
 ## Licence
 
-All files in `skills/public/` are released under the project's
+All agent YAML files in `agents/skills_configs/` are released under the project's
 [MIT Licence](../LICENSE) and are free to use, modify, and redistribute.

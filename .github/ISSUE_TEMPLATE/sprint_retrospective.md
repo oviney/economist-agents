@@ -44,5 +44,5 @@ assignees: ''
 
 ### Learnings Added to Skills System
 
-- [ ] Updated `skills/blog_qa_skills.json` with new patterns
+- [ ] Updated `data/skills_state/blog_qa_skills.json` with new patterns
 - [ ] Created GitHub issue for systemic improvements

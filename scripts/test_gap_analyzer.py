@@ -43,7 +43,9 @@ class TestGapAnalyzer:
         "editor_agent",
     ]
 
-    def __init__(self, defect_tracker_file: str = "skills/defect_tracker.json"):
+    def __init__(
+        self, defect_tracker_file: str = "data/skills_state/defect_tracker.json"
+    ):
         self.defect_tracker_file = Path(defect_tracker_file)
         self.findings = {}
 
@@ -522,8 +524,8 @@ def main():
     )
     parser.add_argument(
         "--tracker",
-        default="skills/defect_tracker.json",
-        help="Path to defect tracker (default: skills/defect_tracker.json)",
+        default="data/skills_state/defect_tracker.json",
+        help="Path to defect tracker (default: data/skills_state/defect_tracker.json)",
     )
 
     args = parser.parse_args()

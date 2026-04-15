@@ -401,7 +401,7 @@ python3 scripts/defect_tracker.py
 - `scripts/defect_prevention_rules.py` - Prevention rules engine
 - `scripts/publication_validator.py` - Final quality gate (v2)
 - `scripts/defect_tracker.py` - Bug tracking with RCA
-- `skills/defect_tracker.json` - Bug database with metadata
+- `data/skills_state/defect_tracker.json` - Bug database with metadata
 
 **Documentation**:
 - `docs/DEFECT_PREVENTION.md` - This file

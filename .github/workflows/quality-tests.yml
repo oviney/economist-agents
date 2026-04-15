@@ -33,5 +33,5 @@ jobs:
 
       - name: Check skills system integrity
         run: |
-          python -c "import json; json.load(open('skills/blog_qa_skills.json'))"
+          python -c "import json; json.load(open('data/skills_state/blog_qa_skills.json'))"
           echo "✅ Skills JSON valid"

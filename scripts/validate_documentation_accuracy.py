@@ -48,7 +48,9 @@ class DocumentationValidator:
         self.readme_path = self.repo_root / "README.md"
         self.sprint_path = self.repo_root / "SPRINT.md"
         self.changelog_path = self.repo_root / "docs" / "CHANGELOG.md"
-        self.tracker_path = self.repo_root / "skills" / "sprint_tracker.json"
+        self.tracker_path = (
+            self.repo_root / "data" / "skills_state" / "sprint_tracker.json"
+        )
 
         self.errors: list[str] = []
         self.warnings: list[str] = []
@@ -92,7 +94,7 @@ class DocumentationValidator:
             (self.readme_path, "README.md"),
             (self.sprint_path, "SPRINT.md"),
             (self.changelog_path, "docs/CHANGELOG.md"),
-            (self.tracker_path, "skills/sprint_tracker.json"),
+            (self.tracker_path, "data/skills_state/sprint_tracker.json"),
         ]:
             if not path.exists():
                 missing.append(name)

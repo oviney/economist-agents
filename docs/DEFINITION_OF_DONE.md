@@ -130,7 +130,7 @@ A sprint is **DONE** when ALL of the following are TRUE:
 - [ ] **README.md Project Status** updated (current phase, recent achievements)
 - [ ] **SPRINT.md header** updated (active sprint, previous sprint status)
 - [ ] **sprint_badge.json** updated (current sprint number)
-- [ ] **skills/sprint_tracker.json** updated (current sprint, completion status)
+- [ ] **data/skills_state/sprint_tracker.json** updated (current sprint, completion status)
 - [ ] **All documentation changes committed** in atomic commit with sprint completion
 
 **Sprint Documentation Checklist**:
@@ -140,7 +140,7 @@ A sprint is **DONE** when ALL of the following are TRUE:
 2. README.md shows Sprint N+1 as current, Sprint N as recent achievement
 3. SPRINT.md header shows Sprint N+1 planning, Sprint N complete
 4. sprint_badge.json message = "N"
-5. skills/sprint_tracker.json current_sprint = N
+5. data/skills_state/sprint_tracker.json current_sprint = N
 6. All above committed together
 ```
 

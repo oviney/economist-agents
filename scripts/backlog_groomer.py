@@ -33,7 +33,7 @@ class BacklogGroomer:
     DUPLICATE_SIMILARITY = 0.8  # 80% title similarity = potential duplicate
     MAX_HEALTH_SCORE = 10  # Target: <10% of backlog has issues
 
-    def __init__(self, backlog_path: str = "skills/sprint_tracker.json"):
+    def __init__(self, backlog_path: str = "data/skills_state/sprint_tracker.json"):
         self.backlog_path = Path(backlog_path)
         self.backlog = self._load_backlog()
         self.issues: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -460,8 +460,8 @@ def main():
     )
     parser.add_argument(
         "--backlog",
-        default="skills/sprint_tracker.json",
-        help="Path to backlog file (default: skills/sprint_tracker.json)",
+        default="data/skills_state/sprint_tracker.json",
+        help="Path to backlog file (default: data/skills_state/sprint_tracker.json)",
     )
 
     args = parser.parse_args()

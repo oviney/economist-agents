@@ -3,8 +3,8 @@ name: Sync Copilot Context
 on:
   push:
     paths:
-      - 'skills/defect_tracker.json'
-      - 'skills/blog_qa_skills.json'
+      - 'data/skills_state/defect_tracker.json'
+      - 'data/skills_state/blog_qa_skills.json'
       - 'docs/ARCHITECTURE_PATTERNS.md'
   workflow_dispatch:  # Manual trigger
   schedule:

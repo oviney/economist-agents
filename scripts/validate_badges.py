@@ -34,7 +34,7 @@ class BadgeValidator:
         try:
             # Get actual quality score
             result = subprocess.run(
-                [sys.executable, "scripts/quality_dashboard.py"],
+                [sys.executable, "scripts/quality_dashboard.py", "--no-save"],
                 cwd=self.repo_root,
                 capture_output=True,
                 text=True,

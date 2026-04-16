@@ -1,46 +1,57 @@
-# Defect Prevention Skill
+---
+name: defect-prevention
+description: Codify editorial failure patterns as deterministic prevention rules. Use when a new bug pattern is detected by the editorial judge, when adding post-mortem rules after a defective article ships.
+---
 
-## Purpose
-When the editorial judge or article evaluator detects a failure pattern,
-automatically codify it as a prevention rule so future articles avoid the
-same defect.  This closes the feedback loop between detection and prevention.
+# Defect Prevention
 
-## How Prevention Rules Work
+## Overview
 
-### Existing System
-`scripts/defect_prevention_rules.py` contains `DefectPrevention` class with
-5 active rules learned from historical bugs (BUG-015 through BUG-022):
+Automatically converts detected failure patterns into deterministic prevention rules so future articles avoid the same defect. Closes the feedback loop between detection and prevention.
 
-```python
-class DefectPrevention:
-    def check_all(self, content: str, metadata: dict) -> list[str]:
-        """Run all prevention checks, return list of violation messages."""
-        violations = []
-        violations.extend(self._check_chart_embedding(content, metadata))
-        violations.extend(self._check_category_present(content))
-        violations.extend(self._check_duplicate_chart(content))
-        violations.extend(self._check_badge_currency(content))
-        violations.extend(self._check_sprint_doc_currency(content))
-        return violations
+## When to Use
+
+- Editorial judge or article evaluator detects a recurring failure pattern
+- A new bug (BUG-NNN) has been root-caused and needs a prevention rule
+- Adding a deterministic fix to the editorial polish stage
+
+### When NOT to Use
+
+- One-off content issues that won't recur (e.g., a typo in a single article)
+- Stylistic preferences — those belong in `economist-writing`
+- Issues requiring LLM judgment — prevention rules must be deterministic
+
+## Core Process
+
+```
+1. Editorial Judge detects failure
+   ↓
+2. Log failure pattern to logs/defect_patterns.json
+   ↓
+3. Pattern analysis: new or known?
+   ↓
+4. If new → generate prevention rule method
+   ↓
+5. Add to DefectPrevention.check_all()
+   ↓
+6. Add deterministic fix to stage4_crew._apply_editorial_fixes() if possible
+   ↓
+7. Write test in tests/test_defect_prevention.py
+   ↓
+8. Next article benefits from prevention
 ```
 
 ### Rule Format
+
 Each prevention rule is a method on `DefectPrevention` that:
+
 1. Takes `content: str` and optional `metadata: dict`
 2. Checks for a specific pattern via regex or string matching
 3. Returns `list[str]` of violation messages (empty if clean)
 4. Message format: `"[SEVERITY] Description (Pattern: BUG-NNN-pattern)"`
 
-### Adding New Rules
+### Adding a New Rule
 
-When a new failure pattern is detected:
-
-1. **Identify the pattern** — what specific text/structure caused the failure?
-2. **Write a check method** — deterministic, no LLM needed
-3. **Add to `check_all()`** — so it runs on every article
-4. **Write a test** — in `tests/test_defect_prevention.py`
-
-Example — adding a rule for missing `layout: post`:
 ```python
 def _check_layout_field(self, content: str) -> list[str]:
     """BUG-028 prevention: Ensure layout: post in frontmatter."""
@@ -51,30 +62,7 @@ def _check_layout_field(self, content: str) -> list[str]:
     return []
 ```
 
-## Feedback Loop Architecture
-
-```
-Editorial Judge detects failure
-  ↓
-Log failure pattern to logs/defect_patterns.json
-  ↓
-Pattern analysis: is this a new pattern or known?
-  ↓
-If new: generate prevention rule
-  ↓
-Add rule to defect_prevention_rules.py
-  ↓
-Add rule to stage4_crew._apply_editorial_fixes() if deterministic fix possible
-  ↓
-Next article benefits from prevention
-```
-
-## Existing Files to Modify
-- `scripts/defect_prevention_rules.py` — add new `_check_*` methods
-- `src/crews/stage4_crew.py` — add deterministic fixes to `_apply_editorial_fixes()`
-- `scripts/publication_validator.py` — add validation checks
-
-## Pattern Storage Schema
+### Pattern Storage Schema
 
 ```json
 {
@@ -93,8 +81,34 @@ Next article benefits from prevention
 }
 ```
 
-## Integration Points
-- Editorial judge (`scripts/editorial_judge.py`) — source of failure patterns
-- Article evaluator (Story #116) — source of low-scoring dimensions
-- Deterministic polish (`stage4_crew._apply_editorial_fixes`) — applies fixes
-- Publication validator — enforces rules before publication
+## Common Rationalizations
+
+| Rationalization | Reality |
+|----------------|---------|
+| "This bug only happened once" | If it happened once without a rule, it will happen again — codify it |
+| "The LLM can just learn not to do that" | LLMs have no memory between runs; only deterministic rules persist |
+| "We'll fix it in code review" | Human review doesn't scale; automated prevention catches 100% of known patterns |
+| "The rule is too strict" | Better to have a false positive that gets refined than a missed defect in production |
+
+## Red Flags
+
+- Prevention rule uses LLM calls instead of deterministic checks
+- Rule added to `check_all()` but no corresponding test written
+- Pattern logged but no prevention rule created within the same sprint
+- Rule silently passes without a violation message format (`[SEVERITY] ... (Pattern: BUG-NNN)`)
+- Duplicate rules checking the same pattern with different names
+
+## Verification
+
+- [ ] New rule method exists on `DefectPrevention` class with `_check_` prefix
+- [ ] Rule is called from `check_all()` — **evidence**: grep shows the method in the call chain
+- [ ] Test exists in `tests/test_defect_prevention.py` covering both pass and fail cases
+- [ ] Pattern logged in `logs/defect_patterns.json` with `prevention_rule_added: true`
+- [ ] If deterministic fix is possible, added to `stage4_crew._apply_editorial_fixes()`
+
+### Integration Points
+
+- `scripts/defect_prevention_rules.py` — add new `_check_*` methods
+- `src/crews/stage4_crew.py` — add deterministic fixes to `_apply_editorial_fixes()`
+- `scripts/publication_validator.py` — add validation checks
+- `scripts/editorial_judge.py` — source of failure patterns

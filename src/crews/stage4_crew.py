@@ -68,6 +68,10 @@ _HEDGING_PHRASES: list[str] = [
     "further complicating matters",
     "invites closer scrutiny",
     "in practical terms",
+    "One suspects",
+    "if you find yourself",
+    "it is clear that",
+    "it remains to be seen",
 ]
 
 # Verbose padding — throat-clearing and redundant attribution (SKILL.md Rule 6)
@@ -114,6 +118,7 @@ _BANNED_CLOSINGS: list[str] = [
     "depends on",
     "the key is",
     "to summarise",
+    "One suspects",
 ]
 
 
@@ -175,6 +180,82 @@ def _auto_embed_chart(article: str) -> str:
         return article[:pos] + chart_embed + article[pos:]
 
     return article.rstrip() + "\n" + chart_embed
+
+
+def _enforce_heading_limit(article: str, max_headings: int = 4) -> str:
+    """Merge the shortest section when body heading count exceeds the limit.
+
+    Counts ``## `` headings in the article body (after YAML frontmatter),
+    excluding ``## References``.  When the count exceeds *max_headings*,
+    the shortest section (fewest lines between consecutive headings) is
+    merged into the previous section by removing its heading line.  The
+    process repeats until the count is at or below the limit.
+
+    Args:
+        article: Full article text, optionally with YAML frontmatter.
+        max_headings: Maximum allowed ``## `` headings (default 4).
+
+    Returns:
+        Article with headings merged down to the limit.
+    """
+    # Split frontmatter from body
+    if article.startswith("---"):
+        parts = article.split("---", 2)
+        if len(parts) >= 3:
+            frontmatter = "---" + parts[1] + "---"
+            body = parts[2]
+        else:
+            frontmatter = ""
+            body = article
+    else:
+        frontmatter = ""
+        body = article
+
+    while True:
+        lines = body.split("\n")
+        # Collect indices of body headings (## ) excluding ## References
+        heading_indices: list[int] = [
+            i
+            for i, line in enumerate(lines)
+            if line.startswith("## ") and line.strip() != "## References"
+        ]
+
+        if len(heading_indices) <= max_headings:
+            break
+
+        # Find shortest section (by line count between headings)
+        # Build section lengths: from heading to next heading (or end)
+        section_lengths: list[tuple[int, int]] = []  # (length, heading_index)
+        for idx, h_idx in enumerate(heading_indices):
+            if idx + 1 < len(heading_indices):
+                next_h = heading_indices[idx + 1]
+            else:
+                next_h = len(lines)
+            section_len = next_h - h_idx
+            section_lengths.append((section_len, h_idx))
+
+        # Don't merge the very first heading (nothing to merge into)
+        mergeable = section_lengths[1:]
+        if not mergeable:
+            break
+
+        # Pick the shortest mergeable section
+        shortest = min(mergeable, key=lambda x: x[0])
+        remove_idx = shortest[1]
+
+        logger.info(
+            "Heading limit exceeded (%d > %d); removing heading at line %d: %s",
+            len(heading_indices),
+            max_headings,
+            remove_idx + 1,
+            lines[remove_idx].strip(),
+        )
+
+        # Remove the heading line
+        del lines[remove_idx]
+        body = "\n".join(lines)
+
+    return frontmatter + body
 
 
 def _apply_editorial_fixes(article: str, current_date: str | None = None) -> str:
@@ -249,6 +330,9 @@ def _apply_editorial_fixes(article: str, current_date: str | None = None) -> str
 
     # 8c. Auto-embed chart if chart_data exists but embed missing
     text = _auto_embed_chart(text)
+
+    # 8d. Enforce heading limit (max 4 body headings)
+    text = _enforce_heading_limit(text)
 
     # 9. Clean up double spaces from phrase/placeholder removal
     text = re.sub(r"  +", " ", text)

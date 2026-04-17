@@ -3,7 +3,11 @@
 
 import pytest
 
-from src.crews.stage4_crew import _apply_editorial_fixes
+from src.crews.stage4_crew import (
+    _apply_editorial_fixes,
+    _BANNED_CLOSINGS,
+    _enforce_heading_limit,
+)
 
 
 class TestBritishSpelling:
@@ -207,6 +211,74 @@ class TestChartAutoEmbed:
         )
         result = _apply_editorial_fixes(article)
         assert "![Chart](/assets/charts/my-slug.png)" in result
+
+
+class TestNewHedgingPhrases:
+    """New hedging phrases added in Story 1."""
+
+    def test_one_suspects_removed(self) -> None:
+        """Article containing 'One suspects' has the phrase stripped."""
+        result = _apply_editorial_fixes("One suspects the future is bleak.")
+        assert "One suspects" not in result
+        assert "the future is bleak" in result
+
+    def test_it_is_clear_that_removed(self) -> None:
+        """Article containing 'it is clear that' has the phrase stripped."""
+        result = _apply_editorial_fixes("It is clear that progress has stalled.")
+        assert "it is clear that" not in result.lower()
+        assert "progress has stalled" in result
+
+    def test_one_suspects_in_closing_banned(self) -> None:
+        """'One suspects' appears in _BANNED_CLOSINGS."""
+        assert "One suspects" in _BANNED_CLOSINGS
+
+
+class TestHeadingLimitEnforcement:
+    """Heading count enforcement (Story 3)."""
+
+    def test_headings_under_limit_unchanged(self) -> None:
+        """Article with 3 headings passes through unchanged."""
+        article = (
+            "---\ntitle: Test\n---\n\n"
+            "## Introduction\n\nParagraph one.\n\n"
+            "## Analysis\n\nParagraph two.\n\n"
+            "## Conclusion\n\nParagraph three.\n"
+        )
+        result = _enforce_heading_limit(article)
+        assert result.count("\n## ") == 3
+
+    def test_headings_over_limit_merged(self) -> None:
+        """Article with 6 headings is reduced to 4."""
+        sections = []
+        for i in range(6):
+            sections.append(f"## Section {i + 1}\n\n{'Line.\n' * (i + 1)}")
+        article = "---\ntitle: Test\n---\n\n" + "\n".join(sections)
+        result = _enforce_heading_limit(article)
+        heading_count = sum(
+            1
+            for line in result.split("\n")
+            if line.startswith("## ") and line.strip() != "## References"
+        )
+        assert heading_count == 4
+
+    def test_references_heading_not_counted(self) -> None:
+        """Article with 4 body headings + ## References stays unchanged."""
+        article = (
+            "---\ntitle: Test\n---\n\n"
+            "## Introduction\n\nText.\n\n"
+            "## Analysis\n\nText.\n\n"
+            "## Results\n\nText.\n\n"
+            "## Outlook\n\nText.\n\n"
+            "## References\n\n1. Source A\n"
+        )
+        result = _enforce_heading_limit(article)
+        # All 4 body headings + References should remain
+        all_headings = [
+            line for line in result.split("\n") if line.startswith("## ")
+        ]
+        assert len(all_headings) == 5
+        body_headings = [h for h in all_headings if h.strip() != "## References"]
+        assert len(body_headings) == 4
 
 
 if __name__ == "__main__":

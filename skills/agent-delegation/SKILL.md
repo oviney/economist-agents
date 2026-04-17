@@ -1,181 +1,96 @@
 ---
 name: agent-delegation
-version: 1.0.0
-description: Rules for assigning stories to the correct agent runtime with appropriate constraints
-category: governance
-author: ouray.viney
-created: 2026-04-05
-last_evaluated: 2026-04-05
-
-agents:
-  - Product Owner
-  - Scrum Master
-
-eval_criteria:
-  - metric: assignment_accuracy
-    description: "Percentage of stories assigned to correct runtime without rework"
-    target: ">= 0.95"
-    source: sprint-retrospective
-  - metric: parallel_utilization
-    description: "Percentage of independent stories executed in parallel vs sequential"
-    target: ">= 0.70"
-    source: sprint-retrospective
-
-dependencies: []
-
-complements:
-  - sprint-management
-  - quality-gates
+description: Rules for assigning stories to the correct agent runtime with appropriate constraints. Use when planning sprint assignments, when deciding between Claude Code / Copilot / Human for a story, when launching parallel sub-agents.
 ---
 
-# Agent Delegation Skill
+# Agent Delegation
 
-## Purpose
+## Overview
 
-Determine which agent runtime executes a given story, with what
-constraints, and under what governance. This skill prevents
-misassignment incidents (e.g., Copilot modifying existing files)
-and maximizes parallel execution throughput.
+Determines which agent runtime executes a given story, with what constraints, and under what governance. Prevents misassignment incidents (e.g., Copilot modifying existing files) and maximises parallel execution throughput.
 
-## Agent Runtimes
+## When to Use
 
-### Claude Code (Primary)
-- **Role:** Orchestrator. Reads, edits, and coordinates across the
-  full codebase.
-- **Strengths:** Full context window, multi-file edits, MCP tool
-  access, browser automation via Playwright, sub-agent spawning.
-- **Assign when:** Story modifies existing files, requires
-  orchestration across multiple files, or needs interactive
-  debugging.
+- Sprint planning: assigning stories to runtimes
+- Deciding whether a story needs Claude Code, Copilot, sub-agents, or human
+- Launching parallel sub-agents for independent work
+- Reviewing whether an assignment follows governance rules
 
-### Claude Code Sub-Agents
-- **Role:** Parallel workers. Execute independent tasks
-  concurrently.
-- **Strengths:** Parallel execution, isolated context prevents
-  interference, full tool access.
-- **Constraints:** Cannot share state or modify the same files.
-  Each agent works on its own files.
-- **Assign when:** Two or more new files need creation with no
-  dependencies between them. Research tasks that can run
-  concurrently.
+### When NOT to Use
 
-### GitHub Copilot
-- **Role:** Autonomous PR creator for isolated new files.
-- **Strengths:** Creates PRs with CI integration, works
-  asynchronously.
-- **Constraints:** DESTROYS existing files when asked to modify
-  them. Limited context window. Cannot access MCP tools.
-- **Assign when:** Story creates a single new self-contained file
-  with no imports from files being concurrently modified.
-- **NEVER assign when:** Story modifies any existing file.
+- For sprint ceremony process — that's `sprint-management`
+- For ADR creation and review — that's `adr-governance`
+- For code quality standards — that's `python-quality`
 
-### Human
-- **Role:** Governance, credentials, judgment calls.
-- **Strengths:** Access to accounts, passwords, approval authority,
-  strategic judgment.
-- **Assign when:** Story requires credential setup, account
-  configuration, architecture approval, or involves sensitive
-  operations on shared infrastructure.
+## Core Process
 
-## Assignment Rules
+### Agent Runtimes
 
-Apply these rules in order. First match wins.
+| Runtime | Role | Strengths | Constraints |
+|---------|------|-----------|-------------|
+| **Claude Code** | Orchestrator | Full context, multi-file edits, MCP tools, Playwright, sub-agents | — |
+| **Claude Code Sub-Agents** | Parallel workers | Concurrent execution, isolated context | Cannot share state or modify same files |
+| **GitHub Copilot** | Autonomous PR creator | Creates PRs with CI, works async | **DESTROYS existing files**. Limited context. No MCP. |
+| **Human** | Governance | Credentials, approval, strategic judgment | — |
 
-### Rule 1: Credentials Required
+### Assignment Rules (first match wins)
+
 ```
-IF story requires login, API keys, account setup, or browser auth
-THEN assign to HUMAN
-     Claude Code assists via Playwright MCP for navigation
+Rule 1: Credentials Required
+  → HUMAN (Claude Code assists via Playwright)
+
+Rule 2: Modifies Existing Files
+  → CLAUDE CODE (NEVER Copilot)
+
+Rule 3: Multiple Independent New Files
+  → CLAUDE CODE SUB-AGENTS (parallel)
+
+Rule 4: Single New File with Dependencies
+  → CLAUDE CODE (sequential)
+
+Rule 5: Research or Exploration
+  → CLAUDE CODE SUB-AGENT (Explore type)
+
+Rule 6: Architecture Decision
+  → CLAUDE CODE + Plan agent, REQUIRES human approval
 ```
 
-### Rule 2: Modifies Existing Files
-```
-IF story modifies any existing file in the codebase
-THEN assign to CLAUDE CODE (primary)
-     NEVER assign to Copilot
-```
-
-### Rule 3: Multiple Independent New Files
-```
-IF story creates 2+ new files with NO dependencies between them
-THEN assign to CLAUDE CODE SUB-AGENTS (parallel)
-     Each agent creates one file + its tests
-     Primary Claude Code orchestrates and verifies
-```
-
-### Rule 4: Single New File with Dependencies
-```
-IF story creates new file(s) that import from existing code
-THEN assign to CLAUDE CODE (primary, sequential)
-```
-
-### Rule 5: Research or Exploration
-```
-IF story is pure research (no code changes)
-THEN assign to CLAUDE CODE SUB-AGENT (Explore type)
-     Results feed back to primary for synthesis
-```
-
-### Rule 6: Architecture Decision
-```
-IF story produces an ADR, schema change, or new agent type
-THEN assign to CLAUDE CODE with Plan agent first
-     REQUIRES human approval before implementation begins
-```
-
-## Governance Gates
+### Governance Gates
 
 | Gate | Trigger | Approver |
 |------|---------|----------|
 | Sprint planning | Before any story assignment | Human |
 | Architecture review | ADRs, new agent types, schema changes | Human |
 | PR review | Before merge to main | Human |
-| Skill modification | Any change to `skills/*/SKILL.md` | Human (must cite performance data) |
+| Skill modification | Any change to `skills/*/SKILL.md` | Human (must cite data) |
 | Credential operations | New API keys, service accounts | Human executes directly |
 | Destructive git ops | Force push, reset, branch delete | Human confirms explicitly |
 
-## Anti-Patterns
+## Common Rationalizations
 
-### 1. Assigning Copilot to Modify Existing Files
-**What happens:** Copilot rewrites entire files, losing existing
-logic, comments, and structure.
-**Rule:** Copilot creates new files ONLY.
+| Rationalization | Reality |
+|----------------|---------|
+| "Copilot can handle this small edit to an existing file" | Copilot rewrites entire files, losing existing logic and structure — assign to Claude Code |
+| "We'll run these stories sequentially, it's simpler" | Independent stories executed sequentially take 2-3x longer; sub-agents run them in parallel |
+| "We don't need human approval for this architecture change" | Agents making structural decisions without governance creates direction conflicts — ADRs need sign-off |
+| "Let's just do it without a GitHub issue" | Untraceable work products break sprint discipline and audit trail |
+| "Sub-agents can coordinate on shared files" | Sub-agents have isolated context; sharing state between them causes race conditions and overwrites |
 
-### 2. Sequential Execution of Independent Stories
-**What happens:** Sprint takes 3x longer than necessary.
-**Rule:** If stories touch different files with no shared state,
-launch sub-agents in parallel.
+## Red Flags
 
-### 3. Skipping Human Approval on Architecture
-**What happens:** Agents make structural decisions that conflict
-with project direction.
-**Rule:** ADRs and schema changes require human sign-off before
-implementation.
+- Copilot assigned to a story that modifies existing files
+- Independent stories executed sequentially instead of in parallel
+- Architecture decision made without human approval gate
+- Work started without a GitHub issue
+- Sub-agents assigned to modify the same file
+- Credential operation attempted by an agent instead of human
+- Story assignment doesn't match any rule in the assignment matrix
 
-### 4. Ad-Hoc Work Without Sprint Tracking
-**What happens:** Work products are untraceable, no GitHub issue
-trail, no PR linkage.
-**Rule:** Non-trivial work gets a GitHub issue before
-implementation begins.
+## Verification
 
-## Example: Sprint 20 Delegation
-
-Story 20.1 (credentials setup):
-- Requires account access and browser login
-- **Rule 1 applies** -> Human + Claude Code (Playwright assist)
-
-Story 20.2 (GA4 ETL script):
-- Creates new file `scripts/ga4_etl.py`
-- No dependency on Story 20.3
-
-Story 20.3 (GSC ETL script):
-- Creates new file `scripts/gsc_etl.py`
-- No dependency on Story 20.2
-
-Stories 20.2 + 20.3:
-- **Rule 3 applies** -> Claude Code sub-agents (parallel)
-- Result: both completed in ~2.5 minutes vs ~5 minutes sequential
-
-Story 20.4 (ADR-003):
-- Architecture decision
-- **Rule 6 applies** -> Claude Code with human approval
+- [ ] Every story has a designated runtime before implementation begins — **evidence**: sprint plan includes runtime column
+- [ ] No Copilot assignments touch existing files — **evidence**: Copilot stories only create new files
+- [ ] Independent stories run in parallel where possible — **evidence**: sub-agent logs show concurrent execution
+- [ ] Architecture decisions have human approval — **evidence**: GitHub issue comment from human before implementation
+- [ ] All work has a GitHub issue — **evidence**: every PR references an issue number
+- [ ] Governance gates enforced — **evidence**: PR review required, no force pushes without explicit approval

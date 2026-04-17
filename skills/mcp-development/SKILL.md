@@ -1,34 +1,48 @@
-# MCP Server Development Skill
+---
+name: mcp-development
+description: Standards for building MCP servers in this project. Use when creating a new MCP server, when reviewing MCP server code, when debugging import or tool registration issues.
+---
 
-## Purpose
-Define the standard for building MCP (Model Context Protocol) servers
-in this project.  Every MCP server must follow these patterns exactly.
-This skill exists because Copilot agents consistently get the import
-wrong — using third-party packages instead of the official SDK.
+# MCP Server Development
 
-## The Critical Import
+## Overview
+
+Every MCP server must use the official SDK import (`from mcp.server.fastmcp import FastMCP`), return structured error dicts instead of exceptions, and follow the template below. This skill exists because agents consistently use the wrong import.
+
+## When to Use
+
+- Creating a new MCP server in `mcp_servers/`
+- Reviewing an MCP server PR for correctness
+- Debugging import errors or tool registration failures
+- Writing tests for MCP server tools
+
+### When NOT to Use
+
+- For general Python quality standards — that's `python-quality`
+- For test coverage requirements — that's `testing`
+- For CI/CD pipeline configuration — that's `quality-gates`
+
+## Core Process
+
+### The Critical Import
 
 ```python
-# ✅ CORRECT — official MCP SDK
+# CORRECT — official MCP SDK
 from mcp.server.fastmcp import FastMCP
 
-# ❌ WRONG — third-party package, different API
+# WRONG — third-party package, different API
 from fastmcp import FastMCP
 ```
 
-**Dependency:** `mcp>=1.0.0` in `requirements.txt`.  Never add
-`fastmcp` as a separate dependency.  The `FastMCP` class lives inside
-the `mcp` package at `mcp.server.fastmcp`.
+**Dependency:** `mcp>=1.0.0` in `requirements.txt`. Never add `fastmcp` as separate dependency.
 
-## Server Template
-
-Every MCP server in this project follows this structure:
+### Server Template
 
 ```python
 #!/usr/bin/env python3
-"""<Name> MCP Server (Story <number>).
+"""<Name> MCP Server.
 
-<One-line description of what this server exposes.>
+<One-line description.>
 
 Tools:
     <tool_name>: <what it does>
@@ -59,55 +73,7 @@ def my_tool(param: str, count: int = 5) -> dict[str, Any]:
         Dict with results or error information.
     """
     try:
-        # Implementation here
-        return {"success": True, "data": result}
-    except SomeSpecificError as e:
-        logger.exception("Descriptive message")
-        return {"success": False, "error": str(e)}
-
-
-if __name__ == "__main__":
-    mcp.run(transport="stdio")
-```
-
-## Mandatory Rules
-
-### 1. Import
-Always `from mcp.server.fastmcp import FastMCP`.  Never `from fastmcp`.
-
-### 2. Decorator
-Always `@mcp.tool()` with parentheses.  Not `@mcp.tool` (no parens).
-
-### 3. Type hints
-Every tool function must have full type hints on parameters and return
-type.  Use `dict[str, Any]` for complex returns, `list[str]` for
-simple lists.
-
-### 4. Docstrings
-Every tool must have a Google-style docstring with Args and Returns
-sections.  The first line becomes the tool description in MCP
-discovery.
-
-### 5. Error handling
-Tools must **never raise exceptions** to MCP clients.  Catch all
-expected errors and return structured error dicts:
-
-```python
-# ✅ CORRECT — structured error
-return {"success": False, "error": "GITHUB_TOKEN not set"}
-
-# ❌ WRONG — exception propagates to client
-raise ValueError("GITHUB_TOKEN not set")
-```
-
-Wrap the entire tool body in try/except for unexpected errors:
-
-```python
-@mcp.tool()
-def my_tool(content: str) -> dict[str, Any]:
-    """Process content."""
-    try:
-        result = do_work(content)
+        result = do_work(param, count)
         return {"success": True, "data": result}
     except SpecificError as e:
         logger.exception("Known failure mode")
@@ -115,76 +81,35 @@ def my_tool(content: str) -> dict[str, Any]:
     except Exception as e:
         logger.exception("Unexpected error in my_tool")
         return {"success": False, "error": f"Unexpected: {e}"}
+
+
+if __name__ == "__main__":
+    mcp.run(transport="stdio")
 ```
 
-### 6. Transport
-Always `mcp.run(transport="stdio")` under `if __name__ == "__main__":`
-guard.  stdio for local dev, HTTP for CI/CD (future).
+### 9 Mandatory Rules
 
-### 7. Server naming
-Use kebab-case for server names: `"article-evaluator"`,
-`"blog-deployer"`, `"web-researcher"`.
+1. **Import:** Always `from mcp.server.fastmcp import FastMCP`
+2. **Decorator:** Always `@mcp.tool()` with parentheses
+3. **Type hints:** Full type hints on all parameters and return type
+4. **Docstrings:** Google-style with Args and Returns sections
+5. **Error handling:** Never raise exceptions; return `{"success": False, "error": "..."}`
+6. **Transport:** `mcp.run(transport="stdio")` under `__main__` guard
+7. **Naming:** kebab-case server names (`"article-evaluator"`)
+8. **Location:** All servers in `mcp_servers/` directory
+9. **Logging:** `logging.getLogger(__name__)`, not `print()`
 
-### 8. Module location
-All servers live in `mcp_servers/` directory.  File name matches
-server purpose: `mcp_servers/article_evaluator_server.py`.
+### Testing Standards
 
-### 9. Logging
-Use `logging.getLogger(__name__)`, not `print()`.  Log at INFO on
-tool entry/exit, ERROR on failures.
+- Test location: `tests/test_mcp_servers/test_<server_name>.py`
+- Mock all external calls (no real API/network traffic)
+- Minimum test categories: happy path, error handling, edge cases, server registration
+- Coverage: ≥80%
+- Use `mcp._tool_manager._tools` for tool introspection (no public `.tools` attribute)
 
-## Testing Standards
+### Configuration
 
-### Test file location
-`tests/test_mcp_servers/test_<server_name>.py`
-
-### Mock all external calls
-No real API calls, no real git operations, no real network traffic
-in tests.  Use `unittest.mock.patch` or `pytest-mock`.
-
-### Test categories (minimum)
-
-1. **Happy path** — tool returns expected result on valid input
-2. **Error handling** — tool returns structured error on bad input,
-   missing credentials, network failures
-3. **Edge cases** — empty input, missing directories, malformed data
-4. **Server registration** — verify server name and tool names:
-
-```python
-class TestMcpServerRegistration:
-    def test_server_name(self) -> None:
-        from mcp_servers.my_server import mcp
-        assert mcp.name == "my-server"
-
-    def test_tools_registered(self) -> None:
-        from mcp_servers.my_server import mcp
-        tool_names = [t.name for t in mcp._tool_manager._tools.values()]
-        assert "my_tool" in tool_names
-```
-
-Note: use `mcp._tool_manager._tools` (underscore prefix) — the
-`ToolManager` does not expose a public `.tools` attribute.
-
-### Coverage
-Minimum 80%.  Uncovered lines should only be `__main__` blocks
-and `sys.path` guards.
-
-### Test isolation
-Use `tmp_path` fixture for file operations.  Use `monkeypatch` for
-environment variables.  Use `EphemeralClient` for ChromaDB tests.
-
-## Requirements
-
-The only dependency needed is `mcp>=1.0.0` in `requirements.txt`.
-
-**Do not add:**
-- `fastmcp` (separate package, wrong API)
-- `mcp-server-*` (these are pre-built servers, not the SDK)
-
-## Configuration
-
-Register servers in `.mcp.json` at project root:
-
+Register in `.mcp.json`:
 ```json
 {
   "mcpServers": {
@@ -197,31 +122,30 @@ Register servers in `.mcp.json` at project root:
 }
 ```
 
-## Anti-Patterns (From Sprint 18 Bugs)
+## Common Rationalizations
 
-1. **The fastmcp import** — `from fastmcp import FastMCP` uses a
-   different third-party package with incompatible API.  This caused
-   4 of 5 Copilot PRs to fail review in Sprint 18.
+| Rationalization | Reality |
+|----------------|---------|
+| "The `fastmcp` package has better ergonomics" | It's a different package with an incompatible API — this caused 4/5 Copilot PRs to fail in Sprint 18 |
+| "We can skip the parentheses on `@mcp.tool`" | Inconsistent with SDK docs and breaks in some versions |
+| "Raising exceptions is simpler than returning dicts" | Exceptions crash the MCP client connection; structured errors keep the session alive |
+| "We don't need all those test categories" | Registration tests catch the import bug; error tests catch exception leaks — both are Sprint 18 bugs |
 
-2. **Missing parentheses** — `@mcp.tool` without `()` may work with
-   some versions but is inconsistent with the SDK documentation.
+## Red Flags
 
-3. **Inconsistent requirements** — PRs adding `fastmcp>=0.1.0`,
-   `fastmcp>=2.0.0`, `fastmcp>=3.0.0` in different PRs.  Standardise
-   on `mcp>=1.0.0` only.
+- `from fastmcp import FastMCP` anywhere in the codebase
+- `fastmcp` listed as a dependency in `requirements.txt`
+- `@mcp.tool` without parentheses
+- Tool function that raises instead of returning error dict
+- `print()` used instead of `logging.getLogger()`
+- MCP server file outside `mcp_servers/` directory
+- Test that makes real API calls or network requests
 
-4. **Raw exceptions** — Letting `ValueError` or `KeyError` propagate
-   from a tool crashes the MCP client connection.  Always catch and
-   return structured dicts.
+## Verification
 
-5. **Public `.tools` attribute** — `mcp._tool_manager.tools` does not
-   exist.  Use `mcp._tool_manager._tools` (private attribute).
-
-## Integration Points
-
-- **All MCP servers** in `mcp_servers/` must follow this skill
-- **Copilot agent** should reference this skill when assigned MCP
-  server stories
-- **Claude Code** follows this skill for Story 18.3 and future
-  MCP server work
-- **Code reviewer** validates against these rules during PR review
+- [ ] Import is `from mcp.server.fastmcp import FastMCP` — **evidence**: grep confirms no `from fastmcp`
+- [ ] All tools use `@mcp.tool()` with parentheses — **evidence**: grep `@mcp.tool[^(]` returns empty
+- [ ] All tools have type hints and Google-style docstrings — **evidence**: mypy passes, docstring present
+- [ ] No tools raise exceptions — **evidence**: every tool body wrapped in try/except returning dicts
+- [ ] Tests exist with ≥80% coverage — **evidence**: `pytest --cov` output
+- [ ] Server registered in `.mcp.json` — **evidence**: JSON entry matches server name

@@ -1,94 +1,91 @@
-# Article Evaluation Skill
+---
+name: article-evaluation
+description: Score articles on 5 quality dimensions with deterministic metrics and persist for trend tracking. Use when evaluating a generated article, when tuning scoring rubrics, when adding a new quality dimension.
+---
 
-## Purpose
-Score every generated article on 5 quality dimensions with deterministic
-metrics.  Persist scores to JSON for trend tracking.  This is the nervous
-system of the quality architecture — without evals there is no signal.
+# Article Evaluation
 
-## Scoring Dimensions (1-10 each, total 50)
+## Overview
 
-### 1. Opening Quality
-**What to measure:**
-- First sentence contains a striking fact or statistic (not throat-clearing)
-- No banned openings: "In today's world", "It's no secret", "When it comes to", "Amidst"
-- Opening paragraph has a clear hook within the first 30 words
+Scores every generated article on 5 quality dimensions (opening, evidence, voice, structure, visuals) using deterministic checks. Persists scores to JSON for trend analysis via the observability dashboard.
 
-**How to score:**
-- 10: Striking data point in first sentence, zero banned patterns
-- 7-9: Good hook but not data-led, or hook appears in second sentence
-- 4-6: Generic opening but not banned
-- 1-3: Contains banned opening pattern
+## When to Use
 
-**Implementation:** Regex match against banned patterns in first paragraph.
-Count data-bearing tokens (numbers, percentages, currency) in first sentence.
+- After Stage 4 quality gate to score the article (pass or revision)
+- After deployment via the editorial judge for deployed-article scoring
+- When tuning scoring rubrics or adjusting dimension weights
+- When adding a new quality dimension to the evaluation
 
-### 2. Evidence Sourcing
-**What to measure:**
-- All statistics have named sources (not "studies show" or "experts say")
-- No `[NEEDS SOURCE]` or `[UNVERIFIED]` placeholders remain
-- References section exists with ≥3 numbered, cited sources
+### When NOT to Use
 
-**How to score:**
-- 10: All stats sourced, ≥5 references, zero placeholders
-- 7-9: All stats sourced, 3-4 references, zero placeholders
-- 4-6: Some unsourced stats, references present
-- 1-3: Multiple unsourced stats or missing references section
+- For trend analysis across articles over time — that's `observability`
+- For codifying recurring failure patterns as rules — that's `defect-prevention`
+- For checking source freshness or diversity — that's `research-sourcing`
 
-**Implementation:** Regex for placeholder tags.  Count numbered items in
-`## References` section.  Scan for vague attribution phrases.
+## Core Process
 
-### 3. Voice Consistency
-**What to measure:**
-- British spelling throughout (organisation, analyse, behaviour)
-- No banned phrases: "game-changer", "paradigm shift", "leverage" (verb)
-- Active voice dominant (no "is experiencing", "was determined")
-- No exclamation points
+```
+1. Receive article text + metadata from pipeline
+   ↓
+2. Score each of 5 dimensions (1-10) using deterministic checks
+   ↓
+3. Compute total (max 50) and percentage
+   ↓
+4. Generate per-dimension detail strings explaining the score
+   ↓
+5. Append evaluation record to logs/article_evals.json
+   ↓
+6. Return scores to caller (quality gate or editorial judge)
+```
 
-**How to score:**
-- 10: Zero American spellings, zero banned phrases, zero exclamation points
-- 7-9: 1-2 minor American spellings, otherwise clean
-- 4-6: Mixed spelling or 1 banned phrase
-- 1-3: Multiple banned phrases or inconsistent voice
+### Scoring Dimensions
 
-**Implementation:** Dictionary lookup for American→British spelling pairs
-(same list as `stage4_crew._BRITISH_SPELLING`).  Regex for banned phrases
-(same list as `stage4_crew._BANNED_PHRASES`).
+| Dimension | 10 (Excellent) | 7-9 (Good) | 4-6 (Acceptable) | 1-3 (Poor) |
+|-----------|---------------|------------|-------------------|------------|
+| **Opening Quality** | Striking data in first sentence, zero banned patterns | Good hook, not data-led | Generic but not banned | Contains banned opening |
+| **Evidence Sourcing** | All stats sourced, ≥5 refs, zero placeholders | All sourced, 3-4 refs | Some unsourced stats | Multiple unsourced or no refs section |
+| **Voice Consistency** | Zero American spellings, banned phrases, exclamation points | 1-2 minor American spellings | Mixed spelling or 1 banned phrase | Multiple banned phrases |
+| **Structure** | All frontmatter, 3+ headings, 800-1200 words, refs, strong ending | Missing 1 optional field or 1200-1500 words | Missing required field or <800 words | No frontmatter or <500 words |
+| **Visual Engagement** | Image, chart embedded and referenced, visual breaks | Image + chart but not referenced naturally | Image missing or chart not embedded | No image, no chart, wall of text |
 
-### 4. Structure
-**What to measure:**
-- YAML frontmatter with all required fields (layout, title, date, categories, image)
-- ≥2 markdown headings (## sections)
-- 800-1500 words (body after frontmatter)
-- References section present
-- Ending is prediction/implication, not summary
+### Implementation Approach
 
-**How to score:**
-- 10: All frontmatter fields, 3+ headings, 800-1200 words, references, strong ending
-- 7-9: Missing 1 optional field, or word count 1200-1500
-- 4-6: Missing required field, or <800 words, or no references
-- 1-3: No frontmatter, or <500 words, or no headings
+All scoring is deterministic — regex, dictionary lookups, and counting. No LLM calls.
 
-**Implementation:** Reuse `FrontmatterSchema.validate_article()` for
-frontmatter.  Regex count headings.  Word count.  Check for banned
-closings in last 500 chars.
+| Dimension | Technique | Reusable Code |
+|-----------|-----------|---------------|
+| Opening | Regex banned patterns, count data tokens in first sentence | `stage4_crew._BANNED_PHRASES` |
+| Evidence | Regex for placeholders, count References items, scan vague attribution | `publication_validator.py` |
+| Voice | Dictionary lookup American→British spelling, regex banned phrases | `stage4_crew._BRITISH_SPELLING` |
+| Structure | `FrontmatterSchema.validate_article()`, regex headings, word count | `frontmatter_schema.py` |
+| Visuals | Check `image:` frontmatter, regex `![` syntax, heading distribution | `editorial_judge.py` |
 
-### 5. Visual Engagement
-**What to measure:**
-- Featured image field present and points to existing file
-- Chart embedded in article body (if chart_data was generated)
-- Chart referenced naturally in text ("As the chart shows...")
-- Article has visual breaks (headings every 200-300 words)
+## Common Rationalizations
 
-**How to score:**
-- 10: Image present, chart embedded and referenced, good visual breaks
-- 7-9: Image present, chart embedded but not referenced naturally
-- 4-6: Image missing or chart not embedded
-- 1-3: No image, no chart, wall of text
+| Rationalization | Reality |
+|----------------|---------|
+| "The quality gate already checks this" | The gate makes a pass/fail decision; evaluation provides granular scores for trend analysis |
+| "LLM-based evaluation would be more nuanced" | LLM scores are non-deterministic and can't be compared across runs; deterministic scoring enables trends |
+| "5 dimensions is too few" | Start with 5 measurable dimensions; add more when you have data showing gaps |
+| "Scoring is subjective" | These rubrics are deliberately mechanical — regex matches and counts, not taste |
 
-**Implementation:** Check `image:` field in frontmatter.  Regex for
-`![` markdown image syntax.  Measure paragraphs between headings.
+## Red Flags
 
-## Output Schema
+- Evaluation uses LLM calls instead of deterministic checks
+- Scores not persisted to `logs/article_evals.json` after each run
+- Missing dimension detail strings (scores without explanations are unauditable)
+- Same article evaluated multiple times without dedup (inflates trend data)
+- Scoring rubric drifts from what the code actually checks
+
+## Verification
+
+- [ ] All 5 dimensions scored for every article — **evidence**: no null scores in `logs/article_evals.json`
+- [ ] Total score = sum of dimensions, max 50 — **evidence**: arithmetic check on latest entry
+- [ ] Detail strings present for every dimension — **evidence**: no empty `details` fields
+- [ ] Evaluation appended (not overwritten) to log file — **evidence**: file length grows monotonically
+- [ ] Uses `orjson` for serialization — **evidence**: import check in evaluator module
+
+### Output Schema
 
 ```json
 {
@@ -114,22 +111,11 @@ closings in last 500 chars.
 }
 ```
 
-## Persistence
+### Integration Points
 
-Append each evaluation to `logs/article_evals.json` as a JSON array.
-Each entry is one article evaluation.  File grows over time for trend
-analysis.  Use `orjson` for serialization.
-
-## Existing Code to Reuse
-
-- `scripts/publication_validator.py` — banned phrases, word count, references checks
-- `scripts/editorial_judge.py` — frontmatter, image, categories, structure checks
+- Called after Stage 4 quality gate in `flow.py`
+- Called by editorial judge post-deployment
+- Scores feed into observability dashboard for trend analysis
+- `scripts/publication_validator.py` — banned phrases, word count, references
+- `scripts/editorial_judge.py` — frontmatter, image, categories, structure
 - `scripts/frontmatter_schema.py` — schema validation
-- `src/crews/stage4_crew.py` — `_BRITISH_SPELLING`, `_BANNED_PHRASES` dictionaries
-- `scripts/agent_reviewer.py` — banned openings, banned closings lists
-
-## Integration Points
-
-- Called after Stage 4 quality gate in `flow.py` (whether published or revision)
-- Called by editorial judge post-deployment for deployed article scoring
-- Scores persisted for observability dashboard (Story #119)

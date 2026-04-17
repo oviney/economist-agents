@@ -1,123 +1,105 @@
-# Research Sourcing Skill
+---
+name: research-sourcing
+description: Enforce source freshness, diversity, and attribution standards for article research. Use when configuring the Research Agent, when evaluating source quality in articles, when adding new source discovery integrations.
+---
 
-## Purpose
-Define the research standard for every article.  The Research Agent
-must find current, authoritative, and diverse sources — not recycled
-analyst reports from 2-3 years ago.
+# Research Sourcing
 
-## The Problem
-The pipeline consistently produces articles citing the same stale
-sources: Capgemini World Quality Report 2023, Forrester 2023, Gartner
-2023.  These are fine reports but they are years old and the same ones
-appear in every article.  A reader who reads 3 blog posts sees the
-same citations repeated — destroying credibility.
+## Overview
 
-## Source Freshness Requirements
+Defines the research standard for every article. The Research Agent must find current, authoritative, and diverse sources — not recycled analyst reports from years ago.
 
-### Mandatory
-- **At least 3 of 5 references must be from the current year or
-  previous year** (e.g., 2025-2026 for articles written in 2026)
-- **No more than 1 reference older than 2 years**
-- **Zero references older than 5 years** unless citing a foundational
-  study that established a field
+## When to Use
 
-### Source Types (Diversify)
-Each article should include at least 3 of these 5 source types:
-1. **Primary research** — survey data, empirical studies, original
-   analysis (not a report summarising someone else's research)
-2. **Named company case study** — specific outcomes at a named
-   organisation with measurable results
-3. **Academic/conference paper** — IEEE, ACM, arXiv, conference
-   proceedings from the past 2 years
-4. **Industry practitioner content** — engineering blog posts from
-   Netflix, Google, Spotify, Microsoft, etc.
-5. **Analyst report** — Gartner, Forrester, McKinsey, BCG (max 1
-   per article to avoid over-reliance)
+- Configuring or updating the Research Agent's source requirements
+- Evaluating an article's evidence quality during review
+- Adding a new source discovery tool (arXiv, Scholar, Serper)
+- Diagnosing why articles keep citing the same stale sources
 
-### Banned Source Patterns
+### When NOT to Use
+
+- For article structure or voice issues — that's `economist-writing`
+- For scoring articles quantitatively — that's `article-evaluation`
+- For post-deployment source verification — that's `citation-verification` (future)
+
+## Core Process
+
+```
+1. Research Agent receives topic from editorial board
+   ↓
+2. Search fresh sources: arXiv (past 12 months), Google Scholar, company blogs
+   ↓
+3. Apply freshness filter: ≥3/5 refs from current/previous year
+   ↓
+4. Apply diversity filter: ≥3 of 5 source types represented
+   ↓
+5. Verify each statistic has: WHO collected, WHEN, HOW, WHAT
+   ↓
+6. Pass sourced brief to Content Generation stage
+```
+
+### Freshness Requirements
+
+- At least 3 of 5 references from current or previous year
+- No more than 1 reference older than 2 years
+- Zero references older than 5 years (unless foundational study)
+
+### Source Type Diversity
+
+Each article needs at least 3 of these 5 types:
+
+1. **Primary research** — surveys, empirical studies, original analysis
+2. **Named company case study** — specific outcomes with measurable results
+3. **Academic/conference paper** — IEEE, ACM, arXiv from past 2 years
+4. **Industry practitioner content** — engineering blogs from Netflix, Google, Spotify, etc.
+5. **Analyst report** — Gartner, Forrester, McKinsey (max 1 per article)
+
+### Banned Attribution Patterns
+
 - "Studies show" without naming the study
 - "Experts say" without naming the expert
-- "Research indicates" without citing the specific paper
-- "According to a recent report" without naming the report or year
-- Citing the same report in more than 2 articles across the blog
+- "Research indicates" without citing the paper
+- "According to a recent report" without name or year
+- Same report cited in more than 2 articles across the blog
 
-## Source Discovery
+### Source Discovery Tools
 
-### Where to Find Fresh Sources
-- **arXiv** (arxiv.org) — preprints in software engineering, AI, testing
-- **Google Scholar** — filter by year for recent papers
-- **Company engineering blogs** — Netflix, Google, Meta, Stripe, Spotify,
-  Shopify, GitHub publish testing and quality research regularly
-- **Conference proceedings** — ICSE, ISSTA, ASE, STARWEST, Agile Testing
-  Days
-- **Government/standards bodies** — NIST, ISO, IEEE standards updates
-- **Venture capital reports** — CB Insights, Crunchbase for market data
+| Tool | Purpose | Enabled By |
+|------|---------|-----------|
+| `scripts/arxiv_search.py` | Academic preprints, past 12 months | Always available |
+| `scripts/google_search.py` | Web + Scholar via Serper API | `SERPER_API_KEY` env var |
+| `mcp_servers/web_researcher_server.py` | MCP tool for Scholar | `SERPER_API_KEY` env var |
 
-### arXiv Integration
-The pipeline already has `scripts/arxiv_search.py` for searching arXiv.
-The Research Agent should use this tool to find papers from the past
-12 months on the article's topic.  arXiv papers provide cutting-edge
-data that analyst reports lag by 6-12 months.
+## Common Rationalizations
 
-### Google Search & Scholar Integration
-The pipeline now has `scripts/google_search.py` for live Google Web Search
-and Google Scholar via the Serper API.  The Research Agent calls
-`search_google_for_topic()` automatically when `SERPER_API_KEY` is set.
+| Rationalization | Reality |
+|----------------|---------|
+| "The Capgemini report is the standard reference" | It's a good report, not the only report — readers who see it in every article lose trust |
+| "2023 data is still relevant in 2026" | Markets move fast; 3-year-old data needs at minimum an "as of" qualifier |
+| "We can't find fresh sources on this topic" | arXiv has preprints months ahead of analyst reports; company blogs publish weekly |
+| "Analyst reports are the most credible" | Primary research and named case studies are more credible than vendor-commissioned surveys |
+| "Adding source diversity slows down the pipeline" | The Research Agent searches in parallel; diversity is a filter, not an extra step |
 
-Key behaviour:
-- **Year targeting** — queries are automatically scoped to the current year
-  and the previous year (e.g., 2025–2026) to maximise source freshness.
-- **Google Scholar** — academic papers with author and citation metadata are
-  retrieved via Serper's `/scholar` endpoint.
-- **MCP tool** — the `search_google_scholar` tool in
-  `mcp_servers/web_researcher_server.py` exposes the same capability to any
-  MCP-aware agent in the pipeline.
+## Red Flags
 
-To enable:
-```
-export SERPER_API_KEY=<your-key>   # https://serper.dev
-```
+- Same 5 sources appearing across multiple articles
+- All references from analyst reports (no primary research or practitioner content)
+- Statistics cited without named source, year, or methodology
+- References section has fewer than 3 entries
+- `[NEEDS SOURCE]` or `[UNVERIFIED]` placeholders remaining in published article
+- arXiv/Scholar search disabled because API key not configured
 
-When the key is absent the agent falls back to arXiv-only search and LLM
-training-data knowledge without error.
+## Verification
 
-## Verification Requirements
+- [ ] Article has ≥3 references from current/previous year — **evidence**: check publication dates in References section
+- [ ] Article uses ≥3 of 5 source types — **evidence**: categorize each reference
+- [ ] Zero banned attribution patterns — **evidence**: regex scan for "studies show", "experts say", etc.
+- [ ] Every statistic has WHO, WHEN, HOW, WHAT — **evidence**: spot-check 3 statistics in article
+- [ ] No `[NEEDS SOURCE]` or `[UNVERIFIED]` placeholders remain
 
-Every cited statistic must include:
-- **Who** collected the data (named organisation)
-- **When** (year, ideally month)
-- **How** (survey of N respondents, analysis of N projects, etc.)
-- **What** (the specific finding, with numbers)
+### Integration Points
 
-Example of GOOD attribution:
-"Capgemini surveyed 1,750 technology leaders across 32 countries in
-its 2024 Quality Engineering Report and found that 42% of QA budgets
-were consumed by test automation maintenance."
-
-Example of BAD attribution:
-"According to industry research, a significant portion of QA budgets
-goes to automation maintenance."
-
-## Integration Points
-
-- **Stage 3 Research Agent** (`src/crews/stage3_crew.py`) — primary
-  consumer of this skill.  Backstory should reference these rules.
-- **Article Evaluator** (`scripts/article_evaluator.py`) — evidence
-  sourcing dimension should check source freshness
-- **arXiv search** (`scripts/arxiv_search.py`) — tool for discovering
-  recent academic sources
-- **Editorial Judge** (`scripts/editorial_judge.py`) — post-deployment
-  check for source diversity
-
-## Anti-Patterns
-
-1. **The Capgemini Crutch** — citing the World Quality Report in every
-   article.  It's a good report; it's not the only report.
-2. **The Year-Old Survey** — using 2023 data in 2026 articles without
-   acknowledging the age or checking for updates
-3. **The Vendor Cite** — citing a vendor's own research to support
-   claims about that vendor's product category
-4. **The Missing Method** — quoting a percentage without explaining
-   how it was measured or who measured it
-5. **The Recycled Reference** — same 5 sources appearing across
-   multiple blog posts
+- `src/crews/stage3_crew.py` — Research Agent backstory references these rules
+- `scripts/article_evaluator.py` — evidence sourcing dimension checks freshness
+- `scripts/arxiv_search.py` — tool for discovering recent academic sources
+- `scripts/editorial_judge.py` — post-deployment check for source diversity

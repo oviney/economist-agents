@@ -56,6 +56,91 @@ class EconomistContentFlow(Flow):
         self.stage4_crew = Stage4Crew()
         self._deduplicator = TopicDeduplicator()
 
+    def _research_unsourced_claims(
+        self, topic: str, feedback: str
+    ) -> str:
+        """Run a targeted Research Agent pass to find sources for unsourced claims.
+
+        Extracts sentences containing placeholder tags from the previous draft,
+        sends them to the Research Agent as specific claims to verify, and returns
+        any verified sources found.
+
+        Args:
+            topic: The article topic.
+            feedback: Revision feedback describing the sourcing issues.
+
+        Returns:
+            Supplementary research text with verified sources, or empty string.
+        """
+        import re as _re
+
+        print("   🔬 Re-running Research Agent for unsourced claims...")
+
+        # Extract the previous article draft
+        quality_result = self.state.get("quality_result", {})
+        article = quality_result.get("article", "")
+        if not article:
+            return ""
+
+        # Find sentences with placeholder tags
+        unsourced = _re.findall(
+            r"[^.]*\[NEEDS SOURCE\][^.]*\.", article
+        )
+        if not unsourced:
+            # Also check for generic "studies show" patterns
+            unsourced = _re.findall(
+                r"[^.]*(?:studies show|experts say|research indicates)[^.]*\.",
+                article,
+                _re.IGNORECASE,
+            )
+
+        if not unsourced:
+            print("   ℹ️  No specific unsourced claims extracted")
+            return ""
+
+        claims_text = "\n".join(f"- {c.strip()}" for c in unsourced[:5])
+        print(f"   Found {len(unsourced)} unsourced claim(s)")
+
+        # Run a lightweight research pass targeting these specific claims
+        try:
+            from crewai import Agent, Crew, Task
+
+            researcher = Agent(
+                role="Source Verification Researcher",
+                goal=(
+                    "Find authoritative, verifiable sources for specific claims. "
+                    "Return ONLY sources you can attribute to a named organisation, "
+                    "year, and methodology. If a claim cannot be sourced, say so."
+                ),
+                backstory=(
+                    "You are a fact-checking researcher. Your job is to find real, "
+                    "citable sources for specific statistical claims. Prefer 2025-2026 "
+                    "publications. Include the source name, year, and key finding."
+                ),
+            )
+            task = Task(
+                description=(
+                    f"Find authoritative sources for the following claims about "
+                    f"'{topic}'. For each claim, provide a named source with year "
+                    f"and specific finding, or state 'UNSOURCEABLE — drop this claim'."
+                    f"\n\nClaims:\n{claims_text}"
+                ),
+                agent=researcher,
+                expected_output=(
+                    "For each claim: the source name, year, finding with numbers, "
+                    "and URL if available. Or 'UNSOURCEABLE' if no credible source exists."
+                ),
+            )
+            crew = Crew(agents=[researcher], tasks=[task])
+            result = crew.kickoff()
+            supplement = str(result.raw) if hasattr(result, "raw") else str(result)
+            print(f"   ✅ Research supplement: {len(supplement)} chars")
+            return supplement
+
+        except Exception as e:
+            print(f"   ⚠️  Research re-run failed: {e}")
+            return ""
+
     @start()
     def discover_topics(self) -> dict[str, Any]:
         """Stage 1: Discover topic candidates via Topic Scout.
@@ -385,9 +470,10 @@ class EconomistContentFlow(Flow):
     def request_revision(self) -> dict[str, Any]:
         """Revision path: retry content generation once with feedback.
 
-        Re-runs Stage3Crew with revision instructions, then re-runs
-        Stage4Crew + PublicationValidator. Returns final result regardless
-        of pass/fail (max 1 retry to avoid runaway LLM costs).
+        When the failure involves unsourced claims (placeholder tags), re-runs
+        the Research Agent first to find real sources for those specific claims,
+        then feeds the new sources into Stage3Crew. For non-sourcing failures,
+        re-runs Stage3Crew directly with revision instructions.
 
         Returns:
             dict with status, article (if published), scores, retry_count.
@@ -415,13 +501,31 @@ class EconomistContentFlow(Flow):
         print(f"🔄 Revision attempt {retry_count + 1}/{MAX_REVISIONS}")
         print(f"   Feedback: {feedback_text[:200]}")
 
-        # Re-run Stage3Crew with revision instructions appended to topic
         topic = self.state.get("selected_topic", {}).get("topic", "")
+
+        # Detect sourcing failures — re-run Research Agent for those claims
+        sourcing_supplement = ""
+        is_sourcing_failure = any(
+            kw in feedback_text.lower()
+            for kw in ("placeholder", "needs source", "unverified", "unsourced")
+        )
+        if is_sourcing_failure:
+            sourcing_supplement = self._research_unsourced_claims(
+                topic, feedback_text
+            )
+
         enhanced_topic = (
             f"{topic}\n\n"
             f"REVISION INSTRUCTIONS — the previous draft failed review. "
             f"Fix these issues:\n{feedback_text}"
         )
+        if sourcing_supplement:
+            enhanced_topic += (
+                f"\n\nADDITIONAL VERIFIED SOURCES from a fresh research pass "
+                f"(use these to replace any unsourced claims, or drop the claim "
+                f"entirely and rewrite the surrounding text for coherence):\n"
+                f"{sourcing_supplement}"
+            )
 
         stage3_crew = Stage3Crew(topic=enhanced_topic)
         new_draft = stage3_crew.kickoff()

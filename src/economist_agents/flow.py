@@ -56,6 +56,32 @@ class EconomistContentFlow(Flow):
         self.stage4_crew = Stage4Crew()
         self._deduplicator = TopicDeduplicator()
 
+    def _run_article_eval(self, article: str, status: str) -> None:
+        """Run the 5-dimension article evaluator and persist scores.
+
+        Called after both publish and quarantine paths so every article
+        gets scored for trend tracking regardless of outcome.
+
+        Args:
+            article: Full article text with YAML frontmatter.
+            status: Pipeline outcome ("published" or "quarantined").
+        """
+        try:
+            from scripts.article_evaluator import ArticleEvaluator
+
+            evaluator = ArticleEvaluator()
+            result = evaluator.evaluate(article, filename=status)
+            result.persist("logs/article_evals.json")
+            print(
+                f"   📊 Article eval: {result.total_score}/{result.max_score} "
+                f"({result.percentage}%)"
+            )
+            for dim, score in result.scores.items():
+                detail = result.details.get(dim, "")
+                print(f"      {dim}: {score}/10 — {detail}")
+        except Exception as e:
+            print(f"   ⚠️  Article evaluation failed: {e}")
+
     def _research_unsourced_claims(
         self, topic: str, feedback: str
     ) -> str:
@@ -450,6 +476,9 @@ class EconomistContentFlow(Flow):
         print("✅ Flow Complete: PUBLISHED")
         print(f"   Editorial Score: {quality_result.get('editorial_score', 0)}/100")
 
+        # ── Article evaluation for trend tracking ─────────────────────
+        self._run_article_eval(article_text, "published")
+
         # ── Post-publication indexing ───────────────────────────────────
         # Index the article in the published_articles archive so future
         # deduplication runs can detect coverage of this topic.
@@ -605,6 +634,9 @@ class EconomistContentFlow(Flow):
         )
         quarantine_path.write_text(edited_article)
         print(f"   📄 Quarantined article saved: {quarantine_path}")
+
+        # ── Article evaluation for trend tracking (even quarantined) ──
+        self._run_article_eval(edited_article, "quarantined")
 
         return {
             "status": "needs_revision",

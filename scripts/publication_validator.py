@@ -141,6 +141,9 @@ class PublicationValidator:
         # Check 12: Category validation
         self._check_category(article_content)
 
+        # Check 13: Ending quality (banned closings from stage4_crew)
+        self._check_ending(article_content)
+
         # Determine if valid (no CRITICAL issues)
         critical_issues = [i for i in self.issues if i["severity"] == "CRITICAL"]
         is_valid = len(critical_issues) == 0
@@ -472,6 +475,89 @@ class PublicationValidator:
                             )
         except Exception:
             pass  # YAML parse errors are caught by _check_yaml_format
+
+    # Banned closing phrases aligned with stage4_crew._BANNED_CLOSINGS + extras.
+    _BANNED_CLOSINGS: list[str] = [
+        "In conclusion",
+        "To conclude",
+        "In summary",
+        "remains to be seen",
+        "only time will tell",
+        "The journey ahead",
+        "will rest on",
+        "depends on",
+        "the key is",
+        "to summarise",
+        "One suspects",
+    ]
+
+    # Summary-opening phrases that signal a restatement ending.
+    _SUMMARY_STARTERS: list[str] = [
+        "In short",
+        "Ultimately",
+        "Overall",
+    ]
+
+    def _check_ending(self, content: str) -> None:
+        """Check the last paragraph for banned closing patterns.
+
+        Extracts the article body (after YAML frontmatter, before
+        ``## References`` if present) and inspects the final paragraph for
+        weak/hedging closings drawn from ``stage4_crew._BANNED_CLOSINGS``
+        plus additional patterns (e.g. summary-opener restatements).
+
+        Issues are reported at **HIGH** severity so they flag without
+        blocking publication on the first run.
+        """
+        # --- extract body after frontmatter ---
+        if content.startswith("---"):
+            parts = content.split("---", 2)
+            body = parts[2] if len(parts) >= 3 else ""
+        else:
+            body = content
+
+        # --- strip References / Sources / Bibliography section ---
+        for pattern in (
+            r"\n## References\b",
+            r"\n## Sources\b",
+            r"\n## Bibliography\b",
+        ):
+            match = re.search(pattern, body, re.IGNORECASE)
+            if match:
+                body = body[: match.start()]
+                break
+
+        # --- isolate last paragraph ---
+        paragraphs = [p.strip() for p in body.strip().split("\n\n") if p.strip()]
+        if not paragraphs:
+            return
+        last_paragraph = paragraphs[-1]
+
+        violations: list[str] = []
+
+        # 1. Check banned closing phrases (case-insensitive)
+        for phrase in self._BANNED_CLOSINGS:
+            if re.search(re.escape(phrase), last_paragraph, re.IGNORECASE):
+                violations.append(f'Banned closing phrase: "{phrase}"')
+
+        # 2. Check summary-opener restatement endings
+        for starter in self._SUMMARY_STARTERS:
+            if re.match(re.escape(starter) + r"\b", last_paragraph, re.IGNORECASE):
+                violations.append(
+                    f'Summary restatement opening: "{starter}"'
+                )
+
+        if violations:
+            details = "\n".join(f"  - {v}" for v in violations)
+            self.issues.append(
+                {
+                    "check": "ending_quality",
+                    "severity": "HIGH",
+                    "message": f"Weak/hedging ending detected ({len(violations)} violations)",
+                    "details": details,
+                    "fix": "Rewrite ending with a vivid prediction, metaphor, or concrete forward-looking statement",
+                }
+            )
 
     def _check_chart_references(self, content: str):
         """Check that articles include at least one chart in /assets/charts/ and flag orphaned charts that lack text references."""

@@ -346,6 +346,70 @@ class TestPublicationValidatorChart:
         assert len(orphan_issues) == 0
 
 
+class TestPublicationValidatorEnding:
+    """Ending quality validation checks (banned closings from stage4_crew)."""
+
+    def test_ending_with_banned_phrase_flagged(self) -> None:
+        """Article ending with 'In conclusion, the key is...' triggers HIGH issue."""
+        validator = PublicationValidator(expected_date="2026-04-03")
+        # Place the banned ending after the chart embed so it is the last paragraph
+        chart_with_ending = (
+            VALID_CHART_EMBED
+            + "\n\nIn conclusion, the key is to keep testing."
+        )
+        article = _make_article(chart_embed=chart_with_ending)
+        _, issues = validator.validate(article)
+        ending_issues = [i for i in issues if i["check"] == "ending_quality"]
+        assert len(ending_issues) == 1
+        assert ending_issues[0]["severity"] == "HIGH"
+        assert "2 violations" in ending_issues[0]["message"]
+
+    def test_ending_with_vivid_prediction_passes(self) -> None:
+        """Article ending with a metaphor should produce no ending issues."""
+        validator = PublicationValidator(expected_date="2026-04-03")
+        chart_with_ending = (
+            VALID_CHART_EMBED
+            + "\n\nThe iceberg, it turns out, hides nine-tenths of itself "
+            "beneath the waterline — and so does technical debt."
+        )
+        article = _make_article(chart_embed=chart_with_ending)
+        _, issues = validator.validate(article)
+        ending_issues = [i for i in issues if i["check"] == "ending_quality"]
+        assert len(ending_issues) == 0
+
+    def test_ending_with_one_suspects_flagged(self) -> None:
+        """Article ending with 'One suspects...' triggers HIGH issue."""
+        validator = PublicationValidator(expected_date="2026-04-03")
+        chart_with_ending = (
+            VALID_CHART_EMBED
+            + "\n\nOne suspects the industry will eventually catch up."
+        )
+        article = _make_article(chart_embed=chart_with_ending)
+        _, issues = validator.validate(article)
+        ending_issues = [i for i in issues if i["check"] == "ending_quality"]
+        assert len(ending_issues) == 1
+        assert ending_issues[0]["severity"] == "HIGH"
+
+    def test_ending_check_ignores_references(self) -> None:
+        """Only text before ## References is checked for ending quality."""
+        validator = PublicationValidator(expected_date="2026-04-03")
+        # Body ends cleanly; the banned phrase only appears inside References
+        chart_with_ending = (
+            VALID_CHART_EMBED
+            + "\n\nThe market will fracture along entirely new lines."
+        )
+        refs = (
+            "## References\n\n"
+            "1. In conclusion paper, [link](https://a.com), 2024\n"
+            "2. Source B, [Report](https://b.com), 2024\n"
+            "3. Source C, [Study](https://c.com), 2024\n"
+        )
+        article = _make_article(chart_embed=chart_with_ending, references=refs)
+        _, issues = validator.validate(article)
+        ending_issues = [i for i in issues if i["check"] == "ending_quality"]
+        assert len(ending_issues) == 0
+
+
 class TestPublicationValidatorReport:
     """format_report() output checks."""
 

@@ -2879,7 +2879,7 @@ For stories involving new dependencies or frameworks:
 <hr />
 <h2 id="github-issue-creation-mandatory-validation">GITHUB ISSUE CREATION (MANDATORY VALIDATION)<a class="headerlink" href="#github-issue-creation-mandatory-validation" title="Permanent link">&para;</a></h2>
 <p><strong>BEFORE creating ANY GitHub issue:</strong></p>
-<p>□ Check skills/defect_tracker.json for existing bug ID
+<p>□ Check data/skills_state/defect_tracker.json for existing bug ID
 □ If bug exists AND github_issue field != null → REUSE existing issue number
 □ If bug exists AND github_issue == null → CREATE new issue, update tracker
 □ If bug doesn't exist → CREATE bug entry + GitHub issue together</p>
@@ -3030,7 +3030,7 @@ For stories involving new dependencies or frameworks:
 <a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>- Add missing priority labels (P0-P4) to bugs and stories
 <a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>- Add effort labels (effort:small/medium/large) for estimation
 <a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>- Archive stale issues (&gt;90 days no activity, low priority)
-<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>- Validate: skills/defect_tracker.json bugs have GitHub issues
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>- Validate: data/skills_state/defect_tracker.json bugs have GitHub issues
 <a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>- Target: All open issues properly labeled and categorized
 <a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>
 <a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>Monthly (60 min):
@@ -3244,7 +3244,7 @@ For stories involving new dependencies or frameworks:
 <p><strong>System</strong>: <code>scripts/sprint_ceremony_tracker.py</code></p>
 <p><strong>Purpose</strong>: Prevents DoR violations through automated blocking.</p>
 <h3 id="how-it-works">How It Works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h3>
-<p><strong>State Tracking</strong> (<code>skills/sprint_tracker.json</code>):
+<p><strong>State Tracking</strong> (<code>data/skills_state/sprint_tracker.json</code>):
 <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="p">{</span>
 <a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="nt">&quot;current_sprint&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span>
 <a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span><span class="nt">&quot;sprint_6&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>

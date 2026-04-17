@@ -2392,7 +2392,7 @@
 </tr>
 <tr>
 <td><strong>Sprint</strong></td>
-<td><code>skills/sprint_tracker.json</code></td>
+<td><code>data/skills_state/sprint_tracker.json</code></td>
 <td>Read <code>current_sprint</code> field</td>
 </tr>
 <tr>
@@ -2491,7 +2491,7 @@
 <p>Badge markdown:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>![<span class="nt">Sprint</span>](<span class="na">https://img.shields.io/badge/sprint-9-blue</span>)
 </code></pre></div></p>
-<p>Updated by: <code>update_badges.py</code> (reads <code>skills/sprint_tracker.json</code>)</p>
+<p>Updated by: <code>update_badges.py</code> (reads <code>data/skills_state/sprint_tracker.json</code>)</p>
 <h2 id="validation-checklist">Validation Checklist<a class="headerlink" href="#validation-checklist" title="Permanent link">&para;</a></h2>
 <p>Before committing badge changes:</p>
 <ul>
@@ -2514,7 +2514,7 @@
 - Check defect_tracker.json has latest data
 - Verify agent_metrics.json exists</p>
 <p><strong>Sprint badge wrong:</strong>
-- Check <code>skills/sprint_tracker.json</code> → <code>current_sprint</code>
+- Check <code>data/skills_state/sprint_tracker.json</code> → <code>current_sprint</code>
 - Run <code>python3 scripts/sprint_ceremony_tracker.py --report</code></p>
 <h2 id="future-enhancements">Future Enhancements<a class="headerlink" href="#future-enhancements" title="Permanent link">&para;</a></h2>
 <ol>

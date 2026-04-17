@@ -150,5 +150,64 @@ class TestVerbosePadding:
         assert "the framework works well" in result
 
 
+class TestCategoryNormalization:
+    """Category casing normalization to kebab-case."""
+
+    def test_title_case_to_kebab(self) -> None:
+        article = '---\ncategories: ["Quality Engineering"]\n---\nBody'
+        result = _apply_editorial_fixes(article)
+        assert "quality-engineering" in result
+        assert "Quality Engineering" not in result
+
+    def test_mixed_case_to_kebab(self) -> None:
+        article = '---\ncategories: ["software engineering"]\n---\nBody'
+        result = _apply_editorial_fixes(article)
+        assert "software-engineering" in result
+
+    def test_already_kebab_unchanged(self) -> None:
+        article = '---\ncategories: ["quality-engineering"]\n---\nBody'
+        result = _apply_editorial_fixes(article)
+        assert "quality-engineering" in result
+
+    def test_test_automation_normalized(self) -> None:
+        article = '---\ncategories: ["Test Automation"]\n---\nBody'
+        result = _apply_editorial_fixes(article)
+        assert "test-automation" in result
+
+
+class TestChartAutoEmbed:
+    """Auto-insert chart embed when missing."""
+
+    def test_chart_inserted_before_references(self) -> None:
+        article = (
+            "---\nimage: /assets/images/my-slug.png\n---\n"
+            "Article body.\n\n## References\n\n1. Source"
+        )
+        result = _apply_editorial_fixes(article)
+        assert "![Chart](/assets/charts/my-slug.png)" in result
+        assert result.index("![Chart]") < result.index("## References")
+
+    def test_chart_not_doubled_if_present(self) -> None:
+        article = (
+            "---\nimage: /assets/images/my-slug.png\n---\n"
+            "Body.\n\n![Chart](/assets/charts/my-slug.png)\n\n## References\n"
+        )
+        result = _apply_editorial_fixes(article)
+        assert result.count("![Chart]") == 1
+
+    def test_no_chart_if_no_image_field(self) -> None:
+        article = "---\ntitle: Test\n---\nBody.\n\n## References\n"
+        result = _apply_editorial_fixes(article)
+        assert "![Chart]" not in result
+
+    def test_chart_appended_if_no_references_section(self) -> None:
+        article = (
+            "---\nimage: /assets/images/my-slug.png\n---\n"
+            "Article body with no references."
+        )
+        result = _apply_editorial_fixes(article)
+        assert "![Chart](/assets/charts/my-slug.png)" in result
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "--tb=short"])

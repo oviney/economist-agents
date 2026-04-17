@@ -169,6 +169,10 @@ jobs:
           # Copy only the validated article (not all output/*.md)
           mkdir -p _posts assets/charts assets/images
           ARTICLE_PATH=$(cat ../article_path.txt 2>/dev/null || echo "")
+          # Resolve relative path against workspace root (we're in blog-repo/)
+          if [ -n "$ARTICLE_PATH" ] && [ ! -f "$ARTICLE_PATH" ] && [ -f "../$ARTICLE_PATH" ]; then
+            ARTICLE_PATH="../$ARTICLE_PATH"
+          fi
           if [ -z "$ARTICLE_PATH" ] || [ ! -f "$ARTICLE_PATH" ]; then
             echo "❌ No article_path.txt or file not found — aborting deploy"
             exit 1

@@ -507,7 +507,11 @@ class EconomistContentFlow(Flow):
         sourcing_supplement = ""
         is_sourcing_failure = any(
             kw in feedback_text.lower()
-            for kw in ("placeholder", "needs source", "unverified", "unsourced")
+            for kw in (
+                "placeholder", "needs source", "unverified", "unsourced",
+                "source for the statistic", "named source", "evidence gate",
+                "sourced", "sourcing",
+            )
         )
         if is_sourcing_failure:
             sourcing_supplement = self._research_unsourced_claims(

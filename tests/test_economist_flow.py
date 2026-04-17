@@ -344,6 +344,138 @@ class TestEconomistFlow:
     not os.environ.get("OPENAI_API_KEY"),
     reason="OPENAI_API_KEY required for CrewAI agent initialization",
 )
+class TestResearchBackedRevision:
+    """Tests for research-backed revision when sourcing issues detected."""
+
+    @pytest.fixture
+    def flow(self) -> EconomistContentFlow:
+        return EconomistContentFlow()
+
+    @patch("src.economist_agents.flow.PublicationValidator")
+    @patch("src.economist_agents.flow.Stage3Crew")
+    def test_sourcing_failure_triggers_research_rerun(
+        self,
+        mock_stage3_class: Mock,
+        mock_validator_class: Mock,
+        flow: EconomistContentFlow,
+    ) -> None:
+        """Revision with placeholder feedback re-runs Research Agent."""
+        flow.state["selected_topic"] = {"topic": "AI Testing"}
+        flow.state["revision_reason"] = "Publication validation failed"
+        flow.state["revision_feedback"] = ["Found 2 placeholder(s)"]
+        flow.state["quality_result"] = {
+            "editorial_score": 98,
+            "gates_passed": 5,
+            "article": (
+                "Half of teams report improved outcomes [NEEDS SOURCE]. "
+                "The market grew by 40% last year [NEEDS SOURCE]."
+            ),
+        }
+        flow.state["retry_count"] = 0
+
+        mock_s3 = Mock()
+        mock_s3.kickoff.return_value = {
+            "article": "Fixed article with real sources",
+            "chart_data": {},
+        }
+        mock_stage3_class.return_value = mock_s3
+
+        flow.stage4_crew = Mock()
+        flow.stage4_crew.kickoff.return_value = {
+            "article": "Polished article",
+            "editorial_score": 95,
+            "gates_passed": 5,
+        }
+
+        mock_validator = Mock()
+        mock_validator.validate.return_value = (True, [])
+        mock_validator_class.return_value = mock_validator
+
+        with patch("crewai.Crew") as mock_crew_cls:
+            mock_crew = Mock()
+            mock_result = Mock()
+            mock_result.raw = "McKinsey 2025 found 48% of teams improved."
+            mock_crew.kickoff.return_value = mock_result
+            mock_crew_cls.return_value = mock_crew
+
+            result = flow.request_revision()
+
+        assert result["status"] == "published"
+        # Verify Stage3Crew received research supplement
+        topic_arg = mock_stage3_class.call_args[1]["topic"]
+        assert "ADDITIONAL VERIFIED SOURCES" in topic_arg
+
+    @patch("src.economist_agents.flow.PublicationValidator")
+    @patch("src.economist_agents.flow.Stage3Crew")
+    def test_non_sourcing_failure_skips_research_rerun(
+        self,
+        mock_stage3_class: Mock,
+        mock_validator_class: Mock,
+        flow: EconomistContentFlow,
+    ) -> None:
+        """Revision for non-sourcing issues does NOT re-run Research Agent."""
+        flow.state["selected_topic"] = {"topic": "AI Testing"}
+        flow.state["revision_reason"] = "Editorial score 65/100"
+        flow.state["revision_feedback"] = ["Fix weak opening paragraph"]
+        flow.state["quality_result"] = {
+            "editorial_score": 65,
+            "gates_passed": 3,
+            "article": "In today's world, AI is changing everything.",
+        }
+        flow.state["retry_count"] = 0
+
+        mock_s3 = Mock()
+        mock_s3.kickoff.return_value = {"article": "Better opening", "chart_data": {}}
+        mock_stage3_class.return_value = mock_s3
+
+        flow.stage4_crew = Mock()
+        flow.stage4_crew.kickoff.return_value = {
+            "article": "Polished article",
+            "editorial_score": 88,
+            "gates_passed": 5,
+        }
+
+        mock_validator = Mock()
+        mock_validator.validate.return_value = (True, [])
+        mock_validator_class.return_value = mock_validator
+
+        result = flow.request_revision()
+
+        assert result["status"] == "published"
+        # Verify no research supplement injected
+        topic_arg = mock_stage3_class.call_args[1]["topic"]
+        assert "ADDITIONAL VERIFIED SOURCES" not in topic_arg
+
+    def test_research_unsourced_claims_extracts_placeholders(
+        self,
+        flow: EconomistContentFlow,
+    ) -> None:
+        """_research_unsourced_claims extracts [NEEDS SOURCE] sentences."""
+        flow.state["quality_result"] = {
+            "article": (
+                "Teams report 50% gains [NEEDS SOURCE]. "
+                "This is well known. "
+                "Market grew 40% [NEEDS SOURCE]."
+            ),
+        }
+
+        with patch("crewai.Crew") as mock_crew_cls:
+            mock_crew = Mock()
+            mock_result = Mock()
+            mock_result.raw = "Gartner 2025: 48% of teams improved."
+            mock_crew.kickoff.return_value = mock_result
+            mock_crew_cls.return_value = mock_crew
+
+            result = flow._research_unsourced_claims("AI Testing", "placeholder issues")
+
+        assert "Gartner 2025" in result
+        mock_crew_cls.assert_called_once()
+
+
+@pytest.mark.skipif(
+    not os.environ.get("OPENAI_API_KEY"),
+    reason="OPENAI_API_KEY required for CrewAI agent initialization",
+)
 def test_flow_decorators_registered() -> None:
     """All Flow decorated methods are registered and callable."""
     flow = EconomistContentFlow()

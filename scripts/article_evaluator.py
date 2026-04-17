@@ -73,6 +73,10 @@ _HEDGING_PHRASES: list[str] = [
     "further complicating matters",
     "invites closer scrutiny",
     "in practical terms",
+    "one suspects",
+    "if you find yourself",
+    "it is clear that",
+    "it remains to be seen",
 ]
 
 _BANNED_CLOSINGS = [
@@ -81,10 +85,12 @@ _BANNED_CLOSINGS = [
     "in summary",
     "remains to be seen",
     "only time will tell",
+    "the journey ahead",
     "will rest on",
     "depends on",
     "the key is",
     "to summarise",
+    "one suspects",
 ]
 
 _VAGUE_ATTRIBUTION = [

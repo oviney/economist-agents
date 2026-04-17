@@ -408,9 +408,10 @@ CRITICAL: You are EVALUATING the article. Do NOT rewrite it. Return ONLY the JSO
     def _create_review_task(self) -> Task:
         """Create review task for quality gate assessment."""
         return Task(
-            description="""Review article from Stage 3 against 5 quality gates.
+            description="""Review the following article against 5 quality gates.
 
-INPUT: Article with YAML frontmatter and chart_data
+ARTICLE TO REVIEW:
+{article}
 
 QUALITY GATES TO CHECK:
 1. OPENING - First sentence hooks? No throat-clearing?
@@ -455,8 +456,9 @@ CRITICAL: Return ONLY valid JSON. Do NOT include the article text in your respon
         chart_data = stage3_input.get("chart_data", {})
 
         # --- LLM step: reviewer evaluates the article ---
-        self.review_task.context = {"article": article, "chart_data": chart_data}
-        crew_output = self.crew.kickoff()
+        crew_output = self.crew.kickoff(
+            inputs={"article": article, "chart_data": str(chart_data)}
+        )
 
         result_str = (
             str(crew_output.raw) if hasattr(crew_output, "raw") else str(crew_output)

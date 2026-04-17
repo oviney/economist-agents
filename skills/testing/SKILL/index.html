@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Multi-agent content pipeline that generates Economist-style articles with autonomous research, writing, illustration, and deployment">
+        <meta name="description" content="Testing patterns for the economist-agents multi-agent system. Use when writing tests for agent code, when mocking API calls, when setting up test fixtures, when debugging coverage gaps.">
       
       
       
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#testing-skill-for-economist-agents" class="md-skip">
+        <a href="#testing" class="md-skip">
           Skip to content
         </a>
       
@@ -1351,77 +1351,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#testing-philosophy" class="md-nav__link">
+  <a href="#when-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Testing Philosophy
+        When to Use
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#testing-framework" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Testing Framework
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#test-structure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Test Structure
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#mocking-api-calls" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mocking API Calls
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Mocking API Calls">
+    <nav class="md-nav" aria-label="When to Use">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#mocking-openai-api" class="md-nav__link">
+  <a href="#when-not-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Mocking OpenAI API
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#mocking-anthropic-api" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mocking Anthropic API
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#testing-api-error-handling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Testing API Error Handling
+        When NOT to Use
       
     </span>
   </a>
@@ -1434,22 +1379,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#testing-agent-workflows" class="md-nav__link">
+  <a href="#core-process" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Testing Agent Workflows
+        Core Process
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Testing Agent Workflows">
+    <nav class="md-nav" aria-label="Core Process">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#testing-topic-scout" class="md-nav__link">
+  <a href="#test-structure-arrange-act-assert" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Testing Topic Scout
+        Test Structure (Arrange-Act-Assert)
       
     </span>
   </a>
@@ -1457,10 +1402,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#testing-editorial-board" class="md-nav__link">
+  <a href="#mocking-llm-apis" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Testing Editorial Board
+        Mocking LLM APIs
       
     </span>
   </a>
@@ -1468,10 +1413,43 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#testing-economist-agent-pipeline" class="md-nav__link">
+  <a href="#test-categories-minimum-per-module" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Testing Economist Agent Pipeline
+        Test Categories (Minimum Per Module)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-and-environment-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File and Environment Testing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coverage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#naming-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Naming Conventions
       
     </span>
   </a>
@@ -1484,66 +1462,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#testing-file-operations" class="md-nav__link">
+  <a href="#common-rationalizations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Testing File Operations
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Testing File Operations">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#testing-with-temporary-directories" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Testing with Temporary Directories
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#testing-logging" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Testing Logging
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Testing Logging">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#capturing-log-output" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Capturing Log Output
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#testing-environment-variables" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Testing Environment Variables
+        Common Rationalizations
       
     </span>
   </a>
@@ -1551,10 +1473,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#coverage-requirements" class="md-nav__link">
+  <a href="#red-flags" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Coverage Requirements
+        Red Flags
       
     </span>
   </a>
@@ -1562,43 +1484,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pytest-configuration" class="md-nav__link">
+  <a href="#verification" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pytest Configuration
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#fixtures-file" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Fixtures File
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#best-practices" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Best Practices
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#running-tests" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Running Tests
+        Verification
       
     </span>
   </a>
@@ -2486,77 +2375,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#testing-philosophy" class="md-nav__link">
+  <a href="#when-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Testing Philosophy
+        When to Use
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#testing-framework" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Testing Framework
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#test-structure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Test Structure
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#mocking-api-calls" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mocking API Calls
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Mocking API Calls">
+    <nav class="md-nav" aria-label="When to Use">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#mocking-openai-api" class="md-nav__link">
+  <a href="#when-not-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Mocking OpenAI API
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#mocking-anthropic-api" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mocking Anthropic API
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#testing-api-error-handling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Testing API Error Handling
+        When NOT to Use
       
     </span>
   </a>
@@ -2569,22 +2403,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#testing-agent-workflows" class="md-nav__link">
+  <a href="#core-process" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Testing Agent Workflows
+        Core Process
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Testing Agent Workflows">
+    <nav class="md-nav" aria-label="Core Process">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#testing-topic-scout" class="md-nav__link">
+  <a href="#test-structure-arrange-act-assert" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Testing Topic Scout
+        Test Structure (Arrange-Act-Assert)
       
     </span>
   </a>
@@ -2592,10 +2426,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#testing-editorial-board" class="md-nav__link">
+  <a href="#mocking-llm-apis" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Testing Editorial Board
+        Mocking LLM APIs
       
     </span>
   </a>
@@ -2603,10 +2437,43 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#testing-economist-agent-pipeline" class="md-nav__link">
+  <a href="#test-categories-minimum-per-module" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Testing Economist Agent Pipeline
+        Test Categories (Minimum Per Module)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-and-environment-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File and Environment Testing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coverage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#naming-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Naming Conventions
       
     </span>
   </a>
@@ -2619,66 +2486,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#testing-file-operations" class="md-nav__link">
+  <a href="#common-rationalizations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Testing File Operations
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Testing File Operations">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#testing-with-temporary-directories" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Testing with Temporary Directories
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#testing-logging" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Testing Logging
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Testing Logging">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#capturing-log-output" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Capturing Log Output
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#testing-environment-variables" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Testing Environment Variables
+        Common Rationalizations
       
     </span>
   </a>
@@ -2686,10 +2497,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#coverage-requirements" class="md-nav__link">
+  <a href="#red-flags" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Coverage Requirements
+        Red Flags
       
     </span>
   </a>
@@ -2697,43 +2508,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pytest-configuration" class="md-nav__link">
+  <a href="#verification" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pytest Configuration
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#fixtures-file" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Fixtures File
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#best-practices" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Best Practices
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#running-tests" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Running Tests
+        Verification
       
     </span>
   </a>
@@ -2760,543 +2538,160 @@
   
 
 
-<h1 id="testing-skill-for-economist-agents">Testing Skill for Economist-Agents<a class="headerlink" href="#testing-skill-for-economist-agents" title="Permanent link">&para;</a></h1>
+<h1 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">&para;</a></h1>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>This skill defines testing patterns for the economist-agents multi-agent AI system. Focus on mocking API calls, testing agent workflows, and achieving &gt;80% code coverage.</p>
-<h2 id="testing-philosophy">Testing Philosophy<a class="headerlink" href="#testing-philosophy" title="Permanent link">&para;</a></h2>
-<p><strong>All agent code must be testable:</strong>
-- Mock all external API calls (OpenAI, Anthropic)
-- Test both success and failure paths
-- Validate agent outputs against schemas
-- Ensure governance workflows are tested
-- Achieve minimum 80% code coverage</p>
-<h2 id="testing-framework">Testing Framework<a class="headerlink" href="#testing-framework" title="Permanent link">&para;</a></h2>
-<p><strong>Use pytest with these plugins:</strong>
-- <code>pytest</code> - Test framework
-- <code>pytest-cov</code> - Coverage reporting
-- <code>pytest-mock</code> - Mocking utilities
-- <code>unittest.mock</code> - Python standard library mocking</p>
-<h2 id="test-structure">Test Structure<a class="headerlink" href="#test-structure" title="Permanent link">&para;</a></h2>
-<p><strong>Follow Arrange-Act-Assert pattern:</strong></p>
+<p>All agent code must be testable. Mock all external API calls (OpenAI, Anthropic), test both success and failure paths, validate agent outputs against schemas, and maintain ≥80% coverage.</p>
+<h2 id="when-to-use">When to Use<a class="headerlink" href="#when-to-use" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Writing tests for any new or modified code</li>
+<li>Mocking LLM API calls in test fixtures</li>
+<li>Setting up shared fixtures in conftest.py</li>
+<li>Investigating coverage gaps or flaky tests</li>
+</ul>
+<h3 id="when-not-to-use">When NOT to Use<a class="headerlink" href="#when-not-to-use" title="Permanent link">&para;</a></h3>
+<ul>
+<li>For Python coding standards — that's <code>python-quality</code></li>
+<li>For CI/CD test pipeline configuration — that's <code>quality-gates</code></li>
+<li>For article content quality checks — that's <code>article-evaluation</code></li>
+</ul>
+<h2 id="core-process">Core Process<a class="headerlink" href="#core-process" title="Permanent link">&para;</a></h2>
+<h3 id="test-structure-arrange-act-assert">Test Structure (Arrange-Act-Assert)<a class="headerlink" href="#test-structure-arrange-act-assert" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_function_name</span><span class="p">():</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="c1"># Arrange - Set up test data and mocks</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="c1"># Arrange — set up test data and mocks</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">mock_client</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">expected_result</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">}</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">expected</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">}</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="c1"># Act - Call the function being tested</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="c1"># Act — call the function under test</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">function_under_test</span><span class="p">(</span><span class="n">mock_client</span><span class="p">)</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="c1"># Assert - Verify the results</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="n">expected_result</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="c1"># Assert — verify the results</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="n">expected</span>
 </code></pre></div>
-<h2 id="mocking-api-calls">Mocking API Calls<a class="headerlink" href="#mocking-api-calls" title="Permanent link">&para;</a></h2>
-<h3 id="mocking-openai-api">Mocking OpenAI API<a class="headerlink" href="#mocking-openai-api" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">unittest.mock</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mock</span><span class="p">,</span> <span class="n">patch</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">def</span><span class="w"> </span><span class="nf">mock_openai_client</span><span class="p">():</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Mock OpenAI client for testing.&quot;&quot;&quot;</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;openai.OpenAI&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">mock</span><span class="p">:</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>        <span class="n">mock_instance</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>        <span class="c1"># Mock successful response</span>
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>        <span class="n">mock_response</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>        <span class="n">mock_response</span><span class="o">.</span><span class="n">choices</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>            <span class="n">Mock</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">Mock</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s1">&#39;{&quot;result&quot;: &quot;success&quot;}&#39;</span><span class="p">))</span>
-<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>        <span class="p">]</span>
-<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>        <span class="n">mock_response</span><span class="o">.</span><span class="n">usage</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">(</span>
-<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>            <span class="n">prompt_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>            <span class="n">completion_tokens</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>            <span class="n">total_tokens</span><span class="o">=</span><span class="mi">150</span>
-<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>        <span class="p">)</span>
-<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>        <span class="n">mock_response</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o&quot;</span>
-<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>
-<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>        <span class="n">mock_instance</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="n">mock_response</span>
-<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>        <span class="n">mock</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="n">mock_instance</span>
-<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>
-<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a>        <span class="k">yield</span> <span class="n">mock_instance</span>
-<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a>
-<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_with_openai_mock</span><span class="p">(</span><span class="n">mock_openai_client</span><span class="p">):</span>
-<a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test function that calls OpenAI.&quot;&quot;&quot;</span>
-<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">my_function</span><span class="p">(</span><span class="n">mock_openai_client</span><span class="p">)</span>
-<a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a>    <span class="k">assert</span> <span class="s2">&quot;result&quot;</span> <span class="ow">in</span> <span class="n">result</span>
-</code></pre></div>
-<h3 id="mocking-anthropic-api">Mocking Anthropic API<a class="headerlink" href="#mocking-anthropic-api" title="Permanent link">&para;</a></h3>
+<h3 id="mocking-llm-apis">Mocking LLM APIs<a class="headerlink" href="#mocking-llm-apis" title="Permanent link">&para;</a></h3>
+<p><strong>OpenAI:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">mock_openai_client</span><span class="p">():</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;openai.OpenAI&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">mock</span><span class="p">:</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>        <span class="n">instance</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>        <span class="n">response</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>        <span class="n">response</span><span class="o">.</span><span class="n">choices</span> <span class="o">=</span> <span class="p">[</span><span class="n">Mock</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">Mock</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s1">&#39;{&quot;result&quot;: &quot;success&quot;}&#39;</span><span class="p">))]</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>        <span class="n">response</span><span class="o">.</span><span class="n">usage</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">(</span><span class="n">total_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>        <span class="n">response</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o&quot;</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>        <span class="n">instance</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="n">response</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>        <span class="n">mock</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="n">instance</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>        <span class="k">yield</span> <span class="n">instance</span>
+</code></pre></div></p>
+<p><strong>Anthropic:</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">mock_anthropic_client</span><span class="p">():</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Mock Anthropic client for testing.&quot;&quot;&quot;</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;anthropic.Anthropic&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">mock</span><span class="p">:</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>        <span class="n">mock_instance</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        <span class="c1"># Mock successful response</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        <span class="n">mock_response</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="n">mock_response</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>            <span class="n">Mock</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s1">&#39;{&quot;result&quot;: &quot;success&quot;}&#39;</span><span class="p">)</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>        <span class="p">]</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>        <span class="n">mock_response</span><span class="o">.</span><span class="n">usage</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">(</span>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>            <span class="n">input_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>            <span class="n">output_tokens</span><span class="o">=</span><span class="mi">50</span>
-<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>        <span class="p">)</span>
-<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>        <span class="n">mock_response</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="s2">&quot;claude-sonnet-4-20250514&quot;</span>
-<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>
-<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>        <span class="n">mock_instance</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">create</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="n">mock_response</span>
-<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>        <span class="n">mock</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="n">mock_instance</span>
-<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>
-<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>        <span class="k">yield</span> <span class="n">mock_instance</span>
-</code></pre></div>
-<h3 id="testing-api-error-handling">Testing API Error Handling<a class="headerlink" href="#testing-api-error-handling" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">APIError</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_api_error_handling</span><span class="p">(</span><span class="n">mock_openai_client</span><span class="p">,</span> <span class="n">caplog</span><span class="p">):</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that API errors are handled correctly.&quot;&quot;&quot;</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="c1"># Arrange</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">mock_openai_client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="o">.</span><span class="n">side_effect</span> <span class="o">=</span> <span class="n">APIError</span><span class="p">(</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>        <span class="s2">&quot;Rate limit exceeded&quot;</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="p">)</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="c1"># Act &amp; Assert</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="n">APIError</span><span class="p">):</span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>        <span class="n">my_function</span><span class="p">(</span><span class="n">mock_openai_client</span><span class="p">)</span>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>
-<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>    <span class="c1"># Verify error was logged</span>
-<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>    <span class="k">assert</span> <span class="s2">&quot;API call failed&quot;</span> <span class="ow">in</span> <span class="n">caplog</span><span class="o">.</span><span class="n">text</span>
-</code></pre></div>
-<h2 id="testing-agent-workflows">Testing Agent Workflows<a class="headerlink" href="#testing-agent-workflows" title="Permanent link">&para;</a></h2>
-<h3 id="testing-topic-scout">Testing Topic Scout<a class="headerlink" href="#testing-topic-scout" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># tests/test_topic_scout.py</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">unittest.mock</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mock</span><span class="p">,</span> <span class="n">patch</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">orjson</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scripts.topic_scout</span><span class="w"> </span><span class="kn">import</span> <span class="n">discover_topics</span><span class="p">,</span> <span class="n">validate_topics_schema</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="k">def</span><span class="w"> </span><span class="nf">sample_topics_response</span><span class="p">():</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample topics JSON response.&quot;&quot;&quot;</span>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>    <span class="k">return</span> <span class="p">{</span>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>        <span class="s2">&quot;topics&quot;</span><span class="p">:</span> <span class="p">[</span>
-<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>            <span class="p">{</span>
-<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;AI in Quality Engineering&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;How AI is transforming QE practices&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>                <span class="s2">&quot;relevance_score&quot;</span><span class="p">:</span> <span class="mi">9</span>
-<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>            <span class="p">},</span>
-<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>            <span class="p">{</span>
-<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Shift-Left Testing&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Moving testing earlier in SDLC&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>                <span class="s2">&quot;relevance_score&quot;</span><span class="p">:</span> <span class="mi">8</span>
-<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>            <span class="p">}</span>
-<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>        <span class="p">]</span>
-<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>    <span class="p">}</span>
-<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>
-<a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_discover_topics_success</span><span class="p">(</span><span class="n">mock_openai_client</span><span class="p">,</span> <span class="n">sample_topics_response</span><span class="p">):</span>
-<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test successful topic discovery.&quot;&quot;&quot;</span>
-<a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a>    <span class="c1"># Arrange</span>
-<a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a>    <span class="n">mock_openai_client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="o">.</span><span class="n">return_value</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a>        <span class="n">orjson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">sample_topics_response</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
-<a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a>    <span class="p">)</span>
-<a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a>
-<a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a>    <span class="c1"># Act</span>
-<a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">discover_topics</span><span class="p">(</span><span class="n">mock_openai_client</span><span class="p">)</span>
-<a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a>
-<a id="__codelineno-4-35" name="__codelineno-4-35" href="#__codelineno-4-35"></a>    <span class="c1"># Assert</span>
-<a id="__codelineno-4-36" name="__codelineno-4-36" href="#__codelineno-4-36"></a>    <span class="k">assert</span> <span class="s2">&quot;topics&quot;</span> <span class="ow">in</span> <span class="n">result</span>
-<a id="__codelineno-4-37" name="__codelineno-4-37" href="#__codelineno-4-37"></a>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;topics&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">2</span>
-<a id="__codelineno-4-38" name="__codelineno-4-38" href="#__codelineno-4-38"></a>    <span class="k">assert</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;topics&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;title&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;AI in Quality Engineering&quot;</span>
-<a id="__codelineno-4-39" name="__codelineno-4-39" href="#__codelineno-4-39"></a>
-<a id="__codelineno-4-40" name="__codelineno-4-40" href="#__codelineno-4-40"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_discover_topics_empty_result</span><span class="p">(</span><span class="n">mock_openai_client</span><span class="p">):</span>
-<a id="__codelineno-4-41" name="__codelineno-4-41" href="#__codelineno-4-41"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test handling of empty topic list.&quot;&quot;&quot;</span>
-<a id="__codelineno-4-42" name="__codelineno-4-42" href="#__codelineno-4-42"></a>    <span class="c1"># Arrange</span>
-<a id="__codelineno-4-43" name="__codelineno-4-43" href="#__codelineno-4-43"></a>    <span class="n">mock_openai_client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="o">.</span><span class="n">return_value</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-4-44" name="__codelineno-4-44" href="#__codelineno-4-44"></a>        <span class="s1">&#39;{&quot;topics&quot;: []}&#39;</span>
-<a id="__codelineno-4-45" name="__codelineno-4-45" href="#__codelineno-4-45"></a>    <span class="p">)</span>
-<a id="__codelineno-4-46" name="__codelineno-4-46" href="#__codelineno-4-46"></a>
-<a id="__codelineno-4-47" name="__codelineno-4-47" href="#__codelineno-4-47"></a>    <span class="c1"># Act</span>
-<a id="__codelineno-4-48" name="__codelineno-4-48" href="#__codelineno-4-48"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">discover_topics</span><span class="p">(</span><span class="n">mock_openai_client</span><span class="p">)</span>
-<a id="__codelineno-4-49" name="__codelineno-4-49" href="#__codelineno-4-49"></a>
-<a id="__codelineno-4-50" name="__codelineno-4-50" href="#__codelineno-4-50"></a>    <span class="c1"># Assert</span>
-<a id="__codelineno-4-51" name="__codelineno-4-51" href="#__codelineno-4-51"></a>    <span class="k">assert</span> <span class="s2">&quot;topics&quot;</span> <span class="ow">in</span> <span class="n">result</span>
-<a id="__codelineno-4-52" name="__codelineno-4-52" href="#__codelineno-4-52"></a>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;topics&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span>
-<a id="__codelineno-4-53" name="__codelineno-4-53" href="#__codelineno-4-53"></a>
-<a id="__codelineno-4-54" name="__codelineno-4-54" href="#__codelineno-4-54"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_validate_topics_schema_valid</span><span class="p">():</span>
-<a id="__codelineno-4-55" name="__codelineno-4-55" href="#__codelineno-4-55"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test schema validation with valid data.&quot;&quot;&quot;</span>
-<a id="__codelineno-4-56" name="__codelineno-4-56" href="#__codelineno-4-56"></a>    <span class="c1"># Arrange</span>
-<a id="__codelineno-4-57" name="__codelineno-4-57" href="#__codelineno-4-57"></a>    <span class="n">topics</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-4-58" name="__codelineno-4-58" href="#__codelineno-4-58"></a>        <span class="s2">&quot;topics&quot;</span><span class="p">:</span> <span class="p">[</span>
-<a id="__codelineno-4-59" name="__codelineno-4-59" href="#__codelineno-4-59"></a>            <span class="p">{</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Test&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Desc&quot;</span><span class="p">,</span> <span class="s2">&quot;relevance_score&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span>
-<a id="__codelineno-4-60" name="__codelineno-4-60" href="#__codelineno-4-60"></a>        <span class="p">]</span>
-<a id="__codelineno-4-61" name="__codelineno-4-61" href="#__codelineno-4-61"></a>    <span class="p">}</span>
-<a id="__codelineno-4-62" name="__codelineno-4-62" href="#__codelineno-4-62"></a>
-<a id="__codelineno-4-63" name="__codelineno-4-63" href="#__codelineno-4-63"></a>    <span class="c1"># Act</span>
-<a id="__codelineno-4-64" name="__codelineno-4-64" href="#__codelineno-4-64"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">validate_topics_schema</span><span class="p">(</span><span class="n">topics</span><span class="p">)</span>
-<a id="__codelineno-4-65" name="__codelineno-4-65" href="#__codelineno-4-65"></a>
-<a id="__codelineno-4-66" name="__codelineno-4-66" href="#__codelineno-4-66"></a>    <span class="c1"># Assert</span>
-<a id="__codelineno-4-67" name="__codelineno-4-67" href="#__codelineno-4-67"></a>    <span class="k">assert</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">True</span>
-<a id="__codelineno-4-68" name="__codelineno-4-68" href="#__codelineno-4-68"></a>
-<a id="__codelineno-4-69" name="__codelineno-4-69" href="#__codelineno-4-69"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_validate_topics_schema_missing_field</span><span class="p">():</span>
-<a id="__codelineno-4-70" name="__codelineno-4-70" href="#__codelineno-4-70"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test schema validation with missing required field.&quot;&quot;&quot;</span>
-<a id="__codelineno-4-71" name="__codelineno-4-71" href="#__codelineno-4-71"></a>    <span class="c1"># Arrange</span>
-<a id="__codelineno-4-72" name="__codelineno-4-72" href="#__codelineno-4-72"></a>    <span class="n">topics</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-4-73" name="__codelineno-4-73" href="#__codelineno-4-73"></a>        <span class="s2">&quot;topics&quot;</span><span class="p">:</span> <span class="p">[</span>
-<a id="__codelineno-4-74" name="__codelineno-4-74" href="#__codelineno-4-74"></a>            <span class="p">{</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Test&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Desc&quot;</span><span class="p">}</span>  <span class="c1"># Missing score</span>
-<a id="__codelineno-4-75" name="__codelineno-4-75" href="#__codelineno-4-75"></a>        <span class="p">]</span>
-<a id="__codelineno-4-76" name="__codelineno-4-76" href="#__codelineno-4-76"></a>    <span class="p">}</span>
-<a id="__codelineno-4-77" name="__codelineno-4-77" href="#__codelineno-4-77"></a>
-<a id="__codelineno-4-78" name="__codelineno-4-78" href="#__codelineno-4-78"></a>    <span class="c1"># Act &amp; Assert</span>
-<a id="__codelineno-4-79" name="__codelineno-4-79" href="#__codelineno-4-79"></a>    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="s2">&quot;Missing required field&quot;</span><span class="p">):</span>
-<a id="__codelineno-4-80" name="__codelineno-4-80" href="#__codelineno-4-80"></a>        <span class="n">validate_topics_schema</span><span class="p">(</span><span class="n">topics</span><span class="p">)</span>
-</code></pre></div>
-<h3 id="testing-editorial-board">Testing Editorial Board<a class="headerlink" href="#testing-editorial-board" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># tests/test_editorial_board.py</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">unittest.mock</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mock</span><span class="p">,</span> <span class="n">patch</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scripts.editorial_board</span><span class="w"> </span><span class="kn">import</span> <span class="n">collect_votes</span><span class="p">,</span> <span class="n">aggregate_scores</span><span class="p">,</span> <span class="n">PERSONA_PROMPTS</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="k">def</span><span class="w"> </span><span class="nf">sample_topic</span><span class="p">():</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample topic for voting.&quot;&quot;&quot;</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="k">return</span> <span class="p">{</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;AI in QE&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>        <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Emerging AI practices&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>        <span class="s2">&quot;relevance_score&quot;</span><span class="p">:</span> <span class="mi">9</span>
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>    <span class="p">}</span>
-<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>
-<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_collect_votes_all_personas</span><span class="p">(</span><span class="n">mock_openai_client</span><span class="p">,</span> <span class="n">sample_topic</span><span class="p">):</span>
-<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that all 6 personas vote.&quot;&quot;&quot;</span>
-<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>    <span class="c1"># Arrange</span>
-<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>    <span class="n">mock_openai_client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="o">.</span><span class="n">return_value</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="s2">&quot;8&quot;</span>
-<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>
-<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>    <span class="c1"># Act</span>
-<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>    <span class="n">votes</span> <span class="o">=</span> <span class="n">collect_votes</span><span class="p">(</span><span class="n">mock_openai_client</span><span class="p">,</span> <span class="n">sample_topic</span><span class="p">)</span>
-<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>
-<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>    <span class="c1"># Assert</span>
-<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">votes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
-<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a>    <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">persona</span> <span class="ow">in</span> <span class="n">votes</span> <span class="k">for</span> <span class="n">persona</span> <span class="ow">in</span> <span class="n">PERSONA_PROMPTS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-<a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a>    <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">vote</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">vote</span> <span class="ow">in</span> <span class="n">votes</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-<a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a>
-<a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_aggregate_scores_weighted</span><span class="p">():</span>
-<a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test weighted score aggregation.&quot;&quot;&quot;</span>
-<a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a>    <span class="c1"># Arrange</span>
-<a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a>    <span class="n">votes</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-5-32" name="__codelineno-5-32" href="#__codelineno-5-32"></a>        <span class="s2">&quot;practitioner&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
-<a id="__codelineno-5-33" name="__codelineno-5-33" href="#__codelineno-5-33"></a>        <span class="s2">&quot;consultant&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
-<a id="__codelineno-5-34" name="__codelineno-5-34" href="#__codelineno-5-34"></a>        <span class="s2">&quot;academic&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
-<a id="__codelineno-5-35" name="__codelineno-5-35" href="#__codelineno-5-35"></a>        <span class="s2">&quot;vendor&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
-<a id="__codelineno-5-36" name="__codelineno-5-36" href="#__codelineno-5-36"></a>        <span class="s2">&quot;skeptic&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-<a id="__codelineno-5-37" name="__codelineno-5-37" href="#__codelineno-5-37"></a>        <span class="s2">&quot;visionary&quot;</span><span class="p">:</span> <span class="mi">10</span>
-<a id="__codelineno-5-38" name="__codelineno-5-38" href="#__codelineno-5-38"></a>    <span class="p">}</span>
-<a id="__codelineno-5-39" name="__codelineno-5-39" href="#__codelineno-5-39"></a>
-<a id="__codelineno-5-40" name="__codelineno-5-40" href="#__codelineno-5-40"></a>    <span class="c1"># Act</span>
-<a id="__codelineno-5-41" name="__codelineno-5-41" href="#__codelineno-5-41"></a>    <span class="n">final_score</span> <span class="o">=</span> <span class="n">aggregate_scores</span><span class="p">(</span><span class="n">votes</span><span class="p">)</span>
-<a id="__codelineno-5-42" name="__codelineno-5-42" href="#__codelineno-5-42"></a>
-<a id="__codelineno-5-43" name="__codelineno-5-43" href="#__codelineno-5-43"></a>    <span class="c1"># Assert</span>
-<a id="__codelineno-5-44" name="__codelineno-5-44" href="#__codelineno-5-44"></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">final_score</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
-<a id="__codelineno-5-45" name="__codelineno-5-45" href="#__codelineno-5-45"></a>    <span class="k">assert</span> <span class="mf">5.0</span> <span class="o">&lt;=</span> <span class="n">final_score</span> <span class="o">&lt;=</span> <span class="mf">10.0</span>
-<a id="__codelineno-5-46" name="__codelineno-5-46" href="#__codelineno-5-46"></a>
-<a id="__codelineno-5-47" name="__codelineno-5-47" href="#__codelineno-5-47"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_validate_vote_score_valid</span><span class="p">():</span>
-<a id="__codelineno-5-48" name="__codelineno-5-48" href="#__codelineno-5-48"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test vote score validation with valid score.&quot;&quot;&quot;</span>
-<a id="__codelineno-5-49" name="__codelineno-5-49" href="#__codelineno-5-49"></a>    <span class="c1"># Arrange</span>
-<a id="__codelineno-5-50" name="__codelineno-5-50" href="#__codelineno-5-50"></a>    <span class="n">vote</span> <span class="o">=</span> <span class="mi">8</span>
-<a id="__codelineno-5-51" name="__codelineno-5-51" href="#__codelineno-5-51"></a>
-<a id="__codelineno-5-52" name="__codelineno-5-52" href="#__codelineno-5-52"></a>    <span class="c1"># Act</span>
-<a id="__codelineno-5-53" name="__codelineno-5-53" href="#__codelineno-5-53"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">validate_vote_score</span><span class="p">(</span><span class="n">vote</span><span class="p">)</span>
-<a id="__codelineno-5-54" name="__codelineno-5-54" href="#__codelineno-5-54"></a>
-<a id="__codelineno-5-55" name="__codelineno-5-55" href="#__codelineno-5-55"></a>    <span class="c1"># Assert</span>
-<a id="__codelineno-5-56" name="__codelineno-5-56" href="#__codelineno-5-56"></a>    <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="mi">8</span>
-<a id="__codelineno-5-57" name="__codelineno-5-57" href="#__codelineno-5-57"></a>
-<a id="__codelineno-5-58" name="__codelineno-5-58" href="#__codelineno-5-58"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_validate_vote_score_out_of_range</span><span class="p">():</span>
-<a id="__codelineno-5-59" name="__codelineno-5-59" href="#__codelineno-5-59"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test vote score validation with invalid score.&quot;&quot;&quot;</span>
-<a id="__codelineno-5-60" name="__codelineno-5-60" href="#__codelineno-5-60"></a>    <span class="c1"># Arrange</span>
-<a id="__codelineno-5-61" name="__codelineno-5-61" href="#__codelineno-5-61"></a>    <span class="n">vote</span> <span class="o">=</span> <span class="mi">15</span>  <span class="c1"># Out of 0-10 range</span>
-<a id="__codelineno-5-62" name="__codelineno-5-62" href="#__codelineno-5-62"></a>
-<a id="__codelineno-5-63" name="__codelineno-5-63" href="#__codelineno-5-63"></a>    <span class="c1"># Act &amp; Assert</span>
-<a id="__codelineno-5-64" name="__codelineno-5-64" href="#__codelineno-5-64"></a>    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="s2">&quot;Vote score must be between 0 and 10&quot;</span><span class="p">):</span>
-<a id="__codelineno-5-65" name="__codelineno-5-65" href="#__codelineno-5-65"></a>        <span class="n">validate_vote_score</span><span class="p">(</span><span class="n">vote</span><span class="p">)</span>
-</code></pre></div>
-<h3 id="testing-economist-agent-pipeline">Testing Economist Agent Pipeline<a class="headerlink" href="#testing-economist-agent-pipeline" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># tests/test_economist_agent.py</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">unittest.mock</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mock</span><span class="p">,</span> <span class="n">patch</span><span class="p">,</span> <span class="n">MagicMock</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scripts.economist_agent</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="n">run_research_stage</span><span class="p">,</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="n">run_graphics_stage</span><span class="p">,</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="n">run_writing_stage</span><span class="p">,</span>
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    <span class="n">run_editing_stage</span><span class="p">,</span>
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>    <span class="n">generate_article</span>
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="p">)</span>
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
-<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="k">def</span><span class="w"> </span><span class="nf">temp_session_dir</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">):</span>
-<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Create temporary session directory.&quot;&quot;&quot;</span>
-<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>    <span class="n">session_dir</span> <span class="o">=</span> <span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;test_session&quot;</span>
-<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>    <span class="n">session_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
-<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>    <span class="k">return</span> <span class="n">session_dir</span>
-<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>
-<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
-<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a><span class="k">def</span><span class="w"> </span><span class="nf">sample_topic</span><span class="p">():</span>
-<a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample topic for article generation.&quot;&quot;&quot;</span>
-<a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a>    <span class="k">return</span> <span class="p">{</span>
-<a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a>        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;AI-Driven Test Automation&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a>        <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The future of automated testing&quot;</span><span class="p">,</span>
-<a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a>        <span class="s2">&quot;relevance_score&quot;</span><span class="p">:</span> <span class="mi">9</span>
-<a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a>    <span class="p">}</span>
-<a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a>
-<a id="__codelineno-6-29" name="__codelineno-6-29" href="#__codelineno-6-29"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_run_research_stage</span><span class="p">(</span><span class="n">mock_openai_client</span><span class="p">,</span> <span class="n">sample_topic</span><span class="p">,</span> <span class="n">temp_session_dir</span><span class="p">):</span>
-<a id="__codelineno-6-30" name="__codelineno-6-30" href="#__codelineno-6-30"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test research stage execution.&quot;&quot;&quot;</span>
-<a id="__codelineno-6-31" name="__codelineno-6-31" href="#__codelineno-6-31"></a>    <span class="c1"># Arrange</span>
-<a id="__codelineno-6-32" name="__codelineno-6-32" href="#__codelineno-6-32"></a>    <span class="n">expected_research</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-6-33" name="__codelineno-6-33" href="#__codelineno-6-33"></a>        <span class="s2">&quot;data_points&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Point 1&quot;</span><span class="p">,</span> <span class="s2">&quot;Point 2&quot;</span><span class="p">],</span>
-<a id="__codelineno-6-34" name="__codelineno-6-34" href="#__codelineno-6-34"></a>        <span class="s2">&quot;sources&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Source 1&quot;</span><span class="p">,</span> <span class="s2">&quot;Source 2&quot;</span><span class="p">]</span>
-<a id="__codelineno-6-35" name="__codelineno-6-35" href="#__codelineno-6-35"></a>    <span class="p">}</span>
-<a id="__codelineno-6-36" name="__codelineno-6-36" href="#__codelineno-6-36"></a>    <span class="n">mock_openai_client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="o">.</span><span class="n">return_value</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-6-37" name="__codelineno-6-37" href="#__codelineno-6-37"></a>        <span class="n">orjson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">expected_research</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
-<a id="__codelineno-6-38" name="__codelineno-6-38" href="#__codelineno-6-38"></a>    <span class="p">)</span>
-<a id="__codelineno-6-39" name="__codelineno-6-39" href="#__codelineno-6-39"></a>
-<a id="__codelineno-6-40" name="__codelineno-6-40" href="#__codelineno-6-40"></a>    <span class="c1"># Act</span>
-<a id="__codelineno-6-41" name="__codelineno-6-41" href="#__codelineno-6-41"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">run_research_stage</span><span class="p">(</span><span class="n">mock_openai_client</span><span class="p">,</span> <span class="n">sample_topic</span><span class="p">,</span> <span class="n">temp_session_dir</span><span class="p">)</span>
-<a id="__codelineno-6-42" name="__codelineno-6-42" href="#__codelineno-6-42"></a>
-<a id="__codelineno-6-43" name="__codelineno-6-43" href="#__codelineno-6-43"></a>    <span class="c1"># Assert</span>
-<a id="__codelineno-6-44" name="__codelineno-6-44" href="#__codelineno-6-44"></a>    <span class="k">assert</span> <span class="s2">&quot;data_points&quot;</span> <span class="ow">in</span> <span class="n">result</span>
-<a id="__codelineno-6-45" name="__codelineno-6-45" href="#__codelineno-6-45"></a>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;data_points&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">2</span>
-<a id="__codelineno-6-46" name="__codelineno-6-46" href="#__codelineno-6-46"></a>
-<a id="__codelineno-6-47" name="__codelineno-6-47" href="#__codelineno-6-47"></a>    <span class="c1"># Verify output was saved</span>
-<a id="__codelineno-6-48" name="__codelineno-6-48" href="#__codelineno-6-48"></a>    <span class="n">output_file</span> <span class="o">=</span> <span class="n">temp_session_dir</span> <span class="o">/</span> <span class="s2">&quot;research_agent.json&quot;</span>
-<a id="__codelineno-6-49" name="__codelineno-6-49" href="#__codelineno-6-49"></a>    <span class="k">assert</span> <span class="n">output_file</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
-<a id="__codelineno-6-50" name="__codelineno-6-50" href="#__codelineno-6-50"></a>
-<a id="__codelineno-6-51" name="__codelineno-6-51" href="#__codelineno-6-51"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_generate_article_full_pipeline</span><span class="p">(</span>
-<a id="__codelineno-6-52" name="__codelineno-6-52" href="#__codelineno-6-52"></a>    <span class="n">mock_openai_client</span><span class="p">,</span>
-<a id="__codelineno-6-53" name="__codelineno-6-53" href="#__codelineno-6-53"></a>    <span class="n">sample_topic</span><span class="p">,</span>
-<a id="__codelineno-6-54" name="__codelineno-6-54" href="#__codelineno-6-54"></a>    <span class="n">tmp_path</span>
-<a id="__codelineno-6-55" name="__codelineno-6-55" href="#__codelineno-6-55"></a><span class="p">):</span>
-<a id="__codelineno-6-56" name="__codelineno-6-56" href="#__codelineno-6-56"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test full article generation pipeline.&quot;&quot;&quot;</span>
-<a id="__codelineno-6-57" name="__codelineno-6-57" href="#__codelineno-6-57"></a>    <span class="c1"># Arrange</span>
-<a id="__codelineno-6-58" name="__codelineno-6-58" href="#__codelineno-6-58"></a>    <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;scripts.economist_agent.OUTPUT_DIR&#39;</span><span class="p">,</span> <span class="n">tmp_path</span><span class="p">):</span>
-<a id="__codelineno-6-59" name="__codelineno-6-59" href="#__codelineno-6-59"></a>        <span class="c1"># Mock all stage responses</span>
-<a id="__codelineno-6-60" name="__codelineno-6-60" href="#__codelineno-6-60"></a>        <span class="n">mock_openai_client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="o">.</span><span class="n">return_value</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-6-61" name="__codelineno-6-61" href="#__codelineno-6-61"></a>            <span class="s1">&#39;{&quot;result&quot;: &quot;success&quot;}&#39;</span>
-<a id="__codelineno-6-62" name="__codelineno-6-62" href="#__codelineno-6-62"></a>        <span class="p">)</span>
-<a id="__codelineno-6-63" name="__codelineno-6-63" href="#__codelineno-6-63"></a>
-<a id="__codelineno-6-64" name="__codelineno-6-64" href="#__codelineno-6-64"></a>        <span class="c1"># Act</span>
-<a id="__codelineno-6-65" name="__codelineno-6-65" href="#__codelineno-6-65"></a>        <span class="n">article_path</span> <span class="o">=</span> <span class="n">generate_article</span><span class="p">(</span><span class="n">sample_topic</span><span class="p">,</span> <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-6-66" name="__codelineno-6-66" href="#__codelineno-6-66"></a>
-<a id="__codelineno-6-67" name="__codelineno-6-67" href="#__codelineno-6-67"></a>        <span class="c1"># Assert</span>
-<a id="__codelineno-6-68" name="__codelineno-6-68" href="#__codelineno-6-68"></a>        <span class="k">assert</span> <span class="n">article_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-<a id="__codelineno-6-69" name="__codelineno-6-69" href="#__codelineno-6-69"></a>        <span class="k">assert</span> <span class="n">article_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
-<a id="__codelineno-6-70" name="__codelineno-6-70" href="#__codelineno-6-70"></a>        <span class="k">assert</span> <span class="n">article_path</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;.md&quot;</span>
-<a id="__codelineno-6-71" name="__codelineno-6-71" href="#__codelineno-6-71"></a>
-<a id="__codelineno-6-72" name="__codelineno-6-72" href="#__codelineno-6-72"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_generate_article_interactive_rejection</span><span class="p">(</span>
-<a id="__codelineno-6-73" name="__codelineno-6-73" href="#__codelineno-6-73"></a>    <span class="n">mock_openai_client</span><span class="p">,</span>
-<a id="__codelineno-6-74" name="__codelineno-6-74" href="#__codelineno-6-74"></a>    <span class="n">sample_topic</span><span class="p">,</span>
-<a id="__codelineno-6-75" name="__codelineno-6-75" href="#__codelineno-6-75"></a>    <span class="n">tmp_path</span>
-<a id="__codelineno-6-76" name="__codelineno-6-76" href="#__codelineno-6-76"></a><span class="p">):</span>
-<a id="__codelineno-6-77" name="__codelineno-6-77" href="#__codelineno-6-77"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test interactive mode with user rejection.&quot;&quot;&quot;</span>
-<a id="__codelineno-6-78" name="__codelineno-6-78" href="#__codelineno-6-78"></a>    <span class="c1"># Arrange</span>
-<a id="__codelineno-6-79" name="__codelineno-6-79" href="#__codelineno-6-79"></a>    <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;scripts.economist_agent.OUTPUT_DIR&#39;</span><span class="p">,</span> <span class="n">tmp_path</span><span class="p">):</span>
-<a id="__codelineno-6-80" name="__codelineno-6-80" href="#__codelineno-6-80"></a>        <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;scripts.economist_agent.approve_stage&#39;</span><span class="p">,</span> <span class="n">return_value</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<a id="__codelineno-6-81" name="__codelineno-6-81" href="#__codelineno-6-81"></a>            <span class="c1"># Act</span>
-<a id="__codelineno-6-82" name="__codelineno-6-82" href="#__codelineno-6-82"></a>            <span class="n">article_path</span> <span class="o">=</span> <span class="n">generate_article</span><span class="p">(</span><span class="n">sample_topic</span><span class="p">,</span> <span class="n">interactive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-6-83" name="__codelineno-6-83" href="#__codelineno-6-83"></a>
-<a id="__codelineno-6-84" name="__codelineno-6-84" href="#__codelineno-6-84"></a>            <span class="c1"># Assert</span>
-<a id="__codelineno-6-85" name="__codelineno-6-85" href="#__codelineno-6-85"></a>            <span class="k">assert</span> <span class="n">article_path</span> <span class="ow">is</span> <span class="kc">None</span>  <span class="c1"># Generation stopped by user</span>
-</code></pre></div>
-<h2 id="testing-file-operations">Testing File Operations<a class="headerlink" href="#testing-file-operations" title="Permanent link">&para;</a></h2>
-<h3 id="testing-with-temporary-directories">Testing with Temporary Directories<a class="headerlink" href="#testing-with-temporary-directories" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="k">def</span><span class="w"> </span><span class="nf">temp_output_dir</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">):</span>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Create temporary output directory structure.&quot;&quot;&quot;</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="n">output_dir</span> <span class="o">=</span> <span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;output&quot;</span>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    <span class="n">output_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    <span class="p">(</span><span class="n">output_dir</span> <span class="o">/</span> <span class="s2">&quot;charts&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>    <span class="p">(</span><span class="n">output_dir</span> <span class="o">/</span> <span class="s2">&quot;governance&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
-<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>    <span class="k">return</span> <span class="n">output_dir</span>
-<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>
-<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_save_agent_output</span><span class="p">(</span><span class="n">temp_output_dir</span><span class="p">):</span>
-<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test saving agent output to JSON.&quot;&quot;&quot;</span>
-<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>    <span class="c1"># Arrange</span>
-<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>    <span class="n">output_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="s2">&quot;list&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]}</span>
-<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>    <span class="n">output_file</span> <span class="o">=</span> <span class="n">temp_output_dir</span> <span class="o">/</span> <span class="s2">&quot;test_output.json&quot;</span>
-<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a>
-<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>    <span class="c1"># Act</span>
-<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>    <span class="n">save_agent_output</span><span class="p">(</span><span class="n">output_data</span><span class="p">,</span> <span class="n">output_file</span><span class="p">)</span>
-<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>
-<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a>    <span class="c1"># Assert</span>
-<a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>    <span class="k">assert</span> <span class="n">output_file</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
-<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a>
-<a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a>    <span class="c1"># Verify content</span>
-<a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-<a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a>        <span class="n">loaded_data</span> <span class="o">=</span> <span class="n">orjson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
-<a id="__codelineno-7-28" name="__codelineno-7-28" href="#__codelineno-7-28"></a>    <span class="k">assert</span> <span class="n">loaded_data</span> <span class="o">==</span> <span class="n">output_data</span>
-</code></pre></div>
-<h2 id="testing-logging">Testing Logging<a class="headerlink" href="#testing-logging" title="Permanent link">&para;</a></h2>
-<h3 id="capturing-log-output">Capturing Log Output<a class="headerlink" href="#capturing-log-output" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_error_logging</span><span class="p">(</span><span class="n">caplog</span><span class="p">):</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that errors are properly logged.&quot;&quot;&quot;</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    <span class="c1"># Arrange</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>    <span class="n">caplog</span><span class="o">.</span><span class="n">set_level</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>    <span class="c1"># Act</span>
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Test error&quot;</span><span class="p">)</span>
-<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Caught error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>
-<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>    <span class="c1"># Assert</span>
-<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>    <span class="k">assert</span> <span class="s2">&quot;Caught error: Test error&quot;</span> <span class="ow">in</span> <span class="n">caplog</span><span class="o">.</span><span class="n">text</span>
-<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>    <span class="k">assert</span> <span class="n">caplog</span><span class="o">.</span><span class="n">records</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levelname</span> <span class="o">==</span> <span class="s2">&quot;ERROR&quot;</span>
-</code></pre></div>
-<h2 id="testing-environment-variables">Testing Environment Variables<a class="headerlink" href="#testing-environment-variables" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_missing_api_key</span><span class="p">(</span><span class="n">monkeypatch</span><span class="p">):</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test handling of missing API key.&quot;&quot;&quot;</span>
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>    <span class="c1"># Arrange</span>
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">delenv</span><span class="p">(</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">,</span> <span class="n">raising</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>
-<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>    <span class="c1"># Act &amp; Assert</span>
-<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="s2">&quot;OPENAI_API_KEY environment variable not set&quot;</span><span class="p">):</span>
-<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>        <span class="n">initialize_client</span><span class="p">()</span>
-<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>
-<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_with_api_key</span><span class="p">(</span><span class="n">monkeypatch</span><span class="p">):</span>
-<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test with API key present.&quot;&quot;&quot;</span>
-<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>    <span class="c1"># Arrange</span>
-<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setenv</span><span class="p">(</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">,</span> <span class="s2">&quot;test-key-123&quot;</span><span class="p">)</span>
-<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>
-<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>    <span class="c1"># Act</span>
-<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>    <span class="n">client</span> <span class="o">=</span> <span class="n">initialize_client</span><span class="p">()</span>
-<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>
-<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a>    <span class="c1"># Assert</span>
-<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a>    <span class="k">assert</span> <span class="n">client</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-</code></pre></div>
-<h2 id="coverage-requirements">Coverage Requirements<a class="headerlink" href="#coverage-requirements" title="Permanent link">&para;</a></h2>
-<p><strong>Minimum coverage: 80%</strong></p>
-<p>Run coverage with:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>pytest<span class="w"> </span>--cov<span class="o">=</span>scripts<span class="w"> </span>--cov-report<span class="o">=</span>term-missing<span class="w"> </span>tests/
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;anthropic.Anthropic&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">mock</span><span class="p">:</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>        <span class="n">instance</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>        <span class="n">response</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>        <span class="n">response</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="p">[</span><span class="n">Mock</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s1">&#39;{&quot;result&quot;: &quot;success&quot;}&#39;</span><span class="p">)]</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        <span class="n">response</span><span class="o">.</span><span class="n">usage</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">(</span><span class="n">input_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">output_tokens</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        <span class="n">instance</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">create</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="n">response</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="n">mock</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="n">instance</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>        <span class="k">yield</span> <span class="n">instance</span>
 </code></pre></div></p>
-<p><strong>Coverage report should show:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Name                          Stmts   Miss  Cover   Missing
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>-----------------------------------------------------------
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>scripts/topic_scout.py           45      2    96%   123, 145
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>scripts/editorial_board.py       67      5    93%   89-93
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>scripts/economist_agent.py      134     15    89%   234-248
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>scripts/generate_chart.py        42      8    81%   67-74
-<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>-----------------------------------------------------------
-<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>TOTAL                           288     30    90%
+<p><strong>Error handling:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_api_error_handling</span><span class="p">(</span><span class="n">mock_openai_client</span><span class="p">,</span> <span class="n">caplog</span><span class="p">):</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">mock_openai_client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="o">.</span><span class="n">side_effect</span> <span class="o">=</span> <span class="n">APIError</span><span class="p">(</span><span class="s2">&quot;Rate limit&quot;</span><span class="p">)</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="n">APIError</span><span class="p">):</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>        <span class="n">my_function</span><span class="p">(</span><span class="n">mock_openai_client</span><span class="p">)</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="k">assert</span> <span class="s2">&quot;API call failed&quot;</span> <span class="ow">in</span> <span class="n">caplog</span><span class="o">.</span><span class="n">text</span>
 </code></pre></div></p>
-<h2 id="pytest-configuration">Pytest Configuration<a class="headerlink" href="#pytest-configuration" title="Permanent link">&para;</a></h2>
-<p><strong>Create <code>pytest.ini</code>:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">[pytest]</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="na">testpaths</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">tests</span>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="na">python_files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">test_*.py</span>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="na">python_classes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Test*</span>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="na">python_functions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">test_*</span>
-<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="na">addopts</span><span class="w"> </span><span class="o">=</span>
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">    </span><span class="na">-v</span>
-<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">    </span><span class="na">--cov</span><span class="o">=</span><span class="s">scripts</span>
-<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">    </span><span class="na">--cov-report</span><span class="o">=</span><span class="s">term-missing</span>
-<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="w">    </span><span class="na">--cov-fail-under</span><span class="o">=</span><span class="s">80</span>
-<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="w">    </span><span class="na">--strict-markers</span>
-<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="na">markers</span><span class="w"> </span><span class="o">=</span>
-<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="w">    </span><span class="na">integration</span><span class="o">:</span><span class="w"> </span><span class="s">Integration tests (require API access)</span>
-<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="w">    </span><span class="na">unit</span><span class="o">:</span><span class="w"> </span><span class="s">Unit tests (no external dependencies)</span>
-</code></pre></div></p>
-<h2 id="fixtures-file">Fixtures File<a class="headerlink" href="#fixtures-file" title="Permanent link">&para;</a></h2>
-<p><strong>Create <code>tests/conftest.py</code>:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="sd">&quot;&quot;&quot;Shared pytest fixtures for economist-agents tests.&quot;&quot;&quot;</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">unittest.mock</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mock</span><span class="p">,</span> <span class="n">patch</span>
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">orjson</span>
-<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>
-<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
-<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="k">def</span><span class="w"> </span><span class="nf">mock_openai_client</span><span class="p">():</span>
-<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Mock OpenAI client.&quot;&quot;&quot;</span>
-<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>    <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;openai.OpenAI&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">mock</span><span class="p">:</span>
-<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>        <span class="n">mock_instance</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>        <span class="n">mock_response</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a>        <span class="n">mock_response</span><span class="o">.</span><span class="n">choices</span> <span class="o">=</span> <span class="p">[</span><span class="n">Mock</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">Mock</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="s1">&#39;{&quot;result&quot;: &quot;success&quot;}&#39;</span><span class="p">))]</span>
-<a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a>        <span class="n">mock_response</span><span class="o">.</span><span class="n">usage</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">(</span><span class="n">total_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
-<a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a>        <span class="n">mock_response</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o&quot;</span>
-<a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a>        <span class="n">mock_instance</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="n">mock_response</span>
-<a id="__codelineno-13-18" name="__codelineno-13-18" href="#__codelineno-13-18"></a>        <span class="n">mock</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="n">mock_instance</span>
-<a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a>        <span class="k">yield</span> <span class="n">mock_instance</span>
-<a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a>
-<a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
-<a id="__codelineno-13-22" name="__codelineno-13-22" href="#__codelineno-13-22"></a><span class="k">def</span><span class="w"> </span><span class="nf">mock_anthropic_client</span><span class="p">():</span>
-<a id="__codelineno-13-23" name="__codelineno-13-23" href="#__codelineno-13-23"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Mock Anthropic client.&quot;&quot;&quot;</span>
-<a id="__codelineno-13-24" name="__codelineno-13-24" href="#__codelineno-13-24"></a>    <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;anthropic.Anthropic&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">mock</span><span class="p">:</span>
-<a id="__codelineno-13-25" name="__codelineno-13-25" href="#__codelineno-13-25"></a>        <span class="n">mock_instance</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<a id="__codelineno-13-26" name="__codelineno-13-26" href="#__codelineno-13-26"></a>        <span class="n">mock_response</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<a id="__codelineno-13-27" name="__codelineno-13-27" href="#__codelineno-13-27"></a>        <span class="n">mock_response</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="p">[</span><span class="n">Mock</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s1">&#39;{&quot;result&quot;: &quot;success&quot;}&#39;</span><span class="p">)]</span>
-<a id="__codelineno-13-28" name="__codelineno-13-28" href="#__codelineno-13-28"></a>        <span class="n">mock_response</span><span class="o">.</span><span class="n">usage</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">(</span><span class="n">input_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">output_tokens</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
-<a id="__codelineno-13-29" name="__codelineno-13-29" href="#__codelineno-13-29"></a>        <span class="n">mock_response</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="s2">&quot;claude-sonnet-4-20250514&quot;</span>
-<a id="__codelineno-13-30" name="__codelineno-13-30" href="#__codelineno-13-30"></a>        <span class="n">mock_instance</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">create</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="n">mock_response</span>
-<a id="__codelineno-13-31" name="__codelineno-13-31" href="#__codelineno-13-31"></a>        <span class="n">mock</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="n">mock_instance</span>
-<a id="__codelineno-13-32" name="__codelineno-13-32" href="#__codelineno-13-32"></a>        <span class="k">yield</span> <span class="n">mock_instance</span>
-<a id="__codelineno-13-33" name="__codelineno-13-33" href="#__codelineno-13-33"></a>
-<a id="__codelineno-13-34" name="__codelineno-13-34" href="#__codelineno-13-34"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
-<a id="__codelineno-13-35" name="__codelineno-13-35" href="#__codelineno-13-35"></a><span class="k">def</span><span class="w"> </span><span class="nf">temp_output_dir</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">):</span>
-<a id="__codelineno-13-36" name="__codelineno-13-36" href="#__codelineno-13-36"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Create temporary output directory structure.&quot;&quot;&quot;</span>
-<a id="__codelineno-13-37" name="__codelineno-13-37" href="#__codelineno-13-37"></a>    <span class="n">output_dir</span> <span class="o">=</span> <span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;output&quot;</span>
-<a id="__codelineno-13-38" name="__codelineno-13-38" href="#__codelineno-13-38"></a>    <span class="n">output_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
-<a id="__codelineno-13-39" name="__codelineno-13-39" href="#__codelineno-13-39"></a>    <span class="p">(</span><span class="n">output_dir</span> <span class="o">/</span> <span class="s2">&quot;charts&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
-<a id="__codelineno-13-40" name="__codelineno-13-40" href="#__codelineno-13-40"></a>    <span class="p">(</span><span class="n">output_dir</span> <span class="o">/</span> <span class="s2">&quot;governance&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
-<a id="__codelineno-13-41" name="__codelineno-13-41" href="#__codelineno-13-41"></a>    <span class="k">return</span> <span class="n">output_dir</span>
-<a id="__codelineno-13-42" name="__codelineno-13-42" href="#__codelineno-13-42"></a>
-<a id="__codelineno-13-43" name="__codelineno-13-43" href="#__codelineno-13-43"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
-<a id="__codelineno-13-44" name="__codelineno-13-44" href="#__codelineno-13-44"></a><span class="k">def</span><span class="w"> </span><span class="nf">sample_agent_response</span><span class="p">():</span>
-<a id="__codelineno-13-45" name="__codelineno-13-45" href="#__codelineno-13-45"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample agent response for testing.&quot;&quot;&quot;</span>
-<a id="__codelineno-13-46" name="__codelineno-13-46" href="#__codelineno-13-46"></a>    <span class="k">return</span> <span class="p">{</span>
-<a id="__codelineno-13-47" name="__codelineno-13-47" href="#__codelineno-13-47"></a>        <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Agent response content&quot;</span><span class="p">,</span>
-<a id="__codelineno-13-48" name="__codelineno-13-48" href="#__codelineno-13-48"></a>        <span class="s2">&quot;usage&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;total_tokens&quot;</span><span class="p">:</span> <span class="mi">150</span><span class="p">},</span>
-<a id="__codelineno-13-49" name="__codelineno-13-49" href="#__codelineno-13-49"></a>        <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;gpt-4o&quot;</span>
-<a id="__codelineno-13-50" name="__codelineno-13-50" href="#__codelineno-13-50"></a>    <span class="p">}</span>
-</code></pre></div></p>
-<h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
+<h3 id="test-categories-minimum-per-module">Test Categories (Minimum Per Module)<a class="headerlink" href="#test-categories-minimum-per-module" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>Test file naming</strong>: <code>test_&lt;module_name&gt;.py</code></li>
-<li><strong>Test function naming</strong>: <code>test_&lt;function&gt;_&lt;scenario&gt;</code></li>
-<li><strong>One assertion per test</strong>: Focus on single behavior</li>
-<li><strong>Use descriptive names</strong>: Test names should explain what they verify</li>
-<li><strong>Mock external dependencies</strong>: Never call real APIs in tests</li>
-<li><strong>Test edge cases</strong>: Empty inputs, invalid data, API errors</li>
-<li><strong>Keep tests isolated</strong>: No test should depend on another</li>
-<li><strong>Use fixtures</strong>: Share common setup code</li>
-<li><strong>Test both paths</strong>: Success and failure scenarios</li>
+<li><strong>Happy path</strong> — function returns expected result on valid input</li>
+<li><strong>Error handling</strong> — function handles API errors, bad input gracefully</li>
+<li><strong>Edge cases</strong> — empty input, missing fields, malformed data</li>
+<li><strong>Schema validation</strong> — agent outputs match expected structure</li>
 </ol>
-<h2 id="running-tests">Running Tests<a class="headerlink" href="#running-tests" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># Run all tests</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>pytest<span class="w"> </span>tests/
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c1"># Run specific test file</span>
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>pytest<span class="w"> </span>tests/test_topic_scout.py
-<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>
-<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="c1"># Run specific test</span>
-<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>pytest<span class="w"> </span>tests/test_topic_scout.py::test_discover_topics_success
-<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>
-<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="c1"># Run with coverage</span>
-<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>pytest<span class="w"> </span>--cov<span class="o">=</span>scripts<span class="w"> </span>--cov-report<span class="o">=</span>html<span class="w"> </span>tests/
-<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>
-<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="c1"># Run only unit tests</span>
-<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a>pytest<span class="w"> </span>-m<span class="w"> </span>unit<span class="w"> </span>tests/
-<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a>
-<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="c1"># Run with verbose output</span>
-<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a>pytest<span class="w"> </span>-v<span class="w"> </span>tests/
+<h3 id="file-and-environment-testing">File and Environment Testing<a class="headerlink" href="#file-and-environment-testing" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Use tmp_path for file operations</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_save_output</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">):</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">path</span> <span class="o">=</span> <span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;output.json&quot;</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">save_output</span><span class="p">({</span><span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">},</span> <span class="n">path</span><span class="p">)</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="k">assert</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Use monkeypatch for env vars</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_missing_api_key</span><span class="p">(</span><span class="n">monkeypatch</span><span class="p">):</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">delenv</span><span class="p">(</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">,</span> <span class="n">raising</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>        <span class="n">initialize_client</span><span class="p">()</span>
 </code></pre></div>
-<hr />
-<p><strong>Remember:</strong> Good tests are the foundation of reliable multi-agent systems. Test early, test often, and aim for &gt;80% coverage.</p>
+<h3 id="coverage">Coverage<a class="headerlink" href="#coverage" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pytest<span class="w"> </span>--cov<span class="o">=</span>scripts<span class="w"> </span>--cov-report<span class="o">=</span>term-missing<span class="w"> </span>tests/
+</code></pre></div>
+<p>Minimum: 80%. Uncovered lines should only be <code>__main__</code> blocks and <code>sys.path</code> guards.</p>
+<h3 id="naming-conventions">Naming Conventions<a class="headerlink" href="#naming-conventions" title="Permanent link">&para;</a></h3>
+<ul>
+<li>File: <code>tests/test_&lt;module_name&gt;.py</code></li>
+<li>MCP servers: <code>tests/test_mcp_servers/test_&lt;server_name&gt;.py</code></li>
+<li>Function: <code>test_&lt;function&gt;_&lt;scenario&gt;</code></li>
+<li>Fixtures: shared setup in <code>tests/conftest.py</code></li>
+</ul>
+<h2 id="common-rationalizations">Common Rationalizations<a class="headerlink" href="#common-rationalizations" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Rationalization</th>
+<th>Reality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"Mocking is too complex for this function"</td>
+<td>If the function is hard to mock, it's doing too much — refactor it</td>
+</tr>
+<tr>
+<td>"We'll add tests after the feature ships"</td>
+<td>Tests after shipping means bugs ship first; write tests alongside code</td>
+</tr>
+<tr>
+<td>"80% coverage is arbitrary"</td>
+<td>It's a ratchet — uncovered code is untested code, and untested agent code fails silently</td>
+</tr>
+<tr>
+<td>"Integration tests are enough"</td>
+<td>Integration tests are slow and flaky; unit tests with mocks give fast, deterministic feedback</td>
+</tr>
+<tr>
+<td>"This is just a script, it doesn't need tests"</td>
+<td>Scripts become library code when agents compose them — test them like library code</td>
+</tr>
+</tbody>
+</table>
+<h2 id="red-flags">Red Flags<a class="headerlink" href="#red-flags" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Tests that make real API calls (no mocking)</li>
+<li>Tests that depend on other tests (shared mutable state)</li>
+<li>Missing error-path tests (only happy path covered)</li>
+<li><code>monkeypatch</code> not used for environment variables</li>
+<li><code>tmp_path</code> not used for file operations (tests write to repo)</li>
+<li>Test names that don't describe the scenario (<code>test_1</code>, <code>test_basic</code>)</li>
+<li>Coverage below 80% with no plan to improve</li>
+<li>Flaky tests ignored instead of fixed</li>
+</ul>
+<h2 id="verification">Verification<a class="headerlink" href="#verification" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[ ] All new/modified code has corresponding tests — <strong>evidence</strong>: <code>git diff --name-only</code> shows test files for each source file</li>
+<li>[ ] API calls mocked in all tests — <strong>evidence</strong>: grep for <code>Mock</code> or <code>patch</code> in test files, no real API imports</li>
+<li>[ ] Both success and error paths tested — <strong>evidence</strong>: test names include <code>_success</code> and <code>_error</code>/<code>_failure</code> variants</li>
+<li>[ ] Coverage ≥80% — <strong>evidence</strong>: <code>pytest --cov</code> output</li>
+<li>[ ] Tests use <code>tmp_path</code> for file I/O — <strong>evidence</strong>: no hardcoded paths in test files</li>
+<li>[ ] Tests use <code>monkeypatch</code> for env vars — <strong>evidence</strong>: no <code>os.environ</code> direct manipulation</li>
+<li>[ ] All tests pass: <code>pytest tests/ -v</code> — <strong>evidence</strong>: zero failures</li>
+</ul>
 
 
 
 
 
 
+
+  
+  
 
 
 

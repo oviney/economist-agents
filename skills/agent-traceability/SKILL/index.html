@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Multi-agent content pipeline that generates Economist-style articles with autonomous research, writing, illustration, and deployment">
+        <meta name="description" content="Log every agent's inputs, outputs, and decisions as structured JSON for end-to-end auditing. Use when adding trace logging to a pipeline stage, when diagnosing a failed article, when the editorial judge needs pipeline context in a GitHub issue.">
       
       
       
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#agent-traceability-skill" class="md-skip">
+        <a href="#agent-traceability" class="md-skip">
           Skip to content
         </a>
       
@@ -1480,10 +1480,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#purpose" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Purpose
+        Overview
       
     </span>
   </a>
@@ -1491,22 +1491,50 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-to-log" class="md-nav__link">
+  <a href="#when-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What to Log
+        When to Use
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="What to Log">
+    <nav class="md-nav" aria-label="When to Use">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#per-stage-trace-record" class="md-nav__link">
+  <a href="#when-not-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Per-Stage Trace Record
+        When NOT to Use
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Process
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Process">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#per-stage-trace-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Per-Stage Trace Matrix
       
     </span>
   </a>
@@ -1524,51 +1552,7 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#where-to-log" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Where to Log
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Where to Log">
-      <ul class="md-nav__list">
-        
           <li class="md-nav__item">
-  <a href="#file-logspipeline_tracesjson" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        File: logs/pipeline_traces.json
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#github-issue-comments" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        GitHub Issue Comments
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#implementation" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1577,29 +1561,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Implementation">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#tracing-decorator" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tracing Decorator
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#lightweight-approach-recommended-for-v1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Lightweight Approach (Recommended for v1)
-      
-    </span>
-  </a>
-  
 </li>
         
       </ul>
@@ -1608,10 +1569,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#existing-patterns-to-follow" class="md-nav__link">
+  <a href="#common-rationalizations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Existing Patterns to Follow
+        Common Rationalizations
       
     </span>
   </a>
@@ -1619,10 +1580,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#privacy-and-security" class="md-nav__link">
+  <a href="#red-flags" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Privacy and Security
+        Red Flags
       
     </span>
   </a>
@@ -1630,6 +1591,18 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#integration-points" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1639,15 +1612,9 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#performance-budget" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Performance Budget
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2381,10 +2348,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#purpose" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Purpose
+        Overview
       
     </span>
   </a>
@@ -2392,22 +2359,50 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-to-log" class="md-nav__link">
+  <a href="#when-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What to Log
+        When to Use
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="What to Log">
+    <nav class="md-nav" aria-label="When to Use">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#per-stage-trace-record" class="md-nav__link">
+  <a href="#when-not-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Per-Stage Trace Record
+        When NOT to Use
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Process
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Process">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#per-stage-trace-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Per-Stage Trace Matrix
       
     </span>
   </a>
@@ -2425,51 +2420,7 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#where-to-log" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Where to Log
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Where to Log">
-      <ul class="md-nav__list">
-        
           <li class="md-nav__item">
-  <a href="#file-logspipeline_tracesjson" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        File: logs/pipeline_traces.json
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#github-issue-comments" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        GitHub Issue Comments
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#implementation" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2478,29 +2429,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Implementation">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#tracing-decorator" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tracing Decorator
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#lightweight-approach-recommended-for-v1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Lightweight Approach (Recommended for v1)
-      
-    </span>
-  </a>
-  
 </li>
         
       </ul>
@@ -2509,10 +2437,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#existing-patterns-to-follow" class="md-nav__link">
+  <a href="#common-rationalizations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Existing Patterns to Follow
+        Common Rationalizations
       
     </span>
   </a>
@@ -2520,10 +2448,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#privacy-and-security" class="md-nav__link">
+  <a href="#red-flags" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Privacy and Security
+        Red Flags
       
     </span>
   </a>
@@ -2531,6 +2459,18 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#integration-points" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2540,15 +2480,9 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#performance-budget" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Performance Budget
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2572,160 +2506,171 @@
   
 
 
-<h1 id="agent-traceability-skill">Agent Traceability Skill<a class="headerlink" href="#agent-traceability-skill" title="Permanent link">&para;</a></h1>
-<h2 id="purpose">Purpose<a class="headerlink" href="#purpose" title="Permanent link">&para;</a></h2>
-<p>Log every agent's inputs, outputs, and decisions as structured JSON so that
-any article can be audited end-to-end.  When the editorial judge creates a
-GitHub issue, include the relevant agent logs for diagnosis.</p>
-<h2 id="what-to-log">What to Log<a class="headerlink" href="#what-to-log" title="Permanent link">&para;</a></h2>
-<h3 id="per-stage-trace-record">Per-Stage Trace Record<a class="headerlink" href="#per-stage-trace-record" title="Permanent link">&para;</a></h3>
-<p>Each stage in the flow produces a trace record:</p>
+<h1 id="agent-traceability">Agent Traceability<a class="headerlink" href="#agent-traceability" title="Permanent link">&para;</a></h1>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>Produces structured trace records for every pipeline stage so any article can be audited end-to-end. When the editorial judge creates a GitHub issue, trace data provides the diagnostic context.</p>
+<h2 id="when-to-use">When to Use<a class="headerlink" href="#when-to-use" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Adding a new pipeline stage that needs trace logging</li>
+<li>Diagnosing why a specific article failed or scored low</li>
+<li>Including pipeline context in editorial judge GitHub issues</li>
+<li>Analyzing stage durations for performance optimization</li>
+</ul>
+<h3 id="when-not-to-use">When NOT to Use<a class="headerlink" href="#when-not-to-use" title="Permanent link">&para;</a></h3>
+<ul>
+<li>For article quality scoring — that's <code>article-evaluation</code></li>
+<li>For quality trend analysis — that's <code>observability</code></li>
+<li>For defect pattern codification — that's <code>defect-prevention</code></li>
+<li>For logging API keys, article full text, or sensitive data (never log these)</li>
+</ul>
+<h2 id="core-process">Core Process<a class="headerlink" href="#core-process" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>1. Pipeline stage begins
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>   ↓
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>2. Record inputs (topic, focus_area, config — never full article text)
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>   ↓
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>3. Execute stage logic
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>   ↓
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>4. Record outputs (scores, counts, decisions) and duration_ms
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>   ↓
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>5. Buffer trace record in memory
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>   ↓
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>6. After all stages complete → flush all records to logs/pipeline_traces.json
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>   ↓
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>7. If editorial judge creates issue → include trace summary table in body
+</code></pre></div>
+<h3 id="per-stage-trace-matrix">Per-Stage Trace Matrix<a class="headerlink" href="#per-stage-trace-matrix" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
 <th>Stage</th>
 <th>Agent</th>
-<th>Inputs</th>
-<th>Outputs</th>
-<th>Decisions</th>
+<th>Key Inputs</th>
+<th>Key Outputs</th>
+<th>Key Decisions</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>1. Topic Discovery</td>
+<td>Topic Discovery</td>
 <td>Topic Scout</td>
 <td>focus_area</td>
-<td>5 topics with scores</td>
-<td>-</td>
+<td>topic count, top topic</td>
+<td>—</td>
 </tr>
 <tr>
-<td>2. Editorial Review</td>
-<td>Editorial Board (6 personas)</td>
-<td>5 topics</td>
+<td>Editorial Review</td>
+<td>Editorial Board</td>
+<td>topics</td>
 <td>top_pick, consensus, votes</td>
-<td>Which topic won, dissenting views</td>
+<td>Winner, dissents</td>
 </tr>
 <tr>
-<td>3. Content Generation</td>
-<td>Stage3Crew (4 agents)</td>
+<td>Content Generation</td>
+<td>Stage3Crew</td>
 <td>topic</td>
-<td>article, chart_data</td>
-<td>-</td>
+<td>word count, chart_data</td>
+<td>—</td>
 </tr>
 <tr>
-<td>4. Quality Gate</td>
-<td>Stage4Crew Reviewer</td>
+<td>Quality Gate</td>
+<td>Stage4Crew</td>
 <td>article</td>
 <td>editorial_score, gates_passed</td>
 <td>publish vs revision</td>
 </tr>
 <tr>
-<td>4b. Schema Validation</td>
+<td>Schema Validation</td>
 <td>FrontmatterSchema</td>
 <td>article</td>
 <td>is_valid, errors</td>
-<td>-</td>
+<td>—</td>
 </tr>
 <tr>
-<td>4c. Publication Validator</td>
+<td>Publication Validator</td>
 <td>PublicationValidator</td>
 <td>article</td>
 <td>is_valid, issues</td>
-<td>-</td>
+<td>—</td>
 </tr>
 <tr>
-<td>5. Editorial Judge</td>
+<td>Editorial Judge</td>
 <td>EditorialJudge</td>
 <td>deployed article</td>
-<td>6 check results</td>
+<td>check results</td>
 <td>pass/warn/fail</td>
 </tr>
 </tbody>
 </table>
 <h3 id="trace-record-schema">Trace Record Schema<a class="headerlink" href="#trace-record-schema" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;trace_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uuid&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">&quot;pipeline_run_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uuid&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nt">&quot;stage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;topic_discovery&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nt">&quot;agent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;topic_scout&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-04-04T12:00:00Z&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="nt">&quot;inputs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="nt">&quot;focus_area&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="nt">&quot;outputs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="nt">&quot;topic_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="nt">&quot;top_topic&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;AI Testing Paradox&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">    </span><span class="nt">&quot;top_score&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">9.2</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">  </span><span class="nt">&quot;decisions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">  </span><span class="nt">&quot;duration_ms&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4500</span><span class="p">,</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;success&quot;</span>
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;trace_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uuid&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">&quot;pipeline_run_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uuid&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">&quot;stage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;topic_discovery&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nt">&quot;agent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;topic_scout&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-04-04T12:00:00Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="nt">&quot;inputs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;focus_area&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="nt">&quot;outputs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;topic_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;top_topic&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;AI Testing Paradox&quot;</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">  </span><span class="nt">&quot;decisions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span><span class="nt">&quot;duration_ms&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4500</span><span class="p">,</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;success&quot;</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="p">}</span>
 </code></pre></div>
-<h2 id="where-to-log">Where to Log<a class="headerlink" href="#where-to-log" title="Permanent link">&para;</a></h2>
-<h3 id="file-logspipeline_tracesjson">File: <code>logs/pipeline_traces.json</code><a class="headerlink" href="#file-logspipeline_tracesjson" title="Permanent link">&para;</a></h3>
-<p>Append-only JSON array.  Each pipeline run produces 4-6 trace records
-(one per stage).  Use <code>orjson</code> for serialization.</p>
-<h3 id="github-issue-comments">GitHub Issue Comments<a class="headerlink" href="#github-issue-comments" title="Permanent link">&para;</a></h3>
-<p>When the editorial judge creates an issue, include a summary of the
-pipeline trace in the issue body:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="gu">## Pipeline Trace</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>| Stage | Agent | Duration | Status | Key Output |
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>|-------|-------|----------|--------|------------|
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>| Topic Discovery | topic_scout | 4.5s | success | 5 topics |
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>| Editorial Review | editorial_board | 8.2s | success | &quot;AI Testing&quot; (8.3/10) |
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>| Content Generation | stage3_crew | 45.1s | success | 1138 words |
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>| Quality Gate | stage4_reviewer | 12.3s | success | 98/100, 5/5 gates |
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>| Publication Validator | pub_validator | 0.1s | success | valid |
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>| Editorial Judge | editorial_judge | 3.2s | fail | image not found |
+<h3 id="implementation">Implementation<a class="headerlink" href="#implementation" title="Permanent link">&para;</a></h3>
+<p>For v1, add trace logging directly in <code>flow.py</code> using a simple helper:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">_log_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">outputs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>               <span class="n">decisions</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">duration_ms</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Append a trace record to logs/pipeline_traces.json.&quot;&quot;&quot;</span>
 </code></pre></div>
-<h2 id="implementation">Implementation<a class="headerlink" href="#implementation" title="Permanent link">&para;</a></h2>
-<h3 id="tracing-decorator">Tracing Decorator<a class="headerlink" href="#tracing-decorator" title="Permanent link">&para;</a></h3>
-<p>Create a <code>@trace</code> decorator or context manager that wraps each flow stage:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scripts.trace_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">TraceLogger</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">logger</span> <span class="o">=</span> <span class="n">TraceLogger</span><span class="p">(</span><span class="n">run_id</span><span class="o">=</span><span class="s2">&quot;uuid&quot;</span><span class="p">)</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="k">with</span> <span class="n">logger</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="s2">&quot;topic_discovery&quot;</span><span class="p">,</span> <span class="n">agent</span><span class="o">=</span><span class="s2">&quot;topic_scout&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">t</span><span class="p">:</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">t</span><span class="o">.</span><span class="n">log_input</span><span class="p">(</span><span class="s2">&quot;focus_area&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">topics</span> <span class="o">=</span> <span class="n">scout_topics</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="n">t</span><span class="o">.</span><span class="n">log_output</span><span class="p">(</span><span class="s2">&quot;topic_count&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">topics</span><span class="p">))</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="n">t</span><span class="o">.</span><span class="n">log_output</span><span class="p">(</span><span class="s2">&quot;top_topic&quot;</span><span class="p">,</span> <span class="n">topics</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;topic&quot;</span><span class="p">])</span>
-</code></pre></div>
-<h3 id="lightweight-approach-recommended-for-v1">Lightweight Approach (Recommended for v1)<a class="headerlink" href="#lightweight-approach-recommended-for-v1" title="Permanent link">&para;</a></h3>
-<p>Don't over-engineer.  For v1, add trace logging directly in <code>flow.py</code>
-methods using a simple helper:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">_log_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">outputs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>               <span class="n">decisions</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">duration_ms</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Append a trace record to logs/pipeline_traces.json.&quot;&quot;&quot;</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="o">...</span>
-</code></pre></div>
-<h2 id="existing-patterns-to-follow">Existing Patterns to Follow<a class="headerlink" href="#existing-patterns-to-follow" title="Permanent link">&para;</a></h2>
+<h2 id="common-rationalizations">Common Rationalizations<a class="headerlink" href="#common-rationalizations" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Rationalization</th>
+<th>Reality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"We can debug from the logs"</td>
+<td>Unstructured logs require manual correlation; structured traces give instant stage-by-stage audit</td>
+</tr>
+<tr>
+<td>"Tracing adds too much overhead"</td>
+<td>Performance budget is &lt;50ms/stage — JSON serialization is negligible</td>
+</tr>
+<tr>
+<td>"We'll add tracing later when we need it"</td>
+<td>You need it the first time a deployed article fails and you can't explain why</td>
+</tr>
+<tr>
+<td>"Just log everything"</td>
+<td>Logging full article text wastes storage and creates privacy risk; log summaries only</td>
+</tr>
+</tbody>
+</table>
+<h2 id="red-flags">Red Flags<a class="headerlink" href="#red-flags" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>scripts/defect_tracker.py</code> — structured JSON logging with timestamps</li>
-<li><code>src/telemetry/roi_tracker.py</code> — per-session logging to JSON files</li>
-<li><code>scripts/editorial_judge.py</code> — GitHub issue creation with structured body</li>
+<li>Trace records missing for any pipeline stage (gap in audit trail)</li>
+<li>Full article text logged in trace records (privacy/storage risk)</li>
+<li>Traces written per-stage instead of buffered and flushed once at end</li>
+<li>No <code>pipeline_run_id</code> linking stages within the same run</li>
+<li>Trace logging adds &gt;50ms per stage or &gt;250ms per pipeline run</li>
+<li>API keys or tokens appearing in trace inputs/outputs</li>
 </ul>
-<h2 id="privacy-and-security">Privacy and Security<a class="headerlink" href="#privacy-and-security" title="Permanent link">&para;</a></h2>
+<h2 id="verification">Verification<a class="headerlink" href="#verification" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Never log article full text in traces (too large, may contain sensitive data)</li>
-<li>Log summaries: word count, title, score — not content</li>
-<li>Never log API keys or tokens</li>
-<li>Trace files should be gitignored (runtime data, not source)</li>
+<li>[ ] Every pipeline stage produces a trace record — <strong>evidence</strong>: <code>logs/pipeline_traces.json</code> has one record per stage per run</li>
+<li>[ ] Records contain <code>pipeline_run_id</code> linking all stages — <strong>evidence</strong>: group by run_id shows complete stage sequences</li>
+<li>[ ] No full article text in any trace record — <strong>evidence</strong>: grep for common article patterns returns empty</li>
+<li>[ ] Flush happens once at pipeline end, not per-stage — <strong>evidence</strong>: single file write in flow.py</li>
+<li>[ ] Performance budget met (&lt;250ms total) — <strong>evidence</strong>: sum of trace overhead in a test run</li>
 </ul>
-<h2 id="integration-points">Integration Points<a class="headerlink" href="#integration-points" title="Permanent link">&para;</a></h2>
+<h3 id="integration-points">Integration Points<a class="headerlink" href="#integration-points" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>src/economist_agents/flow.py</code> — add trace logging to each stage method</li>
 <li><code>scripts/editorial_judge.py</code> — include trace summary in GitHub issues</li>
 <li><code>logs/pipeline_traces.json</code> — append-only trace storage</li>
-<li>Observability dashboard (Story #119) — reads traces for duration metrics</li>
-</ul>
-<h2 id="performance-budget">Performance Budget<a class="headerlink" href="#performance-budget" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Trace logging must add &lt;50ms per stage (&lt;250ms total per pipeline run)</li>
-<li>Use buffered writes — flush once at end of pipeline, not per stage</li>
-<li>File I/O only, no network calls for tracing</li>
+<li>Observability dashboard — reads traces for duration metrics</li>
 </ul>
 
 
@@ -2733,6 +2678,9 @@ methods using a simple helper:</p>
 
 
 
+
+  
+  
 
 
 

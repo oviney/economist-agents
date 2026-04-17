@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Multi-agent content pipeline that generates Economist-style articles with autonomous research, writing, illustration, and deployment">
+        <meta name="description" content="Enforce source freshness, diversity, and attribution standards for article research. Use when configuring the Research Agent, when evaluating source quality in articles, when adding new source discovery integrations.">
       
       
       
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#research-sourcing-skill" class="md-skip">
+        <a href="#research-sourcing" class="md-skip">
           Skip to content
         </a>
       
@@ -1172,10 +1172,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#purpose" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Purpose
+        Overview
       
     </span>
   </a>
@@ -1183,55 +1183,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-problem" class="md-nav__link">
+  <a href="#when-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The Problem
+        When to Use
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#source-freshness-requirements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Source Freshness Requirements
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Source Freshness Requirements">
+    <nav class="md-nav" aria-label="When to Use">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#mandatory" class="md-nav__link">
+  <a href="#when-not-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Mandatory
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#source-types-diversify" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Source Types (Diversify)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#banned-source-patterns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Banned Source Patterns
+        When NOT to Use
       
     </span>
   </a>
@@ -1244,22 +1211,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#source-discovery" class="md-nav__link">
+  <a href="#core-process" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Source Discovery
+        Core Process
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Source Discovery">
+    <nav class="md-nav" aria-label="Core Process">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#where-to-find-fresh-sources" class="md-nav__link">
+  <a href="#freshness-requirements" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Where to Find Fresh Sources
+        Freshness Requirements
       
     </span>
   </a>
@@ -1267,10 +1234,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#arxiv-integration" class="md-nav__link">
+  <a href="#source-type-diversity" class="md-nav__link">
     <span class="md-ellipsis">
       
-        arXiv Integration
+        Source Type Diversity
       
     </span>
   </a>
@@ -1278,10 +1245,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#google-search-scholar-integration" class="md-nav__link">
+  <a href="#banned-attribution-patterns" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Google Search &amp; Scholar Integration
+        Banned Attribution Patterns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-discovery-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Source Discovery Tools
       
     </span>
   </a>
@@ -1294,10 +1272,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#verification-requirements" class="md-nav__link">
+  <a href="#common-rationalizations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Verification Requirements
+        Common Rationalizations
       
     </span>
   </a>
@@ -1305,6 +1283,29 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#red-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Red Flags
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#integration-points" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1314,15 +1315,9 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#anti-patterns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Anti-Patterns
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2364,10 +2359,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#purpose" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Purpose
+        Overview
       
     </span>
   </a>
@@ -2375,55 +2370,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-problem" class="md-nav__link">
+  <a href="#when-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The Problem
+        When to Use
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#source-freshness-requirements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Source Freshness Requirements
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Source Freshness Requirements">
+    <nav class="md-nav" aria-label="When to Use">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#mandatory" class="md-nav__link">
+  <a href="#when-not-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Mandatory
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#source-types-diversify" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Source Types (Diversify)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#banned-source-patterns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Banned Source Patterns
+        When NOT to Use
       
     </span>
   </a>
@@ -2436,22 +2398,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#source-discovery" class="md-nav__link">
+  <a href="#core-process" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Source Discovery
+        Core Process
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Source Discovery">
+    <nav class="md-nav" aria-label="Core Process">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#where-to-find-fresh-sources" class="md-nav__link">
+  <a href="#freshness-requirements" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Where to Find Fresh Sources
+        Freshness Requirements
       
     </span>
   </a>
@@ -2459,10 +2421,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#arxiv-integration" class="md-nav__link">
+  <a href="#source-type-diversity" class="md-nav__link">
     <span class="md-ellipsis">
       
-        arXiv Integration
+        Source Type Diversity
       
     </span>
   </a>
@@ -2470,10 +2432,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#google-search-scholar-integration" class="md-nav__link">
+  <a href="#banned-attribution-patterns" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Google Search &amp; Scholar Integration
+        Banned Attribution Patterns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-discovery-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Source Discovery Tools
       
     </span>
   </a>
@@ -2486,10 +2459,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#verification-requirements" class="md-nav__link">
+  <a href="#common-rationalizations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Verification Requirements
+        Common Rationalizations
       
     </span>
   </a>
@@ -2497,6 +2470,29 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#red-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Red Flags
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#integration-points" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2506,15 +2502,9 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#anti-patterns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Anti-Patterns
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2538,123 +2528,149 @@
   
 
 
-<h1 id="research-sourcing-skill">Research Sourcing Skill<a class="headerlink" href="#research-sourcing-skill" title="Permanent link">&para;</a></h1>
-<h2 id="purpose">Purpose<a class="headerlink" href="#purpose" title="Permanent link">&para;</a></h2>
-<p>Define the research standard for every article.  The Research Agent
-must find current, authoritative, and diverse sources — not recycled
-analyst reports from 2-3 years ago.</p>
-<h2 id="the-problem">The Problem<a class="headerlink" href="#the-problem" title="Permanent link">&para;</a></h2>
-<p>The pipeline consistently produces articles citing the same stale
-sources: Capgemini World Quality Report 2023, Forrester 2023, Gartner
-2023.  These are fine reports but they are years old and the same ones
-appear in every article.  A reader who reads 3 blog posts sees the
-same citations repeated — destroying credibility.</p>
-<h2 id="source-freshness-requirements">Source Freshness Requirements<a class="headerlink" href="#source-freshness-requirements" title="Permanent link">&para;</a></h2>
-<h3 id="mandatory">Mandatory<a class="headerlink" href="#mandatory" title="Permanent link">&para;</a></h3>
+<h1 id="research-sourcing">Research Sourcing<a class="headerlink" href="#research-sourcing" title="Permanent link">&para;</a></h1>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>Defines the research standard for every article. The Research Agent must find current, authoritative, and diverse sources — not recycled analyst reports from years ago.</p>
+<h2 id="when-to-use">When to Use<a class="headerlink" href="#when-to-use" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>At least 3 of 5 references must be from the current year or
-  previous year</strong> (e.g., 2025-2026 for articles written in 2026)</li>
-<li><strong>No more than 1 reference older than 2 years</strong></li>
-<li><strong>Zero references older than 5 years</strong> unless citing a foundational
-  study that established a field</li>
+<li>Configuring or updating the Research Agent's source requirements</li>
+<li>Evaluating an article's evidence quality during review</li>
+<li>Adding a new source discovery tool (arXiv, Scholar, Serper)</li>
+<li>Diagnosing why articles keep citing the same stale sources</li>
 </ul>
-<h3 id="source-types-diversify">Source Types (Diversify)<a class="headerlink" href="#source-types-diversify" title="Permanent link">&para;</a></h3>
-<p>Each article should include at least 3 of these 5 source types:
-1. <strong>Primary research</strong> — survey data, empirical studies, original
-   analysis (not a report summarising someone else's research)
-2. <strong>Named company case study</strong> — specific outcomes at a named
-   organisation with measurable results
-3. <strong>Academic/conference paper</strong> — IEEE, ACM, arXiv, conference
-   proceedings from the past 2 years
-4. <strong>Industry practitioner content</strong> — engineering blog posts from
-   Netflix, Google, Spotify, Microsoft, etc.
-5. <strong>Analyst report</strong> — Gartner, Forrester, McKinsey, BCG (max 1
-   per article to avoid over-reliance)</p>
-<h3 id="banned-source-patterns">Banned Source Patterns<a class="headerlink" href="#banned-source-patterns" title="Permanent link">&para;</a></h3>
+<h3 id="when-not-to-use">When NOT to Use<a class="headerlink" href="#when-not-to-use" title="Permanent link">&para;</a></h3>
+<ul>
+<li>For article structure or voice issues — that's <code>economist-writing</code></li>
+<li>For scoring articles quantitatively — that's <code>article-evaluation</code></li>
+<li>For post-deployment source verification — that's <code>citation-verification</code> (future)</li>
+</ul>
+<h2 id="core-process">Core Process<a class="headerlink" href="#core-process" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>1. Research Agent receives topic from editorial board
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>   ↓
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>2. Search fresh sources: arXiv (past 12 months), Google Scholar, company blogs
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>   ↓
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>3. Apply freshness filter: ≥3/5 refs from current/previous year
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>   ↓
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>4. Apply diversity filter: ≥3 of 5 source types represented
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>   ↓
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>5. Verify each statistic has: WHO collected, WHEN, HOW, WHAT
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>   ↓
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>6. Pass sourced brief to Content Generation stage
+</code></pre></div>
+<h3 id="freshness-requirements">Freshness Requirements<a class="headerlink" href="#freshness-requirements" title="Permanent link">&para;</a></h3>
+<ul>
+<li>At least 3 of 5 references from current or previous year</li>
+<li>No more than 1 reference older than 2 years</li>
+<li>Zero references older than 5 years (unless foundational study)</li>
+</ul>
+<h3 id="source-type-diversity">Source Type Diversity<a class="headerlink" href="#source-type-diversity" title="Permanent link">&para;</a></h3>
+<p>Each article needs at least 3 of these 5 types:</p>
+<ol>
+<li><strong>Primary research</strong> — surveys, empirical studies, original analysis</li>
+<li><strong>Named company case study</strong> — specific outcomes with measurable results</li>
+<li><strong>Academic/conference paper</strong> — IEEE, ACM, arXiv from past 2 years</li>
+<li><strong>Industry practitioner content</strong> — engineering blogs from Netflix, Google, Spotify, etc.</li>
+<li><strong>Analyst report</strong> — Gartner, Forrester, McKinsey (max 1 per article)</li>
+</ol>
+<h3 id="banned-attribution-patterns">Banned Attribution Patterns<a class="headerlink" href="#banned-attribution-patterns" title="Permanent link">&para;</a></h3>
 <ul>
 <li>"Studies show" without naming the study</li>
 <li>"Experts say" without naming the expert</li>
-<li>"Research indicates" without citing the specific paper</li>
-<li>"According to a recent report" without naming the report or year</li>
-<li>Citing the same report in more than 2 articles across the blog</li>
+<li>"Research indicates" without citing the paper</li>
+<li>"According to a recent report" without name or year</li>
+<li>Same report cited in more than 2 articles across the blog</li>
 </ul>
-<h2 id="source-discovery">Source Discovery<a class="headerlink" href="#source-discovery" title="Permanent link">&para;</a></h2>
-<h3 id="where-to-find-fresh-sources">Where to Find Fresh Sources<a class="headerlink" href="#where-to-find-fresh-sources" title="Permanent link">&para;</a></h3>
+<h3 id="source-discovery-tools">Source Discovery Tools<a class="headerlink" href="#source-discovery-tools" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Purpose</th>
+<th>Enabled By</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>scripts/arxiv_search.py</code></td>
+<td>Academic preprints, past 12 months</td>
+<td>Always available</td>
+</tr>
+<tr>
+<td><code>scripts/google_search.py</code></td>
+<td>Web + Scholar via Serper API</td>
+<td><code>SERPER_API_KEY</code> env var</td>
+</tr>
+<tr>
+<td><code>mcp_servers/web_researcher_server.py</code></td>
+<td>MCP tool for Scholar</td>
+<td><code>SERPER_API_KEY</code> env var</td>
+</tr>
+</tbody>
+</table>
+<h2 id="common-rationalizations">Common Rationalizations<a class="headerlink" href="#common-rationalizations" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Rationalization</th>
+<th>Reality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"The Capgemini report is the standard reference"</td>
+<td>It's a good report, not the only report — readers who see it in every article lose trust</td>
+</tr>
+<tr>
+<td>"2023 data is still relevant in 2026"</td>
+<td>Markets move fast; 3-year-old data needs at minimum an "as of" qualifier</td>
+</tr>
+<tr>
+<td>"We can't find fresh sources on this topic"</td>
+<td>arXiv has preprints months ahead of analyst reports; company blogs publish weekly</td>
+</tr>
+<tr>
+<td>"Analyst reports are the most credible"</td>
+<td>Primary research and named case studies are more credible than vendor-commissioned surveys</td>
+</tr>
+<tr>
+<td>"Adding source diversity slows down the pipeline"</td>
+<td>The Research Agent searches in parallel; diversity is a filter, not an extra step</td>
+</tr>
+</tbody>
+</table>
+<h2 id="red-flags">Red Flags<a class="headerlink" href="#red-flags" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>arXiv</strong> (arxiv.org) — preprints in software engineering, AI, testing</li>
-<li><strong>Google Scholar</strong> — filter by year for recent papers</li>
-<li><strong>Company engineering blogs</strong> — Netflix, Google, Meta, Stripe, Spotify,
-  Shopify, GitHub publish testing and quality research regularly</li>
-<li><strong>Conference proceedings</strong> — ICSE, ISSTA, ASE, STARWEST, Agile Testing
-  Days</li>
-<li><strong>Government/standards bodies</strong> — NIST, ISO, IEEE standards updates</li>
-<li><strong>Venture capital reports</strong> — CB Insights, Crunchbase for market data</li>
+<li>Same 5 sources appearing across multiple articles</li>
+<li>All references from analyst reports (no primary research or practitioner content)</li>
+<li>Statistics cited without named source, year, or methodology</li>
+<li>References section has fewer than 3 entries</li>
+<li><code>[NEEDS SOURCE]</code> or <code>[UNVERIFIED]</code> placeholders remaining in published article</li>
+<li>arXiv/Scholar search disabled because API key not configured</li>
 </ul>
-<h3 id="arxiv-integration">arXiv Integration<a class="headerlink" href="#arxiv-integration" title="Permanent link">&para;</a></h3>
-<p>The pipeline already has <code>scripts/arxiv_search.py</code> for searching arXiv.
-The Research Agent should use this tool to find papers from the past
-12 months on the article's topic.  arXiv papers provide cutting-edge
-data that analyst reports lag by 6-12 months.</p>
-<h3 id="google-search-scholar-integration">Google Search &amp; Scholar Integration<a class="headerlink" href="#google-search-scholar-integration" title="Permanent link">&para;</a></h3>
-<p>The pipeline now has <code>scripts/google_search.py</code> for live Google Web Search
-and Google Scholar via the Serper API.  The Research Agent calls
-<code>search_google_for_topic()</code> automatically when <code>SERPER_API_KEY</code> is set.</p>
-<p>Key behaviour:
-- <strong>Year targeting</strong> — queries are automatically scoped to the current year
-  and the previous year (e.g., 2025–2026) to maximise source freshness.
-- <strong>Google Scholar</strong> — academic papers with author and citation metadata are
-  retrieved via Serper's <code>/scholar</code> endpoint.
-- <strong>MCP tool</strong> — the <code>search_google_scholar</code> tool in
-  <code>mcp_servers/web_researcher_server.py</code> exposes the same capability to any
-  MCP-aware agent in the pipeline.</p>
-<p>To enable:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>export SERPER_API_KEY=&lt;your-key&gt;   # https://serper.dev
-</code></pre></div></p>
-<p>When the key is absent the agent falls back to arXiv-only search and LLM
-training-data knowledge without error.</p>
-<h2 id="verification-requirements">Verification Requirements<a class="headerlink" href="#verification-requirements" title="Permanent link">&para;</a></h2>
-<p>Every cited statistic must include:
-- <strong>Who</strong> collected the data (named organisation)
-- <strong>When</strong> (year, ideally month)
-- <strong>How</strong> (survey of N respondents, analysis of N projects, etc.)
-- <strong>What</strong> (the specific finding, with numbers)</p>
-<p>Example of GOOD attribution:
-"Capgemini surveyed 1,750 technology leaders across 32 countries in
-its 2024 Quality Engineering Report and found that 42% of QA budgets
-were consumed by test automation maintenance."</p>
-<p>Example of BAD attribution:
-"According to industry research, a significant portion of QA budgets
-goes to automation maintenance."</p>
-<h2 id="integration-points">Integration Points<a class="headerlink" href="#integration-points" title="Permanent link">&para;</a></h2>
+<h2 id="verification">Verification<a class="headerlink" href="#verification" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Stage 3 Research Agent</strong> (<code>src/crews/stage3_crew.py</code>) — primary
-  consumer of this skill.  Backstory should reference these rules.</li>
-<li><strong>Article Evaluator</strong> (<code>scripts/article_evaluator.py</code>) — evidence
-  sourcing dimension should check source freshness</li>
-<li><strong>arXiv search</strong> (<code>scripts/arxiv_search.py</code>) — tool for discovering
-  recent academic sources</li>
-<li><strong>Editorial Judge</strong> (<code>scripts/editorial_judge.py</code>) — post-deployment
-  check for source diversity</li>
+<li>[ ] Article has ≥3 references from current/previous year — <strong>evidence</strong>: check publication dates in References section</li>
+<li>[ ] Article uses ≥3 of 5 source types — <strong>evidence</strong>: categorize each reference</li>
+<li>[ ] Zero banned attribution patterns — <strong>evidence</strong>: regex scan for "studies show", "experts say", etc.</li>
+<li>[ ] Every statistic has WHO, WHEN, HOW, WHAT — <strong>evidence</strong>: spot-check 3 statistics in article</li>
+<li>[ ] No <code>[NEEDS SOURCE]</code> or <code>[UNVERIFIED]</code> placeholders remain</li>
 </ul>
-<h2 id="anti-patterns">Anti-Patterns<a class="headerlink" href="#anti-patterns" title="Permanent link">&para;</a></h2>
-<ol>
-<li><strong>The Capgemini Crutch</strong> — citing the World Quality Report in every
-   article.  It's a good report; it's not the only report.</li>
-<li><strong>The Year-Old Survey</strong> — using 2023 data in 2026 articles without
-   acknowledging the age or checking for updates</li>
-<li><strong>The Vendor Cite</strong> — citing a vendor's own research to support
-   claims about that vendor's product category</li>
-<li><strong>The Missing Method</strong> — quoting a percentage without explaining
-   how it was measured or who measured it</li>
-<li><strong>The Recycled Reference</strong> — same 5 sources appearing across
-   multiple blog posts</li>
-</ol>
+<h3 id="integration-points">Integration Points<a class="headerlink" href="#integration-points" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>src/crews/stage3_crew.py</code> — Research Agent backstory references these rules</li>
+<li><code>scripts/article_evaluator.py</code> — evidence sourcing dimension checks freshness</li>
+<li><code>scripts/arxiv_search.py</code> — tool for discovering recent academic sources</li>
+<li><code>scripts/editorial_judge.py</code> — post-deployment check for source diversity</li>
+</ul>
 
 
 
 
 
 
+
+  
+  
 
 
 

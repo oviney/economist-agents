@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Multi-agent content pipeline that generates Economist-style articles with autonomous research, writing, illustration, and deployment">
+        <meta name="description" content="Score articles on 5 quality dimensions with deterministic metrics and persist for trend tracking. Use when evaluating a generated article, when tuning scoring rubrics, when adding a new quality dimension.">
       
       
       
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#article-evaluation-skill" class="md-skip">
+        <a href="#article-evaluation" class="md-skip">
           Skip to content
         </a>
       
@@ -1256,10 +1256,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#purpose" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Purpose
+        Overview
       
     </span>
   </a>
@@ -1267,66 +1267,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#scoring-dimensions-1-10-each-total-50" class="md-nav__link">
+  <a href="#when-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Scoring Dimensions (1-10 each, total 50)
+        When to Use
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Scoring Dimensions (1-10 each, total 50)">
+    <nav class="md-nav" aria-label="When to Use">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-opening-quality" class="md-nav__link">
+  <a href="#when-not-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Opening Quality
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-evidence-sourcing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Evidence Sourcing
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-voice-consistency" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Voice Consistency
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-structure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Structure
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5-visual-engagement" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. Visual Engagement
+        When NOT to Use
       
     </span>
   </a>
@@ -1339,6 +1295,79 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#core-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Process
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Process">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scoring-dimensions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scoring Dimensions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Approach
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-rationalizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Rationalizations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#red-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Red Flags
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#output-schema" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1348,30 +1377,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#persistence" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Persistence
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#existing-code-to-reuse" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Existing Code to Reuse
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#integration-points" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1379,6 +1386,11 @@
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2336,10 +2348,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#purpose" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Purpose
+        Overview
       
     </span>
   </a>
@@ -2347,66 +2359,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#scoring-dimensions-1-10-each-total-50" class="md-nav__link">
+  <a href="#when-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Scoring Dimensions (1-10 each, total 50)
+        When to Use
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Scoring Dimensions (1-10 each, total 50)">
+    <nav class="md-nav" aria-label="When to Use">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-opening-quality" class="md-nav__link">
+  <a href="#when-not-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Opening Quality
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-evidence-sourcing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Evidence Sourcing
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-voice-consistency" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Voice Consistency
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-structure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Structure
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5-visual-engagement" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. Visual Engagement
+        When NOT to Use
       
     </span>
   </a>
@@ -2419,6 +2387,79 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#core-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Process
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Process">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scoring-dimensions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scoring Dimensions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Approach
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-rationalizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Rationalizations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#red-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Red Flags
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#output-schema" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2428,30 +2469,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#persistence" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Persistence
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#existing-code-to-reuse" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Existing Code to Reuse
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#integration-points" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2459,6 +2478,11 @@
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2482,118 +2506,196 @@
   
 
 
-<h1 id="article-evaluation-skill">Article Evaluation Skill<a class="headerlink" href="#article-evaluation-skill" title="Permanent link">&para;</a></h1>
-<h2 id="purpose">Purpose<a class="headerlink" href="#purpose" title="Permanent link">&para;</a></h2>
-<p>Score every generated article on 5 quality dimensions with deterministic
-metrics.  Persist scores to JSON for trend tracking.  This is the nervous
-system of the quality architecture — without evals there is no signal.</p>
-<h2 id="scoring-dimensions-1-10-each-total-50">Scoring Dimensions (1-10 each, total 50)<a class="headerlink" href="#scoring-dimensions-1-10-each-total-50" title="Permanent link">&para;</a></h2>
-<h3 id="1-opening-quality">1. Opening Quality<a class="headerlink" href="#1-opening-quality" title="Permanent link">&para;</a></h3>
-<p><strong>What to measure:</strong>
-- First sentence contains a striking fact or statistic (not throat-clearing)
-- No banned openings: "In today's world", "It's no secret", "When it comes to", "Amidst"
-- Opening paragraph has a clear hook within the first 30 words</p>
-<p><strong>How to score:</strong>
-- 10: Striking data point in first sentence, zero banned patterns
-- 7-9: Good hook but not data-led, or hook appears in second sentence
-- 4-6: Generic opening but not banned
-- 1-3: Contains banned opening pattern</p>
-<p><strong>Implementation:</strong> Regex match against banned patterns in first paragraph.
-Count data-bearing tokens (numbers, percentages, currency) in first sentence.</p>
-<h3 id="2-evidence-sourcing">2. Evidence Sourcing<a class="headerlink" href="#2-evidence-sourcing" title="Permanent link">&para;</a></h3>
-<p><strong>What to measure:</strong>
-- All statistics have named sources (not "studies show" or "experts say")
-- No <code>[NEEDS SOURCE]</code> or <code>[UNVERIFIED]</code> placeholders remain
-- References section exists with ≥3 numbered, cited sources</p>
-<p><strong>How to score:</strong>
-- 10: All stats sourced, ≥5 references, zero placeholders
-- 7-9: All stats sourced, 3-4 references, zero placeholders
-- 4-6: Some unsourced stats, references present
-- 1-3: Multiple unsourced stats or missing references section</p>
-<p><strong>Implementation:</strong> Regex for placeholder tags.  Count numbered items in
-<code>## References</code> section.  Scan for vague attribution phrases.</p>
-<h3 id="3-voice-consistency">3. Voice Consistency<a class="headerlink" href="#3-voice-consistency" title="Permanent link">&para;</a></h3>
-<p><strong>What to measure:</strong>
-- British spelling throughout (organisation, analyse, behaviour)
-- No banned phrases: "game-changer", "paradigm shift", "leverage" (verb)
-- Active voice dominant (no "is experiencing", "was determined")
-- No exclamation points</p>
-<p><strong>How to score:</strong>
-- 10: Zero American spellings, zero banned phrases, zero exclamation points
-- 7-9: 1-2 minor American spellings, otherwise clean
-- 4-6: Mixed spelling or 1 banned phrase
-- 1-3: Multiple banned phrases or inconsistent voice</p>
-<p><strong>Implementation:</strong> Dictionary lookup for American→British spelling pairs
-(same list as <code>stage4_crew._BRITISH_SPELLING</code>).  Regex for banned phrases
-(same list as <code>stage4_crew._BANNED_PHRASES</code>).</p>
-<h3 id="4-structure">4. Structure<a class="headerlink" href="#4-structure" title="Permanent link">&para;</a></h3>
-<p><strong>What to measure:</strong>
-- YAML frontmatter with all required fields (layout, title, date, categories, image)
-- ≥2 markdown headings (## sections)
-- 800-1500 words (body after frontmatter)
-- References section present
-- Ending is prediction/implication, not summary</p>
-<p><strong>How to score:</strong>
-- 10: All frontmatter fields, 3+ headings, 800-1200 words, references, strong ending
-- 7-9: Missing 1 optional field, or word count 1200-1500
-- 4-6: Missing required field, or &lt;800 words, or no references
-- 1-3: No frontmatter, or &lt;500 words, or no headings</p>
-<p><strong>Implementation:</strong> Reuse <code>FrontmatterSchema.validate_article()</code> for
-frontmatter.  Regex count headings.  Word count.  Check for banned
-closings in last 500 chars.</p>
-<h3 id="5-visual-engagement">5. Visual Engagement<a class="headerlink" href="#5-visual-engagement" title="Permanent link">&para;</a></h3>
-<p><strong>What to measure:</strong>
-- Featured image field present and points to existing file
-- Chart embedded in article body (if chart_data was generated)
-- Chart referenced naturally in text ("As the chart shows...")
-- Article has visual breaks (headings every 200-300 words)</p>
-<p><strong>How to score:</strong>
-- 10: Image present, chart embedded and referenced, good visual breaks
-- 7-9: Image present, chart embedded but not referenced naturally
-- 4-6: Image missing or chart not embedded
-- 1-3: No image, no chart, wall of text</p>
-<p><strong>Implementation:</strong> Check <code>image:</code> field in frontmatter.  Regex for
-<code>![</code> markdown image syntax.  Measure paragraphs between headings.</p>
-<h2 id="output-schema">Output Schema<a class="headerlink" href="#output-schema" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;article_filename&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-04-04-article-slug.md&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-04-04T12:00:00Z&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nt">&quot;scores&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="nt">&quot;opening_quality&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="nt">&quot;evidence_sourcing&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">9</span><span class="p">,</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="nt">&quot;voice_consistency&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="nt">&quot;structure&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">9</span><span class="p">,</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="nt">&quot;visual_engagement&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">7</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">  </span><span class="nt">&quot;total_score&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">43</span><span class="p">,</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="nt">&quot;max_score&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">50</span><span class="p">,</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">  </span><span class="nt">&quot;percentage&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">86</span><span class="p">,</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">  </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">    </span><span class="nt">&quot;opening_quality&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Strong data hook in first sentence&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">    </span><span class="nt">&quot;evidence_sourcing&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;7 references cited, all stats sourced&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">    </span><span class="nt">&quot;voice_consistency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;British spelling consistent, no banned phrases&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">    </span><span class="nt">&quot;structure&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;4 headings, 1138 words, references present&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">    </span><span class="nt">&quot;visual_engagement&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Image present, no chart embedded&quot;</span>
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">  </span><span class="p">}</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="p">}</span>
+<h1 id="article-evaluation">Article Evaluation<a class="headerlink" href="#article-evaluation" title="Permanent link">&para;</a></h1>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>Scores every generated article on 5 quality dimensions (opening, evidence, voice, structure, visuals) using deterministic checks. Persists scores to JSON for trend analysis via the observability dashboard.</p>
+<h2 id="when-to-use">When to Use<a class="headerlink" href="#when-to-use" title="Permanent link">&para;</a></h2>
+<ul>
+<li>After Stage 4 quality gate to score the article (pass or revision)</li>
+<li>After deployment via the editorial judge for deployed-article scoring</li>
+<li>When tuning scoring rubrics or adjusting dimension weights</li>
+<li>When adding a new quality dimension to the evaluation</li>
+</ul>
+<h3 id="when-not-to-use">When NOT to Use<a class="headerlink" href="#when-not-to-use" title="Permanent link">&para;</a></h3>
+<ul>
+<li>For trend analysis across articles over time — that's <code>observability</code></li>
+<li>For codifying recurring failure patterns as rules — that's <code>defect-prevention</code></li>
+<li>For checking source freshness or diversity — that's <code>research-sourcing</code></li>
+</ul>
+<h2 id="core-process">Core Process<a class="headerlink" href="#core-process" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>1. Receive article text + metadata from pipeline
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>   ↓
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>2. Score each of 5 dimensions (1-10) using deterministic checks
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>   ↓
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>3. Compute total (max 50) and percentage
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>   ↓
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>4. Generate per-dimension detail strings explaining the score
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>   ↓
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>5. Append evaluation record to logs/article_evals.json
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>   ↓
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>6. Return scores to caller (quality gate or editorial judge)
 </code></pre></div>
-<h2 id="persistence">Persistence<a class="headerlink" href="#persistence" title="Permanent link">&para;</a></h2>
-<p>Append each evaluation to <code>logs/article_evals.json</code> as a JSON array.
-Each entry is one article evaluation.  File grows over time for trend
-analysis.  Use <code>orjson</code> for serialization.</p>
-<h2 id="existing-code-to-reuse">Existing Code to Reuse<a class="headerlink" href="#existing-code-to-reuse" title="Permanent link">&para;</a></h2>
+<h3 id="scoring-dimensions">Scoring Dimensions<a class="headerlink" href="#scoring-dimensions" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>10 (Excellent)</th>
+<th>7-9 (Good)</th>
+<th>4-6 (Acceptable)</th>
+<th>1-3 (Poor)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Opening Quality</strong></td>
+<td>Striking data in first sentence, zero banned patterns</td>
+<td>Good hook, not data-led</td>
+<td>Generic but not banned</td>
+<td>Contains banned opening</td>
+</tr>
+<tr>
+<td><strong>Evidence Sourcing</strong></td>
+<td>All stats sourced, ≥5 refs, zero placeholders</td>
+<td>All sourced, 3-4 refs</td>
+<td>Some unsourced stats</td>
+<td>Multiple unsourced or no refs section</td>
+</tr>
+<tr>
+<td><strong>Voice Consistency</strong></td>
+<td>Zero American spellings, banned phrases, exclamation points</td>
+<td>1-2 minor American spellings</td>
+<td>Mixed spelling or 1 banned phrase</td>
+<td>Multiple banned phrases</td>
+</tr>
+<tr>
+<td><strong>Structure</strong></td>
+<td>All frontmatter, 3+ headings, 800-1200 words, refs, strong ending</td>
+<td>Missing 1 optional field or 1200-1500 words</td>
+<td>Missing required field or &lt;800 words</td>
+<td>No frontmatter or &lt;500 words</td>
+</tr>
+<tr>
+<td><strong>Visual Engagement</strong></td>
+<td>Image, chart embedded and referenced, visual breaks</td>
+<td>Image + chart but not referenced naturally</td>
+<td>Image missing or chart not embedded</td>
+<td>No image, no chart, wall of text</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-approach">Implementation Approach<a class="headerlink" href="#implementation-approach" title="Permanent link">&para;</a></h3>
+<p>All scoring is deterministic — regex, dictionary lookups, and counting. No LLM calls.</p>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Technique</th>
+<th>Reusable Code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Opening</td>
+<td>Regex banned patterns, count data tokens in first sentence</td>
+<td><code>stage4_crew._BANNED_PHRASES</code></td>
+</tr>
+<tr>
+<td>Evidence</td>
+<td>Regex for placeholders, count References items, scan vague attribution</td>
+<td><code>publication_validator.py</code></td>
+</tr>
+<tr>
+<td>Voice</td>
+<td>Dictionary lookup American→British spelling, regex banned phrases</td>
+<td><code>stage4_crew._BRITISH_SPELLING</code></td>
+</tr>
+<tr>
+<td>Structure</td>
+<td><code>FrontmatterSchema.validate_article()</code>, regex headings, word count</td>
+<td><code>frontmatter_schema.py</code></td>
+</tr>
+<tr>
+<td>Visuals</td>
+<td>Check <code>image:</code> frontmatter, regex <code>![</code> syntax, heading distribution</td>
+<td><code>editorial_judge.py</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="common-rationalizations">Common Rationalizations<a class="headerlink" href="#common-rationalizations" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Rationalization</th>
+<th>Reality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"The quality gate already checks this"</td>
+<td>The gate makes a pass/fail decision; evaluation provides granular scores for trend analysis</td>
+</tr>
+<tr>
+<td>"LLM-based evaluation would be more nuanced"</td>
+<td>LLM scores are non-deterministic and can't be compared across runs; deterministic scoring enables trends</td>
+</tr>
+<tr>
+<td>"5 dimensions is too few"</td>
+<td>Start with 5 measurable dimensions; add more when you have data showing gaps</td>
+</tr>
+<tr>
+<td>"Scoring is subjective"</td>
+<td>These rubrics are deliberately mechanical — regex matches and counts, not taste</td>
+</tr>
+</tbody>
+</table>
+<h2 id="red-flags">Red Flags<a class="headerlink" href="#red-flags" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>scripts/publication_validator.py</code> — banned phrases, word count, references checks</li>
-<li><code>scripts/editorial_judge.py</code> — frontmatter, image, categories, structure checks</li>
+<li>Evaluation uses LLM calls instead of deterministic checks</li>
+<li>Scores not persisted to <code>logs/article_evals.json</code> after each run</li>
+<li>Missing dimension detail strings (scores without explanations are unauditable)</li>
+<li>Same article evaluated multiple times without dedup (inflates trend data)</li>
+<li>Scoring rubric drifts from what the code actually checks</li>
+</ul>
+<h2 id="verification">Verification<a class="headerlink" href="#verification" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[ ] All 5 dimensions scored for every article — <strong>evidence</strong>: no null scores in <code>logs/article_evals.json</code></li>
+<li>[ ] Total score = sum of dimensions, max 50 — <strong>evidence</strong>: arithmetic check on latest entry</li>
+<li>[ ] Detail strings present for every dimension — <strong>evidence</strong>: no empty <code>details</code> fields</li>
+<li>[ ] Evaluation appended (not overwritten) to log file — <strong>evidence</strong>: file length grows monotonically</li>
+<li>[ ] Uses <code>orjson</code> for serialization — <strong>evidence</strong>: import check in evaluator module</li>
+</ul>
+<h3 id="output-schema">Output Schema<a class="headerlink" href="#output-schema" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;article_filename&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-04-04-article-slug.md&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-04-04T12:00:00Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">&quot;scores&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="nt">&quot;opening_quality&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="nt">&quot;evidence_sourcing&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">9</span><span class="p">,</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="nt">&quot;voice_consistency&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="nt">&quot;structure&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">9</span><span class="p">,</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="nt">&quot;visual_engagement&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">7</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">  </span><span class="nt">&quot;total_score&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">43</span><span class="p">,</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">  </span><span class="nt">&quot;max_score&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">50</span><span class="p">,</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">  </span><span class="nt">&quot;percentage&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">86</span><span class="p">,</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">  </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">    </span><span class="nt">&quot;opening_quality&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Strong data hook in first sentence&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">    </span><span class="nt">&quot;evidence_sourcing&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;7 references cited, all stats sourced&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">    </span><span class="nt">&quot;voice_consistency&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;British spelling consistent, no banned phrases&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">    </span><span class="nt">&quot;structure&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;4 headings, 1138 words, references present&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="w">    </span><span class="nt">&quot;visual_engagement&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Image present, no chart embedded&quot;</span>
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="integration-points">Integration Points<a class="headerlink" href="#integration-points" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Called after Stage 4 quality gate in <code>flow.py</code></li>
+<li>Called by editorial judge post-deployment</li>
+<li>Scores feed into observability dashboard for trend analysis</li>
+<li><code>scripts/publication_validator.py</code> — banned phrases, word count, references</li>
+<li><code>scripts/editorial_judge.py</code> — frontmatter, image, categories, structure</li>
 <li><code>scripts/frontmatter_schema.py</code> — schema validation</li>
-<li><code>src/crews/stage4_crew.py</code> — <code>_BRITISH_SPELLING</code>, <code>_BANNED_PHRASES</code> dictionaries</li>
-<li><code>scripts/agent_reviewer.py</code> — banned openings, banned closings lists</li>
-</ul>
-<h2 id="integration-points">Integration Points<a class="headerlink" href="#integration-points" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Called after Stage 4 quality gate in <code>flow.py</code> (whether published or revision)</li>
-<li>Called by editorial judge post-deployment for deployed article scoring</li>
-<li>Scores persisted for observability dashboard (Story #119)</li>
 </ul>
 
 
@@ -2601,6 +2703,9 @@ analysis.  Use <code>orjson</code> for serialization.</p>
 
 
 
+
+  
+  
 
 
 

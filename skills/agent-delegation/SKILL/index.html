@@ -6,10 +6,8 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Rules for assigning stories to the correct agent runtime with appropriate constraints">
+        <meta name="description" content="Rules for assigning stories to the correct agent runtime with appropriate constraints. Use when planning sprint assignments, when deciding between Claude Code / Copilot / Human for a story, when launching parallel sub-agents.">
       
-      
-        <meta name="author" content="ouray.viney">
       
       
         <link rel="canonical" href="https://oviney.github.io/economist-agents/skills/agent-delegation/SKILL/">
@@ -80,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#agent-delegation-skill" class="md-skip">
+        <a href="#agent-delegation" class="md-skip">
           Skip to content
         </a>
       
@@ -1118,10 +1116,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#purpose" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Purpose
+        Overview
       
     </span>
   </a>
@@ -1129,6 +1127,46 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#when-to-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Use
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="When to Use">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-not-to-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When NOT to Use
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Process
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Process">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#agent-runtimes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1137,25 +1175,13 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Agent Runtimes">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#claude-code-primary" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Claude Code (Primary)
-      
-    </span>
-  </a>
-  
 </li>
         
           <li class="md-nav__item">
-  <a href="#claude-code-sub-agents" class="md-nav__link">
+  <a href="#assignment-rules-first-match-wins" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Claude Code Sub-Agents
+        Assignment Rules (first match wins)
       
     </span>
   </a>
@@ -1163,116 +1189,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#github-copilot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        GitHub Copilot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#human" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Human
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#assignment-rules" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Assignment Rules
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Assignment Rules">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#rule-1-credentials-required" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 1: Credentials Required
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-2-modifies-existing-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 2: Modifies Existing Files
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-3-multiple-independent-new-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 3: Multiple Independent New Files
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-4-single-new-file-with-dependencies" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 4: Single New File with Dependencies
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-5-research-or-exploration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 5: Research or Exploration
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-6-architecture-decision" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 6: Architecture Decision
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#governance-gates" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1282,62 +1198,6 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#anti-patterns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Anti-Patterns
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Anti-Patterns">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-assigning-copilot-to-modify-existing-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Assigning Copilot to Modify Existing Files
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-sequential-execution-of-independent-stories" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Sequential Execution of Independent Stories
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-skipping-human-approval-on-architecture" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Skipping Human Approval on Architecture
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-ad-hoc-work-without-sprint-tracking" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Ad-Hoc Work Without Sprint Tracking
-      
-    </span>
-  </a>
-  
-</li>
         
       </ul>
     </nav>
@@ -1345,10 +1205,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-sprint-20-delegation" class="md-nav__link">
+  <a href="#common-rationalizations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Example: Sprint 20 Delegation
+        Common Rationalizations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#red-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Red Flags
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
       
     </span>
   </a>
@@ -2449,10 +2331,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#purpose" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Purpose
+        Overview
       
     </span>
   </a>
@@ -2460,6 +2342,46 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#when-to-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Use
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="When to Use">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-not-to-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When NOT to Use
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Process
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Process">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#agent-runtimes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2468,25 +2390,13 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Agent Runtimes">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#claude-code-primary" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Claude Code (Primary)
-      
-    </span>
-  </a>
-  
 </li>
         
           <li class="md-nav__item">
-  <a href="#claude-code-sub-agents" class="md-nav__link">
+  <a href="#assignment-rules-first-match-wins" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Claude Code Sub-Agents
+        Assignment Rules (first match wins)
       
     </span>
   </a>
@@ -2494,116 +2404,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#github-copilot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        GitHub Copilot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#human" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Human
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#assignment-rules" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Assignment Rules
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Assignment Rules">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#rule-1-credentials-required" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 1: Credentials Required
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-2-modifies-existing-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 2: Modifies Existing Files
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-3-multiple-independent-new-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 3: Multiple Independent New Files
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-4-single-new-file-with-dependencies" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 4: Single New File with Dependencies
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-5-research-or-exploration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 5: Research or Exploration
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-6-architecture-decision" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 6: Architecture Decision
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#governance-gates" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2613,62 +2413,6 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#anti-patterns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Anti-Patterns
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Anti-Patterns">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-assigning-copilot-to-modify-existing-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Assigning Copilot to Modify Existing Files
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-sequential-execution-of-independent-stories" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Sequential Execution of Independent Stories
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-skipping-human-approval-on-architecture" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Skipping Human Approval on Architecture
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-ad-hoc-work-without-sprint-tracking" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Ad-Hoc Work Without Sprint Tracking
-      
-    </span>
-  </a>
-  
-</li>
         
       </ul>
     </nav>
@@ -2676,10 +2420,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-sprint-20-delegation" class="md-nav__link">
+  <a href="#common-rationalizations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Example: Sprint 20 Delegation
+        Common Rationalizations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#red-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Red Flags
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
       
     </span>
   </a>
@@ -2706,88 +2472,80 @@
   
 
 
-<h1 id="agent-delegation-skill">Agent Delegation Skill<a class="headerlink" href="#agent-delegation-skill" title="Permanent link">&para;</a></h1>
-<h2 id="purpose">Purpose<a class="headerlink" href="#purpose" title="Permanent link">&para;</a></h2>
-<p>Determine which agent runtime executes a given story, with what
-constraints, and under what governance. This skill prevents
-misassignment incidents (e.g., Copilot modifying existing files)
-and maximizes parallel execution throughput.</p>
-<h2 id="agent-runtimes">Agent Runtimes<a class="headerlink" href="#agent-runtimes" title="Permanent link">&para;</a></h2>
-<h3 id="claude-code-primary">Claude Code (Primary)<a class="headerlink" href="#claude-code-primary" title="Permanent link">&para;</a></h3>
+<h1 id="agent-delegation">Agent Delegation<a class="headerlink" href="#agent-delegation" title="Permanent link">&para;</a></h1>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>Determines which agent runtime executes a given story, with what constraints, and under what governance. Prevents misassignment incidents (e.g., Copilot modifying existing files) and maximises parallel execution throughput.</p>
+<h2 id="when-to-use">When to Use<a class="headerlink" href="#when-to-use" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Role:</strong> Orchestrator. Reads, edits, and coordinates across the
-  full codebase.</li>
-<li><strong>Strengths:</strong> Full context window, multi-file edits, MCP tool
-  access, browser automation via Playwright, sub-agent spawning.</li>
-<li><strong>Assign when:</strong> Story modifies existing files, requires
-  orchestration across multiple files, or needs interactive
-  debugging.</li>
+<li>Sprint planning: assigning stories to runtimes</li>
+<li>Deciding whether a story needs Claude Code, Copilot, sub-agents, or human</li>
+<li>Launching parallel sub-agents for independent work</li>
+<li>Reviewing whether an assignment follows governance rules</li>
 </ul>
-<h3 id="claude-code-sub-agents">Claude Code Sub-Agents<a class="headerlink" href="#claude-code-sub-agents" title="Permanent link">&para;</a></h3>
+<h3 id="when-not-to-use">When NOT to Use<a class="headerlink" href="#when-not-to-use" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>Role:</strong> Parallel workers. Execute independent tasks
-  concurrently.</li>
-<li><strong>Strengths:</strong> Parallel execution, isolated context prevents
-  interference, full tool access.</li>
-<li><strong>Constraints:</strong> Cannot share state or modify the same files.
-  Each agent works on its own files.</li>
-<li><strong>Assign when:</strong> Two or more new files need creation with no
-  dependencies between them. Research tasks that can run
-  concurrently.</li>
+<li>For sprint ceremony process — that's <code>sprint-management</code></li>
+<li>For ADR creation and review — that's <code>adr-governance</code></li>
+<li>For code quality standards — that's <code>python-quality</code></li>
 </ul>
-<h3 id="github-copilot">GitHub Copilot<a class="headerlink" href="#github-copilot" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Role:</strong> Autonomous PR creator for isolated new files.</li>
-<li><strong>Strengths:</strong> Creates PRs with CI integration, works
-  asynchronously.</li>
-<li><strong>Constraints:</strong> DESTROYS existing files when asked to modify
-  them. Limited context window. Cannot access MCP tools.</li>
-<li><strong>Assign when:</strong> Story creates a single new self-contained file
-  with no imports from files being concurrently modified.</li>
-<li><strong>NEVER assign when:</strong> Story modifies any existing file.</li>
-</ul>
-<h3 id="human">Human<a class="headerlink" href="#human" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Role:</strong> Governance, credentials, judgment calls.</li>
-<li><strong>Strengths:</strong> Access to accounts, passwords, approval authority,
-  strategic judgment.</li>
-<li><strong>Assign when:</strong> Story requires credential setup, account
-  configuration, architecture approval, or involves sensitive
-  operations on shared infrastructure.</li>
-</ul>
-<h2 id="assignment-rules">Assignment Rules<a class="headerlink" href="#assignment-rules" title="Permanent link">&para;</a></h2>
-<p>Apply these rules in order. First match wins.</p>
-<h3 id="rule-1-credentials-required">Rule 1: Credentials Required<a class="headerlink" href="#rule-1-credentials-required" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>IF story requires login, API keys, account setup, or browser auth
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>THEN assign to HUMAN
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>     Claude Code assists via Playwright MCP for navigation
+<h2 id="core-process">Core Process<a class="headerlink" href="#core-process" title="Permanent link">&para;</a></h2>
+<h3 id="agent-runtimes">Agent Runtimes<a class="headerlink" href="#agent-runtimes" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Runtime</th>
+<th>Role</th>
+<th>Strengths</th>
+<th>Constraints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Claude Code</strong></td>
+<td>Orchestrator</td>
+<td>Full context, multi-file edits, MCP tools, Playwright, sub-agents</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Claude Code Sub-Agents</strong></td>
+<td>Parallel workers</td>
+<td>Concurrent execution, isolated context</td>
+<td>Cannot share state or modify same files</td>
+</tr>
+<tr>
+<td><strong>GitHub Copilot</strong></td>
+<td>Autonomous PR creator</td>
+<td>Creates PRs with CI, works async</td>
+<td><strong>DESTROYS existing files</strong>. Limited context. No MCP.</td>
+</tr>
+<tr>
+<td><strong>Human</strong></td>
+<td>Governance</td>
+<td>Credentials, approval, strategic judgment</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h3 id="assignment-rules-first-match-wins">Assignment Rules (first match wins)<a class="headerlink" href="#assignment-rules-first-match-wins" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Rule 1: Credentials Required
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  → HUMAN (Claude Code assists via Playwright)
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Rule 2: Modifies Existing Files
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>  → CLAUDE CODE (NEVER Copilot)
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>Rule 3: Multiple Independent New Files
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>  → CLAUDE CODE SUB-AGENTS (parallel)
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>Rule 4: Single New File with Dependencies
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>  → CLAUDE CODE (sequential)
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>Rule 5: Research or Exploration
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>  → CLAUDE CODE SUB-AGENT (Explore type)
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>Rule 6: Architecture Decision
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>  → CLAUDE CODE + Plan agent, REQUIRES human approval
 </code></pre></div>
-<h3 id="rule-2-modifies-existing-files">Rule 2: Modifies Existing Files<a class="headerlink" href="#rule-2-modifies-existing-files" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>IF story modifies any existing file in the codebase
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>THEN assign to CLAUDE CODE (primary)
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>     NEVER assign to Copilot
-</code></pre></div>
-<h3 id="rule-3-multiple-independent-new-files">Rule 3: Multiple Independent New Files<a class="headerlink" href="#rule-3-multiple-independent-new-files" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>IF story creates 2+ new files with NO dependencies between them
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>THEN assign to CLAUDE CODE SUB-AGENTS (parallel)
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>     Each agent creates one file + its tests
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>     Primary Claude Code orchestrates and verifies
-</code></pre></div>
-<h3 id="rule-4-single-new-file-with-dependencies">Rule 4: Single New File with Dependencies<a class="headerlink" href="#rule-4-single-new-file-with-dependencies" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>IF story creates new file(s) that import from existing code
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>THEN assign to CLAUDE CODE (primary, sequential)
-</code></pre></div>
-<h3 id="rule-5-research-or-exploration">Rule 5: Research or Exploration<a class="headerlink" href="#rule-5-research-or-exploration" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>IF story is pure research (no code changes)
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>THEN assign to CLAUDE CODE SUB-AGENT (Explore type)
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>     Results feed back to primary for synthesis
-</code></pre></div>
-<h3 id="rule-6-architecture-decision">Rule 6: Architecture Decision<a class="headerlink" href="#rule-6-architecture-decision" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>IF story produces an ADR, schema change, or new agent type
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>THEN assign to CLAUDE CODE with Plan agent first
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>     REQUIRES human approval before implementation begins
-</code></pre></div>
-<h2 id="governance-gates">Governance Gates<a class="headerlink" href="#governance-gates" title="Permanent link">&para;</a></h2>
+<h3 id="governance-gates">Governance Gates<a class="headerlink" href="#governance-gates" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -2815,7 +2573,7 @@ and maximizes parallel execution throughput.</p>
 <tr>
 <td>Skill modification</td>
 <td>Any change to <code>skills/*/SKILL.md</code></td>
-<td>Human (must cite performance data)</td>
+<td>Human (must cite data)</td>
 </tr>
 <tr>
 <td>Credential operations</td>
@@ -2829,41 +2587,56 @@ and maximizes parallel execution throughput.</p>
 </tr>
 </tbody>
 </table>
-<h2 id="anti-patterns">Anti-Patterns<a class="headerlink" href="#anti-patterns" title="Permanent link">&para;</a></h2>
-<h3 id="1-assigning-copilot-to-modify-existing-files">1. Assigning Copilot to Modify Existing Files<a class="headerlink" href="#1-assigning-copilot-to-modify-existing-files" title="Permanent link">&para;</a></h3>
-<p><strong>What happens:</strong> Copilot rewrites entire files, losing existing
-logic, comments, and structure.
-<strong>Rule:</strong> Copilot creates new files ONLY.</p>
-<h3 id="2-sequential-execution-of-independent-stories">2. Sequential Execution of Independent Stories<a class="headerlink" href="#2-sequential-execution-of-independent-stories" title="Permanent link">&para;</a></h3>
-<p><strong>What happens:</strong> Sprint takes 3x longer than necessary.
-<strong>Rule:</strong> If stories touch different files with no shared state,
-launch sub-agents in parallel.</p>
-<h3 id="3-skipping-human-approval-on-architecture">3. Skipping Human Approval on Architecture<a class="headerlink" href="#3-skipping-human-approval-on-architecture" title="Permanent link">&para;</a></h3>
-<p><strong>What happens:</strong> Agents make structural decisions that conflict
-with project direction.
-<strong>Rule:</strong> ADRs and schema changes require human sign-off before
-implementation.</p>
-<h3 id="4-ad-hoc-work-without-sprint-tracking">4. Ad-Hoc Work Without Sprint Tracking<a class="headerlink" href="#4-ad-hoc-work-without-sprint-tracking" title="Permanent link">&para;</a></h3>
-<p><strong>What happens:</strong> Work products are untraceable, no GitHub issue
-trail, no PR linkage.
-<strong>Rule:</strong> Non-trivial work gets a GitHub issue before
-implementation begins.</p>
-<h2 id="example-sprint-20-delegation">Example: Sprint 20 Delegation<a class="headerlink" href="#example-sprint-20-delegation" title="Permanent link">&para;</a></h2>
-<p>Story 20.1 (credentials setup):
-- Requires account access and browser login
-- <strong>Rule 1 applies</strong> -&gt; Human + Claude Code (Playwright assist)</p>
-<p>Story 20.2 (GA4 ETL script):
-- Creates new file <code>scripts/ga4_etl.py</code>
-- No dependency on Story 20.3</p>
-<p>Story 20.3 (GSC ETL script):
-- Creates new file <code>scripts/gsc_etl.py</code>
-- No dependency on Story 20.2</p>
-<p>Stories 20.2 + 20.3:
-- <strong>Rule 3 applies</strong> -&gt; Claude Code sub-agents (parallel)
-- Result: both completed in ~2.5 minutes vs ~5 minutes sequential</p>
-<p>Story 20.4 (ADR-003):
-- Architecture decision
-- <strong>Rule 6 applies</strong> -&gt; Claude Code with human approval</p>
+<h2 id="common-rationalizations">Common Rationalizations<a class="headerlink" href="#common-rationalizations" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Rationalization</th>
+<th>Reality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"Copilot can handle this small edit to an existing file"</td>
+<td>Copilot rewrites entire files, losing existing logic and structure — assign to Claude Code</td>
+</tr>
+<tr>
+<td>"We'll run these stories sequentially, it's simpler"</td>
+<td>Independent stories executed sequentially take 2-3x longer; sub-agents run them in parallel</td>
+</tr>
+<tr>
+<td>"We don't need human approval for this architecture change"</td>
+<td>Agents making structural decisions without governance creates direction conflicts — ADRs need sign-off</td>
+</tr>
+<tr>
+<td>"Let's just do it without a GitHub issue"</td>
+<td>Untraceable work products break sprint discipline and audit trail</td>
+</tr>
+<tr>
+<td>"Sub-agents can coordinate on shared files"</td>
+<td>Sub-agents have isolated context; sharing state between them causes race conditions and overwrites</td>
+</tr>
+</tbody>
+</table>
+<h2 id="red-flags">Red Flags<a class="headerlink" href="#red-flags" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Copilot assigned to a story that modifies existing files</li>
+<li>Independent stories executed sequentially instead of in parallel</li>
+<li>Architecture decision made without human approval gate</li>
+<li>Work started without a GitHub issue</li>
+<li>Sub-agents assigned to modify the same file</li>
+<li>Credential operation attempted by an agent instead of human</li>
+<li>Story assignment doesn't match any rule in the assignment matrix</li>
+</ul>
+<h2 id="verification">Verification<a class="headerlink" href="#verification" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[ ] Every story has a designated runtime before implementation begins — <strong>evidence</strong>: sprint plan includes runtime column</li>
+<li>[ ] No Copilot assignments touch existing files — <strong>evidence</strong>: Copilot stories only create new files</li>
+<li>[ ] Independent stories run in parallel where possible — <strong>evidence</strong>: sub-agent logs show concurrent execution</li>
+<li>[ ] Architecture decisions have human approval — <strong>evidence</strong>: GitHub issue comment from human before implementation</li>
+<li>[ ] All work has a GitHub issue — <strong>evidence</strong>: every PR references an issue number</li>
+<li>[ ] Governance gates enforced — <strong>evidence</strong>: PR review required, no force pushes without explicit approval</li>
+</ul>
 
 
 

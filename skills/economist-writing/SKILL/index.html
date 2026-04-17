@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Multi-agent content pipeline that generates Economist-style articles with autonomous research, writing, illustration, and deployment">
+        <meta name="description" content="Define the writing standard for every article in the content pipeline. Use when configuring the Writer Agent, when reviewing article prose quality, when tuning the deterministic polish stage.">
       
       
       
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#economist-writing-style-skill" class="md-skip">
+        <a href="#economist-writing-style" class="md-skip">
           Skip to content
         </a>
       
@@ -1200,10 +1200,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#purpose" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Purpose
+        Overview
       
     </span>
   </a>
@@ -1211,26 +1211,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#reference" class="md-nav__link">
+  <a href="#when-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Reference
+        When to Use
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="When to Use">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-not-to-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When NOT to Use
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#the-10-rules" class="md-nav__link">
+  <a href="#core-process-the-10-rules" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The 10 Rules
+        Core Process: The 10 Rules
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="The 10 Rules">
+    <nav class="md-nav" aria-label="Core Process: The 10 Rules">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1343,12 +1360,7 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
+          <li class="md-nav__item">
   <a href="#length-and-density" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1358,19 +1370,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#visual-engagement" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Visual Engagement
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#voice-reference" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1380,12 +1381,17 @@
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#anti-patterns-common-pipeline-failures" class="md-nav__link">
+  <a href="#common-rationalizations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Anti-Patterns (Common Pipeline Failures)
+        Common Rationalizations
       
     </span>
   </a>
@@ -1393,6 +1399,29 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#red-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Red Flags
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#integration-points" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1400,6 +1429,11 @@
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2413,10 +2447,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#purpose" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Purpose
+        Overview
       
     </span>
   </a>
@@ -2424,26 +2458,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#reference" class="md-nav__link">
+  <a href="#when-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Reference
+        When to Use
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="When to Use">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-not-to-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When NOT to Use
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#the-10-rules" class="md-nav__link">
+  <a href="#core-process-the-10-rules" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The 10 Rules
+        Core Process: The 10 Rules
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="The 10 Rules">
+    <nav class="md-nav" aria-label="Core Process: The 10 Rules">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2556,12 +2607,7 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
+          <li class="md-nav__item">
   <a href="#length-and-density" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2571,19 +2617,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#visual-engagement" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Visual Engagement
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#voice-reference" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2593,12 +2628,17 @@
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#anti-patterns-common-pipeline-failures" class="md-nav__link">
+  <a href="#common-rationalizations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Anti-Patterns (Common Pipeline Failures)
+        Common Rationalizations
       
     </span>
   </a>
@@ -2606,6 +2646,29 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#red-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Red Flags
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#integration-points" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2613,6 +2676,11 @@
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2636,171 +2704,118 @@
   
 
 
-<h1 id="economist-writing-style-skill">Economist Writing Style Skill<a class="headerlink" href="#economist-writing-style-skill" title="Permanent link">&para;</a></h1>
-<h2 id="purpose">Purpose<a class="headerlink" href="#purpose" title="Permanent link">&para;</a></h2>
-<p>Define the writing standard for every article produced by the content
-pipeline.  This skill is the definitive reference for the Stage 3 Writer
-Agent, the Stage 4 Editorial Reviewer, and the Article Evaluator.  Every
-article must meet these standards before publication.</p>
-<h2 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h2>
-<p>Study The Economist's actual articles for voice, structure, and argument
-style.  The gold standard is editorial prose that combines data-driven
-reporting with sharp, opinionated analysis delivered in a confident,
-conversational tone.</p>
-<h2 id="the-10-rules">The 10 Rules<a class="headerlink" href="#the-10-rules" title="Permanent link">&para;</a></h2>
-<h3 id="1-open-with-a-striking-concrete-claim">1. Open with a striking, concrete claim<a class="headerlink" href="#1-open-with-a-striking-concrete-claim" title="Permanent link">&para;</a></h3>
-<p><strong>Do:</strong> "A system designed to predict the most likely next word in a
-sentence can also write good computer code."
-<strong>Don't:</strong> "The arrival of AI-powered test generation tools promised a
-revolution."</p>
-<p>The first sentence must make the reader stop.  Use a specific fact,
-a surprising statistic, or a provocative assertion.  Never start with
-abstract nouns ("The emergence of", "The arrival of", "The rise of").</p>
-<p><strong>Banned opening patterns:</strong>
-- "In today's world"
-- "It's no secret"
-- "The arrival/emergence/rise of"
-- "When it comes to"
-- "Amidst"
-- Any sentence starting with "The" followed by an abstract noun</p>
-<h3 id="2-argue-a-thesis-not-a-topic">2. Argue a thesis, not a topic<a class="headerlink" href="#2-argue-a-thesis-not-a-topic" title="Permanent link">&para;</a></h3>
-<p>Every article must have a <strong>specific, debatable argument</strong> stated in the
-first two paragraphs.  "AI tools overpromise" is a topic.  "AI test
-generators are making maintenance worse, not better, because they
-optimise for coverage metrics that don't correlate with code quality"
-is a thesis.</p>
-<p>Every subsequent section must advance this argument.  If a paragraph
-doesn't serve the thesis, cut it.</p>
-<h3 id="3-never-use-numbered-or-bulleted-lists-in-prose">3. Never use numbered or bulleted lists in prose<a class="headerlink" href="#3-never-use-numbered-or-bulleted-lists-in-prose" title="Permanent link">&para;</a></h3>
-<p>Lists belong in infographics, not editorial writing.  Each point must
-be argued in its own paragraph with transitions that connect ideas.</p>
-<p><strong>Banned in article body</strong> (outside References section):
-- Numbered lists (1., 2., 3.)
-- Bulleted lists (-, *)
-- "The following steps" / "Here are N ways"</p>
-<h3 id="4-write-with-authority-not-hedging">4. Write with authority, not hedging<a class="headerlink" href="#4-write-with-authority-not-hedging" title="Permanent link">&para;</a></h3>
-<p><strong>Do:</strong> "Companies are racing to de-weird AI."
-<strong>Don't:</strong> "It would be misguided to dismiss" / "One might imagine"</p>
-<p><strong>Banned hedging phrases:</strong>
-- "it would be misguided"
-- "one might"
-- "it is worth noting"
-- "it should be noted"
-- "it is important to"
-- "it is not a minor footnote"
-- "further complicating matters"
-- "invites closer scrutiny"
-- "in practical terms"</p>
-<h3 id="5-name-names-use-real-companies-and-people">5. Name names — use real companies and people<a class="headerlink" href="#5-name-names-use-real-companies-and-people" title="Permanent link">&para;</a></h3>
-<p>Every article must include at least 2 named companies or individuals
-with specific anecdotes.  "Organisations" and "professionals" are too
-generic.  "Microsoft's testing team found..." is specific.  "A 2023
-survey of professionals..." is vague.</p>
-<p><strong>Banned generic attributions:</strong>
-- "organisations"  (use the company name)
-- "professionals" (use the role: "engineers at Google")
-- "studies show" (name the study)
-- "experts say" (name the expert)
-- "research indicates" (cite the specific paper)</p>
-<h3 id="6-cut-ruthlessly-no-padding">6. Cut ruthlessly — no padding<a class="headerlink" href="#6-cut-ruthlessly-no-padding" title="Permanent link">&para;</a></h3>
-<p>Every sentence must earn its place.  Remove:
-- Throat-clearing ("It goes without saying")
-- Redundant attribution ("As mentioned earlier")
-- Weak intensifiers ("very", "quite", "rather", "fairly")
-- Sentences starting with "This" or "These" that merely restate the
-  previous point</p>
-<p>Target: zero wasted sentences.  If you can remove a sentence without
-losing meaning, remove it.</p>
-<h3 id="7-end-with-a-vivid-prediction-or-provocation">7. End with a vivid prediction or provocation<a class="headerlink" href="#7-end-with-a-vivid-prediction-or-provocation" title="Permanent link">&para;</a></h3>
-<p><strong>Do:</strong> "You don't navigate strange territory by pretending your old
-maps still work."
-<strong>Don't:</strong> "Their success will rest on rigorous evaluation and
-tempered expectations."</p>
-<p>The ending must leave the reader thinking.  Use a metaphor, a
-prediction, or a provocative question.  Never summarise.</p>
-<p><strong>Banned closing patterns:</strong>
-- "will rest on" / "depends on" / "the key is"
-- "In conclusion" / "To summarise"
-- "Only time will tell"
-- "remains to be seen"
-- Any sentence that restates the thesis without adding new insight</p>
-<h3 id="8-use-3-4-headings-maximum">8. Use 3-4 headings maximum<a class="headerlink" href="#8-use-3-4-headings-maximum" title="Permanent link">&para;</a></h3>
-<p>Let the argument breathe.  A heading every 94 words is a blog post,
-not an essay.  Target one heading per 250-350 words.  Maximum 4
-headings for a 1000-word article.</p>
-<p>More importantly, headings should be <strong>noun phrases that advance the
-argument</strong>, not questions or descriptions:
-<strong>Do:</strong> "The maintenance trap"
-<strong>Don't:</strong> "A Closer Look at the Disconnect"
-<strong>Don't:</strong> "What Can Be Done?"</p>
-<h3 id="9-integrate-data-dont-catalogue-it">9. Integrate data, don't catalogue it<a class="headerlink" href="#9-integrate-data-dont-catalogue-it" title="Permanent link">&para;</a></h3>
-<p><strong>Do:</strong> "Half of automatically generated test scripts need manual
-adjustment after minor refactoring, according to Microsoft Research."
-<strong>Don't:</strong> "Microsoft Research, in its 2023 technical report, noted
-that half of automatically generated test scripts necessitated manual
-adjustment."</p>
-<p>Never start a sentence with a source name followed by a reporting
-verb (found, noted, highlighted, revealed, reported).  Make the claim
-first, attribute second.</p>
-<h3 id="10-title-must-be-provocative-and-memorable">10. Title must be provocative and memorable<a class="headerlink" href="#10-title-must-be-provocative-and-memorable" title="Permanent link">&para;</a></h3>
-<p><strong>Do:</strong> "The IT department: Where AI goes to die"
-<strong>Don't:</strong> "Why AI Test Generation Tools Overpromise on Maintenance Savings"</p>
-<p>Use a colon to add a surprising twist.  Titles should make the reader
-curious, not tell them the conclusion.</p>
-<p><strong>Banned title patterns:</strong>
-- Starting with "Why" or "How"
-- Starting with "The Impact of" or "The Role of"
-- Longer than 10 words without a colon or twist
-- Purely descriptive (tells you the topic, not the argument)</p>
-<h2 id="length-and-density">Length and Density<a class="headerlink" href="#length-and-density" title="Permanent link">&para;</a></h2>
-<p>The Economist values density over length.  A tight 650-word argument
-beats a padded 1000-word survey.  Quality targets:
-- <strong>Minimum:</strong> 600 words (below this lacks depth)
-- <strong>Sweet spot:</strong> 700-1000 words
-- <strong>Maximum:</strong> 1200 words (above this, tighten)</p>
-<p>Every paragraph must advance the argument.  If removing a paragraph
-doesn't weaken the thesis, the paragraph is padding.  Cut it.</p>
-<h2 id="visual-engagement">Visual Engagement<a class="headerlink" href="#visual-engagement" title="Permanent link">&para;</a></h2>
-<p>Not every article needs a chart.  If the topic is data-driven (market
-trends, adoption rates), embed a chart and reference it naturally.  If
-the topic is conceptual (architecture, strategy), a featured image is
-sufficient.  Never embed a chart just to fill a checkbox.</p>
+<h1 id="economist-writing-style">Economist Writing Style<a class="headerlink" href="#economist-writing-style" title="Permanent link">&para;</a></h1>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>The definitive reference for the Stage 3 Writer Agent, Stage 4 Editorial Reviewer, and Article Evaluator. Every article must meet these standards before publication. The gold standard is editorial prose combining data-driven reporting with sharp, opinionated analysis in a confident, conversational tone.</p>
+<h2 id="when-to-use">When to Use<a class="headerlink" href="#when-to-use" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Featured image: always present in frontmatter (<code>image:</code> field)</li>
-<li>Chart: only when data-driven content warrants it</li>
-<li>No stock photos — use DALL-E editorial illustrations or the blog default</li>
+<li>Configuring or updating the Writer Agent system prompt</li>
+<li>Reviewing article quality during Stage 4 editorial review</li>
+<li>Tuning deterministic polish rules for banned patterns</li>
+<li>Evaluating opening, voice, and structure scoring dimensions</li>
 </ul>
-<h2 id="voice-reference">Voice Reference<a class="headerlink" href="#voice-reference" title="Permanent link">&para;</a></h2>
-<p>The Economist voice is:
-- <strong>Confident</strong> — states opinions as observations, not suggestions
-- <strong>Witty</strong> — dry humour, understated irony, unexpected metaphors
-- <strong>British</strong> — organisation, analyse, colour, favour
-- <strong>Active</strong> — "Companies are racing" not "it is being observed that"
-- <strong>Conversational</strong> — reads like a brilliant dinner companion, not a textbook
-- <strong>Precise</strong> — every word chosen deliberately, no filler</p>
-<h2 id="anti-patterns-common-pipeline-failures">Anti-Patterns (Common Pipeline Failures)<a class="headerlink" href="#anti-patterns-common-pipeline-failures" title="Permanent link">&para;</a></h2>
-<p>These patterns appear frequently in generated articles and must be
-eliminated:</p>
-<ol>
-<li><strong>Literature review structure</strong> — cataloguing findings source by
-   source instead of arguing a point</li>
-<li><strong>Listicle disguised as prose</strong> — numbered recommendations,
-   "5 ways to..." format</li>
-<li><strong>Abstract opening</strong> — starting with the concept rather than a
-   concrete hook</li>
-<li><strong>Reverent data tone</strong> — treating every statistic as sacred instead
-   of wielding it as evidence for an argument</li>
-<li><strong>Summary ending</strong> — restating the thesis in the conclusion</li>
-<li><strong>Excessive headings</strong> — fragmenting the argument into disconnected
-   sections</li>
-<li><strong>Generic attribution</strong> — "organisations" instead of named companies</li>
-</ol>
-<h2 id="integration-points">Integration Points<a class="headerlink" href="#integration-points" title="Permanent link">&para;</a></h2>
+<h3 id="when-not-to-use">When NOT to Use<a class="headerlink" href="#when-not-to-use" title="Permanent link">&para;</a></h3>
+<ul>
+<li>For source freshness and diversity — that's <code>research-sourcing</code></li>
+<li>For visual standards — that's <code>editorial-illustration</code></li>
+<li>For article scoring mechanics — that's <code>article-evaluation</code></li>
+<li>For defect pattern codification — that's <code>defect-prevention</code></li>
+</ul>
+<h2 id="core-process-the-10-rules">Core Process: The 10 Rules<a class="headerlink" href="#core-process-the-10-rules" title="Permanent link">&para;</a></h2>
+<h3 id="1-open-with-a-striking-concrete-claim">1. Open with a striking, concrete claim<a class="headerlink" href="#1-open-with-a-striking-concrete-claim" title="Permanent link">&para;</a></h3>
+<p>First sentence must make the reader stop — specific fact, surprising statistic, or provocative assertion.</p>
+<p><strong>Banned openings:</strong> "In today's world", "It's no secret", "The arrival/emergence/rise of", "When it comes to", "Amidst", any sentence starting with "The" + abstract noun.</p>
+<h3 id="2-argue-a-thesis-not-a-topic">2. Argue a thesis, not a topic<a class="headerlink" href="#2-argue-a-thesis-not-a-topic" title="Permanent link">&para;</a></h3>
+<p>Every article must have a <strong>specific, debatable argument</strong> stated in the first two paragraphs. "AI tools overpromise" is a topic. "AI test generators make maintenance worse because they optimise for coverage metrics that don't correlate with quality" is a thesis.</p>
+<h3 id="3-never-use-numbered-or-bulleted-lists-in-prose">3. Never use numbered or bulleted lists in prose<a class="headerlink" href="#3-never-use-numbered-or-bulleted-lists-in-prose" title="Permanent link">&para;</a></h3>
+<p>Lists belong in infographics, not editorial writing. Each point argued in its own paragraph with transitions.</p>
+<h3 id="4-write-with-authority-not-hedging">4. Write with authority, not hedging<a class="headerlink" href="#4-write-with-authority-not-hedging" title="Permanent link">&para;</a></h3>
+<p><strong>Banned:</strong> "it would be misguided", "one might", "it is worth noting", "it should be noted", "it is important to", "further complicating matters", "invites closer scrutiny", "in practical terms".</p>
+<h3 id="5-name-names-use-real-companies-and-people">5. Name names — use real companies and people<a class="headerlink" href="#5-name-names-use-real-companies-and-people" title="Permanent link">&para;</a></h3>
+<p>At least 2 named companies or individuals with specific anecdotes. <strong>Banned generic attributions:</strong> "organisations", "professionals", "studies show", "experts say", "research indicates".</p>
+<h3 id="6-cut-ruthlessly-no-padding">6. Cut ruthlessly — no padding<a class="headerlink" href="#6-cut-ruthlessly-no-padding" title="Permanent link">&para;</a></h3>
+<p>Remove: throat-clearing ("It goes without saying"), redundant attribution ("As mentioned earlier"), weak intensifiers ("very", "quite", "rather", "fairly").</p>
+<h3 id="7-end-with-a-vivid-prediction-or-provocation">7. End with a vivid prediction or provocation<a class="headerlink" href="#7-end-with-a-vivid-prediction-or-provocation" title="Permanent link">&para;</a></h3>
+<p><strong>Banned closings:</strong> "will rest on" / "depends on" / "the key is", "In conclusion" / "To summarise", "Only time will tell", "remains to be seen".</p>
+<h3 id="8-use-3-4-headings-maximum">8. Use 3-4 headings maximum<a class="headerlink" href="#8-use-3-4-headings-maximum" title="Permanent link">&para;</a></h3>
+<p>One heading per 250-350 words. Headings should be <strong>noun phrases that advance the argument</strong>, not questions or descriptions.</p>
+<h3 id="9-integrate-data-dont-catalogue-it">9. Integrate data, don't catalogue it<a class="headerlink" href="#9-integrate-data-dont-catalogue-it" title="Permanent link">&para;</a></h3>
+<p>Make the claim first, attribute second. Never start a sentence with a source name + reporting verb.</p>
+<h3 id="10-title-must-be-provocative-and-memorable">10. Title must be provocative and memorable<a class="headerlink" href="#10-title-must-be-provocative-and-memorable" title="Permanent link">&para;</a></h3>
+<p>Use a colon to add a surprising twist. <strong>Banned:</strong> starting with "Why"/"How", starting with "The Impact/Role of", longer than 10 words without a twist.</p>
+<h3 id="length-and-density">Length and Density<a class="headerlink" href="#length-and-density" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Minimum:</strong> 600 words</li>
+<li><strong>Sweet spot:</strong> 700-1000 words</li>
+<li><strong>Maximum:</strong> 1200 words</li>
+<li>Every paragraph must advance the argument — if removing it doesn't weaken the thesis, cut it.</li>
+</ul>
+<h3 id="voice-reference">Voice Reference<a class="headerlink" href="#voice-reference" title="Permanent link">&para;</a></h3>
+<p>The Economist voice is: <strong>confident</strong> (states opinions as observations), <strong>witty</strong> (dry humour, understated irony), <strong>British</strong> (organisation, analyse, colour), <strong>active</strong> ("Companies are racing" not "it is being observed"), <strong>conversational</strong> (brilliant dinner companion, not textbook), <strong>precise</strong> (every word chosen deliberately).</p>
+<h2 id="common-rationalizations">Common Rationalizations<a class="headerlink" href="#common-rationalizations" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Rationalization</th>
+<th>Reality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"Lists make content more scannable"</td>
+<td>Scannable is for blog posts; editorial prose argues through connected paragraphs</td>
+</tr>
+<tr>
+<td>"We need to hedge to be accurate"</td>
+<td>Hedging signals uncertainty; The Economist states opinions as observations and lets the evidence do the qualifying</td>
+</tr>
+<tr>
+<td>"The opening needs context before the hook"</td>
+<td>Context is throat-clearing; the hook IS the context — a striking fact frames the whole piece</td>
+</tr>
+<tr>
+<td>"Longer articles are more thorough"</td>
+<td>Density beats length; a tight 700-word argument outperforms a padded 1200-word survey</td>
+</tr>
+<tr>
+<td>"Generic attribution is safer"</td>
+<td>It's lazier — "Microsoft's testing team found" is both more credible and more engaging than "organisations report"</td>
+</tr>
+<tr>
+<td>"Summary endings are expected"</td>
+<td>Expected by whom? The reader already knows the thesis; end with a provocation that extends the argument</td>
+</tr>
+</tbody>
+</table>
+<h2 id="red-flags">Red Flags<a class="headerlink" href="#red-flags" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Article opens with an abstract noun ("The emergence of", "The rise of")</li>
+<li>Bulleted or numbered lists appear in prose body (outside References)</li>
+<li>Hedging phrases: "it is worth noting", "one might argue"</li>
+<li>Generic attribution: "studies show", "experts say", "organisations"</li>
+<li>More than 4 headings in a 1000-word article</li>
+<li>Sentence starts with a source name + reporting verb ("Gartner found...")</li>
+<li>Ending summarises instead of provoking</li>
+<li>American spellings (organization, analyze, color)</li>
+<li>Exclamation points anywhere in the article</li>
+</ul>
+<h2 id="verification">Verification<a class="headerlink" href="#verification" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[ ] First sentence contains a striking fact or statistic — <strong>evidence</strong>: data-bearing token (number, percentage, currency) in sentence 1</li>
+<li>[ ] Debatable thesis stated in first two paragraphs — <strong>evidence</strong>: can be phrased as "The article argues that..."</li>
+<li>[ ] Zero bulleted/numbered lists in prose body — <strong>evidence</strong>: regex <code>^[-*\d+\.]</code> returns no matches outside References</li>
+<li>[ ] Zero banned opening/hedging/closing patterns — <strong>evidence</strong>: regex scan against all banned pattern lists</li>
+<li>[ ] At least 2 named companies or individuals — <strong>evidence</strong>: proper noun count ≥2</li>
+<li>[ ] Word count 600-1200 — <strong>evidence</strong>: <code>wc -w</code> on body after frontmatter</li>
+<li>[ ] British spelling throughout — <strong>evidence</strong>: spellcheck against American→British dictionary</li>
+<li>[ ] 3-4 headings maximum — <strong>evidence</strong>: <code>##</code> count ≤4</li>
+</ul>
+<h3 id="integration-points">Integration Points<a class="headerlink" href="#integration-points" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Stage 3 Writer Agent</strong> — primary consumer of this skill</li>
 <li><strong>Stage 4 Editorial Reviewer</strong> — evaluates against these rules</li>
-<li><strong>Article Evaluator</strong> — scores opening, voice, structure against these standards</li>
-<li><strong>Deterministic Polish</strong> — strips banned phrases and patterns listed here</li>
+<li><strong>Article Evaluator</strong> — scores opening, voice, structure</li>
+<li><strong>Deterministic Polish</strong> — strips banned phrases listed here</li>
 <li><strong>Editorial Judge</strong> — post-deployment check against writing quality</li>
 </ul>
 
@@ -2809,6 +2824,9 @@ eliminated:</p>
 
 
 
+
+  
+  
 
 
 

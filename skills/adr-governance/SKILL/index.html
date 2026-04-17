@@ -6,10 +6,8 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Rules for writing, numbering, and superseding Architectural Decision Records so the ADR tree stays coherent and auditable">
+        <meta name="description" content="Rules for writing, numbering, and superseding Architectural Decision Records. Use when creating a new ADR, when changing an ADR's status, when consolidating or auditing the ADR tree.">
       
-      
-        <meta name="author" content="ouray.viney">
       
       
         <link rel="canonical" href="https://oviney.github.io/economist-agents/skills/adr-governance/SKILL/">
@@ -80,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#adr-governance-skill" class="md-skip">
+        <a href="#adr-governance" class="md-skip">
           Skip to content
         </a>
       
@@ -1146,10 +1144,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#purpose" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Purpose
+        Overview
       
     </span>
   </a>
@@ -1157,110 +1155,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#when-to-invoke" class="md-nav__link">
+  <a href="#when-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        When to Invoke
+        When to Use
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-rules" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The Rules
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="The Rules">
+    <nav class="md-nav" aria-label="When to Use">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#rule-1-one-canonical-location" class="md-nav__link">
+  <a href="#when-not-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Rule 1: One Canonical Location
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-2-madr-filename-format" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 2: MADR Filename Format
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-3-mandatory-header-format" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 3: Mandatory Header Format
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-4-mandatory-body-sections" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 4: Mandatory Body Sections
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-5-immutability-after-accepted" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 5: Immutability After Accepted
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-6-bidirectional-supersession" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 6: Bidirectional Supersession
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-7-not-everything-is-an-adr" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 7: Not Everything Is an ADR
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-8-index-in-mkdocsyml" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 8: Index in mkdocs.yml
+        When NOT to Use
       
     </span>
   </a>
@@ -1273,28 +1183,40 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#delegation" class="md-nav__link">
+  <a href="#core-process" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Delegation
+        Core Process
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Process">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-8-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The 8 Rules
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#template" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#delegation-matrix" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Template
+        Delegation Matrix
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#tooling" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1304,73 +1226,6 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#anti-patterns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Anti-Patterns
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Anti-Patterns">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-editing-an-accepted-adr" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Editing an Accepted ADR
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-deleting-a-rejected-or-superseded-adr" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Deleting a Rejected or Superseded ADR
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-duplicating-adrs-across-directories" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Duplicating ADRs Across Directories
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-using-adrs-as-implementation-reports" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Using ADRs as Implementation Reports
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5-vague-status-values" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. Vague Status Values
-      
-    </span>
-  </a>
-  
-</li>
         
       </ul>
     </nav>
@@ -1378,10 +1233,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-sprint-21-consolidation" class="md-nav__link">
+  <a href="#common-rationalizations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Example: Sprint 21 Consolidation
+        Common Rationalizations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#red-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Red Flags
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
       
     </span>
   </a>
@@ -2454,10 +2331,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#purpose" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Purpose
+        Overview
       
     </span>
   </a>
@@ -2465,110 +2342,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#when-to-invoke" class="md-nav__link">
+  <a href="#when-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        When to Invoke
+        When to Use
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-rules" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The Rules
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="The Rules">
+    <nav class="md-nav" aria-label="When to Use">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#rule-1-one-canonical-location" class="md-nav__link">
+  <a href="#when-not-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Rule 1: One Canonical Location
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-2-madr-filename-format" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 2: MADR Filename Format
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-3-mandatory-header-format" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 3: Mandatory Header Format
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-4-mandatory-body-sections" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 4: Mandatory Body Sections
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-5-immutability-after-accepted" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 5: Immutability After Accepted
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-6-bidirectional-supersession" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 6: Bidirectional Supersession
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-7-not-everything-is-an-adr" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 7: Not Everything Is an ADR
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rule-8-index-in-mkdocsyml" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rule 8: Index in mkdocs.yml
+        When NOT to Use
       
     </span>
   </a>
@@ -2581,28 +2370,40 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#delegation" class="md-nav__link">
+  <a href="#core-process" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Delegation
+        Core Process
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Process">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-8-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The 8 Rules
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#template" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#delegation-matrix" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Template
+        Delegation Matrix
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#tooling" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2612,73 +2413,6 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#anti-patterns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Anti-Patterns
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Anti-Patterns">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-editing-an-accepted-adr" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Editing an Accepted ADR
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-deleting-a-rejected-or-superseded-adr" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Deleting a Rejected or Superseded ADR
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-duplicating-adrs-across-directories" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Duplicating ADRs Across Directories
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-using-adrs-as-implementation-reports" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Using ADRs as Implementation Reports
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5-vague-status-values" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. Vague Status Values
-      
-    </span>
-  </a>
-  
-</li>
         
       </ul>
     </nav>
@@ -2686,10 +2420,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-sprint-21-consolidation" class="md-nav__link">
+  <a href="#common-rationalizations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Example: Sprint 21 Consolidation
+        Common Rationalizations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#red-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Red Flags
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
       
     </span>
   </a>
@@ -2716,111 +2472,44 @@
   
 
 
-<h1 id="adr-governance-skill">ADR Governance Skill<a class="headerlink" href="#adr-governance-skill" title="Permanent link">&para;</a></h1>
-<h2 id="purpose">Purpose<a class="headerlink" href="#purpose" title="Permanent link">&para;</a></h2>
-<p>Keep the Architectural Decision Record tree coherent, auditable, and
-immutable. Every significant architectural decision in the repo lives
-in a single canonical location with a consistent format, a deterministic
-numbering scheme, and a formal supersession lifecycle.</p>
-<p>This skill codifies the rules that Sprint 21 consolidation (Story #177)
-put in place after the repo accumulated 11+ ADR files across three
-directories with colliding numbers.</p>
-<h2 id="when-to-invoke">When to Invoke<a class="headerlink" href="#when-to-invoke" title="Permanent link">&para;</a></h2>
+<h1 id="adr-governance">ADR Governance<a class="headerlink" href="#adr-governance" title="Permanent link">&para;</a></h1>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>Keeps the Architectural Decision Record tree coherent, auditable, and immutable. Every significant architectural decision lives in <code>docs/adr/</code> with consistent format, deterministic numbering, and formal supersession lifecycle.</p>
+<h2 id="when-to-use">When to Use<a class="headerlink" href="#when-to-use" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Any PR that adds or modifies a file under <code>docs/adr/</code></li>
-<li>Any architectural debate in chat that produces a decision ("should we
-  use X framework", "how should we structure Y")</li>
-<li>Any proposal to deprecate or replace an existing architectural
-  approach</li>
-<li>Any status transition on an existing ADR (Proposed → Accepted,
-  Accepted → Superseded)</li>
+<li>Any architectural debate that produces a decision</li>
+<li>Any proposal to deprecate or replace an existing approach</li>
+<li>Any status transition (Proposed -&gt; Accepted, Accepted -&gt; Superseded)</li>
 </ul>
-<h2 id="the-rules">The Rules<a class="headerlink" href="#the-rules" title="Permanent link">&para;</a></h2>
-<h3 id="rule-1-one-canonical-location">Rule 1: One Canonical Location<a class="headerlink" href="#rule-1-one-canonical-location" title="Permanent link">&para;</a></h3>
-<p>All ADRs live in <code>docs/adr/</code>. No exceptions.</p>
-<p><strong>Forbidden paths:</strong>
-- <code>docs/ADR-*.md</code> (pre-consolidation legacy location)
-- <code>docs/architecture/ADR*.md</code> (pre-consolidation legacy location)
-- Any ADR in a component-specific subdirectory</p>
-<p>The CI lint (<code>scripts/lint_adrs.py</code>) enforces this automatically.</p>
-<h3 id="rule-2-madr-filename-format">Rule 2: MADR Filename Format<a class="headerlink" href="#rule-2-madr-filename-format" title="Permanent link">&para;</a></h3>
-<p>Filename pattern: <code>NNNN-kebab-case-title.md</code></p>
+<h3 id="when-not-to-use">When NOT to Use<a class="headerlink" href="#when-not-to-use" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>NNNN</code> is a 4-digit number, zero-padded, globally sequential across
-  the entire repo</li>
-<li>Title is lowercase kebab-case, descriptive of the decision</li>
-<li>Example: <code>0006-agent-framework-selection.md</code></li>
+<li>Implementation status reports — belong in PR descriptions or CHANGELOG</li>
+<li>Coding conventions — belong in <code>docs/ARCHITECTURE_PATTERNS.md</code> or a skill</li>
+<li>Sprint plans — belong in sprint docs</li>
+<li>Bug fix rationale — belong in commit messages</li>
+<li>Decisions reversible in under a day — not worth an ADR</li>
 </ul>
-<p><strong>Numbering rule:</strong> PR author claims the next available number at PR
-open time. If two PRs collide at merge, the rebaser bumps to the next
-number. Numbers are never reused, even for rejected or superseded
-ADRs.</p>
-<h3 id="rule-3-mandatory-header-format">Rule 3: Mandatory Header Format<a class="headerlink" href="#rule-3-mandatory-header-format" title="Permanent link">&para;</a></h3>
-<p>Every ADR starts with exactly these fields:</p>
+<h2 id="core-process">Core Process<a class="headerlink" href="#core-process" title="Permanent link">&para;</a></h2>
+<h3 id="the-8-rules">The 8 Rules<a class="headerlink" href="#the-8-rules" title="Permanent link">&para;</a></h3>
+<p><strong>Rule 1: One Canonical Location.</strong> All ADRs live in <code>docs/adr/</code>. No files in <code>docs/ADR-*.md</code> or <code>docs/architecture/ADR*.md</code>. CI lint enforces this.</p>
+<p><strong>Rule 2: MADR Filename Format.</strong> Pattern: <code>NNNN-kebab-case-title.md</code>. Zero-padded 4-digit number, globally sequential. Numbers never reused.</p>
+<p><strong>Rule 3: Mandatory Header.</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gh"># ADR-NNNN: Title</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gs">**Status:**</span> &lt;one of: Proposed | Accepted | Rejected | Deprecated | Superseded&gt;
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gs">**Status:**</span> Proposed | Accepted | Rejected | Deprecated | Superseded
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gs">**Date:**</span> YYYY-MM-DD
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gs">**Decision Maker:**</span> &lt;name or role&gt;
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="gs">**Supersedes:**</span> &lt;ADR-NNNN link, if applicable&gt;
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="gs">**Superseded by:**</span> &lt;ADR-NNNN link, if applicable&gt;
 </code></pre></div>
-<p><strong>Status values are a closed set.</strong> No "Implemented", no "Approved",
-no emoji, no "In Progress". Use only the five allowed values.</p>
-<h3 id="rule-4-mandatory-body-sections">Rule 4: Mandatory Body Sections<a class="headerlink" href="#rule-4-mandatory-body-sections" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="gu">## Context</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>Why are we making this decision? What forces are at play?
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="gu">## Decision</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>What is the decision, in one clear paragraph?
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="gu">## Alternatives Considered</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>What other options were on the table? Why rejected?
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="gu">## Consequences</span>
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>What becomes easier? Harder? What follow-up work is implied?
-</code></pre></div>
-<p>Additional sections (Research, Objectives, Risks) are welcome but
-these four are required.</p>
-<h3 id="rule-5-immutability-after-accepted">Rule 5: Immutability After Accepted<a class="headerlink" href="#rule-5-immutability-after-accepted" title="Permanent link">&para;</a></h3>
-<p>Once an ADR's status is <code>Accepted</code>, the body is immutable. Typos and
-broken links can be fixed, but the decision content, rationale, and
-consequences cannot be rewritten. If the context changes, write a new
-ADR that supersedes it.</p>
-<p><strong>Why:</strong> ADRs document <em>what was true when the decision was made</em>.
-Rewriting history defeats their purpose. Git blame should show the
-original rationale.</p>
-<h3 id="rule-6-bidirectional-supersession">Rule 6: Bidirectional Supersession<a class="headerlink" href="#rule-6-bidirectional-supersession" title="Permanent link">&para;</a></h3>
-<p>When a new ADR supersedes an old one:</p>
-<ol>
-<li>New ADR header gets <code>Supersedes: [ADR-NNNN](link)</code></li>
-<li>New ADR body includes a supersession note explaining <em>why the
-   context changed</em> (not just "we decided differently")</li>
-<li>Old ADR status changes to <code>Superseded</code></li>
-<li>Old ADR header gets <code>Status: Superseded by [ADR-NNNN](link) as of YYYY-MM-DD</code></li>
-<li>Old ADR body gets a supersession note pointing to the replacement</li>
-</ol>
-<p>The CI lint verifies both sides of the link. Breaking one side fails
-the build.</p>
-<h3 id="rule-7-not-everything-is-an-adr">Rule 7: Not Everything Is an ADR<a class="headerlink" href="#rule-7-not-everything-is-an-adr" title="Permanent link">&para;</a></h3>
-<p>ADRs are for architectural decisions that are expensive to reverse:
-framework choice, data model, security model, agent delegation
-matrix, API contracts.</p>
-<p>ADRs are NOT for:
-- Implementation status reports ("REFACTORING-COMPLETE") — belong in
-  PR descriptions or CHANGELOG
-- Coding conventions — belong in <code>docs/ARCHITECTURE_PATTERNS.md</code> or
-  a skill
-- Sprint plans — belong in sprint docs
-- Bug fix rationale — belong in commit messages</p>
-<p>If you're unsure, ask: "If we reversed this in six months, would it
-cost more than a day?" If no, it's not an ADR.</p>
-<h3 id="rule-8-index-in-mkdocsyml">Rule 8: Index in mkdocs.yml<a class="headerlink" href="#rule-8-index-in-mkdocsyml" title="Permanent link">&para;</a></h3>
-<p>Every ADR must be referenced in <code>mkdocs.yml</code> under the ADRs nav
-section. Orphaned ADRs (not in the nav) fail the CI lint.</p>
-<h2 id="delegation">Delegation<a class="headerlink" href="#delegation" title="Permanent link">&para;</a></h2>
-<p>Per <a href="../../../adr/0008-agent-skill-governance/">ADR-0008 Agent Skill Governance</a>
-and <a href="../../agent-delegation/SKILL/">agent-delegation</a>:</p>
+Status values are a closed set — no "Implemented", "Approved", "In Progress".</p>
+<p><strong>Rule 4: Mandatory Body Sections.</strong> Context, Decision, Alternatives Considered, Consequences. Additional sections welcome.</p>
+<p><strong>Rule 5: Immutability After Accepted.</strong> Body is immutable once Accepted. Typo fixes allowed; decision content cannot be rewritten. If context changes, write a new ADR that supersedes.</p>
+<p><strong>Rule 6: Bidirectional Supersession.</strong> New ADR gets <code>Supersedes:</code> link. Old ADR status changes to <code>Superseded</code> with back-link. CI lint verifies both sides.</p>
+<p><strong>Rule 7: Not Everything Is an ADR.</strong> Only for decisions expensive to reverse: framework choice, data model, security model, agent delegation, API contracts. Ask: "If reversed in 6 months, would it cost more than a day?"</p>
+<p><strong>Rule 8: Index in mkdocs.yml.</strong> Every ADR must be in the nav section. Orphaned ADRs fail CI lint.</p>
+<h3 id="delegation-matrix">Delegation Matrix<a class="headerlink" href="#delegation-matrix" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -2831,85 +2520,74 @@ and <a href="../../agent-delegation/SKILL/">agent-delegation</a>:</p>
 <tbody>
 <tr>
 <td>Draft new ADR</td>
-<td>Any agent, typically Developer or Scrum Master</td>
-</tr>
-<tr>
-<td>Propose ADR (status: Proposed)</td>
 <td>Any agent</td>
 </tr>
 <tr>
-<td>Accept ADR (status: Accepted)</td>
-<td><strong>Engineering Lead only</strong> — human approval</td>
+<td>Propose (status: Proposed)</td>
+<td>Any agent</td>
 </tr>
 <tr>
-<td>Reject ADR (status: Rejected)</td>
-<td><strong>Engineering Lead only</strong></td>
-</tr>
-<tr>
-<td>Supersede ADR (status: Superseded)</td>
-<td><strong>Engineering Lead only</strong> — paired with new Accepted ADR</td>
-</tr>
-<tr>
-<td>Deprecate ADR (status: Deprecated)</td>
-<td><strong>Engineering Lead only</strong></td>
+<td>Accept / Reject / Supersede / Deprecate</td>
+<td><strong>Engineering Lead only</strong> — human approval required</td>
 </tr>
 </tbody>
 </table>
-<p>Status transitions to Accepted/Rejected/Deprecated/Superseded are
-architectural decisions in themselves and fall under
-<code>agent-delegation</code> Rule 6 (architecture → human approval required).</p>
-<h2 id="template">Template<a class="headerlink" href="#template" title="Permanent link">&para;</a></h2>
-<p>See <a href="../../../adr/TEMPLATE/">docs/adr/TEMPLATE.md</a> for the canonical
-starting template. Copy it to a new file, assign the next number,
-fill in the sections, and open a PR.</p>
-<h2 id="tooling">Tooling<a class="headerlink" href="#tooling" title="Permanent link">&para;</a></h2>
+<h3 id="tooling">Tooling<a class="headerlink" href="#tooling" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>scripts/lint_adrs.py</code> — CI lint enforcing all rules above. Runs in
-  pre-commit and in CI on every PR touching <code>docs/adr/</code> or
-  <code>mkdocs.yml</code>.</li>
-<li>Future (issue #178): evaluate <a href="https://github.com/thomvaill/log4brains">Log4brains</a>
-  for static-site rendering of the ADR supersession graph.</li>
+<li><code>scripts/lint_adrs.py</code> — CI lint enforcing all rules (pre-commit + CI)</li>
+<li>Template: <code>docs/adr/TEMPLATE.md</code></li>
 </ul>
-<h2 id="anti-patterns">Anti-Patterns<a class="headerlink" href="#anti-patterns" title="Permanent link">&para;</a></h2>
-<h3 id="1-editing-an-accepted-adr">1. Editing an Accepted ADR<a class="headerlink" href="#1-editing-an-accepted-adr" title="Permanent link">&para;</a></h3>
-<p><strong>What happens:</strong> Git blame no longer shows the original rationale,
-readers can't tell what was true when the decision was made.
-<strong>Rule:</strong> Immutable after Accepted. Write a new ADR if the context
-changes.</p>
-<h3 id="2-deleting-a-rejected-or-superseded-adr">2. Deleting a Rejected or Superseded ADR<a class="headerlink" href="#2-deleting-a-rejected-or-superseded-adr" title="Permanent link">&para;</a></h3>
-<p><strong>What happens:</strong> Future teams re-litigate the same debates without
-knowing why the original choice was made or rejected.
-<strong>Rule:</strong> Never delete. Mark as Rejected or Superseded and keep the
-file.</p>
-<h3 id="3-duplicating-adrs-across-directories">3. Duplicating ADRs Across Directories<a class="headerlink" href="#3-duplicating-adrs-across-directories" title="Permanent link">&para;</a></h3>
-<p><strong>What happens:</strong> Readers get conflicting versions; status drift
-between copies (see Sprint 21 #173).
-<strong>Rule:</strong> One canonical location. CI lint blocks files outside
-<code>docs/adr/</code>.</p>
-<h3 id="4-using-adrs-as-implementation-reports">4. Using ADRs as Implementation Reports<a class="headerlink" href="#4-using-adrs-as-implementation-reports" title="Permanent link">&para;</a></h3>
-<p><strong>What happens:</strong> The ADR tree becomes a dumping ground for status
-updates, obscuring the real architectural decisions.
-<strong>Rule:</strong> ADRs document decisions, not implementation progress. Use
-PR descriptions and CHANGELOG for status.</p>
-<h3 id="5-vague-status-values">5. Vague Status Values<a class="headerlink" href="#5-vague-status-values" title="Permanent link">&para;</a></h3>
-<p><strong>What happens:</strong> "Implemented", "Approved", "In Progress" — the
-status field becomes unparseable and CI can't enforce rules.
-<strong>Rule:</strong> Closed status set only. Lint rejects anything else.</p>
-<h2 id="example-sprint-21-consolidation">Example: Sprint 21 Consolidation<a class="headerlink" href="#example-sprint-21-consolidation" title="Permanent link">&para;</a></h2>
-<p>Story #177 applied this skill to consolidate 11+ ADR files. The
-process:</p>
-<ol>
-<li>Inventory all ADR files across three directories</li>
-<li>Identify canonical vs duplicate vs not-an-ADR</li>
-<li>Renumber to global MADR sequence in <code>docs/adr/</code></li>
-<li>Add bidirectional supersession between ADR-0003 and ADR-0006</li>
-<li>Archive orphaned duplicates to <code>docs/archive/adr-pre-consolidation/</code></li>
-<li>Delete non-ADR content (ADR-002-REFACTORING-COMPLETE)</li>
-<li>Create this skill and the CI lint</li>
-<li>Update mkdocs.yml, docs/README.md, docs/index.md to match</li>
-</ol>
-<p>This was a one-time consolidation. Going forward, this skill prevents
-the problem from recurring.</p>
+<h2 id="common-rationalizations">Common Rationalizations<a class="headerlink" href="#common-rationalizations" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Rationalization</th>
+<th>Reality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"This decision isn't important enough for an ADR"</td>
+<td>If reversing it costs more than a day, it needs one — that's the threshold</td>
+</tr>
+<tr>
+<td>"I'll just update the existing ADR instead of writing a new one"</td>
+<td>Rewriting history defeats the purpose; git blame should show original rationale</td>
+</tr>
+<tr>
+<td>"We can delete rejected ADRs to keep things clean"</td>
+<td>Future teams re-litigate the same debates without knowing why options were rejected</td>
+</tr>
+<tr>
+<td>"The ADR can live next to the code it describes"</td>
+<td>Multiple locations cause drift and collisions — one canonical directory prevents this</td>
+</tr>
+<tr>
+<td>"We don't need the lint — we'll be careful"</td>
+<td>Sprint 21 found 11+ files across 3 directories with colliding numbers; careful doesn't scale</td>
+</tr>
+</tbody>
+</table>
+<h2 id="red-flags">Red Flags<a class="headerlink" href="#red-flags" title="Permanent link">&para;</a></h2>
+<ul>
+<li>ADR file exists outside <code>docs/adr/</code> (legacy location drift)</li>
+<li>Accepted ADR body modified (rationale rewrite)</li>
+<li>Supersession link only goes one direction (missing back-link)</li>
+<li>Status value not in the closed set (Proposed/Accepted/Rejected/Deprecated/Superseded)</li>
+<li>ADR not referenced in <code>mkdocs.yml</code> nav section</li>
+<li>ADR used for implementation status instead of architectural decision</li>
+<li>Number collision between two ADRs</li>
+</ul>
+<h2 id="verification">Verification<a class="headerlink" href="#verification" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[ ] ADR lives in <code>docs/adr/</code> — <strong>evidence</strong>: <code>scripts/lint_adrs.py</code> passes, no files in legacy locations</li>
+<li>[ ] Filename matches <code>NNNN-kebab-case-title.md</code> — <strong>evidence</strong>: lint check</li>
+<li>[ ] Header has all required fields (Status, Date, Decision Maker) — <strong>evidence</strong>: lint check</li>
+<li>[ ] Body has all 4 mandatory sections — <strong>evidence</strong>: grep for <code>## Context</code>, <code>## Decision</code>, <code>## Alternatives</code>, <code>## Consequences</code></li>
+<li>[ ] If superseding: bidirectional links present — <strong>evidence</strong>: lint verifies both sides</li>
+<li>[ ] Referenced in <code>mkdocs.yml</code> — <strong>evidence</strong>: lint check for orphaned ADRs</li>
+<li>[ ] <code>scripts/lint_adrs.py</code> passes in CI — <strong>evidence</strong>: green CI check</li>
+</ul>
 
 
 

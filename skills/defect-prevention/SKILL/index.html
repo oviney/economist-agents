@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Multi-agent content pipeline that generates Economist-style articles with autonomous research, writing, illustration, and deployment">
+        <meta name="description" content="Codify editorial failure patterns as deterministic prevention rules. Use when a new bug pattern is detected by the editorial judge, when adding post-mortem rules after a defective article ships.">
       
       
       
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#defect-prevention-skill" class="md-skip">
+        <a href="#defect-prevention" class="md-skip">
           Skip to content
         </a>
       
@@ -1368,10 +1368,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#purpose" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Purpose
+        Overview
       
     </span>
   </a>
@@ -1379,27 +1379,44 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-prevention-rules-work" class="md-nav__link">
+  <a href="#when-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How Prevention Rules Work
+        When to Use
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="How Prevention Rules Work">
+    <nav class="md-nav" aria-label="When to Use">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#existing-system" class="md-nav__link">
+  <a href="#when-not-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Existing System
+        When NOT to Use
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Process
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Process">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#rule-format" class="md-nav__link">
@@ -1413,10 +1430,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#adding-new-rules" class="md-nav__link">
+  <a href="#adding-a-new-rule" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Adding New Rules
+        Adding a New Rule
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-storage-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern Storage Schema
       
     </span>
   </a>
@@ -1429,10 +1457,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#feedback-loop-architecture" class="md-nav__link">
+  <a href="#common-rationalizations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Feedback Loop Architecture
+        Common Rationalizations
       
     </span>
   </a>
@@ -1440,10 +1468,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#existing-files-to-modify" class="md-nav__link">
+  <a href="#red-flags" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Existing Files to Modify
+        Red Flags
       
     </span>
   </a>
@@ -1451,17 +1479,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pattern-storage-schema" class="md-nav__link">
+  <a href="#verification" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pattern Storage Schema
+        Verification
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#integration-points" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1469,6 +1498,11 @@
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2314,10 +2348,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#purpose" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Purpose
+        Overview
       
     </span>
   </a>
@@ -2325,27 +2359,44 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-prevention-rules-work" class="md-nav__link">
+  <a href="#when-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How Prevention Rules Work
+        When to Use
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="How Prevention Rules Work">
+    <nav class="md-nav" aria-label="When to Use">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#existing-system" class="md-nav__link">
+  <a href="#when-not-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Existing System
+        When NOT to Use
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Process
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Process">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#rule-format" class="md-nav__link">
@@ -2359,10 +2410,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#adding-new-rules" class="md-nav__link">
+  <a href="#adding-a-new-rule" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Adding New Rules
+        Adding a New Rule
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-storage-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern Storage Schema
       
     </span>
   </a>
@@ -2375,10 +2437,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#feedback-loop-architecture" class="md-nav__link">
+  <a href="#common-rationalizations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Feedback Loop Architecture
+        Common Rationalizations
       
     </span>
   </a>
@@ -2386,10 +2448,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#existing-files-to-modify" class="md-nav__link">
+  <a href="#red-flags" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Existing Files to Modify
+        Red Flags
       
     </span>
   </a>
@@ -2397,17 +2459,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pattern-storage-schema" class="md-nav__link">
+  <a href="#verification" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pattern Storage Schema
+        Verification
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#integration-points" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2415,6 +2478,11 @@
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2438,41 +2506,47 @@
   
 
 
-<h1 id="defect-prevention-skill">Defect Prevention Skill<a class="headerlink" href="#defect-prevention-skill" title="Permanent link">&para;</a></h1>
-<h2 id="purpose">Purpose<a class="headerlink" href="#purpose" title="Permanent link">&para;</a></h2>
-<p>When the editorial judge or article evaluator detects a failure pattern,
-automatically codify it as a prevention rule so future articles avoid the
-same defect.  This closes the feedback loop between detection and prevention.</p>
-<h2 id="how-prevention-rules-work">How Prevention Rules Work<a class="headerlink" href="#how-prevention-rules-work" title="Permanent link">&para;</a></h2>
-<h3 id="existing-system">Existing System<a class="headerlink" href="#existing-system" title="Permanent link">&para;</a></h3>
-<p><code>scripts/defect_prevention_rules.py</code> contains <code>DefectPrevention</code> class with
-5 active rules learned from historical bugs (BUG-015 through BUG-022):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">DefectPrevention</span><span class="p">:</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">check_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Run all prevention checks, return list of violation messages.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        <span class="n">violations</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="n">violations</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_check_chart_embedding</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">metadata</span><span class="p">))</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        <span class="n">violations</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_check_category_present</span><span class="p">(</span><span class="n">content</span><span class="p">))</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>        <span class="n">violations</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_check_duplicate_chart</span><span class="p">(</span><span class="n">content</span><span class="p">))</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>        <span class="n">violations</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_check_badge_currency</span><span class="p">(</span><span class="n">content</span><span class="p">))</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="n">violations</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_check_sprint_doc_currency</span><span class="p">(</span><span class="n">content</span><span class="p">))</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        <span class="k">return</span> <span class="n">violations</span>
+<h1 id="defect-prevention">Defect Prevention<a class="headerlink" href="#defect-prevention" title="Permanent link">&para;</a></h1>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>Automatically converts detected failure patterns into deterministic prevention rules so future articles avoid the same defect. Closes the feedback loop between detection and prevention.</p>
+<h2 id="when-to-use">When to Use<a class="headerlink" href="#when-to-use" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Editorial judge or article evaluator detects a recurring failure pattern</li>
+<li>A new bug (BUG-NNN) has been root-caused and needs a prevention rule</li>
+<li>Adding a deterministic fix to the editorial polish stage</li>
+</ul>
+<h3 id="when-not-to-use">When NOT to Use<a class="headerlink" href="#when-not-to-use" title="Permanent link">&para;</a></h3>
+<ul>
+<li>One-off content issues that won't recur (e.g., a typo in a single article)</li>
+<li>Stylistic preferences — those belong in <code>economist-writing</code></li>
+<li>Issues requiring LLM judgment — prevention rules must be deterministic</li>
+</ul>
+<h2 id="core-process">Core Process<a class="headerlink" href="#core-process" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>1. Editorial Judge detects failure
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>   ↓
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>2. Log failure pattern to logs/defect_patterns.json
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>   ↓
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>3. Pattern analysis: new or known?
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>   ↓
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>4. If new → generate prevention rule method
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>   ↓
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>5. Add to DefectPrevention.check_all()
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>   ↓
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>6. Add deterministic fix to stage4_crew._apply_editorial_fixes() if possible
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>   ↓
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>7. Write test in tests/test_defect_prevention.py
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>   ↓
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>8. Next article benefits from prevention
 </code></pre></div>
 <h3 id="rule-format">Rule Format<a class="headerlink" href="#rule-format" title="Permanent link">&para;</a></h3>
-<p>Each prevention rule is a method on <code>DefectPrevention</code> that:
-1. Takes <code>content: str</code> and optional <code>metadata: dict</code>
-2. Checks for a specific pattern via regex or string matching
-3. Returns <code>list[str]</code> of violation messages (empty if clean)
-4. Message format: <code>"[SEVERITY] Description (Pattern: BUG-NNN-pattern)"</code></p>
-<h3 id="adding-new-rules">Adding New Rules<a class="headerlink" href="#adding-new-rules" title="Permanent link">&para;</a></h3>
-<p>When a new failure pattern is detected:</p>
+<p>Each prevention rule is a method on <code>DefectPrevention</code> that:</p>
 <ol>
-<li><strong>Identify the pattern</strong> — what specific text/structure caused the failure?</li>
-<li><strong>Write a check method</strong> — deterministic, no LLM needed</li>
-<li><strong>Add to <code>check_all()</code></strong> — so it runs on every article</li>
-<li><strong>Write a test</strong> — in <code>tests/test_defect_prevention.py</code></li>
+<li>Takes <code>content: str</code> and optional <code>metadata: dict</code></li>
+<li>Checks for a specific pattern via regex or string matching</li>
+<li>Returns <code>list[str]</code> of violation messages (empty if clean)</li>
+<li>Message format: <code>"[SEVERITY] Description (Pattern: BUG-NNN-pattern)"</code></li>
 </ol>
-<p>Example — adding a rule for missing <code>layout: post</code>:
+<h3 id="adding-a-new-rule">Adding a New Rule<a class="headerlink" href="#adding-a-new-rule" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">_check_layout_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;BUG-028 prevention: Ensure layout: post in frontmatter.&quot;&quot;&quot;</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="k">if</span> <span class="n">content</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="p">):</span>
@@ -2480,50 +2554,72 @@ same defect.  This closes the feedback loop between detection and prevention.</p
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span> <span class="ow">and</span> <span class="s2">&quot;layout:&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>            <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;[CRITICAL] Missing layout: post in frontmatter (Pattern: BUG-028-pattern)&quot;</span><span class="p">]</span>
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="k">return</span> <span class="p">[]</span>
-</code></pre></div></p>
-<h2 id="feedback-loop-architecture">Feedback Loop Architecture<a class="headerlink" href="#feedback-loop-architecture" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Editorial Judge detects failure
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  ↓
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>Log failure pattern to logs/defect_patterns.json
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>  ↓
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>Pattern analysis: is this a new pattern or known?
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>  ↓
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>If new: generate prevention rule
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>  ↓
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>Add rule to defect_prevention_rules.py
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>  ↓
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>Add rule to stage4_crew._apply_editorial_fixes() if deterministic fix possible
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>  ↓
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>Next article benefits from prevention
 </code></pre></div>
-<h2 id="existing-files-to-modify">Existing Files to Modify<a class="headerlink" href="#existing-files-to-modify" title="Permanent link">&para;</a></h2>
+<h3 id="pattern-storage-schema">Pattern Storage Schema<a class="headerlink" href="#pattern-storage-schema" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">&quot;patterns&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;PATTERN-001&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">      </span><span class="nt">&quot;detected_by&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;editorial_judge&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">      </span><span class="nt">&quot;check_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;image_exists&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">      </span><span class="nt">&quot;failure_message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Image not found: /assets/images/test.png&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">      </span><span class="nt">&quot;article&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-04-04-article.md&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">      </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-04-04T12:00:00Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">      </span><span class="nt">&quot;prevention_rule_added&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">      </span><span class="nt">&quot;rule_location&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;defect_prevention_rules.py::_check_image_path&quot;</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">  </span><span class="p">]</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="p">}</span>
+</code></pre></div>
+<h2 id="common-rationalizations">Common Rationalizations<a class="headerlink" href="#common-rationalizations" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Rationalization</th>
+<th>Reality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"This bug only happened once"</td>
+<td>If it happened once without a rule, it will happen again — codify it</td>
+</tr>
+<tr>
+<td>"The LLM can just learn not to do that"</td>
+<td>LLMs have no memory between runs; only deterministic rules persist</td>
+</tr>
+<tr>
+<td>"We'll fix it in code review"</td>
+<td>Human review doesn't scale; automated prevention catches 100% of known patterns</td>
+</tr>
+<tr>
+<td>"The rule is too strict"</td>
+<td>Better to have a false positive that gets refined than a missed defect in production</td>
+</tr>
+</tbody>
+</table>
+<h2 id="red-flags">Red Flags<a class="headerlink" href="#red-flags" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Prevention rule uses LLM calls instead of deterministic checks</li>
+<li>Rule added to <code>check_all()</code> but no corresponding test written</li>
+<li>Pattern logged but no prevention rule created within the same sprint</li>
+<li>Rule silently passes without a violation message format (<code>[SEVERITY] ... (Pattern: BUG-NNN)</code>)</li>
+<li>Duplicate rules checking the same pattern with different names</li>
+</ul>
+<h2 id="verification">Verification<a class="headerlink" href="#verification" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[ ] New rule method exists on <code>DefectPrevention</code> class with <code>_check_</code> prefix</li>
+<li>[ ] Rule is called from <code>check_all()</code> — <strong>evidence</strong>: grep shows the method in the call chain</li>
+<li>[ ] Test exists in <code>tests/test_defect_prevention.py</code> covering both pass and fail cases</li>
+<li>[ ] Pattern logged in <code>logs/defect_patterns.json</code> with <code>prevention_rule_added: true</code></li>
+<li>[ ] If deterministic fix is possible, added to <code>stage4_crew._apply_editorial_fixes()</code></li>
+</ul>
+<h3 id="integration-points">Integration Points<a class="headerlink" href="#integration-points" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>scripts/defect_prevention_rules.py</code> — add new <code>_check_*</code> methods</li>
 <li><code>src/crews/stage4_crew.py</code> — add deterministic fixes to <code>_apply_editorial_fixes()</code></li>
 <li><code>scripts/publication_validator.py</code> — add validation checks</li>
-</ul>
-<h2 id="pattern-storage-schema">Pattern Storage Schema<a class="headerlink" href="#pattern-storage-schema" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">{</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">&quot;patterns&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;PATTERN-001&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">      </span><span class="nt">&quot;detected_by&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;editorial_judge&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">      </span><span class="nt">&quot;check_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;image_exists&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">      </span><span class="nt">&quot;failure_message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Image not found: /assets/images/test.png&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">      </span><span class="nt">&quot;article&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-04-04-article.md&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">      </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-04-04T12:00:00Z&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">      </span><span class="nt">&quot;prevention_rule_added&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">      </span><span class="nt">&quot;rule_location&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;defect_prevention_rules.py::_check_image_path&quot;</span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">  </span><span class="p">]</span>
-<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="p">}</span>
-</code></pre></div>
-<h2 id="integration-points">Integration Points<a class="headerlink" href="#integration-points" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Editorial judge (<code>scripts/editorial_judge.py</code>) — source of failure patterns</li>
-<li>Article evaluator (Story #116) — source of low-scoring dimensions</li>
-<li>Deterministic polish (<code>stage4_crew._apply_editorial_fixes</code>) — applies fixes</li>
-<li>Publication validator — enforces rules before publication</li>
+<li><code>scripts/editorial_judge.py</code> — source of failure patterns</li>
 </ul>
 
 
@@ -2531,6 +2627,9 @@ same defect.  This closes the feedback loop between detection and prevention.</p
 
 
 
+
+  
+  
 
 
 

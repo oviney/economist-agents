@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Multi-agent content pipeline that generates Economist-style articles with autonomous research, writing, illustration, and deployment">
+        <meta name="description" content="Standards for building MCP servers in this project. Use when creating a new MCP server, when reviewing MCP server code, when debugging import or tool registration issues.">
       
       
       
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#mcp-server-development-skill" class="md-skip">
+        <a href="#mcp-server-development" class="md-skip">
           Skip to content
         </a>
       
@@ -1536,10 +1536,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#purpose" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Purpose
+        Overview
       
     </span>
   </a>
@@ -1547,6 +1547,46 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#when-to-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Use
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="When to Use">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-not-to-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When NOT to Use
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Process
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Process">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#the-critical-import" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1556,8 +1596,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#server-template" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1567,24 +1607,12 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#mandatory-rules" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mandatory Rules
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Mandatory Rules">
-      <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-import" class="md-nav__link">
+  <a href="#9-mandatory-rules" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Import
+        9 Mandatory Rules
       
     </span>
   </a>
@@ -1592,99 +1620,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-decorator" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Decorator
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-type-hints" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Type hints
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-docstrings" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Docstrings
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5-error-handling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. Error handling
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#6-transport" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6. Transport
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#7-server-naming" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        7. Server naming
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#8-module-location" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8. Module location
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#9-logging" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        9. Logging
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#testing-standards" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1693,81 +1628,9 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Testing Standards">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#test-file-location" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Test file location
-      
-    </span>
-  </a>
-  
 </li>
         
           <li class="md-nav__item">
-  <a href="#mock-all-external-calls" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mock all external calls
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#test-categories-minimum" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Test categories (minimum)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#coverage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Coverage
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#test-isolation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Test isolation
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#requirements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Requirements
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1777,12 +1640,17 @@
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#anti-patterns-from-sprint-18-bugs" class="md-nav__link">
+  <a href="#common-rationalizations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Anti-Patterns (From Sprint 18 Bugs)
+        Common Rationalizations
       
     </span>
   </a>
@@ -1790,10 +1658,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#integration-points" class="md-nav__link">
+  <a href="#red-flags" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Integration Points
+        Red Flags
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
       
     </span>
   </a>
@@ -2474,10 +2353,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#purpose" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Purpose
+        Overview
       
     </span>
   </a>
@@ -2485,6 +2364,46 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#when-to-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Use
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="When to Use">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-not-to-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When NOT to Use
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Process
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Process">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#the-critical-import" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2494,8 +2413,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#server-template" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2505,24 +2424,12 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#mandatory-rules" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mandatory Rules
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Mandatory Rules">
-      <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-import" class="md-nav__link">
+  <a href="#9-mandatory-rules" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Import
+        9 Mandatory Rules
       
     </span>
   </a>
@@ -2530,99 +2437,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-decorator" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Decorator
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-type-hints" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Type hints
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-docstrings" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Docstrings
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5-error-handling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. Error handling
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#6-transport" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6. Transport
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#7-server-naming" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        7. Server naming
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#8-module-location" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8. Module location
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#9-logging" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        9. Logging
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#testing-standards" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2631,81 +2445,9 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Testing Standards">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#test-file-location" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Test file location
-      
-    </span>
-  </a>
-  
 </li>
         
           <li class="md-nav__item">
-  <a href="#mock-all-external-calls" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mock all external calls
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#test-categories-minimum" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Test categories (minimum)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#coverage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Coverage
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#test-isolation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Test isolation
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#requirements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Requirements
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2715,12 +2457,17 @@
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#anti-patterns-from-sprint-18-bugs" class="md-nav__link">
+  <a href="#common-rationalizations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Anti-Patterns (From Sprint 18 Bugs)
+        Common Rationalizations
       
     </span>
   </a>
@@ -2728,10 +2475,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#integration-points" class="md-nav__link">
+  <a href="#red-flags" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Integration Points
+        Red Flags
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
       
     </span>
   </a>
@@ -2758,28 +2516,36 @@
   
 
 
-<h1 id="mcp-server-development-skill">MCP Server Development Skill<a class="headerlink" href="#mcp-server-development-skill" title="Permanent link">&para;</a></h1>
-<h2 id="purpose">Purpose<a class="headerlink" href="#purpose" title="Permanent link">&para;</a></h2>
-<p>Define the standard for building MCP (Model Context Protocol) servers
-in this project.  Every MCP server must follow these patterns exactly.
-This skill exists because Copilot agents consistently get the import
-wrong — using third-party packages instead of the official SDK.</p>
-<h2 id="the-critical-import">The Critical Import<a class="headerlink" href="#the-critical-import" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># ✅ CORRECT — official MCP SDK</span>
+<h1 id="mcp-server-development">MCP Server Development<a class="headerlink" href="#mcp-server-development" title="Permanent link">&para;</a></h1>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>Every MCP server must use the official SDK import (<code>from mcp.server.fastmcp import FastMCP</code>), return structured error dicts instead of exceptions, and follow the template below. This skill exists because agents consistently use the wrong import.</p>
+<h2 id="when-to-use">When to Use<a class="headerlink" href="#when-to-use" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Creating a new MCP server in <code>mcp_servers/</code></li>
+<li>Reviewing an MCP server PR for correctness</li>
+<li>Debugging import errors or tool registration failures</li>
+<li>Writing tests for MCP server tools</li>
+</ul>
+<h3 id="when-not-to-use">When NOT to Use<a class="headerlink" href="#when-not-to-use" title="Permanent link">&para;</a></h3>
+<ul>
+<li>For general Python quality standards — that's <code>python-quality</code></li>
+<li>For test coverage requirements — that's <code>testing</code></li>
+<li>For CI/CD pipeline configuration — that's <code>quality-gates</code></li>
+</ul>
+<h2 id="core-process">Core Process<a class="headerlink" href="#core-process" title="Permanent link">&para;</a></h2>
+<h3 id="the-critical-import">The Critical Import<a class="headerlink" href="#the-critical-import" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># CORRECT — official MCP SDK</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">mcp.server.fastmcp</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastMCP</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># ❌ WRONG — third-party package, different API</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># WRONG — third-party package, different API</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">fastmcp</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastMCP</span>
 </code></pre></div>
-<p><strong>Dependency:</strong> <code>mcp&gt;=1.0.0</code> in <code>requirements.txt</code>.  Never add
-<code>fastmcp</code> as a separate dependency.  The <code>FastMCP</code> class lives inside
-the <code>mcp</code> package at <code>mcp.server.fastmcp</code>.</p>
-<h2 id="server-template">Server Template<a class="headerlink" href="#server-template" title="Permanent link">&para;</a></h2>
-<p>Every MCP server in this project follows this structure:</p>
+<p><strong>Dependency:</strong> <code>mcp&gt;=1.0.0</code> in <code>requirements.txt</code>. Never add <code>fastmcp</code> as separate dependency.</p>
+<h3 id="server-template">Server Template<a class="headerlink" href="#server-template" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="ch">#!/usr/bin/env python3</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="sd">&quot;&quot;&quot;&lt;Name&gt; MCP Server (Story &lt;number&gt;).</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="sd">&quot;&quot;&quot;&lt;Name&gt; MCP Server.</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="sd">&lt;One-line description of what this server exposes.&gt;</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="sd">&lt;One-line description.&gt;</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="sd">Tools:</span>
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="sd">    &lt;tool_name&gt;: &lt;what it does&gt;</span>
@@ -2810,147 +2576,96 @@ the <code>mcp</code> package at <code>mcp.server.fastmcp</code>.</p>
 <a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a><span class="sd">        Dict with results or error information.</span>
 <a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-1-35" name="__codelineno-1-35" href="#__codelineno-1-35"></a>        <span class="c1"># Implementation here</span>
+<a id="__codelineno-1-35" name="__codelineno-1-35" href="#__codelineno-1-35"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">do_work</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
 <a id="__codelineno-1-36" name="__codelineno-1-36" href="#__codelineno-1-36"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">}</span>
-<a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a>    <span class="k">except</span> <span class="n">SomeSpecificError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-<a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Descriptive message&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a>    <span class="k">except</span> <span class="n">SpecificError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Known failure mode&quot;</span><span class="p">)</span>
 <a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
-<a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a>
-<a id="__codelineno-1-41" name="__codelineno-1-41" href="#__codelineno-1-41"></a>
-<a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-<a id="__codelineno-1-43" name="__codelineno-1-43" href="#__codelineno-1-43"></a>    <span class="n">mcp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">transport</span><span class="o">=</span><span class="s2">&quot;stdio&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a>    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<a id="__codelineno-1-41" name="__codelineno-1-41" href="#__codelineno-1-41"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Unexpected error in my_tool&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Unexpected: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+<a id="__codelineno-1-43" name="__codelineno-1-43" href="#__codelineno-1-43"></a>
+<a id="__codelineno-1-44" name="__codelineno-1-44" href="#__codelineno-1-44"></a>
+<a id="__codelineno-1-45" name="__codelineno-1-45" href="#__codelineno-1-45"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<a id="__codelineno-1-46" name="__codelineno-1-46" href="#__codelineno-1-46"></a>    <span class="n">mcp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">transport</span><span class="o">=</span><span class="s2">&quot;stdio&quot;</span><span class="p">)</span>
 </code></pre></div>
-<h2 id="mandatory-rules">Mandatory Rules<a class="headerlink" href="#mandatory-rules" title="Permanent link">&para;</a></h2>
-<h3 id="1-import">1. Import<a class="headerlink" href="#1-import" title="Permanent link">&para;</a></h3>
-<p>Always <code>from mcp.server.fastmcp import FastMCP</code>.  Never <code>from fastmcp</code>.</p>
-<h3 id="2-decorator">2. Decorator<a class="headerlink" href="#2-decorator" title="Permanent link">&para;</a></h3>
-<p>Always <code>@mcp.tool()</code> with parentheses.  Not <code>@mcp.tool</code> (no parens).</p>
-<h3 id="3-type-hints">3. Type hints<a class="headerlink" href="#3-type-hints" title="Permanent link">&para;</a></h3>
-<p>Every tool function must have full type hints on parameters and return
-type.  Use <code>dict[str, Any]</code> for complex returns, <code>list[str]</code> for
-simple lists.</p>
-<h3 id="4-docstrings">4. Docstrings<a class="headerlink" href="#4-docstrings" title="Permanent link">&para;</a></h3>
-<p>Every tool must have a Google-style docstring with Args and Returns
-sections.  The first line becomes the tool description in MCP
-discovery.</p>
-<h3 id="5-error-handling">5. Error handling<a class="headerlink" href="#5-error-handling" title="Permanent link">&para;</a></h3>
-<p>Tools must <strong>never raise exceptions</strong> to MCP clients.  Catch all
-expected errors and return structured error dicts:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># ✅ CORRECT — structured error</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">return</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;GITHUB_TOKEN not set&quot;</span><span class="p">}</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># ❌ WRONG — exception propagates to client</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;GITHUB_TOKEN not set&quot;</span><span class="p">)</span>
-</code></pre></div>
-<p>Wrap the entire tool body in try/except for unexpected errors:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nd">@mcp</span><span class="o">.</span><span class="n">tool</span><span class="p">()</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">my_tool</span><span class="p">(</span><span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Process content.&quot;&quot;&quot;</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">do_work</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">}</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="k">except</span> <span class="n">SpecificError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Known failure mode&quot;</span><span class="p">)</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Unexpected error in my_tool&quot;</span><span class="p">)</span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Unexpected: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
-</code></pre></div>
-<h3 id="6-transport">6. Transport<a class="headerlink" href="#6-transport" title="Permanent link">&para;</a></h3>
-<p>Always <code>mcp.run(transport="stdio")</code> under <code>if __name__ == "__main__":</code>
-guard.  stdio for local dev, HTTP for CI/CD (future).</p>
-<h3 id="7-server-naming">7. Server naming<a class="headerlink" href="#7-server-naming" title="Permanent link">&para;</a></h3>
-<p>Use kebab-case for server names: <code>"article-evaluator"</code>,
-<code>"blog-deployer"</code>, <code>"web-researcher"</code>.</p>
-<h3 id="8-module-location">8. Module location<a class="headerlink" href="#8-module-location" title="Permanent link">&para;</a></h3>
-<p>All servers live in <code>mcp_servers/</code> directory.  File name matches
-server purpose: <code>mcp_servers/article_evaluator_server.py</code>.</p>
-<h3 id="9-logging">9. Logging<a class="headerlink" href="#9-logging" title="Permanent link">&para;</a></h3>
-<p>Use <code>logging.getLogger(__name__)</code>, not <code>print()</code>.  Log at INFO on
-tool entry/exit, ERROR on failures.</p>
-<h2 id="testing-standards">Testing Standards<a class="headerlink" href="#testing-standards" title="Permanent link">&para;</a></h2>
-<h3 id="test-file-location">Test file location<a class="headerlink" href="#test-file-location" title="Permanent link">&para;</a></h3>
-<p><code>tests/test_mcp_servers/test_&lt;server_name&gt;.py</code></p>
-<h3 id="mock-all-external-calls">Mock all external calls<a class="headerlink" href="#mock-all-external-calls" title="Permanent link">&para;</a></h3>
-<p>No real API calls, no real git operations, no real network traffic
-in tests.  Use <code>unittest.mock.patch</code> or <code>pytest-mock</code>.</p>
-<h3 id="test-categories-minimum">Test categories (minimum)<a class="headerlink" href="#test-categories-minimum" title="Permanent link">&para;</a></h3>
+<h3 id="9-mandatory-rules">9 Mandatory Rules<a class="headerlink" href="#9-mandatory-rules" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>Happy path</strong> — tool returns expected result on valid input</li>
-<li><strong>Error handling</strong> — tool returns structured error on bad input,
-   missing credentials, network failures</li>
-<li><strong>Edge cases</strong> — empty input, missing directories, malformed data</li>
-<li><strong>Server registration</strong> — verify server name and tool names:</li>
+<li><strong>Import:</strong> Always <code>from mcp.server.fastmcp import FastMCP</code></li>
+<li><strong>Decorator:</strong> Always <code>@mcp.tool()</code> with parentheses</li>
+<li><strong>Type hints:</strong> Full type hints on all parameters and return type</li>
+<li><strong>Docstrings:</strong> Google-style with Args and Returns sections</li>
+<li><strong>Error handling:</strong> Never raise exceptions; return <code>{"success": False, "error": "..."}</code></li>
+<li><strong>Transport:</strong> <code>mcp.run(transport="stdio")</code> under <code>__main__</code> guard</li>
+<li><strong>Naming:</strong> kebab-case server names (<code>"article-evaluator"</code>)</li>
+<li><strong>Location:</strong> All servers in <code>mcp_servers/</code> directory</li>
+<li><strong>Logging:</strong> <code>logging.getLogger(__name__)</code>, not <code>print()</code></li>
 </ol>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">TestMcpServerRegistration</span><span class="p">:</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_server_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">mcp_servers.my_server</span><span class="w"> </span><span class="kn">import</span> <span class="n">mcp</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>        <span class="k">assert</span> <span class="n">mcp</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;my-server&quot;</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_tools_registered</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">mcp_servers.my_server</span><span class="w"> </span><span class="kn">import</span> <span class="n">mcp</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>        <span class="n">tool_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">mcp</span><span class="o">.</span><span class="n">_tool_manager</span><span class="o">.</span><span class="n">_tools</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>        <span class="k">assert</span> <span class="s2">&quot;my_tool&quot;</span> <span class="ow">in</span> <span class="n">tool_names</span>
-</code></pre></div>
-<p>Note: use <code>mcp._tool_manager._tools</code> (underscore prefix) — the
-<code>ToolManager</code> does not expose a public <code>.tools</code> attribute.</p>
-<h3 id="coverage">Coverage<a class="headerlink" href="#coverage" title="Permanent link">&para;</a></h3>
-<p>Minimum 80%.  Uncovered lines should only be <code>__main__</code> blocks
-and <code>sys.path</code> guards.</p>
-<h3 id="test-isolation">Test isolation<a class="headerlink" href="#test-isolation" title="Permanent link">&para;</a></h3>
-<p>Use <code>tmp_path</code> fixture for file operations.  Use <code>monkeypatch</code> for
-environment variables.  Use <code>EphemeralClient</code> for ChromaDB tests.</p>
-<h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
-<p>The only dependency needed is <code>mcp&gt;=1.0.0</code> in <code>requirements.txt</code>.</p>
-<p><strong>Do not add:</strong>
-- <code>fastmcp</code> (separate package, wrong API)
-- <code>mcp-server-*</code> (these are pre-built servers, not the SDK)</p>
-<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
-<p>Register servers in <code>.mcp.json</code> at project root:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nt">&quot;article-evaluator&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">      </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">      </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;-m&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;mcp_servers.article_evaluator_server&quot;</span><span class="p">],</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">      </span><span class="nt">&quot;transport&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;stdio&quot;</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">  </span><span class="p">}</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="p">}</span>
-</code></pre></div>
-<h2 id="anti-patterns-from-sprint-18-bugs">Anti-Patterns (From Sprint 18 Bugs)<a class="headerlink" href="#anti-patterns-from-sprint-18-bugs" title="Permanent link">&para;</a></h2>
-<ol>
-<li>
-<p><strong>The fastmcp import</strong> — <code>from fastmcp import FastMCP</code> uses a
-   different third-party package with incompatible API.  This caused
-   4 of 5 Copilot PRs to fail review in Sprint 18.</p>
-</li>
-<li>
-<p><strong>Missing parentheses</strong> — <code>@mcp.tool</code> without <code>()</code> may work with
-   some versions but is inconsistent with the SDK documentation.</p>
-</li>
-<li>
-<p><strong>Inconsistent requirements</strong> — PRs adding <code>fastmcp&gt;=0.1.0</code>,
-   <code>fastmcp&gt;=2.0.0</code>, <code>fastmcp&gt;=3.0.0</code> in different PRs.  Standardise
-   on <code>mcp&gt;=1.0.0</code> only.</p>
-</li>
-<li>
-<p><strong>Raw exceptions</strong> — Letting <code>ValueError</code> or <code>KeyError</code> propagate
-   from a tool crashes the MCP client connection.  Always catch and
-   return structured dicts.</p>
-</li>
-<li>
-<p><strong>Public <code>.tools</code> attribute</strong> — <code>mcp._tool_manager.tools</code> does not
-   exist.  Use <code>mcp._tool_manager._tools</code> (private attribute).</p>
-</li>
-</ol>
-<h2 id="integration-points">Integration Points<a class="headerlink" href="#integration-points" title="Permanent link">&para;</a></h2>
+<h3 id="testing-standards">Testing Standards<a class="headerlink" href="#testing-standards" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>All MCP servers</strong> in <code>mcp_servers/</code> must follow this skill</li>
-<li><strong>Copilot agent</strong> should reference this skill when assigned MCP
-  server stories</li>
-<li><strong>Claude Code</strong> follows this skill for Story 18.3 and future
-  MCP server work</li>
-<li><strong>Code reviewer</strong> validates against these rules during PR review</li>
+<li>Test location: <code>tests/test_mcp_servers/test_&lt;server_name&gt;.py</code></li>
+<li>Mock all external calls (no real API/network traffic)</li>
+<li>Minimum test categories: happy path, error handling, edge cases, server registration</li>
+<li>Coverage: ≥80%</li>
+<li>Use <code>mcp._tool_manager._tools</code> for tool introspection (no public <code>.tools</code> attribute)</li>
+</ul>
+<h3 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h3>
+<p>Register in <code>.mcp.json</code>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">&quot;article-evaluator&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">      </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">      </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;-m&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;mcp_servers.article_evaluator_server&quot;</span><span class="p">],</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">      </span><span class="nt">&quot;transport&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;stdio&quot;</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">}</span>
+</code></pre></div></p>
+<h2 id="common-rationalizations">Common Rationalizations<a class="headerlink" href="#common-rationalizations" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Rationalization</th>
+<th>Reality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"The <code>fastmcp</code> package has better ergonomics"</td>
+<td>It's a different package with an incompatible API — this caused 4/5 Copilot PRs to fail in Sprint 18</td>
+</tr>
+<tr>
+<td>"We can skip the parentheses on <code>@mcp.tool</code>"</td>
+<td>Inconsistent with SDK docs and breaks in some versions</td>
+</tr>
+<tr>
+<td>"Raising exceptions is simpler than returning dicts"</td>
+<td>Exceptions crash the MCP client connection; structured errors keep the session alive</td>
+</tr>
+<tr>
+<td>"We don't need all those test categories"</td>
+<td>Registration tests catch the import bug; error tests catch exception leaks — both are Sprint 18 bugs</td>
+</tr>
+</tbody>
+</table>
+<h2 id="red-flags">Red Flags<a class="headerlink" href="#red-flags" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>from fastmcp import FastMCP</code> anywhere in the codebase</li>
+<li><code>fastmcp</code> listed as a dependency in <code>requirements.txt</code></li>
+<li><code>@mcp.tool</code> without parentheses</li>
+<li>Tool function that raises instead of returning error dict</li>
+<li><code>print()</code> used instead of <code>logging.getLogger()</code></li>
+<li>MCP server file outside <code>mcp_servers/</code> directory</li>
+<li>Test that makes real API calls or network requests</li>
+</ul>
+<h2 id="verification">Verification<a class="headerlink" href="#verification" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[ ] Import is <code>from mcp.server.fastmcp import FastMCP</code> — <strong>evidence</strong>: grep confirms no <code>from fastmcp</code></li>
+<li>[ ] All tools use <code>@mcp.tool()</code> with parentheses — <strong>evidence</strong>: grep <code>@mcp.tool[^(]</code> returns empty</li>
+<li>[ ] All tools have type hints and Google-style docstrings — <strong>evidence</strong>: mypy passes, docstring present</li>
+<li>[ ] No tools raise exceptions — <strong>evidence</strong>: every tool body wrapped in try/except returning dicts</li>
+<li>[ ] Tests exist with ≥80% coverage — <strong>evidence</strong>: <code>pytest --cov</code> output</li>
+<li>[ ] Server registered in <code>.mcp.json</code> — <strong>evidence</strong>: JSON entry matches server name</li>
 </ul>
 
 
@@ -2958,6 +2673,9 @@ environment variables.  Use <code>EphemeralClient</code> for ChromaDB tests.</p>
 
 
 
+
+  
+  
 
 
 

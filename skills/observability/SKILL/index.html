@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Multi-agent content pipeline that generates Economist-style articles with autonomous research, writing, illustration, and deployment">
+        <meta name="description" content="Track article quality metrics over time and alert on degradation. Use when adding a new metric to the quality dashboard, when investigating a quality trend, when configuring alert thresholds.">
       
       
       
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#observability-skill" class="md-skip">
+        <a href="#observability" class="md-skip">
           Skip to content
         </a>
       
@@ -1508,10 +1508,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#purpose" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Purpose
+        Overview
       
     </span>
   </a>
@@ -1519,55 +1519,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#metrics-to-track" class="md-nav__link">
+  <a href="#when-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Metrics to Track
+        When to Use
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Metrics to Track">
+    <nav class="md-nav" aria-label="When to Use">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-article-pass-rate" class="md-nav__link">
+  <a href="#when-not-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Article Pass Rate
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-common-failure-modes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Common Failure Modes
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-quality-score-trends" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Quality Score Trends
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-revision-loop-frequency" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Revision Loop Frequency
+        When NOT to Use
       
     </span>
   </a>
@@ -1580,28 +1547,29 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#data-sources" class="md-nav__link">
+  <a href="#core-process" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Data Sources
+        Core Process
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Process">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metrics-tracked" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrics Tracked
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#dashboard-schema" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Dashboard Schema
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#alert-thresholds" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1611,8 +1579,69 @@
   </a>
   
 </li>
+        
+          <li class="md-nav__item">
+  <a href="#dashboard-output-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dashboard Output Schema
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
+  <a href="#common-rationalizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Rationalizations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#red-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Red Flags
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#integration-points" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1622,26 +1651,9 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#existing-code-to-reuse" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Existing Code to Reuse
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#design-principles" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Design Principles
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2347,10 +2359,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#purpose" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Purpose
+        Overview
       
     </span>
   </a>
@@ -2358,55 +2370,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#metrics-to-track" class="md-nav__link">
+  <a href="#when-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Metrics to Track
+        When to Use
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Metrics to Track">
+    <nav class="md-nav" aria-label="When to Use">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-article-pass-rate" class="md-nav__link">
+  <a href="#when-not-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Article Pass Rate
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-common-failure-modes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Common Failure Modes
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-quality-score-trends" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Quality Score Trends
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-revision-loop-frequency" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Revision Loop Frequency
+        When NOT to Use
       
     </span>
   </a>
@@ -2419,28 +2398,29 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#data-sources" class="md-nav__link">
+  <a href="#core-process" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Data Sources
+        Core Process
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Process">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metrics-tracked" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrics Tracked
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#dashboard-schema" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Dashboard Schema
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#alert-thresholds" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2450,8 +2430,69 @@
   </a>
   
 </li>
+        
+          <li class="md-nav__item">
+  <a href="#dashboard-output-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dashboard Output Schema
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
+  <a href="#common-rationalizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Rationalizations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#red-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Red Flags
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#integration-points" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2461,26 +2502,9 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#existing-code-to-reuse" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Existing Code to Reuse
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#design-principles" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Design Principles
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2504,90 +2528,63 @@
   
 
 
-<h1 id="observability-skill">Observability Skill<a class="headerlink" href="#observability-skill" title="Permanent link">&para;</a></h1>
-<h2 id="purpose">Purpose<a class="headerlink" href="#purpose" title="Permanent link">&para;</a></h2>
-<p>Track article quality metrics over time so degradation is detected early
-and improvement is measurable.  The observability pipeline reads from
-evaluation logs and produces a dashboard JSON updated after each pipeline run.</p>
-<h2 id="metrics-to-track">Metrics to Track<a class="headerlink" href="#metrics-to-track" title="Permanent link">&para;</a></h2>
-<h3 id="1-article-pass-rate">1. Article Pass Rate<a class="headerlink" href="#1-article-pass-rate" title="Permanent link">&para;</a></h3>
+<h1 id="observability">Observability<a class="headerlink" href="#observability" title="Permanent link">&para;</a></h1>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>Reads from evaluation logs and produces a dashboard JSON after each pipeline run. Tracks article pass rates, failure modes, quality scores, and revision frequency so degradation is detected early and improvement is measurable.</p>
+<h2 id="when-to-use">When to Use<a class="headerlink" href="#when-to-use" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Percentage of articles that publish on first attempt (no revision)</li>
-<li>Percentage that publish after revision</li>
-<li>Percentage that fail completely (needs_revision after max retries)</li>
-<li>Tracked per week and as rolling 4-week average</li>
+<li>After each pipeline run to update the quality dashboard</li>
+<li>When investigating why article quality has changed over time</li>
+<li>When adding a new tracked metric or alert threshold</li>
+<li>When the editorial judge flags a recurring failure pattern</li>
 </ul>
-<h3 id="2-common-failure-modes">2. Common Failure Modes<a class="headerlink" href="#2-common-failure-modes" title="Permanent link">&para;</a></h3>
+<h3 id="when-not-to-use">When NOT to Use<a class="headerlink" href="#when-not-to-use" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Count of each failure type (missing frontmatter, banned phrases, unsourced stats, etc.)</li>
-<li>Top 3 failure modes per week</li>
-<li>Trend: are specific failures increasing or decreasing?</li>
+<li>For infrastructure/code quality metrics — that's <code>scripts/quality_dashboard.py</code></li>
+<li>For individual article scoring — that's <code>article-evaluation</code></li>
+<li>For defect root-cause analysis — that's <code>defect-prevention</code></li>
 </ul>
-<h3 id="3-quality-score-trends">3. Quality Score Trends<a class="headerlink" href="#3-quality-score-trends" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Average total eval score per week (from <code>logs/article_evals.json</code>)</li>
-<li>Average per-dimension scores (opening, evidence, voice, structure, engagement)</li>
-<li>Min/max scores per week</li>
-<li>Trend direction: improving, stable, or degrading</li>
-</ul>
-<h3 id="4-revision-loop-frequency">4. Revision Loop Frequency<a class="headerlink" href="#4-revision-loop-frequency" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Average retries per article</li>
-<li>Percentage of articles needing 0, 1, or 2 revisions</li>
-<li>What triggers revisions most (gate failures, validation failures, or both)</li>
-</ul>
-<h2 id="data-sources">Data Sources<a class="headerlink" href="#data-sources" title="Permanent link">&para;</a></h2>
-<ul>
-<li><code>logs/article_evals.json</code> — per-article evaluation scores (Story #116)</li>
-<li><code>logs/pipeline_runs.json</code> — pipeline execution metadata (to be created)</li>
-<li>GitHub Issues labeled <code>editorial-judge</code> — post-deployment failures</li>
-</ul>
-<h2 id="dashboard-schema">Dashboard Schema<a class="headerlink" href="#dashboard-schema" title="Permanent link">&para;</a></h2>
-<p>Output to <code>logs/quality_dashboard.json</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;generated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-04-04T12:00:00Z&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="nt">&quot;total_articles&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="nt">&quot;first_attempt_publish_rate&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.80</span><span class="p">,</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="nt">&quot;overall_publish_rate&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.93</span><span class="p">,</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="nt">&quot;avg_eval_score&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">43.2</span><span class="p">,</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="nt">&quot;avg_eval_percentage&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">86.4</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="nt">&quot;weekly_trends&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">      </span><span class="nt">&quot;week&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-W14&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">      </span><span class="nt">&quot;articles_generated&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">      </span><span class="nt">&quot;published&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">      </span><span class="nt">&quot;failed&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">      </span><span class="nt">&quot;avg_score&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">44.0</span><span class="p">,</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">      </span><span class="nt">&quot;avg_retries&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.33</span><span class="p">,</span>
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">      </span><span class="nt">&quot;top_failure_modes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">  </span><span class="p">],</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">  </span><span class="nt">&quot;dimension_trends&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">    </span><span class="nt">&quot;opening_quality&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">8.0</span><span class="p">,</span><span class="w"> </span><span class="mf">8.5</span><span class="p">,</span><span class="w"> </span><span class="mf">9.0</span><span class="p">],</span>
-<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">    </span><span class="nt">&quot;evidence_sourcing&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">7.0</span><span class="p">,</span><span class="w"> </span><span class="mf">8.0</span><span class="p">,</span><span class="w"> </span><span class="mf">8.5</span><span class="p">],</span>
-<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">    </span><span class="nt">&quot;voice_consistency&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">9.5</span><span class="p">,</span><span class="w"> </span><span class="mf">9.5</span><span class="p">,</span><span class="w"> </span><span class="mf">10.0</span><span class="p">],</span>
-<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="w">    </span><span class="nt">&quot;structure&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">8.0</span><span class="p">,</span><span class="w"> </span><span class="mf">9.0</span><span class="p">,</span><span class="w"> </span><span class="mf">9.0</span><span class="p">],</span>
-<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">    </span><span class="nt">&quot;visual_engagement&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">6.0</span><span class="p">,</span><span class="w"> </span><span class="mf">7.0</span><span class="p">,</span><span class="w"> </span><span class="mf">7.5</span><span class="p">]</span>
-<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="w">  </span><span class="nt">&quot;failure_mode_counts&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="w">    </span><span class="nt">&quot;missing_references&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
-<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="w">    </span><span class="nt">&quot;banned_phrases&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
-<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="w">    </span><span class="nt">&quot;missing_layout&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
-<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="w">    </span><span class="nt">&quot;image_not_found&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
-<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="w">  </span><span class="p">},</span>
-<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="w">  </span><span class="nt">&quot;alerts&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a><span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;degradation&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a><span class="w">      </span><span class="nt">&quot;dimension&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;visual_engagement&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a><span class="w">      </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Visual engagement scores dropped 20% over 3 weeks&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a><span class="w">      </span><span class="nt">&quot;severity&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;warn&quot;</span>
-<a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a><span class="w">  </span><span class="p">]</span>
-<a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a><span class="p">}</span>
+<h2 id="core-process">Core Process<a class="headerlink" href="#core-process" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>1. Pipeline run completes (success or failure)
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>   ↓
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>2. Read evaluation logs from logs/article_evals.json
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>   ↓
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>3. Compute weekly aggregates: pass rate, failure modes, dimension scores
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>   ↓
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>4. Append to logs/quality_dashboard.json
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>   ↓
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>5. Check alert thresholds
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>   ↓
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>6. If threshold breached → create GitHub issue with severity
 </code></pre></div>
-<h2 id="alert-thresholds">Alert Thresholds<a class="headerlink" href="#alert-thresholds" title="Permanent link">&para;</a></h2>
+<h3 id="metrics-tracked">Metrics Tracked<a class="headerlink" href="#metrics-tracked" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Metrics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Article pass rate</td>
+<td>First-attempt publish %, publish-after-revision %, total fail %</td>
+</tr>
+<tr>
+<td>Failure modes</td>
+<td>Count per type, top 3 per week, trend direction</td>
+</tr>
+<tr>
+<td>Quality scores</td>
+<td>Avg total per week, per-dimension averages, min/max</td>
+</tr>
+<tr>
+<td>Revision loops</td>
+<td>Avg retries per article, distribution (0/1/2 revisions)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="alert-thresholds">Alert Thresholds<a class="headerlink" href="#alert-thresholds" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -2619,26 +2616,63 @@ evaluation logs and produces a dashboard JSON updated after each pipeline run.</
 </tr>
 </tbody>
 </table>
-<h2 id="integration-points">Integration Points<a class="headerlink" href="#integration-points" title="Permanent link">&para;</a></h2>
+<h3 id="dashboard-output-schema">Dashboard Output Schema<a class="headerlink" href="#dashboard-output-schema" title="Permanent link">&para;</a></h3>
+<p>Output to <code>logs/quality_dashboard.json</code> — append-only, never delete historical data.</p>
+<h2 id="common-rationalizations">Common Rationalizations<a class="headerlink" href="#common-rationalizations" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Rationalization</th>
+<th>Reality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"We can eyeball quality from the articles"</td>
+<td>Degradation is gradual — you won't notice a 5% weekly decline until it's 30% down</td>
+</tr>
+<tr>
+<td>"The eval scores are good enough"</td>
+<td>Scores without trends are snapshots; only trends reveal whether you're improving or decaying</td>
+</tr>
+<tr>
+<td>"Alerts are noisy, let's remove them"</td>
+<td>Tune thresholds, don't remove alerting — silent failures are the most expensive</td>
+</tr>
+<tr>
+<td>"We'll check the dashboard when something breaks"</td>
+<td>By then you've shipped 3 bad articles; proactive monitoring catches the first one</td>
+</tr>
+</tbody>
+</table>
+<h2 id="red-flags">Red Flags<a class="headerlink" href="#red-flags" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Run after each pipeline execution in <code>content-pipeline.yml</code></li>
-<li>Reads from <code>logs/article_evals.json</code> (Story #116 output)</li>
+<li>Dashboard JSON not updated after a pipeline run</li>
+<li>Alert thresholds never triggered (too lenient) or always triggered (too strict)</li>
+<li>Metrics computed from LLM calls instead of deterministic log parsing</li>
+<li>Historical data deleted or overwritten instead of appended</li>
+<li>No weekly trend computation — only point-in-time snapshots</li>
+</ul>
+<h2 id="verification">Verification<a class="headerlink" href="#verification" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[ ] <code>logs/quality_dashboard.json</code> updated after each pipeline run — <strong>evidence</strong>: timestamp matches latest run</li>
+<li>[ ] Weekly aggregates computed from <code>logs/article_evals.json</code> — <strong>evidence</strong>: article count matches eval log entries</li>
+<li>[ ] Alert thresholds configured and tested with synthetic data</li>
+<li>[ ] Dashboard uses <code>orjson</code> for serialization, file-based storage only</li>
+<li>[ ] Graceful handling when log files don't exist (empty dashboard, no crash)</li>
+</ul>
+<h3 id="data-sources">Data Sources<a class="headerlink" href="#data-sources" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>logs/article_evals.json</code> — per-article evaluation scores</li>
+<li><code>logs/pipeline_runs.json</code> — pipeline execution metadata</li>
+<li>GitHub Issues labeled <code>editorial-judge</code> — post-deployment failures</li>
+</ul>
+<h3 id="integration-points">Integration Points<a class="headerlink" href="#integration-points" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Runs after each pipeline execution in <code>content-pipeline.yml</code></li>
 <li>Alerts create GitHub issues on economist-agents</li>
-<li>Dashboard JSON can be rendered by any frontend (future)</li>
-</ul>
-<h2 id="existing-code-to-reuse">Existing Code to Reuse<a class="headerlink" href="#existing-code-to-reuse" title="Permanent link">&para;</a></h2>
-<ul>
-<li><code>scripts/quality_dashboard.py</code> — existing quality scoring (code metrics, not article metrics)</li>
-<li><code>skills/quality_history.json</code> — historical quality scores (infrastructure, not content)</li>
-<li><code>scripts/defect_tracker.py</code> — defect logging patterns</li>
-</ul>
-<h2 id="design-principles">Design Principles<a class="headerlink" href="#design-principles" title="Permanent link">&para;</a></h2>
-<ul>
-<li>All metrics are deterministic — derived from evaluation logs, not LLM</li>
-<li>Dashboard is append-only — never delete historical data</li>
-<li>Use <code>orjson</code> for serialization</li>
-<li>File-based storage (JSON) — no database dependency</li>
-<li>Fail gracefully if log files don't exist yet (empty dashboard)</li>
+<li><code>scripts/quality_dashboard.py</code> — existing code-quality scoring (separate concern)</li>
+<li><code>data/skills_state/quality_history.json</code> — historical quality scores (infrastructure)</li>
 </ul>
 
 
@@ -2646,6 +2680,9 @@ evaluation logs and produces a dashboard JSON updated after each pipeline run.</
 
 
 
+
+  
+  
 
 
 

@@ -31,7 +31,9 @@ class BadgeUpdater:
         self.repo_root = Path(__file__).parent.parent
         self.readme_path = self.repo_root / "README.md"
         self.quality_json_path = self.repo_root / "quality_score.json"
-        self.sprint_tracker_path = self.repo_root / "skills" / "sprint_tracker.json"
+        self.sprint_tracker_path = (
+            self.repo_root / "data" / "skills_state" / "sprint_tracker.json"
+        )
 
     def get_quality_score(self) -> int:
         """Get quality score from quality_dashboard.py"""

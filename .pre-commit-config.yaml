@@ -54,7 +54,7 @@ repos:
         entry: bash -c 'python3 scripts/validate_badges.py || true'
         language: system
         pass_filenames: false
-        files: ^(README\.md|quality_score\.json|skills/sprint_tracker\.json|.*_badge\.json)$
+        files: ^(README\.md|quality_score\.json|data/skills_state/sprint_tracker\.json|.*_badge\.json)$
         always_run: false
 
       # ADR governance lint (skills/adr-governance/SKILL.md)

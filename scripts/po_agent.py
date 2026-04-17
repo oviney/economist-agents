@@ -7,7 +7,7 @@ enabling autonomous sprint execution.
 
 Usage:
     python3 scripts/po_agent.py --request "Improve chart quality"
-    python3 scripts/po_agent.py --backlog skills/backlog.json
+    python3 scripts/po_agent.py --backlog data/skills_state/backlog.json
 """
 
 import argparse
@@ -117,7 +117,7 @@ If user request is unclear, generate partial story and populate escalations[] wi
 class ProductOwnerAgent:
     """Product Owner Agent for autonomous backlog refinement"""
 
-    def __init__(self, backlog_file: str = "skills/backlog.json"):
+    def __init__(self, backlog_file: str = "data/skills_state/backlog.json"):
         self.client = create_llm_client()
         self.backlog_file = Path(backlog_file)
         self.backlog = self._load_backlog()
@@ -394,8 +394,8 @@ def main():
     parser.add_argument("--request", help="User request to convert into user story")
     parser.add_argument(
         "--backlog",
-        default="skills/backlog.json",
-        help="Backlog file path (default: skills/backlog.json)",
+        default="data/skills_state/backlog.json",
+        help="Backlog file path (default: data/skills_state/backlog.json)",
     )
     parser.add_argument("--summary", action="store_true", help="Show backlog summary")
 

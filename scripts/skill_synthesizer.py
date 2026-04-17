@@ -25,7 +25,7 @@ Example:
     ✅ Identified 2 patterns:
        - quality_gates.editorial_gate_failure (HIGH severity)
        - data_verification.unverified_claims (MEDIUM severity)
-    💾 Saved patterns to skills/writer_agent_skills.json
+    💾 Saved patterns to data/skills_state/writer_agent_skills.json
 """
 
 import argparse

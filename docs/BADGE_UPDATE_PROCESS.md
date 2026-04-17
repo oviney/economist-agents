@@ -20,7 +20,7 @@ Automated badge synchronization from live data sources.
 |-------|--------|---------------|
 | **Quality Score** | `quality_dashboard.py` output | Auto-sync to `quality_score.json` |
 | **Test Count** | `grep '^def test_' tests/*.py` | Direct badge update |
-| **Sprint** | `skills/sprint_tracker.json` | Read `current_sprint` field |
+| **Sprint** | `data/skills_state/sprint_tracker.json` | Read `current_sprint` field |
 | **Coverage** | pytest-cov (future) | CI artifact |
 
 ## Manual Update
@@ -139,7 +139,7 @@ Badge markdown:
 ![Sprint](https://img.shields.io/badge/sprint-9-blue)
 ```
 
-Updated by: `update_badges.py` (reads `skills/sprint_tracker.json`)
+Updated by: `update_badges.py` (reads `data/skills_state/sprint_tracker.json`)
 
 ## Validation Checklist
 
@@ -168,7 +168,7 @@ Before committing badge changes:
 - Verify agent_metrics.json exists
 
 **Sprint badge wrong:**
-- Check `skills/sprint_tracker.json` → `current_sprint`
+- Check `data/skills_state/sprint_tracker.json` → `current_sprint`
 - Run `python3 scripts/sprint_ceremony_tracker.py --report`
 
 ## Future Enhancements

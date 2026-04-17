@@ -151,8 +151,8 @@ Output: User stories with acceptance criteria (ready for backlog)
 **Required Integrations**:
 1. **Google Analytics 4 API**: Blog traffic and engagement metrics
 2. **Google Search Console API**: SEO and search performance
-3. **skills/backlog.json**: Current backlog for context
-4. **skills/sprint_tracker.json**: Velocity and capacity data
+3. **data/skills_state/backlog.json**: Current backlog for context
+4. **data/skills_state/sprint_tracker.json**: Velocity and capacity data
 5. **User Input**: Suggestions and improvement ideas
 
 **Optional Integrations**:
@@ -271,7 +271,7 @@ python3 scripts/product_research_agent.py \
   --ga-property-id GA4-XXXXXX \
   --suggestions "Improve chart quality, Add newsletter" \
   --okrs-file docs/OKRS_2026.md \
-  --output skills/product_recommendations.json
+  --output data/skills_state/product_recommendations.json
 
 # Review specific user suggestion
 python3 scripts/product_research_agent.py \

@@ -188,7 +188,7 @@ def main():
 
     parser.add_argument(
         "--metrics-file",
-        help="Path to metrics file (default: skills/chart_metrics.json)",
+        help="Path to metrics file (default: data/skills_state/chart_metrics.json)",
     )
 
     args = parser.parse_args()

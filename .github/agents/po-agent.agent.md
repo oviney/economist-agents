@@ -125,16 +125,16 @@ As a [role], I need [capability], so that [business value]
 ## Integration with SM Agent
 
 **Handoff Protocol**:
-1. PO Agent generates stories → `skills/backlog.json`
+1. PO Agent generates stories → `data/skills_state/backlog.json`
 2. SM Agent validates DoR → signals PO Agent if gaps
 3. PO Agent refines → re-submits to SM Agent
 4. SM Agent accepts → begins sprint execution
 5. PO Agent monitors → escalates blockers to human PO
 
 **Shared Context**:
-- `skills/backlog.json` - Prioritized stories with AC
-- `skills/escalations.json` - Items needing human PO decision
-- `skills/sprint_tracker.json` - Current sprint status
+- `data/skills_state/backlog.json` - Prioritized stories with AC
+- `data/skills_state/escalations.json` - Items needing human PO decision
+- `data/skills_state/sprint_tracker.json` - Current sprint status
 
 ## Human Touch Points
 
@@ -164,8 +164,8 @@ INPUT: "We need to improve chart embedding validation"
 PO_AGENT: Parses → extracts intent → generates story
 
 # Historical data
-REFERENCE: skills/agent_metrics.json (velocity patterns)
-REFERENCE: skills/defect_tracker.json (quality patterns)
+REFERENCE: data/skills_state/agent_metrics.json (velocity patterns)
+REFERENCE: data/skills_state/defect_tracker.json (quality patterns)
 REFERENCE: SPRINT.md (completed story examples)
 ```
 

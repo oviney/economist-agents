@@ -154,7 +154,7 @@ git push origin main
 2. **DoS via Hanging Requests (B113)**: Without timeouts, requests can hang indefinitely, consuming resources and potentially crashing the application
 
 ### Related Documentation
-- Defect tracker: `skills/defect_tracker.json` (BUG-026, BUG-027 already logged)
+- Defect tracker: `data/skills_state/defect_tracker.json` (BUG-026, BUG-027 already logged)
 - Security scan config: `.github/workflows/ci.yml` (Security Scan step)
 - Pre-commit hooks: `.pre-commit-config.yaml` (local validation)
 

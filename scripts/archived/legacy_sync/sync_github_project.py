@@ -25,7 +25,7 @@ class GitHubProjectSync:
     def __init__(self, repo: str = "oviney/economist-agents"):
         self.repo = repo
         self.project_id = None
-        self.sprint_tracker_path = Path("skills/sprint_tracker.json")
+        self.sprint_tracker_path = Path("data/skills_state/sprint_tracker.json")
 
     def _run_gh(self, args: list[str]) -> tuple[str, int]:
         """Run gh CLI command and return output"""

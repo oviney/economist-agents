@@ -60,8 +60,8 @@ class EditorAgentDiagnostic:
         self.test_articles_dir = (
             Path(test_articles_dir) if test_articles_dir else Path("output")
         )
-        self.metrics_file = Path("skills/agent_metrics.json")
-        self.quality_history_file = Path("skills/quality_history.json")
+        self.metrics_file = Path("data/skills_state/agent_metrics.json")
+        self.quality_history_file = Path("data/skills_state/quality_history.json")
         self.findings = {}
 
     def analyze_historical_performance(self) -> dict:

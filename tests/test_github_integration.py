@@ -192,7 +192,7 @@ class GitHubIntegrationTests:
     # TEST 10: Integration with Existing Skills
     def test_skills_system_integration(self):
         """Verify sprint discipline skills are in skills system"""
-        with open("skills/blog_qa_skills.json") as f:
+        with open("data/skills_state/blog_qa_skills.json") as f:
             skills = json.load(f)
 
         assert "sprint_discipline" in skills["skills"], (

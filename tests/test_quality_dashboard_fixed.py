@@ -153,7 +153,7 @@ class TestDataConsistency:
 
     def test_sprint_history_file_exists(self):
         """Verify sprint_history.json exists with required data"""
-        history_file = Path("skills/sprint_history.json")
+        history_file = Path("data/skills_state/sprint_history.json")
         assert history_file.exists(), "sprint_history.json not found"
 
         with open(history_file) as f:
@@ -169,7 +169,7 @@ class TestDataConsistency:
 
     def test_agent_metrics_file_exists(self):
         """Verify agent_metrics.json exists and is valid"""
-        metrics_file = Path("skills/agent_metrics.json")
+        metrics_file = Path("data/skills_state/agent_metrics.json")
         assert metrics_file.exists(), "agent_metrics.json not found"
 
         with open(metrics_file) as f:

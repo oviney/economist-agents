@@ -191,7 +191,7 @@ This file tracks architectural improvements and technical debt identified throug
 **Files to Change**:
 - `scripts/economist_agent.py` - record visual QA results
 - `scripts/skills_manager.py` - add visual QA category
-- `skills/blog_qa_skills.json` - new category
+- `data/skills_state/blog_qa_skills.json` - new category
 
 **Metrics to Track**:
 - Charts generated: count

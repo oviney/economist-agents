@@ -75,7 +75,7 @@ class HybridApproachValidation:
                 "title": "Fix Dashboard Data Accuracy + Validation",
                 "human_work": [
                     "Identify that baseline fallback was the root cause",
-                    "Understand the data flow through skills/agent_metrics.json",
+                    "Understand the data flow through data/skills_state/agent_metrics.json",
                     "Make architectural decision about 'NO DATA' vs baseline",
                 ],
                 "automatable_work": [

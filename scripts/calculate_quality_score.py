@@ -13,7 +13,7 @@ Formula: (Coverage×0.4 + Pass Rate×0.3 + Docs×0.2 + Style×0.1) × 100
 Target: 90%+ quality score
 
 Historical Tracking:
-- Appends each run to skills/quality_history.json
+- Appends each run to data/skills_state/quality_history.json
 - Tracks trend over time (improving/stable/declining)
 - Enables quality dashboard visualization
 """

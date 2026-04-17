@@ -24,7 +24,9 @@ class BadgeValidator:
         self.repo_root = Path(__file__).parent.parent
         self.readme_path = self.repo_root / "README.md"
         self.quality_json_path = self.repo_root / "quality_score.json"
-        self.sprint_tracker_path = self.repo_root / "skills" / "sprint_tracker.json"
+        self.sprint_tracker_path = (
+            self.repo_root / "data" / "skills_state" / "sprint_tracker.json"
+        )
         self.issues: list[str] = []
 
     def validate_quality_badge(self) -> bool:
@@ -32,7 +34,7 @@ class BadgeValidator:
         try:
             # Get actual quality score
             result = subprocess.run(
-                [sys.executable, "scripts/quality_dashboard.py"],
+                [sys.executable, "scripts/quality_dashboard.py", "--no-save"],
                 cwd=self.repo_root,
                 capture_output=True,
                 text=True,

@@ -540,6 +540,11 @@ def main():
     parser.add_argument(
         "--show-history", action="store_true", help="Show sprint history"
     )
+    parser.add_argument(
+        "--no-save",
+        action="store_true",
+        help="Print report without writing QUALITY_DASHBOARD.md",
+    )
     args = parser.parse_args()
 
     dashboard = QualityDashboard()
@@ -568,13 +573,14 @@ def main():
         print("=" * 60 + "\n")
 
     # Generate and display dashboard
-    print(dashboard.generate_dashboard())
+    report = dashboard.generate_dashboard()
+    print(report)
 
-    # Save to file
-    output_file = Path(__file__).parent.parent / "docs" / "QUALITY_DASHBOARD.md"
-    with open(output_file, "w") as f:
-        f.write(dashboard.generate_dashboard())
-    print(f"\n💾 Dashboard saved to {output_file}")
+    if not args.no_save:
+        output_file = Path(__file__).parent.parent / "docs" / "QUALITY_DASHBOARD.md"
+        with open(output_file, "w") as f:
+            f.write(report)
+        print(f"\n💾 Dashboard saved to {output_file}")
 
 
 if __name__ == "__main__":

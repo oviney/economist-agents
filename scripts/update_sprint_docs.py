@@ -23,10 +23,10 @@ from pathlib import Path
 
 def get_current_sprint_status():
     """Read current sprint status from sprint_history.json"""
-    history_file = Path("skills/sprint_history.json")
+    history_file = Path("data/skills_state/sprint_history.json")
 
     if not history_file.exists():
-        print("❌ skills/sprint_history.json not found")
+        print("❌ data/skills_state/sprint_history.json not found")
         return None
 
     with open(history_file) as f:
@@ -52,7 +52,7 @@ def get_current_sprint_status():
 
 def get_open_bugs():
     """Read open bugs from defect_tracker.json"""
-    tracker_file = Path("skills/defect_tracker.json")
+    tracker_file = Path("data/skills_state/defect_tracker.json")
 
     if not tracker_file.exists():
         return []

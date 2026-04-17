@@ -17,7 +17,7 @@ from pathlib import Path
 def generate_sprint_badge(output_path: Path = None) -> dict:
     """Generate sprint badge JSON from sprint_tracker.json"""
     repo_root = Path(__file__).parent.parent
-    tracker_path = repo_root / "skills" / "sprint_tracker.json"
+    tracker_path = repo_root / "data" / "skills_state" / "sprint_tracker.json"
 
     try:
         with open(tracker_path) as f:

@@ -377,7 +377,7 @@ Agent Memory (skills/*.json) → sync_copilot_context.py → .github/copilot-ins
 ```
 
 **Automatic Sync**: GitHub Actions workflow runs on:
-- Push to `skills/defect_tracker.json`, `skills/blog_qa_skills.json`, or `docs/ARCHITECTURE_PATTERNS.md`
+- Push to `data/skills_state/defect_tracker.json`, `data/skills_state/blog_qa_skills.json`, or `docs/ARCHITECTURE_PATTERNS.md`
 - Weekly schedule (Sundays at midnight UTC)
 - Manual dispatch from Actions tab
 
@@ -393,7 +393,7 @@ All badges use shields.io with dynamic JSON endpoints to prevent staleness (BUG-
 |-------|--------|----------------|
 | **Quality Score** | `quality_dashboard.py` output | Automated via `quality_score.json` |
 | **Tests** | Actual pytest test count | `python3 scripts/generate_tests_badge.py` |
-| **Sprint** | `skills/sprint_tracker.json` | `python3 scripts/generate_sprint_badge.py` |
+| **Sprint** | `data/skills_state/sprint_tracker.json` | `python3 scripts/generate_sprint_badge.py` |
 | **Coverage** | pytest-cov output | `python3 scripts/generate_coverage_badge.py` |
 
 ### Badge Validation

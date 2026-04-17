@@ -311,11 +311,11 @@ See [`docs/ARCHITECTURE_PATTERNS.md`](docs/ARCHITECTURE_PATTERNS.md) for the ful
 
 ## 📚 Contributing to the Public Skills Library
 
-The `skills/public/` directory is an open, community-maintained library of generic
+The `agents/skills_configs/` directory is an open, community-maintained library of generic
 agent definitions.  Contributing a new agent or improving an existing one is one of
 the most impactful ways to help the wider agentic-AI community.
 
-### What belongs in `skills/public/`
+### What belongs in `agents/skills_configs/`
 
 A public skills library agent should be:
 
@@ -326,7 +326,7 @@ A public skills library agent should be:
 
 ### Step-by-step: adding a new public agent
 
-1. **Create your YAML file** in `skills/public/<agent-name>.yaml`.
+1. **Create your YAML file** in `agents/skills_configs/<agent-name>.yaml`.
    Follow the schema defined in `agents/schema.json`.
 
 2. **Include all required fields** (example for a "Fact Checker" agent):
@@ -364,7 +364,7 @@ A public skills library agent should be:
    python3 -c "
    import yaml, json, jsonschema
    schema = json.load(open('agents/schema.json'))
-   agent  = yaml.safe_load(open('skills/public/fact-checker.yaml'))
+   agent  = yaml.safe_load(open('agents/skills_configs/fact-checker.yaml'))
    jsonschema.validate(agent, schema)
    print('Valid')
    "
@@ -379,7 +379,7 @@ A public skills library agent should be:
 
 ```markdown
 ## Summary
-Adding [Agent Name] to skills/public/.
+Adding [Agent Name] to agents/skills_configs/.
 
 ## Agent Overview
 - **Role**: Short description
@@ -645,9 +645,9 @@ Skills are structured knowledge patterns stored in JSON files under `skills/`. E
 
 | File | Purpose |
 |------|---------|
-| `skills/blog_qa_skills.json` | Blog validation patterns — grows with each QA run |
-| `skills/defect_tracker.json` | Bug history with root-cause analysis |
-| `skills/copilot_behavior_patterns.json` | Anti-patterns for GitHub Copilot to avoid |
+| `data/skills_state/blog_qa_skills.json` | Blog validation patterns — grows with each QA run |
+| `data/skills_state/defect_tracker.json` | Bug history with root-cause analysis |
+| `data/skills_state/copilot_behavior_patterns.json` | Anti-patterns for GitHub Copilot to avoid |
 | `skills/python-quality/SKILL.md` | Python coding standards (type hints, docstrings, `orjson`) |
 | `skills/testing/SKILL.md` | TDD workflow and coverage requirements |
 | `skills/economist-writing/SKILL.md` | Economist voice and style rules |
@@ -667,7 +667,7 @@ python3 scripts/blog_qa_agent.py --blog-dir /path/to/blog --show-skills
 Each run:
 1. **Applies** known patterns to catch issues faster
 2. **Records** new patterns when novel issues are detected
-3. **Persists** knowledge to `skills/blog_qa_skills.json` for future runs
+3. **Persists** knowledge to `data/skills_state/blog_qa_skills.json` for future runs
 
 ### Adding New Patterns
 
@@ -676,7 +676,7 @@ When you fix a recurring bug, persist the knowledge so it won't regress:
 ```python
 from scripts.skills_manager import SkillsManager
 
-manager = SkillsManager("skills/blog_qa_skills.json")
+manager = SkillsManager("data/skills_state/blog_qa_skills.json")
 manager.learn_pattern(
     category="content_quality",
     issue="missing_chart_embed",

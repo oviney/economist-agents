@@ -1017,7 +1017,7 @@ python3 scripts/agent_registry.py scrum-master
 ps aux | grep "python.*agent" | grep -v grep
 
 # View agent status signals
-cat skills/agent_status.json
+cat data/skills_state/agent_status.json
 ```
 
 ---

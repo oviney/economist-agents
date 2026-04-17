@@ -273,7 +273,7 @@ def measure_sm_agent():
     print()
 
     # Save results
-    output_file = "skills/sm_agent_test_metrics.json"
+    output_file = "data/skills_state/sm_agent_test_metrics.json"
     with open(output_file, "w") as f:
         json.dump(results, f, indent=2)
     print(f"📝 Results saved: {output_file}")

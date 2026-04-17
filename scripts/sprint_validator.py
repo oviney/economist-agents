@@ -29,7 +29,7 @@ class SprintValidator:
 
     def __init__(self, sprint_file: str = "SPRINT.md"):
         self.sprint_file = Path(sprint_file)
-        self.skills_file = Path("skills/blog_qa_skills.json")
+        self.skills_file = Path("data/skills_state/blog_qa_skills.json")
         self.violations = []
 
         if not self.sprint_file.exists():

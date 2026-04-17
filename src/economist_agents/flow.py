@@ -14,6 +14,7 @@ Usage:
     result = flow.kickoff()
 """
 
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -71,7 +72,13 @@ class EconomistContentFlow(Flow):
         # Retry once if scout returns empty (LLM JSON parsing can fail)
         raw_topics: list[dict[str, Any]] = []
         for attempt in range(2):
-            raw_topics = scout_topics(client, focus_area=None)
+            raw_topics = scout_topics(
+                client,
+                focus_area=None,
+                allow_empty_archive=bool(
+                    os.environ.get("TOPIC_SCOUT_ALLOW_EMPTY_ARCHIVE", "").strip()
+                ),
+            )
             if raw_topics:
                 break
             print(

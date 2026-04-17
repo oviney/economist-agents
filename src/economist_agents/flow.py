@@ -546,9 +546,25 @@ class EconomistContentFlow(Flow):
         gates_passed = result.get("gates_passed", 0)
         edited_article = result.get("article", new_draft.get("article", ""))
 
-        # Apply summary→description fixup (same as quality_gate first pass).
+        # Apply the same frontmatter fixups as the first-pass quality_gate.
         if "summary:" in edited_article and "description:" not in edited_article:
             edited_article = edited_article.replace("summary:", "description:", 1)
+
+        # Patch image path to match the DALL-E output (Writer invents its own slug)
+        featured_image = self.state.get("article_draft", {}).get(
+            "featured_image", ""
+        )
+        if featured_image and edited_article.startswith("---"):
+            import re as _re_img
+
+            parts = edited_article.split("---", 2)
+            if len(parts) >= 3:
+                fm = parts[1]
+                if "image:" in fm:
+                    fm = _re_img.sub(r"image:.*", f"image: {featured_image}", fm)
+                else:
+                    fm = fm.rstrip() + f"\nimage: {featured_image}\n"
+                edited_article = "---" + fm + "---" + parts[2]
 
         self.state["quality_result"] = result
 

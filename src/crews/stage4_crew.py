@@ -375,9 +375,12 @@ class Stage4Crew:
 
     def _create_reviewer_agent(self) -> Agent:
         """Reviewer Agent — applies 5 quality gates."""
+        from src.crews.stage3_crew import _get_crewai_llm
+
         return Agent(
             role="Editorial Reviewer",
             goal="Apply 5 quality gates to ensure article meets Economist standards with >95% pass rate",
+            llm=_get_crewai_llm(),
             backstory="""You are a senior editorial reviewer at The Economist with 15 years experience.
 
 You enforce the publication's strict quality standards through 5 quality gates:

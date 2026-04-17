@@ -43,6 +43,7 @@ jobs:
       - name: Generate Article via Flow Pipeline
         id: generate
         env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           PYTHONPATH: ${{ github.workspace }}
           TOPIC_SCOUT_ALLOW_EMPTY_ARCHIVE: "1"
@@ -221,6 +222,7 @@ jobs:
         if: vars.BLOG_REPO_OWNER && vars.BLOG_REPO_NAME
         env:
           GH_TOKEN: ${{ secrets.BLOG_REPO_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           PYTHONPATH: ${{ github.workspace }}
         run: |

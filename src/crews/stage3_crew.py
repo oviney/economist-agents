@@ -1,4 +1,15 @@
+import os
+
 from crewai import Agent, Crew, Task
+
+
+def _get_crewai_llm() -> str:
+    """Return CrewAI LLM string, preferring Anthropic over OpenAI."""
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        return os.environ.get(
+            "CREWAI_LLM", "anthropic/claude-sonnet-4-20250514"
+        )
+    return os.environ.get("CREWAI_LLM", "gpt-4o")
 
 # Default prompt for Graphics Agent
 GRAPHICS_AGENT_PROMPT = """
@@ -109,25 +120,30 @@ Your gates:
 
 You provide explicit PASS/FAIL decisions with rationale for each gate."""
 
+        llm = _get_crewai_llm()
         self.research_agent = Agent(
             role="Research Analyst",
             goal="Gather, verify, and compile researched facts and sources to support article creation",
             backstory=research_backstory,
+            llm=llm,
         )
         self.writer_agent = Agent(
             role="Economist-style Writer",
             goal="Compose an Economist-style article based on researched data, following strict writing and style guidelines",
             backstory=writer_backstory,
+            llm=llm,
         )
         self.graphics_agent = Agent(
             role="Data Visualization Specialist",
             goal="Generate charts and visuals that adhere to layout zones, styles and export integrity requirements",
             backstory=graphics_backstory,
+            llm=llm,
         )
         self.editor_agent = Agent(
             role="Quality Editor",
             goal="Apply quality gates: review sourcing, voice, logical structure, and chart integration before approval",
             backstory=editor_backstory,
+            llm=llm,
         )
         self.agents = [
             self.research_agent,

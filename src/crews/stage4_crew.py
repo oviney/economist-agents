@@ -117,6 +117,66 @@ _BANNED_CLOSINGS: list[str] = [
 ]
 
 
+_CATEGORY_NORMALIZATION: dict[str, str] = {
+    "quality engineering": "quality-engineering",
+    "software engineering": "software-engineering",
+    "test automation": "test-automation",
+}
+
+
+def _normalize_category_casing(frontmatter: str) -> str:
+    """Normalize category values to kebab-case.
+
+    Only modifies the categories: line, not other frontmatter fields.
+
+    Args:
+        frontmatter: YAML frontmatter string (between --- delimiters).
+
+    Returns:
+        Frontmatter with categories normalized to kebab-case.
+    """
+    lines = frontmatter.split("\n")
+    for i, line in enumerate(lines):
+        if line.strip().startswith("categories:"):
+            for title_case, kebab in _CATEGORY_NORMALIZATION.items():
+                lines[i] = re.sub(
+                    re.escape(title_case), kebab, lines[i], flags=re.IGNORECASE
+                )
+            break
+    return "\n".join(lines)
+
+
+def _auto_embed_chart(article: str) -> str:
+    """Insert chart embed if chart_data referenced but no image embed found.
+
+    Looks for a chart file reference in frontmatter or text without a
+    corresponding ``![...](...chart...)`` markdown image. Inserts the embed
+    just before the References section (or at end of body).
+
+    Args:
+        article: Full article text with YAML frontmatter.
+
+    Returns:
+        Article with chart embed inserted if needed.
+    """
+    if "![" in article and "/assets/charts/" in article:
+        return article
+
+    slug_match = re.search(r"image:\s*/assets/images/([^.\s]+)", article)
+    if not slug_match:
+        return article
+
+    slug = slug_match.group(1)
+    chart_embed = f"\n![Chart](/assets/charts/{slug}.png)\n"
+
+    ref_match = re.search(r"\n## References", article)
+    if ref_match:
+        pos = ref_match.start()
+        return article[:pos] + chart_embed + article[pos:]
+
+    return article.rstrip() + "\n" + chart_embed
+
+
 def _apply_editorial_fixes(article: str, current_date: str | None = None) -> str:
     """Apply deterministic editorial fixes to an article.
 
@@ -183,7 +243,12 @@ def _apply_editorial_fixes(article: str, current_date: str | None = None) -> str
                 fm = "\nlayout: post" + fm
             if "categories:" not in fm:
                 fm = fm.rstrip() + '\ncategories: ["quality-engineering"]\n'
+            # 8b. Normalize category casing to kebab-case
+            fm = _normalize_category_casing(fm)
             text = "---" + fm + "---" + parts[2]
+
+    # 8c. Auto-embed chart if chart_data exists but embed missing
+    text = _auto_embed_chart(text)
 
     # 9. Clean up double spaces from phrase/placeholder removal
     text = re.sub(r"  +", " ", text)

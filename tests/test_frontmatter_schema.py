@@ -18,7 +18,7 @@ VALID_FRONTMATTER = {
     "title": "The Economics of Test Automation",
     "date": "2026-04-04",
     "author": "Ouray Viney",
-    "categories": ["Quality Engineering"],
+    "categories": ["quality-engineering"],
     "image": "/assets/images/test-automation.png",
     "description": "How test automation reshapes engineering economics",
 }

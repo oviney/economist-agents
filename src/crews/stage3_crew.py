@@ -16,16 +16,57 @@ if os.environ.get("ANTHROPIC_API_KEY"):
 
         _original_convert = _agent_utils.convert_tools_to_openai_schema
 
+        def _strip_strict(obj):  # type: ignore[no-untyped-def]
+            """Recursively remove 'strict' keys from nested dicts."""
+            if isinstance(obj, dict):
+                obj.pop("strict", None)
+                for v in obj.values():
+                    _strip_strict(v)
+            elif isinstance(obj, list):
+                for item in obj:
+                    _strip_strict(item)
+
         def _patched_convert(tools):  # type: ignore[no-untyped-def]
             openai_tools, funcs, mapping = _original_convert(tools)
             for tool_schema in openai_tools:
-                func = tool_schema.get("function", {})
-                func.pop("strict", None)
+                _strip_strict(tool_schema)
             return openai_tools, funcs, mapping
 
         _agent_utils.convert_tools_to_openai_schema = _patched_convert
+
+        # Also patch the Anthropic provider's tool conversion
+        try:
+            from crewai.llms.providers.anthropic import completion as _anth
+
+            _original_anth_convert = _anth.AnthropicCompletion._convert_tools_for_interference
+
+            def _patched_anth_convert(self, tools):  # type: ignore[no-untyped-def]
+                result = _original_anth_convert(self, tools)
+                for tool_schema in result:
+                    _strip_strict(tool_schema)
+                return result
+
+            _anth.AnthropicCompletion._convert_tools_for_interference = _patched_anth_convert
+        except (ImportError, AttributeError):
+            pass
+
+        # Also patch pydantic_schema_utils which sets strict on structured output
+        try:
+            import crewai.utilities.pydantic_schema_utils as _psu
+
+            _original_schema = _psu.model_to_response_format
+
+            def _patched_schema(model):  # type: ignore[no-untyped-def]
+                result = _original_schema(model)
+                _strip_strict(result)
+                return result
+
+            _psu.model_to_response_format = _patched_schema
+        except (ImportError, AttributeError):
+            pass
+
         logging.getLogger(__name__).info(
-            "Patched CrewAI convert_tools_to_openai_schema to remove strict mode"
+            "Patched CrewAI tool schemas to remove strict mode for Anthropic"
         )
     except Exception as exc:
         logging.getLogger(__name__).warning(

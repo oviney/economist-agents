@@ -151,6 +151,36 @@ def _normalize_category_casing(frontmatter: str) -> str:
     return "\n".join(lines)
 
 
+def _truncate_description(frontmatter: str, max_chars: int = 160) -> str:
+    """Truncate the description field to max_chars.
+
+    The publication validator rejects descriptions over 160 characters.
+    Truncates at the last word boundary and adds ellipsis.
+
+    Args:
+        frontmatter: YAML frontmatter string (between --- delimiters).
+        max_chars: Maximum allowed characters for description.
+
+    Returns:
+        Frontmatter with description truncated if needed.
+    """
+    match = re.search(
+        r'^(description:\s*["\']?)(.+?)(["\']?\s*)$',
+        frontmatter,
+        re.MULTILINE,
+    )
+    if not match:
+        return frontmatter
+
+    prefix, value, suffix = match.group(1), match.group(2), match.group(3)
+    if len(value) <= max_chars:
+        return frontmatter
+
+    # Truncate at last space before limit, add ellipsis
+    truncated = value[: max_chars - 3].rsplit(" ", 1)[0] + "..."
+    return frontmatter.replace(match.group(0), f"{prefix}{truncated}{suffix}")
+
+
 def _auto_embed_chart(article: str) -> str:
     """Insert chart embed if chart_data referenced but no image embed found.
 
@@ -326,6 +356,8 @@ def _apply_editorial_fixes(article: str, current_date: str | None = None) -> str
                 fm = fm.rstrip() + '\ncategories: ["quality-engineering"]\n'
             # 8b. Normalize category casing to kebab-case
             fm = _normalize_category_casing(fm)
+            # 8e. Truncate description to 160 chars (publication validator limit)
+            fm = _truncate_description(fm)
             text = "---" + fm + "---" + parts[2]
 
     # 8c. Auto-embed chart if chart_data exists but embed missing

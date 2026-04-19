@@ -281,5 +281,31 @@ class TestHeadingLimitEnforcement:
         assert len(body_headings) == 4
 
 
+class TestDescriptionTruncation:
+    """Description field truncation to 160 chars."""
+
+    def test_long_description_truncated(self) -> None:
+        desc = "A" * 200
+        article = f'---\ndescription: "{desc}"\n---\nBody'
+        result = _apply_editorial_fixes(article)
+        # Extract description from result
+        import re
+        match = re.search(r'description:\s*"([^"]+)"', result)
+        assert match is not None
+        assert len(match.group(1)) <= 160
+        assert match.group(1).endswith("...")
+
+    def test_short_description_unchanged(self) -> None:
+        article = '---\ndescription: "A short description."\n---\nBody'
+        result = _apply_editorial_fixes(article)
+        assert "A short description." in result
+
+    def test_exactly_160_unchanged(self) -> None:
+        desc = "A" * 160
+        article = f'---\ndescription: "{desc}"\n---\nBody'
+        result = _apply_editorial_fixes(article)
+        assert desc in result
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "--tb=short"])

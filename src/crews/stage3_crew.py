@@ -231,11 +231,23 @@ Your gates:
 You provide explicit PASS/FAIL decisions with rationale for each gate."""
 
         llm = _get_crewai_llm()
+
+        # Wire web search tools into the Research Agent so it fetches
+        # real sources instead of hallucinating from training data.
+        try:
+            from src.tools.research_tools import get_research_tools
+
+            research_tools = get_research_tools()
+        except ImportError:
+            research_tools = []
+            logger.warning("Research tools not available — agent will lack web search")
+
         self.research_agent = Agent(
             role="Research Analyst",
             goal="Gather, verify, and compile researched facts and sources to support article creation",
             backstory=research_backstory,
             llm=llm,
+            tools=research_tools,
         )
         self.writer_agent = Agent(
             role="Economist-style Writer",
@@ -263,11 +275,26 @@ You provide explicit PASS/FAIL decisions with rationale for each gate."""
         ]
 
     def _setup_tasks(self):
-        # Research task - gather & verify facts
+        # Research task — must use search tools for real sources
         self.research_task = Task(
-            description="Gather, verify, and compile researched facts and sources to support article creation for the topic: {topic}",
+            description="""Research the topic: {topic}
+
+YOU MUST USE YOUR TOOLS to find real sources. Do NOT cite any source from memory.
+
+MANDATORY STEPS:
+1. Use search_arxiv to find 2-3 recent academic papers on this topic
+2. Use search_google to find 2-3 industry reports, company blog posts, or practitioner content
+3. For each source found, record: Title, Author/Organisation, URL, Year, Key Finding (with specific numbers)
+4. ONLY include statistics that appear in tool results — do NOT invent or recall stats from memory
+
+OUTPUT FORMAT:
+For each source, use this exact format:
+- [Source Title](URL) by Author/Organisation, Year
+  Key finding: "Exact statistic or claim from the source"
+
+Include at least 5 sources with URLs. Every statistic must have a URL.""",
             agent=self.research_agent,
-            expected_output="A structured research report with verified facts, statistics, and properly attributed sources",
+            expected_output="A research brief with 5+ sources, each with: [Title](URL), Author, Year, and specific statistics from the source. Every stat must have a URL.",
         )
 
         # Writing task - write Economist-style article

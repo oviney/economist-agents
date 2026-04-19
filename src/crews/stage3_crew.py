@@ -234,6 +234,8 @@ You provide explicit PASS/FAIL decisions with rationale for each gate."""
 
         # Wire web search tools into the Research Agent so it fetches
         # real sources instead of hallucinating from training data.
+        # Research Agent uses OpenAI because Anthropic doesn't support
+        # CrewAI's strict tool mode. Other agents use Claude (no tools).
         try:
             from src.tools.research_tools import get_research_tools
 
@@ -242,11 +244,17 @@ You provide explicit PASS/FAIL decisions with rationale for each gate."""
             research_tools = []
             logger.warning("Research tools not available — agent will lack web search")
 
+        research_llm = (
+            os.environ.get("CREWAI_LLM", "gpt-4o")
+            if research_tools
+            else llm
+        )
+
         self.research_agent = Agent(
             role="Research Analyst",
             goal="Gather, verify, and compile researched facts and sources to support article creation",
             backstory=research_backstory,
-            llm=llm,
+            llm=research_llm,
             tools=research_tools,
         )
         self.writer_agent = Agent(

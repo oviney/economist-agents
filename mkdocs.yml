@@ -75,6 +75,7 @@ nav:
     - ADR-0006 — Agent Framework Selection: adr/0006-agent-framework-selection.md
     - ADR-0007 — Content Intelligence Engine: adr/0007-content-intelligence-engine.md
     - ADR-0008 — Agent Skill Governance: adr/0008-agent-skill-governance.md
+    - ADR-0009 — Prompt-Only Image Generation: adr/0009-prompt-only-image-generation.md
 
   - Skills:
     - Agent Delegation: skills/agent-delegation/SKILL.md

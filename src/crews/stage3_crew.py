@@ -6,6 +6,33 @@ from typing import Any
 
 from crewai import Agent, Crew, Task
 
+# ── Patch CrewAI strict-tools for Anthropic compatibility ─────────
+# CrewAI hardcodes "strict": True in tool schemas (agent_utils.py:207)
+# which Anthropic's API rejects. Monkey-patch to remove it when using
+# Anthropic as the LLM provider.
+if os.environ.get("ANTHROPIC_API_KEY"):
+    try:
+        import crewai.utilities.agent_utils as _agent_utils
+
+        _original_convert = _agent_utils.convert_tools_to_openai_schema
+
+        def _patched_convert(tools):  # type: ignore[no-untyped-def]
+            openai_tools, funcs, mapping = _original_convert(tools)
+            for tool_schema in openai_tools:
+                func = tool_schema.get("function", {})
+                func.pop("strict", None)
+            return openai_tools, funcs, mapping
+
+        _agent_utils.convert_tools_to_openai_schema = _patched_convert
+        logging.getLogger(__name__).info(
+            "Patched CrewAI convert_tools_to_openai_schema to remove strict mode"
+        )
+    except Exception as exc:
+        logging.getLogger(__name__).warning(
+            "Failed to patch CrewAI strict tools: %s", exc
+        )
+# ──────────────────────────────────────────────────────────────────
+
 # Allow imports from scripts/ (citation_verifier lives there)
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "scripts"))
 
@@ -234,8 +261,6 @@ You provide explicit PASS/FAIL decisions with rationale for each gate."""
 
         # Wire web search tools into the Research Agent so it fetches
         # real sources instead of hallucinating from training data.
-        # Research Agent uses OpenAI because Anthropic doesn't support
-        # CrewAI's strict tool mode. Other agents use Claude (no tools).
         try:
             from src.tools.research_tools import get_research_tools
 
@@ -244,17 +269,11 @@ You provide explicit PASS/FAIL decisions with rationale for each gate."""
             research_tools = []
             logger.warning("Research tools not available — agent will lack web search")
 
-        research_llm = (
-            os.environ.get("CREWAI_LLM", "gpt-4o")
-            if research_tools
-            else llm
-        )
-
         self.research_agent = Agent(
             role="Research Analyst",
             goal="Gather, verify, and compile researched facts and sources to support article creation",
             backstory=research_backstory,
-            llm=research_llm,
+            llm=llm,
             tools=research_tools,
         )
         self.writer_agent = Agent(

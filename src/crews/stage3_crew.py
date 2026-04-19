@@ -460,6 +460,40 @@ Include ALL data points from the research (Market CAGR 23.2%, Adoption 30%, Time
         ]
 
     @staticmethod
+    def _build_research_brief(topic: str) -> str:
+        """Build a research brief from deterministic web searches.
+
+        Replaces the LLM Research Agent entirely. Searches arXiv and
+        Google, formats results into a structured brief that the Writer
+        can cite directly. No LLM involved — pure web search + formatting.
+
+        Args:
+            topic: The article topic.
+
+        Returns:
+            Formatted research brief with real URLs and source data.
+        """
+        raw = Stage3Crew._run_web_searches(topic)
+        if not raw:
+            return (
+                f"No web search results found for '{topic}'. "
+                f"Write the article using general knowledge but tag every "
+                f"statistic with [NEEDS SOURCE]."
+            )
+
+        brief = [
+            f"# Research Brief: {topic}",
+            f"",
+            f"The following sources were found via live web search.",
+            f"Use ONLY statistics and claims from these sources.",
+            f"If you need a statistic not listed below, tag it [NEEDS SOURCE].",
+            f"Do NOT invent statistics, researcher names, or URLs.",
+            f"",
+            raw,
+        ]
+        return "\n".join(brief)
+
+    @staticmethod
     def _run_web_searches(topic: str) -> str:
         """Run arXiv and Google searches deterministically.
 
@@ -526,44 +560,47 @@ Include ALL data points from the research (Market CAGR 23.2%, Adoption 30%, Time
     def kickoff(self) -> dict:
         from datetime import datetime
 
-        # ── Pre-crew web search (deterministic, not LLM-optional) ─────
-        # Call search tools directly so the Research Agent has real data.
-        # This is NOT optional — the LLM cannot be trusted to call tools.
-        web_research = self._run_web_searches(self.topic)
-        if web_research:
-            print(f"   🔎 Pre-crew web search: {len(web_research)} chars of real sources")
+        # ── Deterministic research: no LLM in the research path ───────
+        # The Research Agent LLM ignores injected data and hallucinate
+        # from training data. Replace it with deterministic web search +
+        # formatting. The LLM only runs for writing, graphics, and editing.
+        research_brief = self._build_research_brief(self.topic)
+        print(f"   🔎 Research brief: {len(research_brief)} chars from web search")
 
-        # Inject web search results into the research task description
-        if web_research:
-            self.research_task.description += (
-                f"\n\nWEB SEARCH RESULTS (use ONLY these sources — do NOT invent others):\n"
-                f"{web_research}"
-            )
+        # Remove research task from the crew — it's done deterministically.
+        # Writer task gets the research brief directly in its description.
+        self.writer_task.description = (
+            self.writer_task.description
+            + f"\n\nRESEARCH BRIEF (use ONLY these sources and statistics — "
+            f"do NOT invent any statistics, researcher names, or URLs):\n\n"
+            f"{research_brief}"
+        )
+        self.writer_task.context = []  # No longer depends on research task
 
-        # Initial input data with current_date for Writer Agent template
+        writer_crew_tasks = [self.writer_task, self.graphics_task, self.editor_task]
+        writer_crew_agents = [self.writer_agent, self.graphics_agent, self.editor_agent]
+
         inputs = {
             "topic": self.topic,
             "current_date": datetime.now().strftime("%Y-%m-%d"),
         }
 
-        # Execute the crew workflow with agents and tasks
-        crew = Crew(agents=self.agents, tasks=self.tasks)
+        crew = Crew(agents=writer_crew_agents, tasks=writer_crew_tasks)
         crew_output = crew.kickoff(inputs=inputs)
 
         # CrewAI returns CrewOutput object - extract task outputs
-        # Tasks execute in order: [0] research, [1] writer, [2] graphics, [3] editor
-        # We need writer output (index 1) for article and graphics output (index 2) for chart_data
-        if hasattr(crew_output, "tasks_output") and len(crew_output.tasks_output) >= 3:
-            research_output = crew_output.tasks_output[0].raw
-            writer_output = crew_output.tasks_output[1].raw
-            graphics_output = crew_output.tasks_output[2].raw
+        # Tasks execute in order: [0] writer, [1] graphics, [2] editor
+        # (Research task removed — done deterministically before crew)
+        if hasattr(crew_output, "tasks_output") and len(crew_output.tasks_output) >= 2:
+            writer_output = crew_output.tasks_output[0].raw
+            graphics_output = crew_output.tasks_output[1].raw
 
-            # ── Citation verification: check research URLs ────────────
+            # ── Citation verification: check URLs in research brief ───
             try:
                 from citation_verifier import verify_citations
 
                 research_data = self._parse_research_for_verification(
-                    research_output
+                    research_brief
                 )
                 if research_data.get("data_points"):
                     verified = verify_citations(research_data)
@@ -579,7 +616,7 @@ Include ALL data points from the research (Market CAGR 23.2%, Adoption 30%, Time
                 logger.warning("Citation verification failed: %s", exc)
 
             # ── Post-write stat audit: tag fabricated stats ───────────
-            writer_output = _audit_article_stats(writer_output, research_output)
+            writer_output = _audit_article_stats(writer_output, research_brief)
 
             # Parse graphics_output - if it's a JSON string, parse it to dict
             try:
@@ -596,12 +633,9 @@ Include ALL data points from the research (Market CAGR 23.2%, Adoption 30%, Time
             return {"article": writer_output, "chart_data": chart_data}
         else:
             # Fallback: use raw output as article, empty chart_data
-            return {
-                "article": str(crew_output.raw)
-                if hasattr(crew_output, "raw")
-                else str(crew_output),
-                "chart_data": {},
-            }
+            raw = str(crew_output.raw) if hasattr(crew_output, "raw") else str(crew_output)
+            raw = _audit_article_stats(raw, research_brief)
+            return {"article": raw, "chart_data": {}}
 
     @staticmethod
     def _parse_research_for_verification(

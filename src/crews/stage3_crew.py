@@ -1,6 +1,116 @@
+import logging
 import os
+import re
+import sys
+from typing import Any
 
 from crewai import Agent, Crew, Task
+
+# Allow imports from scripts/ (citation_verifier lives there)
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "scripts"))
+
+logger = logging.getLogger(__name__)
+
+
+# Regex for numeric claims: "41%", "$4.5 billion", "2.3 times", "156%", etc.
+_STAT_PATTERN = re.compile(
+    r"(\d+(?:\.\d+)?)\s*"
+    r"(%|per\s*cent|billion|million|thousand|trillion|fold|times\b|x\b)",
+    re.IGNORECASE,
+)
+
+
+def _extract_stats(text: str) -> list[str]:
+    """Extract numeric claims with surrounding context from text.
+
+    Returns a list of strings like "41% more bugs" — each is a stat
+    with ~5 words of context on each side for fuzzy matching.
+
+    Args:
+        text: Article or research text to scan.
+
+    Returns:
+        List of stat-with-context strings.
+    """
+    stats: list[str] = []
+    for match in _STAT_PATTERN.finditer(text):
+        start = max(0, match.start() - 60)
+        end = min(len(text), match.end() + 60)
+        context = text[start:end].strip()
+        # Collapse to single line for matching
+        context = re.sub(r"\s+", " ", context)
+        stats.append(context)
+    return stats
+
+
+def _audit_article_stats(
+    article: str, research_brief: str
+) -> str:
+    """Tag stats in the article that don't appear in the research brief.
+
+    Checks every individual numeric claim in the article body against the
+    research brief. Stats with no match are tagged [UNVERIFIED] so the
+    publication validator blocks them.
+
+    Args:
+        article: Full article text with YAML frontmatter.
+        research_brief: Raw research task output.
+
+    Returns:
+        Article with fabricated stats tagged [UNVERIFIED].
+    """
+    # Extract body (after frontmatter)
+    body = article
+    if article.strip().startswith("---"):
+        parts = article.split("---", 2)
+        if len(parts) >= 3:
+            body = parts[2]
+
+    # Find every individual stat in the body (not grouped by context)
+    stat_matches = list(_STAT_PATTERN.finditer(body))
+    if not stat_matches:
+        return article
+
+    norm_research = research_brief.lower()
+    tagged = article
+    fabricated_count = 0
+
+    # Track already-tagged positions to avoid double tagging
+    tagged_offsets: set[int] = set()
+
+    for match in stat_matches:
+        num_with_unit = match.group(0).strip()
+        # The raw number (e.g., "41") for matching
+        raw_num = match.group(1)
+        # Try matching with unit first (e.g., "41%"), then raw number
+        found = (num_with_unit.lower() in norm_research) or (
+            raw_num in norm_research
+        )
+
+        if not found and match.start() not in tagged_offsets:
+            # Tag this specific stat in the article
+            # Find it in the full article text (not just body) to tag it
+            pattern = re.compile(
+                re.escape(num_with_unit) + r"(?!\s*\[UNVERIFIED\])"
+            )
+            if pattern.search(tagged):
+                tagged = pattern.sub(
+                    f"{num_with_unit} [UNVERIFIED]", tagged, count=1
+                )
+                tagged_offsets.add(match.start())
+                fabricated_count += 1
+
+    if fabricated_count > 0:
+        logger.warning(
+            "Stat audit: tagged %d fabricated stat(s) as [UNVERIFIED]",
+            fabricated_count,
+        )
+        print(
+            f"   ⚠️  Stat audit: {fabricated_count} stat(s) not in "
+            f"research brief → tagged [UNVERIFIED]"
+        )
+
+    return tagged
 
 
 def _get_crewai_llm() -> str:
@@ -271,8 +381,32 @@ Include ALL data points from the research (Market CAGR 23.2%, Adoption 30%, Time
         # Tasks execute in order: [0] research, [1] writer, [2] graphics, [3] editor
         # We need writer output (index 1) for article and graphics output (index 2) for chart_data
         if hasattr(crew_output, "tasks_output") and len(crew_output.tasks_output) >= 3:
+            research_output = crew_output.tasks_output[0].raw
             writer_output = crew_output.tasks_output[1].raw
             graphics_output = crew_output.tasks_output[2].raw
+
+            # ── Citation verification: check research URLs ────────────
+            try:
+                from citation_verifier import verify_citations
+
+                research_data = self._parse_research_for_verification(
+                    research_output
+                )
+                if research_data.get("data_points"):
+                    verified = verify_citations(research_data)
+                    cv = verified.get("citation_verification", {})
+                    print(
+                        f"   🔍 Citation verification: "
+                        f"{cv.get('verified', 0)} verified, "
+                        f"{cv.get('failed', 0)} failed"
+                    )
+            except ImportError:
+                logger.info("citation_verifier not available — skipping")
+            except Exception as exc:
+                logger.warning("Citation verification failed: %s", exc)
+
+            # ── Post-write stat audit: tag fabricated stats ───────────
+            writer_output = _audit_article_stats(writer_output, research_output)
 
             # Parse graphics_output - if it's a JSON string, parse it to dict
             try:
@@ -284,7 +418,6 @@ Include ALL data points from the research (Market CAGR 23.2%, Adoption 30%, Time
                     else graphics_output
                 )
             except (json.JSONDecodeError, ValueError):
-                # If parsing fails, wrap as specification
                 chart_data = {"specification": graphics_output}
 
             return {"article": writer_output, "chart_data": chart_data}
@@ -296,3 +429,39 @@ Include ALL data points from the research (Market CAGR 23.2%, Adoption 30%, Time
                 else str(crew_output),
                 "chart_data": {},
             }
+
+    @staticmethod
+    def _parse_research_for_verification(
+        research_text: str,
+    ) -> dict[str, Any]:
+        """Parse research output into citation_verifier format.
+
+        Extracts URL+stat pairs from markdown-style research output.
+
+        Args:
+            research_text: Raw research task output.
+
+        Returns:
+            Dict with data_points list for verify_citations().
+        """
+        data_points: list[dict[str, Any]] = []
+
+        # Find markdown links: [text](url)
+        links = re.findall(r"\[([^\]]+)\]\((https?://[^)]+)\)", research_text)
+
+        for text, url in links:
+            # Look for stats near this link (within 200 chars before/after)
+            idx = research_text.find(url)
+            if idx == -1:
+                continue
+            window = research_text[max(0, idx - 200) : idx + 200]
+            stats = re.findall(r"\d+(?:\.\d+)?%", window)
+            stat_text = ", ".join(stats) if stats else text
+            data_points.append({
+                "url": url,
+                "stat": stat_text,
+                "source": text,
+                "verified": True,
+            })
+
+        return {"data_points": data_points}

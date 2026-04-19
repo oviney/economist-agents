@@ -327,6 +327,12 @@ class EconomistContentFlow(Flow):
         output_dir.mkdir(parents=True, exist_ok=True)
         image_path = str(output_dir / f"{slug}.png")
 
+        if not os.environ.get("OPENAI_API_KEY"):
+            print(
+                "   ⚠️  OPENAI_API_KEY not set — DALL-E image generation requires it "
+                "even when Claude is the primary LLM"
+            )
+
         print("🎨 Generating featured image...")
         try:
             generated = generate_featured_image(

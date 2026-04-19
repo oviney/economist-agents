@@ -1,8 +1,8 @@
 # ADR-0009: Prompt-Only Image Generation
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-04-19
-**Decision Maker:** Engineering Lead
+**Decision Maker:** Engineering Lead (oviney)
 **Supersedes:** None
 **Superseded by:** None
 

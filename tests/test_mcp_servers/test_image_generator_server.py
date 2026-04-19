@@ -17,6 +17,7 @@ from mcp_servers.image_generator_server import (
     DALLE_MAX_PROMPT_LENGTH,
     _build_dalle_prompt,
     generate_editorial_image,
+    generate_image_prompt,
     mcp,
 )
 
@@ -126,6 +127,57 @@ class TestBuildDallePrompt:
         prompt = _build_dalle_prompt(long_title, long_summary)
         assert isinstance(prompt, str)
         assert len(prompt) == DALLE_MAX_PROMPT_LENGTH
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# generate_image_prompt — ADR-0009 prompt-only workflow
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+class TestGenerateImagePrompt:
+    """Tests for the prompt-only MCP tool (ADR-0009 default)."""
+
+    @pytest.mark.unit
+    def test_returns_prompt_and_placeholder(self) -> None:
+        """Tool must return a dict with prompt, placeholder_image, and length."""
+        result = generate_image_prompt(
+            article_title="The Cost of Flaky Tests",
+            article_summary="QA teams spend 30% of time debugging.",
+        )
+        assert "prompt" in result
+        assert "placeholder_image" in result
+        assert "prompt_length" in result
+
+    @pytest.mark.unit
+    def test_placeholder_points_to_pending_asset(self) -> None:
+        """Placeholder path must match the documented ADR-0009 value."""
+        result = generate_image_prompt("Title", "Summary.")
+        assert result["placeholder_image"] == "/assets/images/pending-generation.svg"
+
+    @pytest.mark.unit
+    def test_prompt_length_matches_string_length(self) -> None:
+        """Reported prompt_length must equal len(prompt)."""
+        result = generate_image_prompt("Title", "Summary.")
+        assert result["prompt_length"] == len(result["prompt"])
+
+    @pytest.mark.unit
+    def test_does_not_call_openai(self) -> None:
+        """Tool must not invoke the OpenAI client — zero API cost."""
+        env = {k: v for k, v in os.environ.items() if k != "OPENAI_API_KEY"}
+        with (
+            patch.dict(os.environ, env, clear=True),
+            patch("openai.OpenAI") as mock_client_cls,
+        ):
+            generate_image_prompt("Title", "Summary.")
+            mock_client_cls.assert_not_called()
+
+    @pytest.mark.unit
+    def test_prompt_has_economist_style(self) -> None:
+        """Prompt must embed the Economist editorial style directives."""
+        result = generate_image_prompt("Title", "Summary.")
+        assert "#E3120B" in result["prompt"]
+        assert "human" in result["prompt"].lower()
+        assert "NO TEXT" in result["prompt"] or "ZERO text" in result["prompt"]
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -590,6 +642,15 @@ class TestMcpServerRegistration:
         assert "generate_editorial_image" in tool_names
 
     @pytest.mark.unit
+    def test_prompt_tool_registered(self) -> None:
+        """generate_image_prompt (ADR-0009) must be registered as an MCP tool."""
+        import asyncio
+
+        tools = asyncio.run(mcp.list_tools())
+        tool_names = [t.name for t in tools]
+        assert "generate_image_prompt" in tool_names
+
+    @pytest.mark.unit
     def test_tool_has_required_parameters(self) -> None:
         """Tool schema must expose article_title, article_summary, output_path."""
         import asyncio
@@ -600,3 +661,14 @@ class TestMcpServerRegistration:
         assert "article_title" in schema_props
         assert "article_summary" in schema_props
         assert "output_path" in schema_props
+
+    @pytest.mark.unit
+    def test_prompt_tool_schema(self) -> None:
+        """generate_image_prompt schema must expose article_title and article_summary."""
+        import asyncio
+
+        tools = asyncio.run(mcp.list_tools())
+        tool = next(t for t in tools if t.name == "generate_image_prompt")
+        schema_props = tool.inputSchema.get("properties", {})
+        assert "article_title" in schema_props
+        assert "article_summary" in schema_props

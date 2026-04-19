@@ -11,7 +11,8 @@ Every featured image must look like it was commissioned by The Economist's art d
 
 ## When to Use
 
-- Generating a DALL-E 3 featured image for an article
+- Generating an image prompt for manual generation (default, ADR-0009)
+- Generating a DALL-E 3 featured image for an article (opt-in, `IMAGE_GENERATION_MODE=api`)
 - Creating chart specifications for data-driven articles
 - Evaluating visual engagement scoring dimension
 - Debugging why images look generic or chart formatting is wrong
@@ -22,20 +23,56 @@ Every featured image must look like it was commissioned by The Economist's art d
 - For article scoring — that's `article-evaluation`
 - For non-editorial images (screenshots, diagrams, architecture charts)
 
+## Workflow Modes (ADR-0009)
+
+| Mode | Env Var | Behaviour | Cost |
+|------|---------|-----------|------|
+| Prompt-only (default) | `IMAGE_GENERATION_MODE` unset or `prompt` | Emits `image_prompt:` in article frontmatter; user generates image manually via ChatGPT UI / Midjourney before merging PR | $0.00 |
+| API (opt-in) | `IMAGE_GENERATION_MODE=api` | Calls DALL-E 3 via `generate_featured_image()`; saves PNG to `output/images/` | ~$0.08/image |
+
+### Manual Generation Steps (Prompt-Only Mode)
+
+1. Pipeline produces article PR with `image_prompt: \|` block in frontmatter and `image: /assets/images/pending-generation.svg`.
+2. Copy the `image_prompt:` value from frontmatter.
+3. Paste into ChatGPT UI (or Midjourney, etc.) to generate the image.
+4. Save the generated image to `assets/images/<slug>.png`.
+5. Update the frontmatter `image:` field to point to the new asset.
+6. Remove the `image_prompt:` field (optional — informational only).
+7. Merge the PR.
+
 ## Core Process
 
-### Featured Image Generation
+### Featured Image Generation (Prompt-Only — ADR-0009 default)
 
 ```
 1. Read article title, thesis, and tone
    ↓
-2. Construct DALL-E 3 prompt using template below
+2. Construct editorial prompt using template below
    ↓
-3. Generate at 1792x1024 (landscape, HD)
+3. Emit prompt in frontmatter as `image_prompt: |` block
    ↓
-4. Verify: no text in image, human element present, Economist palette
+4. Set frontmatter `image:` to /assets/images/pending-generation.svg
    ↓
-5. Save to assets/images/ and set frontmatter image field
+5. User pastes prompt into ChatGPT UI / Midjourney to generate image
+   ↓
+6. User verifies: no text, human element, Economist palette,
+   then replaces placeholder with uploaded asset before merge
+```
+
+### Featured Image Generation (API — opt-in)
+
+```
+1. Set IMAGE_GENERATION_MODE=api
+   ↓
+2. Read article title, thesis, and tone
+   ↓
+3. Construct DALL-E 3 prompt using template below
+   ↓
+4. Generate at 1792x1024 (landscape, HD)
+   ↓
+5. Verify: no text in image, human element present, Economist palette
+   ↓
+6. Save to assets/images/ and set frontmatter image field
 ```
 
 ### Chart Generation

@@ -2,15 +2,17 @@
 """
 Image Generator MCP Server
 
-Exposes DALL-E 3 editorial image generation as an MCP tool so that any
-agent in the pipeline can request an Economist-style illustration without
-knowing the underlying OpenAI API details.
+Exposes editorial image-prompt generation (and optional DALL-E 3 fallback)
+as MCP tools so that any agent in the pipeline can request an
+Economist-style illustration without knowing the underlying details.
+
+Per ADR-0009, ``generate_image_prompt`` is the default workflow: it
+returns the prompt for manual generation via free tools (ChatGPT UI,
+Midjourney). ``generate_editorial_image`` remains available for opt-in
+API-based generation and requires ``OPENAI_API_KEY``.
 
 Usage (stdio transport):
     python3 mcp_servers/image_generator_server.py
-
-Requires:
-    OPENAI_API_KEY environment variable
 """
 
 import base64
@@ -115,8 +117,10 @@ def _truncate_prompt(prompt: str, context: str = "DALL-E") -> str:
 mcp = FastMCP(
     name="image-generator",
     instructions=(
-        "Generates Economist-style editorial illustrations using DALL-E 3. "
-        "Requires the OPENAI_API_KEY environment variable."
+        "Generates Economist-style editorial illustration prompts (ADR-0009 default) "
+        "and, opt-in, DALL-E 3 images. Use generate_image_prompt to emit a prompt "
+        "for manual generation via free tools; use generate_editorial_image only "
+        "when automated DALL-E generation is required (requires OPENAI_API_KEY)."
     ),
 )
 
@@ -144,6 +148,37 @@ def _build_dalle_prompt(article_title: str, article_summary: str) -> str:
         "CRITICAL: ZERO text, words, letters, numbers, or symbols in the image."
     )
     return _truncate_prompt(prompt)
+
+
+@mcp.tool()
+def generate_image_prompt(
+    article_title: str,
+    article_summary: str,
+) -> dict:
+    """Generate an Economist-style image prompt without calling DALL-E (ADR-0009).
+
+    Returns the prompt for manual image generation via free tools (ChatGPT UI,
+    Midjourney, etc.) rather than paying ~$0.08/image for DALL-E. The prompt
+    uses the same editorial illustration template as ``generate_editorial_image``.
+
+    Args:
+        article_title: Headline or title of the article.
+        article_summary: 2–3 sentence summary describing the article's argument.
+
+    Returns:
+        A dictionary with keys:
+
+        - ``prompt`` (str): Full DALL-E-ready prompt for manual generation.
+        - ``placeholder_image`` (str): Placeholder path for frontmatter
+          ``image:`` field until the user uploads the generated image.
+        - ``prompt_length`` (int): Character count of the prompt.
+    """
+    prompt = _build_dalle_prompt(article_title, article_summary)
+    return {
+        "prompt": prompt,
+        "placeholder_image": "/assets/images/pending-generation.svg",
+        "prompt_length": len(prompt),
+    }
 
 
 @mcp.tool()

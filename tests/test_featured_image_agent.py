@@ -27,6 +27,7 @@ from featured_image_agent import (
     ECONOMIST_IMAGE_STYLE,
     create_image_prompt,
     generate_featured_image,
+    generate_prompt_only,
     test_generate_sample_images,
 )
 
@@ -402,6 +403,54 @@ class TestGenerateFeaturedImage:
 
         assert result == output_file
         assert Path(output_file).exists()
+
+
+# ===========================================================================
+# generate_prompt_only() — ADR-0009 prompt-only workflow
+# ===========================================================================
+
+
+class TestGeneratePromptOnly:
+    """Tests for the ADR-0009 prompt-only workflow."""
+
+    TOPIC = "The Economics of Flaky Tests"
+    SUMMARY = "QA teams spend 30% of time debugging unreliable tests."
+
+    def test_returns_dict_with_required_keys(self) -> None:
+        """Result must contain prompt, placeholder_image, and mood keys."""
+        result = generate_prompt_only(self.TOPIC, self.SUMMARY)
+        assert "prompt" in result
+        assert "placeholder_image" in result
+        assert "mood" in result
+
+    def test_prompt_matches_create_image_prompt_output(self) -> None:
+        """Emitted prompt must be identical to create_image_prompt output."""
+        result = generate_prompt_only(
+            self.TOPIC, self.SUMMARY, contrarian_angle="culture issue", mood="urgent"
+        )
+        expected = create_image_prompt(
+            self.TOPIC, self.SUMMARY, contrarian_angle="culture issue", mood="urgent"
+        )
+        assert result["prompt"] == expected
+
+    def test_placeholder_image_is_pending_generation(self) -> None:
+        """Placeholder image must point to the documented ADR-0009 path."""
+        result = generate_prompt_only(self.TOPIC, self.SUMMARY)
+        assert result["placeholder_image"] == "/assets/images/pending-generation.svg"
+
+    def test_does_not_call_dalle(self) -> None:
+        """Must not touch openai module — zero cost, no API key required."""
+        env = {k: v for k, v in os.environ.items() if k != "OPENAI_API_KEY"}
+        with patch.dict(os.environ, env, clear=True):
+            mock_openai = MagicMock()
+            with patch.dict(sys.modules, {"openai": mock_openai}):
+                generate_prompt_only(self.TOPIC, self.SUMMARY)
+            mock_openai.OpenAI.assert_not_called()
+
+    def test_mood_propagates_to_output(self) -> None:
+        """Mood value must round-trip in the returned dict."""
+        result = generate_prompt_only(self.TOPIC, self.SUMMARY, mood="satirical")
+        assert result["mood"] == "satirical"
 
 
 # ===========================================================================

@@ -27,6 +27,7 @@ from src.economist_agents.adapters import (
     PublicationValidator,
     create_llm_client,
     generate_featured_image,
+    generate_prompt_only,
     run_editorial_board,
     scout_topics,
 )
@@ -82,9 +83,7 @@ class EconomistContentFlow(Flow):
         except Exception as e:
             print(f"   ⚠️  Article evaluation failed: {e}")
 
-    def _research_unsourced_claims(
-        self, topic: str, feedback: str
-    ) -> str:
+    def _research_unsourced_claims(self, topic: str, feedback: str) -> str:
         """Run a targeted Research Agent pass to find sources for unsourced claims.
 
         Extracts sentences containing placeholder tags from the previous draft,
@@ -109,9 +108,7 @@ class EconomistContentFlow(Flow):
             return ""
 
         # Find sentences with placeholder tags
-        unsourced = _re.findall(
-            r"[^.]*\[NEEDS SOURCE\][^.]*\.", article
-        )
+        unsourced = _re.findall(r"[^.]*\[NEEDS SOURCE\][^.]*\.", article)
         if not unsourced:
             # Also check for generic "studies show" patterns
             unsourced = _re.findall(
@@ -317,39 +314,57 @@ class EconomistContentFlow(Flow):
         article = result.get("article", "")
         print(f"   ✅ Article generated: {len(article.split())} words")
 
-        # Generate featured image via DALL-E
+        # Generate image prompt for manual generation (ADR-0009).
+        # Opt-in DALL-E path retained via IMAGE_GENERATION_MODE=api for urgent
+        # articles; default "prompt" emits the prompt in frontmatter only.
         slug = topic.lower()
         for ch in " :?!,.'\"()":
             slug = slug.replace(ch, "-")
         slug = slug.strip("-")[:60]
 
-        output_dir = Path("output/images")
-        output_dir.mkdir(parents=True, exist_ok=True)
-        image_path = str(output_dir / f"{slug}.png")
+        image_mode = os.environ.get("IMAGE_GENERATION_MODE", "prompt").lower()
 
-        if not os.environ.get("OPENAI_API_KEY"):
-            print(
-                "   ⚠️  OPENAI_API_KEY not set — DALL-E image generation requires it "
-                "even when Claude is the primary LLM"
-            )
+        if image_mode == "api":
+            output_dir = Path("output/images")
+            output_dir.mkdir(parents=True, exist_ok=True)
+            image_path = str(output_dir / f"{slug}.png")
 
-        print("🎨 Generating featured image...")
-        try:
-            generated = generate_featured_image(
+            if not os.environ.get("OPENAI_API_KEY"):
+                print(
+                    "   ⚠️  OPENAI_API_KEY not set — DALL-E image generation requires it "
+                    "even when Claude is the primary LLM"
+                )
+
+            print("🎨 Generating featured image via DALL-E (opt-in api mode)...")
+            try:
+                generated = generate_featured_image(
+                    topic=topic,
+                    article_summary=article[:200],
+                    output_path=image_path,
+                )
+                if generated:
+                    result["featured_image"] = f"/assets/images/{slug}.png"
+                    result["featured_image_local"] = image_path
+                    print(f"   ✅ Featured image: {image_path}")
+                else:
+                    result["featured_image"] = "/assets/images/pending-generation.svg"
+                    print("   ℹ️  Using placeholder image")
+            except Exception as e:
+                result["featured_image"] = "/assets/images/pending-generation.svg"
+                print(f"   ℹ️  Image generation failed ({e}), using placeholder")
+        else:
+            # Prompt-only mode (default per ADR-0009): emit prompt for manual generation.
+            print("🎨 Generating image prompt (manual-generation mode)...")
+            prompt_result = generate_prompt_only(
                 topic=topic,
                 article_summary=article[:200],
-                output_path=image_path,
             )
-            if generated:
-                result["featured_image"] = f"/assets/images/{slug}.png"
-                result["featured_image_local"] = image_path
-                print(f"   ✅ Featured image: {image_path}")
-            else:
-                result["featured_image"] = "/assets/images/blog-default.svg"
-                print("   ℹ️  Using default image")
-        except Exception as e:
-            result["featured_image"] = "/assets/images/blog-default.svg"
-            print(f"   ℹ️  Image generation failed ({e}), using default")
+            result["featured_image"] = prompt_result["placeholder_image"]
+            result["image_prompt"] = prompt_result["prompt"]
+            print(
+                f"   ✅ Image prompt ready ({len(prompt_result['prompt'])} chars); "
+                "paste into ChatGPT/Midjourney before merging PR"
+            )
 
         return result
 
@@ -372,11 +387,12 @@ class EconomistContentFlow(Flow):
         self.state["article_draft"] = article_draft
 
         # Override image path with the actual generated path (the Writer Agent
-        # invents its own slug which won't match the DALL-E output filename)
+        # invents its own slug which won't match the generated output filename)
         article_text = article_draft.get("article", "")
         featured_image = article_draft.get(
-            "featured_image", "/assets/images/blog-default.svg"
+            "featured_image", "/assets/images/pending-generation.svg"
         )
+        image_prompt = article_draft.get("image_prompt", "")
         if article_text.startswith("---"):
             parts = article_text.split("---", 2)
             if len(parts) >= 3:
@@ -388,6 +404,14 @@ class EconomistContentFlow(Flow):
                     fm = _re.sub(r"image:.*", f"image: {featured_image}", fm)
                 else:
                     fm = fm.rstrip() + f"\nimage: {featured_image}\n"
+
+                # ADR-0009: Inject image_prompt as YAML block scalar so users can
+                # copy it into ChatGPT/Midjourney before merging the PR.
+                if image_prompt and "image_prompt:" not in fm:
+                    indented_prompt = "\n".join(
+                        f"  {line}" for line in image_prompt.splitlines()
+                    )
+                    fm = fm.rstrip() + f"\nimage_prompt: |\n{indented_prompt}\n"
 
                 # Fix Writer's persistent summary→description confusion.
                 # gpt-4o outputs "summary:" despite prompt saying "description:".
@@ -545,15 +569,19 @@ class EconomistContentFlow(Flow):
         is_sourcing_failure = any(
             kw in feedback_text.lower()
             for kw in (
-                "placeholder", "needs source", "unverified", "unsourced",
-                "source for the statistic", "named source", "evidence gate",
-                "sourced", "sourcing",
+                "placeholder",
+                "needs source",
+                "unverified",
+                "unsourced",
+                "source for the statistic",
+                "named source",
+                "evidence gate",
+                "sourced",
+                "sourcing",
             )
         )
         if is_sourcing_failure:
-            sourcing_supplement = self._research_unsourced_claims(
-                topic, feedback_text
-            )
+            sourcing_supplement = self._research_unsourced_claims(topic, feedback_text)
 
         enhanced_topic = (
             f"{topic}\n\n"
@@ -588,9 +616,7 @@ class EconomistContentFlow(Flow):
             edited_article = edited_article.replace("summary:", "description:", 1)
 
         # Patch image path to match the DALL-E output (Writer invents its own slug)
-        featured_image = self.state.get("article_draft", {}).get(
-            "featured_image", ""
-        )
+        featured_image = self.state.get("article_draft", {}).get("featured_image", "")
         if featured_image and edited_article.startswith("---"):
             import re as _re_img
 

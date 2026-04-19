@@ -168,6 +168,41 @@ CRITICAL: ZERO text, words, letters, numbers, or symbols in the image.
     return prompt
 
 
+def generate_prompt_only(
+    topic: str,
+    article_summary: str,
+    contrarian_angle: str = "",
+    mood: ImageMood = "contemplative",
+) -> dict[str, str]:
+    """
+    Generate an Economist-style image prompt without calling DALL-E (ADR-0009).
+
+    Produces the same prompt that ``generate_featured_image`` would send to
+    DALL-E, but returns it for manual image generation via free tools
+    (ChatGPT UI, Midjourney, etc.) rather than incurring the ~$0.08/image
+    DALL-E API cost.
+
+    Args:
+        topic: Article headline/title
+        article_summary: 2-3 sentence summary of article
+        contrarian_angle: The counterintuitive take (if available)
+        mood: Tonal direction — e.g. "satirical", "contemplative",
+              "urgent", "ironic", "wry" (default: "contemplative")
+
+    Returns:
+        Dict with keys:
+        - ``prompt`` (str): Full DALL-E-ready prompt for manual image generation
+        - ``placeholder_image`` (str): Placeholder image path for frontmatter
+        - ``mood`` (str): The mood used to generate the prompt
+    """
+    prompt = create_image_prompt(topic, article_summary, contrarian_angle, mood)
+    return {
+        "prompt": prompt,
+        "placeholder_image": "/assets/images/pending-generation.svg",
+        "mood": mood,
+    }
+
+
 def generate_featured_image(
     topic: str,
     article_summary: str,

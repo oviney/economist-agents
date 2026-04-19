@@ -463,6 +463,8 @@ class EconomistContentFlow(Flow):
             )
             self.state["revision_feedback"] = [i["message"] for i in critical]
             print(f"   Decision: REVISION ({len(critical)} critical validation issues)")
+            for ci in critical:
+                print(f"      ❌ {ci.get('check', 'unknown')}: {ci.get('message', '')}")
             return "revision"
 
         self.state["decision"] = "publish"
@@ -623,6 +625,8 @@ class EconomistContentFlow(Flow):
         print(
             f"   ⚠️  Revision still failing (score: {editorial_score}, issues: {len(critical)})"
         )
+        for ci in critical:
+            print(f"      ❌ {ci.get('check', 'unknown')}: {ci.get('message', '')}")
 
         # Persist quarantined article so it can be reviewed/fixed manually.
         import pathlib

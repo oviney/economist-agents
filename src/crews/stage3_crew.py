@@ -459,8 +459,86 @@ Include ALL data points from the research (Market CAGR 23.2%, Adoption 30%, Time
             self.editor_task,
         ]
 
+    @staticmethod
+    def _run_web_searches(topic: str) -> str:
+        """Run arXiv and Google searches deterministically.
+
+        Called before the crew runs so the Research Agent has real
+        sources to work with. Returns combined search results as text.
+
+        Args:
+            topic: The article topic to search for.
+
+        Returns:
+            Combined search results string, or empty string on failure.
+        """
+        results: list[str] = []
+
+        # arXiv search
+        try:
+            from arxiv_search import search_arxiv_for_topic
+
+            arxiv = search_arxiv_for_topic(topic, max_papers=5)
+            if arxiv.get("success"):
+                insights = arxiv.get("insights", {})
+                papers = insights.get("papers_analyzed", [])
+                if papers:
+                    results.append("## arXiv Papers")
+                    for p in papers[:5]:
+                        results.append(
+                            f"- [{p.get('title', 'Unknown')}]({p.get('url', '')})\n"
+                            f"  Authors: {p.get('authors', 'Unknown')}\n"
+                            f"  Published: {p.get('published', 'N/A')}\n"
+                            f"  Key finding: {p.get('key_insight', 'N/A')}"
+                        )
+        except Exception as e:
+            logger.warning("arXiv search failed: %s", e)
+
+        # Google search (requires SERPER_API_KEY)
+        try:
+            from google_search import search_google_for_topic
+
+            google = search_google_for_topic(topic, max_results=5)
+            if google.get("success"):
+                web = google.get("web_results", [])
+                if web:
+                    results.append("\n## Web Sources")
+                    for r in web[:5]:
+                        results.append(
+                            f"- [{r.get('title', 'Unknown')}]({r.get('link', '')})\n"
+                            f"  Snippet: {r.get('snippet', 'N/A')}\n"
+                            f"  Date: {r.get('date', 'N/A')}"
+                        )
+                scholar = google.get("scholar_results", [])
+                if scholar:
+                    results.append("\n## Google Scholar")
+                    for r in scholar[:5]:
+                        results.append(
+                            f"- [{r.get('title', 'Unknown')}]({r.get('link', '')})\n"
+                            f"  Year: {r.get('year', 'N/A')}\n"
+                            f"  Cited by: {r.get('cited_by', 'N/A')}"
+                        )
+        except Exception as e:
+            logger.warning("Google search failed: %s", e)
+
+        return "\n".join(results)
+
     def kickoff(self) -> dict:
         from datetime import datetime
+
+        # ── Pre-crew web search (deterministic, not LLM-optional) ─────
+        # Call search tools directly so the Research Agent has real data.
+        # This is NOT optional — the LLM cannot be trusted to call tools.
+        web_research = self._run_web_searches(self.topic)
+        if web_research:
+            print(f"   🔎 Pre-crew web search: {len(web_research)} chars of real sources")
+
+        # Inject web search results into the research task description
+        if web_research:
+            self.research_task.description += (
+                f"\n\nWEB SEARCH RESULTS (use ONLY these sources — do NOT invent others):\n"
+                f"{web_research}"
+            )
 
         # Initial input data with current_date for Writer Agent template
         inputs = {

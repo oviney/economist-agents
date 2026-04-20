@@ -114,71 +114,79 @@ def _extract_stats(text: str) -> list[str]:
 def _audit_article_stats(
     article: str, research_brief: str
 ) -> str:
-    """Tag stats in the article that don't appear in the research brief.
+    """Remove sentences with fabricated stats from the article.
 
-    Checks every individual numeric claim in the article body against the
-    research brief. Stats with no match are tagged [UNVERIFIED] so the
-    publication validator blocks them.
+    Checks every numeric claim in the article body against the research
+    brief. Sentences containing stats not in the research brief are
+    stripped entirely. Surrounding text is left intact so the article
+    reads coherently with fewer (but real) statistics.
 
     Args:
         article: Full article text with YAML frontmatter.
         research_brief: Raw research task output.
 
     Returns:
-        Article with fabricated stats tagged [UNVERIFIED].
+        Article with fabricated-stat sentences removed.
     """
-    # Extract body (after frontmatter)
-    body = article
     if article.strip().startswith("---"):
         parts = article.split("---", 2)
         if len(parts) >= 3:
+            frontmatter = "---" + parts[1] + "---"
             body = parts[2]
+        else:
+            return article
+    else:
+        frontmatter = ""
+        body = article
 
-    # Find every individual stat in the body (not grouped by context)
-    stat_matches = list(_STAT_PATTERN.finditer(body))
-    if not stat_matches:
-        return article
+    # Don't touch References section
+    ref_match = re.search(r"\n## References", body)
+    if ref_match:
+        pre_refs = body[: ref_match.start()]
+        refs_section = body[ref_match.start() :]
+    else:
+        pre_refs = body
+        refs_section = ""
 
+    # Split into sentences and check each
     norm_research = research_brief.lower()
-    tagged = article
-    fabricated_count = 0
+    sentences = re.split(r"(?<=[.!?])\s+", pre_refs)
+    kept: list[str] = []
+    removed_count = 0
 
-    # Track already-tagged positions to avoid double tagging
-    tagged_offsets: set[int] = set()
+    for sentence in sentences:
+        # Find stats in this sentence
+        stats_in_sentence = list(_STAT_PATTERN.finditer(sentence))
+        if not stats_in_sentence:
+            kept.append(sentence)
+            continue
 
-    for match in stat_matches:
-        num_with_unit = match.group(0).strip()
-        # The raw number (e.g., "41") for matching
-        raw_num = match.group(1)
-        # Try matching with unit first (e.g., "41%"), then raw number
-        found = (num_with_unit.lower() in norm_research) or (
-            raw_num in norm_research
-        )
+        # Check if ANY stat in this sentence is fabricated
+        has_fabricated = False
+        for match in stats_in_sentence:
+            num_with_unit = match.group(0).strip().lower()
+            raw_num = match.group(1)
+            if num_with_unit not in norm_research and raw_num not in norm_research:
+                has_fabricated = True
+                break
 
-        if not found and match.start() not in tagged_offsets:
-            # Tag this specific stat in the article
-            # Find it in the full article text (not just body) to tag it
-            pattern = re.compile(
-                re.escape(num_with_unit) + r"(?!\s*\[UNVERIFIED\])"
-            )
-            if pattern.search(tagged):
-                tagged = pattern.sub(
-                    f"{num_with_unit} [UNVERIFIED]", tagged, count=1
-                )
-                tagged_offsets.add(match.start())
-                fabricated_count += 1
+        if has_fabricated:
+            removed_count += 1
+        else:
+            kept.append(sentence)
 
-    if fabricated_count > 0:
+    if removed_count > 0:
         logger.warning(
-            "Stat audit: tagged %d fabricated stat(s) as [UNVERIFIED]",
-            fabricated_count,
+            "Stat audit: removed %d sentence(s) with fabricated stats",
+            removed_count,
         )
         print(
-            f"   ⚠️  Stat audit: {fabricated_count} stat(s) not in "
-            f"research brief → tagged [UNVERIFIED]"
+            f"   🔪 Stat audit: removed {removed_count} sentence(s) with "
+            f"unverified stats"
         )
 
-    return tagged
+    cleaned_body = " ".join(kept) + refs_section
+    return frontmatter + cleaned_body
 
 
 def _get_crewai_llm() -> str:

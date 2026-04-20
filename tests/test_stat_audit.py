@@ -40,17 +40,18 @@ class TestExtractStats:
 
 
 class TestAuditArticleStats:
-    """_audit_article_stats() tags fabricated stats."""
+    """_audit_article_stats() removes sentences with fabricated stats."""
 
-    def test_fabricated_stat_tagged_unverified(self) -> None:
+    def test_fabricated_stat_sentence_removed(self) -> None:
         research = "Teams report a 23% improvement in deployment speed."
         article = (
             "---\ntitle: Test\n---\n"
-            "The study found a 41% increase in bugs after AI adoption."
+            "The study found a 41% increase in bugs after AI adoption. "
+            "This is a clean sentence."
         )
         result = _audit_article_stats(article, research)
-        assert "[UNVERIFIED]" in result
-        assert "41%" in result
+        assert "41%" not in result
+        assert "clean sentence" in result
 
     def test_verified_stat_passes_cleanly(self) -> None:
         research = "Carnegie Mellon found a 41% increase in bugs."
@@ -59,7 +60,7 @@ class TestAuditArticleStats:
             "Researchers documented a 41% increase in production bugs."
         )
         result = _audit_article_stats(article, research)
-        assert "[UNVERIFIED]" not in result
+        assert "41%" in result
 
     def test_multiple_stats_mixed(self) -> None:
         research = "Adoption reached 68% according to the survey."
@@ -69,36 +70,38 @@ class TestAuditArticleStats:
             "Meanwhile, bugs increased by 156% in the first year."
         )
         result = _audit_article_stats(article, research)
-        # 68% is in research — should not be tagged
+        # 68% is in research — sentence kept
         assert "68%" in result
-        assert "68% [UNVERIFIED]" not in result
-        # 156% is NOT in research — should be tagged
-        assert "156% [UNVERIFIED]" in result
+        # 156% is NOT in research — sentence removed
+        assert "156%" not in result
 
     def test_no_stats_in_article_returns_unchanged(self) -> None:
         research = "Some research data here with 50% stats."
         article = "---\ntitle: Test\n---\nThis article has no numbers."
         result = _audit_article_stats(article, research)
-        assert result == article
+        assert "no numbers" in result
 
-    def test_frontmatter_stats_not_audited(self) -> None:
-        """Stats in frontmatter (like dates) should not be tagged."""
+    def test_frontmatter_preserved(self) -> None:
         research = "No matching stats here."
         article = (
             "---\ntitle: Test\ndate: 2026-04-17\n---\n"
             "The body has no numeric claims."
         )
         result = _audit_article_stats(article, research)
-        assert "[UNVERIFIED]" not in result
+        assert "title: Test" in result
+        assert "date: 2026-04-17" in result
 
-    def test_already_tagged_not_double_tagged(self) -> None:
-        research = "No matching stats."
+    def test_references_section_preserved(self) -> None:
+        research = "Adoption reached 50% globally."
         article = (
             "---\ntitle: Test\n---\n"
-            "The rate was 75% [UNVERIFIED] according to sources."
+            "Adoption reached 50% globally.\n\n"
+            "## References\n\n"
+            "1. Study with 99% accuracy claim"
         )
         result = _audit_article_stats(article, research)
-        assert result.count("[UNVERIFIED]") == 1
+        assert "## References" in result
+        assert "99%" in result  # References not audited
 
 
 class TestParseResearchForVerification:

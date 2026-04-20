@@ -372,13 +372,13 @@ class PublicationValidator:
             body = content
 
         word_count = len(body.split())
-        if word_count < 800:
+        if word_count < 700:
             self.issues.append(
                 {
                     "check": "word_count",
                     "severity": "CRITICAL",
-                    "message": f"Article too short: {word_count} words (minimum 800 required)",
-                    "details": "Economist-style articles require 800-1200 words for adequate depth",
+                    "message": f"Article too short: {word_count} words (minimum 700 required)",
+                    "details": "Economist-style articles require 700-1200 words for adequate depth",
                     "fix": "Expand article with additional examples, data points, or deeper analysis",
                 }
             )

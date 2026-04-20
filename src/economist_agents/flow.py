@@ -32,8 +32,12 @@ from src.economist_agents.adapters import (
 )
 from src.tools.topic_deduplicator import TopicDeduplicator
 
-# Editorial score threshold (0-100 scale) for publication
-PUBLISH_THRESHOLD = 80
+# Editorial score threshold (0-100 scale) for publication.
+# Lowered from 80 to 70: the Stage4 LLM reviewer is unreliable with
+# Claude (JSON parse failures produce artificially low scores). The
+# deterministic article evaluator and publication validator are the
+# real quality gates.
+PUBLISH_THRESHOLD = 70
 MAX_REVISIONS = 2
 
 

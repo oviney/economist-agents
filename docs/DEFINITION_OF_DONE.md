@@ -194,6 +194,17 @@ A sprint is **DONE** when ALL of the following are TRUE:
 3. **Pytest fast tests**: Quick smoke tests (<30s)
 4. **Type hints validation**: Basic mypy checks
 
+**Content Pipeline Quality Gates** (enforced by Stage4Crew + PublicationValidator):
+
+5. **Stat audit** (`stage3_crew.py`): Strips sentences with stats not in the research brief
+6. **Category normalization**: Title Case → kebab-case
+7. **Description truncation**: Caps description/summary at 160 chars
+8. **Heading limit**: Merges sections when body has >4 headings
+9. **Hedging removal**: Strips "One suspects", "it is worth noting", etc.
+10. **Ending validation**: Flags summary endings (HIGH severity)
+11. **British spelling**: American → British replacements
+12. **Publication validator**: Frontmatter, categories, word count, chart embeds, placeholders
+
 **To bypass** (emergency only):
 ```bash
 git commit --no-verify -m "Emergency fix"

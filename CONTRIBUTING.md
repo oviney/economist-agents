@@ -36,7 +36,10 @@ Thank you for your interest in contributing to the Economist-Agents project! Thi
 4. **Configure environment:**
    ```bash
    cp .env.example .env
-   # Edit .env with your API keys (ANTHROPIC_API_KEY or OPENAI_API_KEY)
+   # Edit .env with your API keys:
+   # ANTHROPIC_API_KEY (required — primary LLM)
+   # SERPER_API_KEY (required — web search for research)
+   # OPENAI_API_KEY (optional — DALL-E image generation only)
    ```
 
 5. **Verify setup:**
@@ -271,10 +274,12 @@ Agent prompt constants (e.g., `RESEARCH_AGENT_PROMPT`, `WRITER_AGENT_PROMPT`) ar
 
 ### Finding the Right Prompt
 
-| Agent | File | Prompt Constant |
-|-------|------|----------------|
-| Research Agent | `scripts/economist_agent.py` | `RESEARCH_AGENT_PROMPT` |
-| Writer Agent | `scripts/economist_agent.py` | `WRITER_AGENT_PROMPT` |
+| Agent | File | Notes |
+|-------|------|-------|
+| Research | `src/crews/stage3_crew.py` | Deterministic web search (arXiv + Google) — no LLM agent |
+| Writer Agent | `src/crews/stage3_crew.py` | Backstory + task description define style rules |
+| Graphics Agent | `src/crews/stage3_crew.py` | Chart data generation |
+| Editor Agent | `src/crews/stage3_crew.py` | Quality gate review |
 | Topic Scout | `scripts/topic_scout.py` | `SCOUT_AGENT_PROMPT` |
 | Editorial Board | `scripts/editorial_board.py` | Per-persona prompt strings |
 

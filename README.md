@@ -87,11 +87,11 @@ CrewAI requires Python 3.13 or lower. Python 3.14+ is not currently supported.
 
 **Stage 3 Crew** (`src/crews/stage3_crew.py`) - Content Generation
 - **Purpose**: Research, writing, and chart creation pipeline
-- **Agents**: Research Agent → Writer Agent → Graphics Agent
-- **🆕 Fresh Research**: arXiv API integration provides cutting-edge 2026 academic sources
-- **🎯 Business Value**: Eliminates "dated sources" limitation with real-time research access
-- **Output**: YAML with article content and chart data
-- **Status**: ✅ Operational (100% test pass rate)
+- **Research**: Deterministic web search (arXiv + Google Scholar) — no LLM in research path
+- **Agents**: Writer Agent → Graphics Agent → Editor Agent (all Claude/Anthropic)
+- **Stat Audit**: Strips sentences with stats not found in the research brief
+- **Output**: Article with verified sources and chart data
+- **Status**: ✅ Operational
 - **Integration**: Via Flow-based orchestration (see Flow Architecture below)
 
 **Stage 4 Crew** (`src/crews/stage4_crew.py`) - Editorial Review
@@ -334,19 +334,22 @@ pre-commit install --hook-type pre-push
 
 ```
 economist-agents/
-├── docs/                  # Architecture and process documentation
-├── output/                # Generated content artifacts
-├── scripts/               # Agent implementations and tools
-│   ├── economist_agent.py # Main orchestrator
-│   ├── editorial_board.py # Voting system
-│   └── topic_scout.py     # Discovery engine
-├── skills/                # Learned agent patterns (JSON)
-├── tests/                 # Test suite (Unit, Integration, E2E)
-└── README.md              # This file
+├── agents/skills_configs/    # Agent YAML configs (research-analyst, content-writer, etc.)
+├── data/skills_state/        # Runtime state JSON (sprint tracker, metrics, defect tracker)
+├── docs/                     # Architecture and process documentation
+├── output/                   # Generated content artifacts
+├── scripts/                  # Standalone scripts and tools
+├── skills/*/SKILL.md         # Domain skill definitions (python-quality, testing, etc.)
+├── src/crews/                # CrewAI crew implementations (stage3, stage4)
+├── src/economist_agents/     # Flow orchestration, adapters
+├── src/tools/                # CrewAI tool wrappers (research_tools.py)
+├── tests/                    # Test suite (1700+ tests)
+└── README.md                 # This file
 ```
 
-**Current Status (Sprint 15):**
-- **Quality Score:** 30/100 (red) - Test stabilization required
+**Current Status:**
+- **LLM**: Claude (Anthropic) primary, OpenAI for DALL-E images only
+- **Quality Score:** 100/100
 - **Test Suite:** 447 tests collected, 5 collection errors blocking execution
 - **Defect Escape Rate:** <20% (Target)
 - **Critical Bug TTD:** <2 days (Target)
@@ -362,7 +365,7 @@ This project uses a **Hybrid Copilot Strategy** that bridges local agent memory 
 
 **Architecture:**
 ```
-Agent Memory (skills/*.json) → sync_copilot_context.py → .github/copilot-instructions.md → GitHub Copilot
+Agent Memory (data/skills_state/*.json) → sync_copilot_context.py → .github/copilot-instructions.md → GitHub Copilot
 ```
 
 **What Gets Synced (58 patterns as of 2026-01-05):**

@@ -165,20 +165,27 @@ def _truncate_description(frontmatter: str, max_chars: int = 160) -> str:
         Frontmatter with description truncated if needed.
     """
     match = re.search(
-        r'^(description:\s*["\']?)(.+?)(["\']?\s*)$',
+        r'^(description:\s*)(["\']?)(.+?)(\2\s*)$',
         frontmatter,
         re.MULTILINE,
     )
     if not match:
         return frontmatter
 
-    prefix, value, suffix = match.group(1), match.group(2), match.group(3)
+    prefix, quote, value, suffix = (
+        match.group(1),
+        match.group(2),
+        match.group(3),
+        match.group(4),
+    )
     if len(value) <= max_chars:
         return frontmatter
 
     # Truncate at last space before limit, add ellipsis
     truncated = value[: max_chars - 3].rsplit(" ", 1)[0] + "..."
-    return frontmatter.replace(match.group(0), f"{prefix}{truncated}{suffix}")
+    return frontmatter.replace(
+        match.group(0), f"{prefix}{quote}{truncated}{quote}"
+    )
 
 
 def _auto_embed_chart(article: str) -> str:

@@ -2904,6 +2904,17 @@
 <li><strong>Pytest fast tests</strong>: Quick smoke tests (&lt;30s)</li>
 <li><strong>Type hints validation</strong>: Basic mypy checks</li>
 </ol>
+<p><strong>Content Pipeline Quality Gates</strong> (enforced by Stage4Crew + PublicationValidator):</p>
+<ol>
+<li><strong>Stat audit</strong> (<code>stage3_crew.py</code>): Strips sentences with stats not in the research brief</li>
+<li><strong>Category normalization</strong>: Title Case → kebab-case</li>
+<li><strong>Description truncation</strong>: Caps description/summary at 160 chars</li>
+<li><strong>Heading limit</strong>: Merges sections when body has &gt;4 headings</li>
+<li><strong>Hedging removal</strong>: Strips "One suspects", "it is worth noting", etc.</li>
+<li><strong>Ending validation</strong>: Flags summary endings (HIGH severity)</li>
+<li><strong>British spelling</strong>: American → British replacements</li>
+<li><strong>Publication validator</strong>: Frontmatter, categories, word count, chart embeds, placeholders</li>
+</ol>
 <p><strong>To bypass</strong> (emergency only):
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git<span class="w"> </span>commit<span class="w"> </span>--no-verify<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Emergency fix&quot;</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c1"># Then immediately create issue to fix properly</span>

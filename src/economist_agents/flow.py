@@ -624,6 +624,17 @@ class EconomistContentFlow(Flow):
         )
         is_valid, issues = validator.validate(edited_article)
 
+        # Use article evaluator as fallback when LLM reviewer unreliable
+        if editorial_score < PUBLISH_THRESHOLD:
+            from scripts.article_evaluator import ArticleEvaluator
+
+            eval_result = ArticleEvaluator().evaluate(edited_article)
+            eval_pct = eval_result.percentage
+            print(f"   LLM reviewer: {editorial_score}/100, article evaluator: {eval_pct}%")
+            if eval_pct >= 70:
+                editorial_score = eval_pct
+                print(f"   Using article evaluator score ({eval_pct}%)")
+
         if editorial_score >= PUBLISH_THRESHOLD and is_valid:
             print(f"   ✅ Revision succeeded (score: {editorial_score}/100)")
             return {

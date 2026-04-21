@@ -165,7 +165,7 @@ def _truncate_description(frontmatter: str, max_chars: int = 160) -> str:
         Frontmatter with description truncated if needed.
     """
     match = re.search(
-        r'^(description:\s*)(["\']?)(.+?)(\2\s*)$',
+        r'^((?:description|summary):\s*)(["\']?)(.+?)(\2\s*)$',
         frontmatter,
         re.MULTILINE,
     )

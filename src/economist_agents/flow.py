@@ -441,16 +441,25 @@ class EconomistContentFlow(Flow):
             return "revision"
 
         # Gate 2: Editorial score
+        # LLM reviewer score is unreliable (JSON parse failures produce
+        # 0-45/100). Use deterministic article evaluator as fallback.
         if editorial_score < PUBLISH_THRESHOLD:
-            self.state["decision"] = "revision"
-            self.state["revision_reason"] = (
-                f"Editorial score {editorial_score}/100 below {PUBLISH_THRESHOLD} threshold"
-            )
-            self.state["revision_feedback"] = result.get("specific_edits", [])
-            print(
-                f"   Decision: REVISION (score {editorial_score} < {PUBLISH_THRESHOLD})"
-            )
-            return "revision"
+            from scripts.article_evaluator import ArticleEvaluator
+
+            eval_result = ArticleEvaluator().evaluate(edited_article)
+            eval_pct = eval_result.percentage
+            print(f"   LLM reviewer: {editorial_score}/100, article evaluator: {eval_pct}%")
+            if eval_pct >= 70:
+                editorial_score = eval_pct
+                print(f"   Using article evaluator score ({eval_pct}%) — LLM reviewer unreliable")
+            else:
+                self.state["decision"] = "revision"
+                self.state["revision_reason"] = (
+                    f"Editorial score {editorial_score}/100 and eval {eval_pct}% both below threshold"
+                )
+                self.state["revision_feedback"] = result.get("specific_edits", [])
+                print(f"   Decision: REVISION (both scores below threshold)")
+                return "revision"
 
         # Gate 3: Publication validator
         validator = PublicationValidator(

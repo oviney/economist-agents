@@ -16,10 +16,12 @@ CRITICAL CHECKS (any failure = REJECT):
 NEW in v2: Integrated DefectPrevention rules from defect_tracker.py RCA
 """
 
+import os
 import re
 from datetime import datetime
 from pathlib import Path
 
+import requests
 import yaml
 
 # Import defect prevention rules (learned from historical bugs)
@@ -89,7 +91,10 @@ class PublicationValidator:
             self.defect_checker = None
 
     def validate(
-        self, article_content: str, article_path: str | None = None
+        self,
+        article_content: str,
+        article_path: str | None = None,
+        blog_root: Path | None = None,
     ) -> tuple[bool, list[dict[str, str]]]:
         """
         Validate article for publication.
@@ -97,6 +102,8 @@ class PublicationValidator:
         Args:
             article_content: Full article text including front matter
             article_path: Optional path for context in error messages
+            blog_root: Root directory of blog repo for asset existence checks.
+                      If provided, verifies that referenced images/charts exist.
 
         Returns:
             (is_valid, list_of_issues)
@@ -143,6 +150,22 @@ class PublicationValidator:
 
         # Check 13: Ending quality (banned closings from stage4_crew)
         self._check_ending(article_content)
+
+        # Check 14: Asset path existence (BUG-528689d)
+        self._check_asset_paths(article_content, blog_root)
+
+        # Check 15: Fallback/placeholder image detection
+        self._check_fallback_image(article_content)
+
+        # Check 16: Markdown structure (headers must have preceding blank line)
+        self._check_markdown_structure(article_content)
+
+        # Check 17: Citation URL validity (optional, requires network)
+        if os.environ.get("VALIDATE_CITATION_URLS", "").lower() in ("1", "true", "yes"):
+            self._check_citation_urls(article_content)
+
+        # Check 18: British spelling over-corrections (BUG-528689d)
+        self._check_spelling_overcorrections(article_content)
 
         # Determine if valid (no CRITICAL issues)
         critical_issues = [i for i in self.issues if i["severity"] == "CRITICAL"]
@@ -543,9 +566,7 @@ class PublicationValidator:
         # 2. Check summary-opener restatement endings
         for starter in self._SUMMARY_STARTERS:
             if re.match(re.escape(starter) + r"\b", last_paragraph, re.IGNORECASE):
-                violations.append(
-                    f'Summary restatement opening: "{starter}"'
-                )
+                violations.append(f'Summary restatement opening: "{starter}"')
 
         if violations:
             details = "\n".join(f"  - {v}" for v in violations)
@@ -558,6 +579,235 @@ class PublicationValidator:
                     "fix": "Rewrite ending with a vivid prediction, metaphor, or concrete forward-looking statement",
                 }
             )
+
+    def _check_asset_paths(self, content: str, blog_root: Path | None = None) -> None:
+        """Verify all referenced asset paths exist on disk (BUG-528689d).
+
+        Extracts image refs from:
+        - Frontmatter ``image:`` field
+        - Inline markdown ``![...](/assets/...)``
+
+        Args:
+            content: Article text with YAML frontmatter.
+            blog_root: Root directory of the blog repo (e.g., ``temp_blog_repo``).
+                      If None, skip filesystem checks (validation-only mode).
+        """
+        if blog_root is None:
+            return  # Skip filesystem checks when blog_root not provided
+
+        # 1. Check frontmatter image field
+        if content.startswith("---"):
+            parts = content.split("---", 2)
+            if len(parts) >= 2:
+                try:
+                    front_matter = yaml.safe_load(parts[1])
+                    if isinstance(front_matter, dict):
+                        image_path = front_matter.get("image", "")
+                        if image_path and image_path.startswith("/assets/"):
+                            full_path = blog_root / image_path.lstrip("/")
+                            # Allow pending-generation placeholder
+                            if (
+                                "pending-generation" not in image_path
+                                and not full_path.exists()
+                            ):
+                                self.issues.append(
+                                    {
+                                        "check": "missing_hero_image",
+                                        "severity": "CRITICAL",
+                                        "message": f"Hero image not found: {image_path}",
+                                        "details": f"Expected file at {full_path}",
+                                        "fix": "Generate the featured image or update the image: field",
+                                    }
+                                )
+                except Exception:
+                    pass
+
+        # 2. Check inline image references
+        inline_refs = re.findall(r"!\[.*?\]\((/assets/[^)]+)\)", content)
+        for ref_path in inline_refs:
+            full_path = blog_root / ref_path.lstrip("/")
+            if not full_path.exists():
+                self.issues.append(
+                    {
+                        "check": "missing_asset",
+                        "severity": "CRITICAL",
+                        "message": f"Referenced asset not found: {ref_path}",
+                        "details": f"Expected file at {full_path}",
+                        "fix": "Generate the asset or remove the reference",
+                    }
+                )
+
+    _FALLBACK_IMAGES: list[str] = [
+        "/assets/images/blog-default.svg",
+        "/assets/images/pending-generation.svg",
+        "/assets/images/placeholder.svg",
+        "/assets/images/default.svg",
+    ]
+
+    # Hosts that are known to block automated requests or be flaky.
+    _URL_CHECK_SKIP_HOSTS: set[str] = {
+        "linkedin.com",
+        "www.linkedin.com",
+        "twitter.com",
+        "x.com",
+    }
+
+    def _check_citation_urls(self, content: str) -> None:
+        """Verify citation URLs return 2xx status (BUG-528689d).
+
+        Extracts URLs from the References section and checks each returns
+        a successful HTTP status. Fabricated or dead URLs are flagged.
+
+        This check is opt-in via VALIDATE_CITATION_URLS=1 because it
+        requires network access and can be slow.
+        """
+        # Extract References section
+        refs_match = re.search(
+            r"## References\s*\n(.*?)(?=^##|\Z)", content, re.DOTALL | re.MULTILINE
+        )
+        if not refs_match:
+            return
+
+        refs_text = refs_match.group(1)
+
+        # Find all URLs in references
+        urls = re.findall(r"https?://[^\s\)>\]]+", refs_text)
+        if not urls:
+            return
+
+        broken_urls = []
+        for url in urls[:10]:  # Limit to first 10 to avoid long delays
+            # Skip known-flaky hosts
+            try:
+                from urllib.parse import urlparse
+
+                host = urlparse(url).netloc.lower()
+                if any(skip in host for skip in self._URL_CHECK_SKIP_HOSTS):
+                    continue
+            except Exception:
+                pass
+
+            try:
+                resp = requests.head(url, timeout=5, allow_redirects=True)
+                if resp.status_code >= 400:
+                    broken_urls.append(f"{url} (HTTP {resp.status_code})")
+            except requests.RequestException as e:
+                broken_urls.append(f"{url} (error: {type(e).__name__})")
+
+        if broken_urls:
+            self.issues.append(
+                {
+                    "check": "broken_citation_urls",
+                    "severity": "CRITICAL",
+                    "message": f"Citation URLs not accessible: {len(broken_urls)} broken",
+                    "details": "\n".join(f"  - {u}" for u in broken_urls),
+                    "fix": "Replace broken URLs with valid sources or remove fabricated citations",
+                }
+            )
+
+    # Common LLM over-corrections when applying British spelling naively.
+    # Pattern: (misspelling_regex, correct_spelling, description)
+    _SPELLING_OVERCORRECTIONS: list[tuple[str, str, str]] = [
+        (r"\belabourate\b", "elaborate", "or→our applied to 'elaborate'"),
+        (r"\bexplour\b", "explore", "or→our applied to 'explore'"),
+        (r"\bignour\b", "ignore", "or→our applied to 'ignore'"),
+        (r"\badoure\b", "adore", "or→our applied to 'adore'"),
+        (r"\brestour\b", "restore", "or→our applied to 'restore'"),
+        (r"\bcolour\s+code\b", "color code", "colour in tech context"),
+        (r"\bcolourize\b", "colorize", "colour in tech context"),
+        (r"\borganise\s+imports\b", "organize imports", "IDE command"),
+    ]
+
+    def _check_spelling_overcorrections(self, content: str) -> None:
+        """Detect common British spelling over-corrections (BUG-528689d).
+
+        LLMs instructed to use British spelling sometimes naively apply
+        or→our to words that don't follow this rule (elaborate, explore).
+        """
+        violations = []
+        content_lower = content.lower()
+
+        for pattern, correct, description in self._SPELLING_OVERCORRECTIONS:
+            matches = re.findall(pattern, content_lower, re.IGNORECASE)
+            if matches:
+                violations.append(f"'{matches[0]}' → '{correct}' ({description})")
+
+        if violations:
+            self.issues.append(
+                {
+                    "check": "spelling_overcorrection",
+                    "severity": "CRITICAL",
+                    "message": f"British spelling over-corrections: {len(violations)} found",
+                    "details": "\n".join(f"  - {v}" for v in violations),
+                    "fix": "Review and correct the misspelled words",
+                }
+            )
+
+    def _check_markdown_structure(self, content: str) -> None:
+        """Verify markdown headers are preceded by blank lines (BUG-528689d).
+
+        Proper markdown requires a blank line before headers for correct parsing.
+        Headers embedded mid-paragraph render incorrectly in Jekyll.
+        """
+        # Extract body after frontmatter
+        if content.startswith("---"):
+            parts = content.split("---", 2)
+            body = parts[2] if len(parts) >= 3 else content
+        else:
+            body = content
+
+        lines = body.split("\n")
+        violations = []
+
+        for i, line in enumerate(lines):
+            # Check for ## headers (not # which could be frontmatter artifacts)
+            # First line of body is ok, otherwise previous line must be blank
+            if line.startswith("## ") and i > 0 and lines[i - 1].strip() != "":
+                # Get context
+                prev_line = lines[i - 1].strip()[:40]
+                violations.append(f'"{line[:40]}..." preceded by "{prev_line}..."')
+
+        if violations:
+            self.issues.append(
+                {
+                    "check": "markdown_header_spacing",
+                    "severity": "CRITICAL",
+                    "message": f"Headers without preceding blank line: {len(violations)} found",
+                    "details": "\n".join(f"  - {v}" for v in violations[:5]),
+                    "fix": "Add a blank line before each ## header",
+                }
+            )
+
+    def _check_fallback_image(self, content: str) -> None:
+        """Flag articles using fallback/placeholder images (BUG-528689d).
+
+        Articles should have a generated featured image, not a generic placeholder.
+        """
+        if not content.startswith("---"):
+            return
+
+        try:
+            parts = content.split("---", 2)
+            if len(parts) < 2:
+                return
+
+            front_matter = yaml.safe_load(parts[1])
+            if not isinstance(front_matter, dict):
+                return
+
+            image_path = front_matter.get("image", "")
+            if image_path in self._FALLBACK_IMAGES:
+                self.issues.append(
+                    {
+                        "check": "fallback_image",
+                        "severity": "CRITICAL",
+                        "message": f"Article using placeholder image: {image_path}",
+                        "details": "Every article must have a unique generated featured image",
+                        "fix": "Generate a featured image using the image_prompt in frontmatter",
+                    }
+                )
+        except Exception:
+            pass
 
     def _check_chart_references(self, content: str):
         """Check that articles include at least one chart in /assets/charts/ and flag orphaned charts that lack text references."""
@@ -794,13 +1044,18 @@ class PublicationValidator:
         return "\n".join(lines)
 
 
-def validate_file(file_path: str, expected_date: str = None) -> tuple[bool, str]:
+def validate_file(
+    file_path: str,
+    expected_date: str | None = None,
+    blog_root: Path | None = None,
+) -> tuple[bool, str]:
     """
     Validate a file for publication.
 
     Args:
         file_path: Path to article file
         expected_date: Expected publication date (YYYY-MM-DD)
+        blog_root: Root directory of blog repo for asset existence checks.
 
     Returns:
         (is_valid, report_text)
@@ -810,7 +1065,7 @@ def validate_file(file_path: str, expected_date: str = None) -> tuple[bool, str]
     with open(file_path) as f:
         content = f.read()
 
-    is_valid, issues = validator.validate(content, file_path)
+    is_valid, issues = validator.validate(content, file_path, blog_root=blog_root)
     report = validator.format_report(is_valid, issues)
 
     return is_valid, report

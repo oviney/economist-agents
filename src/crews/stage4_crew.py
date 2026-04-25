@@ -358,6 +358,9 @@ def _apply_editorial_fixes(article: str, current_date: str | None = None) -> str
             fm = _normalize_category_casing(fm)
             # 8e. Truncate description to 160 chars (publication validator limit)
             fm = _truncate_description(fm)
+            # Ensure frontmatter ends with newline so closing --- is on its own line
+            if not fm.endswith("\n"):
+                fm += "\n"
             text = "---" + fm + "---" + parts[2]
 
     # 8c. Auto-embed chart if chart_data exists but embed missing

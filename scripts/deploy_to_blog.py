@@ -192,10 +192,12 @@ def main():
         print(f"   ℹ No featured image at {featured_png} — skipping image copy")
 
     # -----------------------------------------------------------------------
-    # Pre-deploy validation gate
+    # Pre-deploy validation gate (includes asset existence check per BUG-528689d)
     # -----------------------------------------------------------------------
     print("🔍 Running pre-deploy validation...")
-    is_valid, report = validate_file(str(target_article), expected_date=deploy_date)
+    is_valid, report = validate_file(
+        str(target_article), expected_date=deploy_date, blog_root=blog_dir
+    )
     print(report)
 
     if not is_valid:

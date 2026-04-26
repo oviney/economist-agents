@@ -1,5 +1,36 @@
 # Economist Agents - Development Log
 
+## 2026-04-26: Agent Fleet Phase 2 — CrewAI removed, Anthropic Agent SDK shipped (PR #315)
+
+ADR-0006 Phase 2 complete. Closes epic #308 plus skills-polish backlog (#293, #294) and #314.
+
+**What shipped:**
+- `src/agent_sdk/` — new package with `pipeline.py`, `stage3_runner.py`, `stage4_runner.py`, `_shared.py`
+- `src/economist_agents/flow.py` rewritten as plain sequential Python over `src.agent_sdk.pipeline.run_pipeline` (no CrewAI Flow decorators)
+- `src/crews/` deleted (4 files, ~3,200 LOC) — CrewAI removed from `requirements.txt`
+- Per-role model tiering via `WRITER_MODEL` / `GRAPHICS_MODEL` env vars + CLI flags
+- Cost caps via `--writer-budget` / `--graphics-budget`; per-run JSONL spend log at `logs/agent_sdk_costs.jsonl`
+- ADR-0006 status moved to **Accepted**
+- `.claude-plugin/plugin.json` + `docs/skill-anatomy.md` + `scripts/validate_skills.py` (20 tests, wired into pre-commit + CI)
+
+**Bug fixes found along the way:**
+- `scripts/quality_dashboard.py` and `scripts/defect_tracker.py` had stale paths (`skills/*.json` instead of `data/skills_state/*.json`) after the Sprint 20-21 restructure. Dashboard's "Sprint-Over-Sprint Trends" section never rendered because of it.
+- `scripts/destructive_change_guard.py` advertised an "Intentional rewrite: <file>" PR-body bypass that the code never actually read. Implemented properly with `gh pr view`.
+
+**Decision evidence — 3 articles via Agent SDK:**
+
+| # | Topic | Cost | Time | Score | Validator |
+|---|---|---|---|---|---|
+| 1 | productivity paradox of AI coding assistants (Sonnet 4.5) | $0.1425 | 145.7 s | 90% | PASS |
+| 2 | productivity paradox of AI coding assistants (Opus 4.7) | $0.4866 | 288.0 s | 88% | PASS |
+| 3 | unit economics of running language models in production (post-removal) | $0.2624 | 262.3 s | 86% | PASS |
+
+Opus 4.7 cost 3.4× more, took 2× longer, scored marginally LOWER on the same task — defaults set to Sonnet 4.6 for both Writer and Graphics. Opus is a one-flag opt-in.
+
+**Test suite:** 1,749 passing / 12 intentional skips (was 1,724 / 35 before the dashboard fix removed 6 skips).
+
+---
+
 ## 2026-01-18: Test Collection Errors RESOLVED - Python 3.13 Environment Fix
 
 ### Critical Fix Applied

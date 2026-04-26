@@ -1,0 +1,32 @@
+{
+  "title": "The AI Coding Paradox",
+  "subtitle": "Change in developer metrics with AI assistants, %",
+  "data": [
+    {
+      "metric": "Write speed",
+      "value": 100,
+      "unit": "%",
+      "color": "navy"
+    },
+    {
+      "metric": "Review time",
+      "value": 200,
+      "unit": "%",
+      "color": "burgundy"
+    },
+    {
+      "metric": "Sprint velocity",
+      "value": 0,
+      "unit": "%",
+      "color": "navy"
+    }
+  ],
+  "colors": {
+    "navy": "#1E3A8A",
+    "burgundy": "#991B1B"
+  },
+  "dimensions": {
+    "width": 600,
+    "height": 400
+  }
+}

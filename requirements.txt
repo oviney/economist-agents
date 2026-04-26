@@ -4,8 +4,9 @@
 # Economist Agents - Python Dependencies
 # Optional dependencies
 # Security (recommended)
-crewai[anthropic]>=1.13.0  # CrewAI framework with Anthropic provider
-crewai-tools>=0.12.0      # CrewAI tools for agent capabilities
+crewai[anthropic]>=1.13.0  # CrewAI framework with Anthropic provider (legacy — being replaced per ADR-0006 Phase 2, epic #308)
+crewai-tools>=0.12.0      # CrewAI tools for agent capabilities (legacy — see #308)
+claude-agent-sdk>=0.1.68  # Anthropic Agent SDK — replacing CrewAI per ADR-0006 (epic #308)
 chromadb>=0.4.0          # Vector database for Style Memory RAG (STORY-006)
 
 matplotlib>=3.7.0        # Chart generation for graphics agent

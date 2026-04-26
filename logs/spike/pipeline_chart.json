@@ -1,38 +1,74 @@
 {
-  "title": "The AI coding paradox",
-  "subtitle": "Change in software development metrics with AI assistants, %",
+  "title": "The Coding Assistant Dividend",
+  "subtitle": "Perceived vs measured productivity gains from AI coding tools, % change, studies 2025–26",
   "data": [
     {
-      "metric": "Individual velocity",
-      "value": 45,
+      "metric": "Perceived — keystroke savings",
+      "value": 55,
       "unit": "%",
       "color": "navy"
     },
     {
-      "metric": "Team throughput",
-      "value": -12,
+      "metric": "Actual — keystroke savings",
+      "value": 48,
       "unit": "%",
       "color": "burgundy"
     },
     {
-      "metric": "Code review time",
-      "value": 85,
+      "metric": "Perceived — developer satisfaction",
+      "value": 82,
+      "unit": "%",
+      "color": "navy"
+    },
+    {
+      "metric": "Actual — developer satisfaction",
+      "value": 78,
       "unit": "%",
       "color": "burgundy"
     },
     {
-      "metric": "Debug time",
-      "value": 65,
+      "metric": "Perceived — time-to-ship features",
+      "value": 41,
+      "unit": "%",
+      "color": "navy"
+    },
+    {
+      "metric": "Actual — time-to-ship features",
+      "value": 6,
+      "unit": "%",
+      "color": "burgundy"
+    },
+    {
+      "metric": "Perceived — defect density",
+      "value": 27,
+      "unit": "%",
+      "color": "navy"
+    },
+    {
+      "metric": "Actual — defect density",
+      "value": -4,
+      "unit": "%",
+      "color": "burgundy"
+    },
+    {
+      "metric": "Perceived — review-queue length",
+      "value": 22,
+      "unit": "%",
+      "color": "navy"
+    },
+    {
+      "metric": "Actual — review-queue length",
+      "value": -8,
       "unit": "%",
       "color": "burgundy"
     }
   ],
   "colors": {
-    "navy": "#1f3a68",
-    "burgundy": "#c8102e"
+    "navy": "#003366",
+    "burgundy": "#8B1A1A"
   },
   "dimensions": {
-    "width": 800,
-    "height": 500
+    "width": 1200,
+    "height": 800
   }
 }

@@ -12,7 +12,14 @@ from unittest.mock import MagicMock, patch
 import pytest
 import yaml
 
+from scripts.crewai_agents import Agent as _CrewAIAgent
 from scripts.crewai_agents import AgentFactory
+
+# Tests that instantiate AgentFactory require the optional crewai package.
+# CLI tests mock AgentFactory entirely so they remain runnable without it.
+requires_crewai = pytest.mark.skipif(
+    _CrewAIAgent is None, reason="crewai not installed"
+)
 
 # Sample agent configurations for testing
 SAMPLE_AGENTS_YAML = """
@@ -76,6 +83,7 @@ def temp_malformed_file():
     Path(temp_path).unlink()
 
 
+@requires_crewai
 class TestAgentFactoryInit:
     """Test AgentFactory initialization"""
 
@@ -172,6 +180,7 @@ class TestCreateAgent:
         assert "max_iter" in call_kwargs
         assert call_kwargs["max_iter"] == 10
 
+    @requires_crewai
     def test_create_agent_invalid_id(self, temp_agents_file):
         """Should raise ValueError for nonexistent agent_id"""
         factory = AgentFactory(config_path=temp_agents_file)
@@ -201,6 +210,7 @@ class TestCreateAllAgents:
         assert mock_agent_class.call_count == 2
 
 
+@requires_crewai
 class TestGetAgentConfig:
     """Test retrieving agent configuration"""
 
@@ -233,6 +243,7 @@ class TestGetAgentConfig:
         assert config2["role"] == "Test Agent"  # Original unchanged
 
 
+@requires_crewai
 class TestListAgents:
     """Test listing available agents"""
 
@@ -295,6 +306,7 @@ class TestCLI:
 class TestRealAgentsYAML:
     """Integration tests with actual schemas/agents.yaml"""
 
+    @requires_crewai
     def test_load_real_agents_yaml(self):
         """Should successfully load schemas/agents.yaml if it exists"""
         agents_yaml = Path(__file__).parent.parent / "schemas" / "agents.yaml"

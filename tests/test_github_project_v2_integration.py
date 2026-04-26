@@ -28,10 +28,23 @@ import sys
 import unittest
 from pathlib import Path
 
+import pytest
+
 # Add scripts to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
 logger = logging.getLogger(__name__)
+
+try:
+    import crewai  # noqa: F401
+
+    _CREWAI_AVAILABLE = True
+except ImportError:
+    _CREWAI_AVAILABLE = False
+
+requires_crewai = pytest.mark.skipif(
+    not _CREWAI_AVAILABLE, reason="crewai not installed"
+)
 
 
 def is_gh_cli_available() -> bool:
@@ -88,6 +101,7 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
 
     # PHASE 1: TOOL FUNCTIONALITY TESTS
 
+    @requires_crewai
     def test_01_github_project_tool_import(self):
         """Test 1: Verify github_project_add_issue tool can be imported"""
         try:
@@ -135,6 +149,7 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
     @unittest.skipUnless(
         GH_CLI_AVAILABLE, "GitHub CLI not available or not authenticated"
     )
+    @requires_crewai
     def test_03_project_boards_exist(self):
         """Test 3: Verify target Project V2 boards exist and are accessible"""
         try:
@@ -163,6 +178,7 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
     @unittest.skipUnless(
         GH_CLI_AVAILABLE, "GitHub CLI not available or not authenticated"
     )
+    @requires_crewai
     def test_04_sprint_16_issues_exist(self):
         """Test 4: Verify Sprint 16 issues (#95, #96, #97) exist for testing"""
         try:
@@ -196,6 +212,7 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
 
     # PHASE 2: TOOL FUNCTIONALITY VALIDATION
 
+    @requires_crewai
     def test_05_github_project_tool_validation(self):
         """Test 5: Validate github_project_add_issue tool parameter validation"""
         from scripts.tools.github_project_tool import github_project_add_issue
@@ -229,6 +246,7 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
             self.log_test_result("Tool Parameter Validation", "FAIL", str(e))
             self.fail(f"Tool validation failed: {e}")
 
+    @requires_crewai
     def test_06_tool_error_handling(self):
         """Test 6: Verify tool handles errors gracefully"""
         from scripts.tools.github_project_tool import github_project_add_issue
@@ -318,6 +336,7 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
         subprocess.run(["gh", "auth", "status"], capture_output=True).returncode != 0,
         "GitHub CLI not authenticated - skipping live tests",
     )
+    @requires_crewai
     def test_09_real_project_board_operation(self):
         """Test 9: LIVE TEST - Add Issue #97 to Project Board (Story 3 self-validation)"""
         from scripts.tools.github_project_tool import github_project_add_issue
@@ -356,6 +375,7 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
     @unittest.skipUnless(
         GH_CLI_AVAILABLE, "GitHub CLI not available or not authenticated"
     )
+    @requires_crewai
     def test_10_batch_project_operations(self):
         """Test 10: Validate batch operations for multiple Sprint 16 issues"""
         from scripts.tools.github_project_tool import github_project_add_issue
@@ -393,6 +413,7 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
 
     # PHASE 5: WORKFLOW INTEGRATION VALIDATION
 
+    @requires_crewai
     def test_11_mcp_cli_fallback_pattern(self):
         """Test 11: Validate MCP + CLI fallback workflow pattern"""
         try:
@@ -468,6 +489,7 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
 
     # PHASE 6: SECURITY AND VALIDATION
 
+    @requires_crewai
     def test_13_security_validation(self):
         """Test 13: Verify security measures in GitHub Project tool"""
         try:
@@ -498,6 +520,7 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
             self.log_test_result("Security Validation", "FAIL", str(e))
             self.fail(f"Security validation failed: {e}")
 
+    @requires_crewai
     def test_14_logging_and_monitoring(self):
         """Test 14: Verify proper logging and monitoring capabilities"""
         try:

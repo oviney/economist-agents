@@ -8,9 +8,9 @@ cleanly.
 
 import pytest
 
+pytest.importorskip("crewai")
+
 from src.crews.stage3_crew import _audit_article_stats, _extract_stats
-
-
 class TestExtractStats:
     """_extract_stats() regex extraction."""
 

@@ -22,6 +22,17 @@ import pytest
 
 from scripts.context_manager import ContextManager, create_task_context
 
+try:
+    import crewai  # noqa: F401
+
+    _CREWAI_AVAILABLE = True
+except ImportError:
+    _CREWAI_AVAILABLE = False
+
+requires_crewai = pytest.mark.skipif(
+    not _CREWAI_AVAILABLE, reason="crewai not installed"
+)
+
 
 @pytest.fixture
 def story_context_file():
@@ -221,6 +232,7 @@ class TestMultiAgentContextFlow:
         assert task_context["task_id"] == "QE-validation"
         assert task_context["priority"] == "P0"
 
+    @requires_crewai
     @patch("crewai.Task")
     @patch("crewai.Agent")
     def test_realistic_crewai_task_creation(

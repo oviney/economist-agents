@@ -347,7 +347,7 @@ Progress: [{progress_bar}] {progress_pct}%"""
 
     def _load_sprint_history(self) -> dict:
         """Load sprint history from file"""
-        history_file = Path(__file__).parent.parent / "skills" / "sprint_history.json"
+        history_file = Path(__file__).parent.parent / "data" / "skills_state" / "sprint_history.json"
 
         if history_file.exists():
             with open(history_file) as f:
@@ -407,7 +407,7 @@ Progress: [{progress_bar}] {progress_pct}%"""
         self.history["last_updated"] = datetime.now().isoformat()
 
         # Save to file
-        history_file = Path(__file__).parent.parent / "skills" / "sprint_history.json"
+        history_file = Path(__file__).parent.parent / "data" / "skills_state" / "sprint_history.json"
         with open(history_file, "w") as f:
             json.dump(self.history, f, indent=2)
 

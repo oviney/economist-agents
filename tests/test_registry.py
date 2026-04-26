@@ -14,6 +14,17 @@ import pytest
 
 from src.registry import AgentRegistry
 
+try:
+    import crewai  # noqa: F401
+
+    _CREWAI_AVAILABLE = True
+except ImportError:
+    _CREWAI_AVAILABLE = False
+
+requires_crewai = pytest.mark.skipif(
+    not _CREWAI_AVAILABLE, reason="crewai not installed"
+)
+
 # Skip tests that require CrewAI and API keys
 requires_crewai = pytest.mark.skipif(
     not os.environ.get("OPENAI_API_KEY"),
@@ -57,6 +68,7 @@ class TestAgentRegistry:
         assert crew_instance is not None
         assert hasattr(crew_instance, "kickoff")
 
+    @requires_crewai
     def test_get_available_crews(self):
         """Test that AgentRegistry can list available crews"""
         registry = AgentRegistry()

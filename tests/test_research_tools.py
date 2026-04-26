@@ -9,6 +9,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
+pytest.importorskip("crewai")
+
 from src.tools.research_tools import (
     ArxivSearchTool,
     GoogleSearchTool,

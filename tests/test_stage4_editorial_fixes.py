@@ -3,6 +3,8 @@
 
 import pytest
 
+pytest.importorskip("crewai")
+
 from src.crews.stage4_crew import (
     _apply_editorial_fixes,
     _BANNED_CLOSINGS,

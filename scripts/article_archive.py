@@ -151,7 +151,9 @@ class ArticleArchive:
         self.client: Any = None
         self.collection: Any = None
 
-        if not CHROMADB_AVAILABLE:
+        # An injected client (tests) bypasses the chromadb dependency check —
+        # the caller is supplying whatever interface chroma would provide.
+        if _client is None and not CHROMADB_AVAILABLE:
             logger.warning("ChromaDB unavailable — ArticleArchive disabled.")
             return
 

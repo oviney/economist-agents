@@ -13,11 +13,11 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+pytest.importorskip("crewai")
+
 from src.economist_agents.flow import EconomistContentFlow
 from src.telemetry.roi_tracker import ROITracker
 from src.tools.style_memory_tool import StyleMemoryTool
-
-
 class TestFlowOrchestration:
     """Test Flow-based orchestration patterns"""
 

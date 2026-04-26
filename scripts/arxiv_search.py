@@ -12,6 +12,8 @@ Business Value:
 - Enhanced credibility through recent academic citations
 """
 
+from __future__ import annotations
+
 import contextlib
 import logging
 import re
@@ -21,7 +23,7 @@ from typing import Any
 try:
     import arxiv
 except ImportError:
-    arxiv = None
+    arxiv = None  # type: ignore[assignment]
 
 with contextlib.suppress(ImportError):
     pass

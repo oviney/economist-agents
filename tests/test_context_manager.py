@@ -12,6 +12,13 @@ from pathlib import Path
 
 import pytest
 
+try:
+    import pytest_benchmark  # noqa: F401
+
+    _has_benchmark = True
+except ImportError:
+    _has_benchmark = False
+
 from scripts.context_manager import (
     ContextFileNotFoundError,
     ContextManager,
@@ -280,6 +287,10 @@ class TestThreadSafety:
 
 class TestPerformance:
     """Performance validation (Quality Requirement)"""
+
+    pytestmark = pytest.mark.skipif(
+        not _has_benchmark, reason="pytest-benchmark not installed"
+    )
 
     def test_load_time_under_2_seconds(self, benchmark):
         """AC4: Context load time < 2 seconds"""

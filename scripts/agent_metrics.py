@@ -25,9 +25,11 @@ class AgentMetrics:
 
     def __init__(self, metrics_file: str = None):
         if metrics_file is None:
-            # Default to skills directory
+            # Default location: data/skills_state/ per CLAUDE.md
             script_dir = Path(__file__).parent.parent
-            metrics_file = script_dir / "skills" / "agent_metrics.json"
+            metrics_file = (
+                script_dir / "data" / "skills_state" / "agent_metrics.json"
+            )
 
         self.metrics_file = Path(metrics_file)
         self.metrics = self._load_metrics()

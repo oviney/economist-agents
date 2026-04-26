@@ -20,6 +20,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import os
 import re
 import sys
 import time
@@ -42,6 +43,9 @@ from src.crews.stage3_crew import (
 )
 
 logger = logging.getLogger(__name__)
+
+DEFAULT_WRITER_MODEL = os.environ.get("WRITER_MODEL", "claude-sonnet-4-6")
+DEFAULT_GRAPHICS_MODEL = os.environ.get("GRAPHICS_MODEL", "claude-sonnet-4-6")
 
 WRITER_SYSTEM_PROMPT = """You are an Economist-style Writer renowned for sharp, witty prose with British flair.
 Every article must satisfy the 10 rules below before submission. Do not attempt to read any files
@@ -100,6 +104,8 @@ class SpikeResult:
     total_cost_usd: float
     writer_cost_usd: float
     graphics_cost_usd: float
+    writer_model: str
+    graphics_model: str
     wall_seconds: float
     research_brief_chars: int
     article_chars: int
@@ -144,7 +150,8 @@ def _strip_duplicate_article(text: str) -> str:
 async def _collect_text(
     prompt: str,
     system_prompt: str,
-    model: str = "claude-sonnet-4-5",
+    model: str = DEFAULT_WRITER_MODEL,
+    max_budget_usd: float | None = None,
 ) -> tuple[str, float]:
     """Run a single Agent SDK query and return ``(text, cost_usd)``.
 
@@ -160,6 +167,7 @@ async def _collect_text(
         permission_mode="bypassPermissions",
         allowed_tools=[],
         stderr=lambda line: logger.warning("agent-sdk stderr: %s", line),
+        max_budget_usd=max_budget_usd,
     )
     text_chunks: list[str] = []
     cost = 0.0
@@ -202,13 +210,30 @@ def _parse_chart_json(text: str) -> dict:
         return {"specification": text}
 
 
-async def run_stage3_spike(topic: str) -> SpikeResult:
+async def run_stage3_spike(
+    topic: str,
+    writer_budget_usd: float | None = 0.30,
+    graphics_budget_usd: float | None = 0.10,
+    writer_model: str = DEFAULT_WRITER_MODEL,
+    graphics_model: str = DEFAULT_GRAPHICS_MODEL,
+) -> SpikeResult:
     """Generate one article via the Agent SDK and return captured metrics.
 
     Mirrors ``Stage3Crew.kickoff`` so output is comparable.
 
     Args:
         topic: Article topic.
+        writer_budget_usd: Hard cap for the writer call. Default 0.30
+            (~3× headroom over observed Sonnet 4.6 runs ~$0.11). Bump
+            to 0.60 for Opus runs.
+        graphics_budget_usd: Hard cap for the graphics call. Default
+            0.10 (~3× headroom over ~$0.03).
+        writer_model: Model id for the Writer call. Default Sonnet 4.6
+            because the Story 4 verification run showed Opus 4.7 cost
+            3.4× more for a marginally LOWER score on this task. Override
+            with WRITER_MODEL env var if your topic needs deeper reasoning.
+        graphics_model: Model id for the Graphics call. Default Sonnet
+            4.6; override with GRAPHICS_MODEL env var.
 
     Returns:
         SpikeResult with article text, chart dict, cost, and timing.
@@ -238,7 +263,10 @@ async def run_stage3_spike(topic: str) -> SpikeResult:
         f"{research_brief}"
     )
     raw_writer_output, writer_cost = await _collect_text(
-        writer_prompt, WRITER_SYSTEM_PROMPT
+        writer_prompt,
+        WRITER_SYSTEM_PROMPT,
+        model=writer_model,
+        max_budget_usd=writer_budget_usd,
     )
     pre_audit_article = _strip_duplicate_article(raw_writer_output)
 
@@ -254,7 +282,10 @@ async def run_stage3_spike(topic: str) -> SpikeResult:
         f"Article excerpt:\n{article[:2500]}"
     )
     graphics_text, graphics_cost = await _collect_text(
-        graphics_prompt, GRAPHICS_AGENT_PROMPT
+        graphics_prompt,
+        GRAPHICS_AGENT_PROMPT,
+        model=graphics_model,
+        max_budget_usd=graphics_budget_usd,
     )
     chart_data = _parse_chart_json(graphics_text)
 
@@ -267,6 +298,8 @@ async def run_stage3_spike(topic: str) -> SpikeResult:
         total_cost_usd=writer_cost + graphics_cost,
         writer_cost_usd=writer_cost,
         graphics_cost_usd=graphics_cost,
+        writer_model=writer_model,
+        graphics_model=graphics_model,
         wall_seconds=elapsed,
         research_brief_chars=len(research_brief),
         article_chars=len(article),

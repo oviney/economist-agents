@@ -1,6 +1,6 @@
 {
   "topic": "the productivity paradox of AI coding assistants",
-  "editorial_score": 90,
+  "editorial_score": 88,
   "gates_passed": 4,
   "publication_ready": true,
   "publication_validator_passed": true,
@@ -13,9 +13,13 @@
       "fix": "See message for specific remediation"
     }
   ],
-  "total_cost_usd": 0.1425145,
-  "stage3_seconds": 145.7363025409868,
-  "stage4_seconds": 0.010016708984039724,
-  "article_chars": 7679,
-  "total_wall_seconds": 145.74696262495127
+  "total_cost_usd": 0.48664275,
+  "writer_cost_usd": 0.418399,
+  "graphics_cost_usd": 0.06824375,
+  "writer_model": "claude-opus-4-7",
+  "graphics_model": "claude-sonnet-4-6",
+  "stage3_seconds": 288.02270216704346,
+  "stage4_seconds": 0.00917700002901256,
+  "article_chars": 6643,
+  "total_wall_seconds": 288.0324439579854
 }

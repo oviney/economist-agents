@@ -208,5 +208,68 @@
       "structure": "0 headings, 3 words, missing: ['layout', 'title', 'date', 'categories', 'image'], references: no",
       "visual_engagement": "image: no, chart embedded: no"
     }
+  },
+  {
+    "article_filename": "published",
+    "timestamp": "2026-04-25T22:06:15.844343",
+    "scores": {
+      "opening_quality": 4,
+      "evidence_sourcing": 3,
+      "voice_consistency": 10,
+      "structure": 1,
+      "visual_engagement": 5
+    },
+    "total_score": 23,
+    "max_score": 50,
+    "percentage": 46,
+    "details": {
+      "opening_quality": "Opening has 0 data tokens",
+      "evidence_sourcing": "0 references cited, 0 placeholders; fresh citations (2026/2025): 0; analyst vendors cited: 0",
+      "voice_consistency": "Clean voice",
+      "structure": "0 headings, 3 words, missing: ['layout', 'title', 'date', 'categories', 'image'], references: no",
+      "visual_engagement": "image: no, chart embedded: no"
+    }
+  },
+  {
+    "article_filename": "published",
+    "timestamp": "2026-04-25T22:06:49.456387",
+    "scores": {
+      "opening_quality": 4,
+      "evidence_sourcing": 3,
+      "voice_consistency": 10,
+      "structure": 1,
+      "visual_engagement": 5
+    },
+    "total_score": 23,
+    "max_score": 50,
+    "percentage": 46,
+    "details": {
+      "opening_quality": "Opening has 0 data tokens",
+      "evidence_sourcing": "0 references cited, 0 placeholders; fresh citations (2026/2025): 0; analyst vendors cited: 0",
+      "voice_consistency": "Clean voice",
+      "structure": "0 headings, 2 words, missing: ['layout', 'date', 'categories', 'image'], references: no",
+      "visual_engagement": "image: no, chart embedded: no"
+    }
+  },
+  {
+    "article_filename": "published",
+    "timestamp": "2026-04-26T06:46:35.846458",
+    "scores": {
+      "opening_quality": 4,
+      "evidence_sourcing": 3,
+      "voice_consistency": 10,
+      "structure": 1,
+      "visual_engagement": 5
+    },
+    "total_score": 23,
+    "max_score": 50,
+    "percentage": 46,
+    "details": {
+      "opening_quality": "Opening has 0 data tokens",
+      "evidence_sourcing": "0 references cited, 0 placeholders; fresh citations (2026/2025): 0; analyst vendors cited: 0",
+      "voice_consistency": "Clean voice",
+      "structure": "0 headings, 2 words, missing: ['layout', 'date', 'categories', 'image'], references: no",
+      "visual_engagement": "image: no, chart embedded: no"
+    }
   }
 ]

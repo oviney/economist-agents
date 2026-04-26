@@ -106,7 +106,7 @@ class TestClientCreation:
 
     def test_raises_error_when_no_api_key(self, clean_env):
         """Test that error is raised when no API key is provided."""
-        with pytest.raises(ValueError, match="OPENAI_API_KEY not set"):
+        with pytest.raises(ValueError, match="No API key found"):
             create_llm_client()
 
     def test_custom_model_configuration(self, clean_env, mock_openai_client):
@@ -347,4 +347,4 @@ if __name__ == "__main__":
     captured = capsys.readouterr()
     assert "Testing LLM Client Factory" in captured.out
     assert "❌ Error:" in captured.out
-    assert "OPENAI_API_KEY not set" in captured.out
+    assert "No API key found" in captured.out

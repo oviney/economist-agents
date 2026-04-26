@@ -221,6 +221,14 @@ class TestMultiAgentContextFlow:
         assert task_context["task_id"] == "QE-validation"
         assert task_context["priority"] == "P0"
 
+    @pytest.mark.skip(
+        reason=(
+            "CrewAI removed in epic #308. The test patches crewai.Task / "
+            "crewai.Agent which are no longer importable. ContextManager "
+            "is exercised by the other tests in this file, which do not "
+            "depend on crewai."
+        )
+    )
     @patch("crewai.Task")
     @patch("crewai.Agent")
     def test_realistic_crewai_task_creation(

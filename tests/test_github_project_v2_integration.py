@@ -28,6 +28,13 @@ import sys
 import unittest
 from pathlib import Path
 
+import pytest
+
+# CrewAI was removed from production in epic #308. The
+# scripts/tools/github_project_tool used here imports crewai for tool
+# registration; skip this whole module when crewai is not installed.
+pytest.importorskip("crewai")
+
 # Add scripts to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 

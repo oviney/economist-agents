@@ -3,12 +3,12 @@
 
 import pytest
 
-pytest.importorskip("crewai")
-
-from src.crews.stage4_crew import (
-    _apply_editorial_fixes,
+from src.agent_sdk._shared import (
     _BANNED_CLOSINGS,
     _enforce_heading_limit,
+)
+from src.agent_sdk._shared import (
+    apply_editorial_fixes as _apply_editorial_fixes,
 )
 
 
@@ -252,8 +252,10 @@ class TestHeadingLimitEnforcement:
     def test_headings_over_limit_merged(self) -> None:
         """Article with 6 headings is reduced to 4."""
         sections = []
+        line = "Line.\n"
         for i in range(6):
-            sections.append(f"## Section {i + 1}\n\n{'Line.\n' * (i + 1)}")
+            body = line * (i + 1)
+            sections.append(f"## Section {i + 1}\n\n{body}")
         article = "---\ntitle: Test\n---\n\n" + "\n".join(sections)
         result = _enforce_heading_limit(article)
         heading_count = sum(
@@ -275,9 +277,7 @@ class TestHeadingLimitEnforcement:
         )
         result = _enforce_heading_limit(article)
         # All 4 body headings + References should remain
-        all_headings = [
-            line for line in result.split("\n") if line.startswith("## ")
-        ]
+        all_headings = [line for line in result.split("\n") if line.startswith("## ")]
         assert len(all_headings) == 5
         body_headings = [h for h in all_headings if h.strip() != "## References"]
         assert len(body_headings) == 4
@@ -292,6 +292,7 @@ class TestDescriptionTruncation:
         result = _apply_editorial_fixes(article)
         # Extract description from result
         import re
+
         match = re.search(r'description:\s*"([^"]+)"', result)
         assert match is not None
         assert len(match.group(1)) <= 160

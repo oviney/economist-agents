@@ -6,8 +6,8 @@ path; this module runs side-by-side so the comparison report has data
 from both runtimes on the same topic.
 
 Design:
-- Research stays deterministic — calls ``Stage3Crew._build_research_brief``
-  so the LLM never participates in the research path.
+- Research stays deterministic — calls ``build_research_brief`` from
+  ``_shared`` so the LLM never participates in the research path.
 - Writer and Graphics each run as a single ``query()`` against the Agent
   SDK with the existing role prompts.
 - Stat audit runs after the writer via ``_audit_article_stats``.
@@ -36,10 +36,12 @@ from claude_agent_sdk import (
     query,
 )
 
-from src.crews.stage3_crew import (
+from src.agent_sdk._shared import (
     GRAPHICS_AGENT_PROMPT,
-    Stage3Crew,
-    _audit_article_stats,
+    build_research_brief,
+)
+from src.agent_sdk._shared import (
+    audit_article_stats as _audit_article_stats,
 )
 
 logger = logging.getLogger(__name__)
@@ -240,7 +242,7 @@ async def run_stage3_spike(
     """
     start = time.perf_counter()
 
-    research_brief = Stage3Crew._build_research_brief(topic)
+    research_brief = build_research_brief(topic)
     logger.info("Research brief: %d chars", len(research_brief))
 
     writer_prompt = (

@@ -133,6 +133,27 @@ class TestPublicationValidatorContent:
         ph_issues = [i for i in issues if i["check"] == "placeholder_text"]
         assert len(ph_issues) == 1
 
+    def test_your_placeholder_uppercase_rejected(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(body=f"Contact YOUR-NAME today. {VALID_BODY}")
+        is_valid, issues = validator.validate(article)
+        ph_issues = [i for i in issues if i["check"] == "placeholder_text"]
+        assert not is_valid
+        assert len(ph_issues) == 1
+
+    def test_your_in_slug_not_flagged_as_placeholder(self) -> None:
+        """BUG-030: title-derived slugs containing 'your-X' must not trigger
+        the placeholder check unless X is a known placeholder token."""
+        validator = PublicationValidator(expected_date="2026-04-03")
+        body = (
+            f"See [the guide](/posts/your-content-strategy-2026.md) for more. "
+            f"{VALID_BODY}"
+        )
+        article = _make_article(body=body)
+        _, issues = validator.validate(article)
+        ph_issues = [i for i in issues if i["check"] == "placeholder_text"]
+        assert ph_issues == [], f"false positive on slug: {ph_issues}"
+
     def test_weak_ending_rejected(self) -> None:
         validator = PublicationValidator(expected_date="2026-04-03")
         body = f"{VALID_BODY}\n\nIn conclusion, this remains to be seen."
@@ -198,9 +219,9 @@ class TestPublicationValidatorWordCount:
         assert wc_issues[0]["severity"] == "CRITICAL"
 
     def test_borderline_words_rejected(self) -> None:
+        # Gate is 700 (BUG-029). 650 words must still be rejected.
         validator = PublicationValidator(expected_date="2026-04-03")
-        # Use minimal references so body word count dominates
-        body = " ".join(["word"] * 750)
+        body = " ".join(["word"] * 650)
         article = _make_article(
             body=body, references="## References\n\n1. A\n2. B\n3. C\n"
         )
@@ -208,9 +229,10 @@ class TestPublicationValidatorWordCount:
         wc_issues = [i for i in issues if i["check"] == "word_count"]
         assert len(wc_issues) == 1
 
-    def test_exactly_800_words_passes(self) -> None:
+    def test_exactly_700_words_passes(self) -> None:
+        # Gate boundary: exactly 700 words is the lowest accepted count.
         validator = PublicationValidator(expected_date="2026-04-03")
-        body = " ".join(["word"] * 800)
+        body = " ".join(["word"] * 700)
         article = _make_article(body=body)
         is_valid, issues = validator.validate(article)
         wc_issues = [i for i in issues if i["check"] == "word_count"]

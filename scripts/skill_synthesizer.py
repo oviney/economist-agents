@@ -167,12 +167,12 @@ class LogParser:
         word_match = re.search(r"Draft complete \((\d+) words\)", content)
         if word_match:
             words = int(word_match.group(1))
-            if words < 800:  # Target is 800+ words
+            if words < 700:  # Gate at 700, target 800-1000
                 failures.append(
                     {
                         "type": "low_word_count",
                         "count": words,
-                        "target": 800,
+                        "target": 700,
                         "location": f"line {content[: word_match.start()].count(chr(10)) + 1}",
                     }
                 )

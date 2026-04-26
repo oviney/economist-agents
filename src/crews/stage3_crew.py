@@ -394,8 +394,9 @@ summary: "One-sentence summary of the article"
 IMPORTANT for categories: Choose 1-3 from: quality-engineering, software-engineering, test-automation, security. Categories MUST be kebab-case.
 IMPORTANT for image: Replace SLUG with a lowercase-hyphenated version of the title (e.g., "ai-testing-costs").
 
-Then the full article body (minimum 800 words) following these MANDATORY rules:
+Then the full article body following these MANDATORY rules:
 
+LENGTH: 700-1200 words. Articles under 700 words FAIL the publication gate and are rejected. Aim for 800-1000 words of substantive argument.
 THESIS: State a specific, debatable argument in the first two paragraphs.
 TITLE: Provocative and memorable — use a colon for a twist. No "Why/How/The Impact of" openings.
 OPENING: Start with a striking concrete claim or surprising statistic. No abstract openings.
@@ -414,7 +415,7 @@ Example:
 
 Use British spelling, sharp wit, verified sources, and natural chart references.""",
             agent=self.writer_agent,
-            expected_output="The complete article text in full, with YAML frontmatter header (---\ntitle:\ndate:\nauthor:\nsummary:\n---) followed by the entire article body (minimum 800 words) with thesis in first two paragraphs, 3-4 headings maximum, no lists, named companies/people, vivid ending, ending with a ## References section (minimum 3 sources)",
+            expected_output="The complete article text in full, with YAML frontmatter header (---\ntitle:\ndate:\nauthor:\nsummary:\n---) followed by the entire article body (700-1200 words, target 800-1000) with thesis in first two paragraphs, 3-4 headings maximum, no lists, named companies/people, vivid ending, ending with a ## References section (minimum 3 sources)",
             context=[self.research_task],  # Access research findings
         )
 
@@ -491,12 +492,12 @@ Include ALL data points from the research (Market CAGR 23.2%, Adoption 30%, Time
 
         brief = [
             f"# Research Brief: {topic}",
-            f"",
-            f"The following sources were found via live web search.",
-            f"Use ONLY statistics and claims from these sources.",
-            f"If you need a statistic not listed below, tag it [NEEDS SOURCE].",
-            f"Do NOT invent statistics, researcher names, or URLs.",
-            f"",
+            "",
+            "The following sources were found via live web search.",
+            "Use ONLY statistics and claims from these sources.",
+            "If you need a statistic not listed below, tag it [NEEDS SOURCE].",
+            "Do NOT invent statistics, researcher names, or URLs.",
+            "",
             raw,
         ]
         return "\n".join(brief)

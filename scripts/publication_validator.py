@@ -69,7 +69,12 @@ class PublicationValidator:
         "PLACEHOLDER_TEXT": {
             "severity": "CRITICAL",
             "message": "Article contains placeholder text",
-            "pattern": r"(TODO|FIXME|XXX|REPLACE[-_]?ME|YOUR-\w+)",
+            # YOUR- enumerated to avoid false positives on title-derived slugs
+            # like "your-content-strategy" (BUG-030).
+            "pattern": (
+                r"\b(TODO|FIXME|XXX|REPLACE[-_]?ME|"
+                r"YOUR[-_](?:NAME|COMPANY|EMAIL|TITLE|ROLE|DATE|COMPANY[-_]NAME))\b"
+            ),
         },
     }
 

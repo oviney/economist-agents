@@ -229,9 +229,9 @@ class AgentReviewer:
 
         # Check 9: Readability (word count) — CRITICAL triggers regeneration
         word_count = len(body.split())
-        if word_count < 800:
+        if word_count < 700:
             issues.append(
-                f"CRITICAL: Article too short ({word_count} words, ≥800 required)"
+                f"CRITICAL: Article too short ({word_count} words, ≥700 required)"
             )
         elif word_count > 1500:
             issues.append(

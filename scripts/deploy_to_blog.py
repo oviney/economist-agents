@@ -205,12 +205,20 @@ def main():
 
     print("✅ Pre-deploy validation passed — creating PR")
 
-    # Commit changes
+    # Commit changes (Double Commit Protocol — BUG-025)
+    # Pre-commit hooks (e.g. ruff-format) may reformat staged files, leaving
+    # the working tree dirty after the commit succeeds. Re-stage and amend so
+    # the loop terminates and the commit reflects the formatted content.
     print("💾 Committing changes...")
     run_command("git add .", cwd=blog_dir)
 
     commit_msg = f"content: Add generated article {article_name}"
     run_command(f'git commit -m "{commit_msg}"', cwd=blog_dir)
+    dirty = run_command("git status --porcelain", cwd=blog_dir)
+    if dirty:
+        print("🔁 pre-commit hooks modified files; amending commit")
+        run_command("git add -u", cwd=blog_dir)
+        run_command("git commit --amend --no-edit", cwd=blog_dir)
 
     # Push branch
     print(f"📤 Pushing branch {branch}...")

@@ -166,10 +166,18 @@ def deploy_article(
             if image_file.exists():
                 shutil.copy2(image_file, assets_images / f"{slug}.{ext}")
 
-        # Commit
+        # Commit (Double Commit Protocol — BUG-025)
+        # If pre-commit hooks reformat files post-commit, the working directory
+        # is left dirty. Re-stage and amend so the commit captures the fixed
+        # content and we don't loop on the next iteration.
         _run_command("git add .", cwd=str(blog_dir))
         commit_msg = f"content: Add article {article.name}"
         _run_command(f'git commit -m "{commit_msg}"', cwd=str(blog_dir))
+        dirty = _run_command("git status --porcelain", cwd=str(blog_dir))
+        if dirty:
+            logger.info("pre-commit hooks modified files; amending commit")
+            _run_command("git add -u", cwd=str(blog_dir))
+            _run_command("git commit --amend --no-edit", cwd=str(blog_dir))
 
         # Push
         _run_command(f"git push origin {branch}", cwd=str(blog_dir))

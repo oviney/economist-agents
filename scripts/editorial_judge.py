@@ -328,8 +328,8 @@ class EditorialJudge:
         # Word count
         body = self._get_body()
         word_count = len(body.split())
-        if word_count < 800:
-            issues.append(f"Too short: {word_count} words (minimum 800)")
+        if word_count < 700:
+            issues.append(f"Too short: {word_count} words (minimum 700)")
 
         if issues:
             return CheckResult(

@@ -1,3 +1,15 @@
+---
+name: product-research-agent
+description: Product Manager's research analyst — blog performance analysis, backlog recommendations driven by Google Analytics
+model: claude-sonnet-4-20250514
+tools:
+  - bash
+  - file_search
+skills:
+  - skills/observability
+  - skills/sprint-management
+---
+
 # Product Research Agent
 
 ## Role

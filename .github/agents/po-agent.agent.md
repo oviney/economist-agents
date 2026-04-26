@@ -1,3 +1,15 @@
+---
+name: po-agent
+description: Product Owner's Assistant for autonomous backlog refinement and acceptance criteria generation
+model: claude-sonnet-4-20250514
+tools:
+  - bash
+  - github_project_add_issue
+skills:
+  - skills/sprint-management
+  - skills/agent-delegation
+---
+
 # Product Owner Agent
 
 ## Role

@@ -1,6 +1,6 @@
 # Multi-Agent System Documentation
 
-The Economist-Agents project uses a sophisticated multi-agent architecture with 9 specialized AI agents that collaborate to produce publication-quality content and maintain development excellence.
+The Economist-Agents project uses a sophisticated multi-agent architecture with 10 specialized AI agents that collaborate to produce publication-quality content and maintain development excellence.
 
 ## 🤖 Agent Registry System
 
@@ -12,7 +12,7 @@ Agents are automatically discovered via the Agent Registry Pattern (ADR-002). Ag
 # Automatic agent discovery
 registry = AgentRegistry()
 all_agents = registry.create_all_agents()
-available_agents = registry.list_agents()  # Returns 9 agents
+available_agents = registry.list_agents()  # Returns 10 agents
 
 # Get specific agent
 po_agent = registry.get_agent("po-agent")
@@ -90,6 +90,13 @@ Each agent definition includes:
 - **Responsibilities**: Visual quality assurance, chart validation, design consistency
 - **Tools**: bash, file_search
 - **Metrics**: 88% pass rate, 28.6% escape rate baseline
+
+#### **@architect**
+- **Role**: AI Architect for CrewAI multi-agent system design, validation, and audit
+- **Responsibilities**: Architecture design, agent config validation, workflow evaluation, compliance audits, ADR authoring
+- **Tools**: bash, file_search
+- **Skills**: skills/architecture-patterns, skills/agent-delegation, skills/adr-governance
+- **Audit script**: `python scripts/architecture_audit.py` (rubric: 6 dimensions × 0–2 pts, ≥85% compliance threshold)
 
 ## 🎯 Agent Usage Examples
 

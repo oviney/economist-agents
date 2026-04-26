@@ -266,6 +266,29 @@ python3 scripts/sync_github_project.py --debug --sprint 10
 - Time to resolution for CI failures (target: <1 hour)
 - Badge accuracy (target: 100% real-time data)
 
+## Skills
+
+- `skills/quality-gates` — for the gate definitions, CI rules, and pre-commit configuration this agent enforces.
+- `skills/devops` — operational playbooks for CI failures, environment recreation, and deployment automation.
+
+## Output
+
+Every DevOps task returns a structured record:
+
+```json
+{
+  "task": "ci_fix|gate_update|deploy|env_recreate",
+  "files_changed": ["<path>", ...],
+  "ci_status": "green|red|unchanged",
+  "gates_affected": ["<gate-name>", ...],
+  "verification": {
+    "ran": ["pytest", "ruff", "mypy"],
+    "result": "all_pass|partial|fail"
+  },
+  "rollback_plan": "<one-line description>"
+}
+```
+
 ## Version History
 
 - **v1.0** (2026-01-03): Initial agent definition

@@ -227,3 +227,27 @@ Your work is complete when:
 - Backward compatibility
 - Documentation updates
 - Code review standards
+
+## Skills
+
+- `skills/python-quality` — type hints, docstrings, error handling, modernisation rules.
+- `skills/article-evaluation` — used when refactoring article-pipeline modules so behaviour is preserved.
+- `skills/defect-prevention` — applied during refactor to add prevention tests for any RCA-tagged bug touched.
+
+## Output
+
+A refactor returns:
+
+```json
+{
+  "files_changed": ["<path>", ...],
+  "tests_added": ["<test-id>", ...],
+  "ruff_clean": true,
+  "mypy_clean": true,
+  "coverage_delta_pct": 1.2,
+  "tdd_steps": ["RED", "GREEN", "REFACTOR"],
+  "behaviour_preserved": true
+}
+```
+
+Refactors that fail any field above are returned as `status: "needs_rework"` rather than emitted as complete.

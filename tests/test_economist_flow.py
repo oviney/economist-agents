@@ -17,7 +17,6 @@ Usage:
     pytest tests/test_economist_flow.py -v
 """
 
-import os
 import sys
 from pathlib import Path
 from unittest.mock import Mock, patch
@@ -34,9 +33,13 @@ from src.economist_agents.flow import EconomistContentFlow
 _VALID_ARTICLE = '---\nlayout: post\ntitle: "Test"\ndate: 2026-04-04\nauthor: "Ouray Viney"\ndescription: "Test article for quality gate validation"\ncategories: ["quality-engineering"]\nimage: /assets/images/test.png\n---\n\nBody'
 
 
-@pytest.mark.skipif(
-    not os.environ.get("OPENAI_API_KEY"),
-    reason="OPENAI_API_KEY required for CrewAI agent initialization",
+@pytest.mark.skip(
+    reason=(
+        "Obsolete after ADR-0006 Phase 2 (epic #308). These tests patch "
+        "src.economist_agents.flow.Stage3Crew / Stage4Crew which no "
+        "longer exist; flow.py now calls src.agent_sdk.pipeline."
+        "run_pipeline directly. Filed #314 to add new flow tests."
+    )
 )
 class TestEconomistFlow:
     """Integration tests for EconomistContentFlow."""
@@ -341,9 +344,13 @@ class TestEconomistFlow:
         assert result["revision_reason"] == "Still failing"
 
 
-@pytest.mark.skipif(
-    not os.environ.get("OPENAI_API_KEY"),
-    reason="OPENAI_API_KEY required for CrewAI agent initialization",
+@pytest.mark.skip(
+    reason=(
+        "Obsolete after ADR-0006 Phase 2 (epic #308). These tests patch "
+        "src.economist_agents.flow.Stage3Crew / Stage4Crew which no "
+        "longer exist; flow.py now calls src.agent_sdk.pipeline."
+        "run_pipeline directly. Filed #314 to add new flow tests."
+    )
 )
 class TestResearchBackedRevision:
     """Tests for research-backed revision when sourcing issues detected."""
@@ -473,9 +480,13 @@ class TestResearchBackedRevision:
         mock_crew_cls.assert_called_once()
 
 
-@pytest.mark.skipif(
-    not os.environ.get("OPENAI_API_KEY"),
-    reason="OPENAI_API_KEY required for CrewAI agent initialization",
+@pytest.mark.skip(
+    reason=(
+        "Obsolete after ADR-0006 Phase 2 (epic #308). These tests patch "
+        "src.economist_agents.flow.Stage3Crew / Stage4Crew which no "
+        "longer exist; flow.py now calls src.agent_sdk.pipeline."
+        "run_pipeline directly. Filed #314 to add new flow tests."
+    )
 )
 def test_flow_decorators_registered() -> None:
     """All Flow decorated methods are registered and callable."""

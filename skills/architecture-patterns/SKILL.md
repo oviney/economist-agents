@@ -23,7 +23,11 @@ The reference for the AI Architect agent and any reviewer evaluating CrewAI mult
 - For ADR formatting and numbering — that's `adr-governance`
 - For Python coding standards — that's `python-quality`
 
-## Core Patterns
+## Core Process
+
+The architect's work follows three repeatable patterns described below: **CrewAI** (in-repo precedent), **AutoGen** (external reference), and **Anti-Patterns** (failure modes to flag). Apply them in that order when designing or reviewing.
+
+### CrewAI Patterns
 
 ### CrewAI
 
@@ -91,3 +95,20 @@ Architectural decisions get an ADR (`docs/adr/NNNN-*.md`) following `docs/adr/TE
 | "Hierarchical is more flexible" | Hierarchical adds a manager. Use only when branching exists; otherwise sequential is faster and cheaper. |
 | "Tools are free, add what we might need" | Tool sprawl confuses the model and bloats schemas. Each tool needs a justification. |
 | "We'll add an ADR later" | Decisions without an ADR get reversed on the next refactor. Write it now. |
+| "Tuning the rubric is fine if the agents are nearly there" | A calibration tool you tune to clear its own threshold loses signal for catching future drift. Lift the corpus or accept the gap. |
+
+## Red Flags
+
+- An agent file exists but no other file references its slug — the agent is dead weight.
+- Two agents in the corpus have overlapping role descriptions — coordination overhead with no specialisation gain.
+- A new agent's `tools:` list grows during implementation rather than during design — sign that the role wasn't bounded.
+- An ADR is being written *after* the code change has merged — the ADR is rationalisation, not decision.
+- The architecture audit score moves up after a rubric change rather than after a corpus change — calibration drift.
+- A workflow uses `Flow` for what fits a `Crew` (or vice versa) — orchestration mode chosen by familiarity, not by topology.
+
+## Verification
+
+- Run `python scripts/architecture_audit.py` — passes when corpus ≥85%.
+- Tests in `tests/test_architect_agent.py` and `tests/test_architecture_audit.py` enforce the rubric and the architect agent's own compliance.
+- Every architectural change of structural significance has a corresponding ADR under `docs/adr/`.
+- Every new agent under `.github/agents/` is referenced by at least one consumer (registry usage, crew invocation, documentation cross-link).

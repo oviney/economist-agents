@@ -182,7 +182,7 @@ pytest tests/ --cov=scripts --cov-report=html
 
 ### Python Coding Standards
 
-Follow the patterns in [`skills/python-quality/SKILL.md`](skills/python-quality/SKILL.md):
+Follow the patterns in [`skills/python-quality/SKILL.md`](skills/python-quality/SKILL.md). The canonical SKILL.md format is documented in [`docs/skill-anatomy.md`](docs/skill-anatomy.md) and enforced by `scripts/validate_skills.py` in pre-commit and CI.
 
 #### Example: Good Code
 

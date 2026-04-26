@@ -75,6 +75,16 @@ repos:
         language: system
         pass_filenames: false
         files: ^agents/.*\.yaml$
+
+      # Skills format validation (GH #294)
+      - id: validate-skills
+        name: validate SKILL.md format
+        description: Enforce skill anatomy (docs/skill-anatomy.md)
+        entry: python3 scripts/validate_skills.py
+        language: system
+        pass_filenames: false
+        files: ^skills/.*/SKILL\.md$
+        always_run: false
         always_run: false
 
       # Architecture review - catches anti-patterns before CI (issue: pre-commit-arch-review)

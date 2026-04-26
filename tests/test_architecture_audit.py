@@ -32,9 +32,7 @@ def real_report() -> audit_mod.AuditReport:
 class TestAuditReportShape:
     """Audit returns a structured report consumable by tooling."""
 
-    def test_report_has_iso_timestamp(
-        self, real_report: audit_mod.AuditReport
-    ) -> None:
+    def test_report_has_iso_timestamp(self, real_report: audit_mod.AuditReport) -> None:
         assert real_report.audited_at.endswith("Z")
 
     def test_report_threshold_default(self) -> None:
@@ -47,9 +45,7 @@ class TestAuditReportShape:
         assert rep.threshold == 50.0
         assert rep.passes_threshold is True  # easily met
 
-    def test_includes_architect_agent(
-        self, real_report: audit_mod.AuditReport
-    ) -> None:
+    def test_includes_architect_agent(self, real_report: audit_mod.AuditReport) -> None:
         names = {a.name for a in real_report.agents}
         assert "architect" in names
 
@@ -88,9 +84,7 @@ class TestComplianceAcceptance:
         )
         assert real_report.passes_threshold is True
 
-    def test_architect_scores_high(
-        self, real_report: audit_mod.AuditReport
-    ) -> None:
+    def test_architect_scores_high(self, real_report: audit_mod.AuditReport) -> None:
         architect = next(a for a in real_report.agents if a.name == "architect")
         assert architect.compliance_pct >= 85.0, (
             "architect agent itself must be a model citizen"
@@ -138,7 +132,7 @@ class TestEdgeCases:
             "# Minimal Agent\n\n"
             "## Role\nSpecialist that validates the rubric end-to-end.\n\n"
             "## Process\nDo work, then verify.\n\n"
-            "## Output\n```json\n{\"status\": \"ok\"}\n```\n"
+            '## Output\n```json\n{"status": "ok"}\n```\n'
             "References skills/testing throughout.\n",
             encoding="utf-8",
         )

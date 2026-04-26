@@ -13,6 +13,8 @@ from src.agent_sdk._shared import (
 from src.agent_sdk._shared import (
     audit_article_stats as _audit_article_stats,
 )
+
+
 class TestExtractStats:
     """_extract_stats() regex extraction."""
 

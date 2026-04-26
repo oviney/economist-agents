@@ -60,9 +60,7 @@ class TestArchitectFrontmatter:
         fm, _ = architect_parsed
         assert fm["name"] == "architect"
 
-    def test_tools_is_nonempty_list(
-        self, architect_parsed: tuple[dict, str]
-    ) -> None:
+    def test_tools_is_nonempty_list(self, architect_parsed: tuple[dict, str]) -> None:
         fm, _ = architect_parsed
         tools = fm.get("tools")
         assert isinstance(tools, list) and tools, "tools must be a non-empty list"
@@ -95,7 +93,9 @@ class TestArchitectBody:
         self, architect_parsed: tuple[dict, str]
     ) -> None:
         _, body = architect_parsed
-        assert "```json" in body, "architect must document an explicit JSON output contract"
+        assert "```json" in body, (
+            "architect must document an explicit JSON output contract"
+        )
 
     def test_body_includes_mermaid_or_diagram(
         self, architect_parsed: tuple[dict, str]

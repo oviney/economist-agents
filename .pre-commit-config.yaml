@@ -67,6 +67,16 @@ repos:
         files: ^(docs/adr/|mkdocs\.yml$|docs/ADR-.*\.md$|docs/architecture/ADR.*\.md$)
         always_run: false
 
+      # Skill anatomy validation (issues #293 #294 — docs/skill-anatomy.md)
+      - id: validate-skills
+        name: validate SKILL.md anatomy
+        description: Enforce skills/*/SKILL.md frontmatter and required sections
+        entry: .venv/bin/python scripts/validate_skills.py
+        language: system
+        pass_filenames: false
+        files: ^skills/.+/SKILL\.md$
+        always_run: false
+
       # Agent YAML validation (ADR-0001)
       - id: validate-agent-yaml
         name: validate agent YAML configs

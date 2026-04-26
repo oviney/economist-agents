@@ -21,6 +21,10 @@ test_outputs/
 model_comparison_results.json
 output/
 
+# Runtime telemetry / eval logs (appended-to by tests + pipeline)
+logs/article_evals.json
+logs/agent_sdk_costs.jsonl
+
 # Secrets
 .env
 *.key

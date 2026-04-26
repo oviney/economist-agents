@@ -103,5 +103,68 @@
       "structure": "0 headings, 3 words, missing: ['layout', 'title', 'date', 'categories', 'image'], references: no",
       "visual_engagement": "image: no, chart embedded: no"
     }
+  },
+  {
+    "article_filename": "published",
+    "timestamp": "2026-04-25T21:52:49.200460",
+    "scores": {
+      "opening_quality": 4,
+      "evidence_sourcing": 3,
+      "voice_consistency": 10,
+      "structure": 1,
+      "visual_engagement": 5
+    },
+    "total_score": 23,
+    "max_score": 50,
+    "percentage": 46,
+    "details": {
+      "opening_quality": "Opening has 0 data tokens",
+      "evidence_sourcing": "0 references cited, 0 placeholders; fresh citations (2026/2025): 0; analyst vendors cited: 0",
+      "voice_consistency": "Clean voice",
+      "structure": "0 headings, 3 words, missing: ['layout', 'title', 'date', 'categories', 'image'], references: no",
+      "visual_engagement": "image: no, chart embedded: no"
+    }
+  },
+  {
+    "article_filename": "published",
+    "timestamp": "2026-04-25T21:51:10.230412",
+    "scores": {
+      "opening_quality": 4,
+      "evidence_sourcing": 3,
+      "voice_consistency": 10,
+      "structure": 1,
+      "visual_engagement": 5
+    },
+    "total_score": 23,
+    "max_score": 50,
+    "percentage": 46,
+    "details": {
+      "opening_quality": "Opening has 0 data tokens",
+      "evidence_sourcing": "0 references cited, 0 placeholders; fresh citations (2026/2025): 0; analyst vendors cited: 0",
+      "voice_consistency": "Clean voice",
+      "structure": "0 headings, 3 words, missing: ['layout', 'title', 'date', 'categories', 'image'], references: no",
+      "visual_engagement": "image: no, chart embedded: no"
+    }
+  },
+  {
+    "article_filename": "published",
+    "timestamp": "2026-04-25T21:54:56.539509",
+    "scores": {
+      "opening_quality": 4,
+      "evidence_sourcing": 3,
+      "voice_consistency": 10,
+      "structure": 1,
+      "visual_engagement": 5
+    },
+    "total_score": 23,
+    "max_score": 50,
+    "percentage": 46,
+    "details": {
+      "opening_quality": "Opening has 0 data tokens",
+      "evidence_sourcing": "0 references cited, 0 placeholders; fresh citations (2026/2025): 0; analyst vendors cited: 0",
+      "voice_consistency": "Clean voice",
+      "structure": "0 headings, 3 words, missing: ['layout', 'title', 'date', 'categories', 'image'], references: no",
+      "visual_engagement": "image: no, chart embedded: no"
+    }
   }
 ]

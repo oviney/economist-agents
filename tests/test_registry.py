@@ -54,35 +54,30 @@ class TestAgentRegistry:
         assert crew_instance is not None
         assert hasattr(crew_instance, "kickoff")
 
-    @requires_crewai
+    @pytest.mark.skip(
+        reason=(
+            "Stage4Crew was deleted in epic #308 (ADR-0006 Phase 2). "
+            "Stage 4 logic now lives in src.agent_sdk.stage4_runner; "
+            "the registry no longer needs a Stage4Crew entry."
+        )
+    )
     def test_load_stage4_crew(self):
-        """Test that AgentRegistry can load Stage4Crew"""
-        registry = AgentRegistry()
+        pass
 
-        # Load Stage4Crew class
-        stage4_class = registry.get_crew_class("Stage4Crew")
-        assert stage4_class is not None
-
-        # Instantiate (Stage4Crew takes no __init__ args)
-        crew_instance = stage4_class()
-        assert crew_instance is not None
-        assert hasattr(crew_instance, "kickoff")
-
-    @requires_crewai
     def test_get_available_crews(self):
-        """List available crews — requires the legacy CrewAI src/crews/ tree.
+        """List available crews — only the legacy stub remains.
 
-        After ADR-0006 Phase 2 (epic #308) src/crews/ is gone; the
-        registry returns an empty list and the production pipeline uses
-        src.agent_sdk.pipeline.run_pipeline directly. This test only
-        runs in environments where the legacy tree is still present.
+        After ADR-0006 Phase 2 (epic #308) src/crews/ is gone. The
+        registry's legacy fallback at src/stage3_crew.py still exposes
+        a Stage3Crew stub for backwards compatibility; Stage4Crew is
+        gone entirely.
         """
         registry = AgentRegistry()
 
         available_crews = registry.get_available_crews()
         assert isinstance(available_crews, list)
         assert "Stage3Crew" in available_crews
-        assert "Stage4Crew" in available_crews
+        assert "Stage4Crew" not in available_crews
 
     def test_invalid_crew_name(self):
         """Test that requesting an invalid crew raises appropriate error"""

@@ -1,6 +1,6 @@
 # ADR-0006: Agent Framework Selection for Autonomous Content Pipeline
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-04-05
 **Decision Maker:** Ouray Viney (Engineering Lead)
 **Research:** Four parallel research agents covering Anthropic Agent SDK, MCP Protocol, CrewAI current state, and existing tool stack fit
@@ -258,8 +258,10 @@ The project pays for three LLM providers but only actively uses one (GPT-4o via 
 | Date | Decision | Rationale |
 |------|----------|-----------|
 | 2026-04-05 | ADR proposed | Research completed by four parallel agents |
-| _pending_ | Phase 1 approved | _awaiting review_ |
-| _pending_ | Framework selected | _awaiting Phase 1 completion + PoC results_ |
+| 2026-04-21 | Phase 1 complete | All 6 MCP servers landed in `mcp_servers/` plus 2 bonus servers (`orchestrator`, `published-topics`); wired in `.mcp.json` |
+| 2026-04-25 | Framework selected: **Option B (Anthropic Agent SDK + MCP)** | Spike #309 proved Stage 3 viability; Story #310 added Stage 4 + validator gate; Stories #311 #312 added budget caps and per-role model tiering |
+| 2026-04-25 | Story #313 — CrewAI removed | `src/crews/` deleted; `flow.py` rewritten as sequential Python over `src.agent_sdk.pipeline.run_pipeline`; `crewai`/`crewai-tools` dropped from requirements |
+| 2026-04-25 | **Status moved to Accepted** | Phase 2 complete; Agent SDK is the production runtime |
 
 ---
 

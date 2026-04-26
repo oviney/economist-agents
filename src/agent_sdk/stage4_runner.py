@@ -25,7 +25,7 @@ import orjson
 
 from scripts.article_evaluator import ArticleEvaluator
 from scripts.publication_validator import PublicationValidator
-from src.crews.stage4_crew import _apply_editorial_fixes
+from src.agent_sdk._shared import apply_editorial_fixes as _apply_editorial_fixes
 
 logger = logging.getLogger(__name__)
 
@@ -66,8 +66,10 @@ def run_stage4(
     del chart_data
     start = time.perf_counter()
 
-    current_date = datetime.now().strftime("%Y-%m-%d")
-    polished = _apply_editorial_fixes(article, current_date=current_date)
+    polished = _apply_editorial_fixes(
+        article,
+        current_date=datetime.now().strftime("%Y-%m-%d"),
+    )
 
     evaluator = ArticleEvaluator()
     eval_result = evaluator.evaluate(polished)

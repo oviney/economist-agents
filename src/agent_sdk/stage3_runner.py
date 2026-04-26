@@ -20,6 +20,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import re
 import sys
 import time
 from dataclasses import asdict, dataclass
@@ -83,7 +84,10 @@ VOICE (British, confident, witty):
 - Active voice: "Companies are racing" not "it is being observed that"
 - Reads like a brilliant dinner companion, not a textbook
 
-You validate your work against all 10 rules above before submission."""
+FORMATTING:
+- Separate paragraphs with a blank line
+- Place a blank line before and after every `## ` heading
+- Do not emit the article more than once; output exactly one article per response"""
 
 
 @dataclass
@@ -102,6 +106,41 @@ class SpikeResult:
     stat_audit_removed: int
 
 
+_INLINE_HEADING_PATTERN = re.compile(r"[ \t]+(##+ +[A-Z][^\n]*)")
+_HEADING_LINE_PATTERN = re.compile(r"(?<!\n\n)(^|\n)(##+ +[^\n]+)\n(?!\n)")
+_DUPLICATE_FRONTMATTER_PATTERN = re.compile(r"\n---\nlayout:.*", re.DOTALL)
+
+
+def _normalize_paragraphs(text: str) -> str:
+    """Restore blank lines around `##` headings.
+
+    The model frequently emits headings glued to the preceding sentence
+    on the same line (``"...the easy part. ## The Perception Gap"``).
+    Lift any inline heading onto its own line, then ensure every heading
+    has a blank line before and after it.
+    """
+    text = _INLINE_HEADING_PATTERN.sub(r"\n\n\1", text)
+    text = _HEADING_LINE_PATTERN.sub(r"\1\2\n\n", text)
+    return text
+
+
+def _strip_duplicate_article(text: str) -> str:
+    """If the model emitted two complete articles, keep only the first.
+
+    The pattern looks for a ``\\n---\\nlayout:`` block, which can only
+    appear after the original frontmatter (the original starts at offset
+    zero with ``---``, no leading newline). When found, the second
+    article is dropped.
+    """
+    match = _DUPLICATE_FRONTMATTER_PATTERN.search(text)
+    if match:
+        logger.warning(
+            "Stripping duplicate article emission at offset %d", match.start()
+        )
+        return text[: match.start()].rstrip() + "\n"
+    return text
+
+
 async def _collect_text(
     prompt: str,
     system_prompt: str,
@@ -109,13 +148,10 @@ async def _collect_text(
 ) -> tuple[str, float]:
     """Run a single Agent SDK query and return ``(text, cost_usd)``.
 
-    Args:
-        prompt: User prompt for this turn.
-        system_prompt: System prompt establishing role and rules.
-        model: Claude model identifier.
-
-    Returns:
-        Tuple of (concatenated assistant text, total cost in USD).
+    Streaming text chunks are joined with a space when the boundary
+    between two chunks looks like an unintended word concatenation
+    (lowercase letter followed by uppercase letter), to avoid artefacts
+    such as "OrganisationsDoubleDown" seen in the Story 1 spike output.
     """
     options = ClaudeAgentOptions(
         system_prompt=system_prompt,
@@ -134,7 +170,16 @@ async def _collect_text(
                     text_chunks.append(block.text)
         elif isinstance(msg, ResultMessage):
             cost = float(msg.total_cost_usd or 0.0)
-    return "".join(text_chunks), cost
+
+    pieces: list[str] = []
+    for chunk in text_chunks:
+        if pieces and pieces[-1] and chunk:
+            prev_last = pieces[-1][-1]
+            curr_first = chunk[0]
+            if prev_last.islower() and curr_first.isupper():
+                pieces.append(" ")
+        pieces.append(chunk)
+    return "".join(pieces), cost
 
 
 def _parse_chart_json(text: str) -> dict:
@@ -181,18 +226,25 @@ async def run_stage3_spike(topic: str) -> SpikeResult:
         f"(kebab-case from quality-engineering, software-engineering, "
         f"test-automation, security), image (/assets/images/SLUG.png), "
         f"and description (160 chars max).\n\n"
-        f"Body must be at least 800 words. End with a `## References` "
-        f"section containing 3+ numbered citations.\n\n"
+        f"Body must be at least 850 words (the publication validator "
+        f"rejects anything under 700, so leave a margin). End with a "
+        f"`## References` section containing 3+ numbered citations.\n\n"
+        f"At least one paragraph in the body must reference the chart "
+        f"explicitly — write something like 'as the chart shows', "
+        f"'the chart makes clear', or 'the chart below illustrates'. "
+        f"This is required by the publication validator.\n\n"
         f"RESEARCH BRIEF (use ONLY these sources and statistics — do NOT "
         f"invent any statistics, researcher names, or URLs):\n\n"
         f"{research_brief}"
     )
-    pre_audit_article, writer_cost = await _collect_text(
+    raw_writer_output, writer_cost = await _collect_text(
         writer_prompt, WRITER_SYSTEM_PROMPT
     )
+    pre_audit_article = _strip_duplicate_article(raw_writer_output)
 
-    article = _audit_article_stats(pre_audit_article, research_brief)
-    stat_audit_removed = pre_audit_article.count(".") - article.count(".")
+    audited = _audit_article_stats(pre_audit_article, research_brief)
+    stat_audit_removed = pre_audit_article.count(".") - audited.count(".")
+    article = _normalize_paragraphs(audited)
 
     graphics_prompt = (
         "Generate the chart JSON for this article. Output a single valid "

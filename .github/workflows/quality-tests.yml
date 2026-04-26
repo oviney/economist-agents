@@ -35,3 +35,6 @@ jobs:
         run: |
           python -c "import json; json.load(open('data/skills_state/blog_qa_skills.json'))"
           echo "✅ Skills JSON valid"
+
+      - name: Validate SKILL.md anatomy
+        run: python scripts/validate_skills.py

@@ -6,9 +6,13 @@ don't appear in the research brief, and that verified stats pass through
 cleanly.
 """
 
-import pytest
-
-from src.crews.stage3_crew import _audit_article_stats, _extract_stats
+from src.agent_sdk._shared import (
+    _extract_stats,
+    parse_research_for_verification,
+)
+from src.agent_sdk._shared import (
+    audit_article_stats as _audit_article_stats,
+)
 
 
 class TestExtractStats:
@@ -84,8 +88,7 @@ class TestAuditArticleStats:
     def test_frontmatter_preserved(self) -> None:
         research = "No matching stats here."
         article = (
-            "---\ntitle: Test\ndate: 2026-04-17\n---\n"
-            "The body has no numeric claims."
+            "---\ntitle: Test\ndate: 2026-04-17\n---\nThe body has no numeric claims."
         )
         result = _audit_article_stats(article, research)
         assert "title: Test" in result
@@ -108,19 +111,15 @@ class TestParseResearchForVerification:
     """Stage3Crew._parse_research_for_verification() extracts URL+stat pairs."""
 
     def test_extracts_markdown_links_with_stats(self) -> None:
-        from src.crews.stage3_crew import Stage3Crew
-
         research = (
             "According to [Carnegie Mellon Study](https://example.com/study), "
             "bugs increased by 41% after AI adoption."
         )
-        result = Stage3Crew._parse_research_for_verification(research)
+        result = parse_research_for_verification(research)
         assert len(result["data_points"]) >= 1
         assert result["data_points"][0]["url"] == "https://example.com/study"
 
     def test_no_links_returns_empty(self) -> None:
-        from src.crews.stage3_crew import Stage3Crew
-
         research = "Some research text with 50% stats but no URLs."
-        result = Stage3Crew._parse_research_for_verification(research)
+        result = parse_research_for_verification(research)
         assert result["data_points"] == []

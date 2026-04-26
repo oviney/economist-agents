@@ -6,7 +6,7 @@ Thank you for your interest in contributing to the Economist-Agents project! Thi
 
 ### Prerequisites
 
-- **Python 3.13.x** (⚠️ Python 3.14+ is not supported due to CrewAI compatibility)
+- **Python 3.13.x** (3.14+ untested)
 - **Git** with pre-commit hooks enabled
 - **Virtual environment** (venv or conda)
 
@@ -405,6 +405,23 @@ Adding [Agent Name] to agents/skills_configs/.
 - Increment `metadata.version` (patch, minor, or major — see `skills/README.md`).
 - Describe the change in your PR body.
 - If the output format changes (major bump), note any migration steps.
+
+### Adding or modifying a SKILL.md
+
+Every `skills/*/SKILL.md` must follow the canonical anatomy in
+[`docs/skill-anatomy.md`](docs/skill-anatomy.md): two-field frontmatter
+(`name` matches directory, `description` ends with terminal punctuation)
+and the six required `##` body sections (Overview, When to Use, Core
+Process, Common Rationalizations, Red Flags, Verification).
+
+Run the validator locally before committing:
+
+```bash
+python scripts/validate_skills.py
+```
+
+The same script runs in pre-commit (`validate-skills` hook) and in the
+Quality Gates CI workflow, so a non-compliant skill blocks the merge.
 
 ---
 

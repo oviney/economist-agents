@@ -543,9 +543,7 @@ class PublicationValidator:
         # 2. Check summary-opener restatement endings
         for starter in self._SUMMARY_STARTERS:
             if re.match(re.escape(starter) + r"\b", last_paragraph, re.IGNORECASE):
-                violations.append(
-                    f'Summary restatement opening: "{starter}"'
-                )
+                violations.append(f'Summary restatement opening: "{starter}"')
 
         if violations:
             details = "\n".join(f"  - {v}" for v in violations)

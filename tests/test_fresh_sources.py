@@ -292,23 +292,23 @@ class TestResearchAgentPrompt:
 # ─────────────────────────────────────────────────────────────────────────────
 
 
+@pytest.mark.skip(
+    reason=(
+        "Obsolete after ADR-0006 Phase 2 (epic #308): the LLM research "
+        "agent and its backstory were removed entirely. Research now "
+        "happens deterministically via build_research_brief() in "
+        "src/agent_sdk/_shared.py with no LLM call. The freshness, "
+        "analyst-limit, and source-diversity rules live in "
+        "skills/research-sourcing/SKILL.md and are enforced by the "
+        "search query construction, not a prompt."
+    )
+)
 class TestStage3CrewBackstory:
-    """Verify the Stage3Crew research agent backstory references sourcing skill."""
-
     def test_backstory_references_skill_file(self) -> None:
-        """Stage3Crew research backstory should mention the sourcing skill file."""
-        with open("src/crews/stage3_crew.py") as f:
-            content = f.read()
-        assert "skills/research-sourcing/SKILL.md" in content
+        pass
 
     def test_backstory_mentions_analyst_limit(self) -> None:
-        """Stage3Crew research backstory should mention the 1 analyst report limit."""
-        with open("src/crews/stage3_crew.py") as f:
-            content = f.read()
-        assert "max 1" in content.lower() or "MAX 1" in content
+        pass
 
     def test_backstory_mentions_source_freshness(self) -> None:
-        """Stage3Crew research backstory should mention 2025 or 2026 as required years."""
-        with open("src/crews/stage3_crew.py") as f:
-            content = f.read()
-        assert "2025" in content or "2026" in content
+        pass

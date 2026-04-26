@@ -129,9 +129,7 @@ def _create_openai_client(max_retries: int, base_delay: int) -> LLMClient:
                     f"[LLM_CLIENT] Rate limit exceeded after {max_retries} retries: {e}"
                 ) from e
         except Exception as e:
-            raise ValueError(
-                f"[LLM_CLIENT] Failed to create OpenAI client: {e}"
-            ) from e
+            raise ValueError(f"[LLM_CLIENT] Failed to create OpenAI client: {e}") from e
 
     raise ValueError("[LLM_CLIENT] Unreachable")
 

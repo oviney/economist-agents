@@ -1,0 +1,12 @@
+{
+  "name": "economist-agents",
+  "description": "Multi-agent content pipeline that generates Economist-style articles with verified sources, deterministic quality gates, and an Anthropic Agent SDK runtime.",
+  "version": "0.2.0",
+  "author": "Ouray Viney",
+  "license": "MIT",
+  "homepage": "https://github.com/oviney/economist-agents",
+  "repository": "https://github.com/oviney/economist-agents",
+  "skills": "skills",
+  "agents": "agents/skills_configs",
+  "commands": "commands"
+}

@@ -1,0 +1,38 @@
+{
+  "title": "The AI coding paradox",
+  "subtitle": "Change in software development metrics with AI assistants, %",
+  "data": [
+    {
+      "metric": "Individual velocity",
+      "value": 45,
+      "unit": "%",
+      "color": "navy"
+    },
+    {
+      "metric": "Team throughput",
+      "value": -12,
+      "unit": "%",
+      "color": "burgundy"
+    },
+    {
+      "metric": "Code review time",
+      "value": 85,
+      "unit": "%",
+      "color": "burgundy"
+    },
+    {
+      "metric": "Debug time",
+      "value": 65,
+      "unit": "%",
+      "color": "burgundy"
+    }
+  ],
+  "colors": {
+    "navy": "#1f3a68",
+    "burgundy": "#c8102e"
+  },
+  "dimensions": {
+    "width": 800,
+    "height": 500
+  }
+}

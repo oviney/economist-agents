@@ -1,0 +1,21 @@
+{
+  "topic": "the productivity paradox of AI coding assistants",
+  "editorial_score": 90,
+  "gates_passed": 4,
+  "publication_ready": true,
+  "publication_validator_passed": true,
+  "publication_validator_issues": [
+    {
+      "check": "defect_pattern_BUG-017-pattern",
+      "severity": "MEDIUM",
+      "message": "Duplicate chart display detected: 'image:' field in frontmatter AND chart markdown in body. Remove 'image:' field. This prevents BUG-017 (duplicate chart rendering).",
+      "details": "Historical pattern from BUG-017-pattern",
+      "fix": "See message for specific remediation"
+    }
+  ],
+  "total_cost_usd": 0.1425145,
+  "stage3_seconds": 145.7363025409868,
+  "stage4_seconds": 0.010016708984039724,
+  "article_chars": 7679,
+  "total_wall_seconds": 145.74696262495127
+}

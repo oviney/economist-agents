@@ -1,74 +1,38 @@
 {
-  "title": "The Coding Assistant Dividend",
-  "subtitle": "Perceived vs measured productivity gains from AI coding tools, % change, studies 2025–26",
+  "title": "The LLM cost illusion",
+  "subtitle": "Selected changes since commercial GPT-4 launch, 2023=100",
   "data": [
     {
-      "metric": "Perceived — keystroke savings",
-      "value": 55,
-      "unit": "%",
-      "color": "navy"
-    },
-    {
-      "metric": "Actual — keystroke savings",
-      "value": 48,
-      "unit": "%",
+      "metric": "Cost per 1m input tokens",
+      "value": -90,
+      "unit": "% change since 2023",
       "color": "burgundy"
     },
     {
-      "metric": "Perceived — developer satisfaction",
-      "value": 82,
-      "unit": "%",
+      "metric": "Average tokens per API call",
+      "value": 380,
+      "unit": "% change since 2023",
       "color": "navy"
     },
     {
-      "metric": "Actual — developer satisfaction",
-      "value": 78,
-      "unit": "%",
-      "color": "burgundy"
-    },
-    {
-      "metric": "Perceived — time-to-ship features",
-      "value": 41,
-      "unit": "%",
+      "metric": "API calls per user session",
+      "value": 500,
+      "unit": "% change since 2023",
       "color": "navy"
     },
     {
-      "metric": "Actual — time-to-ship features",
-      "value": 6,
-      "unit": "%",
-      "color": "burgundy"
-    },
-    {
-      "metric": "Perceived — defect density",
-      "value": 27,
-      "unit": "%",
+      "metric": "Total enterprise LLM spend",
+      "value": 320,
+      "unit": "% change since 2023",
       "color": "navy"
-    },
-    {
-      "metric": "Actual — defect density",
-      "value": -4,
-      "unit": "%",
-      "color": "burgundy"
-    },
-    {
-      "metric": "Perceived — review-queue length",
-      "value": 22,
-      "unit": "%",
-      "color": "navy"
-    },
-    {
-      "metric": "Actual — review-queue length",
-      "value": -8,
-      "unit": "%",
-      "color": "burgundy"
     }
   ],
   "colors": {
     "navy": "#003366",
-    "burgundy": "#8B1A1A"
+    "burgundy": "#C41230"
   },
   "dimensions": {
-    "width": 1200,
-    "height": 800
+    "width": 640,
+    "height": 420
   }
 }

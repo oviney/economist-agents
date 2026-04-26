@@ -69,13 +69,6 @@ class TestAgentMetricsIntegration:
         assert "Clean Rate" in output or "Verification Rate" in output
 
 
-@pytest.mark.skip(
-    reason=(
-        "Pre-existing failure tracked as #314 — the dashboard generator "
-        "no longer emits the 'Sprint-Over-Sprint Trends' section the "
-        "tests assert on. Out of scope for the ADR-0006 Phase 2 PR."
-    )
-)
 class TestSprintTrendsDisplay:
     """Task 2: Validate sprint trends display correctly"""
 
@@ -111,9 +104,6 @@ class TestSprintTrendsDisplay:
         assert "↑ Better" in output or "↓ Worse" in output or "→ Stable" in output
 
 
-@pytest.mark.skip(
-    reason="Pre-existing failure tracked as #314 — see TestSprintTrendsDisplay."
-)
 class TestDashboardValidation:
     """Task 3: Dashboard validation tests"""
 
@@ -208,9 +198,6 @@ class TestAcceptanceCriteria:
         # Real data varies, so we check format exists
         assert "Rate" in output or "Accuracy" in output
 
-    @pytest.mark.skip(
-        reason="Pre-existing failure tracked as #314 — see TestSprintTrendsDisplay."
-    )
     def test_task2_sprint_trends_display(self):
         """Task 2 AC: Sprint trends table with velocity, quality, escape rate"""
         from scripts.quality_dashboard import QualityDashboard

@@ -83,8 +83,13 @@ class DefectTracker:
 
     def __init__(self, tracker_file: str = None):
         if tracker_file is None:
-            script_dir = Path(__file__).parent.parent
-            tracker_file = script_dir / "data" / "skills_state" / "defect_tracker.json"
+            repo_root = Path(__file__).parent.parent
+            # The tracker JSON moved from skills/ to data/skills_state/
+            # during the Sprint 20-21 restructure. Prefer the new path;
+            # fall back to the legacy location for backwards compat.
+            new_path = repo_root / "data" / "skills_state" / "defect_tracker.json"
+            legacy_path = repo_root / "skills" / "defect_tracker.json"
+            tracker_file = new_path if new_path.exists() else legacy_path
 
         self.tracker_file = Path(tracker_file)
         self.tracker = self._load_tracker()

@@ -20,7 +20,7 @@ import logging
 import re
 import sys
 from dataclasses import asdict, dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -393,7 +393,7 @@ def audit(agents_dir: Path, threshold: float = DEFAULT_THRESHOLD) -> AuditReport
     overall = round(sum(a.compliance_pct for a in agent_scores) / len(agent_scores), 1)
 
     return AuditReport(
-        audited_at=datetime.utcnow().isoformat() + "Z",
+        audited_at=datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
         agents=agent_scores,
         overall_compliance_pct=overall,
         passes_threshold=overall >= threshold,

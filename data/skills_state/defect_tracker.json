@@ -470,6 +470,112 @@
         "Added regression test for title-derived slugs (your-content-strategy)"
       ],
       "fix_notes": "Replaced overly broad YOUR-\\w+ regex in publication_validator.py PLACEHOLDER_TEXT with enumerated tokens (YOUR-NAME, YOUR-COMPANY, YOUR-EMAIL, YOUR-TITLE, YOUR-ROLE, YOUR-DATE, YOUR-COMPANY-NAME) plus word boundaries. Added regression test test_your_in_slug_not_flagged_as_placeholder."
+    },
+    {
+      "id": "BUG-032",
+      "severity": "high",
+      "discovered_in": "test_collection",
+      "discovered_date": "2026-04-26T16:56:33.701701",
+      "description": "scripts/arxiv_search.py module-level annotation `arxiv.Result` evaluated at class creation, crashes import when optional `arxiv` package missing",
+      "component": "research_tools",
+      "status": "fixed",
+      "fixed_date": "2026-04-26T16:56:33.701701",
+      "fix_commit": "2cf28a4",
+      "fix_notes": "Added `from __future__ import annotations` to defer annotation evaluation until access, allowing the module to import even when the optional dependency is absent.",
+      "root_cause": "code_logic",
+      "root_cause_notes": "Type annotation referencing optional dependency at class-body scope, which Python evaluates eagerly without postponed evaluation.",
+      "is_production_escape": false,
+      "prevention_strategy": [
+        "enhanced_validation"
+      ],
+      "prevention_actions": [
+        "Pattern: any module with `try: import optional_pkg / except ImportError: optional_pkg = None` must use `from __future__ import annotations` if it references the package in type annotations."
+      ]
+    },
+    {
+      "id": "BUG-033",
+      "severity": "medium",
+      "discovered_in": "test_failure",
+      "discovered_date": "2026-04-26T16:56:33.701701",
+      "description": "scripts/article_archive.py drops the injected ChromaDB client when CHROMADB_AVAILABLE is False, defeating dependency-injection in tests",
+      "component": "article_archive",
+      "status": "fixed",
+      "fixed_date": "2026-04-26T16:56:33.701701",
+      "fix_commit": "2cf28a4",
+      "fix_notes": "Allow `_client` injection to bypass the availability guard \u2014 caller is supplying whatever interface chroma would provide.",
+      "root_cause": "code_logic",
+      "root_cause_notes": "Availability guard checked before honouring injection.",
+      "is_production_escape": false,
+      "prevention_strategy": [
+        "enhanced_validation"
+      ],
+      "prevention_actions": [
+        "Pattern: dependency-injection points must run before optional-dependency guards."
+      ]
+    },
+    {
+      "id": "BUG-034",
+      "severity": "high",
+      "discovered_in": "test_failure",
+      "discovered_date": "2026-04-26T16:56:33.701701",
+      "description": "scripts/quality_dashboard.py reads sprint history from legacy `skills/sprint_history.json` instead of canonical `data/skills_state/sprint_history.json`, rendering dashboards without sprint trends",
+      "component": "quality_dashboard",
+      "status": "fixed",
+      "fixed_date": "2026-04-26T16:56:33.701701",
+      "fix_commit": "2cf28a4",
+      "fix_notes": "Updated path to data/skills_state/. CLAUDE.md is the source of truth for state file locations.",
+      "root_cause": "integration_error",
+      "root_cause_notes": "State files were relocated to data/skills_state/ but three readers were missed during the migration.",
+      "is_production_escape": true,
+      "prevention_strategy": [
+        "new_validation"
+      ],
+      "prevention_actions": [
+        "Add a regression test asserting the dashboard's sprint-trends section renders with non-empty content when sprint_history.json contains \u22652 sprints.",
+        "Grep audit: any future state-file relocation must update all readers in one commit."
+      ]
+    },
+    {
+      "id": "BUG-035",
+      "severity": "high",
+      "discovered_in": "test_failure",
+      "discovered_date": "2026-04-26T16:56:33.701701",
+      "description": "scripts/defect_tracker.py reads from legacy `skills/defect_tracker.json` instead of `data/skills_state/defect_tracker.json` \u2014 same migration miss as BUG-034",
+      "component": "defect_tracker",
+      "status": "fixed",
+      "fixed_date": "2026-04-26T16:56:33.701701",
+      "fix_commit": "2cf28a4",
+      "fix_notes": "Path updated to data/skills_state/.",
+      "root_cause": "integration_error",
+      "root_cause_notes": "Same migration as BUG-034 \u2014 three readers missed when state files moved.",
+      "is_production_escape": true,
+      "prevention_strategy": [
+        "new_validation"
+      ],
+      "prevention_actions": [
+        "See BUG-034 \u2014 same prevention applies."
+      ]
+    },
+    {
+      "id": "BUG-036",
+      "severity": "high",
+      "discovered_in": "test_failure",
+      "discovered_date": "2026-04-26T16:56:33.701701",
+      "description": "scripts/agent_metrics.py reads from legacy `skills/agent_metrics.json` instead of `data/skills_state/agent_metrics.json` \u2014 same migration miss as BUG-034/035",
+      "component": "agent_metrics",
+      "status": "fixed",
+      "fixed_date": "2026-04-26T16:56:33.701701",
+      "fix_commit": "2cf28a4",
+      "fix_notes": "Path updated to data/skills_state/.",
+      "root_cause": "integration_error",
+      "root_cause_notes": "Same migration as BUG-034 \u2014 three readers missed when state files moved.",
+      "is_production_escape": true,
+      "prevention_strategy": [
+        "new_validation"
+      ],
+      "prevention_actions": [
+        "See BUG-034 \u2014 same prevention applies."
+      ]
     }
   ],
   "summary": {

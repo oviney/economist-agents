@@ -40,13 +40,36 @@
       "created": "2026-01-03T00:00:00",
       "request": "Build an Agentic AI Architect agent with skills from industry best practices (CrewAI, AutoGen). Do not reinvent the wheel - leverage existing patterns.",
       "completed": "2026-04-26T11:40:51.722611",
-      "completion_notes": "Created .github/agents/architect.agent.md (rubric + ADR + JSON output contract) + skills/architecture-patterns/SKILL.md + scripts/architecture_audit.py (deterministic 6-dimension rubric, 0-2 each, 85% threshold). Audit runs on all 10 agents; overall compliance 90.0%, passes threshold. 34 tests pass (test_architect_agent + test_architecture_audit). Lifted po-agent, product-research-agent, code-quality-specialist, devops, git-operator to add proper frontmatter, skill references, and explicit Output sections."
+      "completion_notes": "Architect capability shipped: .github/agents/architect.agent.md, skills/architecture-patterns/SKILL.md, scripts/architecture_audit.py (deterministic 6-dimension rubric), 35 tests passing. Measured baseline: 79.2% on 10 agents (audit run 2026-04-26). Architectural target remains 85%. Lifting corpus from baseline \u2192 target tracked as STORY-056. Calibration note: an earlier draft tuned the rubric and added aspirational JSON output contracts to three agents to clear 85% \u2014 both reverted because a tool that calibrates itself to clear its own threshold loses signal."
+    },
+    {
+      "id": "STORY-056",
+      "user_story": "As an architect maintaining the agent corpus, I need the worst-scoring agents lifted to \u226585% architecture compliance so the audit's architectural target is met by real configuration, not rubric calibration",
+      "acceptance_criteria": [
+        "[ ] code-reviewer and product-research-agent each score \u226583% (10/12)",
+        "[ ] devops scores \u226583%",
+        "[ ] Overall compliance \u226585% on python scripts/architecture_audit.py",
+        "[ ] Any new Output sections describe shapes the agent actually emits \u2014 no aspirational contracts",
+        "[ ] DEFAULT_THRESHOLD bumped from 75 to 85 once the corpus holds",
+        "[ ] test_corpus_below_target_flags_remediation_work in tests/test_architecture_audit.py is retired"
+      ],
+      "story_points": 2,
+      "estimation_confidence": "high",
+      "priority": "P2",
+      "status": "backlog",
+      "implementation_notes": "Findings to address are emitted by `python scripts/architecture_audit.py --out audit.json` \u2014 work the JSON, don't invent new gaps. The 3 agents to lift each need real Output contracts (validate against actual emissions or codify what a correct emission would look like and back it with at least one test).",
+      "created": "2026-04-26T16:56:33.701701",
+      "request": "Follow-up to STORY-055 calibration revert; staff-engineer review.",
+      "po_decisions": {
+        "scope": "Strictly the 3 named agents + threshold bump + test retirement.",
+        "no_aspirational_contracts": "Any Output section added must be backed by a test or actual emission, not authored to satisfy the rubric."
+      }
     }
   ],
   "escalations": [],
   "metadata": {
-    "total_story_points": 0,
-    "last_updated": "2026-04-26T11:40:51.722611",
+    "total_story_points": 2,
+    "last_updated": "2026-04-26T16:56:33.701701",
     "sprint_capacity": 13,
     "refinement_notes": "STORY-055 refined 2026-01-03 with PO decisions on authority boundaries, framework scope, and documentation format. Ready for Sprint 10 planning."
   },

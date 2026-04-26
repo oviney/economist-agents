@@ -70,7 +70,13 @@ class TestAgentRegistry:
 
     @requires_crewai
     def test_get_available_crews(self):
-        """Test that AgentRegistry can list available crews"""
+        """List available crews — requires the legacy CrewAI src/crews/ tree.
+
+        After ADR-0006 Phase 2 (epic #308) src/crews/ is gone; the
+        registry returns an empty list and the production pipeline uses
+        src.agent_sdk.pipeline.run_pipeline directly. This test only
+        runs in environments where the legacy tree is still present.
+        """
         registry = AgentRegistry()
 
         available_crews = registry.get_available_crews()

@@ -136,6 +136,9 @@ jobs:
           python-version: '3.11'
 
       - name: Check for destructive changes to critical files
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: python scripts/destructive_change_guard.py
 
   security-scan:

@@ -346,19 +346,28 @@ class QualityDashboard:
 Progress: [{progress_bar}] {progress_pct}%"""
 
     def _load_sprint_history(self) -> dict:
-        """Load sprint history from file"""
-        history_file = Path(__file__).parent.parent / "skills" / "sprint_history.json"
+        """Load sprint history from disk.
 
-        if history_file.exists():
-            with open(history_file) as f:
-                return json.load(f)
-        else:
-            return {
-                "version": "1.0",
-                "created": datetime.now().isoformat(),
-                "baseline_sprint": None,
-                "sprints": [],
-            }
+        Sprint history was relocated from ``skills/sprint_history.json``
+        to ``data/skills_state/sprint_history.json`` during the Sprint 20
+        / 21 restructure. Try the new canonical location first; fall
+        back to the legacy path for backwards compatibility.
+        """
+        repo_root = Path(__file__).parent.parent
+        candidates = [
+            repo_root / "data" / "skills_state" / "sprint_history.json",
+            repo_root / "skills" / "sprint_history.json",
+        ]
+        for path in candidates:
+            if path.exists():
+                with open(path) as f:
+                    return json.load(f)
+        return {
+            "version": "1.0",
+            "created": datetime.now().isoformat(),
+            "baseline_sprint": None,
+            "sprints": [],
+        }
 
     def save_sprint_snapshot(self, sprint_id: int) -> None:
         """Save current metrics as sprint snapshot"""

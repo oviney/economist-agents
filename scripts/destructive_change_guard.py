@@ -13,6 +13,8 @@ Usage:
 """
 
 import logging
+import os
+import re
 import subprocess
 import sys
 
@@ -82,6 +84,40 @@ def get_file_line_count(base: str, filepath: str) -> int:
     return len(result.stdout.split("\n"))
 
 
+def get_intentional_rewrites() -> set[str]:
+    """Read "Intentional rewrite: <path>" allowlist from the PR description.
+
+    On GitHub Actions the PR number is available via several env vars
+    (``GITHUB_REF`` is ``refs/pull/<n>/merge`` for pull-request events).
+    When the gh CLI is available, fetch the PR body and parse out any
+    ``Intentional rewrite: <path>`` lines. Returns an empty set when not
+    running in a PR context or when the gh call fails — in that case the
+    guard runs in its strict default mode.
+    """
+    pr_number: str | None = None
+    ref = os.environ.get("GITHUB_REF", "")
+    match = re.match(r"refs/pull/(\d+)/", ref)
+    if match:
+        pr_number = match.group(1)
+    elif os.environ.get("PR_NUMBER"):
+        pr_number = os.environ["PR_NUMBER"]
+    if not pr_number:
+        return set()
+
+    result = subprocess.run(
+        ["gh", "pr", "view", pr_number, "--json", "body", "-q", ".body"],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return set()
+
+    body = result.stdout
+    return {
+        m.group(1).strip() for m in re.finditer(r"Intentional rewrite:\s*(\S+)", body)
+    }
+
+
 def check_destructive_changes() -> list[str]:
     """Check for destructive changes in critical files.
 
@@ -90,11 +126,15 @@ def check_destructive_changes() -> list[str]:
     """
     base = get_base_branch()
     stats = get_diff_stats(base)
+    allowlist = get_intentional_rewrites()
     violations = []
 
     for stat in stats:
         filepath = stat["file"]
         if filepath not in CRITICAL_FILES:
+            continue
+        if filepath in allowlist:
+            print(f"  ⏩ Allowed (intentional rewrite per PR body): {filepath}")
             continue
 
         deleted = stat["deleted"]

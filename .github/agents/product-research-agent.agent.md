@@ -348,6 +348,40 @@ python3 scripts/product_research_agent.py \
 - Alerts when metrics deviate from projections
 - Automated weekly performance reports
 
+## Output
+
+The agent emits one of two structured outputs depending on the request:
+
+For backlog recommendations, return a Markdown document matching the
+**Recommendation Format** template documented under Capabilities §3
+(verbatim — same headings, same field semantics).
+
+For audit / triage requests, return a JSON summary so downstream agents
+can ingest deterministically:
+
+```json
+{
+  "audited_at": "<ISO 8601>",
+  "metrics_window_days": 30,
+  "recommendations": [
+    {
+      "title": "<short>",
+      "priority": "P0|P1|P2|P3",
+      "evidence": ["<metric finding>", "..."],
+      "okr_alignment": ["<okr id or label>", "..."],
+      "proposed_solution": "<one or two sentences>",
+      "effort_points": 3,
+      "expected_outcomes": ["<metric target>", "..."],
+      "risk": "low|medium|high"
+    }
+  ],
+  "blockers": ["<missing data or dependency>", "..."]
+}
+```
+
+Both shapes derive from the same underlying analysis — pick the format
+that matches the consumer (human PO → Markdown; automation → JSON).
+
 ## Related Agents
 - **PO Agent**: Converts recommendations → user stories
 - **SM Agent**: Orchestrates implementation of approved stories

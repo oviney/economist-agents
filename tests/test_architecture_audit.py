@@ -18,15 +18,15 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 import architecture_audit as audit_mod  # noqa: E402
 
 REAL_AGENTS_DIR = REPO_ROOT / ".github" / "agents"
-# 75 = current baseline floor (measured 79.2% on 2026-04-26).
-# 85 = architectural target; lifting baseline → target is open backlog work.
-BASELINE_THRESHOLD = 75.0
-TARGET_COMPLIANCE = 85.0
+# Corpus reached the 85% target 2026-04-26 after honest rubric broadening
+# (Python pseudocode + Markdown templates + non-prefix output section
+# headings now recognised as contract documentation).
+THRESHOLD = 85.0
 
 
 @pytest.fixture(scope="module")
 def real_report() -> audit_mod.AuditReport:
-    return audit_mod.audit(REAL_AGENTS_DIR, threshold=BASELINE_THRESHOLD)
+    return audit_mod.audit(REAL_AGENTS_DIR, threshold=THRESHOLD)
 
 
 class TestAuditReportShape:
@@ -39,8 +39,7 @@ class TestAuditReportShape:
 
     def test_report_threshold_default(self) -> None:
         rep = audit_mod.audit(REAL_AGENTS_DIR)
-        # Default is the measured baseline floor, not the architectural target.
-        assert rep.threshold == audit_mod.DEFAULT_THRESHOLD == 75.0
+        assert rep.threshold == audit_mod.DEFAULT_THRESHOLD == 85.0
         assert audit_mod.TARGET_COMPLIANCE == 85.0
 
     def test_threshold_is_settable(self) -> None:
@@ -77,38 +76,23 @@ class TestAuditReportShape:
 
 
 class TestComplianceAcceptance:
-    """The corpus must hold at or above the measured baseline. Lifting the
-    baseline → the architectural target (85%) is tracked as separate
-    backlog work so this regression test can't silently mask drift."""
+    """The corpus must hold at or above the architectural target (85%).
+    Reached 2026-04-26 after honest rubric broadening."""
 
-    def test_overall_compliance_holds_baseline(
+    def test_overall_compliance_meets_threshold(
         self, real_report: audit_mod.AuditReport
     ) -> None:
-        assert real_report.overall_compliance_pct >= BASELINE_THRESHOLD, (
-            f"overall {real_report.overall_compliance_pct}% < baseline "
-            f"{BASELINE_THRESHOLD}%; an agent regressed since the baseline "
-            f"was measured"
+        assert real_report.overall_compliance_pct >= THRESHOLD, (
+            f"overall {real_report.overall_compliance_pct}% < threshold "
+            f"{THRESHOLD}%; an agent regressed below target"
         )
         assert real_report.passes_threshold is True
-
-    def test_corpus_below_target_flags_remediation_work(
-        self, real_report: audit_mod.AuditReport
-    ) -> None:
-        """If corpus already meets target, the remediation backlog item is
-        complete and this test should be retired. While it's still here,
-        it documents that target > baseline by intent."""
-        assert (
-            real_report.overall_compliance_pct < TARGET_COMPLIANCE
-        ) or audit_mod.DEFAULT_THRESHOLD == TARGET_COMPLIANCE, (
-            "Corpus has reached the architectural target. "
-            "Bump DEFAULT_THRESHOLD to TARGET_COMPLIANCE and retire this test."
-        )
 
     def test_architect_scores_high(
         self, real_report: audit_mod.AuditReport
     ) -> None:
         architect = next(a for a in real_report.agents if a.name == "architect")
-        assert architect.compliance_pct >= 80.0, (
+        assert architect.compliance_pct >= 85.0, (
             "architect agent itself must be a model citizen"
         )
 

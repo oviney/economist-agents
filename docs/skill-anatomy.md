@@ -1,118 +1,108 @@
 # Skill Anatomy
 
-The canonical format for `skills/<name>/SKILL.md` files in this repository.
+The canonical format every `skills/*/SKILL.md` file in this repo must
+follow. Adapted from the addyosmani/agent-skills convention. Enforced
+by `scripts/validate_skills.py` (CI) and the pre-commit hook.
 
-A SKILL.md file is a domain-specific knowledge document that one or more agents reference during execution. It encodes the **rules, processes, anti-patterns, and verification steps** for a single domain — e.g. `python-quality`, `economist-writing`, `architecture-patterns`. The purpose of this anatomy is to keep skills consistent so the architect's audit (`scripts/architecture_audit.py`) and the skills validator (`scripts/validate_skills.py`) can score them deterministically and so agents that depend on them can invoke them by stable section name.
+## File location
 
-## File and directory contract
+One skill per directory under `skills/`. The skill file is always named
+`SKILL.md` (uppercase). The directory name is the canonical skill id
+and must match the `name:` frontmatter field.
 
-- Path: `skills/<kebab-case-name>/SKILL.md`.
-- The frontmatter `name:` field MUST equal the parent directory name.
-- One SKILL.md per directory. No nested SKILL.md files.
-
-## Required frontmatter
-
-```yaml
----
-name: <kebab-case-name>
-description: <one sentence describing when to use this skill — used by agents to decide relevance>
----
+```
+skills/
+  economist-writing/
+    SKILL.md
+  python-quality/
+    SKILL.md
+  ...
 ```
 
-The `description` is the primary trigger — write it so the architect or any consuming agent can decide whether to load this skill from the description alone. Avoid generic phrasing ("guidelines for X") and prefer trigger phrases ("Use when configuring the writer agent…", "Apply during code review when…").
+## Frontmatter
 
-## Required sections
-
-Every SKILL.md MUST have these six top-level sections, in this order. All 17 skills currently in the repo follow this structure — the validator enforces it.
-
-### 1. `## Overview`
-One or two paragraphs. State what this skill is *for* and what it is *not* for. End with a sentence describing who or what consumes it (which agent, which gate, which workflow).
-
-### 2. `## When to Use`
-A bulleted list of concrete situations where the skill applies. Each bullet should be specific enough that a reader can match a real task to it without ambiguity.
-
-Include a `### When NOT to Use` subsection that lists adjacent skills the reader might be looking for instead. Cross-reference them by slug.
-
-### 3. `## Core Process`
-The substantive content of the skill. This is where the rules, patterns, rubrics, or step-by-step procedures live. A subtitle is allowed (e.g. `## Core Process: The 10 Rules`, `## Core Process: 4-Layer Architecture`) — the validator matches the `## Core Process` prefix.
-
-Use sub-headings (`###`) freely. Tables, fenced code blocks, and rubrics are encouraged — they make the skill machine-readable as well as human-readable.
-
-### 4. `## Common Rationalizations`
-A two-column table or bulleted list pairing the kind of rationalisation that leads to skipping the skill with the corrective reality. Examples:
-
-| Rationalization | Reality |
-|----------------|---------|
-| "We can hand-edit it just this once" | Hand edits skip the gate that catches the next regression. |
-
-This section exists because skills exist to resist convenient shortcuts. Documenting the shortcut explicitly makes it easier to refuse.
-
-### 5. `## Red Flags`
-A bulleted list of warning signs that the skill is being applied incorrectly or being bypassed. Used by reviewers to catch silent drift.
-
-### 6. `## Verification`
-How to check that the skill was actually applied — the test, the linter rule, the manual check. If the skill is enforced by a gate or hook, name it explicitly with the file path.
-
-## Example structure
+YAML between `---` delimiters at the top of the file. Two required
+fields, no others permitted:
 
 ```markdown
 ---
-name: example-skill
-description: Use when X, to ensure Y, by following Z.
+name: economist-writing
+description: One-sentence description of when to use this skill. Should help an agent decide whether to load it.
 ---
-
-# Example Skill
-
-## Overview
-
-One or two paragraphs.
-
-## When to Use
-
-- Bullet 1
-- Bullet 2
-
-### When NOT to Use
-
-- For X — that's `other-skill`
-
-## Core Process
-
-### Step 1
-…
-
-### Step 2
-…
-
-## Common Rationalizations
-
-| Rationalization | Reality |
-|----------------|---------|
-| … | … |
-
-## Red Flags
-
-- …
-
-## Verification
-
-- Run `pytest tests/test_example.py`
-- The pre-commit hook `…` enforces it
 ```
 
-## Validator behaviour
+- `name` — must equal the parent directory name. Lowercase kebab-case.
+- `description` — single sentence, ends with a period, includes "Use
+  when..." or "Use to..." so the trigger condition is explicit.
 
-`scripts/validate_skills.py` checks every `skills/<name>/SKILL.md` for:
+## Body — six required sections
 
-1. Valid YAML frontmatter parses cleanly.
-2. `name` field equals the parent directory name.
-3. `description` is non-empty.
-4. The six required sections (`## Overview`, `## When to Use`, `## Core Process` *(prefix-match — subtitle allowed)*, `## Common Rationalizations`, `## Red Flags`, `## Verification`) are all present.
+Every skill body must contain these `##` headings, in this order. The
+validator only checks that the headings exist; the contents are at the
+author's discretion.
 
-Adding a SKILL.md that fails any of these checks fails the pre-commit hook and CI.
+### `## Overview`
 
-## References
+One paragraph: what the skill does and why it exists.
 
-- The skills library lives at `skills/`. See `skills/README.md` for the index.
-- Format originally adapted from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills).
-- The architect agent's rubric (`skills/architecture-patterns/SKILL.md`) and the validator (`scripts/validate_skills.py`) operate on this contract.
+### `## When to Use`
+
+Bulleted list of trigger conditions. Should be specific enough that an
+agent can pattern-match against a user request. May include a `### When
+NOT to Use` subsection.
+
+### `## Core Process`
+
+The actual procedure or rules. Sub-headings, tables, numbered lists,
+and code samples are all welcome here. This is the longest section.
+
+### `## Common Rationalizations`
+
+A two-column markdown table mapping the temptation to the reality. Use
+this section to head off shortcuts before they happen.
+
+```markdown
+| Rationalization | Reality |
+|-----------------|---------|
+| "We can skip step 3 just this once" | Skipping step 3 caused incident #117; never skip |
+```
+
+### `## Red Flags`
+
+Bulleted list of warning signs that the skill is being misapplied or
+that something has drifted off-pattern. Used by reviewers to spot bad
+output quickly.
+
+### `## Verification`
+
+Bulleted checklist of how to prove the skill ran correctly. Each item
+should reference the concrete evidence (a test, a CI check, a file
+artefact, a metric). Format:
+
+```markdown
+- [ ] <claim> — **evidence**: <specific check>
+```
+
+## Optional but encouraged
+
+- `## Examples` — concrete inputs and outputs
+- `## References` — links to related ADRs, skills, or external docs
+
+## Validation
+
+Run `python scripts/validate_skills.py` to check the whole tree. The
+script exits 0 when every `skills/*/SKILL.md` file:
+
+1. Has the two required frontmatter fields and nothing else.
+2. Has `name` equal to its parent directory name.
+3. Contains all six required `##` body sections.
+
+The same script runs in pre-commit and in the Quality Gates CI
+workflow, so any non-compliant skill blocks merge.
+
+## See also
+
+- `skills/README.md` — the index of all skills in this repo
+- `.claude-plugin/plugin.json` — plugin manifest pointing at the
+  `skills` directory
+- ADR-0008 — agent + skill governance

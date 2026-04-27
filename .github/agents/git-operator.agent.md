@@ -84,3 +84,20 @@ Before pushing, ALWAYS run:
 
 - `skills/sprint-management` — for story numbering, status values, and the "Story N:" commit message template above.
 - `skills/python-quality` — for understanding which pre-commit hooks (ruff, mypy) modify files and trigger the Double Commit Protocol.
+
+## Output
+
+Every git workflow reports its result in this format so the orchestrator can confirm success and continue:
+
+```markdown
+## Git Operation Result
+
+**Operation**: commit | push | amend | branch
+**Story**: <N or "maintenance">
+**Branch**: <branch-name>
+**Commit SHA**: <sha or "pending push">
+**Files committed**: <list>
+**Hooks modified files**: yes (amended) | no
+**Status**: success | failed
+**Message**: <one-line summary of what changed>
+```

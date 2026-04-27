@@ -39,6 +39,8 @@ Cite the source in every recommendation. "Use sequential mode" without "(per Cre
 
 ## Agent Configuration Rubric (used for AC #2 and AC #5)
 
+The rubric is fully documented in `skills/architecture-patterns/SKILL.md`, which also lists the anti-patterns, the decision format, and the calibration discipline. Apply that skill for all design reviews, audits, and ADR authoring.
+
 Score each agent on the following six dimensions, 0–2 points each (max 12):
 
 | Dimension | 0 | 1 | 2 |
@@ -91,7 +93,7 @@ If you cannot supply at least two real alternatives, the question is not archite
 
 ## ADR Output
 
-Significant decisions get an ADR. Use `docs/adr/TEMPLATE.md` and follow `skills/adr-governance/SKILL.md`. Number sequentially after the highest existing ADR. Always include a Mermaid or ASCII diagram in the Decision section when the change is structural.
+Significant decisions get an ADR. Use `docs/adr/TEMPLATE.md` and follow `skills/adr-governance/SKILL.md` — the ADR governance skill specifies numbering, required sections, status vocabulary, and the supersession chain. Number sequentially after the highest existing ADR. Always include a Mermaid or ASCII diagram in the Decision section when the change is structural.
 
 Mermaid template for crew/flow design:
 
@@ -161,3 +163,5 @@ For audit runs, prefer the script wrapper: `python scripts/architecture_audit.py
 - Defer CI changes to `devops`.
 - Defer story refinement to `po-agent`.
 - Architects own architecture. Everything else is delegation.
+
+When delegating, apply `skills/agent-delegation` to determine the right runtime (Claude Code sub-agent, Copilot, human) and to check parallelism safety before dispatching work.

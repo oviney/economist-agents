@@ -263,3 +263,23 @@ A green build is the team's heartbeat. Keep it healthy.
 ## Remember
 
 Your role is critical to team confidence and velocity. Quality tests enable fearless refactoring, confident deployments, and rapid feature development. Never compromise on test quality.
+
+## Output
+
+After writing or updating tests, emit this report so the team can track coverage progress:
+
+```markdown
+## Test Specialist Report
+
+**Tests added**: <count> (<list of test IDs>)
+**Tests updated**: <count>
+**Coverage before**: X%
+**Coverage after**: Y%
+**Suite runtime**: <Xs>
+**Flaky tests detected**: <list or "none">
+**Status**: completed | needs_rework
+
+**Notes**: <any gotchas, test design decisions, or skips with reasons>
+```
+
+Apply `skills/testing` for test pyramid decisions, parametrisation patterns, and coverage thresholds.

@@ -270,6 +270,24 @@ python3 scripts/sync_github_project.py --debug --sprint 10
 
 - `skills/quality-gates` — for the gate definitions, CI rules, and pre-commit configuration this agent enforces.
 - `skills/devops` — operational playbooks for CI failures, environment recreation, and deployment automation.
+- `skills/observability` — applied when configuring monitoring, alerting, and logging for the CI/CD and content pipelines.
+
+## Output
+
+Every DevOps task emits a structured result. Include this in your response so the orchestrator and scrum master can track state:
+
+```markdown
+## DevOps Task Result
+
+**Task**: <ci_fix | gate_update | deploy | env_recreate | monitoring>
+**Status**: <completed | blocked | needs_rework>
+**Files changed**: <list or "none">
+**CI status after**: <green | red | unchanged | not_run>
+**Gates affected**: <list or "none">
+**Verification ran**: <commands executed>
+**Rollback plan**: <one sentence, or "reversible via git revert">
+**Blocker** (if any): <description>
+```
 
 ## Version History
 

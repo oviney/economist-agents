@@ -72,6 +72,8 @@ Analyze blog performance using Google Analytics, research product improvement op
 **Input**: Research findings + OKRs + user suggestions
 **Output**: Prioritized backlog items with impact estimates
 
+Apply `skills/sprint-management` to size recommendations as user stories and ensure each meets the Definition of Ready (DoR) before handing off to the PO Agent. Apply `skills/observability` to select metrics, define alert thresholds, and recommend monitoring changes that surface the user behaviour patterns found in research.
+
 **Recommendation Format**:
 ```markdown
 ## Improvement Recommendation: [Title]

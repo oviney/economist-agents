@@ -233,3 +233,22 @@ Your work is complete when:
 - `skills/python-quality` — type hints, docstrings, error handling, modernisation rules.
 - `skills/article-evaluation` — used when refactoring article-pipeline modules so behaviour is preserved.
 - `skills/defect-prevention` — applied during refactor to add prevention tests for any RCA-tagged bug touched.
+
+## Output
+
+After completing a refactor or quality task, emit a Markdown result block:
+
+```markdown
+## Quality Task Result
+
+**Files changed**: <list>
+**Tests added/updated**: <list or "none">
+**TDD steps followed**: RED → GREEN → REFACTOR
+**ruff**: clean | <violations count>
+**mypy**: clean | <error count>
+**Coverage delta**: +X% | unchanged
+**Behaviour preserved**: yes | no (describe regression)
+**Status**: completed | needs_rework
+```
+
+If `ruff` or `mypy` violations remain, list them explicitly — do not emit `completed` until both are clean.

@@ -230,3 +230,9 @@ bandit scripts/ -r
 - Code quality improvement trends
 
 Your reviews should feel like pair programming with a senior colleague - supportive, educational, and focused on building great software together.
+
+## Skills
+
+- `skills/python-quality` — the baseline quality bar (type hints, docstrings, ruff/mypy compliance) that every reviewed file must meet.
+- `skills/architecture-patterns` — applied during the architecture review phase to evaluate SOLID principles, coupling, and pattern choices.
+- `skills/agent-traceability` — used to verify that agent interactions, context handoffs, and tool calls are auditable and traceable when reviewing agent-related code.

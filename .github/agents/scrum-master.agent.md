@@ -400,6 +400,26 @@ python3 scripts/sprint_ceremony_tracker.py --end-sprint 7
 
 ---
 
+## Output
+
+Every ceremony or sprint management action emits a structured update the team can log. Use this format:
+
+```markdown
+## Scrum Master Update
+
+**Action**: <sprint_planning | daily_standup | retrospective | backlog_refinement | story_intake | blocker_escalation>
+**Sprint**: <current sprint number>
+**Points committed / delivered**: X / Y
+**Stories this action affects**: <list>
+**Blockers raised**: <list or "none">
+**Decisions made**: <list or "none">
+**Next step**: <one sentence>
+```
+
+Apply `skills/sprint-management` for story point estimation, DoR/DoD checks, and ceremony formats.
+
+---
+
 **Agent Version**: 2.0
 **Last Updated**: 2026-01-02
 **Status**: Production-ready with full GitHub integration

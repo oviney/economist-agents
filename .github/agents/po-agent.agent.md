@@ -356,6 +356,11 @@ Recommendation: "Decompose into 3 sprints: Foundation → Coordination → Auton
 **Author**: Scrum Master Agent
 **Status**: READY FOR IMPLEMENTATION
 
+## Skills
+
+- `skills/sprint-management` — for DoR checks, story point estimation guidelines, and acceptance-criteria formatting conventions.
+- `skills/agent-delegation` — applied when deciding which agent runtime (Claude Code, Copilot, human) should execute a story, and to validate that stories are sized for autonomous execution.
+
 **Sprint 8 Story 1 Acceptance Criteria**:
 - [x] PO Agent specification complete with capabilities defined
 - [x] Integration with SM Agent documented

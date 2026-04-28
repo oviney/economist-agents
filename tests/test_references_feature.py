@@ -262,8 +262,12 @@ This is an article.
 layout: post
 title: "Test Article: Proper References"
 date: 2026-01-02
-categories: ["quality-engineering"]
+author: "Ouray Viney"
+categories: ["Quality Engineering"]
 description: "Testing references validation"
+image: /assets/images/test-article.png
+image_alt: "Editorial illustration"
+image_caption: "Testing the reference gate"
 ---
 
 # Article content
@@ -433,9 +437,12 @@ Content with data.
 layout: post
 title: "Self-Healing Tests: Myth vs Reality"
 date: 2026-01-02
-author: "The Economist"
-categories: ["quality-engineering"]
+author: "Ouray Viney"
+categories: ["Quality Engineering"]
 description: "Testing end-to-end references validation"
+image: /assets/images/self-healing-tests.png
+image_alt: "An Economist-style editorial illustration of a testing pipeline"
+image_caption: "The gap between promise and delivery"
 ---
 
 # The automation paradox

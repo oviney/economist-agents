@@ -157,28 +157,28 @@ class TestVerbosePadding:
 
 
 class TestCategoryNormalization:
-    """Category casing normalization to kebab-case."""
+    """Category casing normalization to Title Case (blog contract, GH #319)."""
 
-    def test_title_case_to_kebab(self) -> None:
-        article = '---\ncategories: ["Quality Engineering"]\n---\nBody'
-        result = _apply_editorial_fixes(article)
-        assert "quality-engineering" in result
-        assert "Quality Engineering" not in result
-
-    def test_mixed_case_to_kebab(self) -> None:
-        article = '---\ncategories: ["software engineering"]\n---\nBody'
-        result = _apply_editorial_fixes(article)
-        assert "software-engineering" in result
-
-    def test_already_kebab_unchanged(self) -> None:
+    def test_kebab_to_title_case(self) -> None:
         article = '---\ncategories: ["quality-engineering"]\n---\nBody'
         result = _apply_editorial_fixes(article)
-        assert "quality-engineering" in result
+        assert "Quality Engineering" in result
+        assert "quality-engineering" not in result
 
-    def test_test_automation_normalized(self) -> None:
-        article = '---\ncategories: ["Test Automation"]\n---\nBody'
+    def test_lowercase_spaces_to_title_case(self) -> None:
+        article = '---\ncategories: ["software engineering"]\n---\nBody'
         result = _apply_editorial_fixes(article)
-        assert "test-automation" in result
+        assert "Software Engineering" in result
+
+    def test_already_title_case_unchanged(self) -> None:
+        article = '---\ncategories: ["Quality Engineering"]\n---\nBody'
+        result = _apply_editorial_fixes(article)
+        assert "Quality Engineering" in result
+
+    def test_test_automation_normalized_to_title(self) -> None:
+        article = '---\ncategories: ["test-automation"]\n---\nBody'
+        result = _apply_editorial_fixes(article)
+        assert "Test Automation" in result
 
 
 class TestChartAutoEmbed:

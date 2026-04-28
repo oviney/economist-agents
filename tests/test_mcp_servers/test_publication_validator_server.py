@@ -33,9 +33,12 @@ def _make_article(
     layout: str = "post",
     title: str = "Specific Descriptive Title for Testing",
     date: str = "2026-04-05",
-    author: str = "The Economist",
-    categories: str = '["quality-engineering"]',
+    author: str = "Ouray Viney",
+    categories: str = '["Quality Engineering"]',
     description: str | None = "A concise test description for SEO purposes",
+    image: str | None = "/assets/images/test-article.png",
+    image_alt: str | None = "An abstract editorial illustration",
+    image_caption: str | None = "Quality gates in action",
     body: str | None = None,
     references: str | None = None,
     chart_embed: str | None = None,
@@ -62,6 +65,12 @@ def _make_article(
         fields.append(f"categories: {categories}")
     if description is not None:
         fields.append(f'description: "{description}"')
+    if image is not None:
+        fields.append(f"image: {image}")
+    if image_alt is not None:
+        fields.append(f'image_alt: "{image_alt}"')
+    if image_caption is not None:
+        fields.append(f'image_caption: "{image_caption}"')
     fm = "\n".join(fields)
     return f"{frontmatter_open}\n{fm}\n{frontmatter_close}\n\n{body}\n{chart_embed}\n{references}\n"
 

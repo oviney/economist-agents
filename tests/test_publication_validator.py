@@ -506,3 +506,89 @@ class TestPublicationValidatorReport:
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "--tb=short"])
+
+
+class TestProductionEscapes319:
+    """Regression tests for GH #319 — production escapes that reached the blog.
+
+    Each test locks in a check that was missing when the malformed article
+    was shipped. Adding these ensures the same defects can never pass the
+    publication gate again.
+    """
+
+    def test_generic_author_rejected(self) -> None:
+        """'The Economist' must not pass the author gate."""
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(author="The Economist")
+        is_valid, issues = validator.validate(article)
+        assert not is_valid
+        auth_issues = [i for i in issues if i["check"] == "author_contract"]
+        assert len(auth_issues) == 1
+
+    def test_correct_author_passes(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(author="Ouray Viney")
+        _, issues = validator.validate(article)
+        auth_issues = [i for i in issues if i["check"] == "author_contract"]
+        assert len(auth_issues) == 0
+
+    def test_kebab_case_category_rejected(self) -> None:
+        """kebab-case category that shipped to prod must now be blocked."""
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(categories='["quality-engineering"]')
+        _, issues = validator.validate(article)
+        cat_issues = [i for i in issues if i["check"] == "invalid_category"]
+        assert len(cat_issues) >= 1
+
+    def test_default_hero_image_rejected(self) -> None:
+        """blog-default.svg must be blocked from reaching production."""
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(image="/assets/images/blog-default.svg")
+        is_valid, issues = validator.validate(article)
+        assert not is_valid
+        img_issues = [i for i in issues if i["check"] == "default_image_fallback"]
+        assert len(img_issues) == 1
+
+    def test_missing_image_alt_rejected(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(image_alt=None)
+        _, issues = validator.validate(article)
+        alt_issues = [i for i in issues if i["check"] == "missing_image_alt"]
+        assert len(alt_issues) == 1
+
+    def test_missing_image_caption_rejected(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(image_caption=None)
+        _, issues = validator.validate(article)
+        cap_issues = [i for i in issues if i["check"] == "missing_image_caption"]
+        assert len(cap_issues) == 1
+
+    def test_inline_heading_in_paragraph_rejected(self) -> None:
+        """'deliver. ## The velocity trap' must be flagged as malformed structure."""
+        validator = PublicationValidator(expected_date="2026-04-03")
+        body = VALID_BODY + " deliver. ## The velocity trap more text here."
+        article = _make_article(body=body)
+        _, issues = validator.validate(article)
+        heading_issues = [i for i in issues if i["check"] == "inline_heading_marker"]
+        assert len(heading_issues) >= 1
+
+    def test_well_formed_article_passes_all_new_checks(self) -> None:
+        """Production-valid article clears author, image, and heading gates."""
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(
+            author="Ouray Viney",
+            categories='["Quality Engineering"]',
+            image="/assets/images/real-article.png",
+            image_alt="Editorial illustration of a testing pipeline",
+            image_caption="The gap between coverage and confidence",
+        )
+        is_valid, issues = validator.validate(article)
+        new_gate_issues = [
+            i for i in issues
+            if i["check"] in (
+                "author_contract", "default_image_fallback",
+                "missing_image", "missing_image_alt", "missing_image_caption",
+                "invalid_category", "inline_heading_marker",
+            )
+        ]
+        assert new_gate_issues == [], f"New gates should pass: {new_gate_issues}"

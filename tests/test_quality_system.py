@@ -451,10 +451,12 @@ def test_complete_article_validation():
 layout: post
 title: "Self-Healing Tests: The 80% Maintenance Gap"
 date: 2026-01-01
-categories: [quality-engineering, test-automation]
-author: "The Economist"
-ai_assisted: true
+categories: ["Quality Engineering", "Test Automation"]
+author: "Ouray Viney"
 description: "Self-healing tests promise 80% savings but few companies deliver"
+image: /assets/images/self-healing-tests.png
+image_alt: "An editorial illustration of a testing pipeline"
+image_caption: "The gap between hype and reality"
 ---
 
 Self-healing tests promise an 80% cut in maintenance costs. According to

@@ -2855,7 +2855,7 @@
 
 
 <h1 id="adr-0006-agent-framework-selection-for-autonomous-content-pipeline">ADR-0006: Agent Framework Selection for Autonomous Content Pipeline<a class="headerlink" href="#adr-0006-agent-framework-selection-for-autonomous-content-pipeline" title="Permanent link">&para;</a></h1>
-<p><strong>Status:</strong> Proposed
+<p><strong>Status:</strong> Accepted
 <strong>Date:</strong> 2026-04-05
 <strong>Decision Maker:</strong> Ouray Viney (Engineering Lead)
 <strong>Research:</strong> Four parallel research agents covering Anthropic Agent SDK, MCP Protocol, CrewAI current state, and existing tool stack fit
@@ -3284,14 +3284,24 @@ This ADR re-evaluates the framework question from scratch.</p>
 <td>Research completed by four parallel agents</td>
 </tr>
 <tr>
-<td><em>pending</em></td>
-<td>Phase 1 approved</td>
-<td><em>awaiting review</em></td>
+<td>2026-04-21</td>
+<td>Phase 1 complete</td>
+<td>All 6 MCP servers landed in <code>mcp_servers/</code> plus 2 bonus servers (<code>orchestrator</code>, <code>published-topics</code>); wired in <code>.mcp.json</code></td>
 </tr>
 <tr>
-<td><em>pending</em></td>
-<td>Framework selected</td>
-<td><em>awaiting Phase 1 completion + PoC results</em></td>
+<td>2026-04-25</td>
+<td>Framework selected: <strong>Option B (Anthropic Agent SDK + MCP)</strong></td>
+<td>Spike #309 proved Stage 3 viability; Story #310 added Stage 4 + validator gate; Stories #311 #312 added budget caps and per-role model tiering</td>
+</tr>
+<tr>
+<td>2026-04-25</td>
+<td>Story #313 — CrewAI removed</td>
+<td><code>src/crews/</code> deleted; <code>flow.py</code> rewritten as sequential Python over <code>src.agent_sdk.pipeline.run_pipeline</code>; <code>crewai</code>/<code>crewai-tools</code> dropped from requirements</td>
+</tr>
+<tr>
+<td>2026-04-25</td>
+<td><strong>Status moved to Accepted</strong></td>
+<td>Phase 2 complete; Agent SDK is the production runtime</td>
 </tr>
 </tbody>
 </table>

@@ -2193,6 +2193,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#2026-04-26-agent-fleet-phase-2-crewai-removed-anthropic-agent-sdk-shipped-pr-315" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-26: Agent Fleet Phase 2 — CrewAI removed, Anthropic Agent SDK shipped (PR #315)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#2026-01-18-test-collection-errors-resolved-python-313-environment-fix" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -5220,6 +5231,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#2026-04-26-agent-fleet-phase-2-crewai-removed-anthropic-agent-sdk-shipped-pr-315" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-04-26: Agent Fleet Phase 2 — CrewAI removed, Anthropic Agent SDK shipped (PR #315)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#2026-01-18-test-collection-errors-resolved-python-313-environment-fix" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8225,6 +8247,61 @@
 
 
 <h1 id="economist-agents-development-log">Economist Agents - Development Log<a class="headerlink" href="#economist-agents-development-log" title="Permanent link">&para;</a></h1>
+<h2 id="2026-04-26-agent-fleet-phase-2-crewai-removed-anthropic-agent-sdk-shipped-pr-315">2026-04-26: Agent Fleet Phase 2 — CrewAI removed, Anthropic Agent SDK shipped (PR #315)<a class="headerlink" href="#2026-04-26-agent-fleet-phase-2-crewai-removed-anthropic-agent-sdk-shipped-pr-315" title="Permanent link">&para;</a></h2>
+<p>ADR-0006 Phase 2 complete. Closes epic #308 plus skills-polish backlog (#293, #294) and #314.</p>
+<p><strong>What shipped:</strong>
+- <code>src/agent_sdk/</code> — new package with <code>pipeline.py</code>, <code>stage3_runner.py</code>, <code>stage4_runner.py</code>, <code>_shared.py</code>
+- <code>src/economist_agents/flow.py</code> rewritten as plain sequential Python over <code>src.agent_sdk.pipeline.run_pipeline</code> (no CrewAI Flow decorators)
+- <code>src/crews/</code> deleted (4 files, ~3,200 LOC) — CrewAI removed from <code>requirements.txt</code>
+- Per-role model tiering via <code>WRITER_MODEL</code> / <code>GRAPHICS_MODEL</code> env vars + CLI flags
+- Cost caps via <code>--writer-budget</code> / <code>--graphics-budget</code>; per-run JSONL spend log at <code>logs/agent_sdk_costs.jsonl</code>
+- ADR-0006 status moved to <strong>Accepted</strong>
+- <code>.claude-plugin/plugin.json</code> + <code>docs/skill-anatomy.md</code> + <code>scripts/validate_skills.py</code> (20 tests, wired into pre-commit + CI)</p>
+<p><strong>Bug fixes found along the way:</strong>
+- <code>scripts/quality_dashboard.py</code> and <code>scripts/defect_tracker.py</code> had stale paths (<code>skills/*.json</code> instead of <code>data/skills_state/*.json</code>) after the Sprint 20-21 restructure. Dashboard's "Sprint-Over-Sprint Trends" section never rendered because of it.
+- <code>scripts/destructive_change_guard.py</code> advertised an "Intentional rewrite: <file>" PR-body bypass that the code never actually read. Implemented properly with <code>gh pr view</code>.</p>
+<p><strong>Decision evidence — 3 articles via Agent SDK:</strong></p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Topic</th>
+<th>Cost</th>
+<th>Time</th>
+<th>Score</th>
+<th>Validator</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>productivity paradox of AI coding assistants (Sonnet 4.5)</td>
+<td>$0.1425</td>
+<td>145.7 s</td>
+<td>90%</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td>2</td>
+<td>productivity paradox of AI coding assistants (Opus 4.7)</td>
+<td>$0.4866</td>
+<td>288.0 s</td>
+<td>88%</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td>3</td>
+<td>unit economics of running language models in production (post-removal)</td>
+<td>$0.2624</td>
+<td>262.3 s</td>
+<td>86%</td>
+<td>PASS</td>
+</tr>
+</tbody>
+</table>
+<p>Opus 4.7 cost 3.4× more, took 2× longer, scored marginally LOWER on the same task — defaults set to Sonnet 4.6 for both Writer and Graphics. Opus is a one-flag opt-in.</p>
+<p><strong>Test suite:</strong> 1,749 passing / 12 intentional skips (was 1,724 / 35 before the dashboard fix removed 6 skips).</p>
+<hr />
 <h2 id="2026-01-18-test-collection-errors-resolved-python-313-environment-fix">2026-01-18: Test Collection Errors RESOLVED - Python 3.13 Environment Fix<a class="headerlink" href="#2026-01-18-test-collection-errors-resolved-python-313-environment-fix" title="Permanent link">&para;</a></h2>
 <h3 id="critical-fix-applied">Critical Fix Applied<a class="headerlink" href="#critical-fix-applied" title="Permanent link">&para;</a></h3>
 <p><strong>Issue</strong>: 5 test collection errors blocking 447 tests due to Python 3.14.2 incompatibility with CrewAI

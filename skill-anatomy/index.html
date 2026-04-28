@@ -2181,10 +2181,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#file-and-directory-contract" class="md-nav__link">
+  <a href="#file-location" class="md-nav__link">
     <span class="md-ellipsis">
       
-        File and directory contract
+        File location
       
     </span>
   </a>
@@ -2192,10 +2192,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#required-frontmatter" class="md-nav__link">
+  <a href="#frontmatter" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Required frontmatter
+        Frontmatter
       
     </span>
   </a>
@@ -2203,22 +2203,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#required-sections" class="md-nav__link">
+  <a href="#body-six-required-sections" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Required sections
+        Body — six required sections
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Required sections">
+    <nav class="md-nav" aria-label="Body — six required sections">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-overview" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. ## Overview
+        ## Overview
       
     </span>
   </a>
@@ -2226,10 +2226,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-when-to-use" class="md-nav__link">
+  <a href="#when-to-use" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. ## When to Use
+        ## When to Use
       
     </span>
   </a>
@@ -2237,10 +2237,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#3-core-process" class="md-nav__link">
+  <a href="#core-process" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. ## Core Process
+        ## Core Process
       
     </span>
   </a>
@@ -2248,10 +2248,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#4-common-rationalizations" class="md-nav__link">
+  <a href="#common-rationalizations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. ## Common Rationalizations
+        ## Common Rationalizations
       
     </span>
   </a>
@@ -2259,10 +2259,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#5-red-flags" class="md-nav__link">
+  <a href="#red-flags" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. ## Red Flags
+        ## Red Flags
       
     </span>
   </a>
@@ -2270,10 +2270,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#6-verification" class="md-nav__link">
+  <a href="#verification" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. ## Verification
+        ## Verification
       
     </span>
   </a>
@@ -2286,10 +2286,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-structure" class="md-nav__link">
+  <a href="#optional-but-encouraged" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Example structure
+        Optional but encouraged
       
     </span>
   </a>
@@ -2297,10 +2297,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#validator-behaviour" class="md-nav__link">
+  <a href="#validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Validator behaviour
+        Validation
       
     </span>
   </a>
@@ -2308,10 +2308,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#references" class="md-nav__link">
+  <a href="#see-also" class="md-nav__link">
     <span class="md-ellipsis">
       
-        References
+        See also
       
     </span>
   </a>
@@ -2339,110 +2339,84 @@
 
 
 <h1 id="skill-anatomy">Skill Anatomy<a class="headerlink" href="#skill-anatomy" title="Permanent link">&para;</a></h1>
-<p>The canonical format for <code>skills/&lt;name&gt;/SKILL.md</code> files in this repository.</p>
-<p>A SKILL.md file is a domain-specific knowledge document that one or more agents reference during execution. It encodes the <strong>rules, processes, anti-patterns, and verification steps</strong> for a single domain — e.g. <code>python-quality</code>, <code>economist-writing</code>, <code>architecture-patterns</code>. The purpose of this anatomy is to keep skills consistent so the architect's audit (<code>scripts/architecture_audit.py</code>) and the skills validator (<code>scripts/validate_skills.py</code>) can score them deterministically and so agents that depend on them can invoke them by stable section name.</p>
-<h2 id="file-and-directory-contract">File and directory contract<a class="headerlink" href="#file-and-directory-contract" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Path: <code>skills/&lt;kebab-case-name&gt;/SKILL.md</code>.</li>
-<li>The frontmatter <code>name:</code> field MUST equal the parent directory name.</li>
-<li>One SKILL.md per directory. No nested SKILL.md files.</li>
-</ul>
-<h2 id="required-frontmatter">Required frontmatter<a class="headerlink" href="#required-frontmatter" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nn">---</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;kebab-case-name&gt;</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;one sentence describing when to use this skill — used by agents to decide relevance&gt;</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nn">---</span>
+<p>The canonical format every <code>skills/*/SKILL.md</code> file in this repo must
+follow. Adapted from the addyosmani/agent-skills convention. Enforced
+by <code>scripts/validate_skills.py</code> (CI) and the pre-commit hook.</p>
+<h2 id="file-location">File location<a class="headerlink" href="#file-location" title="Permanent link">&para;</a></h2>
+<p>One skill per directory under <code>skills/</code>. The skill file is always named
+<code>SKILL.md</code> (uppercase). The directory name is the canonical skill id
+and must match the <code>name:</code> frontmatter field.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>skills/
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  economist-writing/
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    SKILL.md
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  python-quality/
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    SKILL.md
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>  ...
 </code></pre></div>
-<p>The <code>description</code> is the primary trigger — write it so the architect or any consuming agent can decide whether to load this skill from the description alone. Avoid generic phrasing ("guidelines for X") and prefer trigger phrases ("Use when configuring the writer agent…", "Apply during code review when…").</p>
-<h2 id="required-sections">Required sections<a class="headerlink" href="#required-sections" title="Permanent link">&para;</a></h2>
-<p>Every SKILL.md MUST have these six top-level sections, in this order. All 17 skills currently in the repo follow this structure — the validator enforces it.</p>
-<h3 id="1-overview">1. <code>## Overview</code><a class="headerlink" href="#1-overview" title="Permanent link">&para;</a></h3>
-<p>One or two paragraphs. State what this skill is <em>for</em> and what it is <em>not</em> for. End with a sentence describing who or what consumes it (which agent, which gate, which workflow).</p>
-<h3 id="2-when-to-use">2. <code>## When to Use</code><a class="headerlink" href="#2-when-to-use" title="Permanent link">&para;</a></h3>
-<p>A bulleted list of concrete situations where the skill applies. Each bullet should be specific enough that a reader can match a real task to it without ambiguity.</p>
-<p>Include a <code>### When NOT to Use</code> subsection that lists adjacent skills the reader might be looking for instead. Cross-reference them by slug.</p>
-<h3 id="3-core-process">3. <code>## Core Process</code><a class="headerlink" href="#3-core-process" title="Permanent link">&para;</a></h3>
-<p>The substantive content of the skill. This is where the rules, patterns, rubrics, or step-by-step procedures live. A subtitle is allowed (e.g. <code>## Core Process: The 10 Rules</code>, <code>## Core Process: 4-Layer Architecture</code>) — the validator matches the <code>## Core Process</code> prefix.</p>
-<p>Use sub-headings (<code>###</code>) freely. Tables, fenced code blocks, and rubrics are encouraged — they make the skill machine-readable as well as human-readable.</p>
-<h3 id="4-common-rationalizations">4. <code>## Common Rationalizations</code><a class="headerlink" href="#4-common-rationalizations" title="Permanent link">&para;</a></h3>
-<p>A two-column table or bulleted list pairing the kind of rationalisation that leads to skipping the skill with the corrective reality. Examples:</p>
-<table>
-<thead>
-<tr>
-<th>Rationalization</th>
-<th>Reality</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>"We can hand-edit it just this once"</td>
-<td>Hand edits skip the gate that catches the next regression.</td>
-</tr>
-</tbody>
-</table>
-<p>This section exists because skills exist to resist convenient shortcuts. Documenting the shortcut explicitly makes it easier to refuse.</p>
-<h3 id="5-red-flags">5. <code>## Red Flags</code><a class="headerlink" href="#5-red-flags" title="Permanent link">&para;</a></h3>
-<p>A bulleted list of warning signs that the skill is being applied incorrectly or being bypassed. Used by reviewers to catch silent drift.</p>
-<h3 id="6-verification">6. <code>## Verification</code><a class="headerlink" href="#6-verification" title="Permanent link">&para;</a></h3>
-<p>How to check that the skill was actually applied — the test, the linter rule, the manual check. If the skill is enforced by a gate or hook, name it explicitly with the file path.</p>
-<h2 id="example-structure">Example structure<a class="headerlink" href="#example-structure" title="Permanent link">&para;</a></h2>
+<h2 id="frontmatter">Frontmatter<a class="headerlink" href="#frontmatter" title="Permanent link">&para;</a></h2>
+<p>YAML between <code>---</code> delimiters at the top of the file. Two required
+fields, no others permitted:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>---
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>name: example-skill
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="gu">description: Use when X, to ensure Y, by following Z.</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>name: economist-writing
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="gu">description: One-sentence description of when to use this skill. Should help an agent decide whether to load it.</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="gu">---</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="gh"># Example Skill</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="gu">## Overview</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>One or two paragraphs.
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="gu">## When to Use</span>
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>
-<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="k">-</span><span class="w"> </span>Bullet 1
-<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="k">-</span><span class="w"> </span>Bullet 2
-<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>
-<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="gu">### When NOT to Use</span>
-<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>
-<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="k">-</span><span class="w"> </span>For X — that&#39;s <span class="sb">`other-skill`</span>
-<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>
-<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="gu">## Core Process</span>
-<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>
-<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="gu">### Step 1</span>
-<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>…
-<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a>
-<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a><span class="gu">### Step 2</span>
-<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a>…
-<a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a>
-<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a><span class="gu">## Common Rationalizations</span>
-<a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a>
-<a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a>| Rationalization | Reality |
-<a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a>|----------------|---------|
-<a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a>| … | … |
-<a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a>
-<a id="__codelineno-1-35" name="__codelineno-1-35" href="#__codelineno-1-35"></a><span class="gu">## Red Flags</span>
-<a id="__codelineno-1-36" name="__codelineno-1-36" href="#__codelineno-1-36"></a>
-<a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a><span class="k">-</span><span class="w"> </span>…
-<a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a>
-<a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a><span class="gu">## Verification</span>
-<a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a>
-<a id="__codelineno-1-41" name="__codelineno-1-41" href="#__codelineno-1-41"></a><span class="k">-</span><span class="w"> </span>Run <span class="sb">`pytest tests/test_example.py`</span>
-<a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a><span class="k">-</span><span class="w"> </span>The pre-commit hook <span class="sb">`…`</span> enforces it
 </code></pre></div>
-<h2 id="validator-behaviour">Validator behaviour<a class="headerlink" href="#validator-behaviour" title="Permanent link">&para;</a></h2>
-<p><code>scripts/validate_skills.py</code> checks every <code>skills/&lt;name&gt;/SKILL.md</code> for:</p>
-<ol>
-<li>Valid YAML frontmatter parses cleanly.</li>
-<li><code>name</code> field equals the parent directory name.</li>
-<li><code>description</code> is non-empty.</li>
-<li>The six required sections (<code>## Overview</code>, <code>## When to Use</code>, <code>## Core Process</code> <em>(prefix-match — subtitle allowed)</em>, <code>## Common Rationalizations</code>, <code>## Red Flags</code>, <code>## Verification</code>) are all present.</li>
-</ol>
-<p>Adding a SKILL.md that fails any of these checks fails the pre-commit hook and CI.</p>
-<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
 <ul>
-<li>The skills library lives at <code>skills/</code>. See <code>skills/README.md</code> for the index.</li>
-<li>Format originally adapted from <a href="https://github.com/addyosmani/agent-skills">addyosmani/agent-skills</a>.</li>
-<li>The architect agent's rubric (<code>skills/architecture-patterns/SKILL.md</code>) and the validator (<code>scripts/validate_skills.py</code>) operate on this contract.</li>
+<li><code>name</code> — must equal the parent directory name. Lowercase kebab-case.</li>
+<li><code>description</code> — single sentence, ends with a period, includes "Use
+  when..." or "Use to..." so the trigger condition is explicit.</li>
+</ul>
+<h2 id="body-six-required-sections">Body — six required sections<a class="headerlink" href="#body-six-required-sections" title="Permanent link">&para;</a></h2>
+<p>Every skill body must contain these <code>##</code> headings, in this order. The
+validator only checks that the headings exist; the contents are at the
+author's discretion.</p>
+<h3 id="overview"><code>## Overview</code><a class="headerlink" href="#overview" title="Permanent link">&para;</a></h3>
+<p>One paragraph: what the skill does and why it exists.</p>
+<h3 id="when-to-use"><code>## When to Use</code><a class="headerlink" href="#when-to-use" title="Permanent link">&para;</a></h3>
+<p>Bulleted list of trigger conditions. Should be specific enough that an
+agent can pattern-match against a user request. May include a <code>### When
+NOT to Use</code> subsection.</p>
+<h3 id="core-process"><code>## Core Process</code><a class="headerlink" href="#core-process" title="Permanent link">&para;</a></h3>
+<p>The actual procedure or rules. Sub-headings, tables, numbered lists,
+and code samples are all welcome here. This is the longest section.</p>
+<h3 id="common-rationalizations"><code>## Common Rationalizations</code><a class="headerlink" href="#common-rationalizations" title="Permanent link">&para;</a></h3>
+<p>A two-column markdown table mapping the temptation to the reality. Use
+this section to head off shortcuts before they happen.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>| Rationalization | Reality |
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>|-----------------|---------|
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>| &quot;We can skip step 3 just this once&quot; | Skipping step 3 caused incident <span class="ni">#117</span>; never skip |
+</code></pre></div>
+<h3 id="red-flags"><code>## Red Flags</code><a class="headerlink" href="#red-flags" title="Permanent link">&para;</a></h3>
+<p>Bulleted list of warning signs that the skill is being misapplied or
+that something has drifted off-pattern. Used by reviewers to spot bad
+output quickly.</p>
+<h3 id="verification"><code>## Verification</code><a class="headerlink" href="#verification" title="Permanent link">&para;</a></h3>
+<p>Bulleted checklist of how to prove the skill ran correctly. Each item
+should reference the concrete evidence (a test, a CI check, a file
+artefact, a metric). Format:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">- [ ]</span> &lt;claim&gt; — <span class="gs">**evidence**</span>: &lt;specific check&gt;
+</code></pre></div>
+<h2 id="optional-but-encouraged">Optional but encouraged<a class="headerlink" href="#optional-but-encouraged" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>## Examples</code> — concrete inputs and outputs</li>
+<li><code>## References</code> — links to related ADRs, skills, or external docs</li>
+</ul>
+<h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
+<p>Run <code>python scripts/validate_skills.py</code> to check the whole tree. The
+script exits 0 when every <code>skills/*/SKILL.md</code> file:</p>
+<ol>
+<li>Has the two required frontmatter fields and nothing else.</li>
+<li>Has <code>name</code> equal to its parent directory name.</li>
+<li>Contains all six required <code>##</code> body sections.</li>
+</ol>
+<p>The same script runs in pre-commit and in the Quality Gates CI
+workflow, so any non-compliant skill blocks merge.</p>
+<h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>skills/README.md</code> — the index of all skills in this repo</li>
+<li><code>.claude-plugin/plugin.json</code> — plugin manifest pointing at the
+  <code>skills</code> directory</li>
+<li>ADR-0008 — agent + skill governance</li>
 </ul>
 
 

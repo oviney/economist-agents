@@ -29,9 +29,12 @@ def _make_article(
     layout: str = "post",
     title: str = "Specific Descriptive Title for Testing",
     date: str = "2026-04-03",
-    author: str = "The Economist",
-    categories: str = '["quality-engineering"]',
+    author: str = "Ouray Viney",
+    categories: str = '["Quality Engineering"]',
     description: str | None = "A concise test description for SEO purposes",
+    image: str | None = "/assets/images/test-article.png",
+    image_alt: str | None = "A testing rig catching defects before release",
+    image_caption: str | None = "Illustration: stronger gates catch weaker drafts",
     body: str | None = None,
     references: str | None = None,
     chart_embed: str | None = None,
@@ -58,6 +61,12 @@ def _make_article(
         fields.append(f"categories: {categories}")
     if description is not None:
         fields.append(f'description: "{description}"')
+    if image is not None:
+        fields.append(f"image: {image}")
+    if image_alt is not None:
+        fields.append(f'image_alt: "{image_alt}"')
+    if image_caption is not None:
+        fields.append(f'image_caption: "{image_caption}"')
     fm = "\n".join(fields)
     return f"{frontmatter_open}\n{fm}\n{frontmatter_close}\n\n{body}\n{chart_embed}\n{references}\n"
 
@@ -294,7 +303,7 @@ class TestPublicationValidatorCategory:
 
     def test_valid_category_passes(self) -> None:
         validator = PublicationValidator(expected_date="2026-04-03")
-        article = _make_article(categories='["quality-engineering"]')
+        article = _make_article(categories='["Quality Engineering"]')
         is_valid, issues = validator.validate(article)
         cat_issues = [
             i for i in issues if i["check"] in ("missing_category", "invalid_category")
@@ -324,6 +333,43 @@ class TestPublicationValidatorCategory:
         is_valid, issues = validator.validate(article)
         cat_issues = [i for i in issues if i["check"] == "missing_category"]
         assert len(cat_issues) == 1
+
+
+class TestPublicationValidatorBlogContract:
+    """Blog-specific publication contract checks."""
+
+    def test_author_must_match_blog_contract(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(author="The Economist")
+        is_valid, issues = validator.validate(article)
+        assert not is_valid
+        author_issues = [i for i in issues if i["check"] == "author_contract"]
+        assert len(author_issues) == 1
+
+    def test_default_hero_fallback_rejected(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(image="/assets/images/blog-default.svg")
+        is_valid, issues = validator.validate(article)
+        assert not is_valid
+        image_issues = [i for i in issues if i["check"] == "default_image_fallback"]
+        assert len(image_issues) == 1
+
+    def test_missing_image_metadata_rejected(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(image_alt=None, image_caption=None)
+        is_valid, issues = validator.validate(article)
+        assert not is_valid
+        missing = {issue["check"] for issue in issues}
+        assert "missing_image_alt" in missing
+        assert "missing_image_caption" in missing
+
+    def test_inline_heading_marker_rejected(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(body=f"{VALID_BODY} ## Broken heading")
+        is_valid, issues = validator.validate(article)
+        assert not is_valid
+        heading_issues = [i for i in issues if i["check"] == "inline_heading_marker"]
+        assert len(heading_issues) == 1
 
 
 class TestPublicationValidatorChart:

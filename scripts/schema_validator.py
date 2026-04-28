@@ -42,12 +42,10 @@ FRONT_MATTER_SCHEMA = {
             "items": {
                 "type": "string",
                 "enum": [
-                    "quality-engineering",
-                    "test-automation",
-                    "performance",
-                    "ai-testing",
-                    "software-engineering",
-                    "devops",
+                    "Quality Engineering",
+                    "Software Engineering",
+                    "Test Automation",
+                    "Security",
                 ],
             },
             "description": "Category tags (1-3 allowed)",
@@ -192,6 +190,9 @@ class FrontMatterValidator:
                             f"WARNING: Unknown category '{cat}'. "
                             f"Allowed: {', '.join(allowed_categories)}"
                         )
+
+        if "author" in front_matter and front_matter["author"] != "Ouray Viney":
+            issues.append('CRITICAL: author must be "Ouray Viney" for blog publication')
 
         # AI disclosure check
         if "ai_assisted" not in front_matter:

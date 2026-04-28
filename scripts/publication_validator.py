@@ -36,10 +36,10 @@ class PublicationValidator:
 
     #: Blog categories accepted by the publication pipeline.
     VALID_CATEGORIES: list[str] = [
-        "quality-engineering",
-        "software-engineering",
-        "test-automation",
-        "security",
+        "Quality Engineering",
+        "Software Engineering",
+        "Test Automation",
+        "Security",
     ]
 
     CRITICAL_FAILURES = {
@@ -146,7 +146,16 @@ class PublicationValidator:
         # Check 12: Category validation
         self._check_category(article_content)
 
-        # Check 13: Ending quality (banned closings from stage4_crew)
+        # Check 13: Author validation
+        self._check_author(article_content)
+
+        # Check 14: Image contract validation
+        self._check_image_contract(article_content)
+
+        # Check 15: Heading structure validation
+        self._check_heading_structure(article_content)
+
+        # Check 16: Ending quality (banned closings from stage4_crew)
         self._check_ending(article_content)
 
         # Determine if valid (no CRITICAL issues)
@@ -480,6 +489,102 @@ class PublicationValidator:
                             )
         except Exception:
             pass  # YAML parse errors are caught by _check_yaml_format
+
+    def _check_author(self, content: str) -> None:
+        """Require the blog's production author name."""
+        try:
+            if content.startswith("---"):
+                parts = content.split("---", 2)
+                if len(parts) >= 2:
+                    front_matter = yaml.safe_load(parts[1])
+                    if not isinstance(front_matter, dict):
+                        return
+                    author = front_matter.get("author")
+                    if author != "Ouray Viney":
+                        self.issues.append(
+                            {
+                                "check": "author_contract",
+                                "severity": "CRITICAL",
+                                "message": f'Invalid author "{author}". Expected "Ouray Viney"',
+                                "details": "Published blog posts must use the production author metadata contract",
+                                "fix": 'Set author to "Ouray Viney"',
+                            }
+                        )
+        except Exception:
+            pass
+
+    def _check_image_contract(self, content: str) -> None:
+        """Reject placeholder or incomplete image metadata for publication."""
+        try:
+            if content.startswith("---"):
+                parts = content.split("---", 2)
+                if len(parts) >= 2:
+                    front_matter = yaml.safe_load(parts[1])
+                    if not isinstance(front_matter, dict):
+                        return
+
+                    image = str(front_matter.get("image", "") or "").strip()
+                    image_alt = str(front_matter.get("image_alt", "") or "").strip()
+                    image_caption = str(front_matter.get("image_caption", "") or "").strip()
+
+                    if not image:
+                        self.issues.append(
+                            {
+                                "check": "missing_image",
+                                "severity": "CRITICAL",
+                                "message": "Article missing hero image",
+                                "details": "Production blog posts require article-specific hero imagery",
+                                "fix": "Set image to a real article asset path",
+                            }
+                        )
+                    elif "blog-default.svg" in image:
+                        self.issues.append(
+                            {
+                                "check": "default_image_fallback",
+                                "severity": "CRITICAL",
+                                "message": "Article still uses blog-default.svg fallback",
+                                "details": "Default hero fallback must not pass the publication gate",
+                                "fix": "Generate or assign article-specific hero art before publishing",
+                            }
+                        )
+
+                    if not image_alt:
+                        self.issues.append(
+                            {
+                                "check": "missing_image_alt",
+                                "severity": "CRITICAL",
+                                "message": "Article missing image_alt",
+                                "details": "Published posts require reader-facing alt text for hero art",
+                                "fix": "Add concise image_alt describing the visible scene",
+                            }
+                        )
+
+                    if not image_caption:
+                        self.issues.append(
+                            {
+                                "check": "missing_image_caption",
+                                "severity": "CRITICAL",
+                                "message": "Article missing image_caption",
+                                "details": "Published posts require an editorial hero caption",
+                                "fix": "Add image_caption explaining the image's editorial point",
+                            }
+                        )
+        except Exception:
+            pass
+
+    def _check_heading_structure(self, content: str) -> None:
+        """Reject inline markdown headings embedded inside paragraphs."""
+        body = content.split("---", 2)[2] if content.startswith("---") and len(content.split("---", 2)) >= 3 else content
+        if re.search(r"[^\s]\s##\s", body):
+            self.issues.append(
+                {
+                    "check": "inline_heading_marker",
+                    "severity": "CRITICAL",
+                    "message": "Heading markers are embedded inside paragraph text",
+                    "details": "Malformed markdown like '... sentence. ## Heading' must not publish",
+                    "fix": "Move each markdown heading to its own line with surrounding paragraph breaks",
+                }
+            )
 
     # Banned closing phrases aligned with stage4_crew._BANNED_CLOSINGS + extras.
     _BANNED_CLOSINGS: list[str] = [

@@ -44,8 +44,8 @@ def _make_article(*, date: str = "2026-01-15") -> str:
         f"layout: post\n"
         f'title: "Specific Descriptive Article Title"\n'
         f"date: {date}\n"
-        f'author: "The Economist"\n'
-        f'categories: ["quality-engineering"]\n'
+        f'author: "Ouray Viney"\n'
+        f'categories: ["Quality Engineering"]\n'
         f"---\n\n"
         f"{VALID_BODY}\n\n"
         f"{VALID_REFERENCES}\n"

@@ -266,20 +266,24 @@ _BANNED_PATTERNS: list[tuple[re.Pattern[str], str]] = [
 ]
 
 _CATEGORY_NORMALIZATION: dict[str, str] = {
-    "quality engineering": "quality-engineering",
-    "software engineering": "software-engineering",
-    "test automation": "test-automation",
+    "quality engineering": "Quality Engineering",
+    "quality-engineering": "Quality Engineering",
+    "software engineering": "Software Engineering",
+    "software-engineering": "Software Engineering",
+    "test automation": "Test Automation",
+    "test-automation": "Test Automation",
+    "security": "Security",
 }
 
 
 def _normalize_category_casing(frontmatter: str) -> str:
-    """Force category values into kebab-case."""
+    """Normalize category values to the blog's title-case contract."""
     lines = frontmatter.split("\n")
     for i, line in enumerate(lines):
         if line.strip().startswith("categories:"):
-            for title_case, kebab in _CATEGORY_NORMALIZATION.items():
+            for raw_value, canonical in _CATEGORY_NORMALIZATION.items():
                 lines[i] = re.sub(
-                    re.escape(title_case), kebab, lines[i], flags=re.IGNORECASE
+                    re.escape(raw_value), canonical, lines[i], flags=re.IGNORECASE
                 )
             break
     return "\n".join(lines)
@@ -413,8 +417,10 @@ def apply_editorial_fixes(article: str, current_date: str | None = None) -> str:
             fm = parts[1]
             if "layout:" not in fm:
                 fm = "\nlayout: post" + fm
+            if "author:" not in fm:
+                fm = fm.rstrip() + '\nauthor: "Ouray Viney"\n'
             if "categories:" not in fm:
-                fm = fm.rstrip() + '\ncategories: ["quality-engineering"]\n'
+                fm = fm.rstrip() + '\ncategories: ["Quality Engineering"]\n'
             fm = _normalize_category_casing(fm)
             fm = _truncate_description(fm)
             text = "---" + fm + "---" + parts[2]

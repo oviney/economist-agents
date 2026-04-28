@@ -4,16 +4,39 @@
 
 set -e
 
+ISSUE_NUMBER=""
+RUNTIME="${AGENT_RUNTIME:-codex}"
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --issue)
+            ISSUE_NUMBER="$2"
+            shift 2
+            ;;
+        --runtime)
+            RUNTIME="$2"
+            shift 2
+            ;;
+        --help|-h)
+            echo "Usage: ./scripts/pre_work_check.sh [--issue N] [--runtime codex|claude|copilot] \"Work description\""
+            exit 0
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
 echo "🔍 Sprint Discipline Pre-Work Checklist"
 echo "========================================"
 echo ""
 
 # Get work description from user
 if [ -z "$1" ]; then
-    echo "Usage: ./scripts/pre_work_check.sh \"Work description\""
+    echo "Usage: ./scripts/pre_work_check.sh [--issue N] [--runtime codex|claude|copilot] \"Work description\""
     echo ""
     echo "Example:"
-    echo "  ./scripts/pre_work_check.sh \"Implement metrics tracking\""
+    echo "  ./scripts/pre_work_check.sh --issue 123 --runtime codex \"Implement metrics tracking\""
     echo ""
     exit 1
 fi
@@ -32,6 +55,22 @@ if [ $? -ne 0 ]; then
     echo "   Fix the issues above before starting work."
     echo ""
     exit 1
+fi
+
+if [ -n "$ISSUE_NUMBER" ]; then
+    echo "🔐 Verifying issue ownership..."
+    python3 scripts/github_issue_claim.py check "$ISSUE_NUMBER" --runtime "$RUNTIME"
+
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo "❌ BLOCKED: Issue ownership check failed"
+        echo "   Claim the issue before starting work."
+        echo ""
+        exit 1
+    fi
+
+    echo "   ✓ Issue #$ISSUE_NUMBER is reserved for $RUNTIME"
+    echo ""
 fi
 
 echo ""

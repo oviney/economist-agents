@@ -22,7 +22,10 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from github_issue_claim import GitHubIssueClaimer
+
 logger = logging.getLogger(__name__)
+DEFAULT_RUNTIME = "claude"
 
 
 def gh_api(endpoint: str, method: str = "GET") -> dict[str, Any] | list[Any]:
@@ -92,17 +95,10 @@ def fetch_issue(issue_number: int) -> dict[str, Any]:
     }
 
 
-def find_next_issue() -> int | None:
-    """Find the next open issue with enhancement+quality labels."""
-    issues = gh_api(
-        "repos/oviney/economist-agents/issues?labels=enhancement,quality&state=open&sort=created&direction=asc"
-    )
-    # Skip epic issues (they reference other issues)
-    for issue in issues:
-        body = issue.get("body", "")
-        if "## Stories" not in body and "Epic:" not in issue.get("title", ""):
-            return issue["number"]
-    return None
+def find_next_issue(runtime: str) -> int | None:
+    """Find the next claimable open issue with enhancement+quality labels."""
+    claimer = GitHubIssueClaimer()
+    return claimer.find_next_claimable_issue(["enhancement", "quality"], runtime)
 
 
 def create_branch(issue_number: int, title: str) -> str:
@@ -214,13 +210,18 @@ def main() -> None:
     parser.add_argument(
         "--next", action="store_true", help="Pick next ready issue automatically"
     )
+    parser.add_argument(
+        "--runtime",
+        default=DEFAULT_RUNTIME,
+        help="Runtime name used for issue claiming",
+    )
     args = parser.parse_args()
 
     # Determine which issue to work on
     if args.issue:
         issue_number = args.issue
     elif args.next:
-        issue_number = find_next_issue()
+        issue_number = find_next_issue(args.runtime)
         if not issue_number:
             print("No ready issues found with enhancement+quality labels")
             sys.exit(0)
@@ -232,6 +233,20 @@ def main() -> None:
     print("DEVELOPMENT CREW — Autonomous Implementation")
     print(f"{'=' * 60}")
     print(f"Issue: #{issue_number}")
+
+    claimer = GitHubIssueClaimer()
+
+    print("\n🔐 Claiming issue...")
+    try:
+        claim = claimer.claim_issue(issue_number, runtime=args.runtime)
+        claim_expiry = (
+            claim.expires_at.isoformat() if claim.expires_at is not None else "unknown"
+        )
+        print(f"   Owner: {claim.runtime}")
+        print(f"   Lease expiry: {claim_expiry}")
+    except RuntimeError as exc:
+        print(f"   ❌ {exc}")
+        sys.exit(1)
 
     # Step 1: Fetch issue
     print("\n📋 Fetching issue...")
@@ -249,6 +264,8 @@ def main() -> None:
     log_to_issue(
         issue_number,
         f"""🤖 **Development Crew picking up this story**
+
+**Claim owner:** `{args.runtime}`
 
 **Agents assigned:**
 - test-specialist (TDD Red phase)

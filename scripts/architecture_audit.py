@@ -329,9 +329,13 @@ def _score_output_contract(body: str) -> tuple[int, list[dict[str, str]]]:
     # Python pseudocode, and Markdown templates are all valid contract docs
     # in this repo. Untyped fences (just ```) don't count — they're often
     # quoting examples rather than declaring shape.
-    has_typed_code_block = bool(re.search(r"```(?:json|jsonc|yaml|python|markdown|md)\b", body))
+    has_typed_code_block = bool(
+        re.search(r"```(?:json|jsonc|yaml|python|markdown|md)\b", body)
+    )
     has_format_keyword = bool(
-        re.search(r"\b(output\s+format|returns?\s+\w+|emit\b|produces?\b)\b", body, re.I)
+        re.search(
+            r"\b(output\s+format|returns?\s+\w+|emit\b|produces?\b)\b", body, re.I
+        )
     )
     if has_output_section and (has_typed_code_block or has_format_keyword):
         return 2, findings

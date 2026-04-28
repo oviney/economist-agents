@@ -1,0 +1,17 @@
+{
+  "topic": "the unit economics of running language models in production",
+  "editorial_score": 86,
+  "gates_passed": 4,
+  "publication_ready": true,
+  "publication_validator_passed": true,
+  "publication_validator_issues": [],
+  "total_cost_usd": 0.2624302,
+  "writer_cost_usd": 0.20364445,
+  "graphics_cost_usd": 0.05878575,
+  "writer_model": "claude-sonnet-4-6",
+  "graphics_model": "claude-sonnet-4-6",
+  "stage3_seconds": 262.3214111670386,
+  "stage4_seconds": 0.008764625061303377,
+  "article_chars": 7422,
+  "total_wall_seconds": 262.3308155830018
+}

@@ -14,12 +14,19 @@ from pathlib import Path
 
 import pytest
 
-STAGE3_CREW_PATH = Path(__file__).parent.parent / "src" / "crews" / "stage3_crew.py"
+STAGE3_CREW_PATH = (
+    Path(__file__).parent.parent / "src" / "agent_sdk" / "stage3_runner.py"
+)
 
 
 @pytest.fixture(scope="module")
 def stage3_source() -> str:
-    """Read stage3_crew.py source once for all tests."""
+    """Read the writer prompt source once for all tests.
+
+    After ADR-0006 Phase 2 (epic #308) the writer rules live in
+    ``WRITER_SYSTEM_PROMPT`` inside ``src/agent_sdk/stage3_runner.py``
+    instead of a CrewAI Agent backstory.
+    """
     return STAGE3_CREW_PATH.read_text()
 
 
@@ -27,8 +34,13 @@ class TestWriterBackstorySkillReference:
     """Verify writer backstory references the economist-writing skill."""
 
     def test_backstory_references_skill_md(self, stage3_source: str) -> None:
-        """Writer backstory must reference skills/economist-writing/SKILL.md."""
-        assert "skills/economist-writing/SKILL.md" in stage3_source
+        """Writer prompt must NOT reference skill files at runtime.
+
+        Loading the file at runtime caused the spike to crash when the
+        Read tool was disallowed. The 10 rules are now inlined in the
+        system prompt; this test guards that decision.
+        """
+        assert "skills/economist-writing/SKILL.md" not in stage3_source
 
     def test_backstory_references_10_rules(self, stage3_source: str) -> None:
         """Backstory must reference the 10 rules in SKILL.md."""
@@ -177,8 +189,11 @@ class TestWriterTaskDescription:
     """Verify the writer task description enforces all skill rules."""
 
     def test_task_references_skill_md(self, stage3_source: str) -> None:
-        """Writer task must reference skills/economist-writing/SKILL.md."""
-        assert "skills/economist-writing/SKILL.md" in stage3_source
+        """Writer task must NOT reference skill files at runtime.
+
+        See test_backstory_references_skill_md for the reason.
+        """
+        assert "skills/economist-writing/SKILL.md" not in stage3_source
 
     def test_task_requires_thesis(self, stage3_source: str) -> None:
         """Writer task description must require a thesis."""
@@ -193,25 +208,25 @@ class TestWriterTaskDescription:
         assert "LISTS" in stage3_source
 
     def test_task_bans_hedging(self, stage3_source: str) -> None:
-        """Writer task must ban hedging phrases via the AUTHORITY section label."""
-        assert "AUTHORITY" in stage3_source
+        """Writer prompt must ban hedging phrases."""
+        assert "BANNED HEDGING PHRASES" in stage3_source
 
     def test_task_requires_named_companies(self, stage3_source: str) -> None:
         """Writer task must require named companies/individuals."""
         assert "NAMES" in stage3_source
 
     def test_task_requires_vivid_ending(self, stage3_source: str) -> None:
-        """Writer task must require a vivid ending."""
-        assert "ENDING" in stage3_source
+        """Writer prompt must require a vivid ending."""
+        assert "vivid prediction" in stage3_source
 
     def test_task_bans_in_conclusion_ending(self, stage3_source: str) -> None:
         """Writer task must ban 'In conclusion' type endings."""
         assert "In conclusion" in stage3_source
 
     def test_task_expected_output_mentions_thesis(self, stage3_source: str) -> None:
-        """Writer task expected_output must mention thesis requirement."""
-        assert "thesis in first two paragraphs" in stage3_source
+        """Writer prompt must require a thesis in the first two paragraphs."""
+        assert "first two paragraphs" in stage3_source
 
     def test_task_expected_output_mentions_headings(self, stage3_source: str) -> None:
-        """Writer task expected_output must mention headings limit."""
+        """Writer prompt must mention the heading limit."""
         assert "3-4 headings maximum" in stage3_source

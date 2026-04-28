@@ -49,15 +49,23 @@ class SprintValidator:
 
         active_sprint_num = int(status_match.group(1))
 
-        # Find that sprint's section - match "## Sprint N:" with any text after
+        # Find that sprint's section - match "## Sprint N:" with any text after.
+        # Fall back to the current status header if the detailed sprint section
+        # has been collapsed from the planning document.
         sprint_match = re.search(
             rf"## Sprint {active_sprint_num}:\s*([^\(]+)(?:\([^\)]+\))?",
             self.sprint_content,
         )
-        if not sprint_match:
-            return None
-
-        sprint_name = sprint_match.group(1).strip()
+        if sprint_match:
+            sprint_name = sprint_match.group(1).strip()
+        else:
+            current_status_match = re.search(
+                rf"\*\*Active Sprint\*\*: Sprint {active_sprint_num}\s*-\s*([^\n]+)",
+                self.sprint_content,
+            )
+            if not current_status_match:
+                return None
+            sprint_name = current_status_match.group(1).strip()
 
         # Extract sprint goal
         goal_match = re.search(r"### Sprint Goal\n([^\n]+)", self.sprint_content)

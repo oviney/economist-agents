@@ -1,0 +1,38 @@
+{
+  "title": "The LLM cost illusion",
+  "subtitle": "Selected changes since commercial GPT-4 launch, 2023=100",
+  "data": [
+    {
+      "metric": "Cost per 1m input tokens",
+      "value": -90,
+      "unit": "% change since 2023",
+      "color": "burgundy"
+    },
+    {
+      "metric": "Average tokens per API call",
+      "value": 380,
+      "unit": "% change since 2023",
+      "color": "navy"
+    },
+    {
+      "metric": "API calls per user session",
+      "value": 500,
+      "unit": "% change since 2023",
+      "color": "navy"
+    },
+    {
+      "metric": "Total enterprise LLM spend",
+      "value": 320,
+      "unit": "% change since 2023",
+      "color": "navy"
+    }
+  ],
+  "colors": {
+    "navy": "#003366",
+    "burgundy": "#C41230"
+  },
+  "dimensions": {
+    "width": 640,
+    "height": 420
+  }
+}

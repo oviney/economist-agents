@@ -1,27 +1,12 @@
 {
   "name": "economist-agents",
-  "description": "Multi-agent content generation pipeline that produces publication-quality blog posts in The Economist's signature style. Includes 10 specialized agents (architect, code-reviewer, devops, git-operator, po-agent, product-research-agent, scrum-master, test-specialist, code-quality-specialist, visual-qa-agent) and a domain skills library.",
-  "version": "0.1.0",
-  "author": "Owen Viney <oviney@gmail.com>",
+  "description": "Multi-agent content pipeline that generates Economist-style articles with verified sources, deterministic quality gates, and an Anthropic Agent SDK runtime.",
+  "version": "0.2.0",
+  "author": "Ouray Viney",
   "license": "MIT",
   "homepage": "https://github.com/oviney/economist-agents",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/oviney/economist-agents.git"
-  },
-  "agents": ".github/agents",
+  "repository": "https://github.com/oviney/economist-agents",
   "skills": "skills",
-  "commands": null,
-  "engines": {
-    "python": ">=3.11"
-  },
-  "keywords": [
-    "claude-code",
-    "agents",
-    "skills",
-    "crewai",
-    "content-generation",
-    "the-economist",
-    "multi-agent"
-  ]
+  "agents": "agents/skills_configs",
+  "commands": "commands"
 }

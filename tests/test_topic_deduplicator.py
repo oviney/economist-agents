@@ -303,16 +303,20 @@ class TestDiscoverTopicsDeduplication:
     """Integration tests for dedup wiring inside EconomistContentFlow."""
 
     def _build_flow(self, distances: list[float]) -> Any:
-        """Create a flow with a mocked deduplicator and Stage4Crew.
+        """Create a flow with a mocked deduplicator.
+
+        After ADR-0006 Phase 2 (epic #308) the flow no longer
+        instantiates a CrewAI Stage4Crew at __init__ time — the
+        Stage 4 logic runs inline through src.agent_sdk.pipeline.
+        Nothing else needs patching at construction.
 
         Args:
-            distances: Cosine distances returned by the mock ChromaDB collection.
+            distances: Cosine distances returned by the mock ChromaDB
+                collection.
         """
-        with patch("src.economist_agents.flow.Stage4Crew"):
-            from src.economist_agents.flow import EconomistContentFlow
+        from src.economist_agents.flow import EconomistContentFlow
 
-            flow = EconomistContentFlow()
-
+        flow = EconomistContentFlow()
         flow._deduplicator = _make_deduplicator(distances=distances)
         return flow
 
@@ -395,10 +399,9 @@ class TestDiscoverTopicsDeduplication:
 
     def test_publish_article_indexes_in_archive(self) -> None:
         """publish_article() calls deduplicator.index_article after publishing."""
-        with patch("src.economist_agents.flow.Stage4Crew"):
-            from src.economist_agents.flow import EconomistContentFlow
+        from src.economist_agents.flow import EconomistContentFlow
 
-            flow = EconomistContentFlow()
+        flow = EconomistContentFlow()
 
         flow.state["quality_result"] = {
             "article": "---\ntitle: Published\n---\n\nContent here.",

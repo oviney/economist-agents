@@ -221,9 +221,13 @@ class TestPublicationValidatorWordCount:
     def test_borderline_words_rejected(self) -> None:
         # Gate is 700 (BUG-029). 650 words must still be rejected.
         validator = PublicationValidator(expected_date="2026-04-03")
-        body = " ".join(["word"] * 650)
+        # Use 670 words: with ~18 words from chart embed + references injected
+        # by _make_article, total is ~688 < 700 minimum gate.
+        body = " ".join(["word"] * 670)
         article = _make_article(
-            body=body, references="## References\n\n1. A\n2. B\n3. C\n"
+            body=body,
+            references="## References\n\n1. A\n2. B\n3. C\n",
+            chart_embed="",
         )
         is_valid, issues = validator.validate(article)
         wc_issues = [i for i in issues if i["check"] == "word_count"]
@@ -376,8 +380,7 @@ class TestPublicationValidatorEnding:
         validator = PublicationValidator(expected_date="2026-04-03")
         # Place the banned ending after the chart embed so it is the last paragraph
         chart_with_ending = (
-            VALID_CHART_EMBED
-            + "\n\nIn conclusion, the key is to keep testing."
+            VALID_CHART_EMBED + "\n\nIn conclusion, the key is to keep testing."
         )
         article = _make_article(chart_embed=chart_with_ending)
         _, issues = validator.validate(article)
@@ -417,8 +420,7 @@ class TestPublicationValidatorEnding:
         validator = PublicationValidator(expected_date="2026-04-03")
         # Body ends cleanly; the banned phrase only appears inside References
         chart_with_ending = (
-            VALID_CHART_EMBED
-            + "\n\nThe market will fracture along entirely new lines."
+            VALID_CHART_EMBED + "\n\nThe market will fracture along entirely new lines."
         )
         refs = (
             "## References\n\n"

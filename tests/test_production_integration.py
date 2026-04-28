@@ -18,6 +18,16 @@ pytest.importorskip("crewai")
 from src.economist_agents.flow import EconomistContentFlow
 from src.telemetry.roi_tracker import ROITracker
 from src.tools.style_memory_tool import StyleMemoryTool
+
+
+@pytest.mark.skip(
+    reason=(
+        "Obsolete after ADR-0006 Phase 2 (epic #308). Tests patch "
+        "Stage3Crew / Stage4Crew on src.economist_agents.flow which "
+        "were deleted; flow.py now uses src.agent_sdk.pipeline directly. "
+        "Filed #314 for new flow integration tests."
+    )
+)
 class TestFlowOrchestration:
     """Test Flow-based orchestration patterns"""
 
@@ -273,9 +283,11 @@ class TestROIIntegration:
 class TestEndToEndIntegration:
     """Test complete end-to-end pipeline with all components"""
 
-    @pytest.mark.skipif(
-        not os.environ.get("OPENAI_API_KEY"),
-        reason="OPENAI_API_KEY required for CrewAI agent initialization",
+    @pytest.mark.skip(
+        reason=(
+            "Obsolete after ADR-0006 Phase 2 (epic #308) — "
+            "Stage3Crew / Stage4Crew patches no longer apply. See #314."
+        )
     )
     @patch("src.economist_agents.flow.Stage3Crew")
     @patch("src.economist_agents.flow.Stage4Crew")

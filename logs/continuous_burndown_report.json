@@ -1,0 +1,132 @@
+{
+  "generated_at": "2026-04-27T01:54:08.065319Z",
+  "runtime": "codex",
+  "actionable_count": 11,
+  "blocker_count": 1,
+  "empty": false,
+  "actionable": [
+    {
+      "id": "backlog-undefined-1",
+      "title": "Backlog undefined remediation",
+      "source": "validators",
+      "priority": "P1",
+      "status": "pending",
+      "recommended_runtime": "claude",
+      "blocked": false,
+      "details": "Add missing fields: acceptance_criteria, story_points, assigned_to"
+    },
+    {
+      "id": "md-backlog-16",
+      "title": "Documentation System",
+      "source": "markdown_backlog",
+      "priority": "P1",
+      "status": "\ufffd in progress",
+      "recommended_runtime": "codex",
+      "blocked": false,
+      "details": "**Type**: Technical Enabler\n**Added**: 2026-01-04\n**Problem**: Stage 3 (Content Generation) still uses legacy orchestration. Need to migrate to CrewAI pattern for consistency and maintainability.\n**Solution**: Port Stage 3 logic to `src/crews/stage3_crew.py` following TDD approach established in Phase 1.\n**Acceptance Criteria**:\n1. **Red State**: Create `tests/reproduce_stage3.py`. It MUST fail initially.\n2. **Green State**: Create `src/crews/stage3_crew.py` that implements the logic.\n3. **Validation**: The reproduction test passes.\n4. **Constraint**: Do NOT delete the legacy `stage3.py` yet (mark as deprecated).\n**Files to Create**:\n- `tests/reproduce_stage3.py` - TDD reproduction script (must fail first)\n- `src/crews/stage3_crew.py` - New CrewAI implementation\n- `src/tasks/stage3_tasks.py` - Task definitions for Stage 3\n**Files to Modify**:\n- Legacy Stage 3 orchestration code - mark as deprecated with comments\n- Update integration tests to use new crew\n**Dependencies**:\n- Phase 1 migration (Stage 1 & Stage 2) must be complete\n- CrewAI framework already in use\n**Testing Strategy**:\n1. **RED**: Create failing reproduction script first (TDD mandatory)\n2. **GREEN**: Implement Stage3Crew to pass reproduction script\n3. **REFACTOR**: Run existing integration tests to ensure no regression\n4. **VALIDATE**: Compare output quality between legacy and CrewAI implementations\n**Quality Gates**:\n- Reproduction test must fail before implementation begins\n- All existing tests must continue passing\n- No quality regression vs legacy implementation\n**Related Work**:\n- ADR-003: CrewAI Migration Strategy\n- Phase 1 completion documentation\n- TDD best practices from Phase 1"
+    },
+    {
+      "id": "md-backlog-17",
+      "title": "Story 12: Autonomous Documentation Refresh",
+      "source": "markdown_backlog",
+      "priority": "P2",
+      "status": "ready",
+      "recommended_runtime": "codex",
+      "blocked": false,
+      "details": "**Agent**: scrum-master or docs-specialist\n**Goal**: Update `README.md` and `docs/architecture.md` to reflect the Agent Registry, TDD patterns, and CrewAI migration.\n**Problem**: Documentation is out of sync with recent architectural changes:\n- Agent Registry pattern now implemented (ADR-002)\n- TDD methodology established in Phase 1 migration\n- CrewAI framework migration in progress (ADR-003)\n- Current docs don't reflect these patterns\n**Solution**: Comprehensive documentation refresh covering:\n1. **README.md Updates**:\n   - Add Agent Registry pattern overview\n   - Document TDD workflow (RED \u2192 GREEN \u2192 REFACTOR)\n   - Update architecture diagram with CrewAI integration\n   - Add migration status section\n   - Update quick start guide with new patterns\n2. **docs/architecture.md Updates**:\n   - Document Agent Registry implementation details\n   - Add CrewAI migration architecture\n   - Explain TDD patterns used in codebase\n   - Update component diagrams\n   - Document agent configuration extraction pattern\n**Files to Modify**:\n- `README.md` - high-level overview and quick start\n- `docs/architecture.md` - detailed architecture documentation\n- Potentially `docs/ARCHITECTURE_PATTERNS.md` - learned patterns\n**Content to Include**:\n- Agent Registry usage examples\n- TDD workflow diagram\n- CrewAI crew structure\n- Configuration extraction pattern\n- Before/after migration comparison\n**Testing Strategy**:\n- Documentation completeness checklist\n- Link validation (all references work)\n- Code examples are runnable\n- Diagrams render correctly\n**Quality Gates**:\n- All ADRs referenced correctly\n- No broken links in documentation\n- Code examples validated\n- Peer review by another agent\n**Estimate**: 3 story points (4-6 hours)\n- 2 hours: README.md update\n- 2 hours: architecture.md update\n- 1-2 hours: validation and peer review\n**Dependencies**:\n- ADR-002 implementation complete \u2705\n- Phase 1 migration lessons documented\n- Agent Registry in production use\n**Related Work**:\n- ADR-002: Agent Registry Pattern\n- ADR-003: CrewAI Migration Strategy\n- Phase 1 TDD lessons learned\n- Architecture review patterns"
+    },
+    {
+      "id": "md-backlog-6",
+      "title": "Chart Regression Tests",
+      "source": "markdown_backlog",
+      "priority": "P2",
+      "status": "ready",
+      "recommended_runtime": "codex",
+      "blocked": false,
+      "details": "**Problem**: Known chart bugs (5 documented in code) have no automated prevention.\n**Bugs to Test**:\n1. Title/red bar overlap\n2. Inline label ON data line (not offset)\n3. Inline label in X-axis zone\n4. Label-to-label overlap\n5. Clipped elements at edges\n**Solution Approach**:\n- Create test chart generator with known bad configurations\n- Use visual QA agent to detect issues programmatically\n- Add to CI/CD pipeline\n**Files to Create**:\n- `tests/test_chart_layouts.py`\n- `tests/fixtures/bad_charts/` (example bad configurations)\n**Blocked By**: Need test data fixtures\n**Estimate**: 4-6 hours"
+    },
+    {
+      "id": "md-backlog-7",
+      "title": "Visual QA Metrics Tracking",
+      "source": "markdown_backlog",
+      "priority": "P2",
+      "status": "ready",
+      "recommended_runtime": "codex",
+      "blocked": false,
+      "details": "**Problem**: Visual QA runs manually, no metrics on chart quality over time.\n**Solution**:\n- Add metrics to skills system\n- Track pass/fail rate per chart\n- Identify recurring issues\n**Files to Change**:\n- `scripts/economist_agent.py` - record visual QA results\n- `scripts/skills_manager.py` - add visual QA category\n- `data/skills_state/blog_qa_skills.json` - new category\n**Metrics to Track**:\n- Charts generated: count\n- Visual QA pass rate: percentage\n- Most common failures: top 3\n- Improvement trend: pass rate over time\n**Estimate**: 2-3 hours\n## Medium Priority"
+    },
+    {
+      "id": "md-backlog-8",
+      "title": "Migrate Stage 3 Content Generation to CrewAI (Phase 2)",
+      "source": "markdown_backlog",
+      "priority": "P2",
+      "status": "ready",
+      "recommended_runtime": "codex",
+      "blocked": false,
+      "details": "**Type**: Technical Enabler\n**Related**: ADR-003 CrewAI Migration Strategy\n**Context**: \n**Problem**: Stage 3 Content Generation agents (Research, Writer, Editor) still use direct LLM calls. Need to migrate to CrewAI framework for improved orchestration, task dependencies, and context sharing.\n**Solution**:\nImplement Phase 2 of ADR-003 selective migration strategy:\n**Tasks**:\n1. **Migrate Research Agent to CrewAI** (3-4 hours)\n   - Convert research_agent.py to CrewAI agent\n   - Define research tasks with sequential dependencies\n   - Validate data_points and chart_data output format\n   - Ensure 90%+ verification rate maintained\n2. **Migrate Writer Agent to CrewAI** (3-4 hours)\n   - Convert writer_agent.py to CrewAI agent\n   - Implement task dependency on Research Agent output\n   - Preserve banned phrases validation\n   - Maintain chart embedding logic\n   - Test against Sprint 6 quality baseline\n3. **Migrate Editor Agent to CrewAI** (2-3 hours)\n   - Convert editor_agent.py to CrewAI agent\n   - Implement 5 quality gate checks as CrewAI tasks\n   - Preserve PASS/FAIL format from Sprint 8 enhancements\n   - Target 95%+ gate pass rate\n4. **Sequential Task Orchestration** (2-3 hours)\n   - Implement Research \u2192 Writer \u2192 Editor pipeline\n   - Add context sharing between agents\n   - Preserve quality gates and validation\n   - Test end-to-end with 5+ articles\n5. **Quality Validation** (2-3 hours)\n   - Compare metrics vs Sprint 6-8 baselines\n   - Writer: 80%+ clean draft rate\n   - Editor: 95%+ gate pass rate\n   - Graphics: 88%+ Visual QA pass rate\n   - Verify no quality regression\n6. **Update Documentation** (1-2 hours)\n   - Update ADR-003 with Phase 2 completion notes\n   - Document migration patterns for Phase 3\n   - Update SPRINT.md with new architecture\n**Files to Modify**:\n- `agents/research_agent.py` (230 lines \u2192 CrewAI agent)\n- `agents/writer_agent.py` (400 lines \u2192 CrewAI agent)\n- `agents/editor_agent.py` (544 lines \u2192 CrewAI agent)\n- `scripts/economist_agent.py` (orchestration logic)\n- `tests/test_agent_integration.py` (validate CrewAI pipeline)\n- `docs/ADR-003-crewai-migration-strategy.md` (Phase 2 status)\n**Acceptance Criteria**:\n- [ ] All 3 agents migrated to CrewAI framework\n- [ ] Sequential task dependencies working (Research \u2192 Writer \u2192 Editor)\n- [ ] Quality metrics match or exceed Sprint 6-8 baselines\n- [ ] 18+ tests passing (existing + new CrewAI integration tests)\n- [ ] End-to-end article generation via CrewAI pipeline successful\n- [ ] Documentation updated with migration patterns\n**Success Metrics**:\n- Research verification rate: \u226590%\n- Writer clean draft rate: \u226580%\n- Editor gate pass rate: \u226595%\n- Graphics Visual QA: \u226588%\n- Integration test pass rate: 100%\n**Dependencies**:\n- CrewAI 1.7.2+ (\u2705 installed)\n- Python 3.10-3.13 (\u2705 3.13.11 active)\n- schemas/agents.yaml (\u2705 exists)\n- Sprint 6-8 quality baselines (\u2705 documented)\n**Risks**:\n- Quality regression during migration\n- Context sharing between agents may need tuning\n- Sequential dependencies could increase latency\n- AgentFactory may need enhancements for complex orchestration\n**Mitigation**:\n- Parallel track: Keep existing agents as fallback\n- Comprehensive A/B testing vs baselines\n- Incremental migration (one agent at a time)\n- Rollback plan if quality degrades >10%\n**Estimate**: 13-17 hours (Large effort, 2 sprint story)\n**Phase 3 Preview**: Migrate Graphics Agent, implement parallel task execution, optimize CrewAI crew performance\n## Low Priority"
+    },
+    {
+      "id": "md-backlog-10",
+      "title": "Anti-Pattern Detection",
+      "source": "markdown_backlog",
+      "priority": "P3",
+      "status": "ready",
+      "recommended_runtime": "codex",
+      "blocked": false,
+      "details": "**Problem**: Architecture review only documents patterns, not anti-patterns.\n**Anti-Patterns to Detect**:\n- Creating LLM client per request (should be singleton)\n- Hardcoded API keys (should use env vars)\n- Unvalidated JSON parsing (should use try/except)\n- Missing verification flags (should mark unverified claims)\n- Direct file writes without path validation\n**Solution**:\n- Add `_detect_anti_patterns()` to `architecture_review.py`\n- Learn anti-patterns in skills system\n- Generate warnings in review report\n**Files to Change**:\n- `scripts/architecture_review.py`\n**Estimate**: 3-4 hours"
+    },
+    {
+      "id": "md-backlog-11",
+      "title": "Expand Skills Categories",
+      "source": "markdown_backlog",
+      "priority": "P3",
+      "status": "ready",
+      "recommended_runtime": "codex",
+      "blocked": false,
+      "details": "**New Categories**:\n**Solution**:\n**Files to Change**:\n**Estimate**: 4-5 hours"
+    },
+    {
+      "id": "md-backlog-9",
+      "title": "Integration Tests",
+      "source": "markdown_backlog",
+      "priority": "P3",
+      "status": "ready",
+      "recommended_runtime": "codex",
+      "blocked": false,
+      "details": "**Problem**: No automated end-to-end tests. Pipeline quality depends on manual testing.\n**Solution**:\n- Create test data fixtures\n- Run full pipeline: scout \u2192 board \u2192 generator\n- Validate outputs match expectations\n- Check for regression\n**Files to Create**:\n- `tests/test_integration.py`\n- `tests/fixtures/test_topics.json`\n- `tests/fixtures/expected_output/`\n**Test Scenarios**:\n1. Happy path: Valid topic \u2192 Complete article\n2. Missing data: Topic with no research \u2192 Graceful handling\n3. Chart failure: Research without chart data \u2192 Text-only article\n4. API failure: Simulate rate limit \u2192 Retry succeeds\n**Estimate**: 8-10 hours"
+    },
+    {
+      "id": "md-backlog-12",
+      "title": "Pre-commit Architecture Review",
+      "source": "markdown_backlog",
+      "priority": "P4",
+      "status": "icebox",
+      "recommended_runtime": "codex",
+      "blocked": false,
+      "details": "**Problem**: Architectural drift not caught until manual review.\n**Solution**:\n- Add `.git/hooks/pre-commit` script\n- Run architecture review on changed files\n- Fail commit if new anti-patterns detected\n**Trade-off**: Slower commits vs earlier detection\n**Estimate**: 1-2 hours"
+    },
+    {
+      "id": "md-backlog-13",
+      "title": "CONTRIBUTING.md",
+      "source": "markdown_backlog",
+      "priority": "P4",
+      "status": "icebox",
+      "recommended_runtime": "codex",
+      "blocked": false,
+      "details": "**Problem**: No contributor documentation.\n**Solution**:\n- Reference architectural patterns\n- Document \"edit prompts first\" principle\n- Link to all documentation\n- Explain skills learning system\n**Files to Create**:\n- `CONTRIBUTING.md`\n**Estimate**: 1-2 hours\n## Completed Archive\nCompleted items moved here for historical reference."
+    }
+  ],
+  "blockers": [
+    {
+      "id": "ci-red-build",
+      "title": "CI is red and blocks sprint execution",
+      "source": "ci_health",
+      "priority": "P0",
+      "status": "blocked",
+      "recommended_runtime": "human",
+      "blocked": true,
+      "details": "\ud83d\udea8 CI FAILURE - Run #463 failed"
+    }
+  ],
+  "iteration": 1
+}

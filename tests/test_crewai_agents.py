@@ -12,14 +12,12 @@ from unittest.mock import MagicMock, patch
 import pytest
 import yaml
 
-from scripts.crewai_agents import Agent as _CrewAIAgent
-from scripts.crewai_agents import AgentFactory
+# CrewAI was removed from production in epic #308 (ADR-0006 Phase 2).
+# scripts/crewai_agents.py is a vestigial integration that still imports
+# crewai; skip the whole module when crewai is not installed.
+pytest.importorskip("crewai")
 
-# Tests that instantiate AgentFactory require the optional crewai package.
-# CLI tests mock AgentFactory entirely so they remain runnable without it.
-requires_crewai = pytest.mark.skipif(
-    _CrewAIAgent is None, reason="crewai not installed"
-)
+from scripts.crewai_agents import AgentFactory  # noqa: E402
 
 # Sample agent configurations for testing
 SAMPLE_AGENTS_YAML = """

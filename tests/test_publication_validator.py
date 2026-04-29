@@ -584,11 +584,17 @@ class TestProductionEscapes319:
         )
         is_valid, issues = validator.validate(article)
         new_gate_issues = [
-            i for i in issues
-            if i["check"] in (
-                "author_contract", "default_image_fallback",
-                "missing_image", "missing_image_alt", "missing_image_caption",
-                "invalid_category", "inline_heading_marker",
+            i
+            for i in issues
+            if i["check"]
+            in (
+                "author_contract",
+                "default_image_fallback",
+                "missing_image",
+                "missing_image_alt",
+                "missing_image_caption",
+                "invalid_category",
+                "inline_heading_marker",
             )
         ]
         assert new_gate_issues == [], f"New gates should pass: {new_gate_issues}"

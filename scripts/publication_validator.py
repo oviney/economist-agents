@@ -525,7 +525,9 @@ class PublicationValidator:
 
                     image = str(front_matter.get("image", "") or "").strip()
                     image_alt = str(front_matter.get("image_alt", "") or "").strip()
-                    image_caption = str(front_matter.get("image_caption", "") or "").strip()
+                    image_caption = str(
+                        front_matter.get("image_caption", "") or ""
+                    ).strip()
 
                     if not image:
                         self.issues.append(
@@ -574,7 +576,11 @@ class PublicationValidator:
 
     def _check_heading_structure(self, content: str) -> None:
         """Reject inline markdown headings embedded inside paragraphs."""
-        body = content.split("---", 2)[2] if content.startswith("---") and len(content.split("---", 2)) >= 3 else content
+        body = (
+            content.split("---", 2)[2]
+            if content.startswith("---") and len(content.split("---", 2)) >= 3
+            else content
+        )
         if re.search(r"[^\s]\s##\s", body):
             self.issues.append(
                 {

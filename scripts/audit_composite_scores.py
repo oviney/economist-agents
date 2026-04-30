@@ -34,7 +34,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 _sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from ga4_etl import COMPOSITE_WEIGHTS, normalize  # noqa: E402
+from ga4_etl import COMPOSITE_WEIGHTS, normalize
 
 logger = logging.getLogger(__name__)
 
@@ -79,11 +79,12 @@ def load_all_rows(db_path: pathlib.Path) -> list[dict[str, Any]]:
     Raises:
         FileNotFoundError: If ``db_path`` does not exist.
         sqlite3.OperationalError: If the table does not exist.
+
     """
     if not db_path.exists():
         raise FileNotFoundError(
             f"Database not found: {db_path}\n"
-            "Run `python scripts/ga4_etl.py` first to populate it."
+            "Run `python scripts/ga4_etl.py` first to populate it.",
         )
 
     conn = sqlite3.connect(str(db_path))
@@ -101,7 +102,7 @@ def load_all_rows(db_path: pathlib.Path) -> list[dict[str, Any]]:
                 WHERE inner_ap.page_path = article_performance.page_path
             )
             ORDER BY composite_score DESC
-            """
+            """,
         )
         rows: list[dict[str, Any]] = [dict(r) for r in cursor.fetchall()]
     finally:
@@ -133,6 +134,7 @@ def select_sample(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
     Returns:
         Dict mapping slot name → row dict.  A slot is absent if no qualifying
         row exists.
+
     """
     if not rows:
         return {}
@@ -155,7 +157,8 @@ def select_sample(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
     candidates_viral = [r for r in rows if r["pageviews"] > 50]
     if candidates_viral:
         sample["viral_shallow"] = min(
-            candidates_viral, key=lambda r: r["composite_score"]
+            candidates_viral,
+            key=lambda r: r["composite_score"],
         )
 
     # Lowest pageviews with pageviews > 5
@@ -189,6 +192,7 @@ def recompute_score(
         * ``recomputed_score`` — sum of contributions
         * ``stored_score`` — ``composite_score`` from the database
         * ``zero_terms`` — list of terms contributing 0.0 (placeholders)
+
     """
     # Build normalised vectors for the metrics available in the DB
     norm_pageviews = normalize([r["pageviews"] for r in all_rows])
@@ -248,6 +252,7 @@ def render_url_section(
 
     Returns:
         Markdown string.
+
     """
     lines: list[str] = []
     label_map = {
@@ -293,7 +298,7 @@ def render_url_section(
         nv = math["normalized"][term]
         flag = " ⚠️" if contrib == 0.0 and w > 0.0 else ""
         lines.append(
-            f"| `{term}` | {w} | × {_fmt_float(nv)} | = {_fmt_float(contrib)}{flag} |"
+            f"| `{term}` | {w} | × {_fmt_float(nv)} | = {_fmt_float(contrib)}{flag} |",
         )
     lines.append(f"| **Total** | | | **{_fmt_float(math['recomputed_score'])}** |")
     lines.append("")
@@ -304,7 +309,7 @@ def render_url_section(
     status = "✅ matches stored value" if match else "❌ MISMATCH vs stored value"
     lines.append(
         f"Recomputed: `{math['recomputed_score']}` — {status} "
-        f"(stored: `{math['stored_score']}`)"
+        f"(stored: `{math['stored_score']}`)",
     )
     lines.append("")
 
@@ -313,7 +318,7 @@ def render_url_section(
     if active_zero:
         lines.append(
             f"> ⚠️ **{len(active_zero)} term(s) with positive weight are zeroed:** "
-            + ", ".join(f"`{t}`" for t in active_zero)
+            + ", ".join(f"`{t}`" for t in active_zero),
         )
         lines.append("")
 
@@ -344,6 +349,7 @@ def run_sanity_checks(
 
     Returns:
         List of Markdown lines for the sanity-check section.
+
     """
     lines: list[str] = []
 
@@ -358,7 +364,7 @@ def run_sanity_checks(
         if traffic_path in top_20_paths:
             lines.append(
                 f"- ✅ **Top-traffic URL is in the top 20% by composite score** "
-                f"(`{traffic_path}`)"
+                f"(`{traffic_path}`)",
             )
         else:
             rank = next(
@@ -371,7 +377,7 @@ def run_sanity_checks(
                 f"- ⚠️ **Top-traffic URL is NOT in the top 20% by composite score** "
                 f"(`{traffic_path}`, rank {rank}/{n}, top {pct:.0f}%). "
                 f"High pageviews alone do not guarantee a high composite score; "
-                f"engagement-quality metrics (rate, time, scroll) must also be strong."
+                f"engagement-quality metrics (rate, time, scroll) must also be strong.",
             )
 
     # 2 — Stored vs. recomputed score comparison
@@ -393,12 +399,12 @@ def run_sanity_checks(
             "dataset-scoped: the ETL stored each score against the full fetch "
             "batch, while this audit re-normalises over the current DB snapshot. "
             "The formula itself is deterministic (re-running this audit on the "
-            "same snapshot will always produce the same recomputed values)."
+            "same snapshot will always produce the same recomputed values).",
         )
     else:
         lines.append(
             "- ✅ **Stored scores match recomputed values** for all sampled URLs "
-            "(ETL batch and current DB snapshot appear identical in range)."
+            "(ETL batch and current DB snapshot appear identical in range).",
         )
 
     # 3 — Active vs placeholder weight fraction
@@ -415,7 +421,7 @@ def run_sanity_checks(
     lines.append(
         f"- 📊 **Active weight fraction: {active_pct:.0f}%** "
         f"({active_terms_str}).  "
-        f"Placeholder (zero) fraction: {zero_pct:.0f}% ({placeholder_terms})."
+        f"Placeholder (zero) fraction: {zero_pct:.0f}% ({placeholder_terms}).",
     )
 
     return lines
@@ -441,6 +447,7 @@ def compute_verdict(rows: list[dict[str, Any]]) -> tuple[str, str, int]:
 
     Returns:
         Tuple of (verdict_key, narrative, exit_code).
+
     """
     # TODO: use rows for additional ranking-stability checks once GSC data is available
     #       (e.g., compare pre/post GSC ranking positions to quantify the ranking shift)
@@ -495,10 +502,12 @@ def render_verdict_section(
 
     Returns:
         Markdown string.
+
     """
     # TODO: use rows to project per-URL score changes when GSC data becomes available
     icon = {"proceed": "✅", "re-weight": "⚠️", "wait for GSC": "🚫"}.get(
-        verdict_key, "❓"
+        verdict_key,
+        "❓",
     )
     lines: list[str] = [
         "## Verdict",
@@ -520,7 +529,7 @@ def render_verdict_section(
             f"with high organic search visibility (impressions) and click-through "
             f"rates would rise in the rankings relative to URLs that perform well "
             f"only on GA4 engagement metrics. This could significantly reorder "
-            f"topic-selection priorities."
+            f"topic-selection priorities.",
         )
     else:
         lines.append("All terms are currently active — no change expected.")
@@ -571,6 +580,7 @@ def build_report(
 
     Returns:
         Tuple of (markdown_text, exit_code).
+
     """
     ts = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
     n = len(rows)
@@ -597,11 +607,11 @@ def build_report(
     lines.append("")
     lines.append(
         f"**Active weight total:** {_ACTIVE_WEIGHT_SUM:.2f} "
-        f"({_ACTIVE_WEIGHT_SUM * 100:.0f}% of formula)  "
+        f"({_ACTIVE_WEIGHT_SUM * 100:.0f}% of formula)  ",
     )
     lines.append(
         f"**Placeholder weight total:** {_ZERO_WEIGHT_SUM:.2f} "
-        f"({_ZERO_WEIGHT_SUM * 100:.0f}% of formula)"
+        f"({_ZERO_WEIGHT_SUM * 100:.0f}% of formula)",
     )
     lines.append("")
 
@@ -665,6 +675,7 @@ def main(argv: list[str] | None = None) -> None:
 
     Args:
         argv: Optional list of CLI arguments (defaults to sys.argv).
+
     """
     logging.basicConfig(
         level=logging.INFO,

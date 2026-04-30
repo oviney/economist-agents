@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Validation Script: Agile Discipline Enforcement
+"""Validation Script: Agile Discipline Enforcement
 
 Verifies that AGILE_MINDSET is properly injected into all agents.
 """

@@ -63,7 +63,8 @@ class TestEstimateCost:
             500 * default_prompt_rate + 200 * default_completion_rate
         ) / 1_000_000
         assert estimate_cost("gpt-unknown-xyz", 500, 200) == pytest.approx(
-            expected, rel=1e-6
+            expected,
+            rel=1e-6,
         )
 
     def test_zero_tokens(self):
@@ -101,7 +102,8 @@ class TestLogTokenUsage:
         assert rec["completion_tokens"] == 50
         assert rec["total_tokens"] == 150
         assert rec["estimated_cost_usd"] == pytest.approx(
-            estimate_cost("gpt-4o", 100, 50), rel=1e-6
+            estimate_cost("gpt-4o", 100, 50),
+            rel=1e-6,
         )
         assert "timestamp" in rec
 
@@ -163,7 +165,7 @@ class TestReadUsageLog:
                 "completion_tokens": 50,
                 "total_tokens": 150,
                 "estimated_cost_usd": 0.00075,
-            }
+            },
         ]
         _write_jsonl(log_file, sample)
 
@@ -226,7 +228,7 @@ class TestSummariseUsage:
                 "completion_tokens": 50,
                 "total_tokens": 150,
                 "estimated_cost_usd": 0.00075,
-            }
+            },
         ]
         summary = summarise_usage(records)
         assert "gpt-4o" in summary
@@ -258,7 +260,8 @@ class TestSummariseUsage:
         assert summary["gpt-4o"]["completion_tokens"] == 150
         assert summary["gpt-4o"]["total_tokens"] == 450
         assert summary["gpt-4o"]["estimated_cost_usd"] == pytest.approx(
-            0.0015, rel=1e-6
+            0.0015,
+            rel=1e-6,
         )
 
     def test_separates_models(self):
@@ -319,7 +322,7 @@ class TestPrintCiSummary:
                     "completion_tokens": 387,
                     "total_tokens": 1627,
                     "estimated_cost_usd": 0.00697,
-                }
+                },
             ],
         )
 
@@ -347,7 +350,7 @@ class TestPrintCiSummary:
                     "completion_tokens": 50,
                     "total_tokens": 150,
                     "estimated_cost_usd": 0.001,
-                }
+                },
             ],
         )
 
@@ -384,7 +387,12 @@ class TestLLMClientLogsUsage:
 
         with patch("token_usage._DEFAULT_LOG_FILE", log_file):
             result = llm_client._call_openai(
-                mock_client, "gpt-4o", "sys", "usr", 100, 0.5
+                mock_client,
+                "gpt-4o",
+                "sys",
+                "usr",
+                100,
+                0.5,
             )
 
         assert result == "hello"

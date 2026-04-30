@@ -102,7 +102,10 @@ class GitHubIssueClaimer:
     def gh_run(self, args: list[str]) -> str:
         """Run a ``gh`` command and return stdout."""
         result = subprocess.run(
-            ["gh", *args], capture_output=True, text=True, timeout=60
+            ["gh", *args],
+            capture_output=True,
+            text=True,
+            timeout=60,
         )
         if result.returncode != 0:
             raise RuntimeError(f"gh {' '.join(args)} failed: {result.stderr.strip()}")
@@ -112,7 +115,8 @@ class GitHubIssueClaimer:
         """Create claim labels if they do not already exist."""
         for label in labels:
             color, description = LABEL_CONFIG.get(
-                label, ("BFD4F2", "Agent ownership coordination label")
+                label,
+                ("BFD4F2", "Agent ownership coordination label"),
             )
             self.gh_run(
                 [
@@ -126,7 +130,7 @@ class GitHubIssueClaimer:
                     "--description",
                     description,
                     "--force",
-                ]
+                ],
             )
 
     def fetch_issue(self, issue_number: int) -> dict[str, Any]:
@@ -141,7 +145,7 @@ class GitHubIssueClaimer:
     def parse_claim_comment(self, body: str) -> dict[str, Any] | None:
         """Parse a structured claim payload from a comment body."""
         if not body.startswith(CLAIM_COMMENT_PREFIX) or not body.endswith(
-            CLAIM_COMMENT_SUFFIX
+            CLAIM_COMMENT_SUFFIX,
         ):
             return None
         payload = body[len(CLAIM_COMMENT_PREFIX) : -len(CLAIM_COMMENT_SUFFIX)]
@@ -152,7 +156,10 @@ class GitHubIssueClaimer:
         return decoded if isinstance(decoded, dict) else None
 
     def build_claim_comment(
-        self, runtime: str, ttl_hours: int, files: list[str] | None = None
+        self,
+        runtime: str,
+        ttl_hours: int,
+        files: list[str] | None = None,
     ) -> str:
         """Build a machine-readable claim comment."""
         claimed_at = _utc_now()
@@ -160,7 +167,7 @@ class GitHubIssueClaimer:
             "runtime": runtime,
             "claimed_at": _format_timestamp(claimed_at),
             "expires_at": _format_timestamp(
-                claimed_at + timedelta(hours=max(ttl_hours, 1))
+                claimed_at + timedelta(hours=max(ttl_hours, 1)),
             ),
             "files": files or [],
         }
@@ -176,7 +183,9 @@ class GitHubIssueClaimer:
         return owner_labels[0] if owner_labels else None
 
     def get_claim_status(
-        self, issue_number: int, now: datetime | None = None
+        self,
+        issue_number: int,
+        now: datetime | None = None,
     ) -> ClaimStatus:
         """Return current claim state for an issue."""
         issue = self.fetch_issue(issue_number)
@@ -225,7 +234,10 @@ class GitHubIssueClaimer:
         )
 
     def _set_issue_labels(
-        self, issue_number: int, add: list[str], remove: list[str]
+        self,
+        issue_number: int,
+        add: list[str],
+        remove: list[str],
     ) -> None:
         """Apply label changes to an issue."""
         args = ["issue", "edit", str(issue_number), "--repo", self.repo]
@@ -246,7 +258,7 @@ class GitHubIssueClaimer:
                 self.repo,
                 "--body",
                 body,
-            ]
+            ],
         )
 
     def claim_issue(
@@ -268,7 +280,7 @@ class GitHubIssueClaimer:
         ):
             raise RuntimeError(
                 f"Issue #{issue_number} is actively claimed by {current.runtime} "
-                f"until {_format_timestamp(current.expires_at) if current.expires_at else 'unknown'}"
+                f"until {_format_timestamp(current.expires_at) if current.expires_at else 'unknown'}",
             )
 
         issue = self.fetch_issue(issue_number)
@@ -287,7 +299,8 @@ class GitHubIssueClaimer:
 
         self._set_issue_labels(issue_number, add_labels, remove_labels)
         self._post_issue_comment(
-            issue_number, self.build_claim_comment(runtime, ttl_hours, files)
+            issue_number,
+            self.build_claim_comment(runtime, ttl_hours, files),
         )
         return self.get_claim_status(issue_number)
 
@@ -296,7 +309,7 @@ class GitHubIssueClaimer:
         current = self.get_claim_status(issue_number)
         if current.runtime and current.runtime != runtime and current.active:
             raise RuntimeError(
-                f"Issue #{issue_number} is owned by {current.runtime}, not {runtime}"
+                f"Issue #{issue_number} is owned by {current.runtime}, not {runtime}",
             )
         issue = self.fetch_issue(issue_number)
         existing_labels = {label["name"] for label in issue.get("labels", [])}
@@ -345,7 +358,7 @@ class GitHubIssueClaimer:
         """Find the next issue not actively claimed by another runtime."""
         query = ",".join(labels)
         response = self.gh_api(
-            f"repos/{self.repo}/issues?labels={query}&state=open&sort=created&direction=asc"
+            f"repos/{self.repo}/issues?labels={query}&state=open&sort=created&direction=asc",
         )
         issues = response if isinstance(response, list) else []
         for issue in issues:
@@ -368,7 +381,8 @@ def _build_parser() -> argparse.ArgumentParser:
     claim_parser = subparsers.add_parser("claim", help="Claim an issue")
     claim_parser.add_argument("issue", type=int)
     claim_parser.add_argument(
-        "--runtime", default=os.environ.get("AGENT_RUNTIME", "codex")
+        "--runtime",
+        default=os.environ.get("AGENT_RUNTIME", "codex"),
     )
     claim_parser.add_argument("--ttl-hours", type=int, default=DEFAULT_TTL_HOURS)
     claim_parser.add_argument("--files", nargs="*", default=[])
@@ -380,12 +394,14 @@ def _build_parser() -> argparse.ArgumentParser:
     check_parser = subparsers.add_parser("check", help="Check issue access")
     check_parser.add_argument("issue", type=int)
     check_parser.add_argument(
-        "--runtime", default=os.environ.get("AGENT_RUNTIME", "codex")
+        "--runtime",
+        default=os.environ.get("AGENT_RUNTIME", "codex"),
     )
 
     next_parser = subparsers.add_parser("next", help="Find next claimable issue")
     next_parser.add_argument(
-        "--runtime", default=os.environ.get("AGENT_RUNTIME", "codex")
+        "--runtime",
+        default=os.environ.get("AGENT_RUNTIME", "codex"),
     )
     next_parser.add_argument("--labels", nargs="+", default=["enhancement", "quality"])
     next_parser.add_argument("--claim", action="store_true")
@@ -394,7 +410,8 @@ def _build_parser() -> argparse.ArgumentParser:
     release_parser = subparsers.add_parser("release", help="Release an issue")
     release_parser.add_argument("issue", type=int)
     release_parser.add_argument(
-        "--runtime", default=os.environ.get("AGENT_RUNTIME", "codex")
+        "--runtime",
+        default=os.environ.get("AGENT_RUNTIME", "codex"),
     )
     return parser
 
@@ -415,7 +432,7 @@ def main() -> int:
         )
         print(
             f"Claimed issue #{status.issue_number} for {status.runtime} until "
-            f"{_format_timestamp(status.expires_at) if status.expires_at else 'unknown'}"
+            f"{_format_timestamp(status.expires_at) if status.expires_at else 'unknown'}",
         )
         return 0
 
@@ -427,7 +444,7 @@ def main() -> int:
         active_text = "active" if status.active else "expired"
         expires = _format_timestamp(status.expires_at) if status.expires_at else "n/a"
         print(
-            f"Issue #{args.issue}: {active_text} claim by {status.runtime} (expires {expires})"
+            f"Issue #{args.issue}: {active_text} claim by {status.runtime} (expires {expires})",
         )
         return 0
 
@@ -443,7 +460,9 @@ def main() -> int:
             return 1
         if args.claim:
             claimer.claim_issue(
-                issue_number, runtime=args.runtime, ttl_hours=args.ttl_hours
+                issue_number,
+                runtime=args.runtime,
+                ttl_hours=args.ttl_hours,
             )
         print(issue_number)
         return 0

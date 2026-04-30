@@ -22,7 +22,9 @@ logger = logging.getLogger(__name__)
 
 
 def search_arxiv(
-    query: str, max_results: int = 5, days: int = 365
+    query: str,
+    max_results: int = 5,
+    days: int = 365,
 ) -> list[dict[str, str]]:
     """Search arXiv for recent papers.
 
@@ -33,6 +35,7 @@ def search_arxiv(
 
     Returns:
         List of source dicts with title, authors, date, url, summary.
+
     """
     try:
         from scripts.arxiv_search import search_arxiv_for_topic
@@ -53,7 +56,7 @@ def search_arxiv(
                         "url": paper.get("url", ""),
                         "summary": paper.get("summary", "")[:200],
                         "source_type": "academic",
-                    }
+                    },
                 )
         return sources
     except Exception as e:
@@ -62,7 +65,9 @@ def search_arxiv(
 
 
 def search_google(
-    query: str, max_results: int = 5, days: int = 365
+    query: str,
+    max_results: int = 5,
+    days: int = 365,
 ) -> list[dict[str, str]]:
     """Search Google via Custom Search API or Serper API.
 
@@ -77,6 +82,7 @@ def search_google(
 
     Returns:
         List of source dicts.
+
     """
     # Try Serper first (simpler API)
     serper_key = os.environ.get("SERPER_API_KEY")
@@ -91,13 +97,16 @@ def search_google(
 
     logger.warning(
         "No search API configured. Set SERPER_API_KEY or "
-        "GOOGLE_API_KEY + GOOGLE_CSE_ID for web search."
+        "GOOGLE_API_KEY + GOOGLE_CSE_ID for web search.",
     )
     return []
 
 
 def _search_serper(
-    query: str, api_key: str, max_results: int, days: int
+    query: str,
+    api_key: str,
+    max_results: int,
+    days: int,
 ) -> list[dict[str, str]]:
     """Search via Serper.dev API."""
     import requests
@@ -124,7 +133,7 @@ def _search_serper(
                     "summary": item.get("snippet", ""),
                     "date": item.get("date", ""),
                     "source_type": "web",
-                }
+                },
             )
         return sources
     except Exception as e:
@@ -133,7 +142,11 @@ def _search_serper(
 
 
 def _search_google_cse(
-    query: str, api_key: str, cse_id: str, max_results: int, days: int
+    query: str,
+    api_key: str,
+    cse_id: str,
+    max_results: int,
+    days: int,
 ) -> list[dict[str, str]]:
     """Search via Google Custom Search Engine API."""
     import requests
@@ -163,7 +176,7 @@ def _search_google_cse(
                     "summary": item.get("snippet", ""),
                     "date": "",
                     "source_type": "web",
-                }
+                },
             )
         return sources
     except Exception as e:
@@ -193,6 +206,7 @@ def search_for_sources(
 
     Returns:
         List of source dicts sorted by recency.
+
     """
     all_sources: list[dict[str, str]] = []
 

@@ -48,7 +48,7 @@ _SENSITIVE_KEYS: frozenset[str] = frozenset(
         "authorization",
         "credential",
         "private_key",
-    }
+    },
 )
 
 
@@ -60,6 +60,7 @@ def _sanitize(obj: Any) -> Any:
 
     Returns:
         A copy of *obj* with sensitive dict values replaced by "[REDACTED]".
+
     """
     if isinstance(obj, dict):
         return {
@@ -92,6 +93,7 @@ class AgentTraceLogger:
             decision="generated 3 topic candidates",
         )
         summary = tracer.get_trace_summary()
+
     """
 
     def __init__(self) -> None:
@@ -124,6 +126,7 @@ class AgentTraceLogger:
 
         Raises:
             ValueError: If *agent_name* or *stage* is empty.
+
         """
         if not agent_name:
             raise ValueError("agent_name must not be empty")
@@ -142,7 +145,11 @@ class AgentTraceLogger:
         }
         self._entries.append(entry)
         logger.debug(
-            "Agent trace: %s.%s → %s [%s]", agent_name, stage, decision, status
+            "Agent trace: %s.%s → %s [%s]",
+            agent_name,
+            stage,
+            decision,
+            status,
         )
         return entry
 
@@ -156,6 +163,7 @@ class AgentTraceLogger:
                 schema_version (str): Current log format version.
                 entry_count (int): Number of logged actions.
                 entries (list[dict]): Ordered list of action entries.
+
         """
         return {
             "schema_version": TRACE_SCHEMA_VERSION,
@@ -173,6 +181,7 @@ class AgentTraceLogger:
 
         Returns:
             Markdown-formatted string suitable for use as a GitHub comment body.
+
         """
         summary = self.get_trace_summary()
         _status_icon: dict[str, str] = {
@@ -205,7 +214,7 @@ class AgentTraceLogger:
                         "outputs": entry.get("outputs"),
                     },
                     option=orjson.OPT_INDENT_2,
-                ).decode("utf-8")
+                ).decode("utf-8"),
             )
             lines.append("```")
             lines.append("")

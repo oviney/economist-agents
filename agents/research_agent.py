@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Research Agent Module
+"""Research Agent Module
 
 Extracts research agent functionality from economist_agent.py
 for improved modularity and testability.
@@ -29,7 +28,7 @@ from llm_client import call_llm  # type: ignore  # noqa: E402
 
 # Import arXiv integration (optional dependency)
 try:
-    from arxiv_search import search_arxiv_for_topic  # type: ignore  # noqa: E402
+    from arxiv_search import search_arxiv_for_topic  # type: ignore
 
     ARXIV_AVAILABLE = True
 except ImportError:
@@ -37,7 +36,7 @@ except ImportError:
 
 # Import Google Search integration (optional dependency)
 try:
-    from google_search import search_google_for_topic  # type: ignore  # noqa: E402
+    from google_search import search_google_for_topic  # type: ignore
 
     GOOGLE_SEARCH_AVAILABLE = True
 except ImportError:
@@ -74,16 +73,20 @@ class ResearchAgent:
         >>> client = create_llm_client()
         >>> agent = ResearchAgent(client)
         >>> research = agent.research("AI Testing Trends", "adoption rates, ROI")
+
     """
 
     def __init__(
-        self, client: Any, governance: GovernanceTracker | None = None
+        self,
+        client: Any,
+        governance: GovernanceTracker | None = None,
     ) -> None:
         """Initialize research agent with LLM client.
 
         Args:
             client: LLM client instance
             governance: Optional governance tracker for logging
+
         """
         self.client = client
         self.governance = governance
@@ -114,18 +117,19 @@ class ResearchAgent:
             ...     "adoption rates, maintenance costs"
             ... )
             >>> print(f"Found {len(research['data_points'])} data points")
+
         """
         # Input validation
         if not topic or not isinstance(topic, str):
             raise ValueError(
                 "[RESEARCH_AGENT] Invalid topic. Expected non-empty string, "
-                f"got: {type(topic).__name__}"
+                f"got: {type(topic).__name__}",
             )
 
         if len(topic.strip()) < 5:
             raise ValueError(
                 f"[RESEARCH_AGENT] Topic too short: '{topic}'. "
-                "Must be at least 5 characters."
+                "Must be at least 5 characters.",
             )
 
         print(f"📊 Research Agent: Gathering verified data for '{topic[:50]}...'")
@@ -138,7 +142,10 @@ class ResearchAgent:
 
         # Build user prompt with arXiv and web context
         user_prompt = self._build_user_prompt(
-            topic, talking_points, arxiv_insights, web_research
+            topic,
+            talking_points,
+            arxiv_insights,
+            web_research,
         )
 
         # Call LLM
@@ -163,7 +170,7 @@ class ResearchAgent:
             cv = research_data.get("citation_verification", {})
             print(
                 f"   🔍 Citation verification: {cv.get('verified', 0)} verified, "
-                f"{cv.get('failed', 0)} failed"
+                f"{cv.get('failed', 0)} failed",
             )
         except ImportError:
             print("citation_verifier not available — skipping verification")
@@ -191,7 +198,7 @@ class ResearchAgent:
         base_prompt = f"""Research this topic for an Economist-style article:
 
 TOPIC: {topic}
-FOCUS AREAS: {talking_points if talking_points else "General coverage"}
+FOCUS AREAS: {talking_points or "General coverage"}
 
 Find specific, VERIFIABLE data with exact sources. Flag anything you cannot verify."""
 
@@ -238,6 +245,7 @@ Academic Citations:
 
         Returns:
             Dictionary with arXiv research insights or None if unavailable
+
         """
         if not ARXIV_AVAILABLE:
             print("   📖 arXiv not available - using LLM knowledge only")
@@ -252,9 +260,8 @@ Academic Citations:
                 freshness = arxiv_result["insights"].get("source_freshness", "Recent")
                 print(f"   ✅ Found {papers_found} recent papers ({freshness})")
                 return arxiv_result
-            else:
-                print(f"   ℹ️  No recent arXiv papers found for '{topic[:30]}...'")
-                return None
+            print(f"   ℹ️  No recent arXiv papers found for '{topic[:30]}...'")
+            return None
 
         except Exception as e:
             print(f"   ⚠️  arXiv search failed: {e}")
@@ -272,6 +279,7 @@ Academic Citations:
         Returns:
             Dictionary with ``web_results``, ``scholar_results``, and
             metadata, or ``None`` if Google search is unavailable.
+
         """
         if not GOOGLE_SEARCH_AVAILABLE:
             print("   🔎 Google Search not available - skipping live web research")
@@ -283,20 +291,19 @@ Academic Citations:
 
             if result["success"]:
                 web_count = len(
-                    [r for r in result.get("web_results", []) if "error" not in r]
+                    [r for r in result.get("web_results", []) if "error" not in r],
                 )
                 scholar_count = len(
-                    [r for r in result.get("scholar_results", []) if "error" not in r]
+                    [r for r in result.get("scholar_results", []) if "error" not in r],
                 )
                 print(
                     f"   ✅ Google: {web_count} web results, "
                     f"{scholar_count} Scholar results "
-                    f"({result['year_start']}–{result['current_year']})"
+                    f"({result['year_start']}–{result['current_year']})",
                 )
                 return result
-            else:
-                print(f"   ℹ️  Google search returned no results for '{topic[:30]}...'")
-                return None
+            print(f"   ℹ️  Google search returned no results for '{topic[:30]}...'")
+            return None
 
         except Exception as e:
             print(f"   ⚠️  Google search failed: {e}")
@@ -310,6 +317,7 @@ Academic Citations:
 
         Returns:
             Formatted string section to append to the user prompt.
+
         """
         year_start = web_research.get("year_start", "")
         current_year = web_research.get("current_year", "")
@@ -355,9 +363,11 @@ Academic Citations:
         Note: This method uses the existing call_llm function from llm_client.
         It's abstracted here to allow for easier mocking in tests.
         """
-
         return call_llm(
-            self.client, RESEARCH_AGENT_PROMPT, user_prompt, max_tokens=2500
+            self.client,
+            RESEARCH_AGENT_PROMPT,
+            user_prompt,
+            max_tokens=2500,
         )
 
     def _parse_response(self, response_text: str) -> dict[str, Any]:
@@ -395,7 +405,7 @@ Academic Citations:
 
         if research_data.get("unverified_claims"):
             print(
-                f"   ⚠ {len(research_data['unverified_claims'])} unverified claims flagged"
+                f"   ⚠ {len(research_data['unverified_claims'])} unverified claims flagged",
             )
 
         if arxiv_insights and arxiv_insights.get("success"):
@@ -409,13 +419,17 @@ Academic Citations:
 
         if web_research and web_research.get("success"):
             web_count = len(
-                [r for r in web_research.get("web_results", []) if "error" not in r]
+                [r for r in web_research.get("web_results", []) if "error" not in r],
             )
             scholar_count = len(
-                [r for r in web_research.get("scholar_results", []) if "error" not in r]
+                [
+                    r
+                    for r in web_research.get("scholar_results", [])
+                    if "error" not in r
+                ],
             )
             print(
-                f"   🔎 Google: {web_count} web + {scholar_count} Scholar results integrated"
+                f"   🔎 Google: {web_count} web + {scholar_count} Scholar results integrated",
             )
 
     def _self_validate(self, research_data: dict[str, Any]) -> None:
@@ -493,6 +507,7 @@ def run_research_agent(
         >>> from llm_client import create_llm_client
         >>> client = create_llm_client()
         >>> research = run_research_agent(client, "AI Testing")
+
     """
     agent = ResearchAgent(client, governance)
     return agent.research(topic, talking_points)

@@ -48,10 +48,13 @@ class TestArchitectFrontmatter:
         assert fm, "architect agent must have YAML frontmatter"
 
     @pytest.mark.parametrize(
-        "field", ["name", "description", "model", "tools", "skills"]
+        "field",
+        ["name", "description", "model", "tools", "skills"],
     )
     def test_required_field_present(
-        self, architect_parsed: tuple[dict, str], field: str
+        self,
+        architect_parsed: tuple[dict, str],
+        field: str,
     ) -> None:
         fm, _ = architect_parsed
         assert field in fm, f"frontmatter must include '{field}'"
@@ -66,7 +69,8 @@ class TestArchitectFrontmatter:
         assert isinstance(tools, list) and tools, "tools must be a non-empty list"
 
     def test_skills_includes_architecture_patterns(
-        self, architect_parsed: tuple[dict, str]
+        self,
+        architect_parsed: tuple[dict, str],
     ) -> None:
         fm, _ = architect_parsed
         skills = fm.get("skills") or []
@@ -82,7 +86,9 @@ class TestArchitectBody:
         ["role", "rubric", "adr", "output", "boundaries"],
     )
     def test_body_mentions(
-        self, architect_parsed: tuple[dict, str], section_keyword: str
+        self,
+        architect_parsed: tuple[dict, str],
+        section_keyword: str,
     ) -> None:
         _, body = architect_parsed
         assert section_keyword in body.lower(), (
@@ -90,7 +96,8 @@ class TestArchitectBody:
         )
 
     def test_body_includes_json_output_example(
-        self, architect_parsed: tuple[dict, str]
+        self,
+        architect_parsed: tuple[dict, str],
     ) -> None:
         _, body = architect_parsed
         assert "```json" in body, (
@@ -98,7 +105,8 @@ class TestArchitectBody:
         )
 
     def test_body_includes_mermaid_or_diagram(
-        self, architect_parsed: tuple[dict, str]
+        self,
+        architect_parsed: tuple[dict, str],
     ) -> None:
         _, body = architect_parsed
         assert "```mermaid" in body or "diagram" in body.lower()

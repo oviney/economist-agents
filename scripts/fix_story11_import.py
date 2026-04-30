@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Fix Story 11 Import Error in Stage3Crew
+"""Fix Story 11 Import Error in Stage3Crew
 
 This script fixes the ImportError by:
 1. Removing the problematic import from agents.graphics_agent
@@ -31,7 +30,6 @@ def write_file(filepath: str, content: str) -> None:
 
 def fix_stage3_crew_import():
     """Fix the import error in src/crews/stage3_crew.py."""
-
     file_path = "src/crews/stage3_crew.py"
 
     print(f"📖 Reading {file_path}...")
@@ -74,7 +72,8 @@ Create clear, accurate charts that follow Economist style guidelines:
     if import_marker in content:
         # Insert the default prompt after this import
         content = content.replace(
-            f"{import_marker}\n", f"{import_marker}\n{default_prompt}\n"
+            f"{import_marker}\n",
+            f"{import_marker}\n{default_prompt}\n",
         )
     else:
         print(f"⚠️  Could not find import marker: {import_marker}")
@@ -121,13 +120,12 @@ def verify_fix():
             print("=" * 60)
             print("✅ All tests passed! Import error is fixed.")
             return True
-        else:
-            print("=" * 60)
-            print(f"⚠️  Tests failed with exit code: {result.returncode}")
-            print(
-                "   The import error may be fixed, but tests are failing for other reasons."
-            )
-            return False
+        print("=" * 60)
+        print(f"⚠️  Tests failed with exit code: {result.returncode}")
+        print(
+            "   The import error may be fixed, but tests are failing for other reasons.",
+        )
+        return False
 
     except subprocess.TimeoutExpired:
         print("⏱️  Test execution timed out after 30 seconds.")
@@ -169,7 +167,7 @@ def main():
     print("=" * 60)
     print(f"✅ Import fix applied: {fixed}")
     print(
-        f"{'✅' if tests_passed else '⚠️ '} Tests executed: {tests_passed or 'Failed/Incomplete'}"
+        f"{'✅' if tests_passed else '⚠️ '} Tests executed: {tests_passed or 'Failed/Incomplete'}",
     )
     print()
 

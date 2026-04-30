@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Scrum Master Agent - Autonomous Sprint Orchestration
+"""Scrum Master Agent - Autonomous Sprint Orchestration
 
 Enhanced for Sprint 8 with:
 - Task queue management (backlog → executable tasks)
@@ -75,7 +74,7 @@ class TaskQueueManager:
                     "assigned_at": None,
                     "completed_at": None,
                     "phase": "research",
-                }
+                },
             )
 
             # Task 2: Writing phase (depends on research)
@@ -93,7 +92,7 @@ class TaskQueueManager:
                     "assigned_at": None,
                     "completed_at": None,
                     "phase": "writing",
-                }
+                },
             )
 
             # Task 3: Editing phase (depends on writing)
@@ -111,14 +110,13 @@ class TaskQueueManager:
                     "assigned_at": None,
                     "completed_at": None,
                     "phase": "editing",
-                }
+                },
             )
 
         return tasks
 
     def assign_to_agent(self, task: dict[str, Any]) -> str:
-        """
-        Determine which specialist agent should handle task
+        """Determine which specialist agent should handle task
 
         DEPRECATED (Sprint 14): Consider using Flow-based orchestration instead.
         See: src/economist_agents/flow.py (EconomistContentFlow)
@@ -281,7 +279,7 @@ class AgentStatusMonitor:
                     "agent_id": agent_id,
                     "status": status,
                     **kwargs,
-                }
+                },
             )
 
         self.save()
@@ -363,10 +361,9 @@ class QualityGateValidator:
 
         if passed:
             return "APPROVE"
-        elif len(issues) <= 2:
+        if len(issues) <= 2:
             return "ESCALATE"  # Minor issues - ask human PO
-        else:
-            return "REJECT"  # Major issues - block
+        return "REJECT"  # Major issues - block
 
     def send_back_for_fixes(self, task: dict[str, Any], issues: list[str]):
         """Mark task for rework with specific issues"""
@@ -577,7 +574,7 @@ class ScrumMasterAgent:
 def main():
     """CLI interface for SM Agent"""
     parser = argparse.ArgumentParser(
-        description="Scrum Master Agent - Autonomous Sprint Orchestration"
+        description="Scrum Master Agent - Autonomous Sprint Orchestration",
     )
     parser.add_argument(
         "--run-sprint",

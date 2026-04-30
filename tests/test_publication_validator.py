@@ -127,7 +127,7 @@ class TestPublicationValidatorContent:
     def test_verification_flags_rejected(self) -> None:
         validator = PublicationValidator(expected_date="2026-04-03")
         article = _make_article(
-            body=f"Some text [NEEDS SOURCE] more text. {VALID_BODY}"
+            body=f"Some text [NEEDS SOURCE] more text. {VALID_BODY}",
         )
         is_valid, issues = validator.validate(article)
         assert not is_valid
@@ -152,7 +152,8 @@ class TestPublicationValidatorContent:
 
     def test_your_in_slug_not_flagged_as_placeholder(self) -> None:
         """BUG-030: title-derived slugs containing 'your-X' must not trigger
-        the placeholder check unless X is a known placeholder token."""
+        the placeholder check unless X is a known placeholder token.
+        """
         validator = PublicationValidator(expected_date="2026-04-03")
         body = (
             f"See [the guide](/posts/your-content-strategy-2026.md) for more. "
@@ -219,7 +220,8 @@ class TestPublicationValidatorWordCount:
         short_body = " ".join(["word"] * 200)
         # Use empty references to isolate word count to just body
         article = _make_article(
-            body=short_body, references="## References\n\n1. A\n2. B\n3. C\n"
+            body=short_body,
+            references="## References\n\n1. A\n2. B\n3. C\n",
         )
         is_valid, issues = validator.validate(article)
         assert not is_valid
@@ -405,7 +407,8 @@ class TestPublicationValidatorChart:
         """Charts in /assets/charts/ inherently contain the word 'chart' in the URL,
         so the orphan detection check (which looks for 'chart' in content) won't fire.
         This test verifies that behaviour: a chart in /assets/charts/ is NOT flagged
-        as orphaned even when the body text itself contains no explicit mention."""
+        as orphaned even when the body text itself contains no explicit mention.
+        """
         validator = PublicationValidator(expected_date="2026-04-03")
         body = " ".join(["word"] * 850)
         chart_embed = (
@@ -497,7 +500,7 @@ class TestPublicationValidatorReport:
                 "message": "Missing YAML",
                 "details": "No frontmatter",
                 "fix": "Add ---",
-            }
+            },
         ]
         report = validator.format_report(False, issues)
         assert "REJECTED" in report

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Coverage Badge Generator
+"""Coverage Badge Generator
 
 Generates shields.io JSON endpoint for Coverage badge from pytest-cov.
 
@@ -57,7 +56,7 @@ def generate_coverage_badge(output_path: Path = None) -> dict:
         # Use a placeholder for now
         coverage = 0
         print(
-            "ℹ️  Using 0% as placeholder - run pytest with --cov to get actual coverage"
+            "ℹ️  Using 0% as placeholder - run pytest with --cov to get actual coverage",
         )
 
     # Determine color based on coverage

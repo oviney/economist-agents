@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-arXiv Search Integration Module
+"""arXiv Search Integration Module
 
 Provides real-time access to cutting-edge research papers from arXiv.org
 to enhance article research with fresh, authoritative academic sources.
@@ -36,12 +35,9 @@ logger = logging.getLogger(__name__)
 class ArxivSearchError(Exception):
     """Custom exception for arXiv search errors."""
 
-    pass
-
 
 class ArxivSearcher:
-    """
-    Enhanced research capability with arXiv integration.
+    """Enhanced research capability with arXiv integration.
 
     Searches arXiv.org for recent academic papers to provide cutting-edge
     research insights instead of relying on stale LLM training data.
@@ -60,16 +56,16 @@ class ArxivSearcher:
     """
 
     def __init__(self, max_results: int = 10, days_back: int = 30):
-        """
-        Initialize arXiv searcher with configuration.
+        """Initialize arXiv searcher with configuration.
 
         Args:
             max_results: Maximum papers to return per search
             days_back: How many days back to search for recent papers
+
         """
         if arxiv is None:
             raise ArxivSearchError(
-                "arxiv package not installed. Run: pip install arxiv>=2.1.0"
+                "arxiv package not installed. Run: pip install arxiv>=2.1.0",
             )
 
         self.max_results = max_results
@@ -78,14 +74,15 @@ class ArxivSearcher:
 
         logger.info(
             f"ArxivSearcher initialized: max_results={max_results}, "
-            f"searching papers from {self.cutoff_date.strftime('%Y-%m-%d')}"
+            f"searching papers from {self.cutoff_date.strftime('%Y-%m-%d')}",
         )
 
     def search_recent_papers(
-        self, query: str, categories: list[str] | None = None
+        self,
+        query: str,
+        categories: list[str] | None = None,
     ) -> list[dict[str, Any]]:
-        """
-        Search arXiv for recent papers matching the query.
+        """Search arXiv for recent papers matching the query.
 
         Args:
             query: Search terms (e.g., "artificial intelligence automation")
@@ -100,6 +97,7 @@ class ArxivSearcher:
                 "quality metrics automation",
                 categories=["cs.SE", "cs.AI"]
             )
+
         """
         if not query.strip():
             raise ArxivSearchError("Search query cannot be empty")
@@ -141,14 +139,14 @@ class ArxivSearcher:
             raise ArxivSearchError(f"Search failed: {e}") from e
 
     def extract_business_insights(self, papers: list[dict[str, Any]]) -> dict[str, Any]:
-        """
-        Extract business-relevant insights from arXiv papers.
+        """Extract business-relevant insights from arXiv papers.
 
         Args:
             papers: List of paper dictionaries from search_recent_papers()
 
         Returns:
             Dictionary with business insights, statistics, and citations
+
         """
         if not papers:
             return {
@@ -179,7 +177,7 @@ class ArxivSearcher:
                         "finding": insight,
                         "source": citation,
                         "days_old": paper["days_old"],
-                    }
+                    },
                 )
 
         # Calculate source freshness
@@ -196,7 +194,9 @@ class ArxivSearcher:
         }
 
     def _build_search_query(
-        self, query: str, categories: list[str] | None = None
+        self,
+        query: str,
+        categories: list[str] | None = None,
     ) -> str:
         """Build optimized arXiv search query."""
         # Clean and optimize search terms
@@ -229,7 +229,9 @@ class ArxivSearcher:
         return optimized
 
     def _format_paper_result(
-        self, result: arxiv.Result, original_query: str
+        self,
+        result: arxiv.Result,
+        original_query: str,
     ) -> dict[str, Any]:
         """Format arXiv result into our standard paper format."""
         # Calculate relevance score
@@ -326,17 +328,15 @@ class ArxivSearcher:
         """Describe how fresh the research sources are."""
         if avg_age_days <= 7:
             return "Cutting-edge (papers from this week)"
-        elif avg_age_days <= 14:
+        if avg_age_days <= 14:
             return "Very recent (papers from last two weeks)"
-        elif avg_age_days <= 30:
+        if avg_age_days <= 30:
             return "Recent (papers from this month)"
-        else:
-            return f"Moderately recent (average {int(avg_age_days)} days old)"
+        return f"Moderately recent (average {int(avg_age_days)} days old)"
 
 
 def search_arxiv_for_topic(topic: str, max_papers: int = 5) -> dict[str, Any]:
-    """
-    Convenience function for quick arXiv research integration.
+    """Convenience function for quick arXiv research integration.
 
     Args:
         topic: Research topic (e.g., "quality automation metrics")
@@ -348,6 +348,7 @@ def search_arxiv_for_topic(topic: str, max_papers: int = 5) -> dict[str, Any]:
     Example:
         research = search_arxiv_for_topic("AI automation business")
         print(f"Found insights from {research['paper_count']} recent papers")
+
     """
     try:
         searcher = ArxivSearcher(max_results=max_papers, days_back=60)

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Agent Performance Dashboard
+"""Agent Performance Dashboard
 
 Generates comprehensive reports on agent quality, efficiency, and trends.
 Identifies underperforming agents and provides actionable insights.
@@ -101,7 +100,7 @@ class AgentDashboard:
         lines = []
         lines.append("Agent             | Runs | Pass Rate | Quality | Rework | Cost/Q")
         lines.append(
-            "------------------+------+-----------+---------+--------+--------"
+            "------------------+------+-----------+---------+--------+--------",
         )
 
         # Calculate baseline cost (median cost_per_quality_unit across all agents)
@@ -132,7 +131,8 @@ class AgentDashboard:
 
             # Pass rate (validation_pass_rate or gate_pass_rate)
             pass_rate = stats.get(
-                "validation_pass_rate", stats.get("avg_gate_pass_rate", 0)
+                "validation_pass_rate",
+                stats.get("avg_gate_pass_rate", 0),
             )
 
             # Quality score
@@ -167,16 +167,16 @@ class AgentDashboard:
 
             lines.append(
                 f"{display_name} | {runs:4} | {pass_rate:6.0f}%   | {quality:4.0f}/100 | "
-                f"{rework:4.0f}% | {avg_cost:5}{alert}"
+                f"{rework:4.0f}% | {avg_cost:5}{alert}",
             )
 
         if baseline_cost > 0:
             lines.append("")
             lines.append(
-                f"Baseline Cost/Quality: {baseline_cost:.0f} tokens per quality unit"
+                f"Baseline Cost/Quality: {baseline_cost:.0f} tokens per quality unit",
             )
             lines.append(
-                f"⚠️  = Warning (pass rate <{self.WARNING_PASS_RATE}% or cost >{self.MAX_COST_MULTIPLIER}x baseline)"
+                f"⚠️  = Warning (pass rate <{self.WARNING_PASS_RATE}% or cost >{self.MAX_COST_MULTIPLIER}x baseline)",
             )
             lines.append(f"🔴 = Critical (pass rate <{self.CRITICAL_PASS_RATE}%)")
 
@@ -214,17 +214,18 @@ class AgentDashboard:
 
             # Pass rate alerts
             pass_rate = stats.get(
-                "validation_pass_rate", stats.get("avg_gate_pass_rate", 0)
+                "validation_pass_rate",
+                stats.get("avg_gate_pass_rate", 0),
             )
             if pass_rate < self.CRITICAL_PASS_RATE:
                 alerts.append(
                     f"🔴 CRITICAL: {display_name} pass rate {pass_rate:.0f}% "
-                    f"(below {self.CRITICAL_PASS_RATE}%) - REQUIRES IMMEDIATE ATTENTION"
+                    f"(below {self.CRITICAL_PASS_RATE}%) - REQUIRES IMMEDIATE ATTENTION",
                 )
             elif pass_rate < self.WARNING_PASS_RATE:
                 alerts.append(
                     f"⚠️  WARNING: {display_name} pass rate {pass_rate:.0f}% "
-                    f"(below {self.WARNING_PASS_RATE}%) - needs prompt review"
+                    f"(below {self.WARNING_PASS_RATE}%) - needs prompt review",
                 )
 
             # Cost efficiency alerts
@@ -248,7 +249,7 @@ class AgentDashboard:
                 multiplier = avg_cost / baseline_cost
                 alerts.append(
                     f"⚠️  WARNING: {display_name} cost efficiency {avg_cost:.0f} tokens/quality "
-                    f"({multiplier:.1f}x baseline) - excessive token usage"
+                    f"({multiplier:.1f}x baseline) - excessive token usage",
                 )
 
             # Rework rate alerts
@@ -256,14 +257,14 @@ class AgentDashboard:
             if rework > 30:
                 alerts.append(
                     f"⚠️  WARNING: {display_name} rework rate {rework:.0f}% "
-                    f"(>30%) - enhance self-validation prompts"
+                    f"(>30%) - enhance self-validation prompts",
                 )
 
             # Quality trend alerts
             trend = stats.get("trend", "")
             if "declining" in trend.lower():
                 alerts.append(
-                    f"⚠️  WARNING: {display_name} quality trending downward - investigate"
+                    f"⚠️  WARNING: {display_name} quality trending downward - investigate",
                 )
 
         return alerts
@@ -286,33 +287,33 @@ class AgentDashboard:
         # Agent-specific metrics
         if agent_name == "research_agent":
             lines.append(
-                f"Verification Rate: {summary.get('avg_verification_rate', 0):.1f}%"
+                f"Verification Rate: {summary.get('avg_verification_rate', 0):.1f}%",
             )
             lines.append(
-                f"Validation Pass Rate: {summary.get('validation_pass_rate', 0):.1f}%"
+                f"Validation Pass Rate: {summary.get('validation_pass_rate', 0):.1f}%",
             )
             lines.append(f"Trend: {summary.get('trend', 'N/A')}")
 
         elif agent_name == "writer_agent":
             lines.append(f"Clean Draft Rate: {summary.get('clean_draft_rate', 0):.1f}%")
             lines.append(
-                f"Validation Pass Rate: {summary.get('validation_pass_rate', 0):.1f}%"
+                f"Validation Pass Rate: {summary.get('validation_pass_rate', 0):.1f}%",
             )
             lines.append(f"Rework Rate: {summary.get('rework_rate', 0):.1f}%")
             lines.append(
-                f"Avg Regenerations: {summary.get('avg_regenerations', 0):.1f}"
+                f"Avg Regenerations: {summary.get('avg_regenerations', 0):.1f}",
             )
 
         elif agent_name == "editor_agent":
             lines.append(f"Gate Pass Rate: {summary.get('avg_gate_pass_rate', 0):.1f}%")
             lines.append(
-                f"Quality Score: {summary.get('avg_quality_score', 0):.1f}/100"
+                f"Quality Score: {summary.get('avg_quality_score', 0):.1f}/100",
             )
             lines.append(f"Trend: {summary.get('trend', 'N/A')}")
 
         elif agent_name == "graphics_agent":
             lines.append(
-                f"Visual QA Pass Rate: {summary.get('avg_qa_pass_rate', 0):.1f}%"
+                f"Visual QA Pass Rate: {summary.get('avg_qa_pass_rate', 0):.1f}%",
             )
             lines.append(f"Avg Violations: {summary.get('avg_violations', 0):.1f}")
 
@@ -331,7 +332,7 @@ class AgentDashboard:
             if recent_quality:
                 lines.append(f"\nRecent Performance (last {len(recent)} runs):")
                 lines.append(
-                    f"  Quality Scores: {', '.join([str(int(q)) for q in recent_quality])}"
+                    f"  Quality Scores: {', '.join([str(int(q)) for q in recent_quality])}",
                 )
 
                 # Trend indicator
@@ -345,11 +346,11 @@ class AgentDashboard:
 
                     if second_half > first_half + 5:
                         lines.append(
-                            f"  Trend: Improving ⬆️ (+{second_half - first_half:.1f} points)"
+                            f"  Trend: Improving ⬆️ (+{second_half - first_half:.1f} points)",
                         )
                     elif second_half < first_half - 5:
                         lines.append(
-                            f"  Trend: Declining ⬇️ ({second_half - first_half:.1f} points)"
+                            f"  Trend: Declining ⬇️ ({second_half - first_half:.1f} points)",
                         )
                     else:
                         lines.append("  Trend: Stable ➡️")
@@ -366,7 +367,8 @@ class AgentDashboard:
         for agent_name, stats in summary.items():
             if stats:
                 pass_rate = stats.get(
-                    "validation_pass_rate", stats.get("avg_gate_pass_rate", 0)
+                    "validation_pass_rate",
+                    stats.get("avg_gate_pass_rate", 0),
                 )
                 agent_scores[agent_name] = pass_rate
 
@@ -377,7 +379,7 @@ class AgentDashboard:
             if worst_score < self.WARNING_PASS_RATE:
                 recommendations.append(
                     f"1. PRIORITY: Fix {worst_agent.replace('_', ' ').title()} "
-                    f"(pass rate: {worst_score:.0f}%)"
+                    f"(pass rate: {worst_score:.0f}%)",
                 )
                 recommendations.append("   - Review agent prompt for clarity")
                 recommendations.append("   - Add explicit quality gate checks")
@@ -393,11 +395,11 @@ class AgentDashboard:
         if high_rework_agents:
             recommendations.append("")
             recommendations.append(
-                "2. Reduce rework for agents with >30% regeneration rate:"
+                "2. Reduce rework for agents with >30% regeneration rate:",
             )
             for agent_name, rework in high_rework_agents:
                 recommendations.append(
-                    f"   - {agent_name.replace('_', ' ').title()}: {rework:.0f}% rework rate"
+                    f"   - {agent_name.replace('_', ' ').title()}: {rework:.0f}% rework rate",
                 )
 
         # General recommendations

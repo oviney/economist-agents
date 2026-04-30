@@ -92,6 +92,7 @@ class FeedbackLoop:
 
         Returns:
             The created PatternRecord.
+
         """
         record = PatternRecord(
             check_name=failure.get("check_name", "unknown"),
@@ -102,7 +103,9 @@ class FeedbackLoop:
         self._patterns.append(record)
         self._save_patterns()
         logger.info(
-            "Logged failure pattern: %s (%s)", record.check_name, record.message
+            "Logged failure pattern: %s (%s)",
+            record.check_name,
+            record.message,
         )
         return record
 
@@ -118,6 +121,7 @@ class FeedbackLoop:
 
         Returns:
             List of rule dicts with id, description, check_name, occurrence_count.
+
         """
         from collections import Counter
 
@@ -141,7 +145,7 @@ class FeedbackLoop:
                         if p.check_name == check_name
                     ),
                     "last_seen": latest.timestamp,
-                }
+                },
             )
 
         return rules
@@ -156,6 +160,7 @@ class FeedbackLoop:
 
         Returns:
             List of warning messages for matched patterns.
+
         """
         warnings: list[str] = []
         known_checks = {p.check_name for p in self._patterns}
@@ -169,16 +174,16 @@ class FeedbackLoop:
                     if "layout:" not in fm_text:
                         warnings.append(
                             "Known pattern: missing layout field in frontmatter "
-                            "(previously caused deployment failure)"
+                            "(previously caused deployment failure)",
                         )
                     if "categories:" not in fm_text:
                         warnings.append(
                             "Known pattern: missing categories field in frontmatter "
-                            "(previously caused missing tags)"
+                            "(previously caused missing tags)",
                         )
             else:
                 warnings.append(
-                    "Known pattern: article missing YAML frontmatter entirely"
+                    "Known pattern: article missing YAML frontmatter entirely",
                 )
 
         if "image_exists" in known_checks and article.startswith("---"):
@@ -191,7 +196,7 @@ class FeedbackLoop:
                     if image and "blog-default" not in image:
                         warnings.append(
                             f"Known pattern: custom image path '{image}' — "
-                            f"verify file exists before deployment"
+                            f"verify file exists before deployment",
                         )
                 except yaml.YAMLError:
                     pass
@@ -201,7 +206,7 @@ class FeedbackLoop:
             body = article.split("---", 2)[2] if article.count("---") >= 2 else article
             if "[NEEDS SOURCE]" in body or "[UNVERIFIED]" in body:
                 warnings.append(
-                    "Known pattern: verification placeholders left in article"
+                    "Known pattern: verification placeholders left in article",
                 )
 
         if "structure" in known_checks:
@@ -209,7 +214,7 @@ class FeedbackLoop:
             if "## References" not in body and "## references" not in body.lower():
                 warnings.append(
                     "Known pattern: missing References section "
-                    "(previously caused publication rejection)"
+                    "(previously caused publication rejection)",
                 )
 
         return warnings
@@ -219,6 +224,7 @@ class FeedbackLoop:
 
         Returns:
             List of escalation dicts for patterns seen >= ESCALATION_THRESHOLD times.
+
         """
         from collections import Counter
 
@@ -237,7 +243,7 @@ class FeedbackLoop:
                         "message": latest.message,
                         "action": f"Pattern '{check_name}' has occurred {count} times — "
                         f"requires human review to determine root cause fix",
-                    }
+                    },
                 )
 
         return escalations

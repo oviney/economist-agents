@@ -63,6 +63,7 @@ def search_web(query: str, num_results: int = 5) -> list[dict[str, str]]:
     Returns:
         List of dicts with keys ``title``, ``url``, ``snippet``.
         Returns a single-element list with an ``error`` key on failure.
+
     """
     api_key = os.environ.get("SERPER_API_KEY", "")
     if not api_key:
@@ -86,7 +87,7 @@ def search_web(query: str, num_results: int = 5) -> list[dict[str, str]]:
                     "title": item.get("title", ""),
                     "url": item.get("link", ""),
                     "snippet": item.get("snippet", ""),
-                }
+                },
             )
         return results
 
@@ -129,6 +130,7 @@ def search_google_scholar(
         List of dicts with keys ``title``, ``url``, ``snippet``, ``year``,
         ``authors``, ``cited_by``, ``source``.
         Returns a single-element list with an ``error`` key on failure.
+
     """
     if _GoogleSearcher is None:
         return [{"error": "google_search module is not available"}]
@@ -169,6 +171,7 @@ def search_arxiv(query: str, max_results: int = 5) -> list[dict[str, Any]]:
         List of dicts with keys ``title``, ``authors``, ``abstract``,
         ``url``, ``published``.
         Returns a single-element list with an ``error`` key on failure.
+
     """
     if search_arxiv_for_topic is None or ArxivSearcher is None:
         return [{"error": "arxiv package is not installed"}]
@@ -202,7 +205,7 @@ def search_arxiv(query: str, max_results: int = 5) -> list[dict[str, Any]]:
                     "abstract": paper.get("abstract", ""),
                     "url": paper.get("url", ""),
                     "published": paper.get("published", ""),
-                }
+                },
             )
         return results
 
@@ -234,6 +237,7 @@ def fetch_page(url: str) -> str:
 
     Returns:
         Plain-text representation of the page, or an error message string.
+
     """
     try:
         response = requests.get(
@@ -242,7 +246,7 @@ def fetch_page(url: str) -> str:
                 "User-Agent": (
                     "Mozilla/5.0 (compatible; EconomistAgentsBot/1.0; "
                     "+https://github.com/oviney/economist-agents)"
-                )
+                ),
             },
             timeout=15,
         )

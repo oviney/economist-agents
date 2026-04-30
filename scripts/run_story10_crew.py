@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Story 10: Phase 2 Migration - Stage 3 Content Generation (TDD Enforced)
+"""Story 10: Phase 2 Migration - Stage 3 Content Generation (TDD Enforced)
 
 CrewAI migration of Stage 3 (economist_agent.py) with STRICT Red-Green-Refactor discipline.
 
@@ -54,6 +53,7 @@ def load_agents(registry: AgentRegistry) -> dict:
 
     Returns:
         Dictionary mapping role names to CrewAI Agent instances
+
     """
     agents = {}
     for role in REQUIRED_AGENTS:
@@ -61,7 +61,7 @@ def load_agents(registry: AgentRegistry) -> dict:
         if agent_dict is None:
             raise ValueError(
                 f"Agent '{role}' not found. "
-                f"Available: {', '.join(registry.list_agents())}"
+                f"Available: {', '.join(registry.list_agents())}",
             )
 
         # Convert AgentRegistry output to CrewAI Agent instance
@@ -100,6 +100,7 @@ def define_tasks(agents: dict) -> list[Task]:
 
     Returns:
         List of Task objects enforcing TDD discipline
+
     """
     tasks = []
 
@@ -157,7 +158,7 @@ def define_tasks(agents: dict) -> list[Task]:
                 "=== 1 failed in 0.12s ===\n"
                 "```"
             ),
-        )
+        ),
     )
 
     # ========================================================================
@@ -214,7 +215,7 @@ def define_tasks(agents: dict) -> list[Task]:
                 "- Proper output structure matching legacy\n"
                 "- Clean, maintainable code\n"
             ),
-        )
+        ),
     )
 
     return tasks

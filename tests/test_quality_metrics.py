@@ -153,12 +153,14 @@ def pipeline_with_runs(tmp_path: Path) -> QualityMetricsPipeline:
 
 class TestDataLoading:
     def test_load_evals_returns_empty_when_file_missing(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         assert tmp_pipeline._load_evals() == []
 
     def test_load_pipeline_runs_returns_empty_when_file_missing(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         assert tmp_pipeline._load_pipeline_runs() == []
 
@@ -169,7 +171,8 @@ class TestDataLoading:
         assert pipeline._load_evals() == []
 
     def test_load_pipeline_runs_returns_empty_on_corrupt_json(
-        self, tmp_path: Path
+        self,
+        tmp_path: Path,
     ) -> None:
         runs_path = tmp_path / "pipeline_runs.json"
         runs_path.write_text("{broken")
@@ -177,7 +180,8 @@ class TestDataLoading:
         assert pipeline._load_pipeline_runs() == []
 
     def test_invalid_eval_record_skipped(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         """Records without required fields are skipped without raising."""
         result = tmp_pipeline.categorize_failure_modes([INVALID_EVAL, SAMPLE_EVALS[0]])
@@ -192,7 +196,8 @@ class TestDataLoading:
 
 class TestPassRates:
     def test_empty_evals_returns_zeros(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         result = tmp_pipeline.calculate_pass_rates([], [])
         assert result["total_articles"] == 0
@@ -200,7 +205,8 @@ class TestPassRates:
         assert result["overall_publish_rate"] == 0.0
 
     def test_pass_rate_from_eval_scores_no_runs(
-        self, pipeline_with_evals: QualityMetricsPipeline
+        self,
+        pipeline_with_evals: QualityMetricsPipeline,
     ) -> None:
         """Without pipeline runs, pass = percentage >= 70."""
         evals = pipeline_with_evals._load_evals()
@@ -210,7 +216,8 @@ class TestPassRates:
         assert result["first_attempt_publish_rate"] == pytest.approx(1 / 3, abs=0.01)
 
     def test_pass_rate_uses_pipeline_runs_when_available(
-        self, pipeline_with_runs: QualityMetricsPipeline
+        self,
+        pipeline_with_runs: QualityMetricsPipeline,
     ) -> None:
         evals = pipeline_with_runs._load_evals()
         runs = pipeline_with_runs._load_pipeline_runs()
@@ -230,7 +237,8 @@ class TestPassRates:
 
 class TestFailureModes:
     def test_empty_evals_returns_empty_dict(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         assert tmp_pipeline.categorize_failure_modes([]) == {}
 
@@ -239,13 +247,15 @@ class TestFailureModes:
         assert result.get("banned_opening", 0) >= 1
 
     def test_detects_unverified_claims(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         result = tmp_pipeline.categorize_failure_modes([SAMPLE_EVALS[1]])
         assert result.get("unverified_claims", 0) >= 1
 
     def test_detects_missing_references(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         result = tmp_pipeline.categorize_failure_modes([SAMPLE_EVALS[1]])
         assert result.get("missing_references", 0) >= 1
@@ -255,25 +265,29 @@ class TestFailureModes:
         assert result.get("banned_phrases", 0) >= 1
 
     def test_detects_american_spellings(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         result = tmp_pipeline.categorize_failure_modes([SAMPLE_EVALS[1]])
         assert result.get("american_spellings", 0) >= 1
 
     def test_detects_missing_frontmatter_fields(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         result = tmp_pipeline.categorize_failure_modes([SAMPLE_EVALS[1]])
         assert result.get("missing_frontmatter_fields", 0) >= 1
 
     def test_clean_article_has_no_failures(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         result = tmp_pipeline.categorize_failure_modes([SAMPLE_EVALS[0]])
         assert sum(result.values()) == 0
 
     def test_multiple_evals_aggregate_counts(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         result = tmp_pipeline.categorize_failure_modes(SAMPLE_EVALS)
         # article-b and article-c both have american_spellings
@@ -287,14 +301,16 @@ class TestFailureModes:
 
 class TestScoreTrends:
     def test_empty_evals_returns_empty_trends(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         weekly, dims = tmp_pipeline.compute_score_trends([])
         assert weekly == []
         assert all(v == [] for v in dims.values())
 
     def test_weekly_trends_grouped_by_iso_week(
-        self, pipeline_with_evals: QualityMetricsPipeline
+        self,
+        pipeline_with_evals: QualityMetricsPipeline,
     ) -> None:
         evals = pipeline_with_evals._load_evals()
         weekly, _ = pipeline_with_evals.compute_score_trends(evals)
@@ -304,7 +320,8 @@ class TestScoreTrends:
         assert len(weeks) == 2
 
     def test_weekly_trend_contains_required_keys(
-        self, pipeline_with_evals: QualityMetricsPipeline
+        self,
+        pipeline_with_evals: QualityMetricsPipeline,
     ) -> None:
         evals = pipeline_with_evals._load_evals()
         weekly, _ = pipeline_with_evals.compute_score_trends(evals)
@@ -317,7 +334,8 @@ class TestScoreTrends:
             assert "top_failure_modes" in week
 
     def test_dimension_trends_have_all_five_dims(
-        self, pipeline_with_evals: QualityMetricsPipeline
+        self,
+        pipeline_with_evals: QualityMetricsPipeline,
     ) -> None:
         evals = pipeline_with_evals._load_evals()
         _, dims = pipeline_with_evals.compute_score_trends(evals)
@@ -331,7 +349,8 @@ class TestScoreTrends:
         assert set(dims.keys()) == expected
 
     def test_dimension_trends_values_are_floats(
-        self, pipeline_with_evals: QualityMetricsPipeline
+        self,
+        pipeline_with_evals: QualityMetricsPipeline,
     ) -> None:
         evals = pipeline_with_evals._load_evals()
         _, dims = pipeline_with_evals.compute_score_trends(evals)
@@ -339,7 +358,8 @@ class TestScoreTrends:
             assert all(isinstance(v, float) for v in scores)
 
     def test_invalid_eval_timestamp_is_skipped(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         bad_eval = {**SAMPLE_EVALS[0], "timestamp": "not-a-date"}
         weekly, _ = tmp_pipeline.compute_score_trends([bad_eval])
@@ -353,14 +373,16 @@ class TestScoreTrends:
 
 class TestRevisionFrequency:
     def test_empty_runs_returns_zeros(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         result = tmp_pipeline.compute_revision_frequency([])
         assert result["avg_retries"] == 0.0
         assert result["zero_revision_pct"] == 0.0
 
     def test_avg_retries_calculated(
-        self, pipeline_with_runs: QualityMetricsPipeline
+        self,
+        pipeline_with_runs: QualityMetricsPipeline,
     ) -> None:
         runs = pipeline_with_runs._load_pipeline_runs()
         result = pipeline_with_runs.compute_revision_frequency(runs)
@@ -368,7 +390,8 @@ class TestRevisionFrequency:
         assert result["avg_retries"] == pytest.approx(1.0, abs=0.01)
 
     def test_zero_revision_pct(
-        self, pipeline_with_runs: QualityMetricsPipeline
+        self,
+        pipeline_with_runs: QualityMetricsPipeline,
     ) -> None:
         runs = pipeline_with_runs._load_pipeline_runs()
         result = pipeline_with_runs.compute_revision_frequency(runs)
@@ -376,14 +399,16 @@ class TestRevisionFrequency:
         assert result["zero_revision_pct"] == pytest.approx(33.3, abs=0.1)
 
     def test_top_revision_triggers(
-        self, pipeline_with_runs: QualityMetricsPipeline
+        self,
+        pipeline_with_runs: QualityMetricsPipeline,
     ) -> None:
         runs = pipeline_with_runs._load_pipeline_runs()
         result = pipeline_with_runs.compute_revision_frequency(runs)
         assert isinstance(result["top_revision_triggers"], list)
 
     def test_two_plus_revision_pct(
-        self, pipeline_with_runs: QualityMetricsPipeline
+        self,
+        pipeline_with_runs: QualityMetricsPipeline,
     ) -> None:
         runs = pipeline_with_runs._load_pipeline_runs()
         result = pipeline_with_runs.compute_revision_frequency(runs)
@@ -398,7 +423,8 @@ class TestRevisionFrequency:
 
 class TestAlerts:
     def test_no_alerts_for_healthy_metrics(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         summary = {
             "first_attempt_publish_rate": 0.90,
@@ -409,7 +435,8 @@ class TestAlerts:
         assert alerts == []
 
     def test_warn_alert_for_low_pass_rate(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         summary = {"first_attempt_publish_rate": 0.65, "avg_eval_score": 40.0}
         alerts = tmp_pipeline.generate_alerts(summary, {}, {})
@@ -417,7 +444,8 @@ class TestAlerts:
         assert "warn" in severities
 
     def test_critical_alert_for_very_low_pass_rate(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         summary = {"first_attempt_publish_rate": 0.40, "avg_eval_score": 40.0}
         alerts = tmp_pipeline.generate_alerts(summary, {}, {})
@@ -425,14 +453,16 @@ class TestAlerts:
         assert "critical" in severities
 
     def test_warn_alert_for_low_avg_score(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         summary = {"first_attempt_publish_rate": 0.90, "avg_eval_score": 30.0}
         alerts = tmp_pipeline.generate_alerts(summary, {}, {})
         assert any(a["dimension"] == "avg_eval_score" for a in alerts)
 
     def test_warn_alert_for_low_dimension(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         summary = {"first_attempt_publish_rate": 0.90, "avg_eval_score": 40.0}
         dim_trends = {"visual_engagement": [5.0, 5.0, 5.0]}
@@ -440,7 +470,8 @@ class TestAlerts:
         assert any(a["dimension"] == "visual_engagement" for a in alerts)
 
     def test_warn_alert_for_repeated_failure_mode(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         summary = {"first_attempt_publish_rate": 0.90, "avg_eval_score": 40.0}
         failure_modes = {"banned_phrases": 3}
@@ -448,7 +479,8 @@ class TestAlerts:
         assert any(a["type"] == "failure_mode" for a in alerts)
 
     def test_alert_has_required_fields(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         summary = {"first_attempt_publish_rate": 0.40, "avg_eval_score": 20.0}
         alerts = tmp_pipeline.generate_alerts(summary, {}, {})
@@ -466,7 +498,8 @@ class TestAlerts:
 
 class TestDashboardGeneration:
     def test_empty_data_generates_valid_dashboard(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         dashboard = tmp_pipeline.generate_dashboard()
         assert "generated_at" in dashboard
@@ -478,7 +511,8 @@ class TestDashboardGeneration:
         assert "alerts" in dashboard
 
     def test_dashboard_summary_keys(
-        self, pipeline_with_evals: QualityMetricsPipeline
+        self,
+        pipeline_with_evals: QualityMetricsPipeline,
     ) -> None:
         dashboard = pipeline_with_evals.generate_dashboard()
         summary = dashboard["summary"]
@@ -489,13 +523,15 @@ class TestDashboardGeneration:
         assert "avg_eval_percentage" in summary
 
     def test_dashboard_summary_total_articles(
-        self, pipeline_with_evals: QualityMetricsPipeline
+        self,
+        pipeline_with_evals: QualityMetricsPipeline,
     ) -> None:
         dashboard = pipeline_with_evals.generate_dashboard()
         assert dashboard["summary"]["total_articles"] == 3
 
     def test_run_writes_dashboard_json(
-        self, pipeline_with_evals: QualityMetricsPipeline
+        self,
+        pipeline_with_evals: QualityMetricsPipeline,
     ) -> None:
         pipeline_with_evals.run()
         assert pipeline_with_evals.dashboard_path.exists()
@@ -510,7 +546,8 @@ class TestDashboardGeneration:
         assert nested.exists()
 
     def test_dashboard_json_is_valid(
-        self, pipeline_with_evals: QualityMetricsPipeline
+        self,
+        pipeline_with_evals: QualityMetricsPipeline,
     ) -> None:
         pipeline_with_evals.run()
         raw = pipeline_with_evals.dashboard_path.read_bytes()
@@ -518,7 +555,8 @@ class TestDashboardGeneration:
         assert isinstance(data, dict)
 
     def test_dashboard_json_schema_compliance(
-        self, pipeline_with_runs: QualityMetricsPipeline
+        self,
+        pipeline_with_runs: QualityMetricsPipeline,
     ) -> None:
         """Dashboard JSON must comply with internal data interchange standards."""
         pipeline_with_runs.run()
@@ -576,7 +614,8 @@ class TestEdgeCases:
         assert all(w["articles_generated"] <= 1 for w in dashboard["weekly_trends"])
 
     def test_missing_image_failure_detected(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         eval_with_no_image = {
             **SAMPLE_EVALS[0],
@@ -589,7 +628,8 @@ class TestEdgeCases:
         assert result.get("missing_image", 0) >= 1
 
     def test_pipeline_runs_with_missing_article_filename(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         runs = [{"status": "published", "retries": 0}]  # no article_filename
         result = tmp_pipeline.calculate_pass_rates(SAMPLE_EVALS, runs)
@@ -606,13 +646,15 @@ class TestEdgeCases:
         assert dashboard["summary"]["avg_eval_score"] == 0.0
 
     def test_is_valid_eval_rejects_missing_fields(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         assert tmp_pipeline._is_valid_eval({}) is False
         assert tmp_pipeline._is_valid_eval({"scores": {}, "total_score": 0}) is False
 
     def test_is_valid_eval_accepts_complete_record(
-        self, tmp_pipeline: QualityMetricsPipeline
+        self,
+        tmp_pipeline: QualityMetricsPipeline,
     ) -> None:
         assert tmp_pipeline._is_valid_eval(SAMPLE_EVALS[0]) is True
 

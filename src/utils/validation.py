@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Input Validation Utility Functions
+"""Input Validation Utility Functions
 
 Provides standardized validation functions for agent input processing.
 """
@@ -9,8 +8,7 @@ from typing import Any
 
 
 def run_research_agent(client: Any, topic: str, research_brief: dict[str, Any]) -> bool:
-    """
-    Run the research agent to analyze a given topic and update the research brief.
+    """Run the research agent to analyze a given topic and update the research brief.
 
     Args:
         client: Mock or actual client used for interfacing with the agent infrastructure
@@ -22,11 +20,12 @@ def run_research_agent(client: Any, topic: str, research_brief: dict[str, Any]) 
 
     Raises:
         ValueError: If topic is invalid or research_brief is empty
+
     """
     # Validate inputs
     if not isinstance(topic, str) or len(topic.strip()) < 3:
         raise ValueError(
-            "Invalid topic: Must be a non-empty string with at least 3 characters."
+            "Invalid topic: Must be a non-empty string with at least 3 characters.",
         )
 
     if not research_brief:
@@ -39,10 +38,10 @@ def run_research_agent(client: Any, topic: str, research_brief: dict[str, Any]) 
 
 
 def validate_agent_input(
-    input_data: dict[str, Any], required_fields: list[str]
+    input_data: dict[str, Any],
+    required_fields: list[str],
 ) -> bool:
-    """
-    Validate agent input data contains required fields.
+    """Validate agent input data contains required fields.
 
     Args:
         input_data: Dictionary containing input data to validate
@@ -53,6 +52,7 @@ def validate_agent_input(
 
     Raises:
         ValueError: If required fields are missing or invalid
+
     """
     if not isinstance(input_data, dict):
         raise ValueError("Input data must be a dictionary")

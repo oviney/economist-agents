@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Editor Agent Diagnostic Suite
+"""Editor Agent Diagnostic Suite
 
 Analyzes Editor Agent performance to identify root causes of declining quality scores.
 
@@ -96,7 +95,7 @@ class EditorAgentDiagnostic:
                         "gates_failed": editor_data.get("gates_failed", 0),
                         "edits_made": editor_data.get("edits_made", 0),
                         "quality_issues": editor_data.get("quality_issues", []),
-                    }
+                    },
                 )
 
         if not editor_metrics:
@@ -151,18 +150,19 @@ class EditorAgentDiagnostic:
 
         if results["decline_detected"]:
             print(
-                f"\n⚠️  DECLINE DETECTED: {results['decline_percentage']:.1f}% drop over time"
+                f"\n⚠️  DECLINE DETECTED: {results['decline_percentage']:.1f}% drop over time",
             )
         else:
             print(
-                f"\n✅ Performance stable (±{abs(results['decline_percentage']):.1f}%)"
+                f"\n✅ Performance stable (±{abs(results['decline_percentage']):.1f}%)",
             )
 
         self.findings["historical_performance"] = results
         return results
 
     def analyze_pattern_detection_failures(
-        self, test_articles: list[Path] = None
+        self,
+        test_articles: list[Path] = None,
     ) -> dict:
         """Analyze which banned patterns Editor is missing"""
         print("\n" + "=" * 70)
@@ -207,7 +207,7 @@ class EditorAgentDiagnostic:
                             "file": article_path.name,
                             "type": "banned_opening",
                             "pattern": pattern,
-                        }
+                        },
                     )
                     break
 
@@ -222,7 +222,7 @@ class EditorAgentDiagnostic:
                             "type": "banned_phrase",
                             "pattern": pattern,
                             "count": len(matches),
-                        }
+                        },
                     )
 
             # Check for banned closings (last 200 chars)
@@ -235,7 +235,7 @@ class EditorAgentDiagnostic:
                             "file": article_path.name,
                             "type": "banned_closing",
                             "pattern": pattern,
-                        }
+                        },
                     )
                     break
 
@@ -243,7 +243,7 @@ class EditorAgentDiagnostic:
             if "[NEEDS SOURCE]" in body or "[UNVERIFIED]" in body:
                 failures["verification_flags"] += 1
                 violations_found.append(
-                    {"file": article_path.name, "type": "verification_flag"}
+                    {"file": article_path.name, "type": "verification_flag"},
                 )
 
         # Calculate failure rate
@@ -299,7 +299,7 @@ class EditorAgentDiagnostic:
                     "evidence": f"{self.findings['historical_performance']['decline_percentage']:.1f}% performance decline over time",
                     "likelihood": "HIGH",
                     "description": "Editor Agent prompt may have become less effective as LLM model updated or usage patterns changed",
-                }
+                },
             )
 
         # Hypothesis 2: Pattern detection gaps
@@ -311,7 +311,7 @@ class EditorAgentDiagnostic:
                     "evidence": f"{pattern_data['failure_rate']:.1f}% pattern detection failure rate",
                     "likelihood": "HIGH",
                     "description": "Editor not consistently catching banned patterns - prompt may need stronger constraints",
-                }
+                },
             )
 
         # Hypothesis 3: Gate definition ambiguity
@@ -325,7 +325,7 @@ class EditorAgentDiagnostic:
                     "evidence": f"Average {self.findings['historical_performance']['avg_gates_failed']:.1f} gates failing per run",
                     "likelihood": "MEDIUM",
                     "description": "Quality gate definitions may be ambiguous or inconsistently evaluated",
-                }
+                },
             )
 
         # Hypothesis 4: External factors (LLM model changes)
@@ -335,7 +335,7 @@ class EditorAgentDiagnostic:
                 "evidence": "Claude model may have updated (Anthropic does silent updates)",
                 "likelihood": "MEDIUM",
                 "description": "LLM provider model updates can affect prompt interpretation without code changes",
-            }
+            },
         )
 
         results = {
@@ -383,7 +383,7 @@ class EditorAgentDiagnostic:
                     "Could reduce writing creativity if too rigid",
                 ],
                 "targets": ["prompt_drift", "pattern_detection_gaps", "gate_ambiguity"],
-            }
+            },
         )
 
         # Option 2: Add Automated Pre-Editor Validation
@@ -406,7 +406,7 @@ class EditorAgentDiagnostic:
                     "Doesn't fix Editor, just works around it",
                 ],
                 "targets": ["pattern_detection_gaps"],
-            }
+            },
         )
 
         # Option 3: Split Editor into Multi-Stage Pipeline
@@ -435,7 +435,7 @@ class EditorAgentDiagnostic:
                     "gate_ambiguity",
                     "llm_model_changes",
                 ],
-            }
+            },
         )
 
         print(f"\n📋 {len(options)} Remediation Options:\n")
@@ -450,7 +450,8 @@ class EditorAgentDiagnostic:
         return options
 
     def generate_diagnosis_report(
-        self, output_path: str = "docs/EDITOR_AGENT_DIAGNOSIS.md"
+        self,
+        output_path: str = "docs/EDITOR_AGENT_DIAGNOSIS.md",
     ):
         """Generate comprehensive diagnosis report"""
         print("\n" + "=" * 70)
@@ -482,16 +483,16 @@ class EditorAgentDiagnostic:
                     f"- **Baseline Target**: {perf.get('baseline_target', 95)}%",
                     f"- **Performance Gap**: {perf.get('baseline_target', 95) - perf.get('gate_pass_rate', 0):.1f}%",
                     "",
-                ]
+                ],
             )
 
             if perf.get("decline_detected"):
                 report_lines.append(
-                    f"⚠️  **DECLINE DETECTED**: {perf.get('decline_percentage', 0):.1f}% drop in performance over time"
+                    f"⚠️  **DECLINE DETECTED**: {perf.get('decline_percentage', 0):.1f}% drop in performance over time",
                 )
             else:
                 report_lines.append(
-                    f"✅ **Performance Stable**: No significant decline detected (±{abs(perf.get('decline_percentage', 0)):.1f}%)"
+                    f"✅ **Performance Stable**: No significant decline detected (±{abs(perf.get('decline_percentage', 0)):.1f}%)",
                 )
             report_lines.append("")
 
@@ -506,7 +507,7 @@ class EditorAgentDiagnostic:
                     "",
                     f"**Total Root Causes Identified**: {rc_data.get('root_causes_identified', 0)}",
                     "",
-                ]
+                ],
             )
 
             for i, rc in enumerate(rc_data.get("root_causes", []), 1):
@@ -518,7 +519,7 @@ class EditorAgentDiagnostic:
                         "",
                         f"**Description**: {rc['description']}",
                         "",
-                    ]
+                    ],
                 )
 
         # Remediation options
@@ -544,7 +545,7 @@ class EditorAgentDiagnostic:
                         "",
                         f"**Addresses**: {', '.join(opt['targets'])}",
                         "",
-                    ]
+                    ],
                 )
 
         # Recommendations
@@ -587,7 +588,7 @@ class EditorAgentDiagnostic:
                 "",
                 "### A. Quality Gates Evaluated",
                 "",
-            ]
+            ],
         )
 
         for gate in self.QUALITY_GATES:
@@ -614,7 +615,7 @@ class EditorAgentDiagnostic:
                 f"**Report Generated**: {datetime.now().isoformat()}",
                 "**Diagnostic Tool**: `scripts/editor_agent_diagnostic.py`",
                 "",
-            ]
+            ],
         )
 
         # Write report
@@ -626,7 +627,7 @@ class EditorAgentDiagnostic:
         print(f"\n✅ Report generated: {report_path}")
         print(f"   Lines: {len(report_lines)}")
         print(
-            "   Sections: Executive Summary, Root Causes, Remediation Options, Recommendations"
+            "   Sections: Executive Summary, Root Causes, Remediation Options, Recommendations",
         )
 
         return str(report_path)
@@ -664,13 +665,13 @@ class EditorAgentDiagnostic:
         print(f"\n📄 Report: {report_path}")
         print("\n📋 Findings Summary:")
         print(
-            f"   Root Causes: {self.findings.get('root_causes', {}).get('root_causes_identified', 0)}"
+            f"   Root Causes: {self.findings.get('root_causes', {}).get('root_causes_identified', 0)}",
         )
         print(
-            f"   Remediation Options: {len(self.findings.get('remediation_options', []))}"
+            f"   Remediation Options: {len(self.findings.get('remediation_options', []))}",
         )
         print(
-            "\n🎯 Recommendation: Implement Option 1 (Strengthen Prompt) - 2-4 hours effort"
+            "\n🎯 Recommendation: Implement Option 1 (Strengthen Prompt) - 2-4 hours effort",
         )
 
         return {
@@ -682,13 +683,17 @@ class EditorAgentDiagnostic:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Editor Agent Diagnostic Suite - Sprint 7 Story 1"
+        description="Editor Agent Diagnostic Suite - Sprint 7 Story 1",
     )
     parser.add_argument(
-        "--analyze", action="store_true", help="Run full diagnostic analysis"
+        "--analyze",
+        action="store_true",
+        help="Run full diagnostic analysis",
     )
     parser.add_argument(
-        "--report", action="store_true", help="Generate diagnosis report only"
+        "--report",
+        action="store_true",
+        help="Generate diagnosis report only",
     )
     parser.add_argument(
         "--test-dir",
@@ -705,16 +710,16 @@ def main():
         results = diagnostic.run_full_diagnostic()
         print("\n✅ Story 1 Acceptance Criteria:")
         print(
-            f"   [{'✅' if results['status'] == 'complete' else '❌'}] Diagnostic suite created"
+            f"   [{'✅' if results['status'] == 'complete' else '❌'}] Diagnostic suite created",
         )
         print(
-            f"   [{'✅' if 'historical_performance' in results['findings'] else '❌'}] Baseline metrics established"
+            f"   [{'✅' if 'historical_performance' in results['findings'] else '❌'}] Baseline metrics established",
         )
         print(
-            f"   [{'✅' if 'root_causes' in results['findings'] else '❌'}] Root causes identified"
+            f"   [{'✅' if 'root_causes' in results['findings'] else '❌'}] Root causes identified",
         )
         print(
-            f"   [{'✅' if 'remediation_options' in results['findings'] else '❌'}] 3 remediation options proposed"
+            f"   [{'✅' if 'remediation_options' in results['findings'] else '❌'}] 3 remediation options proposed",
         )
         print("   [✅] EDITOR_AGENT_DIAGNOSIS.md published")
     elif args.report:

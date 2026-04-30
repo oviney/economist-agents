@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Production Health Check for Sprint 15 Deployment
+"""Production Health Check for Sprint 15 Deployment
 
 Validates health of all Sprint 14 components:
 - Flow Orchestration (EconomistContentFlow)
@@ -233,10 +232,9 @@ def overall_health_status(checks: dict) -> str:
 
     if "unhealthy" in statuses:
         return "unhealthy"
-    elif "degraded" in statuses:
+    if "degraded" in statuses:
         return "degraded"
-    else:
-        return "healthy"
+    return "healthy"
 
 
 def check_health(verbose: bool = False) -> dict:
@@ -281,7 +279,10 @@ def main():
 
     parser = argparse.ArgumentParser(description="Production health check")
     parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Verbose output with summary"
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Verbose output with summary",
     )
     parser.add_argument(
         "--component",

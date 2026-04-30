@@ -22,10 +22,13 @@ class SkillsManager:
         role_name: The name of the agent role (e.g., "blog_qa", "po_agent").
         skills_file: Path to the role-specific skills JSON file.
         skills: Loaded skills data including patterns and statistics.
+
     """
 
     def __init__(
-        self, role_name: str | None = None, skills_file: str | Path | None = None
+        self,
+        role_name: str | None = None,
+        skills_file: str | Path | None = None,
     ) -> None:
         """Initialize the SkillsManager for a specific role.
 
@@ -43,6 +46,7 @@ class SkillsManager:
             >>> manager = SkillsManager(skills_file="custom/path.json")
             >>> # Default (blog_qa)
             >>> manager = SkillsManager()
+
         """
         if skills_file is not None:
             self.skills_file = Path(skills_file)
@@ -69,6 +73,7 @@ class SkillsManager:
 
         Raises:
             orjson.JSONDecodeError: If skills file contains invalid JSON.
+
         """
         if self.skills_file.exists():
             try:
@@ -88,6 +93,7 @@ class SkillsManager:
         Returns:
             Dictionary with default skills structure including version,
             empty skills categories, and zero validation statistics.
+
         """
         return {
             "version": "1.0",
@@ -116,6 +122,7 @@ class SkillsManager:
             >>> manager = SkillsManager(role_name="blog_qa")
             >>> seo_patterns = manager.get_patterns("seo_validation")
             >>> all_patterns = manager.get_patterns()
+
         """
         if category and category in self.skills.get("skills", {}):
             return self.skills["skills"][category].get("patterns", [])
@@ -127,7 +134,10 @@ class SkillsManager:
         return all_patterns
 
     def learn_pattern(
-        self, category: str, pattern_id: str, pattern_data: dict[str, Any]
+        self,
+        category: str,
+        pattern_id: str,
+        pattern_data: dict[str, Any],
     ) -> None:
         """Add a new learned pattern to the skills database.
 
@@ -149,6 +159,7 @@ class SkillsManager:
             ...         "learned_from": "BUG-015"
             ...     }
             ... )
+
         """
         if "skills" not in self.skills:
             self.skills["skills"] = {}
@@ -191,6 +202,7 @@ class SkillsManager:
         Example:
             >>> manager = SkillsManager(role_name="blog_qa")
             >>> manager.record_run(issues_found=3, issues_fixed=2)
+
         """
         stats = self.skills.get("validation_stats", {})
         stats["total_runs"] = stats.get("total_runs", 0) + 1
@@ -204,6 +216,7 @@ class SkillsManager:
 
         Raises:
             OSError: If directory creation or file write fails.
+
         """
         self.skills_file.parent.mkdir(parents=True, exist_ok=True)
         with open(self.skills_file, "wb") as f:
@@ -216,6 +229,7 @@ class SkillsManager:
         Returns:
             Dictionary containing total_runs, issues_found, issues_fixed,
             and last_run timestamp.
+
         """
         return self.skills.get("validation_stats", {})
 
@@ -228,13 +242,14 @@ class SkillsManager:
 
         Returns:
             List of improvement suggestions based on detected patterns.
+
         """
         suggestions = []
 
         # Check for recurring issues
         if validation_results.get("yaml_issues"):
             suggestions.append(
-                "Consider adding pattern for: recurring YAML validation failures"
+                "Consider adding pattern for: recurring YAML validation failures",
             )
 
         if validation_results.get("style_issues"):
@@ -251,6 +266,7 @@ class SkillsManager:
         Returns:
             Formatted string report containing validation statistics,
             learned patterns by category, and severity information.
+
         """
         report_lines = [
             f"=== {self.role_name.replace('_', ' ').title()} Skills Report ===",
@@ -272,10 +288,10 @@ class SkillsManager:
             report_lines.append(f"    {cat_data.get('description', '')}")
             for pattern in cat_data.get("patterns", []):
                 report_lines.append(
-                    f"    - {pattern['id']}: {pattern.get('pattern', '')}"
+                    f"    - {pattern['id']}: {pattern.get('pattern', '')}",
                 )
                 report_lines.append(
-                    f"      Severity: {pattern.get('severity', 'unknown')}"
+                    f"      Severity: {pattern.get('severity', 'unknown')}",
                 )
 
         return "\n".join(report_lines)

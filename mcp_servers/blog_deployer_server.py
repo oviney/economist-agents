@@ -41,6 +41,7 @@ def _run_command(cmd: str, cwd: str | None = None) -> str:
 
     Raises:
         subprocess.CalledProcessError: If command exits non-zero.
+
     """
     result = subprocess.run(  # noqa: S602
         cmd,
@@ -52,7 +53,10 @@ def _run_command(cmd: str, cwd: str | None = None) -> str:
     )
     if result.returncode != 0:
         raise subprocess.CalledProcessError(
-            result.returncode, cmd, result.stdout, result.stderr
+            result.returncode,
+            cmd,
+            result.stdout,
+            result.stderr,
         )
     return result.stdout.strip()
 
@@ -66,6 +70,7 @@ def list_deployable_articles(output_dir: str = "output") -> list[str]:
 
     Returns:
         List of article file paths sorted by modification time (newest first).
+
     """
     output_path = Path(output_dir)
     if not output_path.exists():
@@ -96,6 +101,7 @@ def deploy_article(
 
     Returns:
         Dict with success status, PR URL, and article filename.
+
     """
     token = os.environ.get("GITHUB_TOKEN", "")
     if not token:
@@ -125,7 +131,7 @@ def deploy_article(
         _run_command(
             f"git clone --depth 1 "
             f"https://x-access-token:{token}@github.com/{blog_repo}.git "
-            f"{blog_dir}"
+            f"{blog_dir}",
         )
 
         # Configure git in temp repo

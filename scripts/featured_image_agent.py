@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Featured Image Generation Agent for Economist-Style Articles
+"""Featured Image Generation Agent for Economist-Style Articles
 
 Generates DALL-E 3 editorial illustrations that match The Economist's visual style
 as defined in skills/editorial-illustration/SKILL.md:
@@ -100,8 +99,7 @@ def create_image_prompt(
     contrarian_angle: str = "",
     mood: ImageMood = "contemplative",
 ) -> str:
-    """
-    Generate DALL-E 3 prompt for Economist-style featured image.
+    """Generate DALL-E 3 prompt for Economist-style featured image.
 
     Follows the template defined in skills/editorial-illustration/SKILL.md,
     producing bold, high-contrast graphic editorial illustrations with
@@ -116,8 +114,8 @@ def create_image_prompt(
 
     Returns:
         Formatted prompt for DALL-E 3
-    """
 
+    """
     # Build scene description from topic, summary, and contrarian angle
     scene_parts = [
         f"A scene that embodies the argument of an article titled '{topic}'.",
@@ -125,12 +123,12 @@ def create_image_prompt(
     ]
     if contrarian_angle:
         scene_parts.append(
-            f"The illustration should capture the counterintuitive angle: {contrarian_angle}"
+            f"The illustration should capture the counterintuitive angle: {contrarian_angle}",
         )
     scene_parts.append(
         "Include at least one human figure (a person in a suit, an engineer, "
         "an executive, or a worker) placed in a recognisable setting such as "
-        "an office, boardroom, laboratory, or city street."
+        "an office, boardroom, laboratory, or city street.",
     )
     scene_description = " ".join(scene_parts)
 
@@ -177,8 +175,7 @@ def generate_featured_image(
     size: Literal["1024x1024", "1792x1024", "1024x1792"] = "1792x1024",
     quality: Literal["standard", "hd"] = "hd",
 ) -> str | None:
-    """
-    Generate a featured image using DALL-E 3.
+    """Generate a featured image using DALL-E 3.
 
     Produces a bold, graphic Economist-style editorial illustration as defined
     in skills/editorial-illustration/SKILL.md.  Images are 1792x1024 landscape
@@ -201,8 +198,8 @@ def generate_featured_image(
     Raises:
         ValueError: If output_path is invalid
         RuntimeError: If image generation fails
-    """
 
+    """
     print(f"🎨 Featured Image Agent: Generating illustration for '{topic[:50]}...'")
 
     # Check if OpenAI API key is available
@@ -269,13 +266,12 @@ def generate_featured_image(
         return str(output_path)
 
     except Exception as e:
-        print(f"   ⚠️  Image generation failed: {str(e)}")
+        print(f"   ⚠️  Image generation failed: {e!s}")
         return None
 
 
 def test_generate_sample_images() -> None:
     """Test function to generate sample images for 3 representative articles."""
-
     test_topics = [
         {
             "topic": "The Economics of Flaky Tests",
@@ -322,7 +318,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Generate Economist-style featured images"
+        description="Generate Economist-style featured images",
     )
     parser.add_argument("--test", action="store_true", help="Generate test images")
     parser.add_argument("--topic", help="Article topic/headline")

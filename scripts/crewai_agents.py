@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-CrewAI Agent Factory
+"""CrewAI Agent Factory
 
 Generates CrewAI Agent instances from declarative YAML configurations.
 Part of Phase 1: CrewAI Migration (ADR-003).
@@ -41,8 +40,7 @@ class AgentFactory:
     """Factory for creating CrewAI agents from YAML configurations"""
 
     def __init__(self, config_path: str | None = None):
-        """
-        Initialize factory with agent registry.
+        """Initialize factory with agent registry.
 
         Args:
             config_path: Path to agents.yaml (default: schemas/agents.yaml)
@@ -51,10 +49,11 @@ class AgentFactory:
             ImportError: If CrewAI is not installed
             FileNotFoundError: If agents.yaml not found
             yaml.YAMLError: If agents.yaml is malformed
+
         """
         if Agent is None:
             raise ImportError(
-                "CrewAI not installed. Install with: pip install crewai crewai-tools"
+                "CrewAI not installed. Install with: pip install crewai crewai-tools",
             )
 
         if config_path is None:
@@ -67,7 +66,7 @@ class AgentFactory:
             raise FileNotFoundError(
                 f"Agent registry not found: {self.config_path}\n"
                 f"Expected location: schemas/agents.yaml\n"
-                f"Create this file with agent definitions (see ADR-003)"
+                f"Create this file with agent definitions (see ADR-003)",
             )
 
         # Load and validate YAML
@@ -78,7 +77,7 @@ class AgentFactory:
             raise yaml.YAMLError(
                 f"Malformed agents.yaml: {e}\n"
                 f"File: {self.config_path}\n"
-                f"Fix YAML syntax errors and try again"
+                f"Fix YAML syntax errors and try again",
             ) from e
 
         if not self.registry or "agents" not in self.registry:
@@ -90,14 +89,13 @@ class AgentFactory:
                 f"  agent_id:\n"
                 f"    role: ...\n"
                 f"    goal: ...\n"
-                f"    backstory: ..."
+                f"    backstory: ...",
             )
 
         self.agents = self.registry["agents"]
 
     def create_agent(self, agent_id: str, **kwargs: Any) -> Agent:
-        """
-        Create a CrewAI Agent instance from registry configuration.
+        """Create a CrewAI Agent instance from registry configuration.
 
         Args:
             agent_id: Agent identifier from agents.yaml (e.g., 'research_agent')
@@ -114,13 +112,14 @@ class AgentFactory:
             >>> agent = factory.create_agent('research_agent', verbose=False)
             >>> print(agent.role)
             Quality Engineering Research Analyst
+
         """
         if agent_id not in self.agents:
             available = ", ".join(self.agents.keys())
             raise ValueError(
                 f"Agent '{agent_id}' not found in registry\n"
                 f"Available agents: {available}\n"
-                f"File: {self.config_path}"
+                f"File: {self.config_path}",
             )
 
         config = self.agents[agent_id].copy()
@@ -148,8 +147,7 @@ class AgentFactory:
         return Agent(**agent_params)
 
     def create_all_agents(self) -> dict[str, Agent]:
-        """
-        Create all agents defined in registry.
+        """Create all agents defined in registry.
 
         Returns:
             Dict mapping agent_id to Agent instance
@@ -159,12 +157,12 @@ class AgentFactory:
             >>> agents = factory.create_all_agents()
             >>> print(list(agents.keys()))
             ['research_agent', 'writer_agent', 'editor_agent', 'graphics_agent']
+
         """
         return {agent_id: self.create_agent(agent_id) for agent_id in self.agents}
 
     def get_agent_config(self, agent_id: str) -> dict[str, Any]:
-        """
-        Get raw configuration for an agent.
+        """Get raw configuration for an agent.
 
         Args:
             agent_id: Agent identifier
@@ -180,19 +178,19 @@ class AgentFactory:
             >>> config = factory.get_agent_config('research_agent')
             >>> print(config['role'])
             Quality Engineering Research Analyst
+
         """
         if agent_id not in self.agents:
             available = ", ".join(self.agents.keys())
             raise ValueError(
                 f"Agent '{agent_id}' not found in registry\n"
-                f"Available agents: {available}"
+                f"Available agents: {available}",
             )
 
         return self.agents[agent_id].copy()
 
     def list_agents(self) -> list[str]:
-        """
-        List all agent IDs in registry.
+        """List all agent IDs in registry.
 
         Returns:
             List of agent identifiers
@@ -201,6 +199,7 @@ class AgentFactory:
             >>> factory = AgentFactory()
             >>> print(factory.list_agents())
             ['research_agent', 'writer_agent', 'editor_agent', 'graphics_agent']
+
         """
         return list(self.agents.keys())
 
@@ -224,13 +223,19 @@ Examples:
     )
 
     parser.add_argument(
-        "--list", action="store_true", help="List all agent IDs in registry"
+        "--list",
+        action="store_true",
+        help="List all agent IDs in registry",
     )
     parser.add_argument(
-        "--show", metavar="AGENT_ID", help="Show configuration for agent"
+        "--show",
+        metavar="AGENT_ID",
+        help="Show configuration for agent",
     )
     parser.add_argument(
-        "--create", metavar="AGENT_ID", help="Create agent (validates config)"
+        "--create",
+        metavar="AGENT_ID",
+        help="Create agent (validates config)",
     )
     parser.add_argument(
         "--config",

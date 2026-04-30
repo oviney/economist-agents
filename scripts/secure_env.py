@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Secure environment loader with python-dotenv support
+"""Secure environment loader with python-dotenv support
 
 Loads API keys from .env file with security checks.
 Falls back to system environment variables if .env not available.
@@ -40,8 +39,7 @@ def load_env():
 
 
 def get_api_key(provider: str = "openai") -> str:
-    """
-    Get API key securely with validation
+    """Get API key securely with validation
 
     Args:
         provider: 'openai' or 'anthropic'
@@ -51,6 +49,7 @@ def get_api_key(provider: str = "openai") -> str:
 
     Raises:
         ValueError: If key not found or invalid
+
     """
     load_env()
 
@@ -63,13 +62,13 @@ def get_api_key(provider: str = "openai") -> str:
             f"Options:\n"
             f"  1. Create .env file: cp .env.example .env (then edit)\n"
             f"  2. Export directly: export {key_name}='sk-...'\n"
-            f"  3. Use secrets manager in production"
+            f"  3. Use secrets manager in production",
         )
 
     # Basic validation
     if provider == "openai" and not api_key.startswith("sk-"):
         raise ValueError("[SECURITY] Invalid OpenAI API key format")
-    elif provider == "anthropic" and not api_key.startswith("sk-ant-"):
+    if provider == "anthropic" and not api_key.startswith("sk-ant-"):
         raise ValueError("[SECURITY] Invalid Anthropic API key format")
 
     # Mask key in logs

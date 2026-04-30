@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-SM Agent Effectiveness Measurement Script
+"""SM Agent Effectiveness Measurement Script
 
 Validates Scrum Master Agent achieves >90% task assignment automation.
 
@@ -186,7 +185,7 @@ def measure_sm_agent():
         if task.get("assigned_agent"):
             automated_assignments += 1
             print(
-                f"  ✓ AUTO: {task['task_id']} → {task['assigned_agent']} (phase: {task['phase']})"
+                f"  ✓ AUTO: {task['task_id']} → {task['assigned_agent']} (phase: {task['phase']})",
             )
         else:
             manual_interventions += 1
@@ -253,7 +252,8 @@ def measure_sm_agent():
         "performance_metrics": {
             "queue_creation_time_seconds": round(queue_time, 2),
             "avg_time_per_story_seconds": round(
-                queue_time / len(backlog["stories"]), 2
+                queue_time / len(backlog["stories"]),
+                2,
             ),
         },
         "dor_validation": dor_results,
@@ -285,7 +285,7 @@ def measure_sm_agent():
         print("   Deploy in Sprint 10 with human oversight for first 2-3 sprints")
     else:
         print(
-            f"⚠️  RECOMMENDATION: SM Agent below target ({automation_rate:.1f}% < 90%)"
+            f"⚠️  RECOMMENDATION: SM Agent below target ({automation_rate:.1f}% < 90%)",
         )
         print("   Identify manual intervention points and enhance automation")
 

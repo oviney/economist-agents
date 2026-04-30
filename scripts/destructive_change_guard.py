@@ -123,6 +123,7 @@ def check_destructive_changes() -> list[str]:
 
     Returns:
         List of violation messages. Empty if all clear.
+
     """
     base = get_base_branch()
     stats = get_diff_stats(base)
@@ -150,7 +151,7 @@ def check_destructive_changes() -> list[str]:
                 f"BLOCKED: {filepath} lost {deletion_pct}% of its content "
                 f"({deleted}/{base_lines} lines deleted). "
                 f"This looks like a destructive rewrite, not a targeted edit. "
-                f"Maximum allowed: {MAX_DELETION_PCT}%."
+                f"Maximum allowed: {MAX_DELETION_PCT}%.",
             )
 
     return violations

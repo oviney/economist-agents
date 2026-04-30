@@ -36,8 +36,8 @@ def test_collects_open_sources_and_blockers(tmp_path: Path) -> None:
                             "priority": "P1",
                             "status": "complete",
                         },
-                    ]
-                }
+                    ],
+                },
             },
         },
     )
@@ -57,7 +57,7 @@ def test_collects_open_sources_and_blockers(tmp_path: Path) -> None:
                     "priority": "P1",
                     "status": "blocked",
                 },
-            ]
+            ],
         },
     )
     _write(
@@ -69,8 +69,8 @@ def test_collects_open_sources_and_blockers(tmp_path: Path) -> None:
                     "title": "Queued task",
                     "priority": "P1",
                     "status": "assigned",
-                }
-            ]
+                },
+            ],
         },
     )
     _write(
@@ -81,12 +81,12 @@ def test_collects_open_sources_and_blockers(tmp_path: Path) -> None:
                     "escalation_id": "ESC-1",
                     "question": "Need human decision",
                     "recommendation": "Ask the PO",
-                }
-            ]
+                },
+            ],
         },
     )
     (repo_root / "SPRINT.md").write_text(
-        "**Active Sprint**: Sprint 15\n## Sprint 15: Test\n### Sprint Goal\nGoal\n"
+        "**Active Sprint**: Sprint 15\n## Sprint 15: Test\n### Sprint Goal\nGoal\n",
     )
     (repo_root / "README.md").write_text("Sprint 15 IN PROGRESS\n")
     (repo_root / "docs").mkdir(exist_ok=True)
@@ -114,7 +114,8 @@ def test_collect_once_returns_blocked_when_no_active_sprint(tmp_path: Path) -> N
     _write(repo_root / "data/skills_state/backlog.json", {"stories": []})
     _write(repo_root / "data/skills_state/task_queue.json", {"tasks": []})
     _write(
-        repo_root / "data/skills_state/escalations.json", {"pending_escalations": []}
+        repo_root / "data/skills_state/escalations.json",
+        {"pending_escalations": []},
     )
     (repo_root / "SPRINT.md").write_text("# Empty sprint file\n")
     (repo_root / "README.md").write_text("README\n")

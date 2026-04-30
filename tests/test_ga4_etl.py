@@ -74,23 +74,35 @@ def _make_response(rows: list[MagicMock] | None = None) -> MagicMock:
     return resp
 
 
-@pytest.fixture()
+@pytest.fixture
 def sample_response() -> MagicMock:
     """A response with three realistic rows."""
     return _make_response(
         [
             _make_row(
-                "/blog/ai-trends", "AI Trends", "20260401", 500, 0.72, 120.5, 300
+                "/blog/ai-trends",
+                "AI Trends",
+                "20260401",
+                500,
+                0.72,
+                120.5,
+                300,
             ),
             _make_row(
-                "/blog/data-eng", "Data Engineering", "20260401", 200, 0.55, 80.0, 100
+                "/blog/data-eng",
+                "Data Engineering",
+                "20260401",
+                200,
+                0.55,
+                80.0,
+                100,
             ),
             _make_row("/blog/cloud", "Cloud Native", "20260401", 800, 0.90, 200.0, 700),
-        ]
+        ],
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def tmp_db(tmp_path: pathlib.Path) -> pathlib.Path:
     """Provide a temporary SQLite database path."""
     return tmp_path / "test_performance.db"
@@ -166,7 +178,7 @@ class TestParseRows:
     def test_zero_pageviews_scroll_depth(self) -> None:
         """Zero pageviews should not cause division by zero."""
         resp = _make_response(
-            [_make_row("/empty", "Empty", "20260401", 0, 0.0, 0.0, 0)]
+            [_make_row("/empty", "Empty", "20260401", 0, 0.0, 0.0, 0)],
         )
         rows = parse_rows(resp)
         assert rows[0]["scroll_depth_rate"] == 0.0
@@ -215,7 +227,7 @@ class TestComputeScores:
                 "engagement_rate": 0.5,
                 "avg_engagement_time": 60.0,
                 "scroll_depth_rate": 0.3,
-            }
+            },
         ]
         scored = compute_scores(rows)
         assert scored[0]["composite_score"] == 0.0
@@ -322,7 +334,9 @@ class TestStoreResults:
     """Tests for SQLite storage."""
 
     def test_creates_table_and_inserts(
-        self, sample_response: MagicMock, tmp_db: pathlib.Path
+        self,
+        sample_response: MagicMock,
+        tmp_db: pathlib.Path,
     ) -> None:
         """Rows are inserted and retrievable."""
         rows = compute_scores(parse_rows(sample_response))
@@ -335,7 +349,9 @@ class TestStoreResults:
         conn.close()
 
     def test_fetched_at_is_populated(
-        self, sample_response: MagicMock, tmp_db: pathlib.Path
+        self,
+        sample_response: MagicMock,
+        tmp_db: pathlib.Path,
     ) -> None:
         """Each row has a non-empty fetched_at timestamp."""
         rows = compute_scores(parse_rows(sample_response))
@@ -359,7 +375,9 @@ class TestStoreResults:
         conn.close()
 
     def test_schema_columns(
-        self, sample_response: MagicMock, tmp_db: pathlib.Path
+        self,
+        sample_response: MagicMock,
+        tmp_db: pathlib.Path,
     ) -> None:
         """Verify all expected columns exist in the table."""
         rows = compute_scores(parse_rows(sample_response))

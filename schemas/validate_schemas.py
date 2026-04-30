@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-JSON Schema Validator for Pipeline Stages
+"""JSON Schema Validator for Pipeline Stages
 
 Validates JSON intermediate files against their schemas to catch
 data flow issues early.
@@ -17,13 +16,12 @@ from pathlib import Path
 
 
 def validate_json_file(json_path: Path, schema_path: Path) -> tuple[bool, list[str]]:
-    """
-    Validate a JSON file against its schema.
+    """Validate a JSON file against its schema.
 
     Returns:
         (is_valid, error_messages)
-    """
 
+    """
     # Load JSON file
     try:
         with open(json_path) as f:
@@ -59,8 +57,7 @@ def validate_json_file(json_path: Path, schema_path: Path) -> tuple[bool, list[s
 
 
 def _basic_validation(data: dict, schema: dict) -> tuple[bool, list[str]]:
-    """
-    Basic validation without jsonschema library.
+    """Basic validation without jsonschema library.
     Checks required fields and types.
     """
     errors = []
@@ -86,23 +83,23 @@ def _basic_validation(data: dict, schema: dict) -> tuple[bool, list[str]]:
             # Type checking
             if expected_type == "string" and not isinstance(value, str):
                 errors.append(
-                    f"Field '{key}' should be string, got {type(value).__name__}"
+                    f"Field '{key}' should be string, got {type(value).__name__}",
                 )
             elif expected_type == "integer" and not isinstance(value, int):
                 errors.append(
-                    f"Field '{key}' should be integer, got {type(value).__name__}"
+                    f"Field '{key}' should be integer, got {type(value).__name__}",
                 )
             elif expected_type == "number" and not isinstance(value, int | float):
                 errors.append(
-                    f"Field '{key}' should be number, got {type(value).__name__}"
+                    f"Field '{key}' should be number, got {type(value).__name__}",
                 )
             elif expected_type == "array" and not isinstance(value, list):
                 errors.append(
-                    f"Field '{key}' should be array, got {type(value).__name__}"
+                    f"Field '{key}' should be array, got {type(value).__name__}",
                 )
             elif expected_type == "object" and not isinstance(value, dict):
                 errors.append(
-                    f"Field '{key}' should be object, got {type(value).__name__}"
+                    f"Field '{key}' should be object, got {type(value).__name__}",
                 )
 
     return len(errors) == 0, errors
@@ -172,7 +169,9 @@ def main():
     parser = argparse.ArgumentParser(description="Validate JSON files against schemas")
     parser.add_argument("file", nargs="?", help="JSON file to validate")
     parser.add_argument(
-        "--all", action="store_true", help="Validate all pipeline files"
+        "--all",
+        action="store_true",
+        help="Validate all pipeline files",
     )
 
     args = parser.parse_args()

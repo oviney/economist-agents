@@ -15,7 +15,7 @@ import pytest
 # Make scripts/ importable.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
-from topic_scout_reproducibility import (  # noqa: E402
+from topic_scout_reproducibility import (
     _compute_tf,
     _cosine_similarity,
     _extract_top_performer_keywords,
@@ -62,7 +62,7 @@ def _make_topic(n: int, score: int = 20) -> dict:
     }
 
 
-@pytest.fixture()
+@pytest.fixture
 def sample_report_kwargs() -> dict:
     """Keyword arguments for ``generate_report`` that cover all branches."""
     return {
@@ -460,7 +460,7 @@ def test_generate_report_insufficient_runs_message(
     kwargs = dict(sample_report_kwargs)
     kwargs["successful_runs"] = 1
     kwargs["runs_topics"] = [
-        [{"topic": "Only Topic", "hook": "Only hook", "total_score": 20}]
+        [{"topic": "Only Topic", "hook": "Only hook", "total_score": 20}],
     ]
     kwargs["run_timings"] = [4.0]
     kwargs["cosine_matrix"] = []
@@ -557,7 +557,9 @@ def test_run_reproducibility_check_writes_report(tmp_path: Path) -> None:
         mock_scout.return_value = topics_payload
 
         report_path = run_reproducibility_check(
-            n_runs=2, output_dir=tmp_path, client=mock_client
+            n_runs=2,
+            output_dir=tmp_path,
+            client=mock_client,
         )
 
     assert report_path.exists()
@@ -588,7 +590,9 @@ def test_run_reproducibility_check_counts_failed_run(tmp_path: Path) -> None:
         ]
 
         report_path = run_reproducibility_check(
-            n_runs=2, output_dir=tmp_path, client=mock_client
+            n_runs=2,
+            output_dir=tmp_path,
+            client=mock_client,
         )
 
     report_text = report_path.read_text()
@@ -608,7 +612,9 @@ def test_run_reproducibility_check_handles_exception(tmp_path: Path) -> None:
         mock_scout.side_effect = RuntimeError("API quota exceeded")
 
         report_path = run_reproducibility_check(
-            n_runs=3, output_dir=tmp_path, client=mock_client
+            n_runs=3,
+            output_dir=tmp_path,
+            client=mock_client,
         )
 
     report_text = report_path.read_text()
@@ -751,7 +757,7 @@ def test_tfidf_matrix_is_symmetric() -> None:
                 "thesis": "t",
                 "contrarian_angle": "c",
                 "talking_points": "p",
-            }
+            },
         ],
         [
             {
@@ -760,7 +766,7 @@ def test_tfidf_matrix_is_symmetric() -> None:
                 "thesis": "t",
                 "contrarian_angle": "c",
                 "talking_points": "p",
-            }
+            },
         ],
         [
             {
@@ -769,7 +775,7 @@ def test_tfidf_matrix_is_symmetric() -> None:
                 "thesis": "t",
                 "contrarian_angle": "c",
                 "talking_points": "p",
-            }
+            },
         ],
     ]
     matrix = compute_tfidf_cosine_matrix(runs)

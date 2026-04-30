@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-GitHub Project V2 Integration Test Suite - Story 3 Validation
+"""GitHub Project V2 Integration Test Suite - Story 3 Validation
 
 Tests comprehensive GitHub Project V2 integration using existing tools:
 1. github_project_add_issue tool functionality
@@ -48,7 +47,8 @@ except ImportError:
     _CREWAI_AVAILABLE = False
 
 requires_crewai = pytest.mark.skipif(
-    not _CREWAI_AVAILABLE, reason="crewai not installed"
+    not _CREWAI_AVAILABLE,
+    reason="crewai not installed",
 )
 
 
@@ -97,7 +97,7 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
     def log_test_result(self, test_name: str, result: str, details: str = ""):
         """Log test result for final summary"""
         self.test_results["tests"].append(
-            {"name": test_name, "result": result, "details": details}
+            {"name": test_name, "result": result, "details": details},
         )
         if result == "PASS":
             self.test_results["passed"] += 1
@@ -127,21 +127,28 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
             self.fail(f"Failed to import github_project_add_issue: {e}")
 
     @unittest.skipUnless(
-        GH_CLI_AVAILABLE, "GitHub CLI not available or not authenticated"
+        GH_CLI_AVAILABLE,
+        "GitHub CLI not available or not authenticated",
     )
     def test_02_github_cli_availability(self):
         """Test 2: Verify GitHub CLI is installed and authenticated"""
         try:
             # Check gh CLI installation
             result = subprocess.run(
-                ["gh", "--version"], capture_output=True, text=True, timeout=10
+                ["gh", "--version"],
+                capture_output=True,
+                text=True,
+                timeout=10,
             )
             self.assertEqual(result.returncode, 0)
             self.assertIn("gh version", result.stdout)
 
             # Check authentication status
             auth_result = subprocess.run(
-                ["gh", "auth", "status"], capture_output=True, text=True, timeout=10
+                ["gh", "auth", "status"],
+                capture_output=True,
+                text=True,
+                timeout=10,
             )
             self.assertEqual(auth_result.returncode, 0)
 
@@ -152,7 +159,8 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
             self.fail(f"GitHub CLI not available: {e}")
 
     @unittest.skipUnless(
-        GH_CLI_AVAILABLE, "GitHub CLI not available or not authenticated"
+        GH_CLI_AVAILABLE,
+        "GitHub CLI not available or not authenticated",
     )
     @requires_crewai
     def test_03_project_boards_exist(self):
@@ -181,7 +189,8 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
             self.fail(f"Failed to verify project boards: {e}")
 
     @unittest.skipUnless(
-        GH_CLI_AVAILABLE, "GitHub CLI not available or not authenticated"
+        GH_CLI_AVAILABLE,
+        "GitHub CLI not available or not authenticated",
     )
     @requires_crewai
     def test_04_sprint_16_issues_exist(self):
@@ -226,7 +235,8 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
             # Test invalid project number (string instead of int)
             with self.assertRaises(TypeError):
                 github_project_add_issue(
-                    "invalid", "https://github.com/test/test/issues/1"
+                    "invalid",
+                    "https://github.com/test/test/issues/1",
                 )
 
             # Test invalid URL format
@@ -353,7 +363,9 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
 
             # Execute the actual tool
             result = github_project_add_issue(
-                project_number=test_project, issue_url=test_issue_url, owner="oviney"
+                project_number=test_project,
+                issue_url=test_issue_url,
+                owner="oviney",
             )
 
             # Verify success or acceptable result
@@ -378,7 +390,8 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
             self.fail(f"Live project board operation failed: {e}")
 
     @unittest.skipUnless(
-        GH_CLI_AVAILABLE, "GitHub CLI not available or not authenticated"
+        GH_CLI_AVAILABLE,
+        "GitHub CLI not available or not authenticated",
     )
     @requires_crewai
     def test_10_batch_project_operations(self):
@@ -391,7 +404,9 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
 
             for issue_url in self.sprint_16_issues:
                 result = github_project_add_issue(
-                    project_number=target_project, issue_url=issue_url, owner="oviney"
+                    project_number=target_project,
+                    issue_url=issue_url,
+                    owner="oviney",
                 )
                 results.append(
                     {
@@ -399,13 +414,15 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
                         "result": result,
                         "success": "Success" in result
                         or "already exists" in result.lower(),
-                    }
+                    },
                 )
 
             # Verify at least some operations succeeded
             successful_ops = [r for r in results if r["success"]]
             self.assertGreater(
-                len(successful_ops), 0, "No successful project operations"
+                len(successful_ops),
+                0,
+                "No successful project operations",
             )
 
             # Log detailed results
@@ -548,7 +565,7 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
                 Path(__file__).parent.parent
                 / "scripts"
                 / "tools"
-                / "github_project_tool.py"
+                / "github_project_tool.py",
             ) as f:
                 content = f.read()
                 self.assertIn("import logging", content)
@@ -589,7 +606,7 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
         print("\n🎯 STORY 3 VALIDATION STATUS:")
         if failed == 0:
             print(
-                "   🎉 STORY 3 COMPLETE: GitHub Project V2 Integration Fully Validated!"
+                "   🎉 STORY 3 COMPLETE: GitHub Project V2 Integration Fully Validated!",
             )
             print("   ✓ All GitHub Project V2 integration patterns working correctly")
             print("   ✓ CrewAI development crew integration validated")
@@ -598,7 +615,7 @@ class GitHubProjectV2IntegrationTests(unittest.TestCase):
         else:
             print(f"   ⚠️  STORY 3 NEEDS ATTENTION: {failed} validation failures")
             print(
-                "   📝 Review failed tests and address issues before story completion"
+                "   📝 Review failed tests and address issues before story completion",
             )
 
         print("\n🔗 SPRINT 16 INTEGRATION:")

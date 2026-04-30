@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Test Agent Registry
+"""Test Agent Registry
 
 Validates that AgentRegistry can load and instantiate Stage3Crew and Stage4Crew.
 Also covers full branch paths in src/registry.py (100% coverage target).
@@ -22,7 +21,8 @@ except ImportError:
     _CREWAI_AVAILABLE = False
 
 requires_crewai = pytest.mark.skipif(
-    not _CREWAI_AVAILABLE, reason="crewai not installed"
+    not _CREWAI_AVAILABLE,
+    reason="crewai not installed",
 )
 
 # Skip tests that require CrewAI and API keys
@@ -59,7 +59,7 @@ class TestAgentRegistry:
             "Stage4Crew was deleted in epic #308 (ADR-0006 Phase 2). "
             "Stage 4 logic now lives in src.agent_sdk.stage4_runner; "
             "the registry no longer needs a Stage4Crew entry."
-        )
+        ),
     )
     def test_load_stage4_crew(self):
         pass

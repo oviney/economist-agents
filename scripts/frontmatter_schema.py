@@ -62,18 +62,21 @@ class FrontmatterSchema:
 
         Returns:
             ValidationResult with is_valid, errors, and warnings.
+
         """
         errors: list[str] = []
         warnings: list[str] = []
 
         if frontmatter is None:
             return ValidationResult(
-                is_valid=False, errors=["Frontmatter is None (no YAML found)"]
+                is_valid=False,
+                errors=["Frontmatter is None (no YAML found)"],
             )
 
         if not isinstance(frontmatter, dict):
             return ValidationResult(
-                is_valid=False, errors=["Frontmatter is not a dictionary"]
+                is_valid=False,
+                errors=["Frontmatter is not a dictionary"],
             )
 
         # Check required fields
@@ -113,7 +116,7 @@ class FrontmatterSchema:
                 if pattern.search(value_str):
                     warnings.append(
                         f"Possible sensitive data in field '{key}' — "
-                        f"review before publishing"
+                        f"review before publishing",
                     )
                     break
             # Check for sensitive field names
@@ -122,7 +125,7 @@ class FrontmatterSchema:
                 for word in ["password", "secret", "token", "credential", "api_key"]
             ):
                 warnings.append(
-                    f"Sensitive field name '{key}' — should not be in frontmatter"
+                    f"Sensitive field name '{key}' — should not be in frontmatter",
                 )
 
         return ValidationResult(
@@ -139,6 +142,7 @@ class FrontmatterSchema:
 
         Returns:
             ValidationResult.
+
         """
         if not article or not article.strip().startswith("---"):
             return ValidationResult(

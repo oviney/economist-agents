@@ -147,7 +147,8 @@ class StorageCheck(ValidationStage):
 
             # Initialize SkillsManager with test role
             manager = SkillsManager(
-                role_name=self.test_role, skills_file=self.test_skills_file
+                role_name=self.test_role,
+                skills_file=self.test_skills_file,
             )
 
             # SkillsManager doesn't create file until save() is called
@@ -261,7 +262,7 @@ class SynthesisCheck(ValidationStage):
 
             if result.returncode != 0:
                 self.error(
-                    f"skill_synthesizer failed with exit code {result.returncode}"
+                    f"skill_synthesizer failed with exit code {result.returncode}",
                 )
                 self.error(f"stderr: {result.stderr}")
                 return False
@@ -289,7 +290,7 @@ class SynthesisCheck(ValidationStage):
                             for field in EXPECTED_PATTERN_SCHEMA["required_fields"]:
                                 if field not in pattern:
                                     self.error(
-                                        f"Pattern missing required field: {field}"
+                                        f"Pattern missing required field: {field}",
                                     )
                                     return False
 
@@ -298,7 +299,7 @@ class SynthesisCheck(ValidationStage):
                                 not in EXPECTED_PATTERN_SCHEMA["severity_values"]
                             ):
                                 self.error(
-                                    f"Invalid severity value: {pattern.get('severity')}"
+                                    f"Invalid severity value: {pattern.get('severity')}",
                                 )
                                 return False
 
@@ -357,7 +358,7 @@ class IntegrationCheck(ValidationStage):
 
             # Create default.html layout
             (layouts_dir / "default.html").write_text(
-                "<html><body>{{ content }}</body></html>"
+                "<html><body>{{ content }}</body></html>",
             )
 
             # Create _config.yml
@@ -468,7 +469,7 @@ class SyncCheck(ValidationStage):
             content = copilot_file.read_text()
             if "Learned Anti-Patterns" not in content:
                 self.error(
-                    "'Learned Anti-Patterns' section not found in copilot instructions"
+                    "'Learned Anti-Patterns' section not found in copilot instructions",
                 )
                 return False
 
@@ -484,7 +485,7 @@ class SyncCheck(ValidationStage):
 
             if result.returncode != 0:
                 self.error(
-                    f"sync_copilot_context failed with exit code {result.returncode}"
+                    f"sync_copilot_context failed with exit code {result.returncode}",
                 )
                 self.error(f"stderr: {result.stderr}")
                 return False
@@ -508,7 +509,6 @@ class SyncCheck(ValidationStage):
 
     def cleanup(self) -> None:
         """No cleanup needed for sync check."""
-        pass
 
 
 class ReportingCheck(ValidationStage):
@@ -538,7 +538,7 @@ class ReportingCheck(ValidationStage):
 
             if result.returncode != 0:
                 self.error(
-                    f"skills_gap_analyzer failed with exit code {result.returncode}"
+                    f"skills_gap_analyzer failed with exit code {result.returncode}",
                 )
                 self.error(f"stderr: {result.stderr}")
                 return False
@@ -576,7 +576,6 @@ class ReportingCheck(ValidationStage):
 
     def cleanup(self) -> None:
         """No cleanup needed for reporting check."""
-        pass
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -603,6 +602,7 @@ class ClosedLoopValidator:
 
         Returns:
             Tuple of (passed, total) stage counts
+
         """
         print("╔════════════════════════════════════════════════════════════════╗")
         print("║ CLOSED-LOOP LEARNING ARCHITECTURE VALIDATION                   ║")
@@ -704,7 +704,10 @@ Available stages:
         """,
     )
     parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Enable verbose output"
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Enable verbose output",
     )
     parser.add_argument(
         "--stage",

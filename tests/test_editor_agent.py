@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Unit Tests for Editor Agent
+"""Unit Tests for Editor Agent
 
 Tests the extracted Editor Agent with mocked LLM responses.
 Achieves 80%+ coverage with 30+ comprehensive test cases.
@@ -198,7 +197,8 @@ def test_edit_success(mock_client, sample_draft, mock_editor_response):
 
     with patch("agents.editor_agent.call_llm", return_value=mock_editor_response):
         edited, gates_passed, gates_failed = agent.edit(
-            sample_draft, current_date="2026-01-18"
+            sample_draft,
+            current_date="2026-01-18",
         )
 
     assert isinstance(edited, str)
@@ -208,14 +208,18 @@ def test_edit_success(mock_client, sample_draft, mock_editor_response):
 
 
 def test_edit_with_governance(
-    mock_client, sample_draft, mock_editor_response, mock_governance
+    mock_client,
+    sample_draft,
+    mock_editor_response,
+    mock_governance,
 ):
     """Test editing with governance tracking."""
     agent = EditorAgent(mock_client, governance=mock_governance)
 
     with patch("agents.editor_agent.call_llm", return_value=mock_editor_response):
         edited, gates_passed, gates_failed = agent.edit(
-            sample_draft, current_date="2026-01-18"
+            sample_draft,
+            current_date="2026-01-18",
         )
 
     assert mock_governance.log_agent_output.called
@@ -239,7 +243,8 @@ def test_edit_with_failures(mock_client, sample_draft):
 
     with patch("agents.editor_agent.call_llm", return_value=response):
         edited, gates_passed, gates_failed = agent.edit(
-            sample_draft, current_date="2026-01-18"
+            sample_draft,
+            current_date="2026-01-18",
         )
 
     assert gates_passed == 3
@@ -264,7 +269,9 @@ def test_edit_extracts_article_section(mock_client, sample_draft, mock_editor_re
 
 
 def test_run_editor_agent_backward_compat(
-    mock_client, sample_draft, mock_editor_response
+    mock_client,
+    sample_draft,
+    mock_editor_response,
 ):
     """Test backward compatible run_editor_agent function."""
     with patch("agents.editor_agent.call_llm", return_value=mock_editor_response):
@@ -276,12 +283,17 @@ def test_run_editor_agent_backward_compat(
 
 
 def test_run_editor_agent_with_governance(
-    mock_client, sample_draft, mock_editor_response, mock_governance
+    mock_client,
+    sample_draft,
+    mock_editor_response,
+    mock_governance,
 ):
     """Test backward compatible function with governance."""
     with patch("agents.editor_agent.call_llm", return_value=mock_editor_response):
         edited, gates_passed, gates_failed = run_editor_agent(
-            mock_client, sample_draft, governance=mock_governance
+            mock_client,
+            sample_draft,
+            governance=mock_governance,
         )
 
     assert mock_governance.log_agent_output.called
@@ -545,7 +557,8 @@ def test_edit_with_empty_response(mock_client, sample_draft):
 
     with patch("agents.editor_agent.call_llm", return_value=""):
         edited, gates_passed, gates_failed = agent.edit(
-            sample_draft, current_date="2026-01-18"
+            sample_draft,
+            current_date="2026-01-18",
         )
 
     # Should return draft unchanged when response is invalid
@@ -561,7 +574,8 @@ def test_edit_with_no_article_section(mock_client, sample_draft):
 
     with patch("agents.editor_agent.call_llm", return_value=response):
         edited, gates_passed, gates_failed = agent.edit(
-            sample_draft, current_date="2026-01-18"
+            sample_draft,
+            current_date="2026-01-18",
         )
 
     # Should return draft unchanged when format invalid (no proper gates section)

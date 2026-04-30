@@ -18,6 +18,7 @@ Example:
     from content_intelligence import get_performance_context
     context = get_performance_context(days=30)
     print(context)  # Markdown block ready to inject into an LLM prompt
+
 """
 
 from __future__ import annotations
@@ -44,7 +45,7 @@ NON_ARTICLE_PATHS: frozenset[str] = frozenset(
         "/contact/",
         "/tags/",
         "/categories/",
-    ]
+    ],
 )
 
 
@@ -110,6 +111,7 @@ def get_top_performers(
     Returns:
         List of ArticlePerformance, sorted descending by composite score.
         Empty list if the database does not exist.
+
     """
     conn = _connect(db_path or DEFAULT_DB_PATH)
     if conn is None:
@@ -171,6 +173,7 @@ def get_bottom_performers(
 
     Returns:
         List of ArticlePerformance, sorted ascending by composite score.
+
     """
     conn = _connect(db_path or DEFAULT_DB_PATH)
     if conn is None:
@@ -230,7 +233,7 @@ def get_traffic_summary(db_path: Path | None = None) -> TrafficSummary | None:
                 SUM(pageviews) AS total_pageviews,
                 AVG(composite_score) AS avg_composite_score
             FROM article_performance
-            """
+            """,
         )
         row = cursor.fetchone()
     finally:
@@ -273,6 +276,7 @@ def get_performance_context(
 
     Returns:
         A Markdown string ready for prompt injection.
+
     """
     summary = get_traffic_summary(db_path=db_path)
     if summary is None:
@@ -302,13 +306,13 @@ def get_performance_context(
         for a in top:
             title = (a.page_title or a.page_path)[:70]
             lines.append(
-                f"| {a.avg_composite_score:.3f} | {a.total_pageviews:,} | {title} |"
+                f"| {a.avg_composite_score:.3f} | {a.total_pageviews:,} | {title} |",
             )
         lines.append("")
 
     if bottom:
         lines.append(
-            "### Underperformers (traffic arrived but engagement was weak — topics to avoid or reframe)"
+            "### Underperformers (traffic arrived but engagement was weak — topics to avoid or reframe)",
         )
         lines.append("")
         lines.append("| Score | Pageviews | Title |")
@@ -316,14 +320,14 @@ def get_performance_context(
         for a in bottom:
             title = (a.page_title or a.page_path)[:70]
             lines.append(
-                f"| {a.avg_composite_score:.3f} | {a.total_pageviews:,} | {title} |"
+                f"| {a.avg_composite_score:.3f} | {a.total_pageviews:,} | {title} |",
             )
         lines.append("")
 
     lines.append(
         "**Use this to inform topic selection:** favour themes similar "
         "to the top performers, and avoid or reframe angles that resemble "
-        "the underperformers."
+        "the underperformers.",
     )
     lines.append("")
 
@@ -343,7 +347,10 @@ def main() -> None:
     )
     parser.add_argument("--top", type=int, default=5, help="Number of top performers")
     parser.add_argument(
-        "--bottom", type=int, default=5, help="Number of bottom performers"
+        "--bottom",
+        type=int,
+        default=5,
+        help="Number of bottom performers",
     )
     args = parser.parse_args()
 
@@ -353,7 +360,7 @@ def main() -> None:
             top_limit=args.top,
             bottom_limit=args.bottom,
             db_path=args.db,
-        )
+        ),
     )
 
 

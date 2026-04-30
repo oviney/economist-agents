@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Story 10 Fix: Relocate Stage3Crew to Proper Directory Structure
+"""Story 10 Fix: Relocate Stage3Crew to Proper Directory Structure
 
 Goal: Fix the directory structure by moving agents/stage3_crew.py to src/crews/stage3_crew.py
       and updating all imports to match the new location.
@@ -121,9 +120,8 @@ def task3_import_fix():
     if NEW_IMPORT in verify_content and OLD_IMPORT not in verify_content:
         print("✓ Import change verified")
         return True
-    else:
-        print("❌ ERROR: Import update failed verification")
-        return False
+    print("❌ ERROR: Import update failed verification")
+    return False
 
 
 def task4_verification():
@@ -149,9 +147,8 @@ def task4_verification():
         if result.returncode == 0:
             print("\n✅ SUCCESS: All tests passed!")
             return True
-        else:
-            print(f"\n⚠️  TESTS FAILED (exit code {result.returncode})")
-            return False
+        print(f"\n⚠️  TESTS FAILED (exit code {result.returncode})")
+        return False
 
     except subprocess.TimeoutExpired:
         print("\n⏱️  Test execution timed out")
@@ -196,7 +193,6 @@ def cleanup_old_file():
 
 def main():
     """Execute the directory structure fix."""
-
     print("\n" + "=" * 80)
     print("STORY 10 FIX: Directory Structure Relocation")
     print("=" * 80)

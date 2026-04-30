@@ -71,6 +71,7 @@ def _make_doc_id(url: str) -> str:
     Returns:
         A non-empty string that is safe to use as a ChromaDB document ID.
         Falls back to ``"unknown"`` when *url* is blank.
+
     """
     if not url:
         return "unknown"
@@ -89,6 +90,7 @@ def _categories_to_str(categories: Any) -> str:
 
     Returns:
         Comma-separated string, e.g. ``"testing,ai"``.
+
     """
     if isinstance(categories, list):
         return ",".join(str(c) for c in categories)
@@ -115,6 +117,7 @@ def fetch_search_json(source: str) -> list[dict[str, Any]]:
         requests.HTTPError: If an HTTP request returns a non-2xx status.
         json.JSONDecodeError: If the response body is not valid JSON.
         OSError: If a local file cannot be read.
+
     """
     if source.startswith("http://") or source.startswith("https://"):
         logger.info("Fetching search.json from %s", source)
@@ -129,7 +132,7 @@ def fetch_search_json(source: str) -> list[dict[str, Any]]:
 
     if not isinstance(data, list):
         raise ValueError(
-            f"Expected a JSON array at {source!r}, got {type(data).__name__}"
+            f"Expected a JSON array at {source!r}, got {type(data).__name__}",
         )
 
     return data
@@ -163,6 +166,7 @@ def _get_collection(
 
     Raises:
         RuntimeError: If ChromaDB is not installed.
+
     """
     if not CHROMADB_AVAILABLE:  # pragma: no cover
         raise RuntimeError("ChromaDB is not installed. Run: pip install chromadb")
@@ -220,6 +224,7 @@ def index_articles(
         A dict with ``"indexed"`` (number of articles upserted) and
         ``"skipped"`` (number of articles that were skipped due to missing
         data or errors).
+
     """
     indexed = 0
     skipped = 0
@@ -298,6 +303,7 @@ def run(
         RuntimeError: If ChromaDB is not installed.
         requests.HTTPError: If the HTTP request fails.
         ValueError: If the JSON is not an array.
+
     """
     articles = fetch_search_json(source)
     logger.info("Found %d articles in search.json", len(articles))
@@ -331,7 +337,7 @@ def main() -> None:
         description=(
             "Index published blog articles into the ChromaDB "
             "'published_articles' collection."
-        )
+        ),
     )
     parser.add_argument(
         "--source",

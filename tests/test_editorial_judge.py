@@ -313,7 +313,9 @@ class TestCreateGithubIssue:
         agent_logs = "## 🔍 Agent Traceability Log\n\nSome trace data"
 
         create_result = Mock(
-            returncode=0, stdout="https://github.com/o/r/issues/99\n", stderr=""
+            returncode=0,
+            stdout="https://github.com/o/r/issues/99\n",
+            stderr="",
         )
         comment_result = Mock(returncode=0, stdout="", stderr="")
 
@@ -361,7 +363,9 @@ class TestCreateGithubIssue:
         agent_logs = "## Trace"
 
         create_result = Mock(
-            returncode=0, stdout="https://github.com/o/r/issues/5\n", stderr=""
+            returncode=0,
+            stdout="https://github.com/o/r/issues/5\n",
+            stderr="",
         )
         comment_result = Mock(returncode=1, stdout="", stderr="error")
 

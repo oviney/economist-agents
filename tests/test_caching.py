@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Tests for Advanced Caching Utility Functions
+"""Tests for Advanced Caching Utility Functions
 
 Comprehensive test suite for Story #145: Advanced caching utility function
 """

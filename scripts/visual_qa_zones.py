@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Visual QA Zone Boundary Validator (Sprint 8 Story 2)
+"""Visual QA Zone Boundary Validator (Sprint 8 Story 2)
 
 Programmatic validation of Economist-style chart zones to catch layout bugs
 BEFORE they reach LLM-based Visual QA. This is shift-left testing for charts.
@@ -55,14 +54,14 @@ class ZoneBoundaryValidator:
         self.issues = []
 
     def validate_chart(self, chart_path: str) -> tuple[bool, list[str]]:
-        """
-        Validate chart zone boundaries.
+        """Validate chart zone boundaries.
 
         Args:
             chart_path: Path to chart PNG file
 
         Returns:
             (is_valid, issues_list)
+
         """
         self.issues = []
         chart_path = Path(chart_path)
@@ -78,7 +77,7 @@ class ZoneBoundaryValidator:
         # Check 1: Validate chart filename follows convention
         if not self._validate_filename(chart_path):
             self.issues.append(
-                f"Invalid filename: {chart_path.name}. Must be slug-style (lowercase-with-hyphens.png)"
+                f"Invalid filename: {chart_path.name}. Must be slug-style (lowercase-with-hyphens.png)",
             )
 
         # Check 2: Look for corresponding generation script or metadata
@@ -127,7 +126,9 @@ class ZoneBoundaryValidator:
 
         # Check 1: Title position (should be y=0.90 in figure coords)
         title_matches = re.findall(
-            r'fig\.text\([^,]+,\s*(0\.\d+),.*?["\'].*?title', code, re.IGNORECASE
+            r'fig\.text\([^,]+,\s*(0\.\d+),.*?["\'].*?title',
+            code,
+            re.IGNORECASE,
         )
         for y_pos in title_matches:
             y = float(y_pos)
@@ -136,7 +137,9 @@ class ZoneBoundaryValidator:
 
         # Check 2: Subtitle position (should be y=0.85)
         subtitle_matches = re.findall(
-            r'fig\.text\([^,]+,\s*(0\.\d+),.*?["\'].*?subtitle', code, re.IGNORECASE
+            r'fig\.text\([^,]+,\s*(0\.\d+),.*?["\'].*?subtitle',
+            code,
+            re.IGNORECASE,
         )
         for y_pos in subtitle_matches:
             y = float(y_pos)
@@ -145,7 +148,8 @@ class ZoneBoundaryValidator:
 
         # Check 3: Source line position (should be y=0.03 in source zone)
         source_matches = re.findall(
-            r'fig\.text\([^,]+,\s*(0\.\d+),.*?["\'].*?[Ss]ource', code
+            r'fig\.text\([^,]+,\s*(0\.\d+),.*?["\'].*?[Ss]ource',
+            code,
         )
         for y_pos in source_matches:
             y = float(y_pos)
@@ -165,7 +169,7 @@ class ZoneBoundaryValidator:
         for match in annotate_matches:
             if "xytext" not in match:
                 issues.append(
-                    f"Inline label missing xytext offset (will overlap data): {match[:50]}..."
+                    f"Inline label missing xytext offset (will overlap data): {match[:50]}...",
                 )
 
         return issues
@@ -202,7 +206,7 @@ class ZoneBoundaryValidator:
 
             if bg_matches.sum() < (bg_pixels.shape[0] * bg_pixels.shape[1] * 0.3):
                 issues.append(
-                    "Background color #f1f0e9 not dominant (expected warm beige)"
+                    "Background color #f1f0e9 not dominant (expected warm beige)",
                 )
 
         except Exception:
@@ -226,7 +230,7 @@ class ZoneBoundaryValidator:
                 "",
                 "Recommendation: Fix zone boundary violations before publication.",
                 "See docs/CHART_DESIGN_SPEC.md for zone layout rules.",
-            ]
+            ],
         )
 
         return "\n".join(report)
@@ -237,11 +241,13 @@ def validate_chart_cli():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Validate Economist-style chart zone boundaries"
+        description="Validate Economist-style chart zone boundaries",
     )
     parser.add_argument("chart_path", help="Path to chart PNG file")
     parser.add_argument(
-        "--report", action="store_true", help="Generate detailed report"
+        "--report",
+        action="store_true",
+        help="Generate detailed report",
     )
 
     args = parser.parse_args()
@@ -251,13 +257,12 @@ def validate_chart_cli():
 
     if args.report:
         print(validator.generate_report())
+    elif is_valid:
+        print(f"✅ {args.chart_path}: All checks PASSED")
     else:
-        if is_valid:
-            print(f"✅ {args.chart_path}: All checks PASSED")
-        else:
-            print(f"❌ {args.chart_path}: {len(issues)} issues found")
-            for issue in issues:
-                print(f"   • {issue}")
+        print(f"❌ {args.chart_path}: {len(issues)} issues found")
+        for issue in issues:
+            print(f"   • {issue}")
 
     return 0 if is_valid else 1
 

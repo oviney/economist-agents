@@ -234,7 +234,8 @@ class TestScoreDeltas:
             assert "max_delta" in stats, f"Missing max_delta for {dim}"
 
     def test_identical_topics_yield_zero_deltas(
-        self, sample_topics_a: list[dict]
+        self,
+        sample_topics_a: list[dict],
     ) -> None:
         result = score_deltas(sample_topics_a, sample_topics_a)
         for stats in result.values():
@@ -275,7 +276,7 @@ class TestQualitativeNotes:
                 "timeliness_trigger": "Recent SRE surge",
                 "scores": {},
                 "total_score": 18,
-            }
+            },
         ]
         notes = qualitative_notes(topics, [], bottom_performers)
         assert any("⚠️" in n for n in notes)
@@ -294,7 +295,7 @@ class TestQualitativeNotes:
                 "timeliness_trigger": "IBM quantum roadmap",
                 "scores": {},
                 "total_score": 15,
-            }
+            },
         ]
         notes = qualitative_notes(topics, top_performers, bottom_performers)
         assert any("ℹ️" in n for n in notes)
@@ -312,7 +313,7 @@ class TestQualitativeNotes:
 class TestVerdict:
     def test_real_when_jaccard_low_and_top_ref(self) -> None:
         notes = [
-            '✅ Run A topic **"X"** references top-performer **"Y"** (keywords: testing)'
+            '✅ Run A topic **"X"** references top-performer **"Y"** (keywords: testing)',
         ]
         is_real, text = verdict(0.2, notes)
         assert is_real is True
@@ -320,7 +321,7 @@ class TestVerdict:
 
     def test_not_real_when_jaccard_high(self) -> None:
         notes = [
-            '✅ Run A topic **"X"** references top-performer **"Y"** (keywords: testing)'
+            '✅ Run A topic **"X"** references top-performer **"Y"** (keywords: testing)',
         ]
         is_real, text = verdict(0.7, notes)
         assert is_real is False
@@ -328,7 +329,7 @@ class TestVerdict:
 
     def test_not_real_when_no_top_ref(self) -> None:
         notes = [
-            "ℹ️  No Run A topic explicitly matched keywords from the top/bottom performers."
+            "ℹ️  No Run A topic explicitly matched keywords from the top/bottom performers.",
         ]
         is_real, text = verdict(0.1, notes)
         assert is_real is False
@@ -336,14 +337,14 @@ class TestVerdict:
 
     def test_boundary_jaccard_0_59_is_real(self) -> None:
         notes = [
-            '✅ Run A topic **"X"** references top-performer **"Y"** (keywords: test)'
+            '✅ Run A topic **"X"** references top-performer **"Y"** (keywords: test)',
         ]
         is_real, _ = verdict(0.59, notes)
         assert is_real is True
 
     def test_boundary_jaccard_0_6_not_real(self) -> None:
         notes = [
-            '✅ Run A topic **"X"** references top-performer **"Y"** (keywords: test)'
+            '✅ Run A topic **"X"** references top-performer **"Y"** (keywords: test)',
         ]
         is_real, _ = verdict(0.6, notes)
         assert is_real is False
@@ -385,7 +386,10 @@ class TestRenderReport:
         bottom_performers: list[ArticlePerformance],
     ) -> None:
         pair = self._make_pair(
-            sample_topics_a, sample_topics_b, top_performers, bottom_performers
+            sample_topics_a,
+            sample_topics_b,
+            top_performers,
+            bottom_performers,
         )
         report = render_report([pair], "2026-04-06 12:00:00")
         assert "# A/B Topic Scout Comparison Report" in report
@@ -420,7 +424,10 @@ class TestRenderReport:
         bottom_performers: list[ArticlePerformance],
     ) -> None:
         pair = self._make_pair(
-            sample_topics_a, sample_topics_b, top_performers, bottom_performers
+            sample_topics_a,
+            sample_topics_b,
+            top_performers,
+            bottom_performers,
         )
         report = render_report([pair, pair], "2026-04-06 12:00:00")
         assert "Aggregate Verdict" in report
@@ -480,7 +487,7 @@ class TestRunAbPair:
                 },
                 "total_score": 20,
                 "talking_points": "ROI, maintenance",
-            }
+            },
         ]
 
         call_count = 0
@@ -540,7 +547,7 @@ class TestRunAbPair:
                 },
                 "total_score": 15,
                 "talking_points": "tp",
-            }
+            },
         ]
         mock_client = MagicMock()
 

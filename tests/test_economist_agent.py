@@ -203,7 +203,9 @@ class TestRunResearchAgent:
     """Tests for run_research_agent function."""
 
     def test_successful_research_with_valid_output(
-        self, mock_llm_client, sample_research_output
+        self,
+        mock_llm_client,
+        sample_research_output,
     ):
         """Test research agent with successful LLM response."""
         # Mock the response at the message content level (Anthropic API structure)
@@ -228,7 +230,9 @@ class TestRunResearchAgent:
             mock_review.return_value = (True, [])
 
             result = ea.run_research_agent(
-                mock_llm_client, "AI Testing Trends", "adoption rates, ROI"
+                mock_llm_client,
+                "AI Testing Trends",
+                "adoption rates, ROI",
             )
 
             assert result == sample_research_output
@@ -258,7 +262,9 @@ class TestRunResearchAgent:
             mock_review.return_value = (True, [])
 
             result = ea.run_research_agent(
-                mock_llm_client, "Testing Topic", "focus areas"
+                mock_llm_client,
+                "Testing Topic",
+                "focus areas",
             )
 
             assert "raw_research" in result
@@ -266,11 +272,13 @@ class TestRunResearchAgent:
             assert result["chart_data"] is None
 
     def test_research_agent_with_unverified_claims(
-        self, mock_llm_client, sample_research_output
+        self,
+        mock_llm_client,
+        sample_research_output,
     ):
         """Test research agent flags unverified claims."""
         sample_research_output["unverified_claims"] = [
-            "90% of companies report improved quality"
+            "90% of companies report improved quality",
         ]
 
         with (
@@ -286,7 +294,10 @@ class TestRunResearchAgent:
             assert len(result["unverified_claims"]) == 1
 
     def test_research_agent_with_governance_logging(
-        self, mock_llm_client, sample_research_output, mock_governance_tracker
+        self,
+        mock_llm_client,
+        sample_research_output,
+        mock_governance_tracker,
     ):
         """Test research agent logs to governance tracker."""
         with (
@@ -297,7 +308,9 @@ class TestRunResearchAgent:
             mock_review.return_value = (True, [])
 
             ea.run_research_agent(
-                mock_llm_client, "Testing Topic", governance=mock_governance_tracker
+                mock_llm_client,
+                "Testing Topic",
+                governance=mock_governance_tracker,
             )
 
             assert mock_governance_tracker.log_agent_output.called
@@ -306,7 +319,9 @@ class TestRunResearchAgent:
             assert "metadata" in call_args[1]
 
     def test_research_agent_with_validation_failures(
-        self, mock_llm_client, sample_research_output
+        self,
+        mock_llm_client,
+        sample_research_output,
     ):
         """Test research agent handles validation failures."""
         with (
@@ -343,7 +358,10 @@ class TestRunWriterAgent:
     """Tests for run_writer_agent function."""
 
     def test_successful_article_generation(
-        self, mock_llm_client, sample_research_output, sample_article_draft
+        self,
+        mock_llm_client,
+        sample_research_output,
+        sample_article_draft,
     ):
         """Test writer agent with successful article generation."""
         with (
@@ -365,17 +383,25 @@ class TestRunWriterAgent:
             assert metadata["regenerated"] is False
 
     def test_writer_agent_with_invalid_topic(
-        self, mock_llm_client, sample_research_output
+        self,
+        mock_llm_client,
+        sample_research_output,
     ):
         """Test writer agent with invalid topic."""
         with pytest.raises(ValueError, match="Invalid topic"):
             ea.run_writer_agent(
-                mock_llm_client, None, sample_research_output, "2024-01-15"
+                mock_llm_client,
+                None,
+                sample_research_output,
+                "2024-01-15",
             )
 
         with pytest.raises(ValueError, match="Invalid topic"):
             ea.run_writer_agent(
-                mock_llm_client, 123, sample_research_output, "2024-01-15"
+                mock_llm_client,
+                123,
+                sample_research_output,
+                "2024-01-15",
             )
 
     def test_writer_agent_with_invalid_research_brief(self, mock_llm_client):
@@ -387,7 +413,10 @@ class TestRunWriterAgent:
             ea.run_writer_agent(mock_llm_client, "Topic", {}, "2024-01-15")
 
     def test_writer_agent_with_chart_embedding(
-        self, mock_llm_client, sample_research_output, sample_article_draft
+        self,
+        mock_llm_client,
+        sample_research_output,
+        sample_article_draft,
     ):
         """Test writer agent includes chart embedding instructions."""
         with (
@@ -411,7 +440,10 @@ class TestRunWriterAgent:
             assert "CHART EMBEDDING REQUIRED" in system_prompt
 
     def test_writer_agent_with_featured_image(
-        self, mock_llm_client, sample_research_output, sample_article_draft
+        self,
+        mock_llm_client,
+        sample_research_output,
+        sample_article_draft,
     ):
         """Test writer agent includes featured image instructions."""
         with (
@@ -434,7 +466,10 @@ class TestRunWriterAgent:
             assert "FEATURED IMAGE AVAILABLE" in system_prompt
 
     def test_writer_agent_with_critical_validation_issues(
-        self, mock_llm_client, sample_research_output, sample_article_draft
+        self,
+        mock_llm_client,
+        sample_research_output,
+        sample_article_draft,
     ):
         """Test writer agent regenerates on critical issues."""
         with (
@@ -464,7 +499,10 @@ class TestRunWriterAgent:
             assert metadata["is_valid"] is True
 
     def test_writer_agent_with_non_critical_issues(
-        self, mock_llm_client, sample_research_output, sample_article_draft
+        self,
+        mock_llm_client,
+        sample_research_output,
+        sample_article_draft,
     ):
         """Test writer agent doesn't regenerate on non-critical issues."""
         with (
@@ -605,7 +643,8 @@ class TestRunEditorAgent:
             # Draft must be >100 chars
             long_draft = "Draft article content here. " * 10  # ~290 chars
             edited, gates_passed, gates_failed = ea.run_editor_agent(
-                mock_llm_client, long_draft
+                mock_llm_client,
+                long_draft,
             )
 
             assert "Edited Article" in edited or "AI testing tools" in edited
@@ -648,7 +687,8 @@ Content here...
             mock_call_llm.return_value = response_with_gates
 
             edited, gates_passed, gates_failed = ea.run_editor_agent(
-                mock_llm_client, "Draft content..." * 50
+                mock_llm_client,
+                "Draft content..." * 50,
             )
 
             assert gates_passed == 3
@@ -767,7 +807,7 @@ class TestMain:
             patch.dict(os.environ, env_vars),
         ):
             mock_generate.return_value = {
-                "article_path": str(custom_output / "article.md")
+                "article_path": str(custom_output / "article.md"),
             }
             mock_client.return_value = mock_llm_client
 
@@ -845,26 +885,34 @@ class TestIntegration:
 
             # Run research
             research = ea.run_research_agent(
-                mock_llm_client, "AI Testing Trends", "ROI, adoption"
+                mock_llm_client,
+                "AI Testing Trends",
+                "ROI, adoption",
             )
             assert "data_points" in research
 
             # Run writer
             draft, _ = ea.run_writer_agent(
-                mock_llm_client, "AI Testing", research, "2024-01-15"
+                mock_llm_client,
+                "AI Testing",
+                research,
+                "2024-01-15",
             )
             assert "AI testing tools" in draft
 
             # Run graphics (if chart data available)
             if research.get("chart_data"):
                 chart_path = ea.run_graphics_agent(
-                    mock_llm_client, research["chart_data"], "/tmp/chart.png"
+                    mock_llm_client,
+                    research["chart_data"],
+                    "/tmp/chart.png",
                 )
                 assert chart_path == "/tmp/chart.png"
 
             # Run editor
             edited, gates_passed, gates_failed = ea.run_editor_agent(
-                mock_llm_client, draft
+                mock_llm_client,
+                draft,
             )
             assert gates_passed > 0
 
@@ -905,6 +953,9 @@ class TestIntegration:
 
             # Writer (governance logging happens at higher level)
             draft, _ = ea.run_writer_agent(
-                mock_llm_client, "Test Topic", research, "2024-01-15"
+                mock_llm_client,
+                "Test Topic",
+                research,
+                "2024-01-15",
             )
             assert draft is not None

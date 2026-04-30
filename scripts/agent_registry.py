@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Agent Registry Pattern Implementation
+"""Agent Registry Pattern Implementation
 
 Implements ADR-002: Central registry for agent discovery and creation.
 Loads agent configurations from Markdown files with YAML frontmatter.
@@ -34,6 +33,7 @@ def _validate_agent_name(name: str) -> None:
 
     Raises:
         ValueError: If agent name contains invalid characters
+
     """
     if not name:
         raise ValueError("Agent name cannot be empty")
@@ -42,7 +42,7 @@ def _validate_agent_name(name: str) -> None:
     if not re.match(r"^[a-zA-Z0-9_-]+$", name):
         raise ValueError(
             f"Invalid agent name '{name}'. "
-            "Agent names can only contain letters, numbers, hyphens, and underscores."
+            "Agent names can only contain letters, numbers, hyphens, and underscores.",
         )
 
     if len(name) > 100:
@@ -66,6 +66,7 @@ class LLMProvider(Protocol):
 
         Returns:
             LLM client instance compatible with the provider
+
         """
         ...  # pragma: no cover
 
@@ -87,6 +88,7 @@ class OpenAIProvider:
         >>> client = provider.create_client()
         >>> client.provider
         'openai'
+
     """
 
     def __init__(
@@ -112,6 +114,7 @@ class OpenAIProvider:
         Raises:
             ValueError: If ``OPENAI_API_KEY`` is not set.
             ImportError: If the ``openai`` package is not installed.
+
         """
         from scripts.llm_client import LLMClient
 
@@ -119,12 +122,12 @@ class OpenAIProvider:
             from openai import OpenAI
         except ImportError as err:
             raise ImportError(
-                "openai package not installed. Install it: pip install openai"
+                "openai package not installed. Install it: pip install openai",
             ) from err
 
         if not self.api_key:
             raise ValueError(
-                "OpenAI API key not set. Pass api_key or export OPENAI_API_KEY."
+                "OpenAI API key not set. Pass api_key or export OPENAI_API_KEY.",
             )
 
         resolved_model = model or self.default_model
@@ -150,6 +153,7 @@ class AnthropicProvider:
         >>> client = provider.create_client()
         >>> client.provider
         'anthropic'
+
     """
 
     def __init__(
@@ -175,6 +179,7 @@ class AnthropicProvider:
         Raises:
             ValueError: If ``ANTHROPIC_API_KEY`` is not set.
             ImportError: If the ``anthropic`` package is not installed.
+
         """
         from scripts.llm_client import LLMClient
 
@@ -182,12 +187,12 @@ class AnthropicProvider:
             import anthropic
         except ImportError as err:
             raise ImportError(
-                "anthropic package not installed. Install it: pip install anthropic"
+                "anthropic package not installed. Install it: pip install anthropic",
             ) from err
 
         if not self.api_key:
             raise ValueError(
-                "Anthropic API key not set. Pass api_key or export ANTHROPIC_API_KEY."
+                "Anthropic API key not set. Pass api_key or export ANTHROPIC_API_KEY.",
             )
 
         resolved_model = model or self.default_model
@@ -253,6 +258,7 @@ class AgentConfig:
         tools: List of tool names the agent can use
         metadata: Additional metadata (category, version, etc.)
         scoring_criteria: Optional performance evaluation criteria
+
     """
 
     name: str
@@ -274,6 +280,7 @@ class AgentRegistry:
     Attributes:
         agents_dir: Directory containing .agent.md files
         _agents: Internal cache of loaded agent configurations
+
     """
 
     def __init__(
@@ -291,6 +298,7 @@ class AgentRegistry:
 
         Raises:
             ValueError: If agents_dir does not exist
+
         """
         self.agents_dir = agents_dir
         self.llm_provider = llm_provider
@@ -346,6 +354,7 @@ class AgentRegistry:
 
         Raises:
             ValueError: If file has no valid frontmatter
+
         """
         with open(file_path, encoding="utf-8") as f:
             content = f.read()
@@ -361,7 +370,7 @@ class AgentRegistry:
 
         try:
             frontmatter = yaml.safe_load(parts[1])
-            return frontmatter if frontmatter else {}
+            return frontmatter or {}
         except yaml.YAMLError as e:
             raise ValueError(f"Invalid YAML in {file_path}: {e}") from e
 
@@ -373,6 +382,7 @@ class AgentRegistry:
 
         Returns:
             Markdown body text (after frontmatter)
+
         """
         with open(file_path, encoding="utf-8") as f:
             content = f.read()
@@ -399,6 +409,7 @@ class AgentRegistry:
 
         Raises:
             ValueError: If unknown tool name provided
+
         """
         # Get the current working directory for search tools
         project_dir = Path.cwd()
@@ -476,16 +487,16 @@ class AgentRegistry:
                 if tool_instance is not None:  # Filter out None tools
                     instantiated.append(tool_instance)
                     logger.debug(
-                        f"Instantiated tool: {tool_name} -> {tool_instance.__class__.__name__}"
+                        f"Instantiated tool: {tool_name} -> {tool_instance.__class__.__name__}",
                     )
                 else:
                     logger.warning(
-                        f"Tool '{tool_name}' factory returned None (likely import failed)"
+                        f"Tool '{tool_name}' factory returned None (likely import failed)",
                     )
             else:
                 logger.warning(
                     f"Unknown tool '{tool_name}' requested. "
-                    f"Available: {', '.join(TOOL_FACTORY.keys())}"
+                    f"Available: {', '.join(TOOL_FACTORY.keys())}",
                 )
 
         return instantiated
@@ -518,6 +529,7 @@ class AgentRegistry:
             >>> writer = registry.get_agent("writer-agent")
             >>> print(writer['role'])
             'Content Writer specializing in Economist style'
+
         """
         # Validate agent name for security
         _validate_agent_name(name)
@@ -583,7 +595,9 @@ class AgentRegistry:
         }
 
     def list_agents(
-        self, category: str | None = None, include_metadata: bool = False
+        self,
+        category: str | None = None,
+        include_metadata: bool = False,
     ) -> list[str] | list[dict[str, Any]]:
         """Discover available agents.
 
@@ -604,6 +618,7 @@ class AgentRegistry:
 
             >>> detailed = registry.list_agents(include_metadata=True)
             [{'name': 'po-agent', 'role': '...', 'category': 'management'}, ...]
+
         """
         agents = self._agents.values()
 
@@ -625,8 +640,7 @@ class AgentRegistry:
                 }
                 for agent in agents
             ]
-        else:
-            return [agent.name for agent in agents]
+        return [agent.name for agent in agents]
 
     def reload_agents(self) -> None:
         """Reload all agent configurations from disk.
@@ -654,11 +668,12 @@ class AgentRegistry:
             >>> config = registry.get_agent_config("writer-agent")
             >>> print(config.role)
             'Content Writer specializing in Economist style'
+
         """
         if name not in self._agents:
             available = ", ".join(self._agents.keys())
             raise ValueError(
-                f"Agent '{name}' not found in registry. Available agents: {available}"
+                f"Agent '{name}' not found in registry. Available agents: {available}",
             )
 
         return self._agents[name]
@@ -677,6 +692,7 @@ class AgentRegistry:
             >>> registry = AgentRegistry()
             >>> config = {"role": "Test Agent", "goal": "Testing", "backstory": "For tests", "tools": []}
             >>> registry.register_test_agent("test-agent", config)
+
         """
         # Validate agent name
         _validate_agent_name(name)
@@ -687,7 +703,7 @@ class AgentRegistry:
         if missing_fields:
             raise ValueError(
                 f"Test agent config missing required fields: {', '.join(missing_fields)}. "
-                f"Required fields: {', '.join(required_fields)}"
+                f"Required fields: {', '.join(required_fields)}",
             )
 
         self._test_agents[name] = config
@@ -703,7 +719,9 @@ class AgentRegistry:
 
         # Create mock LLM client for testing
         mock_client = type(
-            "MockLLMClient", (), {"provider": "test_provider", "model": "test_model"}
+            "MockLLMClient",
+            (),
+            {"provider": "test_provider", "model": "test_model"},
         )()
 
         return {

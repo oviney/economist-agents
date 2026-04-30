@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Topic Scout Agent
+"""Topic Scout Agent
 
 Monitors the quality engineering landscape to identify high-value article topics.
 Runs weekly (or on-demand) to populate the content queue with timely, relevant topics.
@@ -165,6 +164,7 @@ def classify_topic_theme(topic: dict) -> str:
     Returns:
         Theme string (e.g. ``"security"``, ``"ai_testing"``).
         Falls back to ``"other"`` when no keywords match.
+
     """
     # Prefer the LLM-supplied theme field when present.
     if topic.get("theme"):
@@ -178,7 +178,7 @@ def classify_topic_theme(topic: dict) -> str:
             topic.get("thesis", ""),
             topic.get("contrarian_angle", ""),
             topic.get("talking_points", ""),
-        ]
+        ],
     ).lower()
 
     theme_scores: dict[str, int] = {}
@@ -209,6 +209,7 @@ def check_topic_diversity(topics: list) -> tuple[bool, str]:
         - ``is_diverse`` is ``True`` when the threshold is not exceeded.
         - ``dominant_theme`` is the theme that appears most often (empty string
           when *topics* is empty).
+
     """
     if not topics:
         return True, ""
@@ -234,6 +235,7 @@ def _parse_topics_json(response_text: str, label: str = "") -> list | None:
     Returns:
         Parsed list of topic dicts, or ``None`` when parsing fails (the caller
         should treat ``None`` as an empty result and return ``[]``).
+
     """
     suffix = f" {label}" if label else ""
     try:
@@ -273,6 +275,7 @@ def validate_topic_freshness(
 
     Returns:
         Tuple of ``(fresh_topics, stale_topics)``.
+
     """
     cutoff = datetime.now(tz=UTC) - timedelta(days=max_days)
     fresh: list[dict] = []
@@ -294,7 +297,7 @@ def validate_topic_freshness(
         # Parse the date.
         try:
             source_date = datetime.strptime(source_date_str, "%Y-%m-%d").replace(
-                tzinfo=UTC
+                tzinfo=UTC,
             )
         except ValueError:
             logger.info(
@@ -332,8 +335,7 @@ def scout_topics(
     *,
     allow_empty_archive: bool = False,
 ) -> list:
-    """
-    Scout for high-value topics.
+    """Scout for high-value topics.
 
     Args:
         focus_area: Optional filter (e.g., "test automation", "AI", "performance")
@@ -349,6 +351,7 @@ def scout_topics(
     Raises:
         RuntimeError: If the ChromaDB archive is unavailable or empty and
             `allow_empty_archive` is False.
+
     """
     print("🔭 Topic Scout Agent: Scanning the landscape...\n")
 
@@ -365,7 +368,8 @@ def scout_topics(
         )
     except Exception as exc:
         logger.warning(
-            "Trend grounding failed (%s); falling back to unverified mode", exc
+            "Trend grounding failed (%s); falling back to unverified mode",
+            exc,
         )
         trends = (
             "## Live Trend Evidence\n\n"
@@ -404,7 +408,7 @@ def scout_topics(
     if len(topics) >= 3 and not is_diverse:
         print(
             f"   ⚠ Diversity check failed: too many '{dominant_theme}' topics "
-            f"(>{int(0.4 * 100)}% threshold). Regenerating with diversity hint..."
+            f"(>{int(0.4 * 100)}% threshold). Regenerating with diversity hint...",
         )
         diversity_hint = (
             f"\n\nDIVERSITY ALERT: Your previous response contained too many topics "
@@ -430,13 +434,13 @@ def scout_topics(
     if stale_topics:
         print(
             f"   ⚠ {len(stale_topics)} topic(s) rejected for missing or stale "
-            f"source citation."
+            f"source citation.",
         )
     # Regenerate once if more than half were rejected.
     if len(stale_topics) > len(topics) / 2 and topics:
         print(
             "   ⚠ Majority of topics lack fresh sources. "
-            "Regenerating with freshness hint..."
+            "Regenerating with freshness hint...",
         )
         freshness_hint = (
             "\n\nFRESHNESS ALERT: Your previous response had topics without "
@@ -483,7 +487,7 @@ def scout_topics(
     if rejected:
         print(
             f"   🚫 Dropped {len(rejected)} near-duplicate topic(s) "
-            f"against the published archive."
+            f"against the published archive.",
         )
     topics = kept
 
@@ -514,7 +518,7 @@ def format_for_workflow(topics: list) -> str:
                 "category": "quality-engineering",
                 "talking_points": t.get("talking_points", ""),
                 "score": t.get("total_score", 0),
-            }
+            },
         )
     return json.dumps(output, indent=2)
 
@@ -531,7 +535,7 @@ def main():
 
     topics = scout_topics(
         client,
-        focus if focus else None,
+        focus or None,
         allow_empty_archive=allow_empty,
     )
 

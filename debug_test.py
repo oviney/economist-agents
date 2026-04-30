@@ -7,7 +7,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 print("Testing import sequence in debug_test.py")
 print(f"Python executable: {sys.executable}")
-print(f"PYTHONPATH includes: {str(Path(__file__).parent)}")
+print(f"PYTHONPATH includes: {Path(__file__).parent!s}")
 
 # Test the exact imports that happen in economist_agent.py
 print("\n1. Testing StyleMemoryTool import...")

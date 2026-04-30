@@ -133,7 +133,9 @@ def run_development_crew(story_data: dict[str, Any]) -> dict[str, Any]:
 
 
 def create_pr(
-    branch: str, story_data: dict[str, Any], crew_result: dict[str, Any]
+    branch: str,
+    story_data: dict[str, Any],
+    crew_result: dict[str, Any],
 ) -> str:
     """Create a PR for the implemented story."""
     issue_num = story_data["issue_number"]
@@ -181,7 +183,7 @@ Closes #{issue_num}
 
 🤖 Implemented by Development Crew via `scripts/run_dev_crew.py`
 """,
-        ]
+        ],
     )
 
     return pr_url
@@ -208,7 +210,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Autonomous Development Crew Runner")
     parser.add_argument("--issue", type=int, help="GitHub issue number to implement")
     parser.add_argument(
-        "--next", action="store_true", help="Pick next ready issue automatically"
+        "--next",
+        action="store_true",
+        help="Pick next ready issue automatically",
     )
     parser.add_argument(
         "--runtime",
@@ -299,7 +303,8 @@ Starting autonomous implementation...
         error_msg = f"Development Crew failed: {e}"
         print(f"\n❌ {error_msg}")
         log_to_issue(
-            issue_number, f"❌ **Development Crew failed**\n\n```\n{error_msg}\n```"
+            issue_number,
+            f"❌ **Development Crew failed**\n\n```\n{error_msg}\n```",
         )
         git_run(["checkout", "main"])
         sys.exit(1)

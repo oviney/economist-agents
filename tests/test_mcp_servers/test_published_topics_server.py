@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Tests for Published Topics MCP Server (Story 19.3)
+"""Tests for Published Topics MCP Server (Story 19.3)
 
 Coverage targets:
 - scripts/article_archive.py  : ArticleArchive class (all public methods)
@@ -120,8 +119,8 @@ class TestArticleArchiveSearch:
                         "date": "2026-01-10",
                         "categories": "economics",
                         "file_path": "posts/inflation.md",
-                    }
-                ]
+                    },
+                ],
             ],
             "distances": [[0.2]],  # similarity = 1 - 0.2 = 0.8 > 0.6
         }
@@ -144,7 +143,7 @@ class TestArticleArchiveSearch:
         mock_coll.query.return_value = {
             "documents": [["Unrelated article text"]],
             "metadatas": [
-                [{"title": "Unrelated", "date": "", "categories": "", "file_path": ""}]
+                [{"title": "Unrelated", "date": "", "categories": "", "file_path": ""}],
             ],
             "distances": [[0.9]],  # similarity = 0.1 < 0.6
         }
@@ -209,7 +208,7 @@ class TestArticleArchiveSearch:
         mock_coll.query.return_value = {
             "documents": [["Some article"]],
             "metadatas": [
-                [{"title": "X", "date": "", "categories": "", "file_path": ""}]
+                [{"title": "X", "date": "", "categories": "", "file_path": ""}],
             ],
             # no 'distances' key
         }
@@ -240,7 +239,7 @@ class TestArticleArchiveSearch:
                         "categories": "cat",
                         "file_path": "b.md",
                     },
-                ]
+                ],
             ],
             "distances": [[0.1, 0.3]],
         }
@@ -328,7 +327,7 @@ class TestArticleArchiveIndexArticle:
         assert "indexed_at" in metadata
 
     def test_index_article_upsert_called_with_correct_args(self) -> None:
-        """upsert is called with thesis as document and correct metadata fields."""
+        """Upsert is called with thesis as document and correct metadata fields."""
         mock_coll = _make_mock_collection(count=0)
         archive = _make_archive(mock_coll)
 
@@ -384,7 +383,7 @@ class TestArticleArchiveGetStats:
             "metadatas": [
                 {"title": "A", "date": "2026-01-10", "categories": "tech,economics"},
                 {"title": "B", "date": "2026-03-05", "categories": "tech"},
-            ]
+            ],
         }
 
         archive = _make_archive(mock_coll)
@@ -401,7 +400,7 @@ class TestArticleArchiveGetStats:
         """Articles without dates are excluded from date_range computation."""
         mock_coll = _make_mock_collection(count=1)
         mock_coll.get.return_value = {
-            "metadatas": [{"title": "A", "date": "", "categories": ""}]
+            "metadatas": [{"title": "A", "date": "", "categories": ""}],
         }
 
         archive = _make_archive(mock_coll)
@@ -426,8 +425,12 @@ class TestArticleArchiveGetStats:
         mock_coll = _make_mock_collection(count=1)
         mock_coll.get.return_value = {
             "metadatas": [
-                {"title": "A", "date": "2026-01-01", "categories": " tech , economics "}
-            ]
+                {
+                    "title": "A",
+                    "date": "2026-01-01",
+                    "categories": " tech , economics ",
+                },
+            ],
         }
 
         archive = _make_archive(mock_coll)
@@ -464,7 +467,8 @@ class TestMCPServerTools:
         mock_arc.search.return_value = [{"title": "Inflation", "similarity": 0.85}]
 
         with patch(
-            "mcp_servers.published_topics_server._get_archive", return_value=mock_arc
+            "mcp_servers.published_topics_server._get_archive",
+            return_value=mock_arc,
         ):
             results = search_published_topics("inflation", threshold=0.5, n_results=3)
 
@@ -481,7 +485,8 @@ class TestMCPServerTools:
         }
 
         with patch(
-            "mcp_servers.published_topics_server._get_archive", return_value=mock_arc
+            "mcp_servers.published_topics_server._get_archive",
+            return_value=mock_arc,
         ):
             result = index_published_article(
                 title="Test",
@@ -492,7 +497,11 @@ class TestMCPServerTools:
             )
 
         mock_arc.index_article.assert_called_once_with(
-            "Test", "A test article", "2026-04-01", "testing", "posts/test.md"
+            "Test",
+            "A test article",
+            "2026-04-01",
+            "testing",
+            "posts/test.md",
         )
         assert result["success"] is True
 
@@ -507,7 +516,8 @@ class TestMCPServerTools:
         }
 
         with patch(
-            "mcp_servers.published_topics_server._get_archive", return_value=mock_arc
+            "mcp_servers.published_topics_server._get_archive",
+            return_value=mock_arc,
         ):
             stats = get_archive_stats()
 
@@ -539,12 +549,15 @@ class TestMCPServerTools:
         mock_arc.search.return_value = []
 
         with patch(
-            "mcp_servers.published_topics_server._get_archive", return_value=mock_arc
+            "mcp_servers.published_topics_server._get_archive",
+            return_value=mock_arc,
         ):
             search_published_topics("some query")
 
         mock_arc.search.assert_called_once_with(
-            "some query", threshold=0.6, n_results=5
+            "some query",
+            threshold=0.6,
+            n_results=5,
         )
 
     def test_search_returns_empty_list_when_no_results(self) -> None:
@@ -553,7 +566,8 @@ class TestMCPServerTools:
         mock_arc.search.return_value = []
 
         with patch(
-            "mcp_servers.published_topics_server._get_archive", return_value=mock_arc
+            "mcp_servers.published_topics_server._get_archive",
+            return_value=mock_arc,
         ):
             results = search_published_topics("obscure topic")
 
@@ -569,7 +583,8 @@ class TestMCPServerTools:
         }
 
         with patch(
-            "mcp_servers.published_topics_server._get_archive", return_value=mock_arc
+            "mcp_servers.published_topics_server._get_archive",
+            return_value=mock_arc,
         ):
             result = index_published_article("T", "thesis", "2026-01-01", "cat", "")
 

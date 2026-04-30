@@ -89,6 +89,7 @@ def get_imports_from_file(file_path: Path) -> set[str]:
 
     Raises:
         SyntaxError: If file cannot be parsed
+
     """
     try:
         with open(file_path, encoding="utf-8") as f:
@@ -111,6 +112,7 @@ def get_all_python_files(directory: Path) -> list[Path]:
 
     Returns:
         List of Python file paths
+
     """
     return sorted(directory.glob("*.py"))
 
@@ -125,6 +127,7 @@ def check_file_for_violations(
 
     Returns:
         Tuple of (has_violations, list_of_violated_imports)
+
     """
     # Skip allowed files
     if file_path.name in ALLOWED_FILES:
@@ -184,7 +187,7 @@ def test_no_direct_llm_imports_in_scripts():
         error_messages = []
         error_messages.append("\n" + "=" * 80)
         error_messages.append(
-            "ARCHITECTURE VIOLATION (ADR-002): Direct LLM imports detected"
+            "ARCHITECTURE VIOLATION (ADR-002): Direct LLM imports detected",
         )
         error_messages.append("=" * 80)
         error_messages.append("")
@@ -193,7 +196,7 @@ def test_no_direct_llm_imports_in_scripts():
             error_messages.append(f"❌ {filename}")
             error_messages.append(f"   Prohibited imports: {', '.join(imports)}")
             error_messages.append(
-                "   Solution: Use AgentRegistry.get_agent() instead of direct instantiation"
+                "   Solution: Use AgentRegistry.get_agent() instead of direct instantiation",
             )
             error_messages.append("")
 
@@ -281,6 +284,7 @@ def test_allowed_files_configuration(filename: str, should_be_allowed: bool):
     Args:
         filename: File to check
         should_be_allowed: Whether file should be allowed to import LLMs
+
     """
     is_allowed = filename in ALLOWED_FILES
     assert is_allowed == should_be_allowed, (

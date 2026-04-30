@@ -84,7 +84,7 @@ _STOP_WORDS: frozenset[str] = frozenset(
         "the",
         "to",
         "with",
-    }
+    },
 )
 
 
@@ -99,9 +99,10 @@ def _tokenize(text: str) -> list[str]:
 
     Returns:
         List of lowercase word tokens (stop-words excluded).
+
     """
     normalized = text.lower().translate(
-        str.maketrans(string.punctuation, " " * len(string.punctuation))
+        str.maketrans(string.punctuation, " " * len(string.punctuation)),
     )
     return [w for w in normalized.split() if w and w not in _STOP_WORDS]
 
@@ -118,6 +119,7 @@ def _normalise_title(title: str) -> frozenset[str]:
 
     Returns:
         Frozen set of lowercase word tokens (stop-words excluded).
+
     """
     return frozenset(_tokenize(title))
 
@@ -134,6 +136,7 @@ def _extract_topic_text(topic: dict[str, Any]) -> str:
 
     Returns:
         Single whitespace-joined string of all non-empty text fields.
+
     """
     fields = ("topic", "hook", "thesis", "contrarian_angle", "talking_points")
     return " ".join(str(topic[f]) for f in fields if topic.get(f))
@@ -148,6 +151,7 @@ def _compute_tf(tokens: list[str]) -> dict[str, float]:
     Returns:
         Dict mapping each token to its relative frequency in ``[0, 1]``.
         Returns an empty dict when ``tokens`` is empty.
+
     """
     if not tokens:
         return {}
@@ -166,6 +170,7 @@ def _cosine_similarity(vec_a: dict[str, float], vec_b: dict[str, float]) -> floa
     Returns:
         Cosine similarity in ``[0, 1]``.  Returns ``0.0`` if either
         vector has zero magnitude.
+
     """
     dot = sum(vec_a[t] * vec_b.get(t, 0.0) for t in vec_a)
     norm_a = math.sqrt(sum(v * v for v in vec_a.values()))
@@ -193,12 +198,13 @@ def compute_title_jaccard(titles_a: list[str], titles_b: list[str]) -> float:
     Returns:
         Jaccard similarity in ``[0, 1]``.  Returns ``0.0`` if both sets
         are empty.
+
     """
     words_a: frozenset[str] = frozenset(
-        chain.from_iterable(_normalise_title(t) for t in titles_a)
+        chain.from_iterable(_normalise_title(t) for t in titles_a),
     )
     words_b: frozenset[str] = frozenset(
-        chain.from_iterable(_normalise_title(t) for t in titles_b)
+        chain.from_iterable(_normalise_title(t) for t in titles_b),
     )
     union = words_a | words_b
     if not union:
@@ -216,6 +222,7 @@ def compute_jaccard_matrix(
 
     Returns:
         N×N list-of-lists with Jaccard scores; diagonal values are ``1.0``.
+
     """
     n = len(runs_topics)
     titles_per_run: list[list[str]] = [
@@ -245,6 +252,7 @@ def mean_pairwise_similarity(matrix: list[list[float]]) -> float:
 
     Returns:
         Mean pairwise similarity; ``0.0`` when ``N < 2``.
+
     """
     n = len(matrix)
     if n < 2:
@@ -284,6 +292,7 @@ def compute_tfidf_cosine_matrix(
     Returns:
         N×N list-of-lists with cosine similarity scores; diagonal values
         are ``1.0``.  Returns an empty list when ``runs_topics`` is empty.
+
     """
     n = len(runs_topics)
     if n == 0:
@@ -344,6 +353,7 @@ def _extract_top_performer_keywords(
 
     Returns:
         List of title strings (may be shorter than ``top_n``).
+
     """
     titles: list[str] = []
     in_top_section = False
@@ -381,6 +391,7 @@ def compute_thematic_stability(
     Returns:
         Dict mapping performer title → fraction of runs that match it
         (value in ``[0, 1]``).
+
     """
     n = len(runs_topics)
     if n == 0:
@@ -424,6 +435,7 @@ def compute_score_stats(
         - ``overall_std``: std-dev across all runs and topics
         - ``per_run_mean``: list of per-run means
         - ``per_run_std``: list of per-run std-devs
+
     """
     all_scores: list[float] = []
     per_run_mean: list[float] = []
@@ -460,6 +472,7 @@ def detect_outlier_runs(
 
     Returns:
         List of 0-based run indices flagged as outliers.
+
     """
     n = len(jaccard_matrix)
     if n < 3:
@@ -490,6 +503,7 @@ def format_jaccard_matrix(
 
     Returns:
         Markdown table string.
+
     """
     header = "| Run | " + " | ".join(run_labels) + " |"
     separator = "|-----|" + "|".join(["------" for _ in run_labels]) + "|"
@@ -546,6 +560,7 @@ def generate_report(
 
     Returns:
         Markdown string ready to write to a file.
+
     """
     verdict = (
         "✅ **REPRODUCIBLE** — Output is stable enough to trust. "
@@ -629,7 +644,7 @@ def generate_report(
         for title, frac in thematic_stability.items():
             mentions = round(frac * successful_runs)
             lines.append(
-                f"| {title[:60]} | {mentions}/{successful_runs} | {frac:.0%} |"
+                f"| {title[:60]} | {mentions}/{successful_runs} | {frac:.0%} |",
             )
     else:
         lines.append("_No top-performer data available (database may be empty)._")
@@ -653,11 +668,11 @@ def generate_report(
             "|-----|-----------|---------|--------|",
         ]
         for i, (r_mean, r_std) in enumerate(
-            zip(score_stats["per_run_mean"], score_stats["per_run_std"], strict=True)
+            zip(score_stats["per_run_mean"], score_stats["per_run_std"], strict=True),
         ):
             n_topics = len(runs_topics[i])
             lines.append(
-                f"| {run_labels[i]} | {r_mean:.1f} | {r_std:.1f} | {n_topics} |"
+                f"| {run_labels[i]} | {r_mean:.1f} | {r_std:.1f} | {n_topics} |",
             )
     else:
         lines.append("_No score data available._")
@@ -674,14 +689,14 @@ def generate_report(
         outlier_labels = ", ".join(run_labels[i] for i in outlier_run_indices)
         lines.append(
             f"The following runs produced topic sets that are outliers "
-            f"(mean similarity > 1 std-dev below the grand mean): **{outlier_labels}**"
+            f"(mean similarity > 1 std-dev below the grand mean): **{outlier_labels}**",
         )
         for i in outlier_run_indices:
             lines.append(f"\n**{run_labels[i]} topics:**")
             for topic in runs_topics[i]:
                 lines.append(
                     f"- {topic.get('topic', '(unknown)')} "
-                    f"(score: {topic.get('total_score', 'N/A')})"
+                    f"(score: {topic.get('total_score', 'N/A')})",
                 )
     elif successful_runs < 3:
         lines.append("_Need ≥ 3 successful runs to detect outliers._")
@@ -742,6 +757,7 @@ def run_reproducibility_check(
 
     Returns:
         Path to the generated Markdown report file.
+
     """
     if client is None:
         client = create_client()
@@ -768,7 +784,8 @@ def run_reproducibility_check(
             # Patch topic_scout.get_performance_context so every run sees
             # exactly the same performance context regardless of DB timing.
             with patch(
-                "topic_scout.get_performance_context", return_value=perf_context
+                "topic_scout.get_performance_context",
+                return_value=perf_context,
             ):
                 topics = scout_topics(client)
         except Exception as exc:
@@ -780,7 +797,8 @@ def run_reproducibility_check(
 
         if not topics:
             logger.warning(
-                "Run %d returned no topics (likely a JSON parse failure).", i + 1
+                "Run %d returned no topics (likely a JSON parse failure).",
+                i + 1,
             )
             failed_run_count += 1
             continue
@@ -811,7 +829,7 @@ def run_reproducibility_check(
         else "UNSTABLE"
     )
     print(
-        f"   Verdict: {verdict_word} (threshold: {REPRODUCIBILITY_VERDICT_THRESHOLD})"
+        f"   Verdict: {verdict_word} (threshold: {REPRODUCIBILITY_VERDICT_THRESHOLD})",
     )
 
     # ── Step 4: Generate and save report ─────────────────────────────────────
@@ -873,7 +891,7 @@ def main() -> None:
         description=(
             "Measure LLM variance in Topic Scout output by running it N times "
             "with the same performance context and computing TF-IDF cosine similarity."
-        )
+        ),
     )
     parser.add_argument(
         "--runs",

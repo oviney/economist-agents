@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Style Memory MCP Server
+"""Style Memory MCP Server
 
 Exposes ChromaDB-backed style pattern retrieval as MCP tools so that any agent
 can query past article patterns for voice consistency.
@@ -64,8 +63,7 @@ def _get_tool() -> StyleMemoryTool:
 
 
 def _set_tool_for_testing(tool: StyleMemoryTool) -> None:
-    """
-    Replace the shared tool instance.
+    """Replace the shared tool instance.
 
     This is intended for tests only – it allows injecting an in-memory
     ChromaDB instance so that tests leave no persistent state on disk.
@@ -81,8 +79,7 @@ def _set_tool_for_testing(tool: StyleMemoryTool) -> None:
 
 @mcp.tool()
 def query_style_memory(query: str, n_results: int = 3) -> list[dict[str, Any]]:
-    """
-    Query the style memory store for relevant past article excerpts.
+    """Query the style memory store for relevant past article excerpts.
 
     Args:
         query: Natural language query describing the style pattern of interest,
@@ -97,19 +94,21 @@ def query_style_memory(query: str, n_results: int = 3) -> list[dict[str, Any]]:
             closer (more relevant) matches
           - source (str): source article filename
           - paragraph (int): paragraph index within the source article
+
     """
     tool = _get_tool()
     results = tool.query(query_text=query, n_results=n_results, min_score=0.0)
     logger.info(
-        "query_style_memory: query=%r returned %d result(s)", query, len(results)
+        "query_style_memory: query=%r returned %d result(s)",
+        query,
+        len(results),
     )
     return results
 
 
 @mcp.tool()
 def add_to_style_memory(article_text: str, metadata: dict[str, Any]) -> dict[str, Any]:
-    """
-    Index a new article into the style memory store.
+    """Index a new article into the style memory store.
 
     The article is split into paragraphs (≥50 characters) and each paragraph is
     embedded and stored individually for fine-grained retrieval.
@@ -126,6 +125,7 @@ def add_to_style_memory(article_text: str, metadata: dict[str, Any]) -> dict[str
           - success (bool): True when indexing succeeded
           - indexed_paragraphs (int): number of paragraphs added
           - message (str): human-readable summary
+
     """
     tool = _get_tool()
 

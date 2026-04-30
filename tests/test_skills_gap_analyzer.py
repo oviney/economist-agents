@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Test suite for Skills Gap Analyzer
+"""Test suite for Skills Gap Analyzer
 
 Validates that agent performance analysis produces accurate
 skill assessments, hiring recommendations, and training priorities.
@@ -250,7 +249,8 @@ class TestSkillsGapAnalyzer:
             analyzer = SkillsGapAnalyzer(temp_path)
             assessment = analyzer.generate_team_assessment()
             markdown = analyzer.format_team_assessment_table(
-                assessment, format="markdown"
+                assessment,
+                format="markdown",
             )
 
             # Validate markdown structure
@@ -452,7 +452,8 @@ class TestSkillsGapAnalyzer:
             analyzer = SkillsGapAnalyzer(temp_path)
             assessment = analyzer.generate_team_assessment()
             markdown = analyzer.format_team_assessment_table(
-                assessment, format="markdown"
+                assessment,
+                format="markdown",
             )
 
             assert "## Velocity Impact" in markdown

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Image Generator MCP Server
+"""Image Generator MCP Server
 
 Exposes DALL-E 3 editorial image generation as an MCP tool so that any
 agent in the pipeline can request an Economist-style illustration without
@@ -100,6 +99,7 @@ def _truncate_prompt(prompt: str, context: str = "DALL-E") -> str:
     Returns:
         The original prompt (unchanged) when it is within the limit,
         or a truncated copy otherwise.
+
     """
     if len(prompt) > DALLE_MAX_PROMPT_LENGTH:
         logger.warning(
@@ -130,6 +130,7 @@ def _build_dalle_prompt(article_title: str, article_summary: str) -> str:
 
     Returns:
         Formatted prompt string ready for the DALL-E 3 API.
+
     """
     prompt = f"{ECONOMIST_IMAGE_STYLE}\n\n"
     prompt += f"ARTICLE TOPIC: {article_title}\n\n"
@@ -176,6 +177,7 @@ def generate_editorial_image(
 
     Raises:
         Nothing — all exceptions are caught and returned as structured errors.
+
     """
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
@@ -196,7 +198,7 @@ def generate_editorial_image(
             raise ValueError("timeout must be greater than zero")
     except ValueError:
         logger.warning(
-            "IMAGE_DOWNLOAD_TIMEOUT_SECONDS must be a positive integer; using default of 15 s"
+            "IMAGE_DOWNLOAD_TIMEOUT_SECONDS must be a positive integer; using default of 15 s",
         )
         download_timeout = 15
 
@@ -303,12 +305,13 @@ def generate_image(
     Raises:
         ValueError: If ``OPENAI_API_KEY`` is not set in the environment.
         openai.OpenAIError: If the API call fails.
+
     """
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
         raise ValueError(
             "OPENAI_API_KEY environment variable is not set. "
-            "Please export OPENAI_API_KEY=<your-key> before using this tool."
+            "Please export OPENAI_API_KEY=<your-key> before using this tool.",
         )
 
     client = openai.OpenAI(api_key=api_key)

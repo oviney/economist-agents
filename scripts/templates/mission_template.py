@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Autonomous Pod Mission Template
+"""Autonomous Pod Mission Template
 
 Standardized pattern for executing CrewAI missions with dynamic agent loading.
 Implements ADR-002 (Agent Registry Pattern) for Agile discipline.
@@ -39,6 +38,7 @@ def load_agents(registry: AgentRegistry) -> dict:
 
     Returns:
         Dictionary mapping role names to CrewAI Agent instances
+
     """
     agents = {}
     for role in REQUIRED_AGENTS:
@@ -46,7 +46,7 @@ def load_agents(registry: AgentRegistry) -> dict:
         if agent is None:
             raise ValueError(
                 f"Agent '{role}' not found. "
-                f"Available: {', '.join(registry.list_agents())}"
+                f"Available: {', '.join(registry.list_agents())}",
             )
         agents[role] = agent
     return agents
@@ -65,6 +65,7 @@ def define_tasks(agents: dict) -> list[Task]:
 
     Returns:
         List of Task objects for the mission
+
     """
     tasks = []
 
@@ -89,7 +90,7 @@ def define_tasks(agents: dict) -> list[Task]:
     # TODO: Add your tasks here
     raise NotImplementedError(
         "Define your tasks in define_tasks(). "
-        "Remove this exception when tasks are ready."
+        "Remove this exception when tasks are ready.",
     )
 
     return tasks

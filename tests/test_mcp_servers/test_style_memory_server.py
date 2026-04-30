@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Tests for mcp_servers/style_memory_server.py
+"""Tests for mcp_servers/style_memory_server.py
 
 All tests use in-memory ChromaDB so that no state is persisted to disk.
 
@@ -31,8 +30,7 @@ _fake_ef: object | None = None
 
 
 def _get_shared_client() -> tuple[object, object]:
-    """
-    Return (chromadb_client, embedding_function), creating them once per session.
+    """Return (chromadb_client, embedding_function), creating them once per session.
 
     Skips if ChromaDB is not installed.
     """
@@ -77,8 +75,7 @@ def _get_shared_client() -> tuple[object, object]:
 
 
 def _make_in_memory_tool(archive_path: Path | None = None) -> object:
-    """
-    Create a StyleMemoryTool backed by a fresh in-memory ChromaDB collection.
+    """Create a StyleMemoryTool backed by a fresh in-memory ChromaDB collection.
 
     Each call gets its own uniquely named collection so tests are fully
     isolated even though they share a single in-memory client.  Uses a
@@ -324,7 +321,8 @@ class TestAddToStyleMemory:
         server._set_tool_for_testing(tool)
 
         result = server.add_to_style_memory(
-            "Short.\n\nAlso short.", {"source": "tiny.md"}
+            "Short.\n\nAlso short.",
+            {"source": "tiny.md"},
         )
 
         assert result["success"] is False
@@ -416,7 +414,7 @@ class TestMCPServerObject:
     """Smoke tests verifying the FastMCP server is properly configured."""
 
     def test_server_is_fastmcp_instance(self):
-        """mcp is a FastMCP instance."""
+        """Mcp is a FastMCP instance."""
         from mcp.server.fastmcp import FastMCP
 
         import mcp_servers.style_memory_server as server

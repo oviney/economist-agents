@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Integration Health Check - Sprint 15 STORY-008 Task 4
+"""Integration Health Check - Sprint 15 STORY-008 Task 4
 
 Validates that Sprint 14 components (Flow, RAG, ROI) are properly integrated
 and functioning in the production pipeline.
@@ -28,6 +27,7 @@ def check_flow_availability() -> tuple[str, str]:
 
     Returns:
         Tuple of (status, message)
+
     """
     try:
         from src.economist_agents.flow import EconomistContentFlow
@@ -64,6 +64,7 @@ def check_rag_availability() -> tuple[str, str]:
 
     Returns:
         Tuple of (status, message)
+
     """
     try:
         from src.tools.style_memory_tool import StyleMemoryTool
@@ -85,7 +86,7 @@ def check_rag_availability() -> tuple[str, str]:
         # Check performance targets
         if query_time > 500:
             return FAIL, f"RAG query too slow: {query_time:.0f}ms (target <500ms)"
-        elif query_time > 200:
+        if query_time > 200:
             return WARN, f"RAG query acceptable: {query_time:.0f}ms (target <200ms)"
 
         indexed_count = tool.indexed_count if hasattr(tool, "indexed_count") else 0
@@ -105,6 +106,7 @@ def check_roi_tracker_availability() -> tuple[str, str]:
 
     Returns:
         Tuple of (status, message)
+
     """
     try:
         from src.telemetry.roi_tracker import ROITracker
@@ -157,6 +159,7 @@ def check_editor_integration() -> tuple[str, str]:
 
     Returns:
         Tuple of (status, message)
+
     """
     try:
         # Check imports in economist_agent.py
@@ -200,6 +203,7 @@ def check_pipeline_integration() -> tuple[str, str]:
 
     Returns:
         Tuple of (status, message)
+
     """
     try:
         economist_agent_path = Path("scripts/economist_agent.py")
@@ -235,6 +239,7 @@ def run_health_checks(component: str = None, verbose: bool = False) -> dict[str,
 
     Returns:
         Dict with check results and summary
+
     """
     checks = {
         "flow": ("Flow Orchestration", check_flow_availability),
@@ -290,7 +295,7 @@ def run_health_checks(component: str = None, verbose: bool = False) -> dict[str,
             "passed": passed,
             "failed": failed,
         }
-    elif warned > 0:
+    if warned > 0:
         print(f"\n⚠️  HEALTH CHECK PASSED WITH WARNINGS ({warned} issues)")
         return {
             "overall": "WARN",
@@ -298,20 +303,19 @@ def run_health_checks(component: str = None, verbose: bool = False) -> dict[str,
             "passed": passed,
             "failed": failed,
         }
-    else:
-        print(f"\n✅ HEALTH CHECK PASSED (all {total} checks)")
-        return {
-            "overall": "PASS",
-            "results": results,
-            "passed": passed,
-            "failed": failed,
-        }
+    print(f"\n✅ HEALTH CHECK PASSED (all {total} checks)")
+    return {
+        "overall": "PASS",
+        "results": results,
+        "passed": passed,
+        "failed": failed,
+    }
 
 
 def main():
     """CLI entry point for health checks."""
     parser = argparse.ArgumentParser(
-        description="Integration Health Check for Sprint 14 components"
+        description="Integration Health Check for Sprint 14 components",
     )
     parser.add_argument(
         "--component",

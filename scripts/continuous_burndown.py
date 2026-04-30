@@ -17,7 +17,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import subprocess
 import sys
 import time
 from dataclasses import asdict, dataclass
@@ -174,11 +173,14 @@ class ContinuousBurndownCoordinator:
                     priority=priority,
                     status=status,
                     recommended_runtime=_runtime_for_item(
-                        "sprint_tracker", blocked, title, details
+                        "sprint_tracker",
+                        blocked,
+                        title,
+                        details,
                     ),
                     blocked=blocked,
                     details=details,
-                )
+                ),
             )
 
         return todos
@@ -209,11 +211,14 @@ class ContinuousBurndownCoordinator:
                     priority=priority,
                     status=status,
                     recommended_runtime=_runtime_for_item(
-                        "backlog", blocked, title, details
+                        "backlog",
+                        blocked,
+                        title,
+                        details,
                     ),
                     blocked=blocked,
                     details=details,
-                )
+                ),
             )
 
         return todos
@@ -242,11 +247,14 @@ class ContinuousBurndownCoordinator:
                     priority=priority,
                     status=status,
                     recommended_runtime=_runtime_for_item(
-                        "markdown_backlog", blocked, title, details
+                        "markdown_backlog",
+                        blocked,
+                        title,
+                        details,
                     ),
                     blocked=blocked,
                     details=details,
-                )
+                ),
             )
 
         return todos
@@ -273,11 +281,14 @@ class ContinuousBurndownCoordinator:
                     priority=priority,
                     status=status,
                     recommended_runtime=_runtime_for_item(
-                        "task_queue", blocked, title, details
+                        "task_queue",
+                        blocked,
+                        title,
+                        details,
                     ),
                     blocked=blocked,
                     details=details,
-                )
+                ),
             )
 
         return todos
@@ -303,7 +314,7 @@ class ContinuousBurndownCoordinator:
                     recommended_runtime="human",
                     blocked=True,
                     details=recommendation,
-                )
+                ),
             )
 
         return todos
@@ -325,7 +336,7 @@ class ContinuousBurndownCoordinator:
                     recommended_runtime="human",
                     blocked=True,
                     details="SPRINT.md does not expose an active sprint header.",
-                )
+                ),
             )
 
         doc_validator = DocumentationValidator(repo_root=self.repo_root)
@@ -341,7 +352,7 @@ class ContinuousBurndownCoordinator:
                     recommended_runtime="claude",
                     blocked=False,
                     details=error,
-                )
+                ),
             )
         for index, warning in enumerate(doc_validator.warnings, start=1):
             todos.append(
@@ -354,7 +365,7 @@ class ContinuousBurndownCoordinator:
                     recommended_runtime="codex",
                     blocked=False,
                     details=warning,
-                )
+                ),
             )
 
         groomer = BacklogGroomer(str(self.sprint_tracker_path))
@@ -376,7 +387,7 @@ class ContinuousBurndownCoordinator:
                         recommended_runtime="claude",
                         blocked=False,
                         details=str(details),
-                    )
+                    ),
                 )
 
         ci_health = CIHealthMonitor()
@@ -393,7 +404,7 @@ class ContinuousBurndownCoordinator:
                     recommended_runtime="human",
                     blocked=True,
                     details=str(ci_result.get("message", "CI failure detected")),
-                )
+                ),
             )
         elif ci_status == "YELLOW":
             todos.append(
@@ -406,7 +417,7 @@ class ContinuousBurndownCoordinator:
                     recommended_runtime="claude",
                     blocked=False,
                     details=str(ci_result.get("message", "CI requires monitoring")),
-                )
+                ),
             )
 
         schema_checks = [
@@ -438,7 +449,7 @@ class ContinuousBurndownCoordinator:
                         recommended_runtime="claude",
                         blocked=False,
                         details=error,
-                    )
+                    ),
                 )
 
         return todos
@@ -485,11 +496,14 @@ class ContinuousBurndownCoordinator:
                     priority="P1",
                     status="pending",
                     recommended_runtime=_runtime_for_item(
-                        "remediation_queue", False, title, details
+                        "remediation_queue",
+                        False,
+                        title,
+                        details,
                     ),
                     blocked=False,
                     details=f"{post_file} score={score} threshold={threshold}; {details}",
-                )
+                ),
             )
         return todos
 
@@ -500,7 +514,8 @@ class ContinuousBurndownCoordinator:
 
         try:
             next_issue = claimer.find_next_claimable_issue(
-                ["enhancement", "quality"], self.runtime
+                ["enhancement", "quality"],
+                self.runtime,
             )
         except RuntimeError as exc:
             todos.append(
@@ -513,7 +528,7 @@ class ContinuousBurndownCoordinator:
                     recommended_runtime="human",
                     blocked=True,
                     details=str(exc),
-                )
+                ),
             )
             return todos
 
@@ -537,12 +552,14 @@ class ContinuousBurndownCoordinator:
                 recommended_runtime=self.runtime,
                 blocked=False,
                 details=details,
-            )
+            ),
         )
         return todos
 
     def collect_once(
-        self, include_github: bool = False, claim_next: bool = False
+        self,
+        include_github: bool = False,
+        claim_next: bool = False,
     ) -> dict[str, Any]:
         """Run one refresh pass and return a normalized report."""
         todos = []
@@ -628,7 +645,8 @@ def main() -> int:
 
     repo_root = Path(args.repo_root).resolve()
     coordinator = ContinuousBurndownCoordinator(
-        repo_root=repo_root, runtime=args.runtime
+        repo_root=repo_root,
+        runtime=args.runtime,
     )
     output_path = repo_root / args.output
 
@@ -651,7 +669,7 @@ def main() -> int:
 
     print(
         f"Burn-down report: actionable={final_report.get('actionable_count', 0)} "
-        f"blockers={final_report.get('blocker_count', 0)} output={output_path}"
+        f"blockers={final_report.get('blocker_count', 0)} output={output_path}",
     )
 
     if _has_only_blockers(final_report):

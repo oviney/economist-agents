@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Data Sanitization Utility Functions
+"""Data Sanitization Utility Functions
 
 Provides secure data sanitization for various input types.
 Enhanced with security improvements based on senior review feedback.
@@ -35,8 +34,7 @@ def _validate_input_size(input_data: str | None, max_size: int) -> bool:
 
 
 def sanitize_html(input_text: str | None) -> str:
-    """
-    Remove HTML tags from input text with enhanced security.
+    """Remove HTML tags from input text with enhanced security.
 
     Args:
         input_text: Text that may contain HTML tags
@@ -46,6 +44,7 @@ def sanitize_html(input_text: str | None) -> str:
 
     Raises:
         ValueError: If input exceeds size limits
+
     """
     if input_text is None:
         return ""
@@ -68,8 +67,7 @@ def sanitize_html(input_text: str | None) -> str:
 
 
 def sanitize_sql(input_text: str) -> str:
-    """
-    Sanitize SQL injection attempts with proper escaping.
+    """Sanitize SQL injection attempts with proper escaping.
 
     Args:
         input_text: Text that may contain SQL injection patterns
@@ -79,6 +77,7 @@ def sanitize_sql(input_text: str) -> str:
 
     Raises:
         ValueError: If input exceeds size limits
+
     """
     if not isinstance(input_text, str):
         return ""
@@ -112,14 +111,14 @@ def sanitize_sql(input_text: str) -> str:
 
 
 def validate_email(email: str | None) -> bool:
-    """
-    Validate email format with enhanced security checks.
+    """Validate email format with enhanced security checks.
 
     Args:
         email: Email address to validate
 
     Returns:
         True if email format is valid, False otherwise
+
     """
     if email is None or not isinstance(email, str):
         return False
@@ -148,8 +147,7 @@ def validate_email(email: str | None) -> bool:
 
 
 def sanitize_path(file_path: str | None) -> str:
-    """
-    Sanitize file paths to prevent directory traversal with enhanced security.
+    """Sanitize file paths to prevent directory traversal with enhanced security.
 
     Args:
         file_path: File path that may contain traversal patterns
@@ -159,6 +157,7 @@ def sanitize_path(file_path: str | None) -> str:
 
     Raises:
         ValueError: If path exceeds length limits
+
     """
     if file_path is None or not isinstance(file_path, str):
         return ""
@@ -168,7 +167,7 @@ def sanitize_path(file_path: str | None) -> str:
 
     if len(file_path) > MAX_PATH_LENGTH:
         raise ValueError(
-            f"Path length exceeds maximum allowed ({MAX_PATH_LENGTH} characters)"
+            f"Path length exceeds maximum allowed ({MAX_PATH_LENGTH} characters)",
         )
 
     try:
@@ -209,8 +208,7 @@ def sanitize_path(file_path: str | None) -> str:
 
 
 def sanitize_data(data: dict[str, Any]) -> dict[str, Any]:
-    """
-    Comprehensive data sanitization for dictionary input.
+    """Comprehensive data sanitization for dictionary input.
 
     Args:
         data: Dictionary containing data to sanitize
@@ -220,6 +218,7 @@ def sanitize_data(data: dict[str, Any]) -> dict[str, Any]:
 
     Raises:
         ValueError: If input is None or not a dictionary
+
     """
     if data is None:
         raise ValueError("Input data cannot be None")

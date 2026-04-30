@@ -35,7 +35,7 @@ from pre_commit_arch_check import (  # noqa: E402
 # ---------------------------------------------------------------------------
 
 
-@pytest.fixture()
+@pytest.fixture
 def tmp_py(tmp_path: Path):
     """Factory fixture: write source to a temp .py file and return its Path."""
 
@@ -338,7 +338,7 @@ class TestCheckResult:
                 Violation("f.py", 1, "r", "m", "error"),
                 Violation("f.py", 2, "r", "m", "warning"),
                 Violation("f.py", 3, "r", "m", "error"),
-            ]
+            ],
         )
         assert r.error_count == 2
         assert r.warning_count == 1

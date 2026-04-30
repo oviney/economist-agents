@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Architecture Review Agent with Self-Learning Skills
+"""Architecture Review Agent with Self-Learning Skills
 
 Analyzes codebase architecture and documents patterns, anti-patterns, and design decisions.
 Uses Claude-style skills approach to learn and improve architectural understanding over time.
@@ -71,7 +70,6 @@ class ArchitectureReviewer:
 
     def _analyze_agent_architecture(self):
         """Learn patterns from multi-agent system design"""
-
         # Pattern: Agent system prompts as first-class code
         scripts_dir = self.project_root / "scripts"
         prompt_constants = []
@@ -81,7 +79,9 @@ class ArchitectureReviewer:
                 content = f.read()
                 # Find all caps constants that end in _PROMPT
                 prompts = re.findall(
-                    r'^([A-Z_]+_PROMPT)\s*=\s*"""', content, re.MULTILINE
+                    r'^([A-Z_]+_PROMPT)\s*=\s*"""',
+                    content,
+                    re.MULTILINE,
                 )
                 if prompts:
                     prompt_constants.extend([(py_file.name, p) for p in prompts])
@@ -104,7 +104,7 @@ class ArchitectureReviewer:
                     "category": "agent_architecture",
                     "pattern": "prompts_as_code",
                     "count": len(prompt_constants),
-                }
+                },
             )
 
         # Pattern: Persona-driven agents
@@ -134,7 +134,7 @@ class ArchitectureReviewer:
                             "category": "agent_architecture",
                             "pattern": "persona_based_voting",
                             "count": len(personas),
-                        }
+                        },
                     )
 
         # Pattern: Agent orchestration pattern
@@ -162,12 +162,11 @@ class ArchitectureReviewer:
                             "category": "agent_architecture",
                             "pattern": "sequential_agent_orchestration",
                             "count": len(agent_functions),
-                        }
+                        },
                     )
 
     def _analyze_data_flow(self):
         """Learn patterns from data flow between pipeline stages"""
-
         # Pattern: JSON intermediate outputs
         scripts_dir = self.project_root / "scripts"
         json_outputs = []
@@ -199,7 +198,7 @@ class ArchitectureReviewer:
                     "category": "data_flow",
                     "pattern": "json_intermediate_format",
                     "count": len(unique_jsons),
-                }
+                },
             )
 
         # Pattern: Output directory configuration
@@ -224,13 +223,12 @@ class ArchitectureReviewer:
                             "category": "data_flow",
                             "pattern": "configurable_output_paths",
                             "count": 1,
-                        }
+                        },
                     )
                     break
 
     def _analyze_prompt_patterns(self):
         """Learn patterns from prompt engineering practices"""
-
         scripts_dir = self.project_root / "scripts"
 
         for py_file in scripts_dir.glob("*agent*.py"):
@@ -256,7 +254,7 @@ class ArchitectureReviewer:
                             "category": "prompt_engineering",
                             "pattern": "structured_output_specification",
                             "file": py_file.name,
-                        }
+                        },
                     )
 
                 # Pattern: Voice/style constraints
@@ -284,12 +282,11 @@ class ArchitectureReviewer:
                             "category": "prompt_engineering",
                             "pattern": "explicit_constraint_lists",
                             "count": banned_sections,
-                        }
+                        },
                     )
 
     def _analyze_error_handling(self):
         """Learn patterns from error handling approaches"""
-
         scripts_dir = self.project_root / "scripts"
 
         # Pattern: Graceful JSON parsing
@@ -323,7 +320,7 @@ class ArchitectureReviewer:
                     "category": "error_handling",
                     "pattern": "defensive_json_parsing",
                     "count": json_parse_patterns,
-                }
+                },
             )
 
         # Pattern: Unverified claims flagging
@@ -349,12 +346,11 @@ class ArchitectureReviewer:
                             "category": "error_handling",
                             "pattern": "explicit_verification_flags",
                             "count": 1,
-                        }
+                        },
                     )
 
     def _analyze_dependencies(self):
         """Learn patterns from dependency management"""
-
         # Pattern: External API usage
         scripts_dir = self.project_root / "scripts"
         anthropic_usage = 0
@@ -383,7 +379,7 @@ class ArchitectureReviewer:
                     "category": "dependencies",
                     "pattern": "centralized_llm_client",
                     "count": anthropic_usage,
-                }
+                },
             )
 
         # Pattern: Matplotlib for visualization
@@ -409,12 +405,11 @@ class ArchitectureReviewer:
                             "category": "dependencies",
                             "pattern": "headless_matplotlib_backend",
                             "count": 1,
-                        }
+                        },
                     )
 
     def _analyze_testing_strategy(self):
         """Learn patterns from testing and validation approaches"""
-
         # Pattern: Skills-based learning
         skills_files = list(self.project_root.glob("scripts/*skills*.py"))
         if skills_files:
@@ -440,7 +435,7 @@ class ArchitectureReviewer:
                     "category": "testing_strategy",
                     "pattern": "continuous_learning_validation",
                     "count": len(skills_files),
-                }
+                },
             )
 
         # Pattern: Manual quality gates
@@ -470,7 +465,7 @@ class ArchitectureReviewer:
                             "category": "testing_strategy",
                             "pattern": "human_review_checkpoints",
                             "count": 1,
-                        }
+                        },
                     )
                     break
 
@@ -515,7 +510,7 @@ class ArchitectureReviewer:
         doc.append("")
         doc.append("This document is auto-generated from architecture review agent.")
         doc.append(
-            f"Last updated: {self.skills_manager.skills.get('last_updated', 'Unknown')}"
+            f"Last updated: {self.skills_manager.skills.get('last_updated', 'Unknown')}",
         )
         doc.append("")
 
@@ -563,19 +558,26 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Review architecture and learn patterns"
+        description="Review architecture and learn patterns",
     )
     parser.add_argument(
-        "--full-review", action="store_true", help="Run complete architecture review"
+        "--full-review",
+        action="store_true",
+        help="Run complete architecture review",
     )
     parser.add_argument(
-        "--show-skills", action="store_true", help="Show learned architectural patterns"
+        "--show-skills",
+        action="store_true",
+        help="Show learned architectural patterns",
     )
     parser.add_argument(
-        "--export-docs", action="store_true", help="Export patterns to markdown"
+        "--export-docs",
+        action="store_true",
+        help="Export patterns to markdown",
     )
     parser.add_argument(
-        "--focus", help="Focus on specific area (agent-patterns, data-flow, etc)"
+        "--focus",
+        help="Focus on specific area (agent-patterns, data-flow, etc)",
     )
 
     args = parser.parse_args()

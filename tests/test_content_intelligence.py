@@ -16,7 +16,7 @@ import pytest
 # Add scripts/ to path so we can import content_intelligence directly
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
-from content_intelligence import (  # noqa: E402
+from content_intelligence import (
     ArticlePerformance,
     TrafficSummary,
     _is_article,
@@ -44,7 +44,7 @@ def synthetic_db(tmp_path: Path) -> Path:
             composite_score     REAL,
             fetched_at          TEXT
         )
-        """
+        """,
     )
 
     # Three real articles, two non-article index pages, and one article
@@ -119,7 +119,8 @@ def synthetic_db(tmp_path: Path) -> Path:
         ),
     ]
     conn.executemany(
-        "INSERT INTO article_performance VALUES (?, ?, ?, ?, ?, ?, ?, ?)", rows
+        "INSERT INTO article_performance VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        rows,
     )
     conn.commit()
     conn.close()
@@ -143,7 +144,7 @@ def empty_db(tmp_path: Path) -> Path:
             composite_score     REAL,
             fetched_at          TEXT
         )
-        """
+        """,
     )
     conn.commit()
     conn.close()

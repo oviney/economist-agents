@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Skills Gap Analyzer - Agent Performance as Team Skills Indicator
+"""Skills Gap Analyzer - Agent Performance as Team Skills Indicator
 
 Maps agent defect patterns to human role skill levels (Junior/Mid/Senior)
 for data-driven hiring and training recommendations.
@@ -160,8 +159,7 @@ class SkillsGapAnalyzer:
             return json.load(f)
 
     def analyze_agent_performance(self, agent_name: str) -> dict[str, Any]:
-        """
-        Analyze performance for a specific agent
+        """Analyze performance for a specific agent
 
         Returns:
             {
@@ -174,6 +172,7 @@ class SkillsGapAnalyzer:
                 'top_gap': 'requirements_adherence',
                 'recommendation': 'Prompt engineering + Training'
             }
+
         """
         # Get bugs for this agent
         agent_bugs = [
@@ -226,7 +225,10 @@ class SkillsGapAnalyzer:
 
         # Generate recommendation
         recommendation = self._generate_recommendation(
-            agent_name, skill_level, len(agent_bugs), critical_bugs
+            agent_name,
+            skill_level,
+            len(agent_bugs),
+            critical_bugs,
         )
 
         return {
@@ -241,7 +243,10 @@ class SkillsGapAnalyzer:
         }
 
     def _calculate_skill_scores(
-        self, agent_name: str, bugs: list[dict], rubric: dict
+        self,
+        agent_name: str,
+        bugs: list[dict],
+        rubric: dict,
     ) -> dict[str, float]:
         """Calculate individual skill scores based on bug patterns"""
         if not rubric:
@@ -264,7 +269,10 @@ class SkillsGapAnalyzer:
         return skill_scores
 
     def _calculate_skill_penalty(
-        self, bug: dict, skill_name: str, agent_name: str
+        self,
+        bug: dict,
+        skill_name: str,
+        agent_name: str,
     ) -> float:
         """Calculate penalty for a specific skill based on bug characteristics"""
         base_penalty = 10.0
@@ -317,10 +325,9 @@ class SkillsGapAnalyzer:
         """Determine skill level based on overall score"""
         if overall_score >= 85:
             return "senior"
-        elif overall_score >= 65:
+        if overall_score >= 65:
             return "mid"
-        else:
-            return "junior"
+        return "junior"
 
     def _identify_top_gap(self, skill_scores: dict[str, float]) -> str:
         """Identify the skill with the lowest score"""
@@ -329,7 +336,11 @@ class SkillsGapAnalyzer:
         return min(skill_scores.items(), key=lambda x: x[1])[0]
 
     def _generate_recommendation(
-        self, agent_name: str, skill_level: str, bug_count: int, critical_bugs: int
+        self,
+        agent_name: str,
+        skill_level: str,
+        bug_count: int,
+        critical_bugs: int,
     ) -> str:
         """Generate actionable recommendation based on analysis"""
         if skill_level == "senior" and bug_count == 0:
@@ -344,25 +355,23 @@ class SkillsGapAnalyzer:
 
         # Recommendations based on skill level and agent type
         if skill_level == "junior":
-            if agent_name == "writer_agent":  # noqa: SIM116
+            if agent_name == "writer_agent":
                 return f"{urgency}Prompt engineering + CMS training"
-            elif agent_name == "research_agent":
+            if agent_name == "research_agent":
                 return f"{urgency}Source verification workshop"
-            elif agent_name == "editor_agent":
+            if agent_name == "editor_agent":
                 return f"{urgency}Quality gate training"
-            elif agent_name == "graphics_agent":
+            if agent_name == "graphics_agent":
                 return f"{urgency}Visual design training"
-            else:
-                return f"{urgency}Skill development required"
+            return f"{urgency}Skill development required"
 
-        elif skill_level == "mid":
+        if skill_level == "mid":
             return f"Prompt refinement + {bug_count} bug patterns to address"
 
         return "Minor improvements needed"
 
     def generate_team_assessment(self) -> dict[str, Any]:
-        """
-        Generate complete team skills assessment
+        """Generate complete team skills assessment
 
         Returns:
             {
@@ -371,6 +380,7 @@ class SkillsGapAnalyzer:
                 'training_priorities': [...],
                 'summary': {...}
             }
+
         """
         # Analyze all agents with bugs
         agents = set()
@@ -426,7 +436,8 @@ class SkillsGapAnalyzer:
         }
 
     def _generate_hiring_recommendations(
-        self, by_role: dict[str, dict]
+        self,
+        by_role: dict[str, dict],
     ) -> list[dict[str, Any]]:
         """Generate hiring recommendations based on skills analysis"""
         recommendations = []
@@ -440,7 +451,7 @@ class SkillsGapAnalyzer:
                         "reason": f"{analysis['critical_bugs']} critical bugs, {analysis['bugs_count']} total",
                         "current_level": "junior",
                         "target_level": "mid-senior",
-                    }
+                    },
                 )
             elif (
                 analysis["skill_level"] == "junior" or analysis["skill_level"] == "mid"
@@ -452,13 +463,14 @@ class SkillsGapAnalyzer:
                         "reason": f"{analysis['bugs_count']} bugs, score {analysis['overall_score']}/100",
                         "current_level": analysis["skill_level"],
                         "target_level": "senior",
-                    }
+                    },
                 )
 
         return sorted(recommendations, key=lambda x: x["priority"])
 
     def _generate_training_priorities(
-        self, by_role: dict[str, dict]
+        self,
+        by_role: dict[str, dict],
     ) -> list[dict[str, Any]]:
         """Generate training priorities ranked by impact"""
         priorities = []
@@ -474,14 +486,16 @@ class SkillsGapAnalyzer:
                         "role": analysis["role"],
                         "skill_gap": analysis["top_gap"],
                         "current_score": analysis["skill_scores"].get(
-                            analysis["top_gap"], 0
+                            analysis["top_gap"],
+                            0,
                         ),
                         "target_score": 85,  # Mid-senior level
                         "impact_score": impact_score,
                         "training_type": self._suggest_training_type(
-                            agent, analysis["top_gap"]
+                            agent,
+                            analysis["top_gap"],
                         ),
-                    }
+                    },
                 )
 
         return sorted(priorities, key=lambda x: x["impact_score"], reverse=True)
@@ -509,8 +523,7 @@ class SkillsGapAnalyzer:
         return self._determine_skill_level(avg_score)
 
     def calculate_velocity_impact(self) -> dict[str, Any]:
-        """
-        Calculate how skills gaps impact team velocity.
+        """Calculate how skills gaps impact team velocity.
 
         Uses bug resolution time and severity as proxies for lost sprint capacity.
         Higher skill gaps → more bugs → more rework → lower effective velocity.
@@ -531,6 +544,7 @@ class SkillsGapAnalyzer:
                 'total_rework_cost_points': float,
                 'highest_impact_role': str,
             }
+
         """
         severity_weights = {"critical": 3.0, "high": 2.0, "medium": 1.0, "low": 0.5}
 
@@ -604,8 +618,7 @@ class SkillsGapAnalyzer:
         }
 
     def correlate_skills_with_quality(self) -> dict[str, Any]:
-        """
-        Correlate skill gap scores with quality output metrics.
+        """Correlate skill gap scores with quality output metrics.
 
         Answers: "How do skills gaps correlate with team velocity/quality?"
 
@@ -625,6 +638,7 @@ class SkillsGapAnalyzer:
                 'insight': str,   # human-readable summary
                 'data_quality': str,  # 'sufficient' | 'limited' (< 20 bugs)
             }
+
         """
         agents: set[str] = set()
         for bug in self.bugs:
@@ -685,7 +699,7 @@ class SkillsGapAnalyzer:
                     "fix_rate": fix_rate,
                     "quality_grade": grade,
                     "correlation_label": label,
-                }
+                },
             )
 
         # Sort by skill_score ascending (worst first)
@@ -716,15 +730,16 @@ class SkillsGapAnalyzer:
         }
 
     def format_team_assessment_table(
-        self, assessment: dict[str, Any], format: str = "markdown"
+        self,
+        assessment: dict[str, Any],
+        format: str = "markdown",
     ) -> str:
         """Format team assessment as table for executive reporting"""
         if format == "markdown":
             return self._format_markdown_table(assessment)
-        elif format == "text":
+        if format == "text":
             return self._format_text_table(assessment)
-        else:
-            raise ValueError(f"Unsupported format: {format}")
+        raise ValueError(f"Unsupported format: {format}")
 
     def _format_markdown_table(self, assessment: dict[str, Any]) -> str:
         """Format as markdown table"""
@@ -735,11 +750,11 @@ class SkillsGapAnalyzer:
         lines.append("## Executive Summary\n")
         lines.append(f"- **Total Agents Analyzed**: {summary['total_agents_analyzed']}")
         lines.append(
-            f"- **Total Bugs**: {summary['total_bugs']} ({summary['critical_bugs']} critical)"
+            f"- **Total Bugs**: {summary['total_bugs']} ({summary['critical_bugs']} critical)",
         )
         lines.append(f"- **Average Skill Level**: {summary['avg_skill_level'].title()}")
         lines.append(
-            f"- **Roles Needing Attention**: {summary['roles_needing_attention']}\n"
+            f"- **Roles Needing Attention**: {summary['roles_needing_attention']}\n",
         )
 
         # By Role Performance table
@@ -761,7 +776,7 @@ class SkillsGapAnalyzer:
             lines.append(
                 f"| {analysis['role']} | {level_display} | "
                 f"{analysis['overall_score']}/100 | {bugs_display} | "
-                f"{top_gap} | {analysis['recommendation']} |"
+                f"{top_gap} | {analysis['recommendation']} |",
             )
 
         # Hiring Recommendations
@@ -772,7 +787,7 @@ class SkillsGapAnalyzer:
                 icon = "🔴" if rec["priority"] == "URGENT" else "🟡"
                 lines.append(
                     f"{icon} **{rec['priority']}**: {rec['role']} "
-                    f"(current: {rec['current_level']}, target: {rec['target_level']}) - {rec['reason']}"
+                    f"(current: {rec['current_level']}, target: {rec['target_level']}) - {rec['reason']}",
                 )
         else:
             lines.append("✅ No urgent hiring needs identified")
@@ -785,7 +800,7 @@ class SkillsGapAnalyzer:
                 skill_gap = priority["skill_gap"].replace("_", " ").title()
                 lines.append(
                     f"{i}. **{priority['role']}** - {skill_gap} "
-                    f"(current: {priority['current_score']:.0f}/100, target: {priority['target_score']}/100)"
+                    f"(current: {priority['current_score']:.0f}/100, target: {priority['target_score']}/100)",
                 )
                 lines.append(f"   - Training: {priority['training_type']}")
                 lines.append(f"   - Impact Score: {priority['impact_score']}\n")
@@ -797,21 +812,21 @@ class SkillsGapAnalyzer:
         if velocity:
             lines.append("\n## Velocity Impact\n")
             lines.append(
-                f"- **Total Estimated Velocity Loss**: {velocity['total_velocity_loss_days']} days"
+                f"- **Total Estimated Velocity Loss**: {velocity['total_velocity_loss_days']} days",
             )
             lines.append(
-                f"- **Total Rework Cost**: {velocity['total_rework_cost_points']} story points"
+                f"- **Total Rework Cost**: {velocity['total_rework_cost_points']} story points",
             )
             lines.append(
-                f"- **Highest Impact Role**: {velocity['highest_impact_role']}\n"
+                f"- **Highest Impact Role**: {velocity['highest_impact_role']}\n",
             )
             vel_by_role = velocity.get("by_role", {})
             if vel_by_role:
                 lines.append(
-                    "| Role | Risk | Open Bugs | Velocity Loss (days) | Rework (pts) |"
+                    "| Role | Risk | Open Bugs | Velocity Loss (days) | Rework (pts) |",
                 )
                 lines.append(
-                    "|------|------|-----------|---------------------|--------------|"
+                    "|------|------|-----------|---------------------|--------------|",
                 )
                 risk_icons = {
                     "critical": "🔴",
@@ -825,7 +840,7 @@ class SkillsGapAnalyzer:
                     lines.append(
                         f"| {row['role']} | {icon} {row['velocity_risk'].title()} | "
                         f"{row['open_bugs']} | {row['velocity_loss_days']} | "
-                        f"{row['rework_cost_points']} |"
+                        f"{row['rework_cost_points']} |",
                     )
 
         # Quality Correlation (Critical Question #5)
@@ -836,21 +851,21 @@ class SkillsGapAnalyzer:
             data_quality = quality_corr.get("data_quality", "limited")
             lines.append(
                 f"**Data Quality**: {data_quality.title()} "
-                f"({'≥20' if data_quality == 'sufficient' else '<20'} bugs)\n"
+                f"({'≥20' if data_quality == 'sufficient' else '<20'} bugs)\n",
             )
             corrs = quality_corr.get("correlations", [])
             if corrs:
                 lines.append(
-                    "| Role | Skill Score | Quality Grade | Defect Rate | Fix Rate | Correlation |"
+                    "| Role | Skill Score | Quality Grade | Defect Rate | Fix Rate | Correlation |",
                 )
                 lines.append(
-                    "|------|------------|--------------|-------------|----------|-------------|"
+                    "|------|------------|--------------|-------------|----------|-------------|",
                 )
                 for c in corrs:
                     lines.append(
                         f"| {c['role']} | {c['skill_score']}/100 | {c['quality_grade']} | "
                         f"{c['defect_rate']:.2f}x/sprint | {c['fix_rate']}% | "
-                        f"{c['correlation_label'].title()} |"
+                        f"{c['correlation_label'].title()} |",
                     )
 
         # Timestamp
@@ -867,7 +882,7 @@ class SkillsGapAnalyzer:
         summary = assessment["summary"]
         lines.append(f"\nTotal Agents: {summary['total_agents_analyzed']}")
         lines.append(
-            f"Total Bugs: {summary['total_bugs']} ({summary['critical_bugs']} critical)"
+            f"Total Bugs: {summary['total_bugs']} ({summary['critical_bugs']} critical)",
         )
         lines.append(f"Average Skill Level: {summary['avg_skill_level'].upper()}")
         lines.append(f"Roles Needing Attention: {summary['roles_needing_attention']}")
@@ -881,10 +896,10 @@ class SkillsGapAnalyzer:
             analysis = by_role[agent]
             lines.append(f"\n{analysis['role'].upper()}")
             lines.append(
-                f"  Skill Level: {analysis['skill_level'].upper()} ({analysis['overall_score']}/100)"
+                f"  Skill Level: {analysis['skill_level'].upper()} ({analysis['overall_score']}/100)",
             )
             lines.append(
-                f"  Bugs: {analysis['bugs_count']} total, {analysis['critical_bugs']} critical"
+                f"  Bugs: {analysis['bugs_count']} total, {analysis['critical_bugs']} critical",
             )
             lines.append(f"  Top Gap: {analysis['top_gap'].replace('_', ' ').title()}")
             lines.append(f"  Recommendation: {analysis['recommendation']}")
@@ -898,7 +913,7 @@ class SkillsGapAnalyzer:
             for rec in hiring_recs:
                 lines.append(f"\n[{rec['priority']}] {rec['role']}")
                 lines.append(
-                    f"  Current: {rec['current_level']}, Target: {rec['target_level']}"
+                    f"  Current: {rec['current_level']}, Target: {rec['target_level']}",
                 )
                 lines.append(f"  Reason: {rec['reason']}")
         else:
@@ -912,10 +927,10 @@ class SkillsGapAnalyzer:
         if training:
             for i, priority in enumerate(training, 1):
                 lines.append(
-                    f"\n{i}. {priority['role']} - {priority['skill_gap'].replace('_', ' ').title()}"
+                    f"\n{i}. {priority['role']} - {priority['skill_gap'].replace('_', ' ').title()}",
                 )
                 lines.append(
-                    f"   Score: {priority['current_score']:.0f}/100 → {priority['target_score']}/100"
+                    f"   Score: {priority['current_score']:.0f}/100 → {priority['target_score']}/100",
                 )
                 lines.append(f"   Training: {priority['training_type']}")
                 lines.append(f"   Impact: {priority['impact_score']}")
@@ -929,10 +944,10 @@ class SkillsGapAnalyzer:
             lines.append("VELOCITY IMPACT")
             lines.append("-" * 80)
             lines.append(
-                f"\nTotal Velocity Loss: {velocity['total_velocity_loss_days']} days"
+                f"\nTotal Velocity Loss: {velocity['total_velocity_loss_days']} days",
             )
             lines.append(
-                f"Total Rework Cost: {velocity['total_rework_cost_points']} story points"
+                f"Total Rework Cost: {velocity['total_rework_cost_points']} story points",
             )
             lines.append(f"Highest Impact Role: {velocity['highest_impact_role']}")
             for agent in sorted(velocity.get("by_role", {}).keys()):
@@ -951,15 +966,15 @@ class SkillsGapAnalyzer:
             lines.append("-" * 80)
             lines.append(f"\nInsight: {quality_corr.get('insight', '')}")
             lines.append(
-                f"Data Quality: {quality_corr.get('data_quality', 'limited').upper()}"
+                f"Data Quality: {quality_corr.get('data_quality', 'limited').upper()}",
             )
             for c in quality_corr.get("correlations", []):
                 lines.append(f"\n  {c['role'].upper()}")
                 lines.append(
-                    f"    Skill Score: {c['skill_score']}/100  Grade: {c['quality_grade']}"
+                    f"    Skill Score: {c['skill_score']}/100  Grade: {c['quality_grade']}",
                 )
                 lines.append(
-                    f"    Defect Rate: {c['defect_rate']:.2f}x/sprint  Fix Rate: {c['fix_rate']}%"
+                    f"    Defect Rate: {c['defect_rate']:.2f}x/sprint  Fix Rate: {c['fix_rate']}%",
                 )
                 lines.append(f"    Correlation: {c['correlation_label'].upper()}")
 

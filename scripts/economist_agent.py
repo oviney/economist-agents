@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Economist-Style Blog Agent Orchestrator (v3)
+"""Economist-Style Blog Agent Orchestrator (v3)
 
 Updated with governance and human review system.
 
@@ -563,7 +562,7 @@ def run_visual_qa_agent(client, image_path: str, chart_record: dict = None) -> d
                                 "text": "Review this chart for visual quality issues.",
                             },
                         ],
-                    }
+                    },
                 ],
             )
             .content[0]
@@ -586,7 +585,7 @@ def run_visual_qa_agent(client, image_path: str, chart_record: dict = None) -> d
                             {
                                 "type": "image_url",
                                 "image_url": {
-                                    "url": f"data:image/png;base64,{image_data}"
+                                    "url": f"data:image/png;base64,{image_data}",
                                 },
                             },
                         ],
@@ -706,7 +705,9 @@ def generate_economist_post(
     total_points = len(research.get("data_points", []))
     unverified = len(research.get("unverified_claims", []))
     agent_metrics.track_research_agent(
-        data_points=total_points, verified=verified, unverified=unverified
+        data_points=total_points,
+        verified=verified,
+        unverified=unverified,
     )
 
     # Approval Gate 1: Research
@@ -766,7 +767,7 @@ def generate_economist_post(
         # Generate chart
         if chart_attempts > 1:
             print(
-                f"   🔄 Regenerating chart (attempt {chart_attempts}/{max_chart_attempts})..."
+                f"   🔄 Regenerating chart (attempt {chart_attempts}/{max_chart_attempts})...",
             )
             # Add QA feedback to chart spec for regeneration
             if visual_qa_result and visual_qa_result.get("critical_issues"):
@@ -792,21 +793,21 @@ def generate_economist_post(
             if visual_qa_passed:
                 print("   ✓ Chart passed Visual QA")
                 break  # Success - exit loop
-            else:
-                print(
-                    f"   ⚠ Chart failed Visual QA (attempt {chart_attempts}/{max_chart_attempts})"
-                )
-                # Save QA report for debugging
-                qa_report_path = chart_path.replace(
-                    ".png", f"-qa-report-{chart_attempts}.json"
-                )
-                with open(qa_report_path, "w") as f:
-                    json.dump(visual_qa_result, f, indent=2)
+            print(
+                f"   ⚠ Chart failed Visual QA (attempt {chart_attempts}/{max_chart_attempts})",
+            )
+            # Save QA report for debugging
+            qa_report_path = chart_path.replace(
+                ".png",
+                f"-qa-report-{chart_attempts}.json",
+            )
+            with open(qa_report_path, "w") as f:
+                json.dump(visual_qa_result, f, indent=2)
 
-                if chart_attempts >= max_chart_attempts:
-                    print(
-                        "   ❌ Chart failed Visual QA after all attempts - BLOCKING publication"
-                    )
+            if chart_attempts >= max_chart_attempts:
+                print(
+                    "   ❌ Chart failed Visual QA after all attempts - BLOCKING publication",
+                )
         else:
             # No vision support - can't validate
             print("   ℹ Visual QA skipped (provider does not support vision)")
@@ -869,7 +870,7 @@ def generate_economist_post(
             # Always set the expected path so writer includes it in front matter.
             featured_image_blog_path = f"/assets/images/{slug}.png"
             print(
-                "   ℹ DALL-E failed — image path set to expected fallback (no file generated)"
+                "   ℹ DALL-E failed — image path set to expected fallback (no file generated)",
             )
     else:
         # No OpenAI key — still set the expected image path for front matter compliance.
@@ -883,7 +884,12 @@ def generate_economist_post(
         chart_filename = f"/assets/charts/{slug}.png"
 
     draft, writer_metadata = run_writer_agent(
-        client, topic, research, date_str, chart_filename, featured_image_blog_path
+        client,
+        topic,
+        research,
+        date_str,
+        chart_filename,
+        featured_image_blog_path,
     )
 
     # Track Writer Agent metrics
@@ -899,7 +905,7 @@ def generate_economist_post(
         if phrase.lower() in draft.lower()
     )
     chart_embedded = bool(
-        chart_filename and "![" in draft and chart_filename.split("/")[-1] in draft
+        chart_filename and "![" in draft and chart_filename.split("/")[-1] in draft,
     )
 
     agent_metrics.track_writer_agent(
@@ -950,7 +956,10 @@ def generate_economist_post(
             print(f"   ⚠️  Style Memory initialization failed: {e}")
 
     edited_article, gates_passed, gates_failed = run_editor_agent(
-        client, draft, style_memory_tool=style_memory, current_date=date_str
+        client,
+        draft,
+        style_memory_tool=style_memory,
+        current_date=date_str,
     )
 
     # Track Editor Agent metrics
@@ -1001,8 +1010,7 @@ def generate_economist_post(
             "validation_report": str(report_path),
             "issues": validation_issues,
         }
-    else:
-        print(f"   ✓ Validation PASSED ({len(validation_issues)} advisory notes)")
+    print(f"   ✓ Validation PASSED ({len(validation_issues)} advisory notes)")
 
     # Save article (only if validated)
     article_path = str(posts_dir / f"{date_str}-{slug}.md")
@@ -1020,7 +1028,7 @@ def generate_economist_post(
     if chart_path:
         print(f"   Chart:   {chart_path}")
         print(
-            f"   Visual QA: {'PASSED' if visual_qa_passed else 'FAILED - needs review'}"
+            f"   Visual QA: {'PASSED' if visual_qa_passed else 'FAILED - needs review'}",
         )
     print(f"   Editorial: {gates_passed}/5 gates passed")
     print("=" * 70 + "\n")

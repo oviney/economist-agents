@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Documentation Accuracy Validator
+"""Documentation Accuracy Validator
 
 Validates that core documentation files are current and accurate by comparing
 against the authoritative sprint_tracker.json source of truth.
@@ -115,7 +114,9 @@ class DocumentationValidator:
             return {}
 
     def _validate_readme_sprint_status(
-        self, current_sprint: int, sprint_data: dict
+        self,
+        current_sprint: int,
+        sprint_data: dict,
     ) -> None:
         """Validate README.md shows correct sprint status"""
         with open(self.readme_path) as f:
@@ -138,18 +139,22 @@ class DocumentationValidator:
                 re.IGNORECASE,
             ):
                 self.errors.append(
-                    f"README.md does not show Sprint {current_sprint} as IN PROGRESS"
+                    f"README.md does not show Sprint {current_sprint} as IN PROGRESS",
                 )
         elif sprint_status == "planning" and not re.search(
-            r"PLANNING", readme_content, re.IGNORECASE
+            r"PLANNING",
+            readme_content,
+            re.IGNORECASE,
         ):
             # Should say "PLANNING"
             self.warnings.append(
-                f"README.md may not show Sprint {current_sprint} as PLANNING"
+                f"README.md may not show Sprint {current_sprint} as PLANNING",
             )
 
     def _validate_sprint_md_status(
-        self, current_sprint: int, sprint_data: dict
+        self,
+        current_sprint: int,
+        sprint_data: dict,
     ) -> None:
         """Validate SPRINT.md shows correct sprint status"""
         with open(self.sprint_path) as f:
@@ -161,7 +166,7 @@ class DocumentationValidator:
         active_sprint_pattern = rf"\*\*Active Sprint\*\*:\s*Sprint {current_sprint}"
         if not re.search(active_sprint_pattern, sprint_content):
             self.errors.append(
-                f"SPRINT.md does not show Sprint {current_sprint} as Active Sprint"
+                f"SPRINT.md does not show Sprint {current_sprint} as Active Sprint",
             )
             return
 
@@ -169,14 +174,15 @@ class DocumentationValidator:
         if sprint_status == "in_progress":
             if not re.search(r"IN PROGRESS|Day \d+", sprint_content):
                 self.errors.append(
-                    f"SPRINT.md does not show Sprint {current_sprint} as IN PROGRESS"
+                    f"SPRINT.md does not show Sprint {current_sprint} as IN PROGRESS",
                 )
 
         elif sprint_status == "planning" and not re.search(
-            r"PLANNING|Ready for kickoff", sprint_content
+            r"PLANNING|Ready for kickoff",
+            sprint_content,
         ):
             self.warnings.append(
-                f"SPRINT.md may not show Sprint {current_sprint} as PLANNING"
+                f"SPRINT.md may not show Sprint {current_sprint} as PLANNING",
             )
 
     def _validate_changelog_entry(self, current_sprint: int, sprint_data: dict) -> None:
@@ -194,7 +200,7 @@ class DocumentationValidator:
                 story_pattern = rf"STORY-0*{story_id:02d}"
                 if not re.search(story_pattern, changelog_content):
                     self.warnings.append(
-                        f"CHANGELOG.md missing entry for completed Story {story_id}"
+                        f"CHANGELOG.md missing entry for completed Story {story_id}",
                     )
 
     def print_report(self, verbose: bool = False) -> None:
@@ -232,7 +238,7 @@ def main() -> int:
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Validate documentation accuracy against sprint_tracker.json"
+        description="Validate documentation accuracy against sprint_tracker.json",
     )
     parser.add_argument(
         "--warn-only",
@@ -240,7 +246,10 @@ def main() -> int:
         help="Exit 0 even if errors found (warnings only)",
     )
     parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Show detailed information"
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Show detailed information",
     )
 
     args = parser.parse_args()

@@ -1,5 +1,4 @@
-"""
-Sprint 15 Production Integration Tests
+"""Sprint 15 Production Integration Tests
 
 Tests Flow orchestration, RAG integration, and ROI telemetry working together
 in the production pipeline.
@@ -26,7 +25,7 @@ from src.tools.style_memory_tool import StyleMemoryTool
         "Stage3Crew / Stage4Crew on src.economist_agents.flow which "
         "were deleted; flow.py now uses src.agent_sdk.pipeline directly. "
         "Filed #314 for new flow integration tests."
-    )
+    ),
 )
 class TestFlowOrchestration:
     """Test Flow-based orchestration patterns"""
@@ -84,7 +83,6 @@ class TestFlowOrchestration:
     @pytest.mark.skip(reason="Stage2Crew not yet implemented in flow.py")
     def test_flow_editorial_review_skip(self):
         """Placeholder for Stage 2 tests when implemented"""
-        pass
 
     @pytest.mark.skipif(
         not os.environ.get("OPENAI_API_KEY"),
@@ -287,7 +285,7 @@ class TestEndToEndIntegration:
         reason=(
             "Obsolete after ADR-0006 Phase 2 (epic #308) — "
             "Stage3Crew / Stage4Crew patches no longer apply. See #314."
-        )
+        ),
     )
     @patch("src.economist_agents.flow.Stage3Crew")
     @patch("src.economist_agents.flow.Stage4Crew")
@@ -312,7 +310,7 @@ class TestEndToEndIntegration:
 
         mock_rag_instance = MagicMock()
         mock_rag_instance.query.return_value = [
-            {"text": "Use data-driven claims", "score": 0.92}
+            {"text": "Use data-driven claims", "score": 0.92},
         ]
         mock_rag.return_value = mock_rag_instance
 

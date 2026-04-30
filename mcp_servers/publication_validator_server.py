@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Publication Validator MCP Server
+"""Publication Validator MCP Server
 
 Exposes the PublicationValidator quality gate as an MCP tool so that any
 agent in the content pipeline can validate articles before publication.
@@ -68,6 +67,7 @@ def validate_for_publication(
         * ``issues`` (list[dict]): Zero or more issue dictionaries, each
           containing at minimum ``check``, ``severity``, and ``message``
           keys as produced by :class:`~scripts.publication_validator.PublicationValidator`.
+
     """
     logger.info(
         "validate_for_publication called: expected_date=%s, content_length=%d",
@@ -87,12 +87,14 @@ def validate_for_publication(
                     "check": "validator_error",
                     "severity": "CRITICAL",
                     "message": str(exc),
-                }
+                },
             ],
         }
 
     logger.info(
-        "Validation complete: is_valid=%s, issue_count=%d", is_valid, len(issues)
+        "Validation complete: is_valid=%s, issue_count=%d",
+        is_valid,
+        len(issues),
     )
 
     return {"is_valid": is_valid, "issues": issues}
@@ -125,6 +127,7 @@ def validate_post(post_path: str) -> dict:
         * ``errors`` (list[str]): Fatal validation failures; the post must
           be fixed before publication.
         * ``warnings`` (list[str]): Non-fatal advisories.
+
     """
     errors: list[str] = []
     warnings: list[str] = []
@@ -232,7 +235,7 @@ def validate_post(post_path: str) -> dict:
             if cat not in VALID_CATEGORIES:
                 errors.append(
                     f"Invalid category '{cat}'. "
-                    f"Must be one of: {', '.join(VALID_CATEGORIES)}"
+                    f"Must be one of: {', '.join(VALID_CATEGORIES)}",
                 )
 
     # ------------------------------------------------------------------

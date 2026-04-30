@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Evaluate Fresh Data Integration Options
+"""Evaluate Fresh Data Integration Options
 
 Uses our Research Agent to analyze and recommend the best approach
 for enabling research beyond LLM training data cutoffs.

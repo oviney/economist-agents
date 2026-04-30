@@ -59,6 +59,7 @@ def _parse_github_url(url: str) -> tuple[str, str, int]:
 
     Raises:
         ValueError: If the URL does not match expected GitHub format.
+
     """
     match = re.match(
         r"https?://github\.com/([^/]+)/([^/]+)/(?:pull|issues)/(\d+)",
@@ -68,7 +69,7 @@ def _parse_github_url(url: str) -> tuple[str, str, int]:
         raise ValueError(
             f"Invalid GitHub PR/issue URL: {url!r}. "
             "Expected https://github.com/<owner>/<repo>/pull/<n> "
-            "or https://github.com/<owner>/<repo>/issues/<n>"
+            "or https://github.com/<owner>/<repo>/issues/<n>",
         )
     owner, repo, number = match.groups()
     return owner, repo, int(number)
@@ -82,6 +83,7 @@ def _get_github_client() -> Any:
 
     Raises:
         ImportError: If PyGithub is not installed.
+
     """
     from github import Github  # noqa: PLC0415
 
@@ -94,6 +96,7 @@ def _load_state() -> list[dict[str, Any]]:
 
     Returns:
         List of past decision records, or empty list if file missing/corrupt.
+
     """
     if not STATE_FILE.exists():
         return []
@@ -109,6 +112,7 @@ def _save_state(state: list[dict[str, Any]]) -> None:
 
     Args:
         state: Full list of decision records to write.
+
     """
     STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
     STATE_FILE.write_bytes(orjson.dumps(state, option=orjson.OPT_INDENT_2))
@@ -120,6 +124,7 @@ def _log_decision(action: str, data: dict[str, Any]) -> None:
     Args:
         action: Short action label, e.g. "promoted" or "dispatch_check".
         data: Additional key/value context for the record.
+
     """
     state = _load_state()
     entry: dict[str, Any] = {
@@ -139,12 +144,15 @@ def _has_todo_markers(patch: str | None) -> bool:
 
     Returns:
         True if any marker is found in added lines.
+
     """
     if not patch:
         return False
     for line in patch.splitlines():
         if line.startswith("+") and re.search(
-            r"\b(TODO|FIXME|PLACEHOLDER|WIP|HACK)\b", line, re.IGNORECASE
+            r"\b(TODO|FIXME|PLACEHOLDER|WIP|HACK)\b",
+            line,
+            re.IGNORECASE,
         ):
             return True
     return False
@@ -159,6 +167,7 @@ def _estimate_complexity(labels: list[str], file_count: int) -> str:
 
     Returns:
         One of "low", "medium", or "high".
+
     """
     for lbl in labels:
         if any(marker in lbl for marker in ("effort:large", "p1", "complex", "large")):
@@ -194,6 +203,7 @@ def check_pr_ready(pr_url: str) -> dict[str, Any]:
             promote (bool): Whether the PR is ready to promote.
             reason  (str):  Human-readable explanation.
             details (dict): Granular sub-checks.
+
     """
     owner, repo_name, pr_number = _parse_github_url(pr_url)
     g = _get_github_client()
@@ -259,7 +269,8 @@ def check_pr_ready(pr_url: str) -> dict[str, Any]:
         },
     }
     _log_decision(
-        "pr_ready_check", {"pr": pr_url, "promote": promote, "reason": reason}
+        "pr_ready_check",
+        {"pr": pr_url, "promote": promote, "reason": reason},
     )
     return result
 
@@ -279,6 +290,7 @@ def _score_pr(pr: Any, files: list[Any]) -> tuple[int, dict[str, Any]]:
 
     Returns:
         Tuple of (score, details_dict).
+
     """
     file_count = len(files)
     score = min(file_count * 2, 20)
@@ -319,6 +331,7 @@ def triage_duplicates(pr_a_url: str, pr_b_url: str) -> dict[str, Any]:
             reason (str):  Human-readable explanation.
             scores (dict): Numeric scores for each PR.
             details(dict): Sub-scores for each PR.
+
     """
     owner_a, repo_a_name, pr_a_num = _parse_github_url(pr_a_url)
     owner_b, repo_b_name, pr_b_num = _parse_github_url(pr_b_url)
@@ -379,6 +392,7 @@ def check_dispatch_safe(issue_url: str) -> dict[str, Any]:
             dispatch (bool): Whether it is safe to dispatch.
             reason   (str):  Human-readable explanation.
             details  (dict): Granular sub-checks.
+
     """
     owner, repo_name, issue_number = _parse_github_url(issue_url)
     g = _get_github_client()
@@ -398,7 +412,7 @@ def check_dispatch_safe(issue_url: str) -> dict[str, Any]:
 
     body = issue.body or ""
     has_blocking_dependency = bool(
-        re.search(r"depends\s+on\s+#\d+|blocked\s+by\s+#\d+", body, re.IGNORECASE)
+        re.search(r"depends\s+on\s+#\d+|blocked\s+by\s+#\d+", body, re.IGNORECASE),
     )
 
     dispatch = not is_blocked and capacity_available and not has_blocking_dependency
@@ -411,13 +425,13 @@ def check_dispatch_safe(issue_url: str) -> dict[str, Any]:
         reason_parts.append(f"has blocking label(s): {', '.join(blocking)}")
     if not capacity_available:
         reason_parts.append(
-            f"capacity full ({active_count}/{_MAX_CAPACITY} active draft PRs)"
+            f"capacity full ({active_count}/{_MAX_CAPACITY} active draft PRs)",
         )
     if has_blocking_dependency:
         reason_parts.append("issue body references a blocking dependency")
     if dispatch:
         reason_parts.append(
-            f"no blocking dependencies; capacity available ({active_count}/{_MAX_CAPACITY})"
+            f"no blocking dependencies; capacity available ({active_count}/{_MAX_CAPACITY})",
         )
 
     reason = "; ".join(reason_parts) if reason_parts else "unable to determine"
@@ -434,7 +448,8 @@ def check_dispatch_safe(issue_url: str) -> dict[str, Any]:
         },
     }
     _log_decision(
-        "dispatch_check", {"issue": issue_url, "dispatch": dispatch, "reason": reason}
+        "dispatch_check",
+        {"issue": issue_url, "dispatch": dispatch, "reason": reason},
     )
     return result
 
@@ -456,6 +471,7 @@ def check_stalled(pr_url: str, idle_minutes: int = 60) -> dict[str, Any]:
             stalled (bool): Whether the PR is considered stalled.
             reason  (str):  Human-readable explanation.
             details (dict): Complexity estimate and thresholds.
+
     """
     owner, repo_name, pr_number = _parse_github_url(pr_url)
     g = _get_github_client()
@@ -554,7 +570,7 @@ Examples:
         elif args.mode == "duplicate-triage":
             if not args.pr_a or not args.pr_b:
                 parser.error(
-                    "--pr-a and --pr-b are required for --mode duplicate-triage"
+                    "--pr-a and --pr-b are required for --mode duplicate-triage",
                 )
             result = triage_duplicates(args.pr_a, args.pr_b)
 

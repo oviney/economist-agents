@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Editor Agent - Reviews and edits article drafts
+"""Editor Agent - Reviews and edits article drafts
 
 Extracted from economist_agent.py for better modularity.
 Implements Sprint 8 Story 4 fixes:
@@ -17,10 +16,10 @@ from typing import Any
 # Add scripts directory to path for llm_client import
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-from agent_loader import (  # noqa: E402
+from agent_loader import (
     load_content_agent as _load_content_agent,  # type: ignore
 )
-from llm_client import call_llm  # type: ignore  # noqa: E402
+from llm_client import call_llm  # type: ignore
 
 # Sprint 14 Integration: Style Memory RAG
 try:
@@ -83,6 +82,7 @@ class EditorAgent:
         >>> client = create_llm_client()
         >>> agent = EditorAgent(client)
         >>> edited, gates_passed, gates_failed = agent.edit(draft)
+
     """
 
     def __init__(
@@ -97,6 +97,7 @@ class EditorAgent:
             client: LLM client for editorial reviews
             governance: Optional governance tracker for logging
             style_memory_tool: Optional StyleMemoryTool for RAG-based style patterns
+
         """
         self.client = client
         self.governance = governance
@@ -126,10 +127,11 @@ class EditorAgent:
 
         Raises:
             ValueError: If draft is invalid or too short
+
         """
         if not draft or not isinstance(draft, str):
             raise ValueError(
-                f"Invalid draft. Expected non-empty string, got: {type(draft).__name__}"
+                f"Invalid draft. Expected non-empty string, got: {type(draft).__name__}",
             )
 
         if len(draft.strip()) < 100:
@@ -154,17 +156,18 @@ class EditorAgent:
         Example:
             >>> edited, passed, failed = agent.edit(draft)
             >>> print(f"Quality: {passed}/{passed + failed} gates passed")
+
         """
         # Input validation
         if not draft or not isinstance(draft, str):
             raise ValueError(
                 f"[EDITOR_AGENT] Invalid draft. Expected non-empty string, "
-                f"got: {type(draft).__name__}"
+                f"got: {type(draft).__name__}",
             )
 
         if len(draft.strip()) < 100:
             raise ValueError(
-                "[EDITOR_AGENT] Draft too short. Need at least 100 characters."
+                "[EDITOR_AGENT] Draft too short. Need at least 100 characters.",
             )
 
         print("📝 Editor Agent: Reviewing draft through quality gates...")
@@ -175,7 +178,8 @@ class EditorAgent:
             try:
                 # Query for voice/style patterns
                 patterns = self.style_memory_tool.query(
-                    "Economist voice and style guidelines", n_results=3
+                    "Economist voice and style guidelines",
+                    n_results=3,
                 )
                 if patterns:
                     style_context = (
@@ -184,7 +188,7 @@ class EditorAgent:
                     for i, pattern in enumerate(patterns, 1):
                         style_context += f"\n{i}. {pattern['text'][:200]}...\n   (Relevance: {pattern['score']:.2f})"
                     print(
-                        f"   📖 Style Memory: Retrieved {len(patterns)} relevant patterns"
+                        f"   📖 Style Memory: Retrieved {len(patterns)} relevant patterns",
                     )
             except Exception as e:
                 print(f"   ⚠️  Style Memory query failed: {e}")
@@ -247,6 +251,7 @@ class EditorAgent:
 
         Returns:
             Tuple of (gates_passed, gates_failed)
+
         """
         gates_passed = 0
         gates_failed = 0
@@ -279,6 +284,7 @@ class EditorAgent:
 
         Returns:
             True if format is valid, False otherwise
+
         """
         required_sections = [
             "## Quality Gate Results",
@@ -315,6 +321,7 @@ class EditorAgent:
 
         Returns:
             Edited article text with YAML frontmatter
+
         """
         # Look for "## Edited Article" section
         if "## Edited Article" in response:
@@ -384,6 +391,7 @@ def run_editor_agent(
         >>> from llm_client import create_llm_client
         >>> client = create_llm_client()
         >>> edited, passed, failed = run_editor_agent(client, draft)
+
     """
     # Default to today's date if not provided
     if current_date is None:

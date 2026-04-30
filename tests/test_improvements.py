@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Test Suite for Architecture Improvements
+"""Test Suite for Architecture Improvements
 
 Tests all implemented recommendations:
 - JSON schema validation
@@ -49,7 +48,7 @@ def test_json_schema_validation():
                 },
                 "total_score": 21,
                 "talking_points": "point 1, point 2",
-            }
+            },
         ],
     }
 
@@ -59,7 +58,8 @@ def test_json_schema_validation():
 
     try:
         is_valid, errors = validate_json_file(
-            temp_path, schema_dir / "content_queue_schema.json"
+            temp_path,
+            schema_dir / "content_queue_schema.json",
         )
         assert is_valid, f"Valid content queue failed validation: {errors}"
         print("   ✅ Valid content_queue.json passes validation")
@@ -68,7 +68,7 @@ def test_json_schema_validation():
 
     # Test invalid content_queue (missing required field)
     invalid_content_queue = {
-        "updated": "2025-12-31T00:00:00Z"
+        "updated": "2025-12-31T00:00:00Z",
         # Missing 'topics' field
     }
 
@@ -78,7 +78,8 @@ def test_json_schema_validation():
 
     try:
         is_valid, errors = validate_json_file(
-            temp_path, schema_dir / "content_queue_schema.json"
+            temp_path,
+            schema_dir / "content_queue_schema.json",
         )
         assert not is_valid, "Invalid content queue passed validation!"
         assert any("topics" in str(e).lower() for e in errors), (

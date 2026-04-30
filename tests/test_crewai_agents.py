@@ -163,7 +163,9 @@ class TestCreateAgent:
 
     @patch("scripts.crewai_agents.Agent")
     def test_create_agent_with_optional_params(
-        self, mock_agent_class, temp_agents_file,
+        self,
+        mock_agent_class,
+        temp_agents_file,
     ):
         """Should include optional parameters when present"""
         mock_agent = MagicMock()

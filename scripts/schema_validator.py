@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Front Matter Schema Validator
+"""Front Matter Schema Validator
 
 Enforces strict schema validation for Jekyll blog post front matter.
 This is a "BLOCK" in the quality framework - hard validation that
@@ -68,11 +67,11 @@ class FrontMatterValidator:
         self.expected_date = expected_date or datetime.now().strftime("%Y-%m-%d")
 
     def validate(self, content: str) -> tuple[bool, list[str]]:
-        """
-        Validate article front matter.
+        """Validate article front matter.
 
         Returns:
             (is_valid, issues_list)
+
         """
         issues = []
 
@@ -84,7 +83,7 @@ class FrontMatterValidator:
         parts = content.split("---", 2)
         if len(parts) < 3:
             issues.append(
-                "CRITICAL: Incomplete YAML front matter (missing closing ---)"
+                "CRITICAL: Incomplete YAML front matter (missing closing ---)",
             )
             return False, issues
 
@@ -120,7 +119,7 @@ class FrontMatterValidator:
             if layout not in allowed_layouts:
                 issues.append(
                     f"CRITICAL: Invalid layout '{layout}'. "
-                    f"Allowed: {', '.join(allowed_layouts)}"
+                    f"Allowed: {', '.join(allowed_layouts)}",
                 )
 
         # Title validation
@@ -130,7 +129,7 @@ class FrontMatterValidator:
                 issues.append("CRITICAL: Title must be a string")
             elif len(title) < 10:
                 issues.append(
-                    f"CRITICAL: Title too short ({len(title)} chars, ≥10 required)"
+                    f"CRITICAL: Title too short ({len(title)} chars, ≥10 required)",
                 )
 
             # Check for generic titles
@@ -145,7 +144,7 @@ class FrontMatterValidator:
                 if re.search(pattern, title_lower):
                     issues.append(
                         f"WARNING: Generic title pattern detected: '{pattern}' "
-                        f"(title should be specific)"
+                        f"(title should be specific)",
                     )
 
         # Date validation
@@ -158,13 +157,13 @@ class FrontMatterValidator:
 
             if not re.match(r"^\d{4}-\d{2}-\d{2}$", date_str):
                 issues.append(
-                    f"CRITICAL: Invalid date format '{date_str}' (expected YYYY-MM-DD)"
+                    f"CRITICAL: Invalid date format '{date_str}' (expected YYYY-MM-DD)",
                 )
 
             # Check if date matches expected date
             if self.expected_date and date_str != self.expected_date:
                 issues.append(
-                    f"WARNING: Date '{date_str}' doesn't match expected '{self.expected_date}'"
+                    f"WARNING: Date '{date_str}' doesn't match expected '{self.expected_date}'",
                 )
 
         # Categories validation
@@ -177,7 +176,7 @@ class FrontMatterValidator:
                 issues.append("CRITICAL: categories array is empty (need ≥1)")
             elif len(categories) > 3:
                 issues.append(
-                    f"WARNING: Too many categories ({len(categories)}, ≤3 recommended)"
+                    f"WARNING: Too many categories ({len(categories)}, ≤3 recommended)",
                 )
             else:
                 # Validate each category
@@ -188,7 +187,7 @@ class FrontMatterValidator:
                     if cat not in allowed_categories:
                         issues.append(
                             f"WARNING: Unknown category '{cat}'. "
-                            f"Allowed: {', '.join(allowed_categories)}"
+                            f"Allowed: {', '.join(allowed_categories)}",
                         )
 
         if "author" in front_matter and front_matter["author"] != "Ouray Viney":
@@ -208,7 +207,7 @@ class FrontMatterValidator:
             ]
             if any(mention in body for mention in ai_mentions):
                 issues.append(
-                    "WARNING: Content mentions AI but missing 'ai_assisted: true' flag"
+                    "WARNING: Content mentions AI but missing 'ai_assisted: true' flag",
                 )
 
         return len(issues) == 0, issues
@@ -257,10 +256,10 @@ class FrontMatterValidator:
 
 
 def validate_front_matter(
-    content: str, expected_date: str = None
+    content: str,
+    expected_date: str = None,
 ) -> tuple[bool, list[str]]:
-    """
-    Main entry point for front matter validation.
+    """Main entry point for front matter validation.
 
     Args:
         content: Full article content including front matter
@@ -268,6 +267,7 @@ def validate_front_matter(
 
     Returns:
         (is_valid, issues_list)
+
     """
     validator = FrontMatterValidator(expected_date)
     is_valid, issues = validator.validate(content)

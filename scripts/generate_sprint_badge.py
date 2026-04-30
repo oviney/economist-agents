@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Sprint Badge Generator
+"""Sprint Badge Generator
 
 Generates shields.io JSON endpoint for Sprint badge from sprint_tracker.json.
 

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Test Development Crew with Real Debug Story
+"""Test Development Crew with Real Debug Story
 
 Tests our crew with a realistic debugging story similar to what the user
 actually worked on: "Fix Dashboard Data Accuracy + Validation"
@@ -315,7 +314,7 @@ def load_agent_metrics(self) -> dict:
         print("\n🐛 TESTING DEBUG WORKFLOW WITH REAL STORY")
         print(f"Story: {self.debug_story['story_title']}")
         print(
-            f"Bug Location: {self.debug_story['implementation_context']['bug_location']}"
+            f"Bug Location: {self.debug_story['implementation_context']['bug_location']}",
         )
         print(f"{'=' * 90}")
 
@@ -372,7 +371,7 @@ def main():
     bug_resolution = result["bug_resolution"]
     print("\n🐛 Bug Resolution:")
     print(
-        f"   • Root Cause Found: {'✅' if bug_resolution['root_cause_found'] else '❌'}"
+        f"   • Root Cause Found: {'✅' if bug_resolution['root_cause_found'] else '❌'}",
     )
     print(f"   • Bug Fixed: {'✅' if bug_resolution['bug_fixed'] else '❌'}")
     print(f"   • Fix Approved: {'✅' if bug_resolution['fix_approved'] else '❌'}")

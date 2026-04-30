@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-OpenAI Token Usage Logger
+"""OpenAI Token Usage Logger
 
 Captures token consumption and estimated cost for every LLM API call.
 Usage data is appended to ~/.economist-agents/token-usage.jsonl and a
@@ -59,6 +58,7 @@ def estimate_cost(model: str, prompt_tokens: int, completion_tokens: int) -> flo
 
     Returns:
         Estimated cost in USD, rounded to six decimal places.
+
     """
     prompt_rate, completion_rate = MODEL_COSTS.get(model, MODEL_COSTS["default"])
     cost = (
@@ -89,6 +89,7 @@ def log_token_usage(
 
     Returns:
         Estimated cost in USD for this call.
+
     """
     import orjson  # noqa: PLC0415 — deferred so module loads without orjson
 
@@ -109,7 +110,7 @@ def log_token_usage(
         f"prompt={prompt_tokens}  "
         f"completion={completion_tokens}  "
         f"total={total_tokens}  "
-        f"est_cost=${cost:.3f}"
+        f"est_cost=${cost:.3f}",
     )
 
     # Persist to JSONL log
@@ -132,6 +133,7 @@ def read_usage_log(log_file: Path | None = None) -> list[dict]:
 
     Returns:
         List of usage record dicts, in append order (oldest first).
+
     """
     import orjson  # noqa: PLC0415
 
@@ -169,6 +171,7 @@ def summarise_usage(records: list[dict]) -> dict:
                     "estimated_cost_usd": 0.042,
                 }
             }
+
     """
     totals: dict[str, dict] = {}
     for rec in records:
@@ -188,7 +191,8 @@ def summarise_usage(records: list[dict]) -> dict:
         entry["completion_tokens"] += rec.get("completion_tokens", 0)
         entry["total_tokens"] += rec.get("total_tokens", 0)
         entry["estimated_cost_usd"] = round(
-            entry["estimated_cost_usd"] + rec.get("estimated_cost_usd", 0.0), 6
+            entry["estimated_cost_usd"] + rec.get("estimated_cost_usd", 0.0),
+            6,
         )
     return totals
 
@@ -200,6 +204,7 @@ def print_ci_summary(log_file: Path | None = None) -> None:
 
     Args:
         log_file: Override the default JSONL log path.
+
     """
     summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
     if not summary_path:
@@ -223,7 +228,7 @@ def print_ci_summary(log_file: Path | None = None) -> None:
             f"| {stats['calls']:,} "
             f"| {stats['prompt_tokens']:,} "
             f"| {stats['completion_tokens']:,} "
-            f"| ${stats['estimated_cost_usd']:.4f} |"
+            f"| ${stats['estimated_cost_usd']:.4f} |",
         )
 
     total_cost = sum(s["estimated_cost_usd"] for s in by_model.values())
@@ -247,7 +252,7 @@ if __name__ == "__main__":  # pragma: no cover
             print("No token-usage records found.")
         else:
             print(
-                f"{'Model':<20} {'Calls':>6} {'Prompt':>10} {'Completion':>12} {'Cost':>10}"
+                f"{'Model':<20} {'Calls':>6} {'Prompt':>10} {'Completion':>12} {'Cost':>10}",
             )
             print("-" * 64)
             for model, stats in sorted(by_model.items()):
@@ -256,7 +261,7 @@ if __name__ == "__main__":  # pragma: no cover
                     f"{stats['calls']:>6,} "
                     f"{stats['prompt_tokens']:>10,} "
                     f"{stats['completion_tokens']:>12,} "
-                    f"${stats['estimated_cost_usd']:>9.4f}"
+                    f"${stats['estimated_cost_usd']:>9.4f}",
                 )
     else:
         # Demo log call

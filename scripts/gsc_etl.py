@@ -47,6 +47,7 @@ def init_db(db_path: Path) -> sqlite3.Connection:
 
     Returns:
         An open sqlite3 connection.
+
     """
     db_path.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(db_path))
@@ -60,7 +61,7 @@ def init_db(db_path: Path) -> sqlite3.Connection:
             avg_position   REAL,
             fetched_at     TEXT
         )
-        """
+        """,
     )
     conn.execute(
         """
@@ -74,7 +75,7 @@ def init_db(db_path: Path) -> sqlite3.Connection:
             is_content_gap BOOLEAN,
             fetched_at     TEXT
         )
-        """
+        """,
     )
     conn.commit()
     return conn
@@ -95,6 +96,7 @@ def build_gsc_service(
 
     Returns:
         A googleapiclient Resource for the Search Console API.
+
     """
     creds = Credentials.from_service_account_file(
         credentials_path,
@@ -119,6 +121,7 @@ def fetch_search_analytics(
     Returns:
         A list of row dicts with keys, impressions, clicks, ctr, position.
         Returns an empty list when the property has no data yet.
+
     """
     end_date = datetime.now(tz=UTC).date()
     start_date = end_date - timedelta(days=days)
@@ -166,6 +169,7 @@ def parse_rows(
 
     Returns:
         List of dicts with query, page_url, impressions, clicks, ctr, position.
+
     """
     parsed: list[dict[str, Any]] = []
     for row in rows:
@@ -178,7 +182,7 @@ def parse_rows(
                 "clicks": int(row.get("clicks", 0)),
                 "ctr": float(row.get("ctr", 0.0)),
                 "position": float(row.get("position", 0.0)),
-            }
+            },
         )
     return parsed
 
@@ -196,6 +200,7 @@ def identify_content_gaps(
 
     Returns:
         The same rows with an added ``is_content_gap`` boolean field.
+
     """
     if not keyword_rows:
         return keyword_rows
@@ -221,6 +226,7 @@ def aggregate_by_page(
 
     Returns:
         List of page-level aggregate dicts.
+
     """
     pages: dict[str, dict[str, Any]] = {}
     for row in keyword_rows:
@@ -251,7 +257,7 @@ def aggregate_by_page(
                 "total_clicks": agg["total_clicks"],
                 "avg_ctr": agg["ctr_sum"] / count if count else 0.0,
                 "avg_position": agg["position_sum"] / count if count else 0.0,
-            }
+            },
         )
     return results
 
@@ -274,6 +280,7 @@ def store_results(
         page_rows: Per-page aggregated rows.
         keyword_rows: Per-keyword rows with content-gap flags.
         fetched_at: ISO-8601 timestamp string for this fetch.
+
     """
     conn.executemany(
         """
@@ -343,6 +350,7 @@ def run_etl(
 
     Returns:
         Summary dict with total_queries, total_pages, content_gaps counts.
+
     """
     service = build_gsc_service(credentials_path)
     raw_rows = fetch_search_analytics(service, site_url, days)
@@ -390,6 +398,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
     Returns:
         Parsed namespace with ``days`` attribute.
+
     """
     parser = argparse.ArgumentParser(
         description="Google Search Console ETL — fetch keyword & page performance",
@@ -408,6 +417,7 @@ def main(argv: list[str] | None = None) -> None:
 
     Args:
         argv: Optional argument list for testing.
+
     """
     import os
 

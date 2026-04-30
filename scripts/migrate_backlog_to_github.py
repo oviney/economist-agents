@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Migrate BACKLOG.md to GitHub Issues
+"""Migrate BACKLOG.md to GitHub Issues
 
 Converts markdown backlog to GitHub Issues with proper labels and metadata.
 Requires GitHub CLI (gh) to be installed and authenticated.
@@ -122,7 +121,9 @@ class GitHubIssueCreator:
         """Check if GitHub CLI is installed and authenticated"""
         try:
             result = subprocess.run(
-                ["gh", "auth", "status"], capture_output=True, text=True
+                ["gh", "auth", "status"],
+                capture_output=True,
+                text=True,
             )
             if result.returncode != 0:
                 raise RuntimeError("GitHub CLI not authenticated. Run: gh auth login")
@@ -130,7 +131,7 @@ class GitHubIssueCreator:
             raise RuntimeError(
                 "GitHub CLI (gh) not installed.\n"
                 "Install: brew install gh\n"
-                "Then authenticate: gh auth login"
+                "Then authenticate: gh auth login",
             ) from err
 
     def create_issue(self, item: dict[str, Any], dry_run: bool = False) -> str:
@@ -272,10 +273,13 @@ def main():
 
     parser = argparse.ArgumentParser(description="Migrate BACKLOG.md to GitHub Issues")
     parser.add_argument(
-        "--backlog", default=".github/BACKLOG.md", help="Path to BACKLOG.md file"
+        "--backlog",
+        default=".github/BACKLOG.md",
+        help="Path to BACKLOG.md file",
     )
     parser.add_argument(
-        "--repo", help="GitHub repository (owner/repo). Auto-detected if not specified."
+        "--repo",
+        help="GitHub repository (owner/repo). Auto-detected if not specified.",
     )
     parser.add_argument(
         "--dry-run",
@@ -283,10 +287,14 @@ def main():
         help="Preview what will be created without actually creating issues",
     )
     parser.add_argument(
-        "--create", action="store_true", help="Actually create the GitHub issues"
+        "--create",
+        action="store_true",
+        help="Actually create the GitHub issues",
     )
     parser.add_argument(
-        "--export", metavar="FILE", help="Export to JSON file for manual import"
+        "--export",
+        metavar="FILE",
+        help="Export to JSON file for manual import",
     )
     parser.add_argument(
         "--include-completed",
@@ -330,13 +338,15 @@ def main():
         print("=" * 60)
 
         created = creator.create_all(
-            items, dry_run=args.dry_run, skip_completed=not args.include_completed
+            items,
+            dry_run=args.dry_run,
+            skip_completed=not args.include_completed,
         )
 
         print("\n" + "=" * 60)
         if args.dry_run:
             print(
-                f"📊 Would create {len([i for i in items if i['status'] != 'complete' or args.include_completed])} issues"
+                f"📊 Would create {len([i for i in items if i['status'] != 'complete' or args.include_completed])} issues",
             )
             print("\nTo actually create these issues, run:")
             print(f"  python3 {sys.argv[0]} --create")

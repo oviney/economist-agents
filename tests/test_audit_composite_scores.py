@@ -128,7 +128,7 @@ def _populate_db(db_path: pathlib.Path, rows: list[dict[str, Any]]) -> None:
     conn.close()
 
 
-@pytest.fixture()
+@pytest.fixture
 def tmp_db(tmp_path: pathlib.Path) -> pathlib.Path:
     """Provide a temporary SQLite DB populated with sample rows."""
     db = tmp_path / "performance.db"
@@ -136,7 +136,7 @@ def tmp_db(tmp_path: pathlib.Path) -> pathlib.Path:
     return db
 
 
-@pytest.fixture()
+@pytest.fixture
 def empty_db(tmp_path: pathlib.Path) -> pathlib.Path:
     """Provide a temporary empty SQLite DB (table exists, no rows)."""
     db = tmp_path / "empty_performance.db"
@@ -303,7 +303,7 @@ class TestRecomputeScore:
                 assert term in math["zero_terms"]
 
     def test_raw_values_match_db(self, tmp_db: pathlib.Path) -> None:
-        """raw values returned are taken directly from the database row."""
+        """Raw values returned are taken directly from the database row."""
         rows = load_all_rows(tmp_db)
         row = rows[0]
         math = recompute_score(row, rows)

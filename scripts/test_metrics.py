@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Test Chart Metrics Collection
+"""Test Chart Metrics Collection
 
 Simulates chart generation and Visual QA to verify metrics system.
 """
@@ -37,7 +36,7 @@ def test_metrics_collection():
 
     metrics.record_generation(chart_record, success=True)
     print(
-        f"  ✓ Recorded successful generation ({chart_record['generation_time_seconds']:.3f}s)"
+        f"  ✓ Recorded successful generation ({chart_record['generation_time_seconds']:.3f}s)",
     )
 
     # Test 2: Visual QA pass
@@ -63,7 +62,9 @@ def test_metrics_collection():
     chart_record2 = metrics.start_chart("Test Chart: Failed Generation", chart_spec2)
     time.sleep(0.05)
     metrics.record_generation(
-        chart_record2, success=False, error="Invalid data: empty dataset"
+        chart_record2,
+        success=False,
+        error="Invalid data: empty dataset",
     )
     print("  ✓ Recorded failed generation")
 

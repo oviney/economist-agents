@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-LLM Client Factory — OpenAI and Anthropic
+"""LLM Client Factory — OpenAI and Anthropic
 
 Prefers Anthropic (Claude) when ANTHROPIC_API_KEY is set, falls back to
 OpenAI when only OPENAI_API_KEY is available.
@@ -62,6 +61,7 @@ def create_llm_client(max_retries: int = 3, base_delay: int = 1) -> LLMClient:
 
     Raises:
         ValueError: If neither API key is set.
+
     """
     if os.environ.get("ANTHROPIC_API_KEY"):
         print("🤖 LLM Provider: anthropic")
@@ -72,7 +72,7 @@ def create_llm_client(max_retries: int = 3, base_delay: int = 1) -> LLMClient:
         return _create_openai_client(max_retries, base_delay)
 
     raise ValueError(
-        "[LLM_CLIENT] No API key found. Set ANTHROPIC_API_KEY or OPENAI_API_KEY."
+        "[LLM_CLIENT] No API key found. Set ANTHROPIC_API_KEY or OPENAI_API_KEY.",
     )
 
 
@@ -85,7 +85,7 @@ def _create_anthropic_client() -> LLMClient:
     except ImportError as err:
         raise ImportError(
             "[LLM_CLIENT] anthropic package not installed. "
-            "Install it: pip install anthropic"
+            "Install it: pip install anthropic",
         ) from err
 
     client = Anthropic(api_key=api_key)
@@ -100,14 +100,14 @@ def _create_openai_client(max_retries: int, base_delay: int) -> LLMClient:
     if not api_key:
         raise ValueError(
             "[LLM_CLIENT] OPENAI_API_KEY not set. "
-            "Export it: export OPENAI_API_KEY='sk-...'"
+            "Export it: export OPENAI_API_KEY='sk-...'",
         )
 
     try:
         from openai import OpenAI, RateLimitError
     except ImportError as err:
         raise ImportError(
-            "[LLM_CLIENT] openai package not installed. Install it: pip install openai"
+            "[LLM_CLIENT] openai package not installed. Install it: pip install openai",
         ) from err
 
     for attempt in range(max_retries):
@@ -121,12 +121,12 @@ def _create_openai_client(max_retries: int, base_delay: int) -> LLMClient:
                 delay = base_delay * (2**attempt)
                 print(
                     f"   ⚠ Rate limited. Retrying in {delay}s... "
-                    f"(attempt {attempt + 1}/{max_retries})"
+                    f"(attempt {attempt + 1}/{max_retries})",
                 )
                 time.sleep(delay)
             else:
                 raise ValueError(
-                    f"[LLM_CLIENT] Rate limit exceeded after {max_retries} retries: {e}"
+                    f"[LLM_CLIENT] Rate limit exceeded after {max_retries} retries: {e}",
                 ) from e
         except Exception as e:
             raise ValueError(f"[LLM_CLIENT] Failed to create OpenAI client: {e}") from e
@@ -152,6 +152,7 @@ def call_llm(
 
     Returns:
         Response text from LLM.
+
     """
     if llm_client.provider == "anthropic":
         return _call_anthropic(

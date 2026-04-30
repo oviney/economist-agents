@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Pre-commit Architecture Review
+"""Pre-commit Architecture Review
 
 Checks staged Python files for architectural anti-patterns.
 Fails the commit when new violations are detected, giving developers
@@ -43,7 +42,7 @@ LLM_IMPORT_EXCEPTIONS: frozenset[str] = frozenset(
         "run_story11_crew.py",
         "featured_image_agent.py",  # TODO: refactor (Story 10)
         "visual_qa.py",  # TODO: refactor (Story 10)
-    }
+    },
 )
 
 # LLM libraries that must not be imported directly (ADR-002)
@@ -108,6 +107,7 @@ def _get_imports(source: str, filename: str) -> list[tuple[int, str]]:
 
     Returns:
         List of (line_number, base_module_name) tuples.
+
     """
     try:
         tree = ast.parse(source, filename=filename)
@@ -139,6 +139,7 @@ def _find_bare_json_loads(source: str, filename: str) -> list[int]:
 
     Returns:
         List of line numbers with unprotected json.loads calls.
+
     """
     try:
         tree = ast.parse(source, filename=filename)
@@ -188,6 +189,7 @@ def check_llm_imports(path: Path, source: str) -> list[Violation]:
 
     Returns:
         List of Violation objects for each prohibited import found.
+
     """
     if path.name in LLM_IMPORT_EXCEPTIONS:
         return []
@@ -205,7 +207,7 @@ def check_llm_imports(path: Path, source: str) -> list[Violation]:
                         "Use AgentRegistry.get_agent() instead."
                     ),
                     severity="error",
-                )
+                ),
             )
     return violations
 
@@ -222,6 +224,7 @@ def check_unprotected_json_loads(path: Path, source: str) -> list[Violation]:
 
     Returns:
         List of Violation objects.
+
     """
     violations: list[Violation] = []
     for lineno in _find_bare_json_loads(source, path.name):
@@ -235,7 +238,7 @@ def check_unprotected_json_loads(path: Path, source: str) -> list[Violation]:
                     "Wrap in try/except to handle malformed LLM responses."
                 ),
                 severity="warning",
-            )
+            ),
         )
     return violations
 
@@ -249,6 +252,7 @@ def check_hardcoded_secrets(path: Path, source: str) -> list[Violation]:
 
     Returns:
         List of Violation objects.
+
     """
     violations: list[Violation] = []
     for lineno, line in enumerate(source.splitlines(), start=1):
@@ -268,7 +272,7 @@ def check_hardcoded_secrets(path: Path, source: str) -> list[Violation]:
                             "Use environment variables instead (e.g. os.getenv('API_KEY'))."
                         ),
                         severity="error",
-                    )
+                    ),
                 )
                 break  # one violation per line is enough
     return violations
@@ -290,6 +294,7 @@ def check_print_for_errors(path: Path, source: str) -> list[Violation]:
 
     Returns:
         List of Violation objects.
+
     """
     error_print_re = re.compile(
         r'\bprint\s*\(\s*[f"\'r].*?\b(error|warning|failed|exception)\b',
@@ -311,7 +316,7 @@ def check_print_for_errors(path: Path, source: str) -> list[Violation]:
                         "for error/warning output."
                     ),
                     severity="warning",
-                )
+                ),
             )
     return violations
 
@@ -336,6 +341,7 @@ def check_file(path: Path) -> list[Violation]:
 
     Returns:
         List of Violation objects (may be empty).
+
     """
     try:
         source = path.read_text(encoding="utf-8")
@@ -356,6 +362,7 @@ def get_staged_python_files(repo_root: Path) -> list[Path]:
 
     Returns:
         List of Path objects for staged Python files that exist on disk.
+
     """
     try:
         result = subprocess.run(
@@ -384,6 +391,7 @@ def run_checks(files: list[Path]) -> CheckResult:
 
     Returns:
         CheckResult containing all violations and metadata.
+
     """
     result = CheckResult()
     result.files_checked = len(files)
@@ -402,12 +410,13 @@ def format_report(result: CheckResult) -> str:
 
     Returns:
         Multi-line string suitable for printing to the terminal.
+
     """
     lines: list[str] = []
 
     if not result.violations:
         lines.append(
-            f"✅  Architecture check passed ({result.files_checked} file(s) reviewed)"
+            f"✅  Architecture check passed ({result.files_checked} file(s) reviewed)",
         )
         return "\n".join(lines)
 
@@ -424,14 +433,14 @@ def format_report(result: CheckResult) -> str:
     lines.append("")
     lines.append(
         f"Found {result.error_count} error(s) and {result.warning_count} warning(s) "
-        f"across {result.files_checked} file(s)."
+        f"across {result.files_checked} file(s).",
     )
 
     if result.has_errors:
         lines.append("")
         lines.append("Commit BLOCKED — fix errors above before committing.")
         lines.append(
-            "Run  pre-commit run arch-review --all-files  to re-check after fixing."
+            "Run  pre-commit run arch-review --all-files  to re-check after fixing.",
         )
     else:
         lines.append("")
@@ -453,6 +462,7 @@ def main(argv: list[str] | None = None) -> int:
 
     Returns:
         Exit code: 0 for success, 1 if errors were found.
+
     """
     if argv is None:
         argv = sys.argv[1:]

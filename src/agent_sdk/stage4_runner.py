@@ -62,6 +62,7 @@ def run_stage4(
     Returns:
         Stage4Result containing polished article, score, gates passed,
         and a publication-ready flag.
+
     """
     del chart_data
     start = time.perf_counter()
@@ -95,7 +96,8 @@ def run_stage4(
 def main() -> None:
     """CLI entrypoint — read an article from a file and run Stage 4."""
     logging.basicConfig(
-        level=logging.INFO, format="%(levelname)s %(name)s: %(message)s"
+        level=logging.INFO,
+        format="%(levelname)s %(name)s: %(message)s",
     )
     if len(sys.argv) < 2:
         print("Usage: python -m src.agent_sdk.stage4_runner <article.md>")
@@ -121,14 +123,14 @@ def main() -> None:
                 "article_chars": len(result.article),
             },
             option=orjson.OPT_INDENT_2,
-        )
+        ),
     )
     print(
         f"Stage 4 complete: score={result.editorial_score}%, "
         f"gates={result.gates_passed}/5, "
         f"validator={'PASS' if result.publication_validator_passed else 'FAIL'}, "
         f"publication_ready={result.publication_ready}, "
-        f"{result.wall_seconds:.2f}s."
+        f"{result.wall_seconds:.2f}s.",
     )
 
 

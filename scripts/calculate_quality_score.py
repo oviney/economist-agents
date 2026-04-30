@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Quality Score Calculator
+"""Quality Score Calculator
 
 Calculates project quality score based on:
 - Test Coverage (40%)
@@ -64,7 +63,7 @@ def get_test_pass_rate():
         # Parse test results
         if "11/11 tests passed" in output or "Total: 11/11" in output:
             return 100.0
-        elif "tests passed" in output:
+        if "tests passed" in output:
             # Extract pass rate from output
             import re
 
@@ -147,7 +146,6 @@ def get_code_style_score():
 
 def calculate_quality_score():
     """Calculate overall quality score"""
-
     print("\n" + "=" * 70)
     print("QUALITY SCORE CALCULATION")
     print("=" * 70)
@@ -255,10 +253,9 @@ def calculate_trend(scores):
     diff = recent - older
     if diff > 2:
         return f"improving ⬆️ (+{diff:.1f} points)"
-    elif diff < -2:
+    if diff < -2:
         return f"declining ⬇️ ({diff:.1f} points)"
-    else:
-        return "stable ➡️"
+    return "stable ➡️"
 
 
 def export_badge_json(score_data):

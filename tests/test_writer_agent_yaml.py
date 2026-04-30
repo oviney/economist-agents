@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Integration tests for Writer Agent YAML front matter validation (BUG-031)
+"""Integration tests for Writer Agent YAML front matter validation (BUG-031)
 
 These tests verify that Writer Agent:
 1. Generates articles with proper YAML front matter
@@ -51,14 +50,14 @@ def sample_research():
                 "claim": "DNS filtering blocks 80% of malware",
                 "source": "Cisco Security Report 2024",
                 "verified": True,
-            }
+            },
         ],
         "data_points": [
             {
                 "statistic": "80% malware blocked",
                 "source": "Cisco Security Report 2024",
                 "verified": True,
-            }
+            },
         ],
         "contrarian_angle": "DNS filtering has blind spots in encrypted traffic",
     }
@@ -416,7 +415,10 @@ class TestRunWriterAgentWrapper:
 
         # Act
         draft, metadata = run_writer_agent(
-            mock_client, "Test Topic", sample_research, "2026-01-05"
+            mock_client,
+            "Test Topic",
+            sample_research,
+            "2026-01-05",
         )
 
         # Assert
@@ -436,7 +438,11 @@ class TestPublicationValidatorIntegration:
     @patch("agents.writer_agent.call_llm")
     @patch("agents.writer_agent.review_agent_output")
     def test_writer_catches_all_publication_validator_yaml_errors(
-        self, mock_review, mock_call_llm, mock_client, sample_research
+        self,
+        mock_review,
+        mock_call_llm,
+        mock_client,
+        sample_research,
     ):
         """GIVEN article with multiple YAML errors
         WHEN Writer Agent validates

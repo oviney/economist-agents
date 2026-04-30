@@ -130,23 +130,25 @@ class TestFilenameRename:
 class TestDeployToBlogMain:
     """Functional tests for main() with all external side-effects mocked."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def stale_article_file(self, tmp_path: Path) -> Path:
         p = tmp_path / "2026-01-15-stale-article.md"
         p.write_text(_make_article(date="2026-01-15"))
         return p
 
     def test_validate_file_called_with_deploy_date(
-        self, tmp_path: Path, stale_article_file: Path
+        self,
+        tmp_path: Path,
+        stale_article_file: Path,
     ) -> None:
         """validate_file must be called with today's date as expected_date."""
-
         today = datetime.now().strftime("%Y-%m-%d")
         blog_dir = _setup_blog_dir(tmp_path)
         captured: dict = {}
 
         def fake_validate(
-            file_path: str, expected_date: str | None = None
+            file_path: str,
+            expected_date: str | None = None,
         ) -> tuple[bool, str]:
             captured["expected_date"] = expected_date
             return True, "✅ All checks passed"
@@ -174,16 +176,18 @@ class TestDeployToBlogMain:
         assert captured["expected_date"] == today
 
     def test_date_injected_in_written_content(
-        self, tmp_path: Path, stale_article_file: Path
+        self,
+        tmp_path: Path,
+        stale_article_file: Path,
     ) -> None:
         """The article written to the blog clone must carry today's date."""
-
         today = datetime.now().strftime("%Y-%m-%d")
         blog_dir = _setup_blog_dir(tmp_path)
         captured: dict = {}
 
         def fake_validate(
-            file_path: str, expected_date: str | None = None
+            file_path: str,
+            expected_date: str | None = None,
         ) -> tuple[bool, str]:
             with contextlib.suppress(FileNotFoundError):
                 captured["content"] = RealPath(file_path).read_text()
@@ -214,10 +218,11 @@ class TestDeployToBlogMain:
         )
 
     def test_validation_failure_calls_sys_exit_1(
-        self, tmp_path: Path, stale_article_file: Path
+        self,
+        tmp_path: Path,
+        stale_article_file: Path,
     ) -> None:
         """On validation failure, sys.exit(1) must be called."""
-
         blog_dir = _setup_blog_dir(tmp_path)
         exit_codes: list[int] = []
 
@@ -250,10 +255,11 @@ class TestDeployToBlogMain:
         assert 1 in exit_codes, "Expected sys.exit(1) on validation failure"
 
     def test_pr_not_created_on_validation_failure(
-        self, tmp_path: Path, stale_article_file: Path
+        self,
+        tmp_path: Path,
+        stale_article_file: Path,
     ) -> None:
         """When validation fails, gh pr create must NOT be invoked."""
-
         blog_dir = _setup_blog_dir(tmp_path)
         pr_commands: list[str] = []
 
@@ -287,10 +293,11 @@ class TestDeployToBlogMain:
         assert pr_commands == [], "gh pr create must not run when validation fails"
 
     def test_validation_report_included_in_pr_body(
-        self, tmp_path: Path, stale_article_file: Path
+        self,
+        tmp_path: Path,
+        stale_article_file: Path,
     ) -> None:
         """The PR body must contain the validation report text."""
-
         blog_dir = _setup_blog_dir(tmp_path)
         pr_commands: list[str] = []
         validation_report = "✅ All 8 checks passed"

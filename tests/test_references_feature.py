@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Test Suite for FEATURE-001: References Section
+"""Test Suite for FEATURE-001: References Section
 
 Tests Writer Agent and Publication Validator enhancements
 for references section functionality.
@@ -90,8 +89,8 @@ class TestWriterAgentReferences:
                     "stat": "Unverified claim",
                     "source": "Unknown",
                     "verified": False,  # Not verified
-                }
-            ]
+                },
+            ],
         }
 
         guidance = agent._format_references_guidance(research_brief)
@@ -118,7 +117,7 @@ class TestWriterAgentReferences:
                     "year": "2024",
                     "verified": True,
                 },
-            ]
+            ],
         }
 
         guidance = agent._format_references_guidance(research_brief)
@@ -135,7 +134,7 @@ class TestWriterAgentReferences:
             "data_points": [
                 {"source": f"Source {i}", "year": "2024", "verified": True}
                 for i in range(10)
-            ]
+            ],
         }
 
         guidance = agent._format_references_guidance(research_brief)
@@ -145,7 +144,7 @@ class TestWriterAgentReferences:
             line
             for line in guidance.split("\n")
             if line.strip().startswith(
-                ("1.", "2.", "3.", "4.", "5.", "6.", "7.", "8.", "9.")
+                ("1.", "2.", "3.", "4.", "5.", "6.", "7.", "8.", "9."),
             )
         ]
         assert len(numbered_items) <= 5
@@ -407,7 +406,7 @@ Content with data.
                     "year": "2024",
                     "url": "https://forrester.com",
                     "verified": True,
-                }
+                },
             ],
         }
 

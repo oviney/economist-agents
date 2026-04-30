@@ -97,16 +97,18 @@ def parse_adr(path: Path) -> tuple[AdrFile | None, list[str]]:
     status_word = status_raw.split()[0] if status_raw else ""
     if status_word not in ALLOWED_STATUSES:
         errors.append(
-            f"{path}: status '{status_word}' not in allowed set {sorted(ALLOWED_STATUSES)}"
+            f"{path}: status '{status_word}' not in allowed set {sorted(ALLOWED_STATUSES)}",
         )
 
     supersedes_match = re.search(r"\*\*Supersedes:\*\*\s*\[?ADR-(\d{4})\]?", content)
     superseded_by_match = re.search(
-        r"\*\*Superseded by\*\*[:]?\s*\[?ADR-(\d{4})\]?", content
+        r"\*\*Superseded by\*\*[:]?\s*\[?ADR-(\d{4})\]?",
+        content,
     )
     if not superseded_by_match:
         superseded_by_match = re.search(
-            r"Status:\*\*\s*Superseded by\s*\[?ADR-(\d{4})\]?", content
+            r"Status:\*\*\s*Superseded by\s*\[?ADR-(\d{4})\]?",
+            content,
         )
 
     return (
@@ -129,7 +131,7 @@ def check_no_duplicates(adrs: list[AdrFile]) -> list[str]:
     for adr in adrs:
         if adr.number in seen:
             errors.append(
-                f"duplicate ADR number {adr.number:04d}: {seen[adr.number]} and {adr.path}"
+                f"duplicate ADR number {adr.number:04d}: {seen[adr.number]} and {adr.path}",
             )
         else:
             seen[adr.number] = adr.path
@@ -147,7 +149,7 @@ def check_mkdocs_index(repo_root: Path, adrs: list[AdrFile]) -> list[str]:
         relative = f"adr/{adr.path.name}"
         if relative not in mkdocs_content:
             errors.append(
-                f"{adr.path}: not referenced in mkdocs.yml (expected '{relative}')"
+                f"{adr.path}: not referenced in mkdocs.yml (expected '{relative}')",
             )
     return errors
 
@@ -159,31 +161,31 @@ def check_supersession_integrity(adrs: list[AdrFile]) -> list[str]:
     for adr in adrs:
         if adr.status == "Superseded" and adr.superseded_by is None:
             errors.append(
-                f"{adr.path}: status is Superseded but no 'Superseded by ADR-NNNN' link found"
+                f"{adr.path}: status is Superseded but no 'Superseded by ADR-NNNN' link found",
             )
         if adr.superseded_by is not None:
             superseder_num = int(adr.superseded_by)
             superseder = by_number.get(superseder_num)
             if superseder is None:
                 errors.append(
-                    f"{adr.path}: superseded by ADR-{adr.superseded_by} which does not exist"
+                    f"{adr.path}: superseded by ADR-{adr.superseded_by} which does not exist",
                 )
             elif superseder.supersedes != f"{adr.number:04d}":
                 errors.append(
                     f"{adr.path}: claims to be superseded by ADR-{adr.superseded_by} "
-                    f"but {superseder.path} does not have 'Supersedes: ADR-{adr.number:04d}'"
+                    f"but {superseder.path} does not have 'Supersedes: ADR-{adr.number:04d}'",
                 )
         if adr.supersedes is not None:
             superseded_num = int(adr.supersedes)
             superseded = by_number.get(superseded_num)
             if superseded is None:
                 errors.append(
-                    f"{adr.path}: supersedes ADR-{adr.supersedes} which does not exist"
+                    f"{adr.path}: supersedes ADR-{adr.supersedes} which does not exist",
                 )
             elif superseded.superseded_by != f"{adr.number:04d}":
                 errors.append(
                     f"{adr.path}: claims to supersede ADR-{adr.supersedes} "
-                    f"but {superseded.path} does not have 'Superseded by ADR-{adr.number:04d}'"
+                    f"but {superseded.path} does not have 'Superseded by ADR-{adr.number:04d}'",
                 )
     return errors
 
@@ -196,13 +198,13 @@ def lint(repo_root: Path) -> list[str]:
     for path in forbidden:
         all_errors.append(
             f"{path}: ADR found outside canonical location (docs/adr/). "
-            f"Move it or archive it."
+            f"Move it or archive it.",
         )
 
     canonical_paths = find_canonical_adrs(repo_root)
     if not canonical_paths:
         all_errors.append(
-            f"{repo_root / CANONICAL_DIR}: no ADRs found in canonical location"
+            f"{repo_root / CANONICAL_DIR}: no ADRs found in canonical location",
         )
         return all_errors
 

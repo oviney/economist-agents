@@ -19,9 +19,9 @@ from publication_validator import PublicationValidator  # noqa: E402
 from topic_scout import scout_topics  # noqa: E402
 
 __all__ = [
+    "PublicationValidator",
     "create_llm_client",
     "generate_featured_image",
     "run_editorial_board",
     "scout_topics",
-    "PublicationValidator",
 ]

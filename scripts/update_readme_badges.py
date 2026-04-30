@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-README Badge Updater
+"""README Badge Updater
 
 Automatically updates badge values in README.md based on actual metrics:
 - Quality Score (from quality_score.json)
@@ -49,16 +48,15 @@ def get_test_status():
 
         if "11/11 tests passed" in output or "Total: 11/11" in output:
             return "11/11 passing", "brightgreen"
-        elif "tests passed" in output:
+        if "tests passed" in output:
             match = re.search(r"(\d+)/(\d+) tests passed", output)
             if match:
                 passed, total = match.group(1), match.group(2)
                 if int(passed) == int(total):
                     return f"{passed}/{total} passing", "brightgreen"
-                elif int(passed) >= int(total) * 0.8:
+                if int(passed) >= int(total) * 0.8:
                     return f"{passed}/{total} passing", "yellow"
-                else:
-                    return f"{passed}/{total} passing", "red"
+                return f"{passed}/{total} passing", "red"
 
         return "status unknown", "lightgrey"
     except Exception as e:
@@ -80,8 +78,7 @@ def get_sprint_status():
 
                 if status == "complete":
                     return f"{sprint_id} complete", "green"
-                else:
-                    return f"{sprint_id} active", "orange"
+                return f"{sprint_id} active", "orange"
 
     return "no sprint", "lightgrey"
 
@@ -143,9 +140,8 @@ def update_readme_badges():
         print("\n✅ README.md badges updated successfully")
         print(f"   Updated at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         return True
-    else:
-        print("\n⏭️  No changes needed - badges already current")
-        return False
+    print("\n⏭️  No changes needed - badges already current")
+    return False
 
 
 if __name__ == "__main__":

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Update Sprint Documentation
+"""Update Sprint Documentation
 
 Automatically updates SPRINT.md with current sprint status from completion reports.
 Prevents documentation drift by synchronizing with sprint_history.json.
@@ -68,7 +67,7 @@ def get_open_bugs():
                     "id": bug["id"],
                     "severity": bug["severity"],
                     "description": bug["description"],
-                }
+                },
             )
 
     return open_bugs
@@ -186,7 +185,7 @@ def main():
         return 1
 
     print(
-        f"   Current Sprint: {sprint_status['sprint_id']} ({sprint_status['status']})"
+        f"   Current Sprint: {sprint_status['sprint_id']} ({sprint_status['status']})",
     )
     print(f"   Quality Score: {sprint_status['metrics']['quality_score']}/100")
     print(f"   Escape Rate: {sprint_status['metrics']['defect_escape_rate']}%")
@@ -202,9 +201,8 @@ def main():
         print("✅ SPRINT.md updated successfully")
         print(f"   Updated at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         return 0
-    else:
-        print("❌ Failed to update SPRINT.md")
-        return 3
+    print("❌ Failed to update SPRINT.md")
+    return 3
 
 
 if __name__ == "__main__":

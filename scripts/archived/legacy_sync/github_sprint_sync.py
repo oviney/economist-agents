@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-GitHub Sprint Sync
+"""GitHub Sprint Sync
 
 Syncs sprint information between SPRINT.md and GitHub:
 - Creates GitHub issues from sprint stories
@@ -40,7 +39,7 @@ class GitHubSprintSync:
             raise ValueError(
                 "GITHUB_TOKEN not set. Create a token at:\n"
                 "https://github.com/settings/tokens\n"
-                "Then: export GITHUB_TOKEN='your_token'"
+                "Then: export GITHUB_TOKEN='your_token'",
             )
 
         self.gh = Github(token)
@@ -102,14 +101,13 @@ class GitHubSprintSync:
                     "goal": goal,
                     "tasks": [(checked == "x", text) for checked, text in tasks],
                     "acceptance_criteria": acceptance_criteria,
-                }
+                },
             )
 
         return stories
 
     def create_github_issue_from_story(self, story: dict, sprint_number: int) -> int:
         """Create GitHub issue from sprint story"""
-
         # Build issue body
         body_parts = [
             f"## Story Goal\n{story['goal']}\n",
@@ -131,7 +129,7 @@ class GitHubSprintSync:
             body_parts.append("")
 
         body_parts.append(
-            f"\n---\n*Generated from Sprint {sprint_number}, Story {story['number']}*"
+            f"\n---\n*Generated from Sprint {sprint_number}, Story {story['number']}*",
         )
 
         body = "\n".join(body_parts)
@@ -219,7 +217,7 @@ class GitHubSprintSync:
 
         for story in stories:
             print(
-                f"  Creating issue for Story {story['number']}: {story['title'][:50]}..."
+                f"  Creating issue for Story {story['number']}: {story['title'][:50]}...",
             )
             issue_num = self.create_github_issue_from_story(story, sprint_number)
 
@@ -288,7 +286,7 @@ class GitHubSprintSync:
                         content = content.replace(story_header, new_header)
                         changes += 1
                         print(
-                            f"  ✅ Story {story_num}: Marked complete (#{status['number']})"
+                            f"  ✅ Story {story_num}: Marked complete (#{status['number']})",
                         )
 
         if changes > 0:
@@ -329,7 +327,8 @@ class GitHubSprintSync:
 
             # Extract story points
             points_label = next(
-                (label.name for label in issue.labels if "-points" in label.name), None
+                (label.name for label in issue.labels if "-points" in label.name),
+                None,
             )
             points = int(points_label.replace("-points", "")) if points_label else 0
 
@@ -340,7 +339,7 @@ class GitHubSprintSync:
                     "points": points,
                     "state": issue.state,
                     "comments": issue.comments,
-                }
+                },
             )
 
         for sprint_num in sorted(stories_by_sprint.keys()):
@@ -378,7 +377,10 @@ def main():
         help="Show sprint status from GitHub",
     )
     parser.add_argument(
-        "--sprint", type=int, default=7, help="Sprint number (default: 7)"
+        "--sprint",
+        type=int,
+        default=7,
+        help="Sprint number (default: 7)",
     )
     parser.add_argument(
         "--dry-run",

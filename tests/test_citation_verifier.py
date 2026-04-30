@@ -48,13 +48,15 @@ class TestStatAppearsInText:
     def test_number_with_context_match(self) -> None:
         page = "The survey showed that 72% of teams reported reduced cognitive load."
         assert _stat_appears_in_text(
-            "72% of teams reported reduced cognitive load", page
+            "72% of teams reported reduced cognitive load",
+            page,
         )
 
     def test_number_present_but_wrong_context(self) -> None:
         page = "The year 2025 saw 72% growth in cloud spending."
         assert not _stat_appears_in_text(
-            "72% of teams reported reduced cognitive load", page
+            "72% of teams reported reduced cognitive load",
+            page,
         )
 
     def test_number_absent(self) -> None:
@@ -102,14 +104,14 @@ class TestVerifyCitations:
                     "source": "TestGuild 2024",
                     "url": "https://example.com/report",
                     "verified": True,
-                }
+                },
             ],
             "unverified_claims": [],
         }
         fetch = _mock_fetch(
             {
-                "https://example.com/report": "The report found a 50% reduction in maintenance costs across 200 teams."
-            }
+                "https://example.com/report": "The report found a 50% reduction in maintenance costs across 200 teams.",
+            },
         )
         result = verify_citations(research, fetch_fn=fetch)
         assert result["data_points"][0]["verified"] is True
@@ -125,14 +127,14 @@ class TestVerifyCitations:
                     "source": "Gartner 2026",
                     "url": "https://example.com/gartner",
                     "verified": True,
-                }
+                },
             ],
             "unverified_claims": [],
         }
         fetch = _mock_fetch(
             {
-                "https://example.com/gartner": "This paper discusses cloud infrastructure trends and cost optimization."
-            }
+                "https://example.com/gartner": "This paper discusses cloud infrastructure trends and cost optimization.",
+            },
         )
         result = verify_citations(research, fetch_fn=fetch)
         assert result["data_points"][0]["verified"] is False
@@ -148,7 +150,7 @@ class TestVerifyCitations:
                     "source": "Unknown",
                     "url": "",
                     "verified": True,
-                }
+                },
             ],
             "unverified_claims": [],
         }
@@ -165,7 +167,7 @@ class TestVerifyCitations:
                     "source": "Report",
                     "url": "https://down.example.com",
                     "verified": True,
-                }
+                },
             ],
             "unverified_claims": [],
         }
@@ -188,8 +190,8 @@ class TestVerifyCitations:
         }
         fetch = _mock_fetch(
             {
-                "https://example.com/headline": "This page discusses vendor management strategies."
-            }
+                "https://example.com/headline": "This page discusses vendor management strategies.",
+            },
         )
         result = verify_citations(research, fetch_fn=fetch)
         assert result["headline_stat"]["verified"] is False
@@ -223,7 +225,7 @@ class TestVerifyCitations:
             {
                 "https://example.com/real": "The study found a 50% reduction in costs.",
                 "https://example.com/fake": "This page is about gardening tips.",
-            }
+            },
         )
         result = verify_citations(research, fetch_fn=fetch)
         assert result["data_points"][0]["verified"] is True
@@ -236,7 +238,7 @@ class TestVerifyCitations:
         """Existing unverified_claims are preserved, not overwritten."""
         research: dict[str, Any] = {
             "data_points": [
-                {"stat": "fake stat", "url": "https://example.com/x", "verified": True}
+                {"stat": "fake stat", "url": "https://example.com/x", "verified": True},
             ],
             "unverified_claims": ["Pre-existing claim"],
         }

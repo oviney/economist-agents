@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Test Suite for Scrum Master Agent
+"""Test Suite for Scrum Master Agent
 
 Tests autonomous coordination capabilities:
 - Task queue management
@@ -56,8 +55,8 @@ class TestTaskQueueManager:
                     "acceptance_criteria": ["AC1", "AC2", "AC3"],
                     "priority": "P0",
                     "story_points": 3,
-                }
-            ]
+                },
+            ],
         }
         backlog_file.write_text(json.dumps(backlog_data))
 
@@ -144,7 +143,7 @@ class TestAgentStatusMonitor:
                 "agent_id": "writer_agent",
                 "status": "complete",
                 "current_task": "TASK-1",
-            }
+            },
         ]
         monitor.save()
 
@@ -330,8 +329,8 @@ class TestScrumMasterAgent:
                     "acceptance_criteria": ["AC1", "AC2", "AC3"],
                     "quality_requirements": {"test": "value"},
                     "story_points": 2,
-                }
-            ]
+                },
+            ],
         }
         backlog_file.write_text(json.dumps(backlog_data))
 

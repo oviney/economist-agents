@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Quality System Integration Test
+"""Quality System Integration Test
 
 Tests the complete quality improvement system:
 1. RULES: Agent Quality Standards
@@ -53,10 +52,10 @@ Companies investing in robust infrastructure will outpace competitors.
 
     print("\n✅ PASS: Issue #15 pattern now blocked by 2 layers")
     print(
-        f"   - Agent Reviewer: {len([i for i in review_issues if 'categories' in i.lower()])} issues"
+        f"   - Agent Reviewer: {len([i for i in review_issues if 'categories' in i.lower()])} issues",
     )
     print(
-        f"   - Schema Validator: {len([i for i in schema_issues if 'categories' in i.lower()])} issues"
+        f"   - Schema Validator: {len([i for i in schema_issues if 'categories' in i.lower()])} issues",
     )
     return True
 
@@ -359,7 +358,7 @@ def test_chart_visual_bug_xaxis_intrusion():
     print(f"   - Label: '{label_metadata['label_text']}'")
     print(f"   - Y-position (figure coords): {label_metadata['label_y_figure']}")
     print(
-        f"   - X-axis zone: {label_metadata['xaxis_zone_start']}-{label_metadata['xaxis_zone_end']}"
+        f"   - X-axis zone: {label_metadata['xaxis_zone_start']}-{label_metadata['xaxis_zone_end']}",
     )
     print(f"   - Intrudes X-axis: {label_metadata['intrudes_xaxis']}")
 
@@ -434,7 +433,7 @@ def test_chart_visual_bug_clipped_elements():
     assert chart_metadata["clipped"], "Should detect clipping"
 
     print(
-        f"\n   ⚠️  Label extends {chart_metadata['label_extends_to'] - chart_metadata['chart_width']:.2f} inches beyond chart edge"
+        f"\n   ⚠️  Label extends {chart_metadata['label_extends_to'] - chart_metadata['chart_width']:.2f} inches beyond chart edge",
     )
 
     print("\n✅ PASS: Clipped elements would be caught")
@@ -641,9 +640,8 @@ def run_all_tests():
     if passed == total:
         print("\n🎉 ALL TESTS PASSED - Quality system fully operational!")
         return 0
-    else:
-        print(f"\n⚠️  {total - passed} tests failed - review output above")
-        return 1
+    print(f"\n⚠️  {total - passed} tests failed - review output above")
+    return 1
 
 
 if __name__ == "__main__":

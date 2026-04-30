@@ -82,19 +82,19 @@ class EconomistContentFlow:
                 client,
                 focus_area=None,
                 allow_empty_archive=bool(
-                    os.environ.get("TOPIC_SCOUT_ALLOW_EMPTY_ARCHIVE", "").strip()
+                    os.environ.get("TOPIC_SCOUT_ALLOW_EMPTY_ARCHIVE", "").strip(),
                 ),
             )
             if raw_topics:
                 break
             print(
-                f"   ⚠️  Topic scout returned empty (attempt {attempt + 1}/2), retrying..."
+                f"   ⚠️  Topic scout returned empty (attempt {attempt + 1}/2), retrying...",
             )
 
         if not raw_topics:
             raise ValueError(
                 "Topic scout returned no topics after 2 attempts. "
-                "Check LLM connectivity and scout_topics() JSON parsing."
+                "Check LLM connectivity and scout_topics() JSON parsing.",
             )
 
         topics = []
@@ -109,7 +109,7 @@ class EconomistContentFlow:
                     "contrarian_angle": t.get("contrarian_angle", ""),
                     "talking_points": t.get("talking_points", ""),
                     "raw": t,
-                }
+                },
             )
         print(f"   Generated {len(topics)} topic candidates")
 
@@ -117,13 +117,13 @@ class EconomistContentFlow:
         if rejected:
             print(
                 f"   🚫 Dedup filtered {len(rejected)} topic(s): "
-                + ", ".join(f"'{t.get('topic', '?')}'" for t in rejected)
+                + ", ".join(f"'{t.get('topic', '?')}'" for t in rejected),
             )
         warned = [t for t in topics if t.get("dedup_warning")]
         if warned:
             print(
                 f"   ⚠️  Dedup flagged {len(warned)} topic(s) as related coverage: "
-                + ", ".join(f"'{t.get('topic', '?')}'" for t in warned)
+                + ", ".join(f"'{t.get('topic', '?')}'" for t in warned),
             )
         print(f"   {len(topics)} topic(s) forwarded to editorial board")
         return {"topics": topics, "timestamp": datetime.now().isoformat()}
@@ -175,7 +175,7 @@ class EconomistContentFlow:
         print(f"   ✅ Article generated: {len(article.split())} words")
         print(
             f"   ✅ Cost: ${result.total_cost_usd:.4f} "
-            f"({result.writer_model} + {result.graphics_model})"
+            f"({result.writer_model} + {result.graphics_model})",
         )
         print(f"   ✅ Score: {result.editorial_score}% / {result.gates_passed}/5 gates")
 
@@ -192,7 +192,7 @@ class EconomistContentFlow:
         if not os.environ.get("OPENAI_API_KEY"):
             print(
                 "   ⚠️  OPENAI_API_KEY not set — DALL-E image generation requires it "
-                "even when Claude is the primary LLM"
+                "even when Claude is the primary LLM",
             )
 
         print("🎨 Generating featured image...")
@@ -270,10 +270,10 @@ class EconomistContentFlow:
                 f"Editorial score {editorial_score}/100 below {PUBLISH_THRESHOLD}"
             )
             self.state["revision_feedback"] = [
-                f"Score {editorial_score} too low; tighten thesis, evidence, ending."
+                f"Score {editorial_score} too low; tighten thesis, evidence, ending.",
             ]
             print(
-                f"   Decision: REVISION (score {editorial_score} < {PUBLISH_THRESHOLD})"
+                f"   Decision: REVISION (score {editorial_score} < {PUBLISH_THRESHOLD})",
             )
             return "revision"
 
@@ -378,13 +378,15 @@ class EconomistContentFlow:
 
         critical = [i for i in validator_issues if i.get("severity") == "CRITICAL"]
         print(
-            f"   ⚠️  Revision still failing (score: {editorial_score}, issues: {len(critical)})"
+            f"   ⚠️  Revision still failing (score: {editorial_score}, issues: {len(critical)})",
         )
         for ci in critical:
             print(f"      ❌ {ci.get('check', 'unknown')}: {ci.get('message', '')}")
 
         title_match = re.search(
-            r'title:\s*["\']?(.+?)["\']?\s*$', edited_article, re.MULTILINE
+            r'title:\s*["\']?(.+?)["\']?\s*$',
+            edited_article,
+            re.MULTILINE,
         )
         slug_source = title_match.group(1) if title_match else edited_article[:80]
         slug = re.sub(r"[^a-z0-9]+", "-", slug_source.lower()).strip("-")[:60]
@@ -434,7 +436,7 @@ class EconomistContentFlow:
             result.persist("logs/article_evals.json")
             print(
                 f"   📊 Article eval: {result.total_score}/{result.max_score} "
-                f"({result.percentage}%)"
+                f"({result.percentage}%)",
             )
             for dim, score in result.scores.items():
                 detail = result.details.get(dim, "")

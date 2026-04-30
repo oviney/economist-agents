@@ -50,7 +50,8 @@ class TestAuditReportShape:
         assert "architect" in names
 
     def test_all_agents_scored_on_six_dimensions(
-        self, real_report: audit_mod.AuditReport
+        self,
+        real_report: audit_mod.AuditReport,
     ) -> None:
         for a in real_report.agents:
             assert set(a.scores.keys()) == set(audit_mod.DIMENSIONS)
@@ -58,13 +59,15 @@ class TestAuditReportShape:
                 assert 0 <= score <= 2, f"{a.name}.{d} score out of range"
 
     def test_total_matches_sum_of_scores(
-        self, real_report: audit_mod.AuditReport
+        self,
+        real_report: audit_mod.AuditReport,
     ) -> None:
         for a in real_report.agents:
             assert a.total == sum(a.scores.values())
 
     def test_compliance_pct_is_total_over_max(
-        self, real_report: audit_mod.AuditReport
+        self,
+        real_report: audit_mod.AuditReport,
     ) -> None:
         for a in real_report.agents:
             expected = round(a.total / audit_mod.MAX_TOTAL * 100, 1)
@@ -73,10 +76,12 @@ class TestAuditReportShape:
 
 class TestComplianceAcceptance:
     """The corpus must hold at or above the architectural target (85%).
-    Reached 2026-04-26 after honest rubric broadening."""
+    Reached 2026-04-26 after honest rubric broadening.
+    """
 
     def test_overall_compliance_meets_threshold(
-        self, real_report: audit_mod.AuditReport
+        self,
+        real_report: audit_mod.AuditReport,
     ) -> None:
         assert real_report.overall_compliance_pct >= THRESHOLD, (
             f"overall {real_report.overall_compliance_pct}% < threshold "

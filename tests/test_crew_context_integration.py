@@ -1,5 +1,4 @@
-"""
-Integration tests for CrewAI context sharing via ContextManager.
+"""Integration tests for CrewAI context sharing via ContextManager.
 
 Tests AC3 (context propagation) and AC4 (briefing time reduction) by demonstrating
 real multi-agent flow: Developer → QE → Scrum Master.
@@ -30,7 +29,8 @@ except ImportError:
     _CREWAI_AVAILABLE = False
 
 requires_crewai = pytest.mark.skipif(
-    not _CREWAI_AVAILABLE, reason="crewai not installed"
+    not _CREWAI_AVAILABLE,
+    reason="crewai not installed",
 )
 
 
@@ -92,8 +92,7 @@ class TestMultiAgentContextFlow:
     """Test context propagation in realistic multi-agent scenario."""
 
     def test_developer_to_qe_context_propagation(self, story_context_file):
-        """
-        Test AC3: Context updates propagate from Developer to QE.
+        """Test AC3: Context updates propagate from Developer to QE.
 
         Simulates:
         1. Developer adds implementation details
@@ -135,8 +134,7 @@ class TestMultiAgentContextFlow:
         assert full_context["story_id"] == "Story 2"
 
     def test_full_three_agent_flow(self, story_context_file):
-        """
-        Test AC3: Full Developer → QE → Scrum Master flow.
+        """Test AC3: Full Developer → QE → Scrum Master flow.
 
         Validates:
         - Context propagates through all agents
@@ -207,8 +205,7 @@ class TestMultiAgentContextFlow:
         assert any("updated" in entry["action"] for entry in audit_log)
 
     def test_crewai_task_context_integration(self, story_context_file):
-        """
-        Test ContextManager integration with CrewAI Task context parameter.
+        """Test ContextManager integration with CrewAI Task context parameter.
 
         Validates:
         - create_task_context() helper works correctly
@@ -220,7 +217,9 @@ class TestMultiAgentContextFlow:
 
         # Create task context for CrewAI Task - additional params passed as kwargs
         task_context = create_task_context(
-            context, task_id="QE-validation", priority="P0"
+            context,
+            task_id="QE-validation",
+            priority="P0",
         )
 
         # Verify task context contains story context
@@ -238,15 +237,17 @@ class TestMultiAgentContextFlow:
             "crewai.Agent which are no longer importable. ContextManager "
             "is exercised by the other tests in this file, which do not "
             "depend on crewai."
-        )
+        ),
     )
     @patch("crewai.Task")
     @patch("crewai.Agent")
     def test_realistic_crewai_task_creation(
-        self, mock_agent, mock_task, story_context_file
+        self,
+        mock_agent,
+        mock_task,
+        story_context_file,
     ):
-        """
-        Test realistic CrewAI Task creation with ContextManager.
+        """Test realistic CrewAI Task creation with ContextManager.
 
         Simulates:
         1. Load story context
@@ -281,8 +282,7 @@ class TestBriefingTimeReduction:
     """Test AC4: Briefing time reduction from 10min → 3min per agent."""
 
     def test_context_eliminates_redundant_briefings(self, story_context_file):
-        """
-        Validate that shared context eliminates redundant briefings.
+        """Validate that shared context eliminates redundant briefings.
 
         Before Story 2:
         - Developer: 10 min briefing
@@ -333,8 +333,7 @@ class TestBriefingTimeReduction:
         print("✅ Briefing time reduction: ~97% (100ms vs 3 min)")
 
     def test_context_duplication_eliminated(self, story_context_file):
-        """
-        Validate AC4: Context duplication reduced from 40% → 0%.
+        """Validate AC4: Context duplication reduced from 40% → 0%.
 
         Before Story 2:
         - Each agent stores own copy of story info (40% duplication)

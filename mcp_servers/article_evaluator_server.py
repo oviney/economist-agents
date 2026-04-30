@@ -58,6 +58,7 @@ def evaluate_article(content: str, title: str = "") -> dict[str, Any]:
 
         On invalid input an ``error`` key is added to the returned dict
         and all numeric fields are reset to zero.  This function never raises.
+
     """
     if not isinstance(content, str):
         return {

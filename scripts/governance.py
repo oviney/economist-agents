@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Governance and Human Review System
+"""Governance and Human Review System
 
 Adds transparency, approval gates, and decision tracking to the agent pipeline.
 
@@ -91,7 +90,11 @@ class GovernanceTracker:
         return decision["approved"]
 
     def log_decision(
-        self, decision_type: str, choice: str, rationale: str, data: dict = None
+        self,
+        decision_type: str,
+        choice: str,
+        rationale: str,
+        data: dict = None,
     ):
         """Log a decision for audit trail"""
         decision = {
@@ -130,7 +133,7 @@ class GovernanceTracker:
             report_lines.append(f"**Output File**: `{agent_name}.json`")
 
             # Add summary based on agent type
-            if "metadata" in data and data["metadata"]:
+            if data.get("metadata"):
                 report_lines.append("\n**Metadata**:")
                 for key, value in data["metadata"].items():
                     report_lines.append(f"- {key}: {value}")
@@ -162,7 +165,7 @@ class GovernanceTracker:
                 f"**Session Directory**: `{self.session_dir}`",
                 "",
                 "All agent outputs and decisions are saved in this directory for audit and review.",
-            ]
+            ],
         )
 
         report_content = "\n".join(report_lines)
@@ -202,7 +205,9 @@ class InteractiveMode:
             import tempfile
 
             with tempfile.NamedTemporaryFile(
-                mode="w", suffix=".txt", delete=False
+                mode="w",
+                suffix=".txt",
+                delete=False,
             ) as f:
                 f.write(content)
                 temp_path = f.name
@@ -221,7 +226,7 @@ class InteractiveMode:
             print("✓ Edits applied")
             return edited_content
 
-        elif response == "r":
+        if response == "r":
             raise ValueError("Content rejected by human reviewer")
 
         return content

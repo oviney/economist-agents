@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Unit Tests for Research Agent
+"""Unit Tests for Research Agent
 
 Tests the extracted Research Agent with mocked LLM responses.
 """
@@ -95,7 +94,7 @@ def sample_research_response():
             },
             "contrarian_angle": "Despite high adoption, 60% of teams report AI tests require more human review than traditional tests",
             "unverified_claims": [],
-        }
+        },
     )
 
 
@@ -122,7 +121,11 @@ class TestResearchAgent:
     @patch("agents.research_agent.call_llm")
     @patch("agents.research_agent.review_agent_output")
     def test_research_success(
-        self, mock_review, mock_call_llm, mock_client, sample_research_response
+        self,
+        mock_review,
+        mock_call_llm,
+        mock_client,
+        sample_research_response,
     ):
         """Test successful research execution."""
         # Setup mocks
@@ -202,7 +205,10 @@ class TestResearchAgent:
     @patch("agents.research_agent.call_llm")
     @patch("agents.research_agent.review_agent_output")
     def test_research_handles_malformed_json(
-        self, mock_review, mock_call_llm, mock_client
+        self,
+        mock_review,
+        mock_call_llm,
+        mock_client,
     ):
         """Test that malformed JSON is handled gracefully."""
         # Setup mocks with invalid JSON
@@ -221,7 +227,11 @@ class TestResearchAgent:
     @patch("agents.research_agent.call_llm")
     @patch("agents.research_agent.review_agent_output")
     def test_research_with_unverified_claims(
-        self, mock_review, mock_call_llm, mock_client, capsys
+        self,
+        mock_review,
+        mock_call_llm,
+        mock_client,
+        capsys,
     ):
         """Test that unverified claims are properly logged."""
         # Setup response with unverified claims
@@ -238,7 +248,7 @@ class TestResearchAgent:
                 "chart_data": None,
                 "contrarian_angle": "Test",
                 "unverified_claims": ["Claim 1", "Claim 2", "Claim 3"],
-            }
+            },
         )
         mock_call_llm.return_value = response
         mock_review.return_value = (True, [])
@@ -254,7 +264,12 @@ class TestResearchAgent:
     @patch("agents.research_agent.call_llm")
     @patch("agents.research_agent.review_agent_output")
     def test_research_validation_failure_logged(
-        self, mock_review, mock_call_llm, mock_client, sample_research_response, capsys
+        self,
+        mock_review,
+        mock_call_llm,
+        mock_client,
+        sample_research_response,
+        capsys,
     ):
         """Test that validation failures are properly logged."""
         # Setup mocks with validation failure
@@ -289,7 +304,11 @@ class TestBackwardCompatibility:
     @patch("agents.research_agent.call_llm")
     @patch("agents.research_agent.review_agent_output")
     def test_run_research_agent_function(
-        self, mock_review, mock_call_llm, mock_client, sample_research_response
+        self,
+        mock_review,
+        mock_call_llm,
+        mock_client,
+        sample_research_response,
     ):
         """Test that run_research_agent() function works identically."""
         # Setup mocks
@@ -321,7 +340,10 @@ class TestBackwardCompatibility:
 
         # Execute with all parameters
         result = run_research_agent(
-            mock_client, "AI Testing Trends", "adoption rates, ROI", mock_governance
+            mock_client,
+            "AI Testing Trends",
+            "adoption rates, ROI",
+            mock_governance,
         )
 
         # Verify governance was used
@@ -416,7 +438,8 @@ class TestIntegrationScenarios:
         # Execute
         agent = ResearchAgent(mock_client)
         result = agent.research(
-            "AI Testing Trends", "adoption rates, maintenance costs"
+            "AI Testing Trends",
+            "adoption rates, maintenance costs",
         )
 
         # Verify complete flow

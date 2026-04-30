@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Story 2 Crew Execution: Fix Integration Tests
+"""Story 2 Crew Execution: Fix Integration Tests
 
 Executes Story 2 using the test-specialist agent to achieve 100% integration test pass rate.
 """
@@ -36,7 +35,6 @@ Known Issues:
 
 def main():
     """Execute Story 2 crew with test-specialist agent."""
-
     print("=" * 70)
     print("Story 2: Fix Integration Tests")
     print("=" * 70)
@@ -45,7 +43,9 @@ def main():
     # Use AgentFactory to create CrewAI Agent (ADR-002 pattern)
     factory = AgentFactory()
     qa_agent = factory.create_agent(
-        "qa_specialist", verbose=True, allow_delegation=False
+        "qa_specialist",
+        verbose=True,
+        allow_delegation=False,
     )
 
     # Create tasks
@@ -71,7 +71,9 @@ def main():
 
     # Create and execute crew
     crew = Crew(
-        agents=[qa_agent], tasks=[audit_task, fix_task, verify_task], verbose=True
+        agents=[qa_agent],
+        tasks=[audit_task, fix_task, verify_task],
+        verbose=True,
     )
 
     print(f"Starting Story 2 execution at {datetime.now().isoformat()}")

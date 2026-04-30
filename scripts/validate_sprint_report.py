@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Sprint Report Validator
+"""Sprint Report Validator
 
 Validates sprint reports have proper GitHub links for all file references.
 Enforces convention from docs/conventions/SPRINT_REPORT_SPEC.md
@@ -50,7 +49,7 @@ class SprintReportValidator:
             ):
                 issues.append(
                     f"File reference without GitHub link: {file_path}\n"
-                    f"  Should be: [{file_path}]({self.github_base}/blob/main/{file_path})"
+                    f"  Should be: [{file_path}]({self.github_base}/blob/main/{file_path})",
                 )
 
         # Pattern 2: Line number mentions without links
@@ -76,7 +75,7 @@ class SprintReportValidator:
                 if "](" not in content[match.start() - 10 : match.start()]:
                     issues.append(
                         f"Line reference without GitHub link: {file_path} line {line_start}\n"
-                        f"  Should be: [{file_path}]({self.github_base}/blob/main/{file_path}#L{line_start})"
+                        f"  Should be: [{file_path}]({self.github_base}/blob/main/{file_path}#L{line_start})",
                     )
 
         # Pattern 3: Generic file mentions (file.py without path)
@@ -96,7 +95,7 @@ class SprintReportValidator:
                     issues.append(
                         f"Generic file reference without path: {filename}\n"
                         f"  Should specify full path: scripts/{filename} or docs/{filename}\n"
-                        f"  And link to GitHub"
+                        f"  And link to GitHub",
                     )
 
         return len(issues) == 0, issues
@@ -128,11 +127,13 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Validate sprint reports have GitHub links"
+        description="Validate sprint reports have GitHub links",
     )
     parser.add_argument("report", nargs="?", help="Path to report file to validate")
     parser.add_argument(
-        "--check-all", action="store_true", help="Check all sprint reports"
+        "--check-all",
+        action="store_true",
+        help="Check all sprint reports",
     )
 
     args = parser.parse_args()

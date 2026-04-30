@@ -29,7 +29,7 @@ def sample_article(tmp_path: Path) -> Path:
         "date: 2026-04-05\n"
         "image: /assets/images/test-article.png\n"
         "---\n\n"
-        "Article body.\n"
+        "Article body.\n",
     )
     return article
 
@@ -48,7 +48,9 @@ class TestListDeployableArticles:
     """Tests for list_deployable_articles tool."""
 
     def test_returns_articles_from_output_dir(
-        self, sample_article: Path, tmp_path: Path
+        self,
+        sample_article: Path,
+        tmp_path: Path,
     ) -> None:
         from mcp_servers.blog_deployer_server import list_deployable_articles
 
@@ -181,7 +183,7 @@ class TestDeployArticle:
         article = output_dir / "2026-04-05-chart-article.md"
         article.write_text(
             "---\nlayout: post\ntitle: Charts\ndate: 2026-04-05\n---\n\n"
-            "![Chart](output/charts/my-chart.png)\n"
+            "![Chart](output/charts/my-chart.png)\n",
         )
 
         result = deploy_article(str(article), "oviney/blog")

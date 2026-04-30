@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Automated Agent Reviewer
+"""Automated Agent Reviewer
 
 Implements automated quality review for agent outputs based on
 AGENT_QUALITY_STANDARDS.md. This reviewer runs after each agent
@@ -95,14 +94,14 @@ class AgentReviewer:
                 if verification_rate < 0.90:
                     issues.append(
                         f"WARNING: Verification rate {verification_rate:.0%} "
-                        f"below 90% threshold"
+                        f"below 90% threshold",
                     )
 
                 # Check for unnamed sources
                 for i, dp in enumerate(data_points):
                     if "source" not in dp or not dp["source"]:
                         issues.append(
-                            f"CRITICAL: Data point {i + 1} missing named source"
+                            f"CRITICAL: Data point {i + 1} missing named source",
                         )
                     elif dp["source"].lower() in [
                         "studies show",
@@ -110,11 +109,11 @@ class AgentReviewer:
                         "experts say",
                     ]:
                         issues.append(
-                            f"BANNED: Data point {i + 1} uses generic source '{dp['source']}'"
+                            f"BANNED: Data point {i + 1} uses generic source '{dp['source']}'",
                         )
 
         # Check 4: Chart data completeness (if present)
-        if "chart_data" in research_data and research_data["chart_data"]:
+        if research_data.get("chart_data"):
             chart = research_data["chart_data"]
             required_chart_fields = ["title", "data"]
             for field in required_chart_fields:
@@ -124,7 +123,9 @@ class AgentReviewer:
         return len(issues) == 0, issues
 
     def review_writer_output(
-        self, article_content: str, chart_filename: str | None = None
+        self,
+        article_content: str,
+        chart_filename: str | None = None,
     ) -> tuple[bool, list[str]]:
         """Review Writer Agent output"""
         issues = []
@@ -147,7 +148,7 @@ class AgentReviewer:
         for field in required_fields:
             if field not in front_matter:
                 issues.append(
-                    f"CRITICAL: Missing required front matter field '{field}'"
+                    f"CRITICAL: Missing required front matter field '{field}'",
                 )
 
         # Check 2: Title specificity (must be substantial)
@@ -155,7 +156,7 @@ class AgentReviewer:
             title = front_matter["title"]
             if len(title.split()) < 4:
                 issues.append(
-                    f"WARNING: Title too short (≥4 words expected): '{title}'"
+                    f"WARNING: Title too short (≥4 words expected): '{title}'",
                 )
 
             # Check for generic titles
@@ -168,7 +169,7 @@ class AgentReviewer:
             for pattern in generic_patterns:
                 if pattern in title_lower:
                     issues.append(
-                        f"WARNING: Generic title pattern detected: '{pattern}'"
+                        f"WARNING: Generic title pattern detected: '{pattern}'",
                     )
 
         # Check 3: Categories field (must be array with ≥1 item)
@@ -191,7 +192,7 @@ class AgentReviewer:
         for pattern in self.banned_openings:
             if re.search(pattern, first_para, re.IGNORECASE):
                 issues.append(
-                    f"BANNED: Opening contains forbidden pattern: '{pattern}'"
+                    f"BANNED: Opening contains forbidden pattern: '{pattern}'",
                 )
 
         # Check 5: Banned phrases in body
@@ -214,7 +215,7 @@ class AgentReviewer:
         if chart_filename:
             if "![" not in body or chart_filename not in body:
                 issues.append(
-                    f"CRITICAL: Chart not embedded (expected '{chart_filename}')"
+                    f"CRITICAL: Chart not embedded (expected '{chart_filename}')",
                 )
 
             # Check for chart reference in text
@@ -231,11 +232,11 @@ class AgentReviewer:
         word_count = len(body.split())
         if word_count < 700:
             issues.append(
-                f"CRITICAL: Article too short ({word_count} words, ≥700 required)"
+                f"CRITICAL: Article too short ({word_count} words, ≥700 required)",
             )
         elif word_count > 1500:
             issues.append(
-                f"WARNING: Article too long ({word_count} words, ≤1500 expected)"
+                f"WARNING: Article too long ({word_count} words, ≤1500 expected)",
             )
 
         return len(issues) == 0, issues
@@ -261,7 +262,7 @@ class AgentReviewer:
         ):
             if re.search(pattern, body, re.IGNORECASE):
                 issues.append(
-                    f"CRITICAL: Editor failed to remove banned pattern: '{pattern}'"
+                    f"CRITICAL: Editor failed to remove banned pattern: '{pattern}'",
                 )
 
         return len(issues) == 0, issues
@@ -281,7 +282,7 @@ class AgentReviewer:
             title = chart_spec["title"]
             if len(title) > 50:
                 issues.append(
-                    f"WARNING: Chart title too long ({len(title)} chars, ≤50 expected)"
+                    f"WARNING: Chart title too long ({len(title)} chars, ≤50 expected)",
                 )
 
         # Check 3: Data points
@@ -297,7 +298,10 @@ class AgentReviewer:
         return len(issues) == 0, issues
 
     def generate_review_report(
-        self, agent_name: str, is_valid: bool, issues: list[str]
+        self,
+        agent_name: str,
+        is_valid: bool,
+        issues: list[str],
     ) -> str:
         """Generate formatted review report"""
         status = "✅ PASSED" if is_valid else "❌ FAILED"
@@ -330,10 +334,11 @@ class AgentReviewer:
 
 
 def review_agent_output(
-    agent_name: str, output: Any, context: dict = None
+    agent_name: str,
+    output: Any,
+    context: dict = None,
 ) -> tuple[bool, list[str]]:
-    """
-    Main entry point for automated agent review.
+    """Main entry point for automated agent review.
 
     Args:
         agent_name: Name of agent that produced output (research_agent, writer_agent, etc)
@@ -342,6 +347,7 @@ def review_agent_output(
 
     Returns:
         (is_valid, issues_list)
+
     """
     reviewer = AgentReviewer()
     context = context or {}

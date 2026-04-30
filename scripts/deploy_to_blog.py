@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Deploy generated articles to blog repository via Pull Request
+"""Deploy generated articles to blog repository via Pull Request
 
 Usage:
     python scripts/deploy_to_blog.py
@@ -19,7 +18,7 @@ from pathlib import Path
 
 # Allow importing from scripts/ when run directly or via subprocess
 sys.path.insert(0, str(Path(__file__).parent))
-from publication_validator import validate_file  # noqa: E402
+from publication_validator import validate_file
 
 
 def run_command(cmd, cwd=None):
@@ -46,7 +45,7 @@ def find_latest_article():
             print(f"📄 Using article from article_path.txt: {candidate}")
             return candidate
         print(
-            f"⚠️  article_path.txt points to missing file: {candidate} — falling back to mtime scan"
+            f"⚠️  article_path.txt points to missing file: {candidate} — falling back to mtime scan",
         )
 
     output_dir = Path("output")
@@ -58,7 +57,7 @@ def find_latest_article():
 
     latest = sorted(articles, key=lambda p: p.stat().st_mtime)[-1]
     print(
-        f"⚠️  article_path.txt not found — using most recently modified file: {latest}"
+        f"⚠️  article_path.txt not found — using most recently modified file: {latest}",
     )
     return latest
 
@@ -109,7 +108,7 @@ def main():
     # Setup git config
     run_command('git config --global user.name "Economist Agent Bot"')
     run_command(
-        'git config --global user.email "github-actions[bot]@users.noreply.github.com"'
+        'git config --global user.email "github-actions[bot]@users.noreply.github.com"',
     )
 
     # Clone blog repository
@@ -119,7 +118,7 @@ def main():
 
     print(f"📥 Cloning {args.blog_repo}...")
     run_command(
-        f"git clone https://x-access-token:{args.token}@github.com/{args.blog_repo}.git {blog_dir}"
+        f"git clone https://x-access-token:{args.token}@github.com/{args.blog_repo}.git {blog_dir}",
     )
 
     # Create new branch
@@ -186,7 +185,7 @@ def main():
             print(f"🖼️  Generated webp: {target_webp}")
         except ImportError:
             print(
-                "⚠️  Pillow not available — skipping webp generation (htmlproofer may fail)"
+                "⚠️  Pillow not available — skipping webp generation (htmlproofer may fail)",
             )
     else:
         print(f"   ℹ No featured image at {featured_png} — skipping image copy")
@@ -251,7 +250,7 @@ def main():
 """
 
     run_command(
-        f'gh pr create --repo {args.blog_repo} --title "{pr_title}" --body "{pr_body}" --head {branch}'
+        f'gh pr create --repo {args.blog_repo} --title "{pr_title}" --body "{pr_body}" --head {branch}',
     )
 
     print("✅ Pull Request created successfully!")

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Badge Update Automation
+"""Badge Update Automation
 
 Syncs README badges with live data sources to prevent staleness (BUG-023).
 
@@ -110,13 +109,16 @@ class BadgeUpdater:
                 print(f"✅ Updated quality_score.json: {quality_score}/100 ({color})")
             else:
                 print(
-                    f"[DRY RUN] Would update quality_score.json: {quality_score}/100 ({color})"
+                    f"[DRY RUN] Would update quality_score.json: {quality_score}/100 ({color})",
                 )
         except Exception as e:
             print(f"❌ Error updating quality_score.json: {e}")
 
     def update_readme_badges(
-        self, quality_score: int, test_count: int, sprint: int
+        self,
+        quality_score: int,
+        test_count: int,
+        sprint: int,
     ) -> None:
         """Update README.md badge values"""
         try:
@@ -145,7 +147,7 @@ class BadgeUpdater:
                 print(f"✅ Updated README.md: tests={test_count}, sprint={sprint}")
             else:
                 print(
-                    f"[DRY RUN] Would update README.md: tests={test_count}, sprint={sprint}"
+                    f"[DRY RUN] Would update README.md: tests={test_count}, sprint={sprint}",
                 )
         except Exception as e:
             print(f"❌ Error updating README.md: {e}")
@@ -165,7 +167,7 @@ class BadgeUpdater:
 
         if quality_score and quality_score != json_score:
             issues.append(
-                f"Quality score mismatch: JSON={json_score}, Actual={quality_score}"
+                f"Quality score mismatch: JSON={json_score}, Actual={quality_score}",
             )
         else:
             print(f"✅ Quality score: {json_score}/100 (accurate)")
@@ -179,7 +181,7 @@ class BadgeUpdater:
 
         if test_count and readme_tests and test_count != readme_tests:
             issues.append(
-                f"Test count mismatch: Badge={readme_tests}, Actual={test_count}"
+                f"Test count mismatch: Badge={readme_tests}, Actual={test_count}",
             )
         else:
             print(f"✅ Test count: {readme_tests} (accurate)")
@@ -191,7 +193,7 @@ class BadgeUpdater:
 
         if current_sprint and readme_sprint and current_sprint != readme_sprint:
             issues.append(
-                f"Sprint mismatch: Badge={readme_sprint}, Actual={current_sprint}"
+                f"Sprint mismatch: Badge={readme_sprint}, Actual={current_sprint}",
             )
         else:
             print(f"✅ Sprint: {readme_sprint} (accurate)")
@@ -203,9 +205,8 @@ class BadgeUpdater:
             for issue in issues:
                 print(f"  • {issue}")
             return {"valid": False, "issues": issues}
-        else:
-            print("\n✅ All badges are accurate!")
-            return {"valid": True, "issues": []}
+        print("\n✅ All badges are accurate!")
+        return {"valid": True, "issues": []}
 
     def update_all(self) -> bool:
         """Update all badges from live data"""
@@ -242,10 +243,14 @@ def main():
 
     parser = argparse.ArgumentParser(description="Update README badges with live data")
     parser.add_argument(
-        "--dry-run", action="store_true", help="Show changes without applying"
+        "--dry-run",
+        action="store_true",
+        help="Show changes without applying",
     )
     parser.add_argument(
-        "--validate-only", action="store_true", help="Only validate, don't update"
+        "--validate-only",
+        action="store_true",
+        help="Only validate, don't update",
     )
 
     args = parser.parse_args()

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Graphics Agent Tasks - Chart Generation Task Specifications
+"""Graphics Agent Tasks - Chart Generation Task Specifications
 
 Defines task configurations for the Graphics Agent.
 Compatible with CrewAI task structure for future migration.
@@ -15,8 +14,7 @@ from typing import Any
 
 
 class GraphicsTask:
-    """
-    Task specification for Graphics Agent.
+    """Task specification for Graphics Agent.
 
     Attributes:
         task_type: Type of graphics task (generate_chart, validate_zones, etc.)
@@ -24,6 +22,7 @@ class GraphicsTask:
         output_path: Path to save generated chart
         validation_level: Visual QA validation strictness (strict, medium, lenient)
         max_tokens: Maximum LLM tokens for code generation
+
     """
 
     def __init__(
@@ -52,10 +51,11 @@ class GraphicsTask:
 
 
 def create_chart_generation_task(
-    chart_spec: dict[str, Any], output_path: str, max_tokens: int = 2500
+    chart_spec: dict[str, Any],
+    output_path: str,
+    max_tokens: int = 2500,
 ) -> GraphicsTask:
-    """
-    Create a chart generation task.
+    """Create a chart generation task.
 
     Args:
         chart_spec: Chart specification with required fields:
@@ -85,6 +85,7 @@ def create_chart_generation_task(
         ...     },
         ...     output_path="/path/to/chart.png"
         ... )
+
     """
     return GraphicsTask(
         task_type="generate_chart",
@@ -96,10 +97,10 @@ def create_chart_generation_task(
 
 
 def create_zone_validation_task(
-    chart_path: str, validation_level: str = "strict"
+    chart_path: str,
+    validation_level: str = "strict",
 ) -> GraphicsTask:
-    """
-    Create a zone validation task.
+    """Create a zone validation task.
 
     Validates that chart elements respect zone boundaries:
     - Red bar zone (y: 0.96-1.00)
@@ -114,6 +115,7 @@ def create_zone_validation_task(
 
     Returns:
         GraphicsTask configured for zone validation
+
     """
     return GraphicsTask(
         task_type="validate_zones",
@@ -125,10 +127,11 @@ def create_zone_validation_task(
 
 
 def create_label_optimization_task(
-    chart_spec: dict[str, Any], current_code: str, output_path: str
+    chart_spec: dict[str, Any],
+    current_code: str,
+    output_path: str,
 ) -> GraphicsTask:
-    """
-    Create a label optimization task.
+    """Create a label optimization task.
 
     Optimizes label positioning to avoid overlaps:
     - Labels in clear space (not on data lines)
@@ -143,6 +146,7 @@ def create_label_optimization_task(
 
     Returns:
         GraphicsTask configured for label optimization
+
     """
     optimization_spec = chart_spec.copy()
     optimization_spec["optimization_target"] = "labels"
@@ -200,23 +204,23 @@ TASK_TEMPLATES = {
 
 
 def get_task_template(chart_type: str) -> dict[str, Any] | None:
-    """
-    Get task template for chart type.
+    """Get task template for chart type.
 
     Args:
         chart_type: Type of chart (line_chart, bar_chart, scatter_plot)
 
     Returns:
         Template dict or None if not found
+
     """
     return TASK_TEMPLATES.get(chart_type)
 
 
 def validate_chart_spec(
-    chart_spec: dict[str, Any], chart_type: str = None
+    chart_spec: dict[str, Any],
+    chart_type: str = None,
 ) -> tuple[bool, list[str]]:
-    """
-    Validate chart specification against template requirements.
+    """Validate chart specification against template requirements.
 
     Args:
         chart_spec: Chart specification to validate
@@ -224,6 +228,7 @@ def validate_chart_spec(
 
     Returns:
         (is_valid, error_messages)
+
     """
     errors = []
 

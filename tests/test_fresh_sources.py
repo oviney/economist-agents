@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Tests for source freshness and analyst-diversity checks in ArticleEvaluator.
+"""Tests for source freshness and analyst-diversity checks in ArticleEvaluator.
 
 Story #137: Upgrade research agent with fresh source requirements.
 Tests the new source freshness scoring in the evidence_sourcing dimension.
@@ -46,6 +45,7 @@ def _make_article(
         body_extra: Additional body text (e.g., inline citations with years).
         title: Article title for frontmatter.
         date: Article date; defaults to today.
+
     """
     if date is None:
         date = datetime.now().strftime("%Y-%m-%d")
@@ -113,7 +113,8 @@ class TestEvidenceFreshness:
     """Test the freshness checks added to _score_evidence."""
 
     def test_article_with_fresh_sources_scores_well(
-        self, evaluator: ArticleEvaluator
+        self,
+        evaluator: ArticleEvaluator,
     ) -> None:
         """An article with multiple current-year references should not lose freshness points."""
         references = (
@@ -134,7 +135,8 @@ class TestEvidenceFreshness:
         assert score >= 5  # Should be healthy
 
     def test_article_with_no_recent_sources_is_penalised(
-        self, evaluator: ArticleEvaluator
+        self,
+        evaluator: ArticleEvaluator,
     ) -> None:
         """An article citing only stale 2023 sources should score lower."""
         stale_article = _make_article(
@@ -183,7 +185,8 @@ class TestAnalystDiversity:
     """Test penalisation when more than 1 analyst vendor is cited."""
 
     def test_single_analyst_vendor_not_penalised(
-        self, evaluator: ArticleEvaluator
+        self,
+        evaluator: ArticleEvaluator,
     ) -> None:
         """Citing exactly one analyst vendor should not trigger the diversity penalty."""
         article = _make_article(
@@ -199,7 +202,8 @@ class TestAnalystDiversity:
         assert "analyst vendors cited: 1" in detail
 
     def test_multiple_analyst_vendors_are_penalised(
-        self, evaluator: ArticleEvaluator
+        self,
+        evaluator: ArticleEvaluator,
     ) -> None:
         """Citing 3 different analyst vendors should reduce the evidence score."""
         single_vendor_article = _make_article(
@@ -228,7 +232,8 @@ class TestAnalystDiversity:
         )
 
     def test_detail_shows_analyst_vendor_count(
-        self, evaluator: ArticleEvaluator
+        self,
+        evaluator: ArticleEvaluator,
     ) -> None:
         """Detail string should include the number of analyst vendors cited."""
         article = _make_article(
@@ -301,7 +306,7 @@ class TestResearchAgentPrompt:
         "analyst-limit, and source-diversity rules live in "
         "skills/research-sourcing/SKILL.md and are enforced by the "
         "search query construction, not a prompt."
-    )
+    ),
 )
 class TestStage3CrewBackstory:
     def test_backstory_references_skill_file(self) -> None:

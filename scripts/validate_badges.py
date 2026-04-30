@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Badge Validation
+"""Badge Validation
 
 Validates README badge accuracy against live data sources.
 
@@ -55,7 +54,7 @@ class BadgeValidator:
 
             if actual_score != json_score:
                 self.issues.append(
-                    f"Quality score mismatch: quality_score.json={json_score}, actual={actual_score}"
+                    f"Quality score mismatch: quality_score.json={json_score}, actual={actual_score}",
                 )
                 return False
 
@@ -88,15 +87,14 @@ class BadgeValidator:
 
                 if actual_count != badge_count:
                     self.issues.append(
-                        f"Tests count mismatch: tests_badge.json={badge_count}, actual={actual_count}"
+                        f"Tests count mismatch: tests_badge.json={badge_count}, actual={actual_count}",
                     )
                     return False
 
                 print(f"✅ Tests badge: {badge_count} passing (accurate)")
                 return True
-            else:
-                self.issues.append("tests_badge.json not found")
-                return False
+            self.issues.append("tests_badge.json not found")
+            return False
 
         except Exception as e:
             self.issues.append(f"Tests badge validation error: {e}")
@@ -119,15 +117,14 @@ class BadgeValidator:
 
                 if actual_sprint != badge_sprint:
                     self.issues.append(
-                        f"Sprint number mismatch: sprint_badge.json={badge_sprint}, actual={actual_sprint}"
+                        f"Sprint number mismatch: sprint_badge.json={badge_sprint}, actual={actual_sprint}",
                     )
                     return False
 
                 print(f"✅ Sprint badge: {badge_sprint} (accurate)")
                 return True
-            else:
-                self.issues.append("sprint_badge.json not found")
-                return False
+            self.issues.append("sprint_badge.json not found")
+            return False
 
         except Exception as e:
             self.issues.append(f"Sprint badge validation error: {e}")
@@ -160,7 +157,7 @@ class BadgeValidator:
                             json_path = self.repo_root / json_file
                             if not json_path.exists():
                                 self.issues.append(
-                                    f"Badge endpoint file missing: {json_file}"
+                                    f"Badge endpoint file missing: {json_file}",
                                 )
                                 all_valid = False
                             else:
@@ -189,11 +186,10 @@ class BadgeValidator:
         if all(results.values()):
             print("\n✅ All badge validations passed!")
             return {"valid": True, "results": results, "issues": []}
-        else:
-            print("\n❌ Badge validation failed:")
-            for issue in self.issues:
-                print(f"  • {issue}")
-            return {"valid": False, "results": results, "issues": self.issues}
+        print("\n❌ Badge validation failed:")
+        for issue in self.issues:
+            print(f"  • {issue}")
+        return {"valid": False, "results": results, "issues": self.issues}
 
 
 def main():

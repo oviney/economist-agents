@@ -58,6 +58,7 @@ def check_pr_ready_tool(pr_url: str) -> dict[str, Any]:
             details (dict): Granular sub-checks.
 
         On error an ``error`` key is present and promote is False.
+
     """
     try:
         return check_pr_ready(pr_url)
@@ -91,6 +92,7 @@ def triage_duplicates_tool(pr_a_url: str, pr_b_url: str) -> dict[str, Any]:
             details(dict): Sub-scores for each PR.
 
         On error an ``error`` key is present.
+
     """
     try:
         return triage_duplicates(pr_a_url, pr_b_url)
@@ -122,6 +124,7 @@ def check_dispatch_safe_tool(issue_url: str) -> dict[str, Any]:
             details  (dict): Granular sub-checks.
 
         On error an ``error`` key is present and dispatch is False.
+
     """
     try:
         return check_dispatch_safe(issue_url)
@@ -154,6 +157,7 @@ def check_stalled_tool(pr_url: str, idle_minutes: int) -> dict[str, Any]:
             details (dict): Complexity, thresholds, file count.
 
         On error an ``error`` key is present and stalled is False.
+
     """
     try:
         return check_stalled(pr_url, idle_minutes)

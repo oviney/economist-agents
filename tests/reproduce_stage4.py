@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Test Stage 4 Crew - Review and Final Editorial Polish
+"""Test Stage 4 Crew - Review and Final Editorial Polish
 
 Stage 4 represents the final review and editorial refinement stage.
 It ingests YAML/JSON output from Stage 3 and applies additional quality checks.
@@ -23,8 +22,7 @@ def test_stage4_crew_initialization():
 
 
 def test_stage4_ingests_stage3_output():
-    """
-    CRITICAL: Stage 4 must successfully consume YAML/JSON output from Stage 3
+    """CRITICAL: Stage 4 must successfully consume YAML/JSON output from Stage 3
 
     Stage 3 outputs:
     {

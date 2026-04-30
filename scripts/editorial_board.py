@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Editorial Board Agent Swarm
+"""Editorial Board Agent Swarm
 
 A panel of persona agents who evaluate and vote on proposed topics.
 Each agent represents a different reader/stakeholder perspective.
@@ -61,12 +60,11 @@ BOARD_MEMBERS = _load_board_members()
 
 def get_board_vote(client, member_id: str, member_info: dict, topics: list) -> dict:
     """Get a single board member's votes on all topics."""
-
     # Input validation
     if not topics or not isinstance(topics, list):
         raise ValueError(
             f"[EDITORIAL_BOARD:{member_id}] Invalid topics. Expected non-empty list, "
-            f"got: {type(topics).__name__}"
+            f"got: {type(topics).__name__}",
         )
 
     if len(topics) == 0:
@@ -81,7 +79,7 @@ def get_board_vote(client, member_id: str, member_info: dict, topics: list) -> d
             f"Data sources: {', '.join(t.get('data_sources', ['Unknown']))}\n"
             f"Contrarian angle: {t.get('contrarian_angle', 'N/A')}"
             for i, t in enumerate(topics)
-        ]
+        ],
     )
 
     prompt = f"""{member_info["prompt"]}
@@ -140,8 +138,7 @@ Respond in JSON format:
 
 
 def run_editorial_board(client, topics: list, parallel: bool = True) -> dict:
-    """
-    Run the full editorial board voting process.
+    """Run the full editorial board voting process.
 
     Args:
         topics: List of topic dicts from Topic Scout
@@ -149,12 +146,13 @@ def run_editorial_board(client, topics: list, parallel: bool = True) -> dict:
 
     Returns:
         Dict with votes, rankings, and consensus pick
+
     """
     print("\n" + "=" * 70)
     print("📋 EDITORIAL BOARD CONVENING")
     print("=" * 70)
     print(
-        f"\n   Evaluating {len(topics)} topics with {len(BOARD_MEMBERS)} board members...\n"
+        f"\n   Evaluating {len(topics)} topics with {len(BOARD_MEMBERS)} board members...\n",
     )
 
     all_votes = []
@@ -203,7 +201,7 @@ def run_editorial_board(client, topics: list, parallel: bool = True) -> dict:
                         "member": vote_set["member_name"],
                         "score": vote["score"],
                         "rationale": vote["rationale"],
-                    }
+                    },
                 )
 
     # Calculate final scores
@@ -222,7 +220,7 @@ def run_editorial_board(client, topics: list, parallel: bool = True) -> dict:
                 "vote_count": len(scores["votes"]),
                 "votes": scores["votes"],
                 "original_topic": topics[idx],
-            }
+            },
         )
 
     # Sort by weighted score
@@ -261,7 +259,7 @@ def run_editorial_board(client, topics: list, parallel: bool = True) -> dict:
         print(f"\n   #{r['rank']} [{r['weighted_score']}/10] {r['topic']}")
         # Show vote breakdown
         vote_summary = ", ".join(
-            [f"{v['member'].split()[-1]}:{v['score']}" for v in r["votes"][:3]]
+            [f"{v['member'].split()[-1]}:{v['score']}" for v in r["votes"][:3]],
         )
         print(f"      Votes: {vote_summary}...")
 
@@ -269,7 +267,7 @@ def run_editorial_board(client, topics: list, parallel: bool = True) -> dict:
         print(f"\n   ✅ UNANIMOUS: All board members agree on #{rankings[0]['rank']}")
     elif dissenting_views:
         print(
-            f"\n   ⚠️  DISSENT: {len(dissenting_views)} member(s) scored top pick below 5"
+            f"\n   ⚠️  DISSENT: {len(dissenting_views)} member(s) scored top pick below 5",
         )
 
     return result
@@ -277,12 +275,11 @@ def run_editorial_board(client, topics: list, parallel: bool = True) -> dict:
 
 def format_board_report(result: dict) -> str:
     """Format the board's decision as a readable report."""
-
     report = []
     report.append("# Editorial Board Decision\n")
     report.append(f"**Board Size:** {result['board_size']} members\n")
     report.append(
-        f"**Consensus:** {'Yes ✅' if result['consensus'] else 'No (split vote)'}\n"
+        f"**Consensus:** {'Yes ✅' if result['consensus'] else 'No (split vote)'}\n",
     )
 
     report.append("\n## Final Rankings\n")
@@ -292,7 +289,7 @@ def format_board_report(result: dict) -> str:
         report.append("**Board Feedback:**\n")
         for vote in r["votes"]:
             report.append(
-                f"- **{vote['member']}** ({vote['score']}/10): {vote['rationale']}\n"
+                f"- **{vote['member']}** ({vote['score']}/10): {vote['rationale']}\n",
             )
         report.append("\n")
 
@@ -311,7 +308,6 @@ def format_board_report(result: dict) -> str:
 
 def main():
     """Run editorial board on topics from content_queue.json or environment."""
-
     client = create_llm_client()
 
     # Load topics

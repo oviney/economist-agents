@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Tests for scripts/article_archive.py
+"""Tests for scripts/article_archive.py
 
 Tests the published-article archive backed by ChromaDB for:
 1. index_article — stores articles with correct metadata
@@ -97,13 +96,13 @@ def _ephemeral_archive() -> ArticleArchive:
 # ---------------------------------------------------------------------------
 
 
-@pytest.fixture()
+@pytest.fixture
 def archive() -> ArticleArchive:
     """Fresh in-memory ArticleArchive for each test."""
     return _ephemeral_archive()
 
 
-@pytest.fixture()
+@pytest.fixture
 def posts_dir(tmp_path: Path) -> Path:
     """Temporary directory with sample markdown posts."""
     posts = tmp_path / "_posts"
@@ -294,7 +293,7 @@ class TestIndexArticle:
 class TestFindSimilarTopics:
     """Tests for the find_similar_topics search method."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def populated_archive(self, archive: ArticleArchive) -> ArticleArchive:
         """Archive pre-populated with two distinct articles."""
         archive.index_article(
@@ -320,7 +319,8 @@ class TestFindSimilarTopics:
     def test_result_has_required_keys(self, populated_archive: ArticleArchive) -> None:
         """Each result dict contains the required schema keys."""
         results = populated_archive.find_similar_topics(
-            "AI test quality", threshold=0.0
+            "AI test quality",
+            threshold=0.0,
         )
         assert results  # at least one result
         required_keys = {
@@ -335,33 +335,41 @@ class TestFindSimilarTopics:
             assert required_keys.issubset(result.keys())
 
     def test_threshold_filters_low_similarity(
-        self, populated_archive: ArticleArchive
+        self,
+        populated_archive: ArticleArchive,
     ) -> None:
         """Results respect the similarity threshold."""
         results = populated_archive.find_similar_topics(
-            "AI testing defects", threshold=0.8
+            "AI testing defects",
+            threshold=0.8,
         )
         for result in results:
             assert result["similarity"] >= 0.8
 
     def test_threshold_zero_returns_all(
-        self, populated_archive: ArticleArchive
+        self,
+        populated_archive: ArticleArchive,
     ) -> None:
         """threshold=0 returns all documents (up to n_results)."""
         results = populated_archive.find_similar_topics(
-            "x", threshold=0.0, n_results=10
+            "x",
+            threshold=0.0,
+            n_results=10,
         )
         assert len(results) == 2
 
     def test_n_results_limits_output(self, populated_archive: ArticleArchive) -> None:
         """n_results caps results before threshold filtering."""
         results = populated_archive.find_similar_topics(
-            "testing", threshold=0.0, n_results=1
+            "testing",
+            threshold=0.0,
+            n_results=1,
         )
         assert len(results) <= 1
 
     def test_sorted_by_similarity_descending(
-        self, populated_archive: ArticleArchive
+        self,
+        populated_archive: ArticleArchive,
     ) -> None:
         """Results are returned in descending similarity order."""
         results = populated_archive.find_similar_topics("testing", threshold=0.0)
@@ -393,7 +401,9 @@ class TestBackfillFromDirectory:
     """Tests for the backfill_from_directory method."""
 
     def test_backfill_indexes_all_md_files(
-        self, archive: ArticleArchive, posts_dir: Path
+        self,
+        archive: ArticleArchive,
+        posts_dir: Path,
     ) -> None:
         """All .md files (except README) are indexed."""
         count = archive.backfill_from_directory(posts_dir)
@@ -402,7 +412,9 @@ class TestBackfillFromDirectory:
         assert archive.count() == 2
 
     def test_backfill_skips_readme(
-        self, archive: ArticleArchive, posts_dir: Path
+        self,
+        archive: ArticleArchive,
+        posts_dir: Path,
     ) -> None:
         """README.md is excluded from indexing."""
         archive.backfill_from_directory(posts_dir)
@@ -411,33 +423,44 @@ class TestBackfillFromDirectory:
         assert all("README" not in t for t in titles)
 
     def test_backfill_extracts_frontmatter_title(
-        self, archive: ArticleArchive, posts_dir: Path
+        self,
+        archive: ArticleArchive,
+        posts_dir: Path,
     ) -> None:
         """Frontmatter title is stored in metadata."""
         archive.backfill_from_directory(posts_dir)
         results = archive.find_similar_topics(
-            "AI testing fails", threshold=0.0, n_results=10
+            "AI testing fails",
+            threshold=0.0,
+            n_results=10,
         )
         titles = [r["title"] for r in results]
         assert any("AI Testing Fails Teams" in t for t in titles)
 
     def test_backfill_extracts_categories_list(
-        self, archive: ArticleArchive, posts_dir: Path
+        self,
+        archive: ArticleArchive,
+        posts_dir: Path,
     ) -> None:
         """List-type categories are stored as comma-separated string."""
         archive.backfill_from_directory(posts_dir)
         results = archive.find_similar_topics(
-            "AI testing fails", threshold=0.0, n_results=10
+            "AI testing fails",
+            threshold=0.0,
+            n_results=10,
         )
         ai_article = next(
-            (r for r in results if "AI Testing Fails Teams" in r["title"]), None
+            (r for r in results if "AI Testing Fails Teams" in r["title"]),
+            None,
         )
         assert ai_article is not None
         assert "testing" in ai_article["categories"]
         assert "ai" in ai_article["categories"]
 
     def test_backfill_is_idempotent(
-        self, archive: ArticleArchive, posts_dir: Path
+        self,
+        archive: ArticleArchive,
+        posts_dir: Path,
     ) -> None:
         """Running backfill twice does not create duplicates."""
         archive.backfill_from_directory(posts_dir)
@@ -445,14 +468,18 @@ class TestBackfillFromDirectory:
         assert archive.count() == 2  # same 2 articles, no duplicates
 
     def test_backfill_raises_on_missing_directory(
-        self, archive: ArticleArchive, tmp_path: Path
+        self,
+        archive: ArticleArchive,
+        tmp_path: Path,
     ) -> None:
         """FileNotFoundError is raised when the directory does not exist."""
         with pytest.raises(FileNotFoundError):
             archive.backfill_from_directory(tmp_path / "nonexistent")
 
     def test_backfill_handles_missing_frontmatter(
-        self, archive: ArticleArchive, tmp_path: Path
+        self,
+        archive: ArticleArchive,
+        tmp_path: Path,
     ) -> None:
         """Articles without frontmatter are indexed using the filename as title."""
         posts = tmp_path / "_posts"
@@ -465,7 +492,9 @@ class TestBackfillFromDirectory:
         assert count == 1
 
     def test_backfill_returns_zero_for_empty_directory(
-        self, archive: ArticleArchive, tmp_path: Path
+        self,
+        archive: ArticleArchive,
+        tmp_path: Path,
     ) -> None:
         """An empty directory returns 0 indexed articles."""
         posts = tmp_path / "empty_posts"

@@ -72,7 +72,7 @@ def build_research_brief(topic: str) -> str:
             "Do NOT invent statistics, researcher names, or URLs.",
             "",
             raw,
-        ]
+        ],
     )
 
 
@@ -92,7 +92,7 @@ def _run_web_searches(topic: str) -> str:
                         f"- [{p.get('title', 'Unknown')}]({p.get('url', '')})\n"
                         f"  Authors: {p.get('authors', 'Unknown')}\n"
                         f"  Published: {p.get('published', 'N/A')}\n"
-                        f"  Key finding: {p.get('key_insight', 'N/A')}"
+                        f"  Key finding: {p.get('key_insight', 'N/A')}",
                     )
     except Exception as exc:
         logger.warning("arXiv search failed: %s", exc)
@@ -109,7 +109,7 @@ def _run_web_searches(topic: str) -> str:
                     results.append(
                         f"- [{r.get('title', 'Unknown')}]({r.get('link', '')})\n"
                         f"  Snippet: {r.get('snippet', 'N/A')}\n"
-                        f"  Date: {r.get('date', 'N/A')}"
+                        f"  Date: {r.get('date', 'N/A')}",
                     )
             scholar = google.get("scholar_results", [])
             if scholar:
@@ -118,7 +118,7 @@ def _run_web_searches(topic: str) -> str:
                     results.append(
                         f"- [{r.get('title', 'Unknown')}]({r.get('link', '')})\n"
                         f"  Year: {r.get('year', 'N/A')}\n"
-                        f"  Cited by: {r.get('cited_by', 'N/A')}"
+                        f"  Cited by: {r.get('cited_by', 'N/A')}",
                     )
     except Exception as exc:
         logger.warning("Google search failed: %s", exc)
@@ -178,7 +178,7 @@ def audit_article_stats(article: str, research_brief: str) -> str:
         )
         print(
             f"   🔪 Stat audit: removed {removed_count} sentence(s) with "
-            f"unverified stats"
+            f"unverified stats",
         )
 
     cleaned_body = " ".join(kept) + refs_section
@@ -283,7 +283,10 @@ def _normalize_category_casing(frontmatter: str) -> str:
         if line.strip().startswith("categories:"):
             for raw_value, canonical in _CATEGORY_NORMALIZATION.items():
                 lines[i] = re.sub(
-                    re.escape(raw_value), canonical, lines[i], flags=re.IGNORECASE
+                    re.escape(raw_value),
+                    canonical,
+                    lines[i],
+                    flags=re.IGNORECASE,
                 )
             break
     return "\n".join(lines)
@@ -458,6 +461,6 @@ def parse_research_for_verification(research_text: str) -> dict[str, Any]:
                 "stat": stat_text,
                 "source": text_label,
                 "verified": True,
-            }
+            },
         )
     return {"data_points": data_points}

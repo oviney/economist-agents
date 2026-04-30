@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-GitHub Issue Validator - Prevents Duplicate Issue Creation
+"""GitHub Issue Validator - Prevents Duplicate Issue Creation
 
 Validates against defect_tracker.json before creating GitHub issues.
 Prevents duplicate issues by checking existing bug entries.
@@ -42,11 +41,11 @@ class GitHubIssueValidator:
             return json.load(f)
 
     def check_existing_issue(self, bug_id: str) -> tuple[bool, int | None]:
-        """
-        Check if bug already has GitHub issue.
+        """Check if bug already has GitHub issue.
 
         Returns:
             (bug_exists, github_issue_number)
+
         """
         bug = self._find_bug(bug_id)
 
@@ -64,13 +63,15 @@ class GitHubIssueValidator:
         return None
 
     def validate_before_create(
-        self, bug_id: str, title: str = None
+        self,
+        bug_id: str,
+        title: str = None,
     ) -> tuple[bool, str]:
-        """
-        Validate before creating GitHub issue.
+        """Validate before creating GitHub issue.
 
         Returns:
             (can_create, message)
+
         """
         bug_exists, github_issue = self.check_existing_issue(bug_id)
 
@@ -98,7 +99,7 @@ class GitHubIssueValidator:
                         "severity": bug["severity"],
                         "description": bug["description"],
                         "discovered_in": bug["discovered_in"],
-                    }
+                    },
                 )
 
         return bugs_missing_issues
@@ -149,7 +150,8 @@ Examples:
 
     parser.add_argument("--bug", help="Check if specific bug has GitHub issue")
     parser.add_argument(
-        "--validate", help="Validate before creating issue (blocks if duplicate)"
+        "--validate",
+        help="Validate before creating issue (blocks if duplicate)",
     )
     parser.add_argument("--title", help="Issue title for validation")
     parser.add_argument(
@@ -158,7 +160,9 @@ Examples:
         help="List all bugs without GitHub issues",
     )
     parser.add_argument(
-        "--next-id", action="store_true", help="Get next available BUG-XXX ID"
+        "--next-id",
+        action="store_true",
+        help="Get next available BUG-XXX ID",
     )
 
     args = parser.parse_args()
@@ -182,7 +186,8 @@ Examples:
 
     elif args.validate:
         can_create, message = validator.validate_before_create(
-            args.validate, args.title
+            args.validate,
+            args.title,
         )
 
         print(message)

@@ -104,7 +104,7 @@ def _get_searcher() -> Any:
     # Import lazily to keep module importable even when google_search has
     # heavy optional deps.
     try:
-        from google_search import GoogleSearcher  # noqa: E402
+        from google_search import GoogleSearcher
     except ImportError as exc:
         logger.warning(
             "SERPER_API_KEY is set but google_search is unavailable; "
@@ -133,6 +133,7 @@ def _run_query(searcher: Any, query: str, num_results: int = 5) -> list[Evidence
 
     Returns:
         List of :class:`EvidenceItem` dicts (may be empty on error).
+
     """
     try:
         raw = searcher.search_web(
@@ -156,7 +157,7 @@ def _run_query(searcher: Any, query: str, num_results: int = 5) -> list[Evidence
                 snippet=r.get("snippet", ""),
                 date=r.get("date", ""),
                 source=r.get("source", "google_search"),
-            )
+            ),
         )
     return items
 
@@ -172,6 +173,7 @@ def _fetch_hn_top_stories(max_items: int = _HN_MAX_ITEMS) -> list[EvidenceItem]:
 
     Returns:
         List of :class:`EvidenceItem` dicts.
+
     """
     try:
         resp = requests.get(_HN_TOP_STORIES_URL, timeout=_HN_TIMEOUT)
@@ -181,7 +183,8 @@ def _fetch_hn_top_stories(max_items: int = _HN_MAX_ITEMS) -> list[EvidenceItem]:
         items: list[EvidenceItem] = []
         for sid in story_ids:
             item_resp = requests.get(
-                _HN_ITEM_URL.format(item_id=sid), timeout=_HN_TIMEOUT
+                _HN_ITEM_URL.format(item_id=sid),
+                timeout=_HN_TIMEOUT,
             )
             item_resp.raise_for_status()
             story = orjson.loads(item_resp.content)
@@ -199,7 +202,7 @@ def _fetch_hn_top_stories(max_items: int = _HN_MAX_ITEMS) -> list[EvidenceItem]:
                     snippet="",
                     date=datetime.fromtimestamp(ts, tz=UTC).strftime("%Y-%m-%d"),
                     source="hacker_news",
-                )
+                ),
             )
         logger.info("Fetched %d HN front-page stories", len(items))
         return items
@@ -229,6 +232,7 @@ def gather_trend_evidence(
         List of :class:`TrendEvidence` dicts, one per query (plus one for HN
         if *include_hn* is ``True``).  Each element contains a ``query`` key
         and a ``results`` list of :class:`EvidenceItem`.
+
     """
     if queries is None:
         queries = _default_queries()
@@ -239,7 +243,7 @@ def gather_trend_evidence(
     if searcher is None:
         logger.warning(
             "SERPER_API_KEY not set — web search disabled; "
-            "trend grounding will be limited to HN stories (if enabled)"
+            "trend grounding will be limited to HN stories (if enabled)",
         )
     else:
         for q in queries:
@@ -251,7 +255,7 @@ def gather_trend_evidence(
         hn_stories = _fetch_hn_top_stories()
         if hn_stories:
             evidence.append(
-                TrendEvidence(query="Hacker News front page", results=hn_stories)
+                TrendEvidence(query="Hacker News front page", results=hn_stories),
             )
 
     return evidence
@@ -277,6 +281,7 @@ def build_grounded_trend_context(
         Formatted string containing dated evidence with URLs, suitable for
         injection into an LLM prompt.  Returns a fallback message when no
         evidence could be collected.
+
     """
     queries = _default_queries()
 
@@ -289,7 +294,7 @@ def build_grounded_trend_context(
             [
                 f"{safe_focus} {year} trends",
                 f"{safe_focus} {year} announcements",
-            ]
+            ],
         )
 
     evidence = gather_trend_evidence(
@@ -311,6 +316,7 @@ def format_evidence_as_prompt(evidence: list[TrendEvidence]) -> str:
     Returns:
         Formatted string.  Returns a fallback note when *evidence* contains
         no items.
+
     """
     total_items = sum(len(e["results"]) for e in evidence)
     if total_items == 0:

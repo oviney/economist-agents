@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Evaluate Architecture Options
+"""Evaluate Architecture Options
 
 Generic script to evaluate research briefs using AI analysis.
 Supports multiple topics: fresh-data, infrastructure, or any custom brief.
@@ -167,7 +166,7 @@ def format_recommendation(rec: dict[str, Any], title: str) -> str:
 def main() -> None:
     """Main entry point."""
     parser = argparse.ArgumentParser(
-        description="Evaluate architecture options using AI analysis"
+        description="Evaluate architecture options using AI analysis",
     )
     parser.add_argument(
         "--topic",

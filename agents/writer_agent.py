@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Writer Agent Module
+"""Writer Agent Module
 
 Extracts writer agent functionality from economist_agent.py
 for improved modularity and testability.
@@ -70,6 +69,7 @@ class WriterAgent:
         ...     research_brief={...},
         ...     current_date="2026-01-02"
         ... )
+
     """
 
     def __init__(self, client: Any, governance: GovernanceTracker | None = None):
@@ -78,6 +78,7 @@ class WriterAgent:
         Args:
             client: LLM client for generating articles
             governance: Optional governance tracker for logging
+
         """
         self.client = client
         self.governance = governance
@@ -97,6 +98,7 @@ class WriterAgent:
 
         Returns:
             Article text with corrected frontmatter delimiters.
+
         """
         text = draft.strip()
 
@@ -161,23 +163,24 @@ class WriterAgent:
             ... )
             >>> print(f"Valid: {metadata['is_valid']}")
             >>> print(f"Word count: {len(draft.split())}")
+
         """
         # Input validation
         if not topic or not isinstance(topic, str):
             raise ValueError(
                 "[WRITER_AGENT] Invalid topic. Expected non-empty string, "
-                f"got: {type(topic).__name__}"
+                f"got: {type(topic).__name__}",
             )
 
         if not isinstance(research_brief, dict):
             raise ValueError(
                 "[WRITER_AGENT] Invalid research_brief. Expected dict, "
-                f"got: {type(research_brief).__name__}"
+                f"got: {type(research_brief).__name__}",
             )
 
         if not research_brief:
             raise ValueError(
-                "[WRITER_AGENT] Empty research_brief. Cannot write without research data."
+                "[WRITER_AGENT] Empty research_brief. Cannot write without research data.",
             )
 
         print(f"✍️  Writer Agent: Drafting article on '{topic[:50]}...'")
@@ -210,7 +213,8 @@ Failure to include the chart will result in article rejection.
             )
         else:
             system_prompt = system_prompt.replace(
-                "{research_brief}", json_stdlib.dumps(research_brief, indent=2)
+                "{research_brief}",
+                json_stdlib.dumps(research_brief, indent=2),
             )
 
         # Add references information from research data
@@ -254,7 +258,9 @@ image: {featured_image}
         # SELF-VALIDATION: Review draft before returning
         print("   🔍 Self-validating draft...")
         is_valid, issues = review_agent_output(
-            "writer_agent", draft, context={"chart_filename": chart_filename}
+            "writer_agent",
+            draft,
+            context={"chart_filename": chart_filename},
         )
 
         critical_issues = []
@@ -268,7 +274,7 @@ image: {featured_image}
 
                 print(
                     f"   ⚠️  {len(critical_issues)} critical issues found, regenerating"
-                    f" (attempt {attempt + 1}/2)..."
+                    f" (attempt {attempt + 1}/2)...",
                 )
 
                 # Create fix instructions — targeted guidance for word count failures
@@ -292,12 +298,12 @@ image: {featured_image}
                             "Expand by: (1) adding a concrete real-world example or case study, "
                             "(2) deepening the economic analysis with specific figures, "
                             "or (3) adding a new ## section exploring implications. "
-                            "Do NOT pad with filler — add substantive content."
+                            "Do NOT pad with filler — add substantive content.",
                         )
                     else:
                         fix_lines.append(f"- {issue}")
                 fix_lines.append(
-                    "\nReturn the COMPLETE corrected article with ALL fixes applied."
+                    "\nReturn the COMPLETE corrected article with ALL fixes applied.",
                 )
                 fix_instructions = "\n".join(fix_lines)
 
@@ -314,7 +320,9 @@ image: {featured_image}
 
                 # Re-validate
                 is_valid, issues = review_agent_output(
-                    "writer_agent", draft, context={"chart_filename": chart_filename}
+                    "writer_agent",
+                    draft,
+                    context={"chart_filename": chart_filename},
                 )
                 critical_issues = [
                     i for i in issues if "CRITICAL" in i or "BANNED" in i
@@ -322,7 +330,7 @@ image: {featured_image}
 
                 if not is_valid and critical_issues:
                     print(
-                        f"   ⚠️  Draft still has {len(issues)} issues after attempt {attempt + 1}"
+                        f"   ⚠️  Draft still has {len(issues)} issues after attempt {attempt + 1}",
                     )
                 else:
                     if is_valid:
@@ -364,6 +372,7 @@ image: {featured_image}
 
         Returns:
             Formatted guidance string or empty string if no sources
+
         """
         sources = []
 
@@ -412,12 +421,12 @@ image: {featured_image}
 
             if url:
                 guidance.append(
-                    f"{i}. {source_name}, [source title/report name], *Publication*, {year}"
+                    f"{i}. {source_name}, [source title/report name], *Publication*, {year}",
                 )
                 guidance.append(f"   URL: {url}")
             else:
                 guidance.append(
-                    f"{i}. {source_name}, [report/study name], *Publication*, {year}"
+                    f"{i}. {source_name}, [report/study name], *Publication*, {year}",
                 )
 
         guidance.extend(
@@ -426,7 +435,7 @@ image: {featured_image}
                 "Format these as proper references in your '## References' section.",
                 "Use descriptive link text, not generic 'click here'.",
                 "═══════════════════════════════════════════════════════════════════════════",
-            ]
+            ],
         )
 
         return "\n".join(guidance)
@@ -472,6 +481,7 @@ def run_writer_agent(
         ...     {"headline_stat": {...}},
         ...     "2026-01-02"
         ... )
+
     """
     agent = WriterAgent(client, governance)
     return agent.write(

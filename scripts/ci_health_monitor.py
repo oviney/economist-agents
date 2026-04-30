@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-CI Health Monitor - Automated GitHub Actions Status Checker
+"""CI Health Monitor - Automated GitHub Actions Status Checker
 
 Responsible Agent: @code-quality-specialist
 Purpose: Daily CI/CD health monitoring and automated dispatch
@@ -27,7 +26,9 @@ class CIHealthMonitor:
     """Monitor GitHub Actions CI/CD health and dispatch on failures"""
 
     def __init__(
-        self, workflow_id: str = "ci.yml", repo: str = "oviney/economist-agents"
+        self,
+        workflow_id: str = "ci.yml",
+        repo: str = "oviney/economist-agents",
     ):
         self.workflow_id = workflow_id
         self.repo = repo
@@ -171,7 +172,7 @@ class CIHealthMonitor:
 
             if health["consecutive_failures"]:
                 print(
-                    f"\n   ⚠️  {health['failure_count']} consecutive failures detected"
+                    f"\n   ⚠️  {health['failure_count']} consecutive failures detected",
                 )
                 print("   This is a systematic issue requiring immediate attention")
 
@@ -182,7 +183,7 @@ class CIHealthMonitor:
                 "\n   Next Steps:"
                 "\n   - View logs: gh run view {run_number} --repo {repo}"
                 "\n   - Create issue: scripts/ci_health_monitor.py --alert --create-issue"
-                "\n   - Update log: Update docs/CI_HEALTH_LOG.md manually"
+                "\n   - Update log: Update docs/CI_HEALTH_LOG.md manually",
             )
 
         elif status == "YELLOW":
@@ -287,19 +288,18 @@ class CIHealthMonitor:
 
         if status == "GREEN":
             return "✅ CI green - all workflows passing"
-        elif status == "RED":
+        if status == "RED":
             return (
                 f"🚨 CI red - P0 blocker (Run #{health['latest_run']['number']} failed)"
             )
-        elif status == "YELLOW":
+        if status == "YELLOW":
             return f"⚠️  CI yellow - monitoring (Run #{health['latest_run']['number']} in progress)"
-        else:
-            return "❓ CI status unknown - manual check required"
+        return "❓ CI status unknown - manual check required"
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="CI Health Monitor - Automated GitHub Actions status checker"
+        description="CI Health Monitor - Automated GitHub Actions status checker",
     )
     parser.add_argument(
         "--workflow-id",

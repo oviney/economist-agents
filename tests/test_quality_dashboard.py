@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Quality Dashboard Validation Tests
+"""Quality Dashboard Validation Tests
 
 Sprint 12 Story 1 Task 3: Comprehensive validation tests for dashboard accuracy.
 
@@ -54,8 +53,8 @@ class TestDashboardMetricsAccuracy:
                             "data_points": 12,
                         },
                     },
-                }
-            ]
+                },
+            ],
         }
         metrics_file.write_text(json.dumps(test_data))
 
@@ -224,7 +223,7 @@ class TestQualityScoreCalculation:
                 "defect_escape_rate": 40.0,
                 "avg_time_to_detect_days": 3.5,
                 "avg_time_to_resolve_days": 2.0,
-            }
+            },
         }
 
         with patch(
@@ -238,7 +237,8 @@ class TestQualityScoreCalculation:
                 "graphics": {"visual_qa_pass_rate": 85.0},
             }
             score = dashboard._calculate_quality_score(
-                mock_defects["summary"], agent_summary
+                mock_defects["summary"],
+                agent_summary,
             )
 
             # Actual formula uses threshold-based penalties:
@@ -256,7 +256,7 @@ class TestQualityScoreCalculation:
                 "defect_escape_rate": 30.0,
                 "avg_time_to_detect_days": None,  # Missing
                 "avg_time_to_resolve_days": 1.5,
-            }
+            },
         }
 
         with patch(
@@ -270,7 +270,8 @@ class TestQualityScoreCalculation:
                 "graphics": {"visual_qa_pass_rate": 85.0},
             }
             score = dashboard._calculate_quality_score(
-                mock_defects["summary"], agent_summary
+                mock_defects["summary"],
+                agent_summary,
             )
 
             # Actual formula with None TTD:
@@ -297,7 +298,7 @@ class TestDashboardGeneration:
             patch(
                 "scripts.defect_tracker.DefectTracker.get_metrics",
                 return_value={
-                    "summary": {"defect_escape_rate": 40.0, "total_bugs": 10}
+                    "summary": {"defect_escape_rate": 40.0, "total_bugs": 10},
                 },
             ),
         ):

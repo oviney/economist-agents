@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Tests for OpenAIProvider and AnthropicProvider concrete implementations.
+"""Tests for OpenAIProvider and AnthropicProvider concrete implementations.
 
 Validates ADR-002 acceptance criteria:
 - LLMProvider protocol defined
@@ -423,7 +422,8 @@ class TestAgentRegistryCoveragePaths:
         """Error message mentions test agents when any are registered."""
         registry = _registry()
         registry.register_test_agent(
-            "tmp-agent", {"role": "R", "goal": "G", "backstory": "B", "tools": []}
+            "tmp-agent",
+            {"role": "R", "goal": "G", "backstory": "B", "tools": []},
         )
         with pytest.raises(ValueError, match="test agent"):
             registry.get_agent("nonexistent-agent-xyz")
@@ -617,7 +617,7 @@ class TestGetAgentWithDefaultProvider:
             assert agent["llm_client"] is mock_client
 
     def test_get_agent_model_override_with_default_provider(self):
-        """model arg overrides llm_client.model when no provider is injected."""
+        """Model arg overrides llm_client.model when no provider is injected."""
         from scripts.llm_client import LLMClient
 
         mock_underlying = MagicMock()

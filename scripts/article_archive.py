@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Article Archive - Searchable archive of published articles via ChromaDB.
+"""Article Archive - Searchable archive of published articles via ChromaDB.
 
 Provides Topic Scout with duplicate-detection capability by indexing published
 articles into a ChromaDB vector store and exposing similarity search.
@@ -66,6 +65,7 @@ def _parse_frontmatter(content: str) -> tuple[dict[str, Any], str]:
     Returns:
         Tuple of (frontmatter dict, body string).  If no frontmatter is
         found the dict is empty and body is the full content.
+
     """
     match = _FRONTMATTER_RE.match(content)
     if not match:
@@ -90,6 +90,7 @@ def _extract_thesis(body: str) -> str:
     Returns:
         Concatenated first two paragraphs, stripped of markdown headings and
         blank lines.
+
     """
     paragraphs = [
         p.strip()
@@ -108,6 +109,7 @@ def _categories_to_str(categories: Any) -> str:
 
     Returns:
         Comma-separated string of categories.
+
     """
     if isinstance(categories, list):
         return ",".join(str(c) for c in categories)
@@ -146,6 +148,7 @@ class ArticleArchive:
                 ChromaDB collection.  Pass ``None`` to let ChromaDB use its
                 default.  Primarily used in tests to inject an offline-capable
                 embedding function so tests do not require network access.
+
         """
         self.persist_directory = persist_directory
         self.client: Any = None
@@ -218,6 +221,7 @@ class ArticleArchive:
             (int) on success, or ``success`` (bool) and ``error`` (str) on
             failure.  The stored metadata includes an ``indexed_at`` ISO-8601
             UTC timestamp added automatically on each upsert.
+
         """
         if self.collection is None:
             return {
@@ -226,7 +230,7 @@ class ArticleArchive:
                 "id": "",
             }
 
-        doc_id = file_path if file_path else f"{title}_{date}"
+        doc_id = file_path or f"{title}_{date}"
 
         metadata: dict[str, str] = {
             "title": title,
@@ -270,6 +274,7 @@ class ArticleArchive:
             List of dicts, each containing the article schema fields plus a
             ``"similarity"`` key (float in [0, 1]).  Sorted by similarity
             descending.  Returns ``[]`` if the archive is unavailable or empty.
+
         """
         if self.collection is None:
             logger.warning("ArticleArchive unavailable — returning empty results.")
@@ -307,7 +312,8 @@ class ArticleArchive:
         # guarantees a distances list when include=["distances"] is requested,
         # but guard defensively; the calling test documents this expectation.
         distances: list[float] = list(raw_distances) + [0.0] * max(
-            0, len(documents) - len(raw_distances)
+            0,
+            len(documents) - len(raw_distances),
         )
 
         for doc, meta, distance in zip(documents, metadatas, distances, strict=False):
@@ -324,7 +330,7 @@ class ArticleArchive:
                     "categories": meta.get("categories", ""),
                     "file_path": meta.get("file_path", ""),
                     "similarity": similarity,
-                }
+                },
             )
 
         results.sort(key=lambda r: r["similarity"], reverse=True)
@@ -344,6 +350,7 @@ class ArticleArchive:
 
         Raises:
             FileNotFoundError: If *posts_dir* does not exist.
+
         """
         posts_path = Path(posts_dir)
         if not posts_path.exists():
@@ -379,7 +386,9 @@ class ArticleArchive:
                 continue
 
         logger.info(
-            "Backfill complete — %d/%d articles indexed.", indexed, len(md_files)
+            "Backfill complete — %d/%d articles indexed.",
+            indexed,
+            len(md_files),
         )
         return indexed
 
@@ -392,6 +401,7 @@ class ArticleArchive:
 
         Returns:
             Integer count, or 0 if ChromaDB is unavailable.
+
         """
         if self.collection is None:
             return 0
@@ -412,6 +422,7 @@ class ArticleArchive:
 
         Returns:
             List of matching article dicts with a ``similarity`` key.
+
         """
         return self.find_similar_topics(query, threshold=threshold, n_results=n_results)
 
@@ -422,6 +433,7 @@ class ArticleArchive:
             dict with ``available`` (bool), ``total_articles`` (int),
             ``date_range`` (dict with ``earliest``/``latest`` str),
             and ``category_distribution`` (dict mapping category to count).
+
         """
         if self.collection is None:
             return {"available": False, "total_articles": 0}
@@ -475,6 +487,7 @@ def _make_doc_id(file_path: str) -> str:
 
     Returns:
         A URL-safe string suitable for use as a ChromaDB document ID.
+
     """
     stem = Path(file_path).stem
     # Replace characters that may cause issues with some ChromaDB backends

@@ -113,7 +113,8 @@ def _append_cost_log(result: PipelineResult, total_wall_seconds: float) -> None:
 
 def main() -> None:
     logging.basicConfig(
-        level=logging.INFO, format="%(levelname)s %(name)s: %(message)s"
+        level=logging.INFO,
+        format="%(levelname)s %(name)s: %(message)s",
     )
     parser = argparse.ArgumentParser(description="Run the Agent SDK pipeline.")
     parser.add_argument("topic", nargs="*", help="Article topic")
@@ -149,7 +150,7 @@ def main() -> None:
     print(f"  Models: writer={args.writer_model}, graphics={args.graphics_model}")
     print(
         f"  Budgets: writer ${args.writer_budget:.2f}, "
-        f"graphics ${args.graphics_budget:.2f}"
+        f"graphics ${args.graphics_budget:.2f}",
     )
 
     start = time.perf_counter()
@@ -160,7 +161,7 @@ def main() -> None:
             graphics_budget_usd=args.graphics_budget,
             writer_model=args.writer_model,
             graphics_model=args.graphics_model,
-        )
+        ),
     )
     total = time.perf_counter() - start
     _append_cost_log(result, total)
@@ -169,14 +170,14 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "pipeline_article.md").write_text(result.article)
     (out_dir / "pipeline_chart.json").write_bytes(
-        orjson.dumps(result.chart_data, option=orjson.OPT_INDENT_2)
+        orjson.dumps(result.chart_data, option=orjson.OPT_INDENT_2),
     )
     metrics = {
         k: v for k, v in asdict(result).items() if k not in ("article", "chart_data")
     }
     metrics["total_wall_seconds"] = total
     (out_dir / "pipeline_metrics.json").write_bytes(
-        orjson.dumps(metrics, option=orjson.OPT_INDENT_2)
+        orjson.dumps(metrics, option=orjson.OPT_INDENT_2),
     )
 
     print(
@@ -189,7 +190,7 @@ def main() -> None:
         f"gates={result.gates_passed}/5, "
         f"validator={'PASS' if result.publication_validator_passed else 'FAIL'}, "
         f"ready={result.publication_ready}, "
-        f"{result.article_chars} chars."
+        f"{result.article_chars} chars.",
     )
     if not result.publication_validator_passed:
         print("Validator issues:")

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Test Gap Detection Automation
+"""Test Gap Detection Automation
 
 Analyzes defect tracker to identify systematic test gaps and generate
 actionable recommendations for closing those gaps.
@@ -44,7 +43,8 @@ class TestGapAnalyzer:
     ]
 
     def __init__(
-        self, defect_tracker_file: str = "data/skills_state/defect_tracker.json"
+        self,
+        defect_tracker_file: str = "data/skills_state/defect_tracker.json",
     ):
         self.defect_tracker_file = Path(defect_tracker_file)
         self.findings = {}
@@ -118,7 +118,9 @@ class TestGapAnalyzer:
         if agent_gaps:
             print("\n   Agent-Specific Gaps:")
             for agent, count in sorted(
-                agent_gaps.items(), key=lambda x: x[1], reverse=True
+                agent_gaps.items(),
+                key=lambda x: x[1],
+                reverse=True,
             ):
                 print(f"      {agent}: {count} bugs")
 
@@ -151,7 +153,7 @@ class TestGapAnalyzer:
                         "root_cause": root_cause,
                         "severity": bug.get("severity"),
                         "description": bug.get("description", "")[:60] + "...",
-                    }
+                    },
                 )
 
         # Group by test type + agent
@@ -174,7 +176,7 @@ class TestGapAnalyzer:
                     "critical_count": critical_count,
                     "priority": "HIGH" if critical_count > 0 else "MEDIUM",
                     "examples": [p["bug_id"] for p in patterns[:3]],
-                }
+                },
             )
 
         # Sort by bug count
@@ -192,7 +194,7 @@ class TestGapAnalyzer:
         print("\n   High-Priority Gaps:")
         for gap in priority_gaps[:5]:
             print(
-                f"      {gap['test_type']} + {gap['agent']}: {gap['bug_count']} bugs ({gap['priority']} priority)"
+                f"      {gap['test_type']} + {gap['agent']}: {gap['bug_count']} bugs ({gap['priority']} priority)",
             )
 
         self.findings["component_gaps"] = results
@@ -226,7 +228,7 @@ class TestGapAnalyzer:
                     ],
                     "expected_impact": "Catch 80% of chart layout bugs before publication",
                     "validation": "Re-run diagnostic on historical bugs with enhanced QA",
-                }
+                },
             )
 
         # Recommendation 2: Integration Test Gaps
@@ -246,7 +248,7 @@ class TestGapAnalyzer:
                     ],
                     "expected_impact": "Catch agent coordination bugs before deployment",
                     "validation": "Run integration tests in CI/CD on every commit",
-                }
+                },
             )
 
         # Recommendation 3: Writer Agent Validation
@@ -271,7 +273,7 @@ class TestGapAnalyzer:
                     ],
                     "expected_impact": "Reduce Writer defects by 40% through self-correction",
                     "validation": "Monitor Writer validation_passed metric over 10 runs",
-                }
+                },
             )
 
         # Recommendation 4: Manual Test Automation
@@ -291,7 +293,7 @@ class TestGapAnalyzer:
                     ],
                     "expected_impact": "Eliminate 60% of manual testing burden",
                     "validation": "Track manual test escapes over next 10 bugs",
-                }
+                },
             )
 
         # Recommendation 5: Prevention Rule Generation
@@ -310,7 +312,7 @@ class TestGapAnalyzer:
                 ],
                 "expected_impact": "Prevent 70% of historically-missed bug patterns",
                 "validation": "Track prevention system effectiveness over Sprint 8",
-            }
+            },
         )
 
         print(f"\n📋 {len(recommendations)} Recommendations Generated:\n")
@@ -354,7 +356,7 @@ class TestGapAnalyzer:
                     "",
                     "**Test Gap Distribution**:",
                     "",
-                ]
+                ],
             )
 
             for test_type, pct in dist.get("top_gaps", []):
@@ -372,7 +374,7 @@ class TestGapAnalyzer:
                     "",
                     "**High-Priority Component Gaps**:",
                     "",
-                ]
+                ],
             )
 
             for gap in comp.get("priority_gaps", [])[:5]:
@@ -386,7 +388,7 @@ class TestGapAnalyzer:
                         f"- **Priority**: {gap['priority']}",
                         f"- **Examples**: {examples_str}",
                         "",
-                    ]
+                    ],
                 )
 
         # Recommendations
@@ -400,7 +402,7 @@ class TestGapAnalyzer:
                     "",
                     f"**Total Recommendations**: {len(recs)}",
                     "",
-                ]
+                ],
             )
 
             for rec in recs:
@@ -422,7 +424,7 @@ class TestGapAnalyzer:
                         "",
                         "---",
                         "",
-                    ]
+                    ],
                 )
 
         # Action Plan
@@ -462,7 +464,7 @@ class TestGapAnalyzer:
                 f"**Report Generated**: {datetime.now().isoformat()}",
                 "**Analysis Tool**: `scripts/test_gap_analyzer.py`",
                 "",
-            ]
+            ],
         )
 
         # Write report
@@ -501,7 +503,7 @@ class TestGapAnalyzer:
         print(f"\n📄 Report: {report_path}")
         print("\n📋 Findings:")
         print(
-            f"   Test Gap Patterns: {self.findings.get('component_gaps', {}).get('total_patterns', 0)}"
+            f"   Test Gap Patterns: {self.findings.get('component_gaps', {}).get('total_patterns', 0)}",
         )
         print(f"   Recommendations: {len(self.findings.get('recommendations', []))}")
 
@@ -514,13 +516,17 @@ class TestGapAnalyzer:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Test Gap Detection Automation - Sprint 7 Story 2"
+        description="Test Gap Detection Automation - Sprint 7 Story 2",
     )
     parser.add_argument(
-        "--analyze", action="store_true", help="Run full test gap analysis"
+        "--analyze",
+        action="store_true",
+        help="Run full test gap analysis",
     )
     parser.add_argument(
-        "--report", action="store_true", help="Generate test gap report only"
+        "--report",
+        action="store_true",
+        help="Generate test gap report only",
     )
     parser.add_argument(
         "--tracker",
@@ -537,16 +543,16 @@ def main():
         results = analyzer.run_full_analysis()
         print("\n✅ Story 2 Acceptance Criteria:")
         print(
-            f"   [{'✅' if results['status'] == 'complete' else '❌'}] Test gap analyzer created"
+            f"   [{'✅' if results['status'] == 'complete' else '❌'}] Test gap analyzer created",
         )
         print(
-            f"   [{'✅' if 'test_gap_distribution' in results['findings'] else '❌'}] Gap distribution analyzed"
+            f"   [{'✅' if 'test_gap_distribution' in results['findings'] else '❌'}] Gap distribution analyzed",
         )
         print(
-            f"   [{'✅' if 'component_gaps' in results['findings'] else '❌'}] Gaps mapped to components"
+            f"   [{'✅' if 'component_gaps' in results['findings'] else '❌'}] Gaps mapped to components",
         )
         print(
-            f"   [{'✅' if 'recommendations' in results['findings'] else '❌'}] Actionable recommendations generated"
+            f"   [{'✅' if 'recommendations' in results['findings'] else '❌'}] Actionable recommendations generated",
         )
         print("   [✅] TEST_GAP_REPORT.md published")
     elif args.report:

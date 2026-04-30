@@ -511,7 +511,7 @@ class TestRun:
 
 def test_module_imports() -> None:
     """All public symbols import without errors."""
-    from scripts.index_published_articles import (  # noqa: F401
+    from scripts.index_published_articles import (
         COLLECTION_NAME,
         _categories_to_str,
         _make_doc_id,

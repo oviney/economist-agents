@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Product Owner Agent - Autonomous Backlog Refinement
+"""Product Owner Agent - Autonomous Backlog Refinement
 
 Converts user requests into well-formed user stories with acceptance criteria,
 enabling autonomous sprint execution.
@@ -193,7 +192,7 @@ Consider historical context from similar stories in this quality engineering pro
 
         if story.get("escalations"):
             print(
-                f"   ⚠ Escalations: {len(story['escalations'])} questions for human PO"
+                f"   ⚠ Escalations: {len(story['escalations'])} questions for human PO",
             )
 
         return story
@@ -215,7 +214,7 @@ Consider historical context from similar stories in this quality engineering pro
         valid_points = [1, 2, 3, 5, 8, 13]
         if story.get("story_points") not in valid_points:
             print(
-                f"   ⚠ Story points {story.get('story_points')} not in {valid_points}"
+                f"   ⚠ Story points {story.get('story_points')} not in {valid_points}",
             )
             return False
 
@@ -237,7 +236,9 @@ Consider historical context from similar stories in this quality engineering pro
         }
 
     def generate_acceptance_criteria(
-        self, user_story: str, additional_context: str = ""
+        self,
+        user_story: str,
+        additional_context: str = "",
     ) -> list[str]:
         """Generate acceptance criteria for existing user story"""
         print("📋 PO Agent: Generating acceptance criteria...")
@@ -263,15 +264,16 @@ Return JSON array of strings:
                 criteria = json.loads(response_text[start:end])
                 print(f"   ✓ Generated {len(criteria)} acceptance criteria")
                 return criteria
-            else:
-                print("   ⚠ Could not parse AC JSON")
-                return ["[ ] Manual acceptance criteria required - generation failed"]
+            print("   ⚠ Could not parse AC JSON")
+            return ["[ ] Manual acceptance criteria required - generation failed"]
         except json.JSONDecodeError as e:
             print(f"   ⚠ JSON parse error: {e}")
             return ["[ ] Manual acceptance criteria required - JSON parse error"]
 
     def estimate_story_points(
-        self, user_story: str, acceptance_criteria: list[str]
+        self,
+        user_story: str,
+        acceptance_criteria: list[str],
     ) -> tuple[int, str]:
         """Estimate story points using historical velocity"""
         print("📊 PO Agent: Estimating story points...")
@@ -325,7 +327,7 @@ Return JSON array of strings:
                         "question": escalation,
                         "created": datetime.now().isoformat(),
                         "status": "pending",
-                    }
+                    },
                 )
 
         self._save_backlog()
@@ -374,7 +376,7 @@ Return JSON array of strings:
                 if esc["status"] == "pending":
                     story_id = esc["story_id"]
                     summary.append(
-                        f"\nStory {story_id}: {stories[story_id].get('user_story', 'Unknown')[:50]}..."
+                        f"\nStory {story_id}: {stories[story_id].get('user_story', 'Unknown')[:50]}...",
                     )
                     summary.append(f"  ❓ {esc['question']}")
 
@@ -389,7 +391,7 @@ Return JSON array of strings:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Product Owner Agent - Autonomous Backlog Refinement"
+        description="Product Owner Agent - Autonomous Backlog Refinement",
     )
     parser.add_argument("--request", help="User request to convert into user story")
     parser.add_argument(

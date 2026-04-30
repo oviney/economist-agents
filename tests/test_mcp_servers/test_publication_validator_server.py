@@ -85,31 +85,36 @@ class TestValidateForPublicationReturnShape:
 
     def test_returns_dict(self) -> None:
         result = validate_for_publication(
-            content=_make_article(), expected_date="2026-04-05"
+            content=_make_article(),
+            expected_date="2026-04-05",
         )
         assert isinstance(result, dict)
 
     def test_has_is_valid_key(self) -> None:
         result = validate_for_publication(
-            content=_make_article(), expected_date="2026-04-05"
+            content=_make_article(),
+            expected_date="2026-04-05",
         )
         assert "is_valid" in result
 
     def test_has_issues_key(self) -> None:
         result = validate_for_publication(
-            content=_make_article(), expected_date="2026-04-05"
+            content=_make_article(),
+            expected_date="2026-04-05",
         )
         assert "issues" in result
 
     def test_issues_is_list(self) -> None:
         result = validate_for_publication(
-            content=_make_article(), expected_date="2026-04-05"
+            content=_make_article(),
+            expected_date="2026-04-05",
         )
         assert isinstance(result["issues"], list)
 
     def test_is_valid_is_bool(self) -> None:
         result = validate_for_publication(
-            content=_make_article(), expected_date="2026-04-05"
+            content=_make_article(),
+            expected_date="2026-04-05",
         )
         assert isinstance(result["is_valid"], bool)
 

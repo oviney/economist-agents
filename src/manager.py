@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Mission Control - Manager Agent Orchestration
+"""Mission Control - Manager Agent Orchestration
 
 This script provides the command-line interface for the Manager Agent,
 which orchestrates high-level missions across the Economist Agents system.
@@ -25,8 +24,7 @@ from scripts.agent_registry import AgentRegistry  # noqa: E402
 
 
 def main():
-    """
-    Main entry point for Mission Control.
+    """Main entry point for Mission Control.
 
     Parses command-line arguments and executes the specified mission
     using the Manager Agent crew from the AgentRegistry.
@@ -50,7 +48,9 @@ Examples:
     )
 
     parser.add_argument(
-        "--verbose", action="store_true", help="Enable verbose output for debugging"
+        "--verbose",
+        action="store_true",
+        help="Enable verbose output for debugging",
     )
 
     args = parser.parse_args()

@@ -145,7 +145,7 @@ class EditorialJudge:
         """Fetch the article under test (cached)."""
         if self._article_content is None:
             self._article_content = self._fetch_file_content(
-                f"_posts/{self.article_filename}"
+                f"_posts/{self.article_filename}",
             )
         return self._article_content
 
@@ -191,7 +191,9 @@ class EditorialJudge:
 
         if missing:
             return CheckResult(
-                "Frontmatter", FAIL, f"Missing required fields: {missing}"
+                "Frontmatter",
+                FAIL,
+                f"Missing required fields: {missing}",
             )
 
         # Check layout value
@@ -215,7 +217,9 @@ class EditorialJudge:
 
         if not image_path:
             return CheckResult(
-                "Image", WARN, "No image field in frontmatter (no featured image)"
+                "Image",
+                WARN,
+                "No image field in frontmatter (no featured image)",
             )
 
         # Strip leading / for API path
@@ -238,7 +242,9 @@ class EditorialJudge:
 
         if categories is None:
             return CheckResult(
-                "Categories", FAIL, "No categories or category field in frontmatter"
+                "Categories",
+                FAIL,
+                "No categories or category field in frontmatter",
             )
 
         if isinstance(categories, list) and len(categories) == 0:
@@ -403,7 +409,7 @@ class EditorialJudge:
                 report.checks.append(result)
             except Exception as e:
                 report.checks.append(
-                    CheckResult(check_fn.__name__, FAIL, f"Check crashed: {e}")
+                    CheckResult(check_fn.__name__, FAIL, f"Check crashed: {e}"),
                 )
 
         return report
@@ -432,13 +438,15 @@ class EditorialJudge:
         lines.append("")
         lines.append(
             f"VERDICT: {report.verdict} "
-            f"({len(report.failures)} critical, {len(report.warnings)} warning)"
+            f"({len(report.failures)} critical, {len(report.warnings)} warning)",
         )
 
         return "\n".join(lines)
 
     def create_github_issue(
-        self, report: JudgeReport, agent_logs: str | None = None
+        self,
+        report: JudgeReport,
+        agent_logs: str | None = None,
     ) -> str | None:
         """Create a GitHub issue on economist-agents if failures found.
 
@@ -449,6 +457,7 @@ class EditorialJudge:
 
         Returns:
             The URL of the created issue, or None on failure.
+
         """
         if not report.failures:
             return None
@@ -496,6 +505,7 @@ class EditorialJudge:
         Args:
             issue_url: The full URL of the GitHub issue to comment on.
             comment_body: The Markdown body text for the comment.
+
         """
         comment_result = subprocess.run(
             [
@@ -514,7 +524,8 @@ class EditorialJudge:
             logger.debug("Posted agent trace log comment on %s", issue_url)
         else:
             logger.warning(
-                "Failed to post agent trace comment: %s", comment_result.stderr
+                "Failed to post agent trace comment: %s",
+                comment_result.stderr,
             )
 
 

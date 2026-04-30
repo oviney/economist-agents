@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Environment Validation Script
+"""Environment Validation Script
 
 Validates technical prerequisites before sprint work begins.
 Checks Python version, dependency compatibility, and critical imports.
@@ -69,7 +68,7 @@ class EnvironmentValidator:
                     "issue": f"Python {current} may be incompatible with some dependencies",
                     "details": "CrewAI requires Python <=3.13 (Sprint 7 blocker)",
                     "fix": "Use pyenv to create Python 3.13 environment: pyenv install 3.13.0",
-                }
+                },
             )
             print(f"   ❌ CRITICAL: Python {current} incompatible with CrewAI")
         elif version.major == 3 and version.minor >= 10:
@@ -82,7 +81,7 @@ class EnvironmentValidator:
                     "issue": f"Python {current} too old",
                     "details": "Requires Python 3.10+",
                     "fix": "Upgrade to Python 3.13",
-                }
+                },
             )
             print(f"   ❌ Python {current} too old (need 3.10+)")
 
@@ -125,7 +124,7 @@ class EnvironmentValidator:
                         "issue": "Some dependencies cannot be installed",
                         "details": error[:200],
                         "fix": "Review requirements.txt for version conflicts",
-                    }
+                    },
                 )
                 print("   ❌ Dependency installation issues")
                 print(f"      {error[:100]}")
@@ -137,7 +136,7 @@ class EnvironmentValidator:
                     "category": "Dependencies",
                     "issue": "Dependency check timed out (>30s)",
                     "fix": "Run manually: pip install --dry-run -r requirements.txt",
-                }
+                },
             )
             print("   ⚠️  Dependency check timed out")
         except Exception as e:
@@ -172,7 +171,7 @@ class EnvironmentValidator:
                         "issue": f"Cannot import {module_name}",
                         "details": description,
                         "fix": f"pip install {module_name}",
-                    }
+                    },
                 )
                 print(f"   ❌ {module_name:15} MISSING")
 
@@ -187,7 +186,7 @@ class EnvironmentValidator:
                         "category": "Optional Dependency",
                         "issue": f"Optional module {module_name} not available",
                         "details": description,
-                    }
+                    },
                 )
                 print(f"   ⚠️  {module_name:15} (optional, not installed)")
 
@@ -207,7 +206,7 @@ class EnvironmentValidator:
                         "issue": "CrewAI installed with Python 3.14+",
                         "details": "CrewAI requires Python <=3.13 (may fail at runtime)",
                         "fix": "Create Python 3.13 environment: pyenv install 3.13.0 && pyenv local 3.13.0",
-                    }
+                    },
                 )
                 print("   ⚠️  CrewAI installed but Python version incompatible")
             except ImportError:
@@ -228,7 +227,7 @@ class EnvironmentValidator:
                     "category": "Platform",
                     "issue": f"Untested platform: {os_name}",
                     "details": "Project primarily tested on macOS/Linux",
-                }
+                },
             )
             print(f"   ⚠️  Platform: {os_name} (untested)")
 
@@ -261,28 +260,28 @@ class EnvironmentValidator:
             print("✅ ALL CHECKS PASSED\n")
             print("Environment ready for sprint work.")
             return True
-        elif not self.issues and self.warnings:
+        if not self.issues and self.warnings:
             if self.strict:
                 print(
-                    "❌ VALIDATION FAILED (strict mode, warnings treated as errors)\n"
+                    "❌ VALIDATION FAILED (strict mode, warnings treated as errors)\n",
                 )
                 return False
-            else:
-                print("✅ VALIDATION PASSED (with warnings)\n")
-                print("Review warnings above but safe to proceed.")
-                return True
-        else:
-            print("❌ VALIDATION FAILED\n")
-            print("Fix critical issues above before starting sprint work.")
-            return False
+            print("✅ VALIDATION PASSED (with warnings)\n")
+            print("Review warnings above but safe to proceed.")
+            return True
+        print("❌ VALIDATION FAILED\n")
+        print("Fix critical issues above before starting sprint work.")
+        return False
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Validate development environment prerequisites"
+        description="Validate development environment prerequisites",
     )
     parser.add_argument(
-        "--strict", action="store_true", help="Treat warnings as errors"
+        "--strict",
+        action="store_true",
+        help="Treat warnings as errors",
     )
     parser.add_argument(
         "--deps",

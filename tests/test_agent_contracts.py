@@ -1,5 +1,4 @@
-"""
-Agent Contract Tests
+"""Agent Contract Tests
 
 Validates the contracts between pipeline agents:
 - Research → Writer schema contract

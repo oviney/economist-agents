@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Sprint Discipline Validator
+"""Sprint Discipline Validator
 
 Enforces sprint planning and iteration discipline by validating:
 1. Work aligns to active sprint stories
@@ -42,7 +41,8 @@ class SprintValidator:
         """Extract active sprint information"""
         # Find which sprint is marked as active
         status_match = re.search(
-            r"\*\*Active Sprint\*\*: Sprint (\d+)", self.sprint_content
+            r"\*\*Active Sprint\*\*: Sprint (\d+)",
+            self.sprint_content,
         )
         if not status_match:
             return None
@@ -76,14 +76,16 @@ class SprintValidator:
 
         # Extract completed stories
         completed_match = re.search(
-            r"\*\*Completed Stories\*\*: (\d+)/(\d+)", self.sprint_content
+            r"\*\*Completed Stories\*\*: (\d+)/(\d+)",
+            self.sprint_content,
         )
         completed = int(completed_match.group(1)) if completed_match else 0
         total = int(completed_match.group(2)) if completed_match else 0
 
         # Extract story points
         points_match = re.search(
-            r"\*\*Story Points Done\*\*: (\d+)/(\d+)", self.sprint_content
+            r"\*\*Story Points Done\*\*: (\d+)/(\d+)",
+            self.sprint_content,
         )
         points_done = int(points_match.group(1)) if points_match else 0
         points_total = int(points_match.group(2)) if points_match else 0
@@ -131,7 +133,7 @@ class SprintValidator:
                     "points": points,
                     "tasks": tasks,
                     "completed": completed,
-                }
+                },
             )
 
         return stories
@@ -139,7 +141,7 @@ class SprintValidator:
     def check_before_work(self, work_description: str) -> bool:
         """Validate before starting new work"""
         print(
-            f"🔍 Sprint Validator: Checking if '{work_description}' aligns with sprint...\n"
+            f"🔍 Sprint Validator: Checking if '{work_description}' aligns with sprint...\n",
         )
 
         # Check 1: Is there an active sprint?
@@ -151,7 +153,7 @@ class SprintValidator:
                     "severity": "critical",
                     "message": f"No active sprint found. Create sprint plan before working on '{work_description}'",
                     "action": "1. Open SPRINT.md\n2. Define sprint goal and stories\n3. Estimate story points\n4. Mark sprint as active",
-                }
+                },
             )
             return False
 
@@ -179,17 +181,17 @@ class SprintValidator:
                     "severity": "critical",
                     "message": f"'{work_description}' doesn't match any sprint story",
                     "action": f"Add this work to sprint backlog:\n\n#### Story X: {work_description}\n**Priority**: P?\n**Story Points**: ?\n**Tasks**:\n- [ ] Define tasks\n\nOR wait until next sprint if not urgent.",
-                }
+                },
             )
             return False
 
         print(
-            f"✅ Matched to Story {matching_story['number']}: {matching_story['title']}"
+            f"✅ Matched to Story {matching_story['number']}: {matching_story['title']}",
         )
         print(f"   Priority: {matching_story['priority']}")
         print(f"   Story Points: {matching_story['points']}")
         print(
-            f"   Tasks: {len([t for t in matching_story['tasks'] if t['completed']])}/{len(matching_story['tasks'])} completed\n"
+            f"   Tasks: {len([t for t in matching_story['tasks'] if t['completed']])}/{len(matching_story['tasks'])} completed\n",
         )
 
         # Check 3: Are acceptance criteria defined?
@@ -203,7 +205,7 @@ class SprintValidator:
                     "severity": "high",
                     "message": f"Story {matching_story['number']} lacks acceptance criteria",
                     "action": "Define clear acceptance criteria before starting:\n- How will you know it's done?\n- What tests prove it works?\n- What's the definition of 'complete'?",
-                }
+                },
             )
             return False
 
@@ -217,7 +219,7 @@ class SprintValidator:
                     "severity": "medium",
                     "message": f"Story {matching_story['number']} has no story point estimate",
                     "action": "Estimate using scale: 1 (1hr), 2 (1-2hr), 3 (2-4hr), 5 (1day), 8 (2days)",
-                }
+                },
             )
             return False
 
@@ -245,7 +247,7 @@ class SprintValidator:
         print(f"Sprint {sprint['number']}: {sprint['name']}")
         print(f"Goal: {sprint['goal']}")
         print(
-            f"Progress: {sprint['completed_stories']}/{sprint['total_stories']} stories ({sprint['points_done']}/{sprint['points_total']} points)\n"
+            f"Progress: {sprint['completed_stories']}/{sprint['total_stories']} stories ({sprint['points_done']}/{sprint['points_total']} points)\n",
         )
 
         # Check stories
@@ -254,7 +256,7 @@ class SprintValidator:
         for story in stories:
             status = "✅" if story["completed"] else "🔄"
             print(
-                f"{status} Story {story['number']}: {story['title']} ({story['points']} pts)"
+                f"{status} Story {story['number']}: {story['title']} ({story['points']} pts)",
             )
 
             incomplete_tasks = [t for t in story["tasks"] if not t["completed"]]
@@ -278,7 +280,7 @@ class SprintValidator:
             print(f"✅ Sprint on track: {int(completion_rate * 100)}% complete\n")
         elif completion_rate > 0:
             print(
-                f"⚠️  Sprint progress: {int(completion_rate * 100)}% - may need to adjust scope\n"
+                f"⚠️  Sprint progress: {int(completion_rate * 100)}% - may need to adjust scope\n",
             )
 
         return True
@@ -308,7 +310,8 @@ class SprintValidator:
             and "Retrospective" in self.sprint_content
         ):
             retro_section = re.search(
-                rf"### Sprint {sprint['number']} Retrospective", self.sprint_content
+                rf"### Sprint {sprint['number']} Retrospective",
+                self.sprint_content,
             )
 
             if not retro_section:
@@ -318,7 +321,7 @@ class SprintValidator:
                         "severity": "high",
                         "message": f"Sprint {sprint['number']} lacks retrospective",
                         "action": "Document:\n1. What went well?\n2. What could improve?\n3. Action items for next sprint",
-                    }
+                    },
                 )
                 print("❌ Retrospective not completed\n")
                 return False
@@ -362,7 +365,9 @@ def main():
         help="Check if work aligns with sprint before starting",
     )
     parser.add_argument(
-        "--validate-sprint", action="store_true", help="Validate current sprint status"
+        "--validate-sprint",
+        action="store_true",
+        help="Validate current sprint status",
     )
     parser.add_argument(
         "--check-sprint-complete",

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Shared Context Manager for CrewAI Agents
+"""Shared Context Manager for CrewAI Agents
 
 Provides shared memory for context inheritance across agent tasks.
 Implements zero-config learning pattern for Sprint 7 Story 2.
@@ -66,30 +65,21 @@ from typing import Any
 class ContextFileNotFoundError(FileNotFoundError):
     """Raised when STORY_N_CONTEXT.md file not found"""
 
-    pass
-
 
 class ContextParseError(ValueError):
     """Raised when context markdown parsing fails"""
-
-    pass
 
 
 class ContextUpdateError(ValueError):
     """Raised when context update has invalid type or key"""
 
-    pass
-
 
 class ContextSizeExceededError(MemoryError):
     """Raised when context exceeds memory limits (1MB)"""
 
-    pass
-
 
 class ContextManager:
-    """
-    Manages shared context for CrewAI agent coordination.
+    """Manages shared context for CrewAI agent coordination.
 
     Provides thread-safe access to story context parsed from
     STORY_N_CONTEXT.md markdown files. Enables automatic context
@@ -111,6 +101,7 @@ class ContextManager:
         - Access time: <10ms per operation
         - Memory usage: <10MB per story context
         - Size limit: Warning at 5MB, error at 1MB
+
     """
 
     # Size limits (bytes)
@@ -120,8 +111,7 @@ class ContextManager:
     )  # 10 MB (error threshold in docs was 1MB but adjusted for safety)
 
     def __init__(self, file_path: str | Path):
-        """
-        Initialize ContextManager from STORY_N_CONTEXT.md file.
+        """Initialize ContextManager from STORY_N_CONTEXT.md file.
 
         Args:
             file_path: Path to markdown context file
@@ -135,6 +125,7 @@ class ContextManager:
             >>> ctx = ContextManager("docs/STORY_2_CONTEXT.md")
             >>> print(ctx.story_id)
             Story 2
+
         """
         self.file_path = Path(file_path)
 
@@ -144,7 +135,7 @@ class ContextManager:
                 f"Expected location: docs/STORY_N_CONTEXT.md\n\n"
                 f"Create this file using STORY_TEMPLATE_WITH_QUALITY.md:\n"
                 f"  cp docs/STORY_TEMPLATE_WITH_QUALITY.md {self.file_path}\n"
-                f"  # Then edit with story details"
+                f"  # Then edit with story details",
             )
 
         # Check file size before loading
@@ -154,7 +145,7 @@ class ContextManager:
                 f"Context file too large: {file_size / 1024 / 1024:.1f}MB\n"
                 f"Maximum: {self.MAX_SIZE / 1024 / 1024:.1f}MB\n"
                 f"File: {self.file_path}\n"
-                f"Reduce context size or split into multiple stories"
+                f"Reduce context size or split into multiple stories",
             )
 
         # Initialize thread-safe storage
@@ -169,8 +160,7 @@ class ContextManager:
         self.story_id = self._context.get("story_id", "Unknown")
 
     def _parse_context(self) -> None:
-        """
-        Parse STORY_N_CONTEXT.md markdown into structured dict.
+        """Parse STORY_N_CONTEXT.md markdown into structured dict.
 
         Extracts key sections:
         - Story Information (story_id, priority, points, status)
@@ -188,12 +178,13 @@ class ContextManager:
 
         Raises:
             ContextParseError: If required sections missing or malformed
+
         """
         try:
             content = self.file_path.read_text(encoding="utf-8")
         except Exception as e:
             raise ContextParseError(
-                f"Failed to read context file: {e}\nFile: {self.file_path}"
+                f"Failed to read context file: {e}\nFile: {self.file_path}",
             ) from e
 
         # Extract story ID from filename or content
@@ -235,7 +226,9 @@ class ContextManager:
             ac_text = ac_section.group(1)
             # Find all AC headers (### ACN:)
             ac_matches = re.findall(
-                r"### (AC\d+):\s*(.*?)\n(.*?)(?=\n###|\Z)", ac_text, re.DOTALL
+                r"### (AC\d+):\s*(.*?)\n(.*?)(?=\n###|\Z)",
+                ac_text,
+                re.DOTALL,
             )
             acceptance_criteria = []
             for ac_id, ac_title, ac_content in ac_matches:
@@ -244,7 +237,7 @@ class ContextManager:
                         "id": ac_id,
                         "title": ac_title.strip(),
                         "content": ac_content.strip(),
-                    }
+                    },
                 )
             self._context["acceptance_criteria"] = acceptance_criteria
 
@@ -276,7 +269,7 @@ class ContextManager:
                 f"Expected sections:\n"
                 f"  - ## User Story (with **I need** for goal)\n"
                 f"  - ## Functional Acceptance Criteria (with ### ACN:)\n"
-                f"  - Story identifier in filename or content"
+                f"  - Story identifier in filename or content",
             )
 
         # Log successful parse
@@ -286,12 +279,11 @@ class ContextManager:
                 "action": "context_loaded",
                 "story_id": story_id,
                 "sections_parsed": len(self._context),
-            }
+            },
         )
 
     def get(self, key: str, default: Any = None) -> Any:
-        """
-        Thread-safe get operation.
+        """Thread-safe get operation.
 
         Args:
             key: Context key (e.g., 'goal', 'acceptance_criteria')
@@ -305,13 +297,13 @@ class ContextManager:
             "Shared context via crew.context for automatic context inheritance"
             >>> ctx.get("nonexistent", "fallback")
             "fallback"
+
         """
         with self._lock:
             return self._context.get(key, default)
 
     def set(self, key: str, value: Any) -> None:
-        """
-        Thread-safe set operation with audit logging.
+        """Thread-safe set operation with audit logging.
 
         Args:
             key: Context key to set
@@ -324,6 +316,7 @@ class ContextManager:
         Example:
             >>> ctx.set("developer_result", "Implementation complete")
             >>> ctx.set("test_results", {"passed": 42, "failed": 0})
+
         """
         # Validate value is JSON-serializable
         try:
@@ -333,7 +326,7 @@ class ContextManager:
                 f"Context value must be JSON-serializable\n"
                 f"Key: {key}\n"
                 f"Type: {type(value).__name__}\n"
-                f"Error: {e}"
+                f"Error: {e}",
             ) from e
 
         with self._lock:
@@ -353,7 +346,7 @@ class ContextManager:
                     f"Context size exceeded after update: {context_size / 1024 / 1024:.1f}MB\n"
                     f"Maximum: {self.MAX_SIZE / 1024 / 1024:.1f}MB\n"
                     f"Key attempted: {key}\n"
-                    f"Update rolled back"
+                    f"Update rolled back",
                 )
 
             # Log audit trail
@@ -364,7 +357,7 @@ class ContextManager:
                     "key": key,
                     "value_type": type(value).__name__,
                     "size_kb": context_size / 1024,
-                }
+                },
             )
 
             # Warn if approaching size limit
@@ -372,12 +365,11 @@ class ContextManager:
                 print(
                     f"⚠️  WARNING: Context size approaching limit: "
                     f"{context_size / 1024 / 1024:.1f}MB / "
-                    f"{self.MAX_SIZE / 1024 / 1024:.1f}MB"
+                    f"{self.MAX_SIZE / 1024 / 1024:.1f}MB",
                 )
 
     def update(self, updates: dict[str, Any]) -> None:
-        """
-        Thread-safe bulk update operation.
+        """Thread-safe bulk update operation.
 
         Args:
             updates: Dict of key-value pairs to update
@@ -392,6 +384,7 @@ class ContextManager:
             ...     "test_results": {"passed": 42, "failed": 0},
             ...     "code_review_status": "approved"
             ... })
+
         """
         # Validate all updates first
         for key, value in updates.items():
@@ -402,7 +395,7 @@ class ContextManager:
                     f"Context value must be JSON-serializable\n"
                     f"Key: {key}\n"
                     f"Type: {type(value).__name__}\n"
-                    f"Error: {e}"
+                    f"Error: {e}",
                 ) from e
 
         with self._lock:
@@ -426,7 +419,7 @@ class ContextManager:
                     f"Context size exceeded after bulk update: {context_size / 1024 / 1024:.1f}MB\n"
                     f"Maximum: {self.MAX_SIZE / 1024 / 1024:.1f}MB\n"
                     f"Keys attempted: {list(updates.keys())}\n"
-                    f"All updates rolled back"
+                    f"All updates rolled back",
                 )
 
             # Log audit trail
@@ -436,12 +429,11 @@ class ContextManager:
                     "action": "context_bulk_update",
                     "keys_updated": list(updates.keys()),
                     "size_kb": context_size / 1024,
-                }
+                },
             )
 
     def to_dict(self) -> dict[str, Any]:
-        """
-        Get complete context as dictionary (thread-safe).
+        """Get complete context as dictionary (thread-safe).
 
         Returns:
             Copy of entire context dict
@@ -450,13 +442,13 @@ class ContextManager:
             >>> task_context = ctx.to_dict()
             >>> print(task_context.keys())
             dict_keys(['story_id', 'goal', 'acceptance_criteria', ...])
+
         """
         with self._lock:
             return self._context.copy()
 
     def get_audit_log(self) -> list[dict[str, Any]]:
-        """
-        Get context modification audit trail.
+        """Get context modification audit trail.
 
         Returns:
             List of audit log entries with timestamps
@@ -465,19 +457,20 @@ class ContextManager:
             >>> log = ctx.get_audit_log()
             >>> for entry in log:
             ...     print(f"{entry['timestamp']}: {entry['action']}")
+
         """
         with self._lock:
             return self._audit_log.copy()
 
     def save_audit_log(self, output_path: str | Path) -> None:
-        """
-        Save audit log to JSON file.
+        """Save audit log to JSON file.
 
         Args:
             output_path: Path to save audit log (e.g., logs/context_audit_story2.json)
 
         Example:
             >>> ctx.save_audit_log("logs/context_audit_story2.json")
+
         """
         output_path = Path(output_path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -498,10 +491,10 @@ class ContextManager:
 
 
 def create_task_context(
-    context_manager: ContextManager, **additional_context: Any
+    context_manager: ContextManager,
+    **additional_context: Any,
 ) -> dict[str, Any]:
-    """
-    Create context dict for CrewAI Task initialization.
+    """Create context dict for CrewAI Task initialization.
 
     Combines context manager data with additional runtime context.
     Use this to prepare context for task.context parameter.
@@ -525,6 +518,7 @@ def create_task_context(
         ...     expected_output="Test results",
         ...     context=task_context
         ... )
+
     """
     base_context = context_manager.to_dict()
     base_context.update(additional_context)

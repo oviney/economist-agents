@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Topic Deduplicator - ChromaDB-backed similarity check for topic candidates.
+"""Topic Deduplicator - ChromaDB-backed similarity check for topic candidates.
 
 Prevents publishing articles on topics already covered by querying
 the ``published_articles`` ChromaDB collection and comparing
@@ -51,8 +50,7 @@ except ImportError:
 
 
 class TopicDeduplicator:
-    """
-    ChromaDB-backed topic deduplication for the Economist content pipeline.
+    """ChromaDB-backed topic deduplication for the Economist content pipeline.
 
     Queries the ``published_articles`` collection to detect near-duplicate
     topics before they enter the editorial board vote.
@@ -73,6 +71,7 @@ class TopicDeduplicator:
         dedup = TopicDeduplicator()
         topics = [{"topic": "AI Testing Trends"}, {"topic": "Unit Testing Basics"}]
         kept, flagged = dedup.filter_topics(topics)
+
     """
 
     def __init__(
@@ -82,14 +81,14 @@ class TopicDeduplicator:
         reject_threshold: float = REJECT_THRESHOLD,
         warn_threshold: float = WARN_THRESHOLD,
     ) -> None:
-        """
-        Initialise the deduplicator with ChromaDB connection.
+        """Initialise the deduplicator with ChromaDB connection.
 
         Args:
             collection_name: Name of the ChromaDB collection.
             persist_directory: Path to ChromaDB persistence storage.
             reject_threshold: Similarity cutoff for rejection (default 0.8).
             warn_threshold: Similarity cutoff for warning (default 0.6).
+
         """
         self.collection_name = collection_name
         self.persist_directory = persist_directory
@@ -100,7 +99,7 @@ class TopicDeduplicator:
 
         if not CHROMADB_AVAILABLE:
             logger.warning(
-                "ChromaDB unavailable — TopicDeduplicator in pass-through mode"
+                "ChromaDB unavailable — TopicDeduplicator in pass-through mode",
             )
             return
 
@@ -115,7 +114,7 @@ class TopicDeduplicator:
             self.collection = self.client.get_or_create_collection(
                 name=collection_name,
                 metadata={
-                    "description": "Published article titles and summaries for deduplication"
+                    "description": "Published article titles and summaries for deduplication",
                 },
             )
             logger.info(
@@ -132,10 +131,10 @@ class TopicDeduplicator:
     # ------------------------------------------------------------------
 
     def filter_topics(
-        self, topics: list[dict[str, Any]]
+        self,
+        topics: list[dict[str, Any]],
     ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-        """
-        Filter candidate topics against the published-articles archive.
+        """Filter candidate topics against the published-articles archive.
 
         Each topic dict must contain at least a ``"topic"`` key with the
         topic title/description string.
@@ -159,6 +158,7 @@ class TopicDeduplicator:
             Tuple of (kept_topics, rejected_topics).
             kept_topics includes warned topics (with ``"dedup_warning"``).
             rejected_topics lists those silently dropped (>reject_threshold).
+
         """
         if not topics:
             return [], []
@@ -196,7 +196,7 @@ class TopicDeduplicator:
                         **topic_dict,
                         "dedup_similarity": similarity,
                         "dedup_matched": matched_title,
-                    }
+                    },
                 )
             elif similarity > self.warn_threshold:
                 logger.warning(
@@ -214,7 +214,7 @@ class TopicDeduplicator:
                         ),
                         "dedup_similarity": similarity,
                         "dedup_matched": matched_title,
-                    }
+                    },
                 )
             else:
                 logger.info(
@@ -230,10 +230,12 @@ class TopicDeduplicator:
         return kept, rejected
 
     def index_article(
-        self, title: str, content: str, article_id: str | None = None
+        self,
+        title: str,
+        content: str,
+        article_id: str | None = None,
     ) -> bool:
-        """
-        Index a newly published article in the archive collection.
+        """Index a newly published article in the archive collection.
 
         Should be called after successful publication to keep the
         deduplication archive current.
@@ -245,10 +247,11 @@ class TopicDeduplicator:
 
         Returns:
             True if indexing succeeded, False on error.
+
         """
         if self.collection is None:
             logger.warning(
-                "TopicDeduplicator: cannot index article — ChromaDB unavailable"
+                "TopicDeduplicator: cannot index article — ChromaDB unavailable",
             )
             return False
 
@@ -274,8 +277,7 @@ class TopicDeduplicator:
     # ------------------------------------------------------------------
 
     def _query_similarity(self, topic_text: str) -> tuple[float | None, str]:
-        """
-        Query ChromaDB for the most similar published article.
+        """Query ChromaDB for the most similar published article.
 
         Args:
             topic_text: Topic string to check against the archive.
@@ -283,6 +285,7 @@ class TopicDeduplicator:
         Returns:
             Tuple of (highest_similarity, matched_title).
             Returns (None, "") if the query fails.
+
         """
         try:
             results = self.collection.query(
@@ -314,8 +317,7 @@ class TopicDeduplicator:
         rejected: list[dict[str, Any]],
         original: list[dict[str, Any]],
     ) -> list[dict[str, Any]]:
-        """
-        Ensure at least MIN_TOPICS_AFTER_FILTER topics survive filtering.
+        """Ensure at least MIN_TOPICS_AFTER_FILTER topics survive filtering.
 
         If all topics were rejected, rescue the one with the lowest
         similarity (most novel) and log a warning.
@@ -327,6 +329,7 @@ class TopicDeduplicator:
 
         Returns:
             Possibly augmented kept list.
+
         """
         if len(kept) >= MIN_TOPICS_AFTER_FILTER:
             return kept

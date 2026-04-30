@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Story 7: Sprint 9 Planning & Close-Out
+"""Story 7: Sprint 9 Planning & Close-Out
 
 Autonomous Sprint Closure with CrewAI orchestration.
 Calculates velocity, generates retrospective, and closes Sprint 9.
@@ -42,6 +41,7 @@ def load_agents() -> dict:
 
     Returns:
         Dictionary mapping role names to CrewAI Agent instances
+
     """
     factory = AgentFactory()
     agents = {}
@@ -51,7 +51,7 @@ def load_agents() -> dict:
         if agent is None:
             raise ValueError(
                 f"Agent '{role}' not found in schemas/agents.yaml. "
-                f"Check agent configuration."
+                f"Check agent configuration.",
             )
         agents[role] = agent
     return agents
@@ -70,6 +70,7 @@ def define_tasks(agents: dict) -> list[Task]:
 
     Returns:
         List of Task objects for the mission
+
     """
     tasks = []
 
@@ -84,7 +85,7 @@ def define_tasks(agents: dict) -> list[Task]:
             expected_output=(
                 "Summary of completed points vs. planned points for Sprint 9."
             ),
-        )
+        ),
     )
 
     # Task 2: Generate Retrospective Report
@@ -101,7 +102,7 @@ def define_tasks(agents: dict) -> list[Task]:
                 "Complete markdown document with Sprint 9 Retrospective "
                 "containing Executive Summary, Velocity, What went well, and Next Steps."
             ),
-        )
+        ),
     )
 
     return tasks

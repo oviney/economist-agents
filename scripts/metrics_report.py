@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Chart Metrics Reporting Tool
+"""Chart Metrics Reporting Tool
 
 Generate detailed reports on chart quality metrics.
 Supports multiple export formats (console, markdown, JSON).
@@ -20,7 +19,8 @@ from chart_metrics import ChartMetricsCollector
 
 
 def generate_console_report(
-    collector: ChartMetricsCollector, include_sessions: bool = False
+    collector: ChartMetricsCollector,
+    include_sessions: bool = False,
 ):
     """Generate console-friendly report"""
     print(collector.export_report(include_sessions=include_sessions))
@@ -66,7 +66,7 @@ def generate_markdown_report(collector: ChartMetricsCollector, output_file: str 
                 else pattern["issue"]
             )
             report_lines.append(
-                f"| {i} | {pattern['count']} | {pattern['type']} | {issue_preview} |"
+                f"| {i} | {pattern['count']} | {pattern['type']} | {issue_preview} |",
             )
     else:
         report_lines.append("*No failure patterns recorded yet*")
@@ -76,7 +76,7 @@ def generate_markdown_report(collector: ChartMetricsCollector, output_file: str 
             "",
             "## Trend Analysis",
             "",
-        ]
+        ],
     )
 
     # Calculate trends from recent sessions
@@ -93,7 +93,7 @@ def generate_markdown_report(collector: ChartMetricsCollector, output_file: str 
         if len(qa_rates) >= 2:
             trend = "improving" if qa_rates[-1] > qa_rates[0] else "declining"
             report_lines.append(
-                f"- Visual QA pass rate is **{trend}** over last {len(recent)} sessions"
+                f"- Visual QA pass rate is **{trend}** over last {len(recent)} sessions",
             )
             report_lines.append(f"- Current pass rate: {qa_rates[-1]:.1f}%")
             report_lines.append(f"- Previous pass rate: {qa_rates[0]:.1f}%")
@@ -105,29 +105,29 @@ def generate_markdown_report(collector: ChartMetricsCollector, output_file: str 
             "",
             "## Recommendations",
             "",
-        ]
+        ],
     )
 
     # Generate actionable recommendations
     if summary["visual_qa_pass_rate"] < 80:
         report_lines.append(
-            "- ⚠️  **Low QA Pass Rate**: Visual QA pass rate below 80% - review agent prompts"
+            "- ⚠️  **Low QA Pass Rate**: Visual QA pass rate below 80% - review agent prompts",
         )
 
     if summary["avg_zone_violations_per_chart"] > 0.5:
         report_lines.append(
-            "- ⚠️  **Zone Violations**: High rate of zone violations - strengthen layout rules in prompt"
+            "- ⚠️  **Zone Violations**: High rate of zone violations - strengthen layout rules in prompt",
         )
 
     if summary["total_regenerations"] > summary["total_charts_generated"] * 0.3:
         report_lines.append(
-            "- ⚠️  **High Regeneration Rate**: >30% regeneration rate - improve first-attempt quality"
+            "- ⚠️  **High Regeneration Rate**: >30% regeneration rate - improve first-attempt quality",
         )
 
     if top_patterns:
         most_common = top_patterns[0]
         report_lines.append(
-            f"- 🎯 **Top Issue**: '{most_common['type']}' ({most_common['count']}x) - prioritize fix"
+            f"- 🎯 **Top Issue**: '{most_common['type']}' ({most_common['count']}x) - prioritize fix",
         )
 
     if not report_lines[-1].startswith("-"):
@@ -176,7 +176,9 @@ def main():
     parser.add_argument("--output", "-o", help="Output file (default: stdout)")
 
     parser.add_argument(
-        "--sessions", action="store_true", help="Include session details in report"
+        "--sessions",
+        action="store_true",
+        help="Include session details in report",
     )
 
     parser.add_argument(

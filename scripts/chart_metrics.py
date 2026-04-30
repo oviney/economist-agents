@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Chart Metrics Collection System
+"""Chart Metrics Collection System
 
 Tracks visual quality metrics for Economist-style charts:
 - Charts generated count
@@ -64,7 +63,9 @@ class ChartMetricsCollector:
         }
 
     def start_chart(
-        self, chart_title: str, chart_spec: dict[str, Any]
+        self,
+        chart_title: str,
+        chart_spec: dict[str, Any],
     ) -> dict[str, Any]:
         """Start tracking a new chart generation"""
         chart_record = {
@@ -84,7 +85,10 @@ class ChartMetricsCollector:
         return chart_record
 
     def record_generation(
-        self, chart_record: dict[str, Any], success: bool, error: str = None
+        self,
+        chart_record: dict[str, Any],
+        success: bool,
+        error: str = None,
     ):
         """Record chart generation result"""
         chart_record["generation_time_seconds"] = (
@@ -97,15 +101,14 @@ class ChartMetricsCollector:
             self.metrics["summary"]["total_generation_time_seconds"] += chart_record[
                 "generation_time_seconds"
             ]
-        else:
-            if error:
-                chart_record["errors"].append(
-                    {
-                        "type": "generation_error",
-                        "message": error,
-                        "timestamp": datetime.now().isoformat(),
-                    }
-                )
+        elif error:
+            chart_record["errors"].append(
+                {
+                    "type": "generation_error",
+                    "message": error,
+                    "timestamp": datetime.now().isoformat(),
+                },
+            )
 
     def record_visual_qa(self, chart_record: dict[str, Any], qa_result: dict[str, Any]):
         """Record Visual QA results"""
@@ -146,7 +149,7 @@ class ChartMetricsCollector:
                 "type": "regeneration",
                 "reason": reason,
                 "timestamp": datetime.now().isoformat(),
-            }
+            },
         )
 
     def _track_failure_pattern(self, pattern_type: str, issue: str):
@@ -181,13 +184,17 @@ class ChartMetricsCollector:
                     c
                     for c in self.current_session["charts"]
                     if c.get("generation_success")
-                ]
+                ],
             ),
             "visual_qa_runs": len(
-                [c for c in self.current_session["charts"] if c.get("visual_qa_run")]
+                [c for c in self.current_session["charts"] if c.get("visual_qa_run")],
             ),
             "visual_qa_passed": len(
-                [c for c in self.current_session["charts"] if c.get("visual_qa_passed")]
+                [
+                    c
+                    for c in self.current_session["charts"]
+                    if c.get("visual_qa_passed")
+                ],
             ),
             "charts": self.current_session["charts"],
         }
@@ -244,7 +251,7 @@ class ChartMetricsCollector:
                         "count": data["count"],
                         "first_seen": data["first_seen"],
                         "last_seen": data["last_seen"],
-                    }
+                    },
                 )
 
         # Sort by count descending
@@ -283,7 +290,7 @@ class ChartMetricsCollector:
                 report_lines.append(f"  #{i} [{pattern['count']}x] {pattern['type']}")
                 report_lines.append(f"      {pattern['issue'][:100]}...")
                 report_lines.append(
-                    f"      First: {pattern['first_seen'][:10]}, Last: {pattern['last_seen'][:10]}"
+                    f"      First: {pattern['first_seen'][:10]}, Last: {pattern['last_seen'][:10]}",
                 )
         else:
             report_lines.append("  No failure patterns recorded yet")
@@ -296,7 +303,7 @@ class ChartMetricsCollector:
                 report_lines.append(f"    Duration: {session['duration_seconds']:.1f}s")
                 report_lines.append(f"    Charts: {session['charts_generated']}")
                 report_lines.append(
-                    f"    Visual QA: {session['visual_qa_passed']}/{session['visual_qa_runs']} passed"
+                    f"    Visual QA: {session['visual_qa_passed']}/{session['visual_qa_runs']} passed",
                 )
 
         report_lines.append("=" * 70)

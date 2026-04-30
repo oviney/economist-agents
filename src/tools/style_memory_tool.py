@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Style Memory Tool - RAG-based Style Pattern Retrieval
+"""Style Memory Tool - RAG-based Style Pattern Retrieval
 
 Provides Editor Agent with concrete style examples from Gold Standard articles
 for GATE 3 (VOICE) enhancement. Uses ChromaDB vector store for efficient
@@ -35,8 +34,7 @@ except ImportError:
 
 
 class StyleMemoryTool:
-    """
-    RAG-based style pattern retrieval for Editor Agent GATE 3 enhancement.
+    """RAG-based style pattern retrieval for Editor Agent GATE 3 enhancement.
 
     Graceful Degradation:
     - If ChromaDB unavailable: returns empty results with warning
@@ -50,13 +48,13 @@ class StyleMemoryTool:
         collection_name: str = "economist_style_patterns",
         persist_directory: str = ".chromadb",
     ):
-        """
-        Initialize Style Memory Tool with vector store.
+        """Initialize Style Memory Tool with vector store.
 
         Args:
             archive_path: Path to archived/ directory with Gold Standard articles
             collection_name: ChromaDB collection name
             persist_directory: ChromaDB persistence directory
+
         """
         self.archive_path = Path(archive_path)
         self.collection_name = collection_name
@@ -83,7 +81,7 @@ class StyleMemoryTool:
             self.collection = self.client.get_or_create_collection(
                 name=collection_name,
                 metadata={
-                    "description": "Economist style patterns from Gold Standard articles"
+                    "description": "Economist style patterns from Gold Standard articles",
                 },
             )
 
@@ -100,8 +98,7 @@ class StyleMemoryTool:
             self.collection = None
 
     def _index_archive(self) -> None:
-        """
-        Index all markdown articles from archived/ directory.
+        """Index all markdown articles from archived/ directory.
 
         Graceful degradation: If archive is empty, continues without error.
         """
@@ -142,7 +139,7 @@ class StyleMemoryTool:
                             "source": md_file.name,
                             "paragraph": para_idx,
                             "path": str(md_file),
-                        }
+                        },
                     )
                     ids.append(doc_id)
 
@@ -155,7 +152,7 @@ class StyleMemoryTool:
                 self.collection.add(documents=documents, metadatas=metadatas, ids=ids)
                 self.indexed_count = len(documents)
                 print(
-                    f"✅ Indexed {self.indexed_count} style patterns from {len(md_files)} articles"
+                    f"✅ Indexed {self.indexed_count} style patterns from {len(md_files)} articles",
                 )
             except Exception as e:
                 print(f"❌ Failed to add documents to ChromaDB: {e}")
@@ -168,8 +165,7 @@ class StyleMemoryTool:
         n_results: int = 3,
         min_score: float = 0.7,
     ) -> list[dict[str, Any]]:
-        """
-        Query vector store for relevant style patterns.
+        """Query vector store for relevant style patterns.
 
         Args:
             query_text: Natural language query (e.g., "How to handle banned phrases?")
@@ -185,6 +181,7 @@ class StyleMemoryTool:
                 print(f"Score: {result['score']:.2f}")
                 print(f"Source: {result['source']}")
                 print(f"Text: {result['text'][:100]}...")
+
         """
         # Graceful degradation: return empty if tool unavailable
         if not self.collection:
@@ -196,7 +193,8 @@ class StyleMemoryTool:
         try:
             # Query ChromaDB
             results = self.collection.query(
-                query_texts=[query_text], n_results=n_results
+                query_texts=[query_text],
+                n_results=n_results,
             )
 
             # Format results
@@ -211,7 +209,10 @@ class StyleMemoryTool:
                 )
 
                 for doc, metadata, distance in zip(
-                    documents, metadatas, distances, strict=False
+                    documents,
+                    metadatas,
+                    distances,
+                    strict=False,
                 ):
                     # Convert distance to similarity score (1 - distance)
                     # ChromaDB uses L2 distance, so lower is better
@@ -225,7 +226,7 @@ class StyleMemoryTool:
                                 "score": round(score, 3),
                                 "source": metadata.get("source", "unknown"),
                                 "paragraph": metadata.get("paragraph", 0),
-                            }
+                            },
                         )
 
             return formatted_results
@@ -235,8 +236,7 @@ class StyleMemoryTool:
             return []
 
     def get_stats(self) -> dict[str, Any]:
-        """
-        Get Style Memory Tool statistics.
+        """Get Style Memory Tool statistics.
 
         Returns:
             dict: {
@@ -244,6 +244,7 @@ class StyleMemoryTool:
                 "indexed_count": int,
                 "collection_name": str
             }
+
         """
         return {
             "available": self.collection is not None,
@@ -254,23 +255,23 @@ class StyleMemoryTool:
 
 # CrewAI Tool wrapper for integration with Stage4Crew
 def create_style_memory_tool():
-    """
-    Factory function to create CrewAI-compatible tool.
+    """Factory function to create CrewAI-compatible tool.
 
     Returns:
         Callable tool function for CrewAI Agent
+
     """
     tool = StyleMemoryTool()
 
     def style_query(query: str) -> str:
-        """
-        Query Style Memory for relevant style patterns.
+        """Query Style Memory for relevant style patterns.
 
         Args:
             query: Natural language query about style patterns
 
         Returns:
             Formatted string with top 3 relevant style examples
+
         """
         results = tool.query(query, n_results=3)
 
@@ -282,7 +283,7 @@ def create_style_memory_tool():
         output = ["**Style Memory Results:**\n"]
         for idx, result in enumerate(results, 1):
             output.append(
-                f"{idx}. (Score: {result['score']:.2f}, Source: {result['source']})"
+                f"{idx}. (Score: {result['score']:.2f}, Source: {result['source']})",
             )
             output.append(f"   {result['text'][:200]}...")
             output.append("")
@@ -314,14 +315,14 @@ if __name__ == "__main__":
             print(f"\nFound {len(results)} relevant patterns:\n")
             for idx, result in enumerate(results, 1):
                 print(
-                    f"{idx}. Score: {result['score']:.2f} | Source: {result['source']}"
+                    f"{idx}. Score: {result['score']:.2f} | Source: {result['source']}",
                 )
                 print(f"   {result['text'][:150]}...\n")
         else:
             print(
-                "No results found (may need more specific query or lower min_score)\n"
+                "No results found (may need more specific query or lower min_score)\n",
             )
     else:
         print(
-            "⚠️  Tool not fully operational (check archive and ChromaDB installation)\n"
+            "⚠️  Tool not fully operational (check archive and ChromaDB installation)\n",
         )

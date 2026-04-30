@@ -79,6 +79,7 @@ class ROITracker:
 
         Args:
             log_file: Path to JSON log file
+
         """
         self.log_file = Path(log_file)
         self.log_file.parent.mkdir(parents=True, exist_ok=True)
@@ -131,6 +132,7 @@ class ROITracker:
 
         Returns:
             execution_id: Unique identifier for this execution
+
         """
         if execution_id is None:
             execution_id = f"{agent}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
@@ -171,6 +173,7 @@ class ROITracker:
             input_tokens: Input token count
             output_tokens: Output token count
             metadata: Optional metadata (task, stage, etc.)
+
         """
         start_time = time.perf_counter()
 
@@ -216,6 +219,7 @@ class ROITracker:
 
         Returns:
             Final execution metrics
+
         """
         if execution_id not in self.active_executions:
             raise ValueError(f"Execution {execution_id} not found")
@@ -226,7 +230,8 @@ class ROITracker:
         # Calculate ROI multiplier
         if execution["total_cost_usd"] > 0:
             execution["roi_multiplier"] = round(
-                execution["human_cost_equivalent"] / execution["total_cost_usd"], 2
+                execution["human_cost_equivalent"] / execution["total_cost_usd"],
+                2,
             )
         else:
             execution["roi_multiplier"] = 0.0
@@ -263,10 +268,12 @@ class ROITracker:
             "total_tokens": sum(e["total_tokens"] for e in executions),
             "total_cost_usd": round(sum(e["total_cost_usd"] for e in executions), 2),
             "total_human_hours_saved": round(
-                sum(e["human_hours_equivalent"] for e in executions), 2
+                sum(e["human_hours_equivalent"] for e in executions),
+                2,
             ),
             "total_human_cost_saved": round(
-                sum(e["human_cost_equivalent"] for e in executions), 2
+                sum(e["human_cost_equivalent"] for e in executions),
+                2,
             ),
             "avg_roi_multiplier": round(
                 sum(e["roi_multiplier"] for e in executions if e["roi_multiplier"] > 0)
@@ -296,6 +303,7 @@ class ROITracker:
 
         Returns:
             Execution metrics or None if not found
+
         """
         # Check active executions
         if execution_id in self.active_executions:
@@ -316,6 +324,7 @@ class ROITracker:
 
         Returns:
             Aggregate metrics for the agent
+
         """
         agent_executions = [e for e in self.log["executions"] if e["agent"] == agent]
 
@@ -333,10 +342,12 @@ class ROITracker:
             "total_executions": len(agent_executions),
             "total_tokens": sum(e["total_tokens"] for e in agent_executions),
             "total_cost_usd": round(
-                sum(e["total_cost_usd"] for e in agent_executions), 2
+                sum(e["total_cost_usd"] for e in agent_executions),
+                2,
             ),
             "total_human_hours_saved": round(
-                sum(e["human_hours_equivalent"] for e in agent_executions), 2
+                sum(e["human_hours_equivalent"] for e in agent_executions),
+                2,
             ),
             "avg_roi_multiplier": round(
                 sum(e["roi_multiplier"] for e in agent_executions)
@@ -355,6 +366,7 @@ class ROITracker:
 
         Returns:
             List of agent summaries sorted by total cost
+
         """
         agents = {e["agent"] for e in self.log["executions"]}
         summaries = [self.get_agent_summary(agent) for agent in agents]
@@ -367,6 +379,7 @@ class ROITracker:
 
         Returns:
             Formatted report string
+
         """
         summary = self.log["summary"]
         agent_summaries = self.get_all_agent_summaries()
@@ -396,7 +409,7 @@ class ROITracker:
                     f"    Cost: ${agent_summary['total_cost_usd']:.2f}",
                     f"    ROI: {agent_summary['avg_roi_multiplier']}x",
                     "",
-                ]
+                ],
             )
 
         report.append("=" * 70)
@@ -413,6 +426,7 @@ def get_tracker() -> ROITracker:
 
     Returns:
         Global ROITracker singleton
+
     """
     global _tracker
     if _tracker is None:

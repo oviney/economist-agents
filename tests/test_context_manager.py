@@ -1,5 +1,4 @@
-"""
-Unit tests for ContextManager (Sprint 7 Story 2)
+"""Unit tests for ContextManager (Sprint 7 Story 2)
 
 Tests context loading, access, updates, thread safety, and error handling.
 Validates all acceptance criteria and quality requirements.
@@ -289,7 +288,8 @@ class TestPerformance:
     """Performance validation (Quality Requirement)"""
 
     pytestmark = pytest.mark.skipif(
-        not _has_benchmark, reason="pytest-benchmark not installed"
+        not _has_benchmark,
+        reason="pytest-benchmark not installed",
     )
 
     def test_load_time_under_2_seconds(self, benchmark):
@@ -349,7 +349,9 @@ class TestTaskContextHelper:
         ctx = ContextManager("docs/STORY_2_CONTEXT.md")
 
         task_context = create_task_context(
-            ctx, previous_output="Developer done", current_agent="QE Lead"
+            ctx,
+            previous_output="Developer done",
+            current_agent="QE Lead",
         )
 
         assert task_context["story_id"] == "Story 2"

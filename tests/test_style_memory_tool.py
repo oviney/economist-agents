@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Integration Tests for Style Memory Tool
+"""Integration Tests for Style Memory Tool
 
 Tests RAG-based style pattern retrieval for Editor Agent GATE 3 enhancement.
 
@@ -50,14 +49,13 @@ Active voice dominates. No exclamation points or rhetorical questions as headers
 
 Third paragraph validates style patterns. Chart integration example: As the chart
 shows, productivity gains plateaued after 2020. Concrete data, clear attribution.
-            """.strip()
+            """.strip(),
         )
 
         return archive_dir
 
     def test_tool_initialization_with_chromadb(self, temp_archive):
-        """
-        Test 1: Tool initialization with ChromaDB available
+        """Test 1: Tool initialization with ChromaDB available
 
         Given: ChromaDB installed and temp archive
         When: StyleMemoryTool initialized
@@ -79,8 +77,7 @@ shows, productivity gains plateaued after 2020. Concrete data, clear attribution
             pytest.skip("ChromaDB not installed - test requires chromadb package")
 
     def test_tool_initialization_without_chromadb(self, temp_archive):
-        """
-        Test 2: Tool initialization without ChromaDB (graceful degradation)
+        """Test 2: Tool initialization without ChromaDB (graceful degradation)
 
         Given: ChromaDB unavailable (mocked)
         When: StyleMemoryTool initialized
@@ -95,8 +92,7 @@ shows, productivity gains plateaued after 2020. Concrete data, clear attribution
             assert results == []  # Graceful degradation
 
     def test_query_with_results(self, temp_archive):
-        """
-        Test 3: Query functionality with relevant results
+        """Test 3: Query functionality with relevant results
 
         Given: Tool initialized with test article
         When: Query for "banned phrases"
@@ -112,7 +108,9 @@ shows, productivity gains plateaued after 2020. Concrete data, clear attribution
 
             if tool.indexed_count > 0:
                 results = tool.query(
-                    "banned phrases examples", n_results=3, min_score=0.5
+                    "banned phrases examples",
+                    n_results=3,
+                    min_score=0.5,
                 )
 
                 assert isinstance(results, list)
@@ -128,8 +126,7 @@ shows, productivity gains plateaued after 2020. Concrete data, clear attribution
             pytest.skip("ChromaDB not installed")
 
     def test_query_latency_requirement(self, temp_archive):
-        """
-        Test 4: Query latency <500ms requirement
+        """Test 4: Query latency <500ms requirement
 
         Given: Tool initialized
         When: Query executed
@@ -160,8 +157,7 @@ shows, productivity gains plateaued after 2020. Concrete data, clear attribution
             pytest.skip("ChromaDB not installed")
 
     def test_min_score_threshold(self, temp_archive):
-        """
-        Test 5: Minimum score threshold filtering (>0.7)
+        """Test 5: Minimum score threshold filtering (>0.7)
 
         Given: Tool with indexed articles
         When: Query with min_score=0.7
@@ -189,8 +185,7 @@ shows, productivity gains plateaued after 2020. Concrete data, clear attribution
             pytest.skip("ChromaDB not installed")
 
     def test_empty_archive_graceful_degradation(self, tmp_path):
-        """
-        Test 6: Empty archive handling (graceful degradation)
+        """Test 6: Empty archive handling (graceful degradation)
 
         Given: Empty archive directory
         When: Tool initialized
@@ -215,8 +210,7 @@ shows, productivity gains plateaued after 2020. Concrete data, clear attribution
             pytest.skip("ChromaDB not installed")
 
     def test_crewai_tool_wrapper(self, temp_archive):
-        """
-        Test 7: CrewAI tool wrapper returns formatted string
+        """Test 7: CrewAI tool wrapper returns formatted string
 
         Given: create_style_memory_tool() factory
         When: Tool function called with query
@@ -234,7 +228,7 @@ shows, productivity gains plateaued after 2020. Concrete data, clear attribution
                         "score": 0.85,
                         "source": "test.md",
                         "paragraph": 0,
-                    }
+                    },
                 ]
                 MockTool.return_value = mock_instance
 
@@ -251,8 +245,7 @@ shows, productivity gains plateaued after 2020. Concrete data, clear attribution
             pytest.skip("ChromaDB not installed")
 
     def test_stats_method(self, temp_archive):
-        """
-        Test 8: get_stats() returns tool status
+        """Test 8: get_stats() returns tool status
 
         Given: Tool initialized
         When: get_stats() called
@@ -279,8 +272,7 @@ shows, productivity gains plateaued after 2020. Concrete data, clear attribution
 
 
 def test_style_memory_tool_import():
-    """
-    Test 9: Module import without errors
+    """Test 9: Module import without errors
 
     Given: style_memory_tool module
     When: Imported

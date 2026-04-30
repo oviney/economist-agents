@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Generate Sample Metrics Data
+"""Generate Sample Metrics Data
 
 Creates realistic historical metrics for demonstration.
 Simulates 5 runs with varying quality scores and agent performance.
@@ -14,7 +13,6 @@ from pathlib import Path
 
 def generate_sample_data():
     """Generate sample historical data"""
-
     skills_dir = Path(__file__).parent.parent / "skills"
     skills_dir.mkdir(parents=True, exist_ok=True)
 
@@ -43,7 +41,7 @@ def generate_sample_data():
                     "documentation": 100.0,
                     "code_style": round(96 + i * 0.4 + random.uniform(-1, 1), 1),
                 },
-            }
+            },
         )
 
     # Calculate trend
@@ -151,15 +149,16 @@ def generate_sample_data():
                             1 if banned_phrases == 0 else 0,
                             1 if gates_failed == 0 else 0,
                             1 if zone_violations == 0 else 0,
-                        ]
+                        ],
                     ),
                     "success_rate": 0,  # Will be calculated
                 },
-            }
+            },
         )
 
         agent_metrics["runs"][-1]["summary"]["success_rate"] = round(
-            agent_metrics["runs"][-1]["summary"]["agents_successful"] / 4 * 100, 1
+            agent_metrics["runs"][-1]["summary"]["agents_successful"] / 4 * 100,
+            1,
         )
 
     agent_metrics["summary"]["total_runs"] = len(agent_metrics["runs"])
@@ -240,16 +239,16 @@ def generate_sample_data():
     print(f"✅ Generated agent_metrics.json with {len(agent_metrics['runs'])} runs")
     print("\nAgent Performance Summary:")
     print(
-        f"  Research Agent: {agent_metrics['summary']['agents']['research_agent']['avg_verification_rate']}% verification"
+        f"  Research Agent: {agent_metrics['summary']['agents']['research_agent']['avg_verification_rate']}% verification",
     )
     print(
-        f"  Writer Agent: {agent_metrics['summary']['agents']['writer_agent']['clean_draft_rate']}% clean drafts"
+        f"  Writer Agent: {agent_metrics['summary']['agents']['writer_agent']['clean_draft_rate']}% clean drafts",
     )
     print(
-        f"  Editor Agent: {agent_metrics['summary']['agents']['editor_agent']['avg_gate_pass_rate']}% gate pass rate"
+        f"  Editor Agent: {agent_metrics['summary']['agents']['editor_agent']['avg_gate_pass_rate']}% gate pass rate",
     )
     print(
-        f"  Graphics Agent: {agent_metrics['summary']['agents']['graphics_agent']['avg_qa_pass_rate']}% QA pass rate"
+        f"  Graphics Agent: {agent_metrics['summary']['agents']['graphics_agent']['avg_qa_pass_rate']}% QA pass rate",
     )
 
 

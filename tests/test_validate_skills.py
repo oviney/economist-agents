@@ -23,7 +23,7 @@ def _write_skill(tmp_path: Path, name: str, *, body: str | None = None) -> Path:
             f"## {section}\nFiller text." for section in REQUIRED_SECTIONS
         )
     skill.write_text(
-        f"---\nname: {name}\ndescription: Use to test the validator.\n---\n\n{body}\n"
+        f"---\nname: {name}\ndescription: Use to test the validator.\n---\n\n{body}\n",
     )
     return skill
 
@@ -47,7 +47,7 @@ class TestValidateSkill:
         skill_dir.mkdir()
         body = "\n\n".join(f"## {s}\nFiller." for s in REQUIRED_SECTIONS)
         (skill_dir / "SKILL.md").write_text(
-            f"---\nname: wrong-name\ndescription: Use to test.\n---\n\n{body}\n"
+            f"---\nname: wrong-name\ndescription: Use to test.\n---\n\n{body}\n",
         )
         report = validate_skill(skill_dir / "SKILL.md")
         assert not report.ok
@@ -63,7 +63,7 @@ class TestValidateSkill:
             "description: Use to test.\n"
             "version: 1.0\n"
             "---\n\n"
-            f"{body}\n"
+            f"{body}\n",
         )
         report = validate_skill(skill_dir / "SKILL.md")
         assert not report.ok
@@ -89,7 +89,8 @@ class TestValidateSkill:
         assert report.ok, report.errors
 
     def test_description_without_terminal_punctuation_flagged(
-        self, tmp_path: Path
+        self,
+        tmp_path: Path,
     ) -> None:
         skill_dir = tmp_path / "no-punct"
         skill_dir.mkdir()
@@ -99,7 +100,7 @@ class TestValidateSkill:
             "name: no-punct\n"
             "description: A description with no punctuation\n"
             "---\n\n"
-            f"{body}\n"
+            f"{body}\n",
         )
         report = validate_skill(skill_dir / "SKILL.md")
         assert not report.ok

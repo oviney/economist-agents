@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Unit Tests for Writer Agent
+"""Unit Tests for Writer Agent
 
 Tests the extracted Writer Agent with mocked LLM responses.
 Achieves 80%+ coverage with 18+ comprehensive test cases.
@@ -54,7 +53,7 @@ def sample_research_brief():
                 "source": "Forrester Research",
                 "year": "2024",
                 "verified": True,
-            }
+            },
         ],
         "trend_narrative": "AI adoption in testing accelerated in 2024.",
         "chart_data": {
@@ -209,7 +208,11 @@ class TestWriterAgent:
     @patch("agents.writer_agent.call_llm")
     @patch("agents.writer_agent.review_agent_output")
     def test_write_with_validation_failure(
-        self, mock_review, mock_call_llm, mock_client, sample_research_brief
+        self,
+        mock_review,
+        mock_call_llm,
+        mock_client,
+        sample_research_brief,
     ):
         """Test article regeneration on validation failure."""
         bad_article = "---\ntitle: Bad\n---\nGame-changer!"
@@ -267,7 +270,11 @@ class TestWriterAgent:
     @patch("agents.writer_agent.call_llm")
     @patch("agents.writer_agent.review_agent_output")
     def test_regeneration_user_message_includes_draft(
-        self, mock_review, mock_call_llm, mock_client, sample_research_brief
+        self,
+        mock_review,
+        mock_call_llm,
+        mock_client,
+        sample_research_brief,
     ):
         """Regeneration call must include original draft in user message (fix for #270)."""
         bad_article = "---\ntitle: Bad\n---\nIn conclusion, game-changer!"
@@ -365,7 +372,10 @@ class TestRunWriterAgent:
         mock_review.return_value = (True, [])
 
         draft, metadata = run_writer_agent(
-            mock_client, "AI Testing", sample_research_brief, "2026-01-02"
+            mock_client,
+            "AI Testing",
+            sample_research_brief,
+            "2026-01-02",
         )
 
         assert draft == sample_article

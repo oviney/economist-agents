@@ -113,18 +113,18 @@ def validate_skill(path: Path) -> SkillReport:
     extra_keys = keys - REQUIRED_FRONTMATTER_KEYS
     if missing_keys:
         report.errors.append(
-            f"missing frontmatter key(s): {', '.join(sorted(missing_keys))}"
+            f"missing frontmatter key(s): {', '.join(sorted(missing_keys))}",
         )
     if extra_keys:
         report.errors.append(
-            f"unexpected frontmatter key(s): {', '.join(sorted(extra_keys))}"
+            f"unexpected frontmatter key(s): {', '.join(sorted(extra_keys))}",
         )
 
     declared_name = frontmatter.get("name", "").strip().strip("\"'")
     parent_name = path.parent.name
     if declared_name and declared_name != parent_name:
         report.errors.append(
-            f"frontmatter name '{declared_name}' does not match directory '{parent_name}'"
+            f"frontmatter name '{declared_name}' does not match directory '{parent_name}'",
         )
 
     description = frontmatter.get("description", "").strip().strip("\"'")
@@ -134,7 +134,7 @@ def validate_skill(path: Path) -> SkillReport:
     missing_sections = _required_sections_present(body)
     if missing_sections:
         report.errors.append(
-            f"missing required ## section(s): {', '.join(missing_sections)}"
+            f"missing required ## section(s): {', '.join(missing_sections)}",
         )
 
     return report

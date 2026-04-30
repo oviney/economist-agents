@@ -94,7 +94,7 @@ class TestFetchPosts:
             },
         ]
         file_response = {
-            "content": base64.b64encode(GOOD_POST_CONTENT.encode()).decode() + "\n"
+            "content": base64.b64encode(GOOD_POST_CONTENT.encode()).decode() + "\n",
         }
 
         call_responses = [contents_response, file_response]
@@ -123,7 +123,9 @@ class TestFetchPosts:
         file_response = {"content": base64.b64encode(raw.encode()).decode() + "\n"}
 
         with patch.object(
-            audit, "_gh_get", side_effect=[contents_response, file_response]
+            audit,
+            "_gh_get",
+            side_effect=[contents_response, file_response],
         ):
             posts = audit.fetch_posts()
 
@@ -234,11 +236,15 @@ class TestRunAuditDryRun:
 
 class TestRunAuditLive:
     def test_creates_issue_for_low_scoring_post(
-        self, tmp_path: Path, monkeypatch
+        self,
+        tmp_path: Path,
+        monkeypatch,
     ) -> None:
         monkeypatch.setattr(audit, "AUDIT_LOG", tmp_path / "blog_audit.json")
         monkeypatch.setattr(
-            audit, "fetch_posts", lambda: [MOCK_POSTS[1]]
+            audit,
+            "fetch_posts",
+            lambda: [MOCK_POSTS[1]],
         )  # bad post only
         monkeypatch.setattr(audit, "ensure_label", lambda: None)
         monkeypatch.setattr(audit, "existing_issue_title", lambda t: False)
@@ -259,12 +265,16 @@ class TestRunAuditLive:
         monkeypatch.setattr(audit, "fetch_posts", lambda: [MOCK_POSTS[1]])
         monkeypatch.setattr(audit, "ensure_label", lambda: None)
         monkeypatch.setattr(
-            audit, "existing_issue_title", lambda t: True
+            audit,
+            "existing_issue_title",
+            lambda t: True,
         )  # already exists
 
         created: list = []
         monkeypatch.setattr(
-            audit, "create_issue", lambda *a, **kw: created.append(a) or "http://x"
+            audit,
+            "create_issue",
+            lambda *a, **kw: created.append(a) or "http://x",
         )
 
         audit.run_audit(dry_run=False)
@@ -279,7 +289,9 @@ class TestRunAuditLive:
 
         created: list = []
         monkeypatch.setattr(
-            audit, "create_issue", lambda *a, **kw: created.append(a) or "http://x"
+            audit,
+            "create_issue",
+            lambda *a, **kw: created.append(a) or "http://x",
         )
 
         audit.run_audit(dry_run=False)

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Test Development Crew Workflow (Mock Implementation)
+"""Test Development Crew Workflow (Mock Implementation)
 
 Tests the TDD workflow logic without requiring CrewAI installation.
 Simulates what each agent would do in the development crew.

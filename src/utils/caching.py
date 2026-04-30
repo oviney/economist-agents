@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Advanced Caching Utility Functions
+"""Advanced Caching Utility Functions
 
 Provides multi-level caching with Redis integration, memory fallback,
 and comprehensive cache management capabilities.
@@ -153,8 +152,8 @@ class RedisCache(CacheBackend):
                 if data:
                     if hasattr(json, "loads"):
                         return json.loads(data.decode("utf-8"))
-                    else:  # orjson
-                        return json.loads(data)
+                    # orjson
+                    return json.loads(data)
         except Exception as e:
             logger.warning(f"Redis get error: {e}")
 
@@ -309,6 +308,7 @@ def cached(ttl: int = DEFAULT_TTL, key_func: Callable | None = None):
         @cached(ttl=3600)
         def expensive_computation(x, y):
             return x * y
+
     """
 
     def decorator(func: Callable) -> Callable:

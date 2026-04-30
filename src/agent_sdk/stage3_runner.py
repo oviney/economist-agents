@@ -143,7 +143,8 @@ def _strip_duplicate_article(text: str) -> str:
     match = _DUPLICATE_FRONTMATTER_PATTERN.search(text)
     if match:
         logger.warning(
-            "Stripping duplicate article emission at offset %d", match.start()
+            "Stripping duplicate article emission at offset %d",
+            match.start(),
         )
         return text[: match.start()].rstrip() + "\n"
     return text
@@ -203,8 +204,7 @@ def _parse_chart_json(text: str) -> dict:
     if cleaned.startswith("```"):
         first_nl = cleaned.find("\n")
         cleaned = cleaned[first_nl + 1 :] if first_nl != -1 else cleaned[3:]
-        if cleaned.endswith("```"):
-            cleaned = cleaned[:-3]
+        cleaned = cleaned.removesuffix("```")
         cleaned = cleaned.strip()
     try:
         return json.loads(cleaned)
@@ -239,6 +239,7 @@ async def run_stage3_spike(
 
     Returns:
         SpikeResult with article text, chart dict, cost, and timing.
+
     """
     start = time.perf_counter()
 
@@ -312,7 +313,8 @@ async def run_stage3_spike(
 def main() -> None:
     """CLI entrypoint — write spike artefacts to ``logs/spike/``."""
     logging.basicConfig(
-        level=logging.INFO, format="%(levelname)s %(name)s: %(message)s"
+        level=logging.INFO,
+        format="%(levelname)s %(name)s: %(message)s",
     )
     topic = (
         " ".join(sys.argv[1:])
@@ -326,13 +328,13 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "agent_sdk_article.md").write_text(result.article)
     (out_dir / "agent_sdk_chart.json").write_bytes(
-        orjson.dumps(result.chart_data, option=orjson.OPT_INDENT_2)
+        orjson.dumps(result.chart_data, option=orjson.OPT_INDENT_2),
     )
     metrics = {
         k: v for k, v in asdict(result).items() if k not in ("article", "chart_data")
     }
     (out_dir / "agent_sdk_metrics.json").write_bytes(
-        orjson.dumps(metrics, option=orjson.OPT_INDENT_2)
+        orjson.dumps(metrics, option=orjson.OPT_INDENT_2),
     )
 
     print(
@@ -340,7 +342,7 @@ def main() -> None:
         f"(writer ${result.writer_cost_usd:.4f}, "
         f"graphics ${result.graphics_cost_usd:.4f}), "
         f"{result.wall_seconds:.1f}s, "
-        f"{result.article_chars} chars."
+        f"{result.article_chars} chars.",
     )
     print("Artefacts: logs/spike/agent_sdk_{article.md,chart.json,metrics.json}")
 

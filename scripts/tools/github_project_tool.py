@@ -34,7 +34,10 @@ def _check_github_auth() -> bool:
     """Check if GitHub CLI is authenticated."""
     try:
         result = subprocess.run(
-            ["gh", "auth", "status"], capture_output=True, timeout=10, check=False
+            ["gh", "auth", "status"],
+            capture_output=True,
+            timeout=10,
+            check=False,
         )
         return result.returncode == 0
     except (FileNotFoundError, subprocess.TimeoutExpired):
@@ -42,7 +45,9 @@ def _check_github_auth() -> bool:
 
 
 def _github_project_add_issue_impl(
-    project_number: int, issue_url: str, owner: str = "oviney"
+    project_number: int,
+    issue_url: str,
+    owner: str = "oviney",
 ) -> str:
     """Add a GitHub Issue to a Project V2 board.
 
@@ -72,11 +77,12 @@ def _github_project_add_issue_impl(
         ... )
         >>> print(result)
         'Success: Added https://github.com/oviney/economist-agents/issues/42 to Project 1'
+
     """
     # Enhanced input validation with type checking
     if not isinstance(project_number, int):
         raise TypeError(
-            f"project_number must be an integer, got {type(project_number).__name__}"
+            f"project_number must be an integer, got {type(project_number).__name__}",
         )
 
     if project_number < 1:
@@ -115,7 +121,11 @@ def _github_project_add_issue_impl(
 
     try:
         result = subprocess.run(
-            command, capture_output=True, text=True, check=False, timeout=30
+            command,
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=30,
         )
 
         if result.returncode != 0:
@@ -204,5 +214,5 @@ if __name__ == "__main__":
         "#     project_number=1,\n"
         '#     issue_url="https://github.com/oviney/economist-agents/issues/1"\n'
         "# )\n"
-        "# print(result)"
+        "# print(result)",
     )

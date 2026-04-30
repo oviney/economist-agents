@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Smart Article Fixer
+"""Smart Article Fixer
 
 Automatically fixes common validation failures without regenerating the entire article.
 Saves OpenAI credits by fixing issues in-place when possible.
@@ -32,10 +31,11 @@ class ArticleFixer:
         self.fixes_applied = []
 
     def auto_fix(
-        self, content: str, expected_date: str = None
+        self,
+        content: str,
+        expected_date: str = None,
     ) -> tuple[str, list[str], bool]:
-        """
-        Attempt to automatically fix common issues.
+        """Attempt to automatically fix common issues.
 
         Args:
             content: Article content
@@ -43,6 +43,7 @@ class ArticleFixer:
 
         Returns:
             (fixed_content, list_of_fixes_applied, needs_human_review)
+
         """
         self.fixes_applied = []
         fixed = content
@@ -69,17 +70,19 @@ class ArticleFixer:
         if source_count > 0:
             needs_review = True
             self.fixes_applied.append(
-                f"⚠️  {source_count} [NEEDS SOURCE] flags - needs manual review"
+                f"⚠️  {source_count} [NEEDS SOURCE] flags - needs manual review",
             )
 
         # Fix 5: Placeholder text (flag for review)
         placeholders = re.findall(
-            r"(TODO|FIXME|XXX|REPLACE[-_]?ME|YOUR-\w+)", fixed, re.IGNORECASE
+            r"(TODO|FIXME|XXX|REPLACE[-_]?ME|YOUR-\w+)",
+            fixed,
+            re.IGNORECASE,
         )
         if placeholders:
             needs_review = True
             self.fixes_applied.append(
-                f"⚠️  Found placeholders: {set(placeholders)} - needs manual review"
+                f"⚠️  Found placeholders: {set(placeholders)} - needs manual review",
             )
 
         return fixed, self.fixes_applied, needs_review
@@ -119,7 +122,9 @@ class ArticleFixer:
 
             # Reconstruct content
             new_yaml = yaml.dump(
-                front_matter, default_flow_style=False, sort_keys=False
+                front_matter,
+                default_flow_style=False,
+                sort_keys=False,
             )
             return f"---\n{new_yaml}---{parts[2]}", True
 
@@ -154,8 +159,7 @@ class ArticleFixer:
 
 
 def fix_quarantined_article(article_path: str, expected_date: str = None) -> bool:
-    """
-    Attempt to fix a quarantined article.
+    """Attempt to fix a quarantined article.
 
     Args:
         article_path: Path to quarantined article
@@ -163,6 +167,7 @@ def fix_quarantined_article(article_path: str, expected_date: str = None) -> boo
 
     Returns:
         True if article was fixed and validated, False otherwise
+
     """
     if expected_date is None:
         expected_date = datetime.now().strftime("%Y-%m-%d")
@@ -201,21 +206,21 @@ def fix_quarantined_article(article_path: str, expected_date: str = None) -> boo
 
         print(f"   Saved to: {output_path}")
         return True
-    else:
-        print("\n❌ Still has issues:")
-        critical = [i for i in issues if i["severity"] == "CRITICAL"]
-        for issue in critical:
-            print(f"   • {issue['check']}: {issue['message']}")
+    print("\n❌ Still has issues:")
+    critical = [i for i in issues if i["severity"] == "CRITICAL"]
+    for issue in critical:
+        print(f"   • {issue['check']}: {issue['message']}")
 
-        if needs_review:
-            print("\n⚠️  Manual review required")
-            print("   Some issues cannot be fixed automatically")
+    if needs_review:
+        print("\n⚠️  Manual review required")
+        print("   Some issues cannot be fixed automatically")
 
-        return False
+    return False
 
 
 def batch_fix_quarantine(
-    quarantine_dir: str = "output/quarantine", expected_date: str = None
+    quarantine_dir: str = "output/quarantine",
+    expected_date: str = None,
 ):
     """Fix all articles in quarantine directory"""
     quarantine_path = Path(quarantine_dir)

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Test Suite for Product Owner Agent
+"""Test Suite for Product Owner Agent
 
 Tests story generation, AC generation, estimation, and backlog management.
 """
@@ -31,8 +30,8 @@ def temp_backlog():
                     "created": "2026-01-02",
                     "stories": [],
                     "escalations": [],
-                }
-            )
+                },
+            ),
         )
         temp_path = f.name
 
@@ -140,7 +139,7 @@ class TestProductOwnerAgent:
             mock_call.return_value = json.dumps(mock_response)
             agent = ProductOwnerAgent(backlog_file=temp_backlog)
             criteria = agent.generate_acceptance_criteria(
-                "As a PO, I need automated story generation, so that backlog refinement is faster"
+                "As a PO, I need automated story generation, so that backlog refinement is faster",
             )
 
         assert len(criteria) == 3

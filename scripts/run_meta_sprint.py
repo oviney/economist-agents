@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Meta-Sprint Runner for Self-Documentation
+"""Meta-Sprint Runner for Self-Documentation
 
 Orchestrates the meta-blog article generation where the economist-agents
 system writes about itself. Uses ContextManager to inject repository
@@ -33,8 +32,7 @@ from economist_agent import generate_economist_post
 
 
 def start_sprint(output_dir: str = "output") -> dict:
-    """
-    Execute meta-sprint for self-documentation blog article.
+    """Execute meta-sprint for self-documentation blog article.
 
     Strategy:
     1. Initialize ContextManager with story context
@@ -52,6 +50,7 @@ def start_sprint(output_dir: str = "output") -> dict:
     Raises:
         FileNotFoundError: If required context or research files missing
         ValueError: If context initialization fails
+
     """
     print("\n" + "=" * 70)
     print("🚀 META-SPRINT: Economist-Agents Self-Documentation")
@@ -64,7 +63,7 @@ def start_sprint(output_dir: str = "output") -> dict:
     if not Path(story_path).exists():
         raise FileNotFoundError(
             f"Story context not found: {story_path}\n"
-            f"Please ensure STORY_META_BLOG.md exists in docs/ directory"
+            f"Please ensure STORY_META_BLOG.md exists in docs/ directory",
         )
 
     ctx = ContextManager(story_path)
@@ -98,13 +97,13 @@ def start_sprint(output_dir: str = "output") -> dict:
             }
         print(
             f"      ✓ Loaded {research_data[file_path]['lines']} lines, "
-            f"{research_data[file_path]['size_bytes']:,} bytes"
+            f"{research_data[file_path]['size_bytes']:,} bytes",
         )
 
     if not research_data:
         raise FileNotFoundError(
             "No research files found. Ensure README.md and "
-            "docs/QUALITY_DASHBOARD.md exist."
+            "docs/QUALITY_DASHBOARD.md exist.",
         )
 
     print(f"\n   ✓ Total research sources: {len(research_data)}")

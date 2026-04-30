@@ -95,7 +95,9 @@ class TestDiscoverTopics:
     @patch("src.economist_agents.flow.scout_topics", return_value=[])
     @patch("src.economist_agents.flow.create_llm_client")
     def test_raises_when_scout_empty_after_retry(
-        self, mock_client: Mock, mock_scout: Mock
+        self,
+        mock_client: Mock,
+        mock_scout: Mock,
     ) -> None:
         mock_client.return_value = Mock()
         flow = EconomistContentFlow()
@@ -134,7 +136,9 @@ class TestEditorialReview:
     @patch("src.economist_agents.flow.run_editorial_board")
     @patch("src.economist_agents.flow.create_llm_client")
     def test_falls_back_to_highest_scored(
-        self, mock_client: Mock, mock_board: Mock
+        self,
+        mock_client: Mock,
+        mock_board: Mock,
     ) -> None:
         mock_client.return_value = Mock()
         mock_board.return_value = {"top_pick": None}
@@ -143,7 +147,7 @@ class TestEditorialReview:
             "topics": [
                 {"topic": "Low", "score": 3.0},
                 {"topic": "High", "score": 9.0},
-            ]
+            ],
         }
 
         result = flow.editorial_review(topics)
@@ -163,7 +167,9 @@ class TestGenerateContent:
     @patch("src.economist_agents.flow.generate_featured_image", return_value=False)
     @patch("src.economist_agents.flow.asyncio.run")
     def test_calls_pipeline_and_returns_article(
-        self, mock_asyncio_run: Mock, mock_image: Mock
+        self,
+        mock_asyncio_run: Mock,
+        mock_image: Mock,
     ) -> None:
         mock_asyncio_run.return_value = _passing_pipeline_result()
         flow = EconomistContentFlow()
@@ -184,7 +190,9 @@ class TestGenerateContent:
     @patch("src.economist_agents.flow.generate_featured_image", return_value=True)
     @patch("src.economist_agents.flow.asyncio.run")
     def test_uses_dalle_image_when_generated(
-        self, mock_asyncio_run: Mock, mock_image: Mock
+        self,
+        mock_asyncio_run: Mock,
+        mock_image: Mock,
     ) -> None:
         mock_asyncio_run.return_value = _passing_pipeline_result()
         flow = EconomistContentFlow()
@@ -231,7 +239,7 @@ class TestQualityGate:
                     "check": "word_count",
                     "severity": "CRITICAL",
                     "message": "too short",
-                }
+                },
             ],
         )
         decision = flow.quality_gate(draft)
@@ -287,7 +295,9 @@ class TestRequestRevision:
 
     @patch("src.economist_agents.flow.asyncio.run")
     def test_quarantines_when_retry_still_fails(
-        self, mock_asyncio_run: Mock, tmp_path
+        self,
+        mock_asyncio_run: Mock,
+        tmp_path,
     ) -> None:
         failing = _passing_pipeline_result()
         failing.publication_validator_passed = False
@@ -296,7 +306,7 @@ class TestRequestRevision:
                 "check": "word_count",
                 "severity": "CRITICAL",
                 "message": "still too short",
-            }
+            },
         ]
         failing.editorial_score = 40
         mock_asyncio_run.return_value = failing
@@ -330,7 +340,8 @@ class TestPatchFrontmatter:
     def test_overrides_image_path(self) -> None:
         article = "---\nlayout: post\ntitle: T\nimage: /old.png\n---\n\nBody"
         patched = EconomistContentFlow._patch_frontmatter(
-            article, "/assets/images/new.png"
+            article,
+            "/assets/images/new.png",
         )
         assert "image: /assets/images/new.png" in patched
         assert "/old.png" not in patched

@@ -154,23 +154,23 @@ def _recommendations(result) -> str:
     recs = []
     if result.scores.get("opening_quality", 10) < 7:
         recs.append(
-            "- **Opening**: Lead with a specific data point (e.g. '73% of organisations…'). Avoid banned openings like 'In today's world'."
+            "- **Opening**: Lead with a specific data point (e.g. '73% of organisations…'). Avoid banned openings like 'In today's world'.",
         )
     if result.scores.get("evidence_sourcing", 10) < 7:
         recs.append(
-            "- **Evidence**: Add a `## References` section with ≥5 numbered citations. Remove `[NEEDS SOURCE]` placeholders."
+            "- **Evidence**: Add a `## References` section with ≥5 numbered citations. Remove `[NEEDS SOURCE]` placeholders.",
         )
     if result.scores.get("voice_consistency", 10) < 7:
         recs.append(
-            "- **Voice**: Replace American spellings with British equivalents (organisation, behaviour). Remove clichés like 'game-changer' and 'paradigm shift'."
+            "- **Voice**: Replace American spellings with British equivalents (organisation, behaviour). Remove clichés like 'game-changer' and 'paradigm shift'.",
         )
     if result.scores.get("structure", 10) < 7:
         recs.append(
-            "- **Structure**: Ensure front matter includes `layout`, `title`, `date`, `categories`, and `image`. Keep 2–5 `##` headings; aim for 600–1500 words."
+            "- **Structure**: Ensure front matter includes `layout`, `title`, `date`, `categories`, and `image`. Keep 2–5 `##` headings; aim for 600–1500 words.",
         )
     if result.scores.get("visual_engagement", 10) < 7:
         recs.append(
-            "- **Visuals**: Add a featured `image:` in front matter. Embed at least one chart with a reference ('As the chart shows…')."
+            "- **Visuals**: Add a featured `image:` in front matter. Embed at least one chart with a reference ('As the chart shows…').",
         )
     return (
         "\n".join(recs)

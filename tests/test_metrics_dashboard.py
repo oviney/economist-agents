@@ -36,6 +36,7 @@ def tmp_db(tmp_path: Path) -> Path:
 
     Returns:
         Path to a not-yet-created SQLite file inside *tmp_path*.
+
     """
     return tmp_path / "test_metrics.db"
 
@@ -66,7 +67,7 @@ class TestInitDb:
         """The *pipeline_runs* table is present after initialisation."""
         conn = init_db(tmp_db)
         cursor = conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='pipeline_runs'"
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='pipeline_runs'",
         )
         tables = [row[0] for row in cursor.fetchall()]
         conn.close()
@@ -126,7 +127,10 @@ class TestRecordRun:
         """A caller-supplied run_id is stored verbatim."""
         custom_id = str(uuid.uuid4())
         returned_id = record_run(
-            "editor", "Test Topic", run_id=custom_id, db_path=tmp_db
+            "editor",
+            "Test Topic",
+            run_id=custom_id,
+            db_path=tmp_db,
         )
         assert returned_id == custom_id
         rows = fetch_all_runs(tmp_db)
@@ -175,7 +179,10 @@ class TestRecordRun:
         """An unrecognised status value raises ValueError."""
         with pytest.raises(ValueError, match="Invalid status"):
             record_run(
-                "researcher", "Bad Status Topic", status="nonsense", db_path=tmp_db
+                "researcher",
+                "Bad Status Topic",
+                status="nonsense",
+                db_path=tmp_db,
             )
 
     def test_valid_statuses(self, tmp_db: Path) -> None:
@@ -477,6 +484,7 @@ class TestEndToEnd:
         assert summary["failed_count"] == 1
         assert summary["success_rate_pct"] == pytest.approx(100 / 3, rel=0.01)
         assert summary["avg_editorial_score"] == pytest.approx(
-            (85 + 55 + 20) / 3, abs=0.01
+            (85 + 55 + 20) / 3,
+            abs=0.01,
         )
         assert summary["total_cost_usd"] == pytest.approx(0.03 + 0.024 + 0.015)

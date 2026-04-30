@@ -81,14 +81,16 @@ class TestGetSearcher:
     """Tests for the _get_searcher helper."""
 
     def test_returns_none_without_api_key(
-        self, monkeypatch: pytest.MonkeyPatch
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Returns None when SERPER_API_KEY is not set."""
         monkeypatch.delenv("SERPER_API_KEY", raising=False)
         assert _get_searcher() is None
 
     def test_returns_searcher_with_api_key(
-        self, monkeypatch: pytest.MonkeyPatch
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Returns a GoogleSearcher when SERPER_API_KEY is set."""
         monkeypatch.setenv("SERPER_API_KEY", "fake-key")
@@ -266,7 +268,7 @@ class TestFetchHnTopStories:
             if "topstories" in url:
                 return mock_top_resp
             # Extract item ID from URL
-            item_id = int(url.split("/")[-1].split(".")[0])
+            item_id = int(url.rsplit("/", maxsplit=1)[-1].split(".", maxsplit=1)[0])
             mock_item = MagicMock()
             mock_item.content = orjson.dumps(_make_hn_item(item_id))
             mock_item.raise_for_status = MagicMock()
@@ -354,7 +356,8 @@ class TestGatherTrendEvidence:
         assert len(evidence) == 1
 
     def test_uses_default_queries_when_none(
-        self, monkeypatch: pytest.MonkeyPatch
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Uses _default_queries() when queries=None."""
         monkeypatch.setenv("SERPER_API_KEY", "fake-key")
@@ -415,9 +418,9 @@ class TestFormatEvidenceAsPrompt:
                         snippet="A new AI testing tool was released.",
                         date="Apr 2026",
                         source="google_search",
-                    )
+                    ),
                 ],
-            )
+            ),
         ]
         output = format_evidence_as_prompt(evidence)
 
@@ -452,7 +455,7 @@ class TestFormatEvidenceAsPrompt:
                         snippet="Good result",
                         date="2026-04",
                         source="google_search",
-                    )
+                    ),
                 ],
             ),
         ]
@@ -475,7 +478,7 @@ class TestFormatEvidenceAsPrompt:
                     )
                     for i in range(5)
                 ],
-            )
+            ),
         ]
         output = format_evidence_as_prompt(evidence)
         assert "5 items" in output
@@ -492,9 +495,9 @@ class TestFormatEvidenceAsPrompt:
                         snippet="Snippet",
                         date="",
                         source="google_search",
-                    )
+                    ),
                 ],
-            )
+            ),
         ]
         output = format_evidence_as_prompt(evidence)
         assert "No Date Item" in output
@@ -512,9 +515,9 @@ class TestFormatEvidenceAsPrompt:
                         snippet="Snippet",
                         date="2026-04",
                         source="google_search",
-                    )
+                    ),
                 ],
-            )
+            ),
         ]
         output = format_evidence_as_prompt(evidence)
         assert "No URL" in output
@@ -543,12 +546,13 @@ class TestBuildGroundedTrendContext:
                         snippet="Snippet",
                         date="Apr 2026",
                         source="google_search",
-                    )
+                    ),
                 ],
-            )
+            ),
         ]
         with patch(
-            "topic_trend_grounding.gather_trend_evidence", return_value=evidence
+            "topic_trend_grounding.gather_trend_evidence",
+            return_value=evidence,
         ):
             context = build_grounded_trend_context()
 
@@ -563,7 +567,8 @@ class TestBuildGroundedTrendContext:
         captured_queries: list[list[str]] = []
 
         def mock_gather(
-            queries: list[str] | None = None, **kwargs: Any
+            queries: list[str] | None = None,
+            **kwargs: Any,
         ) -> list[TrendEvidence]:
             captured_queries.append(queries or [])
             return []
@@ -580,7 +585,8 @@ class TestBuildGroundedTrendContext:
         assert len(focus_queries) >= 2
 
     def test_returns_fallback_without_evidence(
-        self, monkeypatch: pytest.MonkeyPatch
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Returns fallback text when no evidence collected."""
         monkeypatch.delenv("SERPER_API_KEY", raising=False)
@@ -591,7 +597,8 @@ class TestBuildGroundedTrendContext:
         assert "[UNVERIFIED]" in context
 
     def test_no_focus_area_uses_default_queries(
-        self, monkeypatch: pytest.MonkeyPatch
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Without focus_area, only default queries are used."""
         monkeypatch.setenv("SERPER_API_KEY", "fake-key")
@@ -599,7 +606,8 @@ class TestBuildGroundedTrendContext:
         captured_queries: list[list[str]] = []
 
         def mock_gather(
-            queries: list[str] | None = None, **kwargs: Any
+            queries: list[str] | None = None,
+            **kwargs: Any,
         ) -> list[TrendEvidence]:
             captured_queries.append(queries or [])
             return []

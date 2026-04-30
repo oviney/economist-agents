@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Tests for Graphics Agent
+"""Tests for Graphics Agent
 
 Comprehensive test suite covering:
 - Chart generation with valid/invalid specs
@@ -150,7 +149,9 @@ class TestChartGeneration:
         assert result is None
 
     def test_generate_chart_validates_chart_spec_type(
-        self, mock_llm_client, temp_output_path
+        self,
+        mock_llm_client,
+        temp_output_path,
     ):
         """Should validate chart_spec is dict."""
         agent = GraphicsAgent(mock_llm_client)
@@ -158,7 +159,9 @@ class TestChartGeneration:
             agent.generate_chart("not a dict", temp_output_path)
 
     def test_generate_chart_validates_required_fields(
-        self, mock_llm_client, temp_output_path
+        self,
+        mock_llm_client,
+        temp_output_path,
     ):
         """Should validate required fields present."""
         agent = GraphicsAgent(mock_llm_client)
@@ -166,7 +169,9 @@ class TestChartGeneration:
             agent.generate_chart({"title": "Test"}, temp_output_path)  # Missing data
 
     def test_generate_chart_validates_output_path(
-        self, mock_llm_client, valid_chart_spec
+        self,
+        mock_llm_client,
+        valid_chart_spec,
     ):
         """Should validate output_path is non-empty string."""
         agent = GraphicsAgent(mock_llm_client)
@@ -245,7 +250,11 @@ class TestMatplotlibCodeGeneration:
 
     @patch("llm_client.call_llm")
     def test_generate_matplotlib_code(
-        self, mock_call_llm, mock_llm_client, valid_chart_spec, sample_matplotlib_code
+        self,
+        mock_call_llm,
+        mock_llm_client,
+        valid_chart_spec,
+        sample_matplotlib_code,
     ):
         """Should generate matplotlib code via LLM."""
         mock_call_llm.return_value = sample_matplotlib_code
@@ -258,7 +267,10 @@ class TestMatplotlibCodeGeneration:
 
     @patch("llm_client.call_llm")
     def test_extract_code_from_python_block(
-        self, mock_call_llm, mock_llm_client, valid_chart_spec
+        self,
+        mock_call_llm,
+        mock_llm_client,
+        valid_chart_spec,
     ):
         """Should extract code from ```python blocks."""
         mock_call_llm.return_value = "```python\nprint('test')\n```"
@@ -270,7 +282,10 @@ class TestMatplotlibCodeGeneration:
 
     @patch("llm_client.call_llm")
     def test_extract_code_from_generic_block(
-        self, mock_call_llm, mock_llm_client, valid_chart_spec
+        self,
+        mock_call_llm,
+        mock_llm_client,
+        valid_chart_spec,
     ):
         """Should extract code from ``` blocks."""
         mock_call_llm.return_value = "```\nprint('test')\n```"
@@ -286,14 +301,19 @@ class TestMatplotlibCodeExecution:
 
     @patch("subprocess.run")
     def test_execute_matplotlib_code_success(
-        self, mock_subprocess, mock_llm_client, sample_matplotlib_code, temp_output_path
+        self,
+        mock_subprocess,
+        mock_llm_client,
+        sample_matplotlib_code,
+        temp_output_path,
     ):
         """Should execute matplotlib code successfully."""
         mock_subprocess.return_value = Mock(returncode=0)
 
         agent = GraphicsAgent(mock_llm_client)
         success = agent._execute_matplotlib_code(
-            sample_matplotlib_code, temp_output_path
+            sample_matplotlib_code,
+            temp_output_path,
         )
 
         assert success is True
@@ -316,7 +336,8 @@ class TestMatplotlibCodeExecution:
 
         agent = GraphicsAgent(mock_llm_client)
         success = agent._execute_matplotlib_code(
-            sample_matplotlib_code, temp_output_path
+            sample_matplotlib_code,
+            temp_output_path,
         )
 
         assert success is False
@@ -436,7 +457,9 @@ class TestTaskCreation:
     def test_create_label_optimization_task(self, valid_chart_spec, temp_output_path):
         """Should create label optimization task."""
         task = create_label_optimization_task(
-            valid_chart_spec, "current_code", temp_output_path
+            valid_chart_spec,
+            "current_code",
+            temp_output_path,
         )
         assert isinstance(task, GraphicsTask)
         assert task.task_type == "optimize_labels"
@@ -507,7 +530,8 @@ class TestMetricsIntegration:
         agent.generate_chart(valid_chart_spec, temp_output_path)
 
         mock_metrics_collector.start_chart.assert_called_once_with(
-            valid_chart_spec["title"], valid_chart_spec
+            valid_chart_spec["title"],
+            valid_chart_spec,
         )
 
     @patch("llm_client.call_llm")

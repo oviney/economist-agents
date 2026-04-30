@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-TDD RED Phase: Failing tests for data sanitization utility
+"""TDD RED Phase: Failing tests for data sanitization utility
 
 These tests define the requirements for the data sanitization function.
 All tests should initially FAIL until implementation is complete.

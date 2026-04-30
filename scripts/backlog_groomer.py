@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Backlog Groomer - Automated Backlog Health Management
+"""Backlog Groomer - Automated Backlog Health Management
 
 Maintains backlog health through automated detection of:
 - Aging stories (>30 days flag, >90 days close)
@@ -93,7 +92,7 @@ class BacklogGroomer:
                         "severity": "CLOSE",
                         "recommendation": f"Story {age_days} days old - suggest closing if inactive",
                         "sprint": story.get("sprint"),
-                    }
+                    },
                 )
                 self.issues["aging"].append(aging[-1])
 
@@ -106,7 +105,7 @@ class BacklogGroomer:
                         "severity": "FLAG",
                         "recommendation": f"Story {age_days} days old - review priority",
                         "sprint": story.get("sprint"),
-                    }
+                    },
                 )
                 self.issues["aging"].append(aging[-1])
 
@@ -136,7 +135,7 @@ class BacklogGroomer:
                             "story2_title": story2.get("title"),
                             "similarity": round(similarity * 100, 1),
                             "recommendation": "Review and merge if duplicate",
-                        }
+                        },
                     )
                     self.issues["duplicates"].append(duplicates[-1])
 
@@ -164,7 +163,7 @@ class BacklogGroomer:
 
             for lower_priority in p2_stories + p3_stories:
                 lower_age = self._calculate_age_days(
-                    lower_priority.get("created_date", "")
+                    lower_priority.get("created_date", ""),
                 )
 
                 if p0_age > lower_age + 14:  # P0 at least 2 weeks older
@@ -175,7 +174,7 @@ class BacklogGroomer:
                             "priority": "P0",
                             "age_days": p0_age,
                             "recommendation": f"P0 story {p0_age} days old while newer P2/P3 exist - validate priority",
-                        }
+                        },
                     )
                     self.issues["priority_drift"].append(drift[-1])
                     break  # Only flag once per P0 story
@@ -212,7 +211,7 @@ class BacklogGroomer:
                         "title": story.get("title"),
                         "missing_fields": missing,
                         "recommendation": f"Add missing fields: {', '.join(missing)}",
-                    }
+                    },
                 )
                 self.issues["undefined"].append(undefined[-1])
 
@@ -255,17 +254,17 @@ class BacklogGroomer:
         report.append(f"  Active Stories: {len(active_stories)}")
         report.append(f"  Completed Stories: {len(stories) - len(active_stories)}")
         report.append(
-            f"  Health Score: {health_score}% (target: <{self.MAX_HEALTH_SCORE}%)"
+            f"  Health Score: {health_score}% (target: <{self.MAX_HEALTH_SCORE}%)",
         )
         report.append("")
 
         if health_score < self.MAX_HEALTH_SCORE:
             report.append(
-                f"  ✅ HEALTHY - Backlog below {self.MAX_HEALTH_SCORE}% threshold"
+                f"  ✅ HEALTHY - Backlog below {self.MAX_HEALTH_SCORE}% threshold",
             )
         else:
             report.append(
-                f"  ⚠️  NEEDS ATTENTION - Backlog exceeds {self.MAX_HEALTH_SCORE}% threshold"
+                f"  ⚠️  NEEDS ATTENTION - Backlog exceeds {self.MAX_HEALTH_SCORE}% threshold",
             )
         report.append("")
 
@@ -275,7 +274,7 @@ class BacklogGroomer:
             close_count = sum(1 for a in aging if a["severity"] == "CLOSE")
             flag_count = sum(1 for a in aging if a["severity"] == "FLAG")
             report.append(
-                f"  Total: {len(aging)} ({close_count} close, {flag_count} flag)"
+                f"  Total: {len(aging)} ({close_count} close, {flag_count} flag)",
             )
             report.append("")
 
@@ -309,14 +308,14 @@ class BacklogGroomer:
         report.append("## Priority Drift")
         if drift:
             report.append(
-                f"  Total: {len(drift)} P0 stories older than lower priorities"
+                f"  Total: {len(drift)} P0 stories older than lower priorities",
             )
             report.append("")
 
             for item in drift:
                 report.append(f"  ⚠️  [{item['story_id']}] {item['title']}")
                 report.append(
-                    f"     Priority: {item['priority']}, Age: {item['age_days']} days"
+                    f"     Priority: {item['priority']}, Age: {item['age_days']} days",
                 )
                 report.append(f"     {item['recommendation']}")
                 report.append("")
@@ -328,7 +327,7 @@ class BacklogGroomer:
         report.append("## Undefined Stories")
         if undefined:
             report.append(
-                f"  Total: {len(undefined)} stories missing critical information"
+                f"  Total: {len(undefined)} stories missing critical information",
             )
             report.append("")
 
@@ -355,7 +354,7 @@ class BacklogGroomer:
                 close_stories = [a for a in aging if a["severity"] == "CLOSE"]
                 if close_stories:
                     report.append(
-                        f"  1. Close {len(close_stories)} stories >90 days old:"
+                        f"  1. Close {len(close_stories)} stories >90 days old:",
                     )
                     for story in close_stories[:5]:  # Show first 5
                         report.append(f"     - {story['story_id']}")
@@ -369,7 +368,7 @@ class BacklogGroomer:
 
             if drift:
                 report.append(
-                    f"  3. Re-prioritize {len(drift)} P0 stories or close if no longer critical"
+                    f"  3. Re-prioritize {len(drift)} P0 stories or close if no longer critical",
                 )
                 report.append("")
 
@@ -429,7 +428,7 @@ class BacklogGroomer:
 
                 if "title" not in story:
                     issues.append(
-                        f"Sprint {sprint_id}: Story {story.get('id', 'unknown')} missing 'title'"
+                        f"Sprint {sprint_id}: Story {story.get('id', 'unknown')} missing 'title'",
                     )
 
         return {"valid": len(issues) == 0, "issues": issues}
@@ -437,10 +436,12 @@ class BacklogGroomer:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Backlog Groomer - Automated backlog health management"
+        description="Backlog Groomer - Automated backlog health management",
     )
     parser.add_argument(
-        "--report", action="store_true", help="Generate backlog health report"
+        "--report",
+        action="store_true",
+        help="Generate backlog health report",
     )
     parser.add_argument(
         "--clean",
@@ -448,10 +449,14 @@ def main():
         help="Clean backlog by flagging/closing stale stories",
     )
     parser.add_argument(
-        "--validate", action="store_true", help="Validate backlog structure"
+        "--validate",
+        action="store_true",
+        help="Validate backlog structure",
     )
     parser.add_argument(
-        "--duplicates", action="store_true", help="Find duplicate stories only"
+        "--duplicates",
+        action="store_true",
+        help="Find duplicate stories only",
     )
     parser.add_argument(
         "--dry-run",

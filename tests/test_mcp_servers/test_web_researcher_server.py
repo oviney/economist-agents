@@ -46,7 +46,7 @@ class TestSearchWeb:
                     "link": "https://example.com/2",
                     "snippet": "Snippet two",
                 },
-            ]
+            ],
         }
         mock_response.raise_for_status = MagicMock()
 
@@ -84,7 +84,8 @@ class TestSearchWeb:
         assert len(results) == 3
 
     def test_missing_api_key_returns_error(
-        self, monkeypatch: pytest.MonkeyPatch
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Given no SERPER_API_KEY, returns structured error without HTTP call."""
         monkeypatch.delenv("SERPER_API_KEY", raising=False)
@@ -98,7 +99,8 @@ class TestSearchWeb:
         assert "SERPER_API_KEY" in results[0]["error"]
 
     def test_http_error_returns_structured_error(
-        self, monkeypatch: pytest.MonkeyPatch
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Given an HTTP error from Serper, returns structured error dict."""
         monkeypatch.setenv("SERPER_API_KEY", "bad-key")
@@ -117,7 +119,8 @@ class TestSearchWeb:
         assert "HTTP error" in results[0]["error"]
 
     def test_network_error_returns_structured_error(
-        self, monkeypatch: pytest.MonkeyPatch
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Given a network failure, returns structured error dict."""
         monkeypatch.setenv("SERPER_API_KEY", "fake-key")
@@ -317,7 +320,8 @@ class TestFetchPage:
         mock_response.raise_for_status = MagicMock()
 
         with patch(
-            "mcp_servers.web_researcher_server.requests.get", return_value=mock_response
+            "mcp_servers.web_researcher_server.requests.get",
+            return_value=mock_response,
         ):
             result = fetch_page("https://example.com")
 
@@ -336,7 +340,8 @@ class TestFetchPage:
         mock_response.raise_for_status = MagicMock()
 
         with patch(
-            "mcp_servers.web_researcher_server.requests.get", return_value=mock_response
+            "mcp_servers.web_researcher_server.requests.get",
+            return_value=mock_response,
         ):
             result = fetch_page("https://example.com")
 
@@ -350,7 +355,8 @@ class TestFetchPage:
         mock_response.raise_for_status.side_effect = requests.HTTPError("404 Not Found")
 
         with patch(
-            "mcp_servers.web_researcher_server.requests.get", return_value=mock_response
+            "mcp_servers.web_researcher_server.requests.get",
+            return_value=mock_response,
         ):
             result = fetch_page("https://example.com/missing")
 
@@ -386,7 +392,8 @@ class TestFetchPage:
         mock_response.raise_for_status = MagicMock()
 
         with patch(
-            "mcp_servers.web_researcher_server.requests.get", return_value=mock_response
+            "mcp_servers.web_researcher_server.requests.get",
+            return_value=mock_response,
         ):
             result = fetch_page("https://example.com")
 
@@ -421,7 +428,9 @@ class TestSearchGoogleScholar:
         mock_searcher.search_scholar.return_value = papers
 
         with patch.object(
-            web_researcher_module, "_GoogleSearcher", return_value=mock_searcher
+            web_researcher_module,
+            "_GoogleSearcher",
+            return_value=mock_searcher,
         ):
             results = search_google_scholar("software testing AI", max_results=3)
 
@@ -450,7 +459,9 @@ class TestSearchGoogleScholar:
         mock_searcher.search_scholar.return_value = []
 
         with patch.object(
-            web_researcher_module, "_GoogleSearcher", return_value=mock_searcher
+            web_researcher_module,
+            "_GoogleSearcher",
+            return_value=mock_searcher,
         ):
             search_google_scholar("topic")
 
@@ -464,7 +475,9 @@ class TestSearchGoogleScholar:
         mock_searcher.search_scholar.return_value = []
 
         with patch.object(
-            web_researcher_module, "_GoogleSearcher", return_value=mock_searcher
+            web_researcher_module,
+            "_GoogleSearcher",
+            return_value=mock_searcher,
         ):
             search_google_scholar("topic", year_start=2024, year_end=2025)
 
@@ -478,7 +491,9 @@ class TestSearchGoogleScholar:
         mock_searcher.search_scholar.side_effect = RuntimeError("API down")
 
         with patch.object(
-            web_researcher_module, "_GoogleSearcher", return_value=mock_searcher
+            web_researcher_module,
+            "_GoogleSearcher",
+            return_value=mock_searcher,
         ):
             results = search_google_scholar("topic")
 

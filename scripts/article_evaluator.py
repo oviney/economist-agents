@@ -195,6 +195,7 @@ class ArticleEvaluator:
 
         Returns:
             EvalResult with scores (1-10 each), details, and total.
+
         """
         frontmatter = self._parse_frontmatter(article)
         body = self._extract_body(article)
@@ -238,7 +239,7 @@ class ArticleEvaluator:
     # --- Dimension 1: Opening Quality ---
 
     def _score_opening(self, body: str) -> int:
-        first_para = body.split("\n\n")[0] if body else ""
+        first_para = body.split("\n\n", maxsplit=1)[0] if body else ""
         first_sentence = first_para.split(".")[0] if first_para else ""
 
         # Check for banned openings
@@ -271,7 +272,7 @@ class ArticleEvaluator:
         return 4
 
     def _detail_opening(self, body: str) -> str:
-        first_para = body.split("\n\n")[0] if body else ""
+        first_para = body.split("\n\n", maxsplit=1)[0] if body else ""
         for pattern in _BANNED_OPENINGS:
             if re.search(pattern, first_para, re.IGNORECASE):
                 return f"Banned opening detected: '{pattern}'"
@@ -380,7 +381,10 @@ class ArticleEvaluator:
     # --- Dimension 4: Structure ---
 
     def _score_structure(
-        self, article: str, frontmatter: dict[str, Any], body: str
+        self,
+        article: str,
+        frontmatter: dict[str, Any],
+        body: str,
     ) -> int:
         score = 10
 
@@ -395,7 +399,10 @@ class ArticleEvaluator:
 
         # Check for list formatting in prose (outside References section)
         prose_only = re.sub(
-            r"## References.*", "", body, flags=re.DOTALL | re.IGNORECASE
+            r"## References.*",
+            "",
+            body,
+            flags=re.DOTALL | re.IGNORECASE,
         )
         list_items = re.findall(r"^[-*]\s|^\d+\.\s", prose_only, re.MULTILINE)
         if len(list_items) > 2:
@@ -427,7 +434,10 @@ class ArticleEvaluator:
         missing = [f for f in _REQUIRED_FRONTMATTER if f not in frontmatter]
         has_refs = "## references" in body.lower()
         prose_only = re.sub(
-            r"## References.*", "", body, flags=re.DOTALL | re.IGNORECASE
+            r"## References.*",
+            "",
+            body,
+            flags=re.DOTALL | re.IGNORECASE,
         )
         list_count = len(re.findall(r"^[-*]\s|^\d+\.\s", prose_only, re.MULTILINE))
         parts = [f"{headings} headings", f"{words} words"]

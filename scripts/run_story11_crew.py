@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Story 11: Transplant Logic from Legacy to Crew - Stage 3 Enhancement
+"""Story 11: Transplant Logic from Legacy to Crew - Stage 3 Enhancement
 
 CrewAI migration enhancement for Stage 3, transplanting complete logic and prompts.
 
@@ -57,6 +56,7 @@ def load_agents(registry: AgentRegistry) -> dict:
 
     Returns:
         Dictionary mapping role names to CrewAI Agent instances
+
     """
     agents = {}
     for role in REQUIRED_AGENTS:
@@ -64,7 +64,7 @@ def load_agents(registry: AgentRegistry) -> dict:
         if agent_dict is None:
             raise ValueError(
                 f"Agent '{role}' not found. "
-                f"Available: {', '.join(registry.list_agents())}"
+                f"Available: {', '.join(registry.list_agents())}",
             )
 
         # Convert AgentRegistry output to CrewAI Agent instance
@@ -104,6 +104,7 @@ def define_tasks(agents: dict) -> list[Task]:
 
     Returns:
         List of Task objects for logic transplant workflow
+
     """
     tasks = []
 
@@ -160,7 +161,7 @@ def define_tasks(agents: dict) -> list[Task]:
                 "Step 4: Editor phase (quality gates)\n"
                 "```"
             ),
-        )
+        ),
     )
 
     # ========================================================================
@@ -227,7 +228,7 @@ def define_tasks(agents: dict) -> list[Task]:
                 "- Editor agent with EDITOR_AGENT_PROMPT\n"
                 "- Orchestrated workflow matching legacy\n"
             ),
-        )
+        ),
     )
 
     # ========================================================================
@@ -297,7 +298,7 @@ def define_tasks(agents: dict) -> list[Task]:
                 "- Legacy format mimicry checks\n"
                 "- Comprehensive coverage of output\n"
             ),
-        )
+        ),
     )
 
     # ========================================================================
@@ -343,7 +344,7 @@ def define_tasks(agents: dict) -> list[Task]:
                 "4. Format matches legacy\n"
                 "5. Stage3Crew fully functional\n"
             ),
-        )
+        ),
     )
 
     return tasks

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Tests for Stage3Crew Writer Agent economist-writing skill integration.
+"""Tests for Stage3Crew Writer Agent economist-writing skill integration.
 
 Validates that the writer backstory and task description in stage3_crew.py
 satisfy Story 17.1 acceptance criteria:

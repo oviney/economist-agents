@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Editor Agent Tasks for CrewAI Integration
+"""Editor Agent Tasks for CrewAI Integration
 
 Defines task configurations and utilities for the Editor Agent
 when working within CrewAI framework.
@@ -59,6 +58,7 @@ def create_editor_task_config(
 
     Returns:
         Task configuration dict for CrewAI
+
     """
     return {
         "description": f"""Review and edit this Economist-style article on '{topic}'.
@@ -97,6 +97,7 @@ def create_critique_task_config(
 
     Returns:
         Task configuration dict for CrewAI
+
     """
     return {
         "description": f"""Perform hostile review of this Economist article on '{topic}'.
@@ -135,6 +136,7 @@ def validate_opening(draft: str) -> dict[str, Any]:
 
     Returns:
         Validation result with issues found
+
     """
     lines = draft.split("\n")
     first_two_lines = "\n".join(lines[:2]).lower()
@@ -158,6 +160,7 @@ def validate_closing(draft: str) -> dict[str, Any]:
 
     Returns:
         Validation result with issues found
+
     """
     lines = [line for line in draft.split("\n") if line.strip()]
     last_paragraphs = "\n".join(lines[-6:]).lower()  # Last ~2 paragraphs
@@ -181,6 +184,7 @@ def validate_voice(draft: str) -> dict[str, Any]:
 
     Returns:
         Validation result with issues found
+
     """
     draft_lower = draft.lower()
     issues = []
@@ -227,6 +231,7 @@ def validate_chart_integration(draft: str, has_chart: bool = False) -> dict[str,
 
     Returns:
         Validation result with issues found
+
     """
     issues = []
 
@@ -267,6 +272,7 @@ def parse_quality_gates(response: str) -> dict[str, Any]:
 
     Returns:
         Parsed gate results with counts and details
+
     """
     # Extract individual gate results first to get accurate count
     gate_results = {}
@@ -313,6 +319,7 @@ def extract_edited_article(response: str) -> str | None:
 
     Returns:
         Edited article text or None if not found
+
     """
     if "## Edited Article" not in response:
         return None
@@ -350,6 +357,7 @@ def validate_all_gates(
 
     Returns:
         Combined validation results
+
     """
     results = {
         "opening": validate_opening(draft),

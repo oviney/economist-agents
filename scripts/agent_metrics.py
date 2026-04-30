@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Agent Performance Metrics Tracker
+"""Agent Performance Metrics Tracker
 
 Tracks per-agent predictions vs actuals to identify improvement opportunities.
 Stores metrics in data/skills_state/agent_metrics.json with historical trends.
@@ -97,7 +96,6 @@ class AgentMetrics:
         token_usage: int = 0,
     ):
         """Track Writer Agent performance"""
-
         # Calculate quality score (0-100)
         quality_score = 100
         if banned_phrases > 0:
@@ -273,7 +271,8 @@ class AgentMetrics:
                     if rates
                     else 0,
                     "avg_quality_score": round(
-                        sum(quality_scores) / len(quality_scores), 1
+                        sum(quality_scores) / len(quality_scores),
+                        1,
                     )
                     if quality_scores
                     else 0,
@@ -293,7 +292,8 @@ class AgentMetrics:
                     if regen_counts
                     else 0,
                     "avg_quality_score": round(
-                        sum(quality_scores) / len(quality_scores), 1
+                        sum(quality_scores) / len(quality_scores),
+                        1,
                     )
                     if quality_scores
                     else 0,
@@ -316,7 +316,8 @@ class AgentMetrics:
                     if pass_rates
                     else 0,
                     "avg_quality_score": round(
-                        sum(quality_scores) / len(quality_scores), 1
+                        sum(quality_scores) / len(quality_scores),
+                        1,
                     )
                     if quality_scores
                     else 0,
@@ -336,7 +337,8 @@ class AgentMetrics:
                     if qa_rates
                     else 0,
                     "avg_quality_score": round(
-                        sum(quality_scores) / len(quality_scores), 1
+                        sum(quality_scores) / len(quality_scores),
+                        1,
                     )
                     if quality_scores
                     else 0,
@@ -359,10 +361,9 @@ class AgentMetrics:
         diff = second_half - first_half
         if diff > 5:
             return "improving ⬆️"
-        elif diff < -5:
+        if diff < -5:
             return "declining ⬇️"
-        else:
-            return "stable ➡️"
+        return "stable ➡️"
 
     def get_latest_run(self) -> dict[str, Any] | None:
         """Get most recent run data"""
@@ -371,14 +372,16 @@ class AgentMetrics:
         return None
 
     def get_agent_history(
-        self, agent_name: str, last_n: int = 10
+        self,
+        agent_name: str,
+        last_n: int = 10,
     ) -> list[dict[str, Any]]:
         """Get last N runs for specific agent"""
         agent_runs = []
         for run in reversed(self.metrics["runs"]):
             if agent_name in run["agents"]:
                 agent_runs.append(
-                    {"timestamp": run["timestamp"], **run["agents"][agent_name]}
+                    {"timestamp": run["timestamp"], **run["agents"][agent_name]},
                 )
                 if len(agent_runs) >= last_n:
                     break
@@ -404,33 +407,33 @@ class AgentMetrics:
             # Common metrics
             report.append(f"  Quality Score: {stats.get('avg_quality_score', 0)}/100")
             report.append(
-                f"  Validation Pass Rate: {stats.get('validation_pass_rate', 0)}%"
+                f"  Validation Pass Rate: {stats.get('validation_pass_rate', 0)}%",
             )
 
             if agent_name == "research_agent":
                 report.append(
-                    f"  Average Verification Rate: {stats.get('avg_verification_rate', 0)}%"
+                    f"  Average Verification Rate: {stats.get('avg_verification_rate', 0)}%",
                 )
                 report.append(f"  Trend: {stats.get('trend', 'N/A')}")
 
             elif agent_name == "writer_agent":
                 report.append(
-                    f"  Clean Draft Rate: {stats.get('clean_draft_rate', 0)}%"
+                    f"  Clean Draft Rate: {stats.get('clean_draft_rate', 0)}%",
                 )
                 report.append(f"  Rework Rate: {stats.get('rework_rate', 0)}%")
                 report.append(
-                    f"  Average Regenerations: {stats.get('avg_regenerations', 0)}"
+                    f"  Average Regenerations: {stats.get('avg_regenerations', 0)}",
                 )
 
             elif agent_name == "editor_agent":
                 report.append(
-                    f"  Average Gate Pass Rate: {stats.get('avg_gate_pass_rate', 0)}%"
+                    f"  Average Gate Pass Rate: {stats.get('avg_gate_pass_rate', 0)}%",
                 )
                 report.append(f"  Trend: {stats.get('trend', 'N/A')}")
 
             elif agent_name == "graphics_agent":
                 report.append(
-                    f"  Average Visual QA Pass Rate: {stats.get('avg_qa_pass_rate', 0)}%"
+                    f"  Average Visual QA Pass Rate: {stats.get('avg_qa_pass_rate', 0)}%",
                 )
                 report.append(f"  Average Violations: {stats.get('avg_violations', 0)}")
 
@@ -459,11 +462,17 @@ if __name__ == "__main__":
     )
 
     metrics.track_editor_agent(
-        gates_passed=5, gates_failed=0, edits_made=12, quality_issues=[]
+        gates_passed=5,
+        gates_failed=0,
+        edits_made=12,
+        quality_issues=[],
     )
 
     metrics.track_graphics_agent(
-        charts_generated=1, visual_qa_passed=1, zone_violations=0, regenerations=0
+        charts_generated=1,
+        visual_qa_passed=1,
+        zone_violations=0,
+        regenerations=0,
     )
 
     metrics.save()

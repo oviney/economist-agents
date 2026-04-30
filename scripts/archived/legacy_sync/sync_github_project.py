@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-GitHub Projects Board Synchronization
+"""GitHub Projects Board Synchronization
 
 Syncs Sprint 9 backlog to GitHub Projects for visibility and tracking.
 Creates project board with all stories, configures fields, and sets up automation.
@@ -39,7 +38,7 @@ class GitHubProjectSync:
             # Debug output for failures
             if result.returncode != 0:
                 print(
-                    f"   DEBUG: gh {' '.join(args[:2])} failed (code {result.returncode})"
+                    f"   DEBUG: gh {' '.join(args[:2])} failed (code {result.returncode})",
                 )
                 if result.stderr:
                     print(f"   DEBUG: stderr={result.stderr[:300]}")
@@ -89,7 +88,7 @@ class GitHubProjectSync:
                 title,
                 "--format",
                 "json",
-            ]
+            ],
         )
 
         if code != 0:
@@ -166,7 +165,7 @@ class GitHubProjectSync:
                     body,
                     "--label",
                     ",".join(labels),
-                ]
+                ],
             )
 
             if code != 0:
@@ -183,7 +182,7 @@ class GitHubProjectSync:
                     "issue_number": issue_num,
                     "issue_url": issue_url,
                     "title": title,
-                }
+                },
             )
 
             print(f"   ✅ Created issue #{issue_num}: {issue_url}")
@@ -209,7 +208,7 @@ class GitHubProjectSync:
                     self.repo.split("/")[0],
                     "--url",
                     f"https://github.com/{self.repo}/issues/{issue_num}",
-                ]
+                ],
             )
 
             if code != 0:
@@ -301,7 +300,7 @@ class GitHubProjectSync:
         print("=" * 70)
         print(f"Status: {sprint.get('status', 'unknown')}")
         print(
-            f"Points Delivered: {sprint.get('points_delivered', 0)}/{sprint.get('capacity', 0)}"
+            f"Points Delivered: {sprint.get('points_delivered', 0)}/{sprint.get('capacity', 0)}",
         )
         print(f"Completion: {sprint.get('completion_rate', 0) * 100:.0f}%")
 
@@ -318,7 +317,7 @@ class GitHubProjectSync:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Sync sprint backlog to GitHub Projects"
+        description="Sync sprint backlog to GitHub Projects",
     )
     parser.add_argument(
         "--create",
@@ -326,10 +325,15 @@ def main():
         help="Create new GitHub Project board with all stories",
     )
     parser.add_argument(
-        "--status", action="store_true", help="Show current GitHub sync status"
+        "--status",
+        action="store_true",
+        help="Show current GitHub sync status",
     )
     parser.add_argument(
-        "--sprint", type=int, default=9, help="Sprint number to sync (default: 9)"
+        "--sprint",
+        type=int,
+        default=9,
+        help="Sprint number to sync (default: 9)",
     )
 
     args = parser.parse_args()

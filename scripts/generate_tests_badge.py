@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Tests Badge Generator
+"""Tests Badge Generator
 
 Generates shields.io JSON endpoint for Tests badge from pytest test count.
 
@@ -27,7 +26,7 @@ def count_tests() -> int:
             text=True,
         )
         test_count = int(result.stdout.strip())
-        return test_count if test_count > 0 else 0
+        return max(0, test_count)
     except Exception as e:
         print(f"⚠️  Error counting tests: {e}")
         return 0

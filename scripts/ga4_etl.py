@@ -136,13 +136,15 @@ def build_ga4_client(credentials_path: str | None = None) -> BetaAnalyticsDataCl
 
     Returns:
         An authenticated GA4 Data API client.
+
     """
     creds_file = credentials_path or os.environ.get(
-        "GOOGLE_APPLICATION_CREDENTIALS", ""
+        "GOOGLE_APPLICATION_CREDENTIALS",
+        "",
     )
     if not creds_file:
         raise OSError(
-            "GOOGLE_APPLICATION_CREDENTIALS is not set and no credentials_path provided"
+            "GOOGLE_APPLICATION_CREDENTIALS is not set and no credentials_path provided",
         )
     credentials = Credentials.from_service_account_file(creds_file, scopes=GA4_SCOPES)
     return BetaAnalyticsDataClient(credentials=credentials)
@@ -162,6 +164,7 @@ def fetch_ga4_report(
 
     Returns:
         The raw ``RunReportResponse`` from the GA4 Data API.
+
     """
     request = RunReportRequest(
         property=f"properties/{property_id}",
@@ -191,6 +194,7 @@ def parse_rows(response: RunReportResponse) -> list[dict[str, Any]]:
     Returns:
         A list of dicts with keys: page_path, page_title, date,
         pageviews, engagement_rate, avg_engagement_time, scroll_depth_rate.
+
     """
     rows: list[dict[str, Any]] = []
     if not response.rows:
@@ -212,7 +216,7 @@ def parse_rows(response: RunReportResponse) -> list[dict[str, Any]]:
                 "engagement_rate": float(mets[1].value),
                 "avg_engagement_time": float(mets[2].value),
                 "scroll_depth_rate": scroll_depth_rate,
-            }
+            },
         )
     logger.info("Parsed %d rows from GA4 response", len(rows))
     return rows
@@ -236,6 +240,7 @@ def compute_scores(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     Returns:
         The same rows, each augmented with a ``composite_score`` key.
         Scores are in the range [0.0, 1.0] for any non-degenerate input.
+
     """
     if not rows:
         return rows
@@ -269,6 +274,7 @@ def store_results(
 
     Returns:
         Number of rows inserted.
+
     """
     db_path = pathlib.Path(db_path)
     db_path.parent.mkdir(parents=True, exist_ok=True)

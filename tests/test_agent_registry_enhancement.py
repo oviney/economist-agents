@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Tests for Agent Registry Pattern Implementation - Issue #27
+"""Tests for Agent Registry Pattern Implementation - Issue #27
 
 These tests validate the requirements from Issue #27:
 - AgentRegistry class with full functionality

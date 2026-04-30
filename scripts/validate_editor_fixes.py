@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Sprint 8 Story 4: Editor Agent Validation
+"""Sprint 8 Story 4: Editor Agent Validation
 
 Generates 10 test articles to validate:
 1. Gate counting fix (exactly 5 gates parsed)
@@ -128,7 +127,7 @@ def main():
                 else "❌ FAIL"
             )
             print(
-                f"   Result: {gates_passed}/5 gates passed ({result['pass_rate']:.1f}%) - {status}"
+                f"   Result: {gates_passed}/5 gates passed ({result['pass_rate']:.1f}%) - {status}",
             )
 
         except Exception as e:
@@ -142,7 +141,7 @@ def main():
                     "gates_failed": 0,
                     "total_gates": 0,
                     "pass_rate": 0,
-                }
+                },
             )
 
     # Calculate final statistics
@@ -161,13 +160,13 @@ def main():
 
     if successful_runs:
         avg_pass_rate = sum(r["pass_rate"] for r in successful_runs) / len(
-            successful_runs
+            successful_runs,
         )
         perfect_runs = sum(1 for r in successful_runs if r["gates_passed"] == 5)
 
         print(f"Average gate pass rate: {avg_pass_rate:.1f}%")
         print(
-            f"Perfect runs (5/5 gates): {perfect_runs}/10 ({perfect_runs / 10 * 100:.0f}%)"
+            f"Perfect runs (5/5 gates): {perfect_runs}/10 ({perfect_runs / 10 * 100:.0f}%)",
         )
         print()
 
@@ -182,7 +181,7 @@ def main():
             status_code = 1
         else:
             print(
-                f"❌ OBJECTIVE NOT MET: Gate pass rate {avg_pass_rate:.1f}% (target: 95%)"
+                f"❌ OBJECTIVE NOT MET: Gate pass rate {avg_pass_rate:.1f}% (target: 95%)",
             )
             status_code = 2
 
@@ -192,7 +191,7 @@ def main():
             print("✅ Gate counting fix VALIDATED: All runs parsed exactly 5 gates")
         else:
             print(
-                f"⚠️  Gate counting issues: {gate_count_issues}/10 runs had wrong gate count"
+                f"⚠️  Gate counting issues: {gate_count_issues}/10 runs had wrong gate count",
             )
 
         # Save results

@@ -123,6 +123,7 @@ def verify_citations(
     Returns:
         The same dict with updated ``verified`` flags and
         ``unverified_claims`` list.
+
     """
     fetch = fetch_fn or _fetch_page_text
     data_points = research_data.get("data_points", [])
@@ -147,7 +148,9 @@ def verify_citations(
             # Couldn't fetch — mark unverified but don't penalise
             # (network issues shouldn't block the pipeline)
             logger.info(
-                "Could not fetch %s — leaving verified=%s", url, dp.get("verified")
+                "Could not fetch %s — leaving verified=%s",
+                url,
+                dp.get("verified"),
             )
             continue
 
@@ -171,7 +174,7 @@ def verify_citations(
         if page_text and not _stat_appears_in_text(headline_stat, page_text):
             headline["verified"] = False
             unverified.append(
-                f"HEADLINE: {headline_stat} (not found in {headline_url})"
+                f"HEADLINE: {headline_stat} (not found in {headline_url})",
             )
             failed_count += 1
             logger.warning("❌ Headline unverified: '%s'", headline_stat[:60])

@@ -85,7 +85,8 @@ class TestOpeningQuality:
         assert result.scores["opening_quality"] <= 3
 
     def test_abstract_noun_opening_scores_low(
-        self, evaluator: ArticleEvaluator
+        self,
+        evaluator: ArticleEvaluator,
     ) -> None:
         article = "---\nlayout: post\ntitle: Test\ndate: 2026-04-05\ncategories: []\nimage: x.png\n---\n\nThe arrival of AI tools has changed testing.\n\nMore content here."
         result = evaluator.evaluate(article)

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Defect Tracking & Bug Metrics
+"""Defect Tracking & Bug Metrics
 
 Tracks bugs discovered, fixed, and leaked to production.
 Provides quality metrics and defect escape rate analysis.
@@ -137,6 +136,7 @@ class DefectTracker:
         Args:
             responsible_agent: Which agent produced buggy output
                              (research_agent, writer_agent, graphics_agent, editor_agent)
+
         """
         if severity not in self.SEVERITIES:
             raise ValueError(f"Severity must be one of {self.SEVERITIES}")
@@ -401,8 +401,7 @@ class DefectTracker:
         expected_behavior: str,
         original_story: str = None,
     ) -> dict[str, Any]:
-        """
-        Validate if behavior was explicitly required before logging as bug.
+        """Validate if behavior was explicitly required before logging as bug.
 
         Sprint 7 Day 2: Requirements traceability gate to prevent misclassification.
 
@@ -421,6 +420,7 @@ class DefectTracker:
                 "recommendation": str,
                 "confidence": "high" | "medium" | "low"
             }
+
         """
         # Load requirements registry if available
         registry_path = (
@@ -499,8 +499,7 @@ class DefectTracker:
         original_story: str = None,
         requirement_existed: bool = False,
     ) -> None:
-        """
-        Reclassify a bug as a feature enhancement.
+        """Reclassify a bug as a feature enhancement.
 
         Sprint 7 Day 2: Support for requirements gap reclassification.
 
@@ -510,6 +509,7 @@ class DefectTracker:
             reason: Reclassification justification
             original_story: Story where component was implemented
             requirement_existed: Was this behavior explicitly required?
+
         """
         bug = next((b for b in self.tracker["bugs"] if b["id"] == bug_id), None)
         if not bug:
@@ -536,7 +536,7 @@ class DefectTracker:
 
         # Note: Caller should update feature_registry.json separately
         print(
-            f"\n⚠️  ACTION REQUIRED: Update data/skills_state/feature_registry.json with {feature_id} details"
+            f"\n⚠️  ACTION REQUIRED: Update data/skills_state/feature_registry.json with {feature_id} details",
         )
 
     def save(self) -> None:
@@ -573,7 +573,7 @@ class DefectTracker:
             [
                 "",
                 "## By Discovery Stage",
-            ]
+            ],
         )
 
         for stage, count in metrics["by_stage"].items():
@@ -586,7 +586,7 @@ class DefectTracker:
                 [
                     "",
                     "## 🔍 Root Cause Analysis",
-                ]
+                ],
             )
             sorted_causes = sorted(
                 metrics["root_cause_distribution"].items(),
@@ -600,7 +600,7 @@ class DefectTracker:
                     else 0
                 )
                 report.append(
-                    f"- **{cause.replace('_', ' ').title()}**: {count} ({pct:.0f}%)"
+                    f"- **{cause.replace('_', ' ').title()}**: {count} ({pct:.0f}%)",
                 )
 
         # NEW: Test Gap Analysis
@@ -609,7 +609,7 @@ class DefectTracker:
                 [
                     "",
                     "## 🧪 Test Gap Analysis",
-                ]
+                ],
             )
             sorted_gaps = sorted(
                 metrics["test_gap_distribution"].items(),
@@ -623,7 +623,7 @@ class DefectTracker:
                     else 0
                 )
                 report.append(
-                    f"- **{gap.replace('_', ' ').title()}**: {count} ({pct:.0f}%)"
+                    f"- **{gap.replace('_', ' ').title()}**: {count} ({pct:.0f}%)",
                 )
 
         # NEW: Time Metrics
@@ -633,15 +633,15 @@ class DefectTracker:
                     "",
                     "## ⏱️ Time Metrics",
                     f"- **Avg Time to Detect**: {metrics['avg_time_to_detect_days']} days",
-                ]
+                ],
             )
             if metrics.get("avg_critical_ttd_days") is not None:
                 report.append(
-                    f"- **Avg Critical Bug TTD**: {metrics['avg_critical_ttd_days']} days"
+                    f"- **Avg Critical Bug TTD**: {metrics['avg_critical_ttd_days']} days",
                 )
             if metrics.get("avg_time_to_resolve_days") is not None:
                 report.append(
-                    f"- **Avg Time to Resolve**: {metrics['avg_time_to_resolve_days']} days"
+                    f"- **Avg Time to Resolve**: {metrics['avg_time_to_resolve_days']} days",
                 )
 
         if production_bugs:
@@ -649,7 +649,7 @@ class DefectTracker:
                 [
                     "",
                     "## 🚨 Production Escapes",
-                ]
+                ],
             )
             for bug in production_bugs:
                 status = "✅ Fixed" if bug["status"] == "fixed" else "🔴 Open"
@@ -658,11 +658,11 @@ class DefectTracker:
                     report.append(f"  - GitHub Issue: #{bug['github_issue']}")
                 if bug.get("root_cause"):
                     report.append(
-                        f"  - Root Cause: {bug['root_cause'].replace('_', ' ')}"
+                        f"  - Root Cause: {bug['root_cause'].replace('_', ' ')}",
                     )
                 if bug.get("time_to_detect_days") is not None:
                     report.append(
-                        f"  - Time to Detect: {bug['time_to_detect_days']} days"
+                        f"  - Time to Detect: {bug['time_to_detect_days']} days",
                     )
 
         if open_bugs:
@@ -670,12 +670,12 @@ class DefectTracker:
                 [
                     "",
                     "## 🔴 Open Bugs",
-                ]
+                ],
             )
             for bug in open_bugs:
                 escape = " [PRODUCTION]" if bug["is_production_escape"] else ""
                 report.append(
-                    f"- **{bug['id']}** ({bug['severity']}){escape}: {bug['description']}"
+                    f"- **{bug['id']}** ({bug['severity']}){escape}: {bug['description']}",
                 )
 
         return "\n".join(report)

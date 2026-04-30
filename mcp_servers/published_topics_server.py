@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Published Topics MCP Server
+"""Published Topics MCP Server
 
 Exposes the published article archive as MCP tools so that topic
 deduplication works from both interactive (Claude Code) and automated
@@ -66,8 +65,7 @@ def query_published_topics(
     query: str,
     n_results: int = 5,
 ) -> list[dict[str, Any]]:
-    """
-    Return the *n_results* most similar published articles for a topic query.
+    """Return the *n_results* most similar published articles for a topic query.
 
     Unlike ``search_published_topics``, this tool applies no similarity
     threshold — it always returns the closest matches sorted by descending
@@ -81,6 +79,7 @@ def query_published_topics(
         List of matching articles, each with title, thesis, date,
         categories, file_path, and similarity score.
         On failure returns an empty list.
+
     """
     try:
         return _get_archive().search(query, threshold=0.0, n_results=n_results)
@@ -91,8 +90,7 @@ def query_published_topics(
 
 @mcp.tool()
 def is_topic_duplicate(topic: str) -> dict[str, Any]:
-    """
-    Check whether a proposed topic has already been covered.
+    """Check whether a proposed topic has already been covered.
 
     Thresholds:
       - similarity > 0.8  -> duplicate (is_duplicate=True)
@@ -109,6 +107,7 @@ def is_topic_duplicate(topic: str) -> dict[str, Any]:
           - similar_articles (list): Up to 5 similar articles with metadata.
           - warning (bool): True when 0.6 <= confidence <= 0.8.
         On failure, returns is_duplicate=False, confidence=0.0 with an error key.
+
     """
     try:
         similar = _get_archive().search(topic, threshold=0.6, n_results=5)
@@ -136,8 +135,7 @@ def search_published_topics(
     threshold: float = 0.6,
     n_results: int = 5,
 ) -> list[dict[str, Any]]:
-    """
-    Search for published articles similar to the given topic query.
+    """Search for published articles similar to the given topic query.
 
     Args:
         query: Topic description or title to search for.
@@ -148,6 +146,7 @@ def search_published_topics(
         List of matching articles, each with title, thesis, date,
         categories, file_path, and similarity score.
         On failure returns an empty list.
+
     """
     try:
         return _get_archive().search(query, threshold=threshold, n_results=n_results)
@@ -164,8 +163,7 @@ def index_published_article(
     categories: str,
     file_path: str,
 ) -> dict[str, Any]:
-    """
-    Index a published article in the archive.
+    """Index a published article in the archive.
 
     Args:
         title: Article title.
@@ -177,6 +175,7 @@ def index_published_article(
     Returns:
         dict with success (bool), id (str), and total_indexed (int).
         On failure, includes an error (str) field instead of total_indexed.
+
     """
     try:
         # index_article returns a success/error dict rather than raising, so
@@ -190,14 +189,14 @@ def index_published_article(
 
 @mcp.tool()
 def get_archive_stats() -> dict[str, Any]:
-    """
-    Return statistics about the published article archive.
+    """Return statistics about the published article archive.
 
     Returns:
         dict with available (bool), total_articles (int),
         date_range (dict with earliest/latest), and
         category_distribution (dict mapping category to count).
         On failure, returns available=False with an error key.
+
     """
     try:
         return _get_archive().get_stats()

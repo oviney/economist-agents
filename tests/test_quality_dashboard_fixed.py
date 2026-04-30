@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Sprint 12 Story 1 Task 3: Dashboard Validation Tests
+"""Sprint 12 Story 1 Task 3: Dashboard Validation Tests
 
 Tests validate:
 1. Agent metrics show real data (no fake baselines)

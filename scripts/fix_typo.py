@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Fix Typo Script - Fix package name typo in src/crews/stage3_crew.py
+"""Fix Typo Script - Fix package name typo in src/crews/stage3_crew.py
 
 Goal: Replace all instances of 'crew_ai' with 'crewai' in imports.
 
@@ -14,7 +13,6 @@ from pathlib import Path
 
 def fix_typo():
     """Fix the package name typo in src/crews/stage3_crew.py"""
-
     # Define file path
     file_path = Path("src/crews/stage3_crew.py")
 
@@ -49,9 +47,8 @@ def fix_typo():
         file_path.write_text(content)
         print(f"✅ Successfully fixed {changes_made} typo(s) in {file_path}")
         return True
-    else:
-        print(f"ℹ️  No typos found in {file_path}")
-        return False
+    print(f"ℹ️  No typos found in {file_path}")
+    return False
 
 
 def main():

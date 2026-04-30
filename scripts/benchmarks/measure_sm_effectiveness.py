@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Scrum Master Agent Effectiveness Benchmark (Story 4)
+"""Scrum Master Agent Effectiveness Benchmark (Story 4)
 
 Measures Scrum Master agent's routing intelligence using the new Registry pattern.
 Tests real LLM responses (no mocking) across 10 diverse request scenarios.
@@ -154,6 +153,7 @@ class SMEffectivenessBenchmark:
 
         Returns:
             Dict with agent response and metadata
+
         """
         start_time = time.time()
 
@@ -223,7 +223,9 @@ Respond in JSON format:
             }
 
     def _evaluate_response(
-        self, scenario: dict[str, Any], agent_result: dict[str, Any]
+        self,
+        scenario: dict[str, Any],
+        agent_result: dict[str, Any],
     ) -> dict[str, Any]:
         """Evaluate if agent's response matches expected routing.
 
@@ -233,6 +235,7 @@ Respond in JSON format:
 
         Returns:
             Evaluation results with correctness flags
+
         """
         if not agent_result["success"]:
             return {
@@ -252,7 +255,8 @@ Respond in JSON format:
         }
 
         actual_routing = decision_to_routing.get(
-            response.get("decision", ""), "unknown"
+            response.get("decision", ""),
+            "unknown",
         )
         expected_routing = scenario["expected_routing"]
 
@@ -277,7 +281,7 @@ Respond in JSON format:
         notes = []
         if not routing_correct:
             notes.append(
-                f"Expected routing '{expected_routing}', got '{actual_routing}'"
+                f"Expected routing '{expected_routing}', got '{actual_routing}'",
             )
         if not dor_correct:
             notes.append(f"Expected DoR {expected_dor}, got {actual_dor}")
@@ -296,6 +300,7 @@ Respond in JSON format:
 
         Returns:
             Complete benchmark results with metrics
+
         """
         print(f"\n{'=' * 70}")
         print("SM Agent Effectiveness Benchmark (Story 4)")
@@ -373,13 +378,13 @@ Respond in JSON format:
         print(f"{'=' * 70}\n")
         print(f"Total Tests:           {total_tests}")
         print(
-            f"Routing Accuracy:      {routing_accuracy:.1f}% ({correct_routing}/{total_tests})"
+            f"Routing Accuracy:      {routing_accuracy:.1f}% ({correct_routing}/{total_tests})",
         )
         print(
-            f"DoR Compliance Rate:   {dor_compliance_rate:.1f}% ({correct_dor}/{total_tests}) {'✅' if dor_compliance_rate >= 90 else '❌'}"
+            f"DoR Compliance Rate:   {dor_compliance_rate:.1f}% ({correct_dor}/{total_tests}) {'✅' if dor_compliance_rate >= 90 else '❌'}",
         )
         print(
-            f"Escalation Rate:       {escalation_rate:.1f}% ({escalations}/{total_tests})"
+            f"Escalation Rate:       {escalation_rate:.1f}% ({escalations}/{total_tests})",
         )
         print(f"Accepts:               {accepts}")
         print(f"Refusals:              {refusals}")
@@ -421,6 +426,7 @@ Respond in JSON format:
         Args:
             results: Benchmark results dictionary
             output_path: Path to save report
+
         """
         output_path.parent.mkdir(parents=True, exist_ok=True)
 

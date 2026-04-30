@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Sprint Ceremony Tracker
+"""Sprint Ceremony Tracker
 
 Enforces Definition of Ready and tracks sprint ceremony completion.
 Prevents DoR violations by blocking sprint planning without proper ceremonies.
@@ -87,7 +86,7 @@ class SprintCeremonyTracker:
                 "retrospective_done": False,
                 "backlog_refined": False,
                 "next_sprint_dor_met": False,
-            }
+            },
         )
 
         self.tracker["current_sprint"] = sprint_number
@@ -95,7 +94,7 @@ class SprintCeremonyTracker:
 
         print(f"✅ Sprint {sprint_number} marked complete")
         print(
-            f"⚠️  Next: Complete retrospective before starting Sprint {sprint_number + 1}"
+            f"⚠️  Next: Complete retrospective before starting Sprint {sprint_number + 1}",
         )
 
     def can_start_sprint(self, sprint_number: int) -> bool:
@@ -108,7 +107,7 @@ class SprintCeremonyTracker:
         if prev_sprint_key not in self.tracker["sprints"]:
             print(f"❌ BLOCKED: Sprint {sprint_number - 1} not found in tracker")
             print(
-                f"   Run: python3 sprint_ceremony_tracker.py --end-sprint {sprint_number - 1}"
+                f"   Run: python3 sprint_ceremony_tracker.py --end-sprint {sprint_number - 1}",
             )
             return False
 
@@ -118,21 +117,21 @@ class SprintCeremonyTracker:
         if not prev_sprint.get("retrospective_done", False):
             print(f"❌ BLOCKED: Sprint {sprint_number - 1} retrospective not complete")
             print(
-                f"   Run: python3 sprint_ceremony_tracker.py --retrospective {sprint_number - 1}"
+                f"   Run: python3 sprint_ceremony_tracker.py --retrospective {sprint_number - 1}",
             )
             return False
 
         if not prev_sprint.get("backlog_refined", False):
             print(f"❌ BLOCKED: Sprint {sprint_number} backlog not refined")
             print(
-                f"   Run: python3 sprint_ceremony_tracker.py --refine-backlog {sprint_number}"
+                f"   Run: python3 sprint_ceremony_tracker.py --refine-backlog {sprint_number}",
             )
             return False
 
         if not prev_sprint.get("next_sprint_dor_met", False):
             print(f"❌ BLOCKED: Sprint {sprint_number} Definition of Ready not met")
             print(
-                f"   Run: python3 sprint_ceremony_tracker.py --validate-dor {sprint_number}"
+                f"   Run: python3 sprint_ceremony_tracker.py --validate-dor {sprint_number}",
             )
             return False
 
@@ -146,18 +145,18 @@ class SprintCeremonyTracker:
 
             if days_since_grooming > self.MAX_DAYS_SINCE_GROOMING:
                 print(
-                    f"⚠️  RECOMMENDED: Backlog grooming is {days_since_grooming} days old (>14 days)"
+                    f"⚠️  RECOMMENDED: Backlog grooming is {days_since_grooming} days old (>14 days)",
                 )
                 print("   Run: python3 scripts/backlog_groomer.py --report")
                 print(
-                    f"   Or: python3 sprint_ceremony_tracker.py --groom {sprint_number - 1}"
+                    f"   Or: python3 sprint_ceremony_tracker.py --groom {sprint_number - 1}",
                 )
         else:
             print(
-                f"⚠️  RECOMMENDED: No backlog grooming recorded for Sprint {sprint_number - 1}"
+                f"⚠️  RECOMMENDED: No backlog grooming recorded for Sprint {sprint_number - 1}",
             )
             print(
-                f"   Run: python3 sprint_ceremony_tracker.py --groom {sprint_number - 1}"
+                f"   Run: python3 sprint_ceremony_tracker.py --groom {sprint_number - 1}",
             )
 
         print(f"✅ Sprint {sprint_number} ready to start - all ceremonies complete")
@@ -287,7 +286,9 @@ class SprintCeremonyTracker:
         return str(template_path)
 
     def complete_backlog_grooming(
-        self, sprint_number: int, dry_run: bool = False
+        self,
+        sprint_number: int,
+        dry_run: bool = False,
     ) -> dict:
         """Complete backlog grooming ceremony and update health metrics"""
         sprint_key = f"sprint_{sprint_number}"
@@ -347,7 +348,7 @@ class SprintCeremonyTracker:
                     and health_score > self.MAX_BACKLOG_HEALTH_SCORE
                 ):
                     print(
-                        f"\n⚠️  QUALITY GATE FAILED: Health score {health_score:.1f}% > {self.MAX_BACKLOG_HEALTH_SCORE}% target"
+                        f"\n⚠️  QUALITY GATE FAILED: Health score {health_score:.1f}% > {self.MAX_BACKLOG_HEALTH_SCORE}% target",
                     )
                     print("   Run: python3 scripts/backlog_groomer.py --clean")
                     return {
@@ -355,29 +356,26 @@ class SprintCeremonyTracker:
                         "health_score": health_score,
                         "gate_passed": False,
                     }
-                else:
-                    print("\n✅ Backlog Grooming complete")
-                    if health_score is not None:
-                        print(
-                            f"   Health Score: {health_score:.1f}% (target: <{self.MAX_BACKLOG_HEALTH_SCORE}%)"
-                        )
-                    return {
-                        "success": True,
-                        "health_score": health_score,
-                        "gate_passed": True,
-                    }
-            else:
-                print(f"❌ Backlog groomer failed: {result.stderr}")
-                return {"success": False, "error": result.stderr}
-        else:
-            print(f"⚠️  Backlog groomer script not found: {groomer_script}")
-            print("   Marking grooming complete without automated health check")
-            self.tracker["sprints"][sprint_key]["backlog_groomed"] = True
-            self.tracker["sprints"][sprint_key]["grooming_date"] = (
-                datetime.now().isoformat()
-            )
-            self.save()
-            return {"success": True, "health_score": None, "gate_passed": True}
+                print("\n✅ Backlog Grooming complete")
+                if health_score is not None:
+                    print(
+                        f"   Health Score: {health_score:.1f}% (target: <{self.MAX_BACKLOG_HEALTH_SCORE}%)",
+                    )
+                return {
+                    "success": True,
+                    "health_score": health_score,
+                    "gate_passed": True,
+                }
+            print(f"❌ Backlog groomer failed: {result.stderr}")
+            return {"success": False, "error": result.stderr}
+        print(f"⚠️  Backlog groomer script not found: {groomer_script}")
+        print("   Marking grooming complete without automated health check")
+        self.tracker["sprints"][sprint_key]["backlog_groomed"] = True
+        self.tracker["sprints"][sprint_key]["grooming_date"] = (
+            datetime.now().isoformat()
+        )
+        self.save()
+        return {"success": True, "health_score": None, "gate_passed": True}
 
     def _generate_story_template(self, sprint_number: int) -> Path:
         """Generate story template for sprint planning"""
@@ -556,7 +554,8 @@ Total Estimate: [Sum of tasks]
 
         # List all sprints
         for sprint_key in sorted(
-            self.tracker["sprints"].keys(), key=lambda x: int(x.split("_")[1])
+            self.tracker["sprints"].keys(),
+            key=lambda x: int(x.split("_")[1]),
         ):
             sprint_num = sprint_key.split("_")[1]
             sprint = self.tracker["sprints"][sprint_key]
@@ -580,7 +579,7 @@ Total Estimate: [Sum of tasks]
                 report.append(f"    Completed: {sprint['retrospective_date'][:10]}")
 
             report.append(
-                f"  Backlog Refined: {'✅ Done' if backlog else '❌ Not done'}"
+                f"  Backlog Refined: {'✅ Done' if backlog else '❌ Not done'}",
             )
             if sprint.get("refinement_date"):
                 report.append(f"    Completed: {sprint['refinement_date'][:10]}")
@@ -599,23 +598,23 @@ Total Estimate: [Sum of tasks]
                 if not current_sprint.get("retrospective_done", False):
                     report.append(f"  1. Complete Sprint {current} retrospective")
                     report.append(
-                        f"     Run: python3 sprint_ceremony_tracker.py --retrospective {current}"
+                        f"     Run: python3 sprint_ceremony_tracker.py --retrospective {current}",
                     )
                 elif not current_sprint.get("backlog_refined", False):
                     report.append(f"  1. Refine Sprint {current + 1} backlog")
                     report.append(
-                        f"     Run: python3 sprint_ceremony_tracker.py --refine-backlog {current + 1}"
+                        f"     Run: python3 sprint_ceremony_tracker.py --refine-backlog {current + 1}",
                     )
                 elif not current_sprint.get("next_sprint_dor_met", False):
                     report.append(
-                        f"  1. Validate Sprint {current + 1} Definition of Ready"
+                        f"  1. Validate Sprint {current + 1} Definition of Ready",
                     )
                     report.append(
-                        f"     Run: python3 sprint_ceremony_tracker.py --validate-dor {current + 1}"
+                        f"     Run: python3 sprint_ceremony_tracker.py --validate-dor {current + 1}",
                     )
                 else:
                     report.append(
-                        f"  ✅ All ceremonies complete - Sprint {current + 1} ready to start"
+                        f"  ✅ All ceremonies complete - Sprint {current + 1} ready to start",
                     )
 
         report.append("=" * 60)
@@ -713,7 +712,10 @@ Total Estimate: [Sum of tasks]
         return False
 
     def update_documentation_story_complete(
-        self, sprint_number: int, story_id: int, story_name: str
+        self,
+        sprint_number: int,
+        story_id: int,
+        story_name: str,
     ) -> bool:
         """Update CHANGELOG.md and SPRINT.md when a story completes"""
         print(f"\n📝 Updating documentation for Story {story_id} completion...")
@@ -793,10 +795,16 @@ Examples:
     )
 
     parser.add_argument(
-        "--end-sprint", type=int, metavar="N", help="Mark sprint N as complete"
+        "--end-sprint",
+        type=int,
+        metavar="N",
+        help="Mark sprint N as complete",
     )
     parser.add_argument(
-        "--can-start", type=int, metavar="N", help="Check if sprint N can start"
+        "--can-start",
+        type=int,
+        metavar="N",
+        help="Check if sprint N can start",
     )
     parser.add_argument(
         "--retrospective",
@@ -823,7 +831,9 @@ Examples:
         help="Validate Definition of Ready for sprint N",
     )
     parser.add_argument(
-        "--report", action="store_true", help="Generate ceremony status report"
+        "--report",
+        action="store_true",
+        help="Generate ceremony status report",
     )
     parser.add_argument(
         "--dry-run",

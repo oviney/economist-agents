@@ -88,7 +88,10 @@ class TestClientCreation:
     """Test OpenAI LLM client creation."""
 
     def test_creates_openai_client_when_key_present(
-        self, clean_env, mock_openai_client, capsys
+        self,
+        clean_env,
+        mock_openai_client,
+        capsys,
     ):
         """Test that OpenAI client is created when OPENAI_API_KEY is set."""
         os.environ["OPENAI_API_KEY"] = "sk-test-key"
@@ -241,7 +244,9 @@ class TestIntegration:
 
             # Call LLM
             response = call_llm(
-                client, "You are an expert.", "Explain quantum physics briefly."
+                client,
+                "You are an expert.",
+                "Explain quantum physics briefly.",
             )
 
             assert response == "Test response from GPT"

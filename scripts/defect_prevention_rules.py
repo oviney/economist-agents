@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Defect Prevention Rules - Automated Quality Gates
+"""Defect Prevention Rules - Automated Quality Gates
 
 Learned patterns from 6 production bugs with Root Cause Analysis.
 Catches common defect patterns before commit/deployment.
@@ -52,7 +51,7 @@ class DefectPrevention:
                 "description": "Missing category tag on article page",
                 "check_function": self._check_category_present,
                 "prevention_actions": [
-                    "Added blog_qa_agent.py Jekyll layout validation"
+                    "Added blog_qa_agent.py Jekyll layout validation",
                 ],
             },
             {
@@ -64,7 +63,7 @@ class DefectPrevention:
                 "description": "Duplicate chart display (featured image + embed)",
                 "check_function": self._check_duplicate_chart,
                 "prevention_actions": [
-                    "Removed 'image:' field from YAML frontmatter specification"
+                    "Removed 'image:' field from YAML frontmatter specification",
                 ],
             },
             {
@@ -76,7 +75,7 @@ class DefectPrevention:
                 "description": "README.md badges show stale values",
                 "check_function": self._check_badge_currency,
                 "prevention_actions": [
-                    "Created update_readme_badges.py for automatic updates"
+                    "Created update_readme_badges.py for automatic updates",
                 ],
             },
             {
@@ -88,16 +87,17 @@ class DefectPrevention:
                 "description": "SPRINT.md shows outdated sprint content",
                 "check_function": self._check_sprint_doc_currency,
                 "prevention_actions": [
-                    "Created update_sprint_docs.py for automatic updates"
+                    "Created update_sprint_docs.py for automatic updates",
                 ],
             },
         ]
 
     def check_all(
-        self, article_content: str, metadata: dict[str, Any] = None
+        self,
+        article_content: str,
+        metadata: dict[str, Any] = None,
     ) -> list[str]:
-        """
-        Run all prevention checks on article content.
+        """Run all prevention checks on article content.
 
         Args:
             article_content: Full article markdown content
@@ -105,6 +105,7 @@ class DefectPrevention:
 
         Returns:
             List of violation messages (empty if all checks pass)
+
         """
         violations = []
 
@@ -113,7 +114,7 @@ class DefectPrevention:
             violation = check_func(article_content, metadata or {})
             if violation:
                 violations.append(
-                    f"[{rule['severity'].upper()}] {violation} (Pattern: {rule['id']})"
+                    f"[{rule['severity'].upper()}] {violation} (Pattern: {rule['id']})",
                 )
 
         return violations
@@ -123,8 +124,7 @@ class DefectPrevention:
     # =========================================================================
 
     def _check_chart_embedding(self, content: str, metadata: dict) -> str:
-        """
-        BUG-016 Prevention: Detect when chart generated but not embedded
+        """BUG-016 Prevention: Detect when chart generated but not embedded
 
         Pattern: Graphics Agent creates chart → Writer Agent ignores it
         Root Cause: Prompt engineering - Writer didn't have explicit requirement
@@ -167,8 +167,7 @@ class DefectPrevention:
         return ""  # All checks passed
 
     def _check_category_present(self, content: str, metadata: dict) -> str:
-        """
-        BUG-015 Prevention: Detect missing category in YAML frontmatter
+        """BUG-015 Prevention: Detect missing category in YAML frontmatter
 
         Pattern: Jekyll layout expects category but it's missing
         Root Cause: Validation gap - no check for required frontmatter fields
@@ -184,7 +183,7 @@ class DefectPrevention:
 
         # Check for category field (single or plural)
         has_category = bool(
-            re.search(r"^(category|categories):", frontmatter, re.MULTILINE)
+            re.search(r"^(category|categories):", frontmatter, re.MULTILINE),
         )
 
         if not has_category:
@@ -196,8 +195,7 @@ class DefectPrevention:
         return ""
 
     def _check_duplicate_chart(self, content: str, metadata: dict) -> str:
-        """
-        BUG-017 Prevention: Detect duplicate chart display paths
+        """BUG-017 Prevention: Detect duplicate chart display paths
 
         Pattern: Jekyll 'image:' field + markdown embed = duplicate display
         Root Cause: Requirements gap - unclear featured image vs embed
@@ -228,8 +226,7 @@ class DefectPrevention:
         return ""
 
     def _check_badge_currency(self, content: str, metadata: dict) -> str:
-        """
-        BUG-021 Prevention: Detect stale README badges
+        """BUG-021 Prevention: Detect stale README badges
 
         Pattern: Badges manually updated, prone to drift
         Root Cause: Code logic - no automated process
@@ -253,8 +250,7 @@ class DefectPrevention:
         return ""
 
     def _check_sprint_doc_currency(self, content: str, metadata: dict) -> str:
-        """
-        BUG-022 Prevention: Detect stale sprint documentation
+        """BUG-022 Prevention: Detect stale sprint documentation
 
         Pattern: SPRINT.md shows old sprint, actual sprint is further along
         Root Cause: Code logic - no automated process
@@ -317,7 +313,7 @@ class DefectPrevention:
                 "- Defect escape rate: 66.7% → Target <20%",
                 "- Critical TTD: 5.5 days → Target <2 days",
                 "- Prevention coverage: 5/6 bugs = 83%",
-            ]
+            ],
         )
 
         return "\n".join(report)
@@ -338,7 +334,8 @@ date: 2026-01-01
 This is an article about testing.
 """
     violations = checker.check_all(
-        test_article, {"chart_data": {"title": "Test Chart"}}
+        test_article,
+        {"chart_data": {"title": "Test Chart"}},
     )
     if violations:
         print("  ❌ CAUGHT:")
@@ -363,7 +360,8 @@ This is an article about testing.
 As the chart shows, testing prevents bugs.
 """
     violations = checker.check_all(
-        test_article_good, {"chart_data": {"title": "Test Chart"}}
+        test_article_good,
+        {"chart_data": {"title": "Test Chart"}},
     )
     if violations:
         print("  ❌ VIOLATIONS:")

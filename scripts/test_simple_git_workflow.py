@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Simple Git Workflow Test - Minimal validation of git operations without heavy embeddings
+"""Simple Git Workflow Test - Minimal validation of git operations without heavy embeddings
 
 This script tests the core git operations workflow without the heavy directory search
 functionality that causes context limit issues.
@@ -25,7 +24,8 @@ from scripts.agent_registry import AgentRegistry
 
 # Logging setup
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
 

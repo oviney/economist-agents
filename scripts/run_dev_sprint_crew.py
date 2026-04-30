@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-CrewAI Development Sprint Execution
+"""CrewAI Development Sprint Execution
 
 Executes entire sprints using CrewAI development teams with parallel story execution.
 
@@ -50,7 +49,8 @@ STORY_CONTEXT = (
 
 # Logging setup
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
 
@@ -64,7 +64,8 @@ def execute_full_sprint(sprint_number: int, max_parallel: int = 3) -> dict[str, 
 
     # Execute sprint
     result = orchestrator.execute_sprint(
-        sprint_number=sprint_number, max_parallel_stories=max_parallel
+        sprint_number=sprint_number,
+        max_parallel_stories=max_parallel,
     )
 
     return result
@@ -93,7 +94,9 @@ def close_sprint(sprint_number: int) -> dict[str, Any]:
         print(f"{'=' * 70}")
 
         finalization_result = orchestrator._finalize_sprint_metrics(
-            sprint_number, sprint_data, story_results
+            sprint_number,
+            sprint_data,
+            story_results,
         )
 
         return {
@@ -103,7 +106,8 @@ def close_sprint(sprint_number: int) -> dict[str, Any]:
             "finalization_result": finalization_result,
             "closure_summary": {
                 "metrics_finalized": finalization_result.get(
-                    "metrics_finalized", False
+                    "metrics_finalized",
+                    False,
                 ),
                 "velocity_updated": finalization_result.get("velocity_updated", False),
                 "project_archived": finalization_result.get("project_archived", False),
@@ -133,7 +137,8 @@ def close_sprint(sprint_number: int) -> dict[str, Any]:
 
 
 def execute_single_story(
-    story_title: str, acceptance_criteria: list = None
+    story_title: str,
+    acceptance_criteria: list = None,
 ) -> dict[str, Any]:
     """Execute single story using development crew."""
     logger.info(f"Starting single story execution: {story_title}")
@@ -198,18 +203,17 @@ def generate_execution_summary(result: dict[str, Any]) -> dict[str, Any]:
                 "TDD discipline maintained throughout",
             ],
         }
-    else:
-        return {
-            "status": "FAILED",
-            "error": result.get("error", "Unknown error"),
-            "phase": result.get("phase", "Unknown phase"),
-            "recommendations": [
-                "Review error details and fix blocking issues",
-                "Ensure Definition of Ready is complete",
-                "Validate SPRINT.md structure and content",
-                "Check agent configuration and tools",
-            ],
-        }
+    return {
+        "status": "FAILED",
+        "error": result.get("error", "Unknown error"),
+        "phase": result.get("phase", "Unknown phase"),
+        "recommendations": [
+            "Review error details and fix blocking issues",
+            "Ensure Definition of Ready is complete",
+            "Validate SPRINT.md structure and content",
+            "Check agent configuration and tools",
+        ],
+    }
 
 
 def print_execution_report(result: dict[str, Any]):
@@ -222,7 +226,7 @@ def print_execution_report(result: dict[str, Any]):
         summary = result["execution_summary"]
         print(f"✅ Sprint {result['sprint_number']} COMPLETED SUCCESSFULLY")
         print(
-            f"   Stories: {summary['completed_stories']} ({summary['completion_rate']})"
+            f"   Stories: {summary['completed_stories']} ({summary['completion_rate']})",
         )
         print(f"   Velocity: {summary['velocity']} story points")
         print(f"   Success Rate: {summary['success_rate']}")
@@ -232,12 +236,12 @@ def print_execution_report(result: dict[str, Any]):
             status_emoji = "✅" if story_result["status"] == "success" else "❌"
             crew_type = story_result.get("crew_type", "unknown")
             print(
-                f"   {status_emoji} Story {story_result['story_number']}: {story_result['story_title']} ({crew_type})"
+                f"   {status_emoji} Story {story_result['story_number']}: {story_result['story_title']} ({crew_type})",
             )
 
         print("\n🎯 KEY ACHIEVEMENTS:")
         print(
-            "   • Autonomous 5-phase TDD workflow execution (Red→Green→Review→Refactor→Git)"
+            "   • Autonomous 5-phase TDD workflow execution (Red→Green→Review→Refactor→Git)",
         )
         print("   • Senior developer code review for all stories")
         print("   • Git operations with proper commit standards and pre-commit hooks")
@@ -280,7 +284,7 @@ def print_execution_report(result: dict[str, Any]):
             prev_sprint = validation.get("previous_sprint_number", "N-1")
             print(f"\n💡 To close Sprint {prev_sprint}, run:")
             print(
-                f"   python3 scripts/run_dev_sprint_crew.py --close-sprint {prev_sprint}"
+                f"   python3 scripts/run_dev_sprint_crew.py --close-sprint {prev_sprint}",
             )
         else:
             print("   Sprint not ready to start - Definition of Ready incomplete")
@@ -291,13 +295,13 @@ def print_execution_report(result: dict[str, Any]):
             print(f"✅ Sprint {result['sprint_number']} CLOSURE SUCCESSFUL")
             closure_summary = result.get("closure_summary", {})
             print(
-                f"   Metrics Finalized: {'✅' if closure_summary.get('metrics_finalized') else '❌'}"
+                f"   Metrics Finalized: {'✅' if closure_summary.get('metrics_finalized') else '❌'}",
             )
             print(
-                f"   Velocity Updated: {'✅' if closure_summary.get('velocity_updated') else '❌'}"
+                f"   Velocity Updated: {'✅' if closure_summary.get('velocity_updated') else '❌'}",
             )
             print(
-                f"   Project Archived: {'✅' if closure_summary.get('project_archived') else '❌'}"
+                f"   Project Archived: {'✅' if closure_summary.get('project_archived') else '❌'}",
             )
 
             print("\n📋 NEXT ACTIONS:")
@@ -322,10 +326,12 @@ def print_execution_report(result: dict[str, Any]):
 def main():
     """Main execution function."""
     parser = argparse.ArgumentParser(
-        description="Execute development sprints using CrewAI teams"
+        description="Execute development sprints using CrewAI teams",
     )
     parser.add_argument(
-        "--sprint", type=int, help="Sprint number to execute (e.g., 15)"
+        "--sprint",
+        type=int,
+        help="Sprint number to execute (e.g., 15)",
     )
     parser.add_argument(
         "--max-parallel",
@@ -334,10 +340,14 @@ def main():
         help="Maximum number of stories to execute in parallel (default: 3)",
     )
     parser.add_argument(
-        "--story", type=str, help="Execute single story instead of full sprint"
+        "--story",
+        type=str,
+        help="Execute single story instead of full sprint",
     )
     parser.add_argument(
-        "--single-story", action="store_true", help="Execute in single story mode"
+        "--single-story",
+        action="store_true",
+        help="Execute in single story mode",
     )
     parser.add_argument(
         "--close-sprint",
@@ -356,7 +366,7 @@ def main():
     # Validate arguments
     if not args.sprint and not args.story and not args.close_sprint:
         print(
-            "Error: Must specify either --sprint NUMBER, --story TITLE, or --close-sprint NUMBER"
+            "Error: Must specify either --sprint NUMBER, --story TITLE, or --close-sprint NUMBER",
         )
         sys.exit(1)
 
@@ -364,7 +374,7 @@ def main():
     options_count = sum(bool(x) for x in [args.sprint, args.story, args.close_sprint])
     if options_count > 1:
         print(
-            "Error: Cannot specify multiple options. Choose one: --sprint, --story, or --close-sprint"
+            "Error: Cannot specify multiple options. Choose one: --sprint, --story, or --close-sprint",
         )
         sys.exit(1)
 

@@ -24,7 +24,8 @@ import orjson
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
 
@@ -37,6 +38,7 @@ class PatternExtractor:
 
         Args:
             root_dir: Root directory of the project
+
         """
         self.root_dir = root_dir
         self.skills_dir = root_dir / "skills"
@@ -48,6 +50,7 @@ class PatternExtractor:
 
         Returns:
             List of defect patterns with root causes and prevention strategies
+
         """
         patterns = []
         tracker_file = self.skills_dir / "defect_tracker.json"
@@ -85,6 +88,7 @@ class PatternExtractor:
 
         Returns:
             List of QA skill patterns
+
         """
         patterns = []
         qa_file = self.skills_dir / "blog_qa_skills.json"
@@ -107,7 +111,7 @@ class PatternExtractor:
                             "pattern": pattern["pattern"],
                             "check": pattern["check"],
                             "auto_fix": pattern.get("auto_fix"),
-                        }
+                        },
                     )
 
             logger.info(f"Extracted {len(patterns)} QA skill patterns")
@@ -122,6 +126,7 @@ class PatternExtractor:
 
         Returns:
             List of architectural patterns
+
         """
         patterns = []
         arch_file = self.docs_dir / "ARCHITECTURE_PATTERNS.md"
@@ -196,13 +201,14 @@ class PatternExtractor:
 
         Returns:
             Formatted markdown section
+
         """
         sections = []
         sections.append("## Learned Anti-Patterns")
         sections.append("")
         sections.append(
             f"*Auto-generated from skills/*.json and docs/ARCHITECTURE_PATTERNS.md "
-            f"on {datetime.now().strftime('%Y-%m-%d')}*"
+            f"on {datetime.now().strftime('%Y-%m-%d')}*",
         )
         sections.append("")
 
@@ -222,7 +228,7 @@ class PatternExtractor:
 
                 for bug in bugs:
                     sections.append(
-                        f"**{bug['id']}** ({bug['severity']}) - {bug['component']}"
+                        f"**{bug['id']}** ({bug['severity']}) - {bug['component']}",
                     )
                     sections.append(f"- **Issue**: {bug['description']}")
                     if bug.get("test_gap"):
@@ -271,7 +277,7 @@ class PatternExtractor:
 
                 for pattern in patterns:
                     sections.append(
-                        f"**{pattern['name']}** ({pattern.get('severity', 'medium')})"
+                        f"**{pattern['name']}** ({pattern.get('severity', 'medium')})",
                     )
                     if pattern.get("pattern"):
                         sections.append(f"- **Pattern**: {pattern['pattern']}")
@@ -284,7 +290,9 @@ class PatternExtractor:
         return "\n".join(sections)
 
     def update_copilot_instructions(
-        self, anti_patterns_section: str, dry_run: bool = False
+        self,
+        anti_patterns_section: str,
+        dry_run: bool = False,
     ) -> bool:
         """Update copilot instructions with anti-patterns section.
 
@@ -294,6 +302,7 @@ class PatternExtractor:
 
         Returns:
             True if updated successfully, False otherwise
+
         """
         if not self.copilot_file.exists():
             logger.error(f"Copilot instructions not found: {self.copilot_file}")
@@ -338,9 +347,10 @@ def main() -> int:
 
     Returns:
         Exit code (0 for success, 1 for failure)
+
     """
     parser = argparse.ArgumentParser(
-        description="Sync learned patterns into Copilot instructions"
+        description="Sync learned patterns into Copilot instructions",
     )
     parser.add_argument(
         "--dry-run",
@@ -374,13 +384,16 @@ def main() -> int:
     # Format anti-patterns section
     logger.info("Formatting anti-patterns section...")
     anti_patterns_section = extractor.format_anti_patterns_section(
-        defects, qa_skills, arch_patterns
+        defects,
+        qa_skills,
+        arch_patterns,
     )
 
     # Update copilot instructions
     logger.info("Updating Copilot instructions...")
     success = extractor.update_copilot_instructions(
-        anti_patterns_section, dry_run=args.dry_run
+        anti_patterns_section,
+        dry_run=args.dry_run,
     )
 
     if success:
@@ -388,12 +401,11 @@ def main() -> int:
             logger.info("DRY RUN complete - no files modified")
         else:
             logger.info(
-                f"✅ Successfully synced {total_patterns} patterns to Copilot instructions"
+                f"✅ Successfully synced {total_patterns} patterns to Copilot instructions",
             )
         return 0
-    else:
-        logger.error("❌ Failed to sync patterns")
-        return 1
+    logger.error("❌ Failed to sync patterns")
+    return 1
 
 
 if __name__ == "__main__":

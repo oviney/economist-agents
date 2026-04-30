@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Graphics Agent - Economist-Style Chart Generation
+"""Graphics Agent - Economist-Style Chart Generation
 
 Extracts the Graphics Agent from economist_agent.py for better modularity and testing.
 Generates Economist-style data visualizations with strict zone boundary enforcement.
@@ -37,8 +36,7 @@ GRAPHICS_AGENT_PROMPT = _graphics_config.system_message
 
 
 class GraphicsAgent:
-    """
-    Generates Economist-style charts from specifications.
+    """Generates Economist-style charts from specifications.
 
     Key Features:
     - Generates matplotlib code via LLM
@@ -53,6 +51,7 @@ class GraphicsAgent:
         ...     chart_spec={"title": "AI Adoption", "data": {...}},
         ...     output_path="/path/to/chart.png"
         ... )
+
     """
 
     GRAPHICS_AGENT_PROMPT = (
@@ -65,10 +64,12 @@ class GraphicsAgent:
         self.metrics = get_metrics_collector()
 
     def generate_chart(
-        self, chart_spec: dict[str, Any], output_path: str, max_tokens: int = 2500
+        self,
+        chart_spec: dict[str, Any],
+        output_path: str,
+        max_tokens: int = 2500,
     ) -> str | None:
-        """
-        Generate Economist-style chart from specification.
+        """Generate Economist-style chart from specification.
 
         Args:
             chart_spec: Chart specification with title, data, type
@@ -80,6 +81,7 @@ class GraphicsAgent:
 
         Raises:
             ValueError: If chart_spec or output_path invalid
+
         """
         if not chart_spec:
             print("📈 Graphics Agent: No chart data provided, skipping...")
@@ -89,29 +91,30 @@ class GraphicsAgent:
         if not isinstance(chart_spec, dict):
             raise ValueError(
                 "[GRAPHICS_AGENT] Invalid chart_spec. Expected dict, "
-                f"got: {type(chart_spec).__name__}"
+                f"got: {type(chart_spec).__name__}",
             )
 
         required_fields = ["title", "data"]
         missing = [f for f in required_fields if f not in chart_spec]
         if missing:
             raise ValueError(
-                f"[GRAPHICS_AGENT] Chart spec missing required fields: {missing}"
+                f"[GRAPHICS_AGENT] Chart spec missing required fields: {missing}",
             )
 
         if not output_path or not isinstance(output_path, str):
             raise ValueError(
                 "[GRAPHICS_AGENT] Invalid output_path. Expected non-empty string, "
-                f"got: {type(output_path).__name__}"
+                f"got: {type(output_path).__name__}",
             )
 
         print(
-            f"📈 Graphics Agent: Creating visualization '{chart_spec.get('title', 'Untitled')[:40]}...'"
+            f"📈 Graphics Agent: Creating visualization '{chart_spec.get('title', 'Untitled')[:40]}...'",
         )
 
         # Start metrics collection
         chart_record = self.metrics.start_chart(
-            chart_spec.get("title", "Untitled"), chart_spec
+            chart_spec.get("title", "Untitled"),
+            chart_spec,
         )
 
         try:
@@ -125,8 +128,7 @@ class GraphicsAgent:
                 print(f"   ✓ Chart saved to {output_path}")
                 self.metrics.record_generation(chart_record, success=True)
                 return output_path
-            else:
-                return None
+            return None
 
         except Exception as e:
             error_msg = str(e)
@@ -135,13 +137,15 @@ class GraphicsAgent:
             return None
 
     def _generate_matplotlib_code(
-        self, chart_spec: dict[str, Any], max_tokens: int
+        self,
+        chart_spec: dict[str, Any],
+        max_tokens: int,
     ) -> str:
         """Generate matplotlib code via LLM."""
         from llm_client import call_llm
 
         prompt = self.GRAPHICS_AGENT_PROMPT.format(
-            chart_spec=json.dumps(chart_spec, indent=2)
+            chart_spec=json.dumps(chart_spec, indent=2),
         )
 
         code = call_llm(
@@ -160,8 +164,7 @@ class GraphicsAgent:
         return code
 
     def _execute_matplotlib_code(self, code: str, output_path: str) -> bool:
-        """
-        Execute matplotlib code to generate chart.
+        """Execute matplotlib code to generate chart.
 
         Args:
             code: Python code string to execute
@@ -169,6 +172,7 @@ class GraphicsAgent:
 
         Returns:
             True if successful, False otherwise
+
         """
         # Ensure savefig with correct parameters
         if "plt.savefig" not in code:
@@ -187,32 +191,35 @@ class GraphicsAgent:
             f.write(
                 "import matplotlib.pyplot as plt\n"
                 "import matplotlib.patches as mpatches\n"
-                "import numpy as np\n"
+                "import numpy as np\n",
             )
             f.write(code)
 
         # Execute script
         result = subprocess.run(
-            [sys.executable, temp_script], capture_output=True, text=True
+            [sys.executable, temp_script],
+            capture_output=True,
+            text=True,
         )
 
         if result.returncode == 0:
             return True
-        else:
-            error_msg = result.stderr[:200]
-            print(f"   ⚠ Chart generation failed: {error_msg}")
+        error_msg = result.stderr[:200]
+        print(f"   ⚠ Chart generation failed: {error_msg}")
 
-            # Record failure in chart record
-            if (
-                hasattr(self.metrics, "current_session")
-                and self.metrics.current_session["charts"]
-            ):
-                chart_record = self.metrics.current_session["charts"][-1]
-                self.metrics.record_generation(
-                    chart_record, success=False, error=error_msg
-                )
+        # Record failure in chart record
+        if (
+            hasattr(self.metrics, "current_session")
+            and self.metrics.current_session["charts"]
+        ):
+            chart_record = self.metrics.current_session["charts"][-1]
+            self.metrics.record_generation(
+                chart_record,
+                success=False,
+                error=error_msg,
+            )
 
-            return False
+        return False
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -221,8 +228,7 @@ class GraphicsAgent:
 
 
 def run_graphics_agent(client, chart_spec: dict, output_path: str) -> str | None:
-    """
-    Backward-compatible wrapper for Graphics Agent.
+    """Backward-compatible wrapper for Graphics Agent.
 
     Maintains 100% compatibility with economist_agent.py usage.
 
@@ -233,6 +239,7 @@ def run_graphics_agent(client, chart_spec: dict, output_path: str) -> str | None
 
     Returns:
         output_path if successful, None otherwise
+
     """
     agent = GraphicsAgent(client)
     return agent.generate_chart(chart_spec, output_path)

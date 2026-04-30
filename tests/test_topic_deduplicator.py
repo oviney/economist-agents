@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Unit Tests for TopicDeduplicator
+"""Unit Tests for TopicDeduplicator
 
 Tests cover:
 - Pass-through when ChromaDB unavailable (module-level mock)
@@ -46,6 +45,7 @@ def _make_deduplicator(distances: list[float] | None = None) -> TopicDeduplicato
     Args:
         distances: List of distance values returned per query.
                    Defaults to [0.0] (identical match) for a single call.
+
     """
     if distances is None:
         distances = [0.0]
@@ -313,6 +313,7 @@ class TestDiscoverTopicsDeduplication:
         Args:
             distances: Cosine distances returned by the mock ChromaDB
                 collection.
+
         """
         from src.economist_agents.flow import EconomistContentFlow
 
@@ -323,7 +324,9 @@ class TestDiscoverTopicsDeduplication:
     @patch("src.economist_agents.flow.scout_topics")
     @patch("src.economist_agents.flow.create_llm_client")
     def test_novel_topic_reaches_editorial(
-        self, mock_client: Mock, mock_scout: Mock
+        self,
+        mock_client: Mock,
+        mock_scout: Mock,
     ) -> None:
         """Novel topics (<0.6 sim) are returned to the editorial board."""
         mock_client.return_value = Mock()
@@ -336,7 +339,7 @@ class TestDiscoverTopicsDeduplication:
                 "data_sources": [],
                 "contrarian_angle": "",
                 "talking_points": "",
-            }
+            },
         ]
         # distance = 1.4 → similarity = 0.3 (novel)
         flow = self._build_flow(distances=[1.4])
@@ -347,7 +350,9 @@ class TestDiscoverTopicsDeduplication:
     @patch("src.economist_agents.flow.scout_topics")
     @patch("src.economist_agents.flow.create_llm_client")
     def test_duplicate_topic_filtered_before_editorial(
-        self, mock_client: Mock, mock_scout: Mock
+        self,
+        mock_client: Mock,
+        mock_scout: Mock,
     ) -> None:
         """Duplicate topics (>0.8 sim) are removed before editorial board.
 
@@ -364,7 +369,7 @@ class TestDiscoverTopicsDeduplication:
                 "data_sources": [],
                 "contrarian_angle": "",
                 "talking_points": "",
-            }
+            },
         ]
         # distance = 0.1 → similarity = 0.95 (reject)
         flow = self._build_flow(distances=[0.1])
@@ -376,7 +381,9 @@ class TestDiscoverTopicsDeduplication:
     @patch("src.economist_agents.flow.scout_topics")
     @patch("src.economist_agents.flow.create_llm_client")
     def test_related_topic_flagged_for_editorial(
-        self, mock_client: Mock, mock_scout: Mock
+        self,
+        mock_client: Mock,
+        mock_scout: Mock,
     ) -> None:
         """Related topics (0.6–0.8 sim) pass but carry a dedup_warning."""
         mock_client.return_value = Mock()
@@ -389,7 +396,7 @@ class TestDiscoverTopicsDeduplication:
                 "data_sources": [],
                 "contrarian_angle": "",
                 "talking_points": "",
-            }
+            },
         ]
         # distance = 0.5 → similarity = 0.75 (warn tier)
         flow = self._build_flow(distances=[0.5])

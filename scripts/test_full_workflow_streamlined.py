@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Streamlined Full 5-Phase Workflow Test
+"""Streamlined Full 5-Phase Workflow Test
 
 Demonstrates the complete TDD workflow without heavy embedding operations
 that cause OpenAI context limit issues.
@@ -32,7 +31,8 @@ from scripts.agent_registry import AgentRegistry
 
 # Logging setup
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
 
@@ -108,7 +108,6 @@ def create_streamlined_development_crew():
 
 def create_workflow_tasks():
     """Create the 5-phase TDD workflow tasks."""
-
     # Phase 1: TDD Red
     phase1_task = Task(
         description="""

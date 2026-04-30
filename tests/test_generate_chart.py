@@ -1,5 +1,4 @@
-"""
-Comprehensive tests for generate_chart.py
+"""Comprehensive tests for generate_chart.py
 
 Tests chart generation functionality including:
 - Chart creation with valid data
@@ -94,7 +93,9 @@ def test_data_integrity():
     """Test that data maintains referential integrity."""
     # AI adoption should be higher than maintenance reduction
     for ai, maint in zip(
-        generate_chart.ai_adoption, generate_chart.maintenance_reduction, strict=False
+        generate_chart.ai_adoption,
+        generate_chart.maintenance_reduction,
+        strict=False,
     ):
         assert ai >= maint  # AI adoption always higher or equal
 

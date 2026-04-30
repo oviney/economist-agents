@@ -127,7 +127,7 @@ class TestEvaluateArticleValidInput:
         assert len(result["feedback"]) == 5
 
     def test_pass_consistent_with_score(self) -> None:
-        """pass must equal score >= 60.0."""
+        """Pass must equal score >= 60.0."""
         result = evaluate_article(GOOD_ARTICLE)
         assert result["pass"] == (result["score"] >= 60.0)
 
@@ -240,7 +240,7 @@ class TestToolMetadata:
         assert len(evaluate_article.__doc__) > 10
 
     def test_mcp_server_importable(self) -> None:
-        from mcp_servers import article_evaluator_server  # noqa: F401
+        from mcp_servers import article_evaluator_server
 
         assert article_evaluator_server.mcp is not None
 

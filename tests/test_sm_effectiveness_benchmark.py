@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Tests for SM Agent Effectiveness Benchmark
+"""Tests for SM Agent Effectiveness Benchmark
 
 Tests the benchmark infrastructure (not the SM agent itself).
 Validates test scenario definitions, evaluation logic, and report generation.
@@ -304,7 +303,7 @@ class TestSMEffectivenessBenchmark:
                 "dor_compliant": True,
                 "reasoning": "Clear requirements",
                 "suggested_story_title": "Add feature X",
-            }
+            },
         )
 
         scenario = benchmark.test_scenarios[0]

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Quality Dashboard - Real-Time Defect & Agent Metrics
+"""Quality Dashboard - Real-Time Defect & Agent Metrics
 
 Displays integrated view of:
 - Defect tracking with RCA insights
@@ -73,7 +72,7 @@ class QualityDashboard:
                 )
                 bar = "█" * int(pct / 5)  # Visual bar
                 dashboard.append(
-                    f"- {cause.replace('_', ' ').title()}: {bar} {count} ({pct:.0f}%)"
+                    f"- {cause.replace('_', ' ').title()}: {bar} {count} ({pct:.0f}%)",
                 )
             dashboard.append("")
 
@@ -109,7 +108,7 @@ class QualityDashboard:
                 )
                 bar = "█" * int(pct / 10)
                 dashboard.append(
-                    f"- {gap.replace('_', ' ').title()}: {bar} {count} ({pct:.0f}%)"
+                    f"- {gap.replace('_', ' ').title()}: {bar} {count} ({pct:.0f}%)",
                 )
             dashboard.append("")
 
@@ -138,7 +137,7 @@ class QualityDashboard:
                 f"- **Briefs Generated**: {agent_summary['research']['briefs']}",
                 f"- **Avg Data Points**: {agent_summary['research']['avg_data_points']}",
                 "",
-            ]
+            ],
         )
 
         # Sprint trends (new section)
@@ -149,7 +148,7 @@ class QualityDashboard:
                     "",
                     self._render_sprint_trends(),
                     "",
-                ]
+                ],
             )
 
         # Quality trends
@@ -159,7 +158,7 @@ class QualityDashboard:
                 "",
                 self._render_trend_indicator(defect_metrics, agent_summary),
                 "",
-            ]
+            ],
         )
 
         # Sprint progress
@@ -168,7 +167,7 @@ class QualityDashboard:
                 "## 🏃 Sprint Progress",
                 "",
                 self._render_sprint_progress(),
-            ]
+            ],
         )
 
         return "\n".join(dashboard)
@@ -224,7 +223,7 @@ class QualityDashboard:
             if "graphics_agent" in agents:
                 g = agents["graphics_agent"]
                 summary["graphics"]["visual_qa_pass_rate"] = g.get(
-                    "visual_qa_pass_rate"
+                    "visual_qa_pass_rate",
                 )
                 summary["graphics"]["zone_violations"] = g.get("zone_violations")
 
@@ -236,7 +235,9 @@ class QualityDashboard:
         return summary
 
     def _calculate_quality_score(
-        self, defect_metrics: dict, agent_summary: dict
+        self,
+        defect_metrics: dict,
+        agent_summary: dict,
     ) -> int:
         """Calculate overall quality score (0-100)"""
         score = 100
@@ -298,11 +299,11 @@ class QualityDashboard:
         escape_rate = defect_metrics["defect_escape_rate"]
         if escape_rate <= 40:
             trends.append(
-                "✅ Defect escape rate improving (50% → " + str(escape_rate) + "%)"
+                "✅ Defect escape rate improving (50% → " + str(escape_rate) + "%)",
             )
         elif escape_rate >= 50:
             trends.append(
-                "⚠️ Defect escape rate stable/increasing (" + str(escape_rate) + "%)"
+                "⚠️ Defect escape rate stable/increasing (" + str(escape_rate) + "%)",
             )
 
         # Writer clean rate
@@ -311,7 +312,7 @@ class QualityDashboard:
             trends.append("✅ Writer Agent meeting target (>80% clean)")
         elif writer_clean is not None:
             trends.append(
-                "🔄 Writer Agent improving (current: " + str(writer_clean) + "%)"
+                "🔄 Writer Agent improving (current: " + str(writer_clean) + "%)",
             )
 
         # Editor accuracy
@@ -320,7 +321,7 @@ class QualityDashboard:
             trends.append("✅ Editor Agent meeting target (>60% accuracy)")
         elif editor_acc is not None:
             trends.append(
-                "🔄 Editor Agent improving (current: " + str(editor_acc) + "%)"
+                "🔄 Editor Agent improving (current: " + str(editor_acc) + "%)",
             )
 
         return "\n".join(trends) if trends else "📊 Establishing baseline metrics"
@@ -452,7 +453,7 @@ Progress: [{progress_bar}] {progress_pct}%"""
         lines.append(
             "| Metric | "
             + " | ".join([f"Sprint {s['sprint_id']}" for s in sprints])
-            + " | Trend |"
+            + " | Trend |",
         )
         lines.append("|--------|" + "--------|" * len(sprints) + "--------|")
 
@@ -495,14 +496,13 @@ Progress: [{progress_bar}] {progress_pct}%"""
                         trend = "↓ Worse"
                     else:
                         trend = "→ Stable"
+                # For other metrics, higher is better
+                elif last_val > first_val * 1.1:  # 10% improvement
+                    trend = "↑ Better"
+                elif last_val < first_val * 0.9:  # 10% regression
+                    trend = "↓ Worse"
                 else:
-                    # For other metrics, higher is better
-                    if last_val > first_val * 1.1:  # 10% improvement
-                        trend = "↑ Better"
-                    elif last_val < first_val * 0.9:  # 10% regression
-                        trend = "↓ Worse"
-                    else:
-                        trend = "→ Stable"
+                    trend = "→ Stable"
 
                 row.append(trend)
             else:
@@ -518,10 +518,10 @@ Progress: [{progress_bar}] {progress_pct}%"""
             1 for _, _, _ in metrics_config if self._is_metric_improving(sprints, _)
         )
         lines.append(
-            f"- **{improving} of {len(metrics_config)}** metrics improving vs Sprint {sprints[0]['sprint_id']}"
+            f"- **{improving} of {len(metrics_config)}** metrics improving vs Sprint {sprints[0]['sprint_id']}",
         )
         lines.append(
-            f"- **Baseline**: Sprint {self.history['baseline_sprint']} (reference point for all comparisons)"
+            f"- **Baseline**: Sprint {self.history['baseline_sprint']} (reference point for all comparisons)",
         )
 
         return "\n".join(lines)
@@ -537,8 +537,7 @@ Progress: [{progress_bar}] {progress_pct}%"""
         # For escape rate and TTD, lower is better
         if metric_key in ["defect_escape_rate", "avg_critical_ttd_days"]:
             return last_val < first_val * 0.9
-        else:
-            return last_val > first_val * 1.1
+        return last_val > first_val * 1.1
 
 
 def main():
@@ -546,13 +545,17 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Quality Dashboard with sprint tracking"
+        description="Quality Dashboard with sprint tracking",
     )
     parser.add_argument(
-        "--save-sprint", metavar="NAME", help="Save current metrics as sprint snapshot"
+        "--save-sprint",
+        metavar="NAME",
+        help="Save current metrics as sprint snapshot",
     )
     parser.add_argument(
-        "--show-history", action="store_true", help="Show sprint history"
+        "--show-history",
+        action="store_true",
+        help="Show sprint history",
     )
     parser.add_argument(
         "--no-save",

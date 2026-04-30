@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Agent Performance Metrics Dashboard (Streamlit)
+"""Agent Performance Metrics Dashboard (Streamlit)
 
 Visualises quality, cost, and performance metrics stored in data/metrics.db
 over time. Run with:
@@ -50,6 +49,7 @@ def _load_runs() -> list[dict]:
 
     Returns:
         List of run dicts, newest first.
+
     """
     db_path = get_db_path()
     if not db_path.exists():
@@ -69,7 +69,7 @@ runs = _load_runs()
 if not runs:
     st.warning(
         "No pipeline runs recorded yet. "
-        "Run `python scripts/record_metrics.py --help` to get started."
+        "Run `python scripts/record_metrics.py --help` to get started.",
     )
     st.stop()
 
@@ -95,7 +95,7 @@ except ImportError:  # pragma: no cover
 
 if not _HAS_PANDAS:
     st.error(
-        "pandas is required for chart rendering. Install it with `pip install pandas`."
+        "pandas is required for chart rendering. Install it with `pip install pandas`.",
     )
     st.stop()
 
@@ -168,7 +168,7 @@ if not _token_records:
     st.info(
         "No token-usage records found. "
         "Records are written to `~/.economist-agents/token-usage.jsonl` "
-        "whenever `llm_client.call_llm` is invoked."
+        "whenever `llm_client.call_llm` is invoked.",
     )
 else:
     _by_model = summarise_usage(_token_records)
@@ -177,7 +177,8 @@ else:
     _tok_col1, _tok_col2, _tok_col3 = st.columns(3)
     _tok_col1.metric("Total calls logged", sum(s["calls"] for s in _by_model.values()))
     _tok_col2.metric(
-        "Total tokens", f"{sum(s['total_tokens'] for s in _by_model.values()):,}"
+        "Total tokens",
+        f"{sum(s['total_tokens'] for s in _by_model.values()):,}",
     )
     _tok_col3.metric("Est. total cost", f"${_total_cost:.4f}")
 
@@ -193,7 +194,7 @@ else:
                     "Est. cost (USD)": f"${stats['estimated_cost_usd']:.4f}",
                 }
                 for model, stats in sorted(_by_model.items())
-            ]
+            ],
         )
         st.dataframe(_tok_df, use_container_width=True, hide_index=True)
 
@@ -202,6 +203,6 @@ else:
             [
                 {"Model": model, "Est. cost (USD)": stats["estimated_cost_usd"]}
                 for model, stats in sorted(_by_model.items())
-            ]
+            ],
         ).set_index("Model")
         st.bar_chart(_cost_df, use_container_width=True)

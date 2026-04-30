@@ -70,6 +70,7 @@ class GoogleSearcher:
         >>> searcher = GoogleSearcher()
         >>> web_results = searcher.search_web("AI test automation 2026")
         >>> scholar_results = searcher.search_scholar("software testing automation")
+
     """
 
     def __init__(
@@ -83,6 +84,7 @@ class GoogleSearcher:
             api_key: Serper API key (falls back to SERPER_API_KEY env var).
             current_year: Reference year for freshness filtering (defaults to
                 today's year).
+
         """
         self.api_key = api_key or os.environ.get("SERPER_API_KEY", "")
         self.current_year = current_year or datetime.now().year
@@ -112,6 +114,7 @@ class GoogleSearcher:
             List of dicts with keys ``title``, ``url``, ``snippet``, ``date``,
             ``source``.  Returns a single-element list with an ``error`` key
             on failure.
+
         """
         if not self.api_key:
             logger.error("SERPER_API_KEY is not set")
@@ -141,7 +144,7 @@ class GoogleSearcher:
                         "snippet": item.get("snippet", ""),
                         "date": item.get("date", ""),
                         "source": "google_search",
-                    }
+                    },
                 )
             logger.info(
                 "Google web search '%s' returned %d results",
@@ -181,6 +184,7 @@ class GoogleSearcher:
             List of dicts with keys ``title``, ``url``, ``snippet``, ``year``,
             ``authors``, ``cited_by``, ``source``.  Returns a single-element
             list with an ``error`` key on failure.
+
         """
         if not self.api_key:
             logger.error("SERPER_API_KEY is not set")
@@ -216,7 +220,7 @@ class GoogleSearcher:
                         "authors": item.get("authors", ""),
                         "cited_by": item.get("citedBy", 0),
                         "source": "google_scholar",
-                    }
+                    },
                 )
             logger.info(
                 "Google Scholar search '%s' returned %d results",
@@ -255,6 +259,7 @@ class GoogleSearcher:
 
         Returns:
             Augmented query string.
+
         """
         if year_start is not None and year_end is not None and year_start == year_end:
             return f"{query} {year_start}"
@@ -298,6 +303,7 @@ def search_google_for_topic(
     Example:
         >>> results = search_google_for_topic("quality engineering")
         >>> print(results["web_results"][0]["title"])
+
     """
     current_year = datetime.now().year
     year_start = current_year - 1  # Previous year

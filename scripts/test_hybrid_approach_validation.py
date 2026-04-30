@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Hybrid Approach Validation Test
+"""Hybrid Approach Validation Test
 
 Based on Sprint 15 orchestration test results, validate the hybrid approach:
 - Human sprint coordination (what you did manually)
@@ -140,7 +139,7 @@ class HybridApproachValidation:
             for story in self.story_execution_work.values()
         ]
         avg_story_automation = sum(story_automation_scores) / len(
-            story_automation_scores
+            story_automation_scores,
         )
 
         # Hybrid approach assessment
@@ -165,11 +164,11 @@ class HybridApproachValidation:
         }
 
         print(
-            f"   📊 Coordination: {human_coordination_percentage:.0f}% human, {auto_coordination_percentage:.0f}% automated"
+            f"   📊 Coordination: {human_coordination_percentage:.0f}% human, {auto_coordination_percentage:.0f}% automated",
         )
         print(f"   🔧 Story execution: {avg_story_automation:.0f}% automatable")
         print(
-            f"   ⚡ Time savings: {(avg_story_automation * 0.7):.0f}% reduction in execution work"
+            f"   ⚡ Time savings: {(avg_story_automation * 0.7):.0f}% reduction in execution work",
         )
 
         return hybrid_assessment

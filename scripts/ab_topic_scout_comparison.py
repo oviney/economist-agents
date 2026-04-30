@@ -82,6 +82,7 @@ def _topic_title_set(topics: list[dict[str, Any]]) -> set[str]:
 
     Returns:
         Set of lower-cased, stripped title strings.
+
     """
     return {t.get("topic", "").strip().lower() for t in topics if t.get("topic")}
 
@@ -100,6 +101,7 @@ def jaccard_similarity(set_a: set[str], set_b: set[str]) -> float:
 
     Returns:
         Float in [0.0, 1.0].
+
     """
     if not set_a and not set_b:
         return 0.0
@@ -124,6 +126,7 @@ def score_deltas(
 
     Returns:
         Dict mapping dimension name to ``{"avg_delta": ..., "max_delta": ...}``.
+
     """
 
     def _mean_dim(topics: list[dict[str, Any]], dim: str) -> float:
@@ -181,6 +184,7 @@ def qualitative_notes(
 
     Returns:
         List of human-readable note strings.
+
     """
     notes: list[str] = []
 
@@ -218,7 +222,7 @@ def qualitative_notes(
             if matched_kws:
                 notes.append(
                     f'✅ Run A topic **"{title}"** references top-performer '
-                    f'**"{art.page_title}"** (keywords: {", ".join(matched_kws)})'
+                    f'**"{art.page_title}"** (keywords: {", ".join(matched_kws)})',
                 )
                 break
 
@@ -228,13 +232,13 @@ def qualitative_notes(
             if matched_kws:
                 notes.append(
                     f'⚠️  Run A topic **"{title}"** resembles underperformer '
-                    f'**"{art.page_title}"** (keywords: {", ".join(matched_kws)})'
+                    f'**"{art.page_title}"** (keywords: {", ".join(matched_kws)})',
                 )
                 break
 
     if not notes:
         notes.append(
-            "ℹ️  No Run A topic explicitly matched keywords from the top/bottom performers."
+            "ℹ️  No Run A topic explicitly matched keywords from the top/bottom performers.",
         )
     return notes
 
@@ -256,6 +260,7 @@ def verdict(
 
     Returns:
         Tuple of (is_real: bool, explanation: str).
+
     """
     has_top_ref = any("✅" in note for note in notes)
     criteria_1 = jac < 0.6
@@ -265,10 +270,10 @@ def verdict(
     reasons: list[str] = []
     reasons.append(
         f"Jaccard similarity = {jac:.3f} "
-        + ("✅ < 0.6 (runs diverge)" if criteria_1 else "❌ ≥ 0.6 (runs too similar)")
+        + ("✅ < 0.6 (runs diverge)" if criteria_1 else "❌ ≥ 0.6 (runs too similar)"),
     )
     reasons.append(
-        "Run A references a top performer: " + ("✅ YES" if criteria_2 else "❌ NO")
+        "Run A references a top performer: " + ("✅ YES" if criteria_2 else "❌ NO"),
     )
 
     conclusion = (
@@ -303,6 +308,7 @@ def run_ab_pair(
         Dict with keys: ``topics_a``, ``topics_b``, ``jaccard``,
         ``deltas``, ``notes``, ``verdict_is_real``, ``verdict_text``,
         ``top_performers``, ``bottom_performers``.
+
     """
     logger.info("Pair %d — Run A (with performance context)…", pair_index)
     topics_a = topic_scout.scout_topics(client)
@@ -351,6 +357,7 @@ def _escape_md_table(text: str) -> str:
 
     Returns:
         Text with ``|`` replaced by ``\\|``.
+
     """
     return text.replace("|", "\\|")
 
@@ -364,6 +371,7 @@ def _topic_table(topics: list[dict[str, Any]], label: str) -> list[str]:
 
     Returns:
         List of Markdown lines.
+
     """
     lines: list[str] = [f"### {label}", ""]
     if not topics:
@@ -394,6 +402,7 @@ def render_report(
 
     Returns:
         Complete Markdown report as a single string.
+
     """
     lines: list[str] = [
         "# A/B Topic Scout Comparison Report",
@@ -439,7 +448,7 @@ def render_report(
             lines.append(
                 f"| {dim.replace('_', ' ').title()} "
                 f"| {stats['avg_delta']:.3f} "
-                f"| {stats['max_delta']:.3f} |"
+                f"| {stats['max_delta']:.3f} |",
             )
         lines.append("")
 
@@ -503,6 +512,7 @@ def save_report(report: str, output_dir: Path) -> Path:
 
     Returns:
         Path to the written file.
+
     """
     output_dir.mkdir(parents=True, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -520,6 +530,7 @@ def save_raw_json(pairs: list[dict[str, Any]], output_dir: Path) -> Path:
 
     Returns:
         Path to the written JSON file.
+
     """
     output_dir.mkdir(parents=True, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -545,7 +556,7 @@ def save_raw_json(pairs: list[dict[str, Any]], output_dir: Path) -> Path:
                 "bottom_performers": [
                     _serialisable(p) for p in pair["bottom_performers"]
                 ],
-            }
+            },
         )
     out_path.write_bytes(orjson.dumps(raw, option=orjson.OPT_INDENT_2))
     return out_path

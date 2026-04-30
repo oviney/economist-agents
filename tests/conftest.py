@@ -15,6 +15,7 @@ def temp_output_dir(tmp_path: Path) -> Path:
 
     Returns:
         Path to temporary output directory
+
     """
     output_dir = tmp_path / "output"
     output_dir.mkdir()
@@ -28,6 +29,7 @@ def mock_anthropic_client() -> Mock:
 
     Returns:
         Mock Anthropic client with messages.create method
+
     """
     mock_client = Mock()
     mock_response = Mock()
@@ -42,6 +44,7 @@ def mock_openai_client() -> Mock:
 
     Returns:
         Mock OpenAI client with chat.completions.create method
+
     """
     mock_client = Mock()
     mock_response = Mock()
@@ -56,6 +59,7 @@ def sample_research_data() -> dict:
 
     Returns:
         Dictionary with research data structure
+
     """
     return {
         "headline_stat": {
@@ -70,7 +74,7 @@ def sample_research_data() -> dict:
                 "source": "Industry Report",
                 "year": "2024",
                 "verified": True,
-            }
+            },
         ],
         "chart_data": {
             "title": "AI Adoption in Testing",

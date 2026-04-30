@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Direct Git Operations Test - Test git-operator agent without heavy embeddings
+"""Direct Git Operations Test - Test git-operator agent without heavy embeddings
 
 This script directly tests the git-operator agent capabilities by creating a minimal
 environment focused solely on git operations validation.
@@ -25,7 +24,8 @@ from scripts.agent_registry import AgentRegistry
 
 # Logging setup
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
 

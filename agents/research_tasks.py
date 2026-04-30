@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Research Agent Tasks
+"""Research Agent Tasks
 
 CrewAI-compatible task definitions for the Research Agent.
 These tasks can be used with CrewAI's Task class or standalone.
@@ -12,7 +11,9 @@ from agents.research_agent import ResearchAgent
 
 
 def create_research_task_config(
-    topic: str, talking_points: str = "", expected_output: str = None
+    topic: str,
+    talking_points: str = "",
+    expected_output: str = None,
 ) -> dict[str, Any]:
     """Create a CrewAI-compatible task configuration for research.
 
@@ -31,6 +32,7 @@ def create_research_task_config(
         ...     "adoption rates, ROI"
         ... )
         >>> task = Task(**config, agent=research_agent)
+
     """
     if expected_output is None:
         expected_output = """A comprehensive research brief with:
@@ -43,7 +45,7 @@ def create_research_task_config(
 
     description = f"""Research the topic "{topic}" for an Economist-style article.
 
-Focus areas: {talking_points if talking_points else "General coverage"}
+Focus areas: {talking_points or "General coverage"}
 
 Critical requirements:
 1. Every statistic MUST have a named source (organization, report, date)
@@ -68,7 +70,10 @@ The research should identify:
 
 
 def execute_research_task(
-    client: Any, topic: str, talking_points: str = "", governance: Any | None = None
+    client: Any,
+    topic: str,
+    talking_points: str = "",
+    governance: Any | None = None,
 ) -> dict[str, Any]:
     """Execute research task directly (non-CrewAI mode).
 
@@ -88,6 +93,7 @@ def execute_research_task(
         >>> from llm_client import create_llm_client
         >>> client = create_llm_client()
         >>> research = execute_research_task(client, "AI Testing")
+
     """
     agent = ResearchAgent(client, governance)
     return agent.research(topic, talking_points)
@@ -111,6 +117,7 @@ def research_tool_config() -> dict[str, Any]:
     Note:
         This is a placeholder for future CrewAI integration.
         Actual implementation will follow Sprint 7 Story 3 patterns.
+
     """
     return {
         "name": "research_economist_article",

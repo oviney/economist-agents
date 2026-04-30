@@ -13,13 +13,13 @@ import time
 from pathlib import Path
 
 import orjson
-
 from src.crews.stage3_crew import Stage3Crew
 
 
 def main() -> None:
     logging.basicConfig(
-        level=logging.INFO, format="%(levelname)s %(name)s: %(message)s"
+        level=logging.INFO,
+        format="%(levelname)s %(name)s: %(message)s",
     )
     topic = (
         " ".join(sys.argv[1:])
@@ -39,7 +39,7 @@ def main() -> None:
     chart = result.get("chart_data", {})
     (out_dir / "crewai_article.md").write_text(article)
     (out_dir / "crewai_chart.json").write_bytes(
-        orjson.dumps(chart, option=orjson.OPT_INDENT_2)
+        orjson.dumps(chart, option=orjson.OPT_INDENT_2),
     )
     metrics = {
         "topic": topic,
@@ -48,7 +48,7 @@ def main() -> None:
         "chart_keys": sorted(chart.keys()) if isinstance(chart, dict) else [],
     }
     (out_dir / "crewai_metrics.json").write_bytes(
-        orjson.dumps(metrics, option=orjson.OPT_INDENT_2)
+        orjson.dumps(metrics, option=orjson.OPT_INDENT_2),
     )
     print(f"Baseline complete: {elapsed:.1f}s, {len(article)} chars.")
 

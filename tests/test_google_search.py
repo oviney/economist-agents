@@ -39,7 +39,7 @@ def _make_web_response(n: int = 2) -> dict[str, Any]:
                 "date": "Apr 2026",
             }
             for i in range(1, n + 1)
-        ]
+        ],
     }
 
 
@@ -56,7 +56,7 @@ def _make_scholar_response(n: int = 2) -> dict[str, Any]:
                 "citedBy": i * 10,
             }
             for i in range(1, n + 1)
-        ]
+        ],
     }
 
 
@@ -96,7 +96,8 @@ class TestGoogleSearcherSearchWeb:
         assert len(results) == 3
 
     def test_missing_api_key_returns_error(
-        self, monkeypatch: pytest.MonkeyPatch
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """When SERPER_API_KEY is absent, returns error without HTTP call."""
         monkeypatch.delenv("SERPER_API_KEY", raising=False)
@@ -111,7 +112,8 @@ class TestGoogleSearcherSearchWeb:
         assert "SERPER_API_KEY" in results[0]["error"]
 
     def test_http_error_returns_structured_error(
-        self, searcher: GoogleSearcher
+        self,
+        searcher: GoogleSearcher,
     ) -> None:
         """HTTP error from Serper returns structured error dict."""
         mock_response = MagicMock()
@@ -125,7 +127,8 @@ class TestGoogleSearcherSearchWeb:
         assert "HTTP error" in results[0]["error"]
 
     def test_network_error_returns_structured_error(
-        self, searcher: GoogleSearcher
+        self,
+        searcher: GoogleSearcher,
     ) -> None:
         """Network failure returns structured error dict."""
         with patch(
@@ -149,7 +152,8 @@ class TestGoogleSearcherSearchWeb:
         assert results == []
 
     def test_year_appended_to_query_when_year_start_provided(
-        self, searcher: GoogleSearcher
+        self,
+        searcher: GoogleSearcher,
     ) -> None:
         """year_start causes an 'after:' clause to be added to the query."""
         mock_response = MagicMock()
@@ -157,7 +161,8 @@ class TestGoogleSearcherSearchWeb:
         mock_response.raise_for_status = MagicMock()
 
         with patch(
-            "scripts.google_search.requests.post", return_value=mock_response
+            "scripts.google_search.requests.post",
+            return_value=mock_response,
         ) as mock_post:
             searcher.search_web("test topic", year_start=2025)
 
@@ -165,7 +170,8 @@ class TestGoogleSearcherSearchWeb:
         assert "after:2024" in call_kwargs["q"]
 
     def test_single_year_appended_when_start_equals_end(
-        self, searcher: GoogleSearcher
+        self,
+        searcher: GoogleSearcher,
     ) -> None:
         """When year_start == year_end, just the year is appended."""
         mock_response = MagicMock()
@@ -173,7 +179,8 @@ class TestGoogleSearcherSearchWeb:
         mock_response.raise_for_status = MagicMock()
 
         with patch(
-            "scripts.google_search.requests.post", return_value=mock_response
+            "scripts.google_search.requests.post",
+            return_value=mock_response,
         ) as mock_post:
             searcher.search_web("test topic", year_start=2026, year_end=2026)
 
@@ -212,7 +219,8 @@ class TestGoogleSearcherSearchScholar:
         mock_response.raise_for_status = MagicMock()
 
         with patch(
-            "scripts.google_search.requests.post", return_value=mock_response
+            "scripts.google_search.requests.post",
+            return_value=mock_response,
         ) as mock_post:
             searcher.search_scholar("topic", year_start=2025, year_end=2026)
 
@@ -227,7 +235,8 @@ class TestGoogleSearcherSearchScholar:
         mock_response.raise_for_status = MagicMock()
 
         with patch(
-            "scripts.google_search.requests.post", return_value=mock_response
+            "scripts.google_search.requests.post",
+            return_value=mock_response,
         ) as mock_post:
             searcher.search_scholar("topic")
 
@@ -236,7 +245,8 @@ class TestGoogleSearcherSearchScholar:
         assert "yearHigh" not in payload
 
     def test_missing_api_key_returns_error(
-        self, monkeypatch: pytest.MonkeyPatch
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """When SERPER_API_KEY is absent, returns error without HTTP call."""
         monkeypatch.delenv("SERPER_API_KEY", raising=False)
@@ -249,7 +259,8 @@ class TestGoogleSearcherSearchScholar:
         assert "error" in results[0]
 
     def test_http_error_returns_structured_error(
-        self, searcher: GoogleSearcher
+        self,
+        searcher: GoogleSearcher,
     ) -> None:
         """HTTP error returns structured error dict."""
         mock_response = MagicMock()
@@ -268,7 +279,8 @@ class TestGoogleSearcherSearchScholar:
         mock_response.raise_for_status = MagicMock()
 
         with patch(
-            "scripts.google_search.requests.post", return_value=mock_response
+            "scripts.google_search.requests.post",
+            return_value=mock_response,
         ) as mock_post:
             searcher.search_scholar("topic")
 
@@ -307,7 +319,8 @@ class TestSearchGoogleForTopic:
         return mock_instance
 
     def test_success_returns_combined_results(
-        self, monkeypatch: pytest.MonkeyPatch
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Returns dict with success=True and both web and scholar results."""
         monkeypatch.setenv("SERPER_API_KEY", "fake-key")
@@ -315,8 +328,13 @@ class TestSearchGoogleForTopic:
         mock_response.json.side_effect = [
             {
                 "organic": [
-                    {"title": "W1", "link": "https://w1.com", "snippet": "", "date": ""}
-                ]
+                    {
+                        "title": "W1",
+                        "link": "https://w1.com",
+                        "snippet": "",
+                        "date": "",
+                    },
+                ],
             },
             {
                 "organic": [
@@ -327,8 +345,8 @@ class TestSearchGoogleForTopic:
                         "year": 2026,
                         "authors": "A",
                         "citedBy": 5,
-                    }
-                ]
+                    },
+                ],
             },
         ]
         mock_response.raise_for_status = MagicMock()
@@ -347,7 +365,8 @@ class TestSearchGoogleForTopic:
         assert result["error"] is None
 
     def test_year_range_set_to_current_and_previous(
-        self, monkeypatch: pytest.MonkeyPatch
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """current_year and year_start span current and previous year."""
         monkeypatch.setenv("SERPER_API_KEY", "fake-key")
@@ -355,7 +374,9 @@ class TestSearchGoogleForTopic:
 
         mock_instance = self._patch_searcher([], [])
         with patch.object(
-            google_search_module, "GoogleSearcher", return_value=mock_instance
+            google_search_module,
+            "GoogleSearcher",
+            return_value=mock_instance,
         ):
             result = search_google_for_topic("topic")
 
@@ -363,14 +384,17 @@ class TestSearchGoogleForTopic:
         assert result["year_start"] == current_year - 1
 
     def test_scholar_skipped_when_include_scholar_false(
-        self, monkeypatch: pytest.MonkeyPatch
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """When include_scholar=False, search_scholar is not called."""
         monkeypatch.setenv("SERPER_API_KEY", "fake-key")
         mock_instance = self._patch_searcher([], [])
 
         with patch.object(
-            google_search_module, "GoogleSearcher", return_value=mock_instance
+            google_search_module,
+            "GoogleSearcher",
+            return_value=mock_instance,
         ):
             result = search_google_for_topic("topic", include_scholar=False)
 
@@ -378,7 +402,8 @@ class TestSearchGoogleForTopic:
         assert result["scholar_results"] == []
 
     def test_exception_returns_failure_dict(
-        self, monkeypatch: pytest.MonkeyPatch
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Unexpected error returns success=False with error message."""
         monkeypatch.setenv("SERPER_API_KEY", "fake-key")
@@ -396,7 +421,8 @@ class TestSearchGoogleForTopic:
         assert result["scholar_results"] == []
 
     def test_web_query_includes_year_range(
-        self, monkeypatch: pytest.MonkeyPatch
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Web search query contains 'current_year OR previous_year' for freshness."""
         monkeypatch.setenv("SERPER_API_KEY", "fake-key")
@@ -404,7 +430,9 @@ class TestSearchGoogleForTopic:
         mock_instance = self._patch_searcher([], [])
 
         with patch.object(
-            google_search_module, "GoogleSearcher", return_value=mock_instance
+            google_search_module,
+            "GoogleSearcher",
+            return_value=mock_instance,
         ):
             search_google_for_topic("AI testing")
 

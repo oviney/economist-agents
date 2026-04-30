@@ -49,7 +49,9 @@ class TestPatternLogging:
         assert patterns[0].check_name == "image_exists"
 
     def test_multiple_failures_logged(
-        self, feedback: FeedbackLoop, sample_failure: dict
+        self,
+        feedback: FeedbackLoop,
+        sample_failure: dict,
     ) -> None:
         feedback.log_failure(sample_failure)
         feedback.log_failure({**sample_failure, "check_name": "frontmatter"})
@@ -57,14 +59,19 @@ class TestPatternLogging:
         assert len(patterns) == 2
 
     def test_pattern_persisted_to_file(
-        self, feedback: FeedbackLoop, sample_failure: dict, tmp_path: Path
+        self,
+        feedback: FeedbackLoop,
+        sample_failure: dict,
+        tmp_path: Path,
     ) -> None:
         feedback.log_failure(sample_failure)
         data = json.loads((tmp_path / "patterns.json").read_text())
         assert len(data["patterns"]) == 1
 
     def test_pattern_has_timestamp(
-        self, feedback: FeedbackLoop, sample_failure: dict
+        self,
+        feedback: FeedbackLoop,
+        sample_failure: dict,
     ) -> None:
         feedback.log_failure(sample_failure)
         pattern = feedback.get_patterns()[0]
@@ -80,7 +87,9 @@ class TestRuleInjection:
     """Given a logged pattern, When polish runs, Then prevention rule applied."""
 
     def test_generates_prevention_rule(
-        self, feedback: FeedbackLoop, sample_failure: dict
+        self,
+        feedback: FeedbackLoop,
+        sample_failure: dict,
     ) -> None:
         feedback.log_failure(sample_failure)
         rules = feedback.generate_prevention_rules()
@@ -88,7 +97,9 @@ class TestRuleInjection:
         assert any("image" in r["description"].lower() for r in rules)
 
     def test_rule_has_required_fields(
-        self, feedback: FeedbackLoop, sample_failure: dict
+        self,
+        feedback: FeedbackLoop,
+        sample_failure: dict,
     ) -> None:
         feedback.log_failure(sample_failure)
         rules = feedback.generate_prevention_rules()
@@ -108,7 +119,8 @@ class TestPrevention:
     """Given previous failure patterns, When new article processed, Then apply rules."""
 
     def test_known_pattern_detected_in_new_article(
-        self, feedback: FeedbackLoop
+        self,
+        feedback: FeedbackLoop,
     ) -> None:
         # Log a "missing layout" pattern
         feedback.log_failure(
@@ -117,7 +129,7 @@ class TestPrevention:
                 "status": "fail",
                 "message": "Missing critical field: layout",
                 "article_filename": "old-article.md",
-            }
+            },
         )
         # Check a new article missing layout
         article = '---\ntitle: "New"\ndate: 2026-04-04\n---\n\nBody'
@@ -135,7 +147,9 @@ class TestPerformance:
     """Feedback loop completes within 2 minutes."""
 
     def test_logging_under_100ms(
-        self, feedback: FeedbackLoop, sample_failure: dict
+        self,
+        feedback: FeedbackLoop,
+        sample_failure: dict,
     ) -> None:
         import time
 
@@ -155,14 +169,18 @@ class TestEscalation:
     """Given an ambiguous failure, When detected, Then escalate."""
 
     def test_single_occurrence_not_escalated(
-        self, feedback: FeedbackLoop, sample_failure: dict
+        self,
+        feedback: FeedbackLoop,
+        sample_failure: dict,
     ) -> None:
         feedback.log_failure(sample_failure)
         escalations = feedback.get_escalations()
         assert len(escalations) == 0
 
     def test_repeated_pattern_escalated(
-        self, feedback: FeedbackLoop, sample_failure: dict
+        self,
+        feedback: FeedbackLoop,
+        sample_failure: dict,
     ) -> None:
         for _ in range(3):
             feedback.log_failure(sample_failure)

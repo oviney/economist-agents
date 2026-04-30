@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Blog QA Agent with Self-Learning Skills
+"""Blog QA Agent with Self-Learning Skills
 
 Validates blog posts and site structure before publication.
 Learns from each run to improve validation patterns over time.
@@ -22,7 +21,9 @@ from skills_manager import SkillsManager
 
 
 def write_validation_log(
-    log_path: Path, issues: list[str], posts_validated: int
+    log_path: Path,
+    issues: list[str],
+    posts_validated: int,
 ) -> None:
     """Write validation issues to log file for learning.
 
@@ -30,6 +31,7 @@ def write_validation_log(
         log_path: Path to write log file
         issues: List of validation issues found
         posts_validated: Number of posts validated
+
     """
     log_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -42,8 +44,7 @@ def write_validation_log(
         if issues:
             f.write("VALIDATION ISSUES:\n")
             f.write("-" * 60 + "\n")
-            for i, issue in enumerate(issues, 1):
-                f.write(f"{i}. {issue}\n")
+            f.writelines(f"{i}. {issue}\n" for i, issue in enumerate(issues, 1))
         else:
             f.write("✅ No issues found - all validation checks passed\n")
 
@@ -63,6 +64,7 @@ def run_learning_loop(log_path: Path, role_name: str = "blog_qa") -> bool:
 
     Returns:
         True if learning succeeded, False otherwise
+
     """
     if not log_path.exists():
         print(f"⚠️  Learning skipped: Log file not found: {log_path}")
@@ -77,7 +79,7 @@ def run_learning_loop(log_path: Path, role_name: str = "blog_qa") -> bool:
     synthesizer_path = Path(__file__).parent / "skill_synthesizer.py"
     if not synthesizer_path.exists():
         print(
-            f"⚠️  Learning skipped: skill_synthesizer.py not found at {synthesizer_path}"
+            f"⚠️  Learning skipped: skill_synthesizer.py not found at {synthesizer_path}",
         )
         return False
 
@@ -115,11 +117,10 @@ def run_learning_loop(log_path: Path, role_name: str = "blog_qa") -> bool:
                 # Print synthesizer output (pattern summaries)
                 print(result.stdout)
             return True
-        else:
-            print(f"❌ Learning loop failed (exit code {result.returncode})")
-            if result.stderr:
-                print(f"   Error: {result.stderr}")
-            return False
+        print(f"❌ Learning loop failed (exit code {result.returncode})")
+        if result.stderr:
+            print(f"   Error: {result.stderr}")
+        return False
 
     except subprocess.TimeoutExpired:
         print("❌ Learning loop timed out after 60 seconds")
@@ -234,7 +235,7 @@ def check_broken_links(file_path):
                 and "graph" not in content.lower()
             ):
                 issues.append(
-                    f"Chart embedded but never referenced in text: {chart_img}"
+                    f"Chart embedded but never referenced in text: {chart_img}",
                 )
 
     for i, line in enumerate(lines, 1):
@@ -334,9 +335,8 @@ def validate_post(file_path, blog_dir=None, skills_manager=None):
         for issue in all_issues:
             print(f"  • {issue}")
         return False
-    else:
-        print("✅ All checks passed!")
-        return True
+    print("✅ All checks passed!")
+    return True
 
 
 def validate_blog_structure(blog_dir, skills_manager=None):
@@ -379,7 +379,7 @@ def validate_blog_structure(blog_dir, skills_manager=None):
                 layout_content = f.read()
                 if "{% seo %}" in layout_content and "jekyll-seo-tag" not in plugins:
                     print(
-                        "  ⚠️  Layout uses {% seo %} but jekyll-seo-tag not in plugins"
+                        "  ⚠️  Layout uses {% seo %} but jekyll-seo-tag not in plugins",
                     )
                     issues_found += 1
                     if skills_manager:
@@ -428,12 +428,14 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Validate blog posts with self-learning skills"
+        description="Validate blog posts with self-learning skills",
     )
     parser.add_argument("--blog-dir", required=True, help="Path to blog directory")
     parser.add_argument("--post", help="Specific post to validate (optional)")
     parser.add_argument(
-        "--show-skills", action="store_true", help="Show learned skills report"
+        "--show-skills",
+        action="store_true",
+        help="Show learned skills report",
     )
     parser.add_argument(
         "--learn",
@@ -461,7 +463,9 @@ if __name__ == "__main__":
             post_path = Path(args.blog_dir) / args.post
 
         success = validate_post(
-            post_path, args.blog_dir, skills_manager if args.learn else None
+            post_path,
+            args.blog_dir,
+            skills_manager if args.learn else None,
         )
         total_issues = 0 if success else 1
 
@@ -469,7 +473,7 @@ if __name__ == "__main__":
             skills_manager.record_run(total_issues)
             skills_manager.save()
             print(
-                "\n💡 Skills updated. Run with --show-skills to see learned patterns."
+                "\n💡 Skills updated. Run with --show-skills to see learned patterns.",
             )
 
         sys.exit(0 if success else 1)
@@ -481,14 +485,15 @@ if __name__ == "__main__":
 
         # Validate structure with Jekyll config checks
         structure_issues = validate_blog_structure(
-            blog_dir, skills_manager if args.learn else None
+            blog_dir,
+            skills_manager if args.learn else None,
         )
         total_issues += structure_issues
 
         if structure_issues > 0:
             print(f"\n⚠️  Found {structure_issues} structural issues")
             all_validation_issues.append(
-                f"[STRUCTURE] {structure_issues} issues in blog structure"
+                f"[STRUCTURE] {structure_issues} issues in blog structure",
             )
 
         # Validate all posts
@@ -501,12 +506,14 @@ if __name__ == "__main__":
             failed_posts = []
             for post in posts:
                 if not validate_post(
-                    post, blog_dir, skills_manager if args.learn else None
+                    post,
+                    blog_dir,
+                    skills_manager if args.learn else None,
                 ):
                     failed_posts.append(post.name)
                     total_issues += 1
                     all_validation_issues.append(
-                        f"[POST] {post.name} failed validation"
+                        f"[POST] {post.name} failed validation",
                     )
 
             if failed_posts:
@@ -521,7 +528,7 @@ if __name__ == "__main__":
             skills_manager.record_run(total_issues, 0)
             skills_manager.save()
             print(
-                f"\n💡 Skills updated. Total runs: {skills_manager.get_stats()['total_runs']}"
+                f"\n💡 Skills updated. Total runs: {skills_manager.get_stats()['total_runs']}",
             )
             print("   Run with --show-skills to see learned patterns.")
 
@@ -542,7 +549,7 @@ if __name__ == "__main__":
 
             if learning_success:
                 print(
-                    "\n🎓 Automated learning complete - new patterns may have been learned"
+                    "\n🎓 Automated learning complete - new patterns may have been learned",
                 )
             else:
                 print("\n⚠️  Automated learning encountered issues (see above)")

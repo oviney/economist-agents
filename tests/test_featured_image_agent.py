@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Tests for featured_image_agent.py
+"""Tests for featured_image_agent.py
 
 Covers:
 - ECONOMIST_IMAGE_STYLE constant — editorial quality requirements
@@ -134,7 +133,9 @@ class TestCreateImagePrompt:
     def test_contrarian_angle_included_when_provided(self) -> None:
         """Contrarian angle must appear in prompt when supplied."""
         prompt = create_image_prompt(
-            self.TOPIC, self.SUMMARY, contrarian_angle=self.CONTRARIAN
+            self.TOPIC,
+            self.SUMMARY,
+            contrarian_angle=self.CONTRARIAN,
         )
         assert self.CONTRARIAN in prompt
 

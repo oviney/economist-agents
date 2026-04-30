@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Record Metrics — CLI tool to append a pipeline run row to data/metrics.db.
+"""Record Metrics — CLI tool to append a pipeline run row to data/metrics.db.
 
 Usage:
     python3 scripts/record_metrics.py \\
@@ -78,6 +77,7 @@ def get_db_path() -> Path:
 
     Returns:
         Path to the SQLite database file.
+
     """
     import os
 
@@ -96,6 +96,7 @@ def init_db(db_path: Path | None = None) -> sqlite3.Connection:
     Returns:
         An open :class:`sqlite3.Connection` with row_factory set to
         ``sqlite3.Row``.
+
     """
     if db_path is None:
         db_path = get_db_path()
@@ -141,10 +142,11 @@ def record_run(
 
     Raises:
         ValueError: If *status* is not a recognised value.
+
     """
     if status not in _VALID_STATUSES:
         raise ValueError(
-            f"Invalid status {status!r}. Must be one of {sorted(_VALID_STATUSES)}"
+            f"Invalid status {status!r}. Must be one of {sorted(_VALID_STATUSES)}",
         )
     if run_id is None:
         run_id = str(uuid.uuid4())
@@ -190,6 +192,7 @@ def fetch_all_runs(db_path: Path | None = None) -> list[dict[str, Any]]:
 
     Returns:
         A list of dicts, each representing one pipeline run.
+
     """
     conn = init_db(db_path)
     try:
@@ -217,6 +220,7 @@ def compute_summary(runs: list[dict[str, Any]]) -> dict[str, Any]:
         - ``avg_duration_s`` (float)
         - ``total_cost_usd`` (float)
         - ``success_rate_pct`` (float)  — published / total × 100
+
     """
     if not runs:
         return {
@@ -313,7 +317,9 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Run status (default: unknown)",
     )
     parser.add_argument(
-        "--db-path", default=None, help="Override DB path (default: data/metrics.db)"
+        "--db-path",
+        default=None,
+        help="Override DB path (default: data/metrics.db)",
     )
     return parser
 

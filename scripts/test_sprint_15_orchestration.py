@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Test Sprint Orchestrator with Actual Sprint 15
+"""Test Sprint Orchestrator with Actual Sprint 15
 
 Tests our CrewAI sprint orchestrator with real Sprint 15 data to validate
 if it can handle the coordination complexity the user experienced manually.
@@ -33,7 +32,8 @@ class Sprint15OrchestrationTest:
 
         # Look for current sprint status
         current_sprint_match = re.search(
-            r"\*\*Active Sprint\*\*: Sprint 15.*?Status\*\*: (.+)", content
+            r"\*\*Active Sprint\*\*: Sprint 15.*?Status\*\*: (.+)",
+            content,
         )
         if current_sprint_match:
             status = current_sprint_match.group(1)
@@ -157,13 +157,14 @@ class Sprint15OrchestrationTest:
 
         print(f"   ✅ Parsed {len(sprint_15_stories)} Sprint 15 stories")
         print(
-            f"   📊 Total: {sprint_data['total_points']} points, {sprint_data['completed_points']} complete"
+            f"   📊 Total: {sprint_data['total_points']} points, {sprint_data['completed_points']} complete",
         )
 
         return sprint_data
 
     def simulate_sprint_orchestrator_analysis(
-        self, sprint_data: dict
+        self,
+        sprint_data: dict,
     ) -> dict[str, Any]:
         """Simulate how sprint orchestrator would analyze Sprint 15."""
         print("🎯 Sprint Orchestrator analyzing Sprint 15 complexity...")
@@ -196,12 +197,12 @@ class Sprint15OrchestrationTest:
         # Analyze complexity factors
         complexity_analysis = {
             "story_type_diversity": len(
-                {s["crew_type"] for s in sprint_data["stories"]}
+                {s["crew_type"] for s in sprint_data["stories"]},
             ),
             "priority_mix": len({s["priority"] for s in sprint_data["stories"]}),
             "status_mix": len({s["status"] for s in sprint_data["stories"]}),
             "parallel_execution_potential": len(
-                [s for s in sprint_data["stories"] if s["status"] != "COMPLETE"]
+                [s for s in sprint_data["stories"] if s["status"] != "COMPLETE"],
             ),
             "dependency_complexity": len(dependencies),
         }
@@ -226,7 +227,9 @@ class Sprint15OrchestrationTest:
         return orchestration_plan
 
     def simulate_parallel_execution_coordination(
-        self, sprint_data: dict, orchestration_plan: dict
+        self,
+        sprint_data: dict,
+        orchestration_plan: dict,
     ) -> dict[str, Any]:
         """Simulate coordinating parallel execution of Sprint 15 stories."""
         print("⚡ Simulating parallel coordination of Sprint 15...")
@@ -255,7 +258,7 @@ class Sprint15OrchestrationTest:
                     "execution_mode": "parallel",
                     "estimated_time": max(s["story_points"] for s in phase_1_stories)
                     * 2.8,  # hours per point
-                }
+                },
             )
 
         # Phase 2: Dependent stories (after Phase 1 completes)
@@ -273,7 +276,7 @@ class Sprint15OrchestrationTest:
                     "execution_mode": "parallel",
                     "estimated_time": max(s["story_points"] for s in phase_2_stories)
                     * 2.8,
-                }
+                },
             )
 
         # Simulate coordination challenges
@@ -288,7 +291,7 @@ class Sprint15OrchestrationTest:
                     "description": f"Stories in different states: {', '.join(statuses)}",
                     "agent_capability": "Medium - requires sophisticated status tracking",
                     "human_judgment_needed": "Low - status is factual",
-                }
+                },
             )
 
         # Challenge 2: Priority balancing
@@ -300,7 +303,7 @@ class Sprint15OrchestrationTest:
                     "description": "Dashboard P0 work vs P1 infrastructure work",
                     "agent_capability": "High - can prioritize P0 first",
                     "human_judgment_needed": "Low - priority is explicit",
-                }
+                },
             )
 
         # Challenge 3: Crew type coordination
@@ -312,7 +315,7 @@ class Sprint15OrchestrationTest:
                     "description": f"Coordinating: {', '.join(crew_assignments.keys())}",
                     "agent_capability": "Medium - requires crew handoff management",
                     "human_judgment_needed": "Medium - resource allocation decisions",
-                }
+                },
             )
 
         # Challenge 4: Infrastructure dependencies
@@ -323,17 +326,17 @@ class Sprint15OrchestrationTest:
                     "description": f"Story dependencies: {dependencies}",
                     "agent_capability": "High - dependency graphs are logical",
                     "human_judgment_needed": "Low - dependencies are technical",
-                }
+                },
             )
 
         coordination_result = {
             "execution_phases": execution_phases,
             "coordination_challenges": coordination_challenges,
             "overall_complexity": self._assess_coordination_complexity(
-                coordination_challenges
+                coordination_challenges,
             ),
             "automation_feasibility": self._assess_automation_feasibility(
-                coordination_challenges
+                coordination_challenges,
             ),
         }
 
@@ -377,7 +380,6 @@ class Sprint15OrchestrationTest:
 
     def _assess_automation_feasibility(self, challenges: list[dict]) -> dict[str, Any]:
         """Assess how much of Sprint 15 coordination could be automated."""
-
         # Calculate automation percentage based on challenges
         total_challenges = len(challenges)
         if total_challenges == 0:
@@ -421,7 +423,8 @@ class Sprint15OrchestrationTest:
         return feasibility_assessment
 
     def simulate_human_coordination_comparison(
-        self, sprint_data: dict
+        self,
+        sprint_data: dict,
     ) -> dict[str, Any]:
         """Compare agent coordination vs what human actually did."""
         print("👤 Analyzing what human coordination actually involved...")
@@ -519,7 +522,8 @@ class Sprint15OrchestrationTest:
 
         # Test parallel coordination
         coordination_result = self.simulate_parallel_execution_coordination(
-            sprint_data, orchestration_plan
+            sprint_data,
+            orchestration_plan,
         )
         print()
 
@@ -539,14 +543,17 @@ class Sprint15OrchestrationTest:
                 f"Human coordination value: {100 - human_comparison['overall_automation_potential']:.0f}% strategic judgment",
             ],
             "validation_conclusion": self._generate_validation_conclusion(
-                coordination_result, human_comparison
+                coordination_result,
+                human_comparison,
             ),
         }
 
         return final_assessment
 
     def _generate_validation_conclusion(
-        self, coordination_result: dict, human_comparison: dict
+        self,
+        coordination_result: dict,
+        human_comparison: dict,
     ) -> dict[str, Any]:
         """Generate final validation conclusion."""
         automation_percentage = coordination_result["automation_feasibility"][
@@ -608,10 +615,10 @@ def main():
     print("\n🤖 AUTOMATION ANALYSIS:")
     print(f"   • Overall automation potential: {feasibility['automation_percentage']}%")
     print(
-        f"   • Fully automatable: {', '.join(feasibility['fully_automatable_aspects'][:2])}"
+        f"   • Fully automatable: {', '.join(feasibility['fully_automatable_aspects'][:2])}",
     )
     print(
-        f"   • Requires oversight: {', '.join(feasibility['requires_human_oversight'][:2])}"
+        f"   • Requires oversight: {', '.join(feasibility['requires_human_oversight'][:2])}",
     )
 
     # Print complexity assessment

@@ -1,5 +1,4 @@
-"""
-Comprehensive tests for scripts/editorial_board.py
+"""Comprehensive tests for scripts/editorial_board.py
 
 Tests the editorial board voting system with 6 persona agents,
 weighted aggregation, and consensus determination.
@@ -82,7 +81,7 @@ def sample_vote_response():
             ],
             "top_pick": 1,
             "top_pick_reason": "Best combination of data and insight.",
-        }
+        },
     )
 
 
@@ -95,7 +94,10 @@ class TestPersonaAgents:
     """Test individual board member persona voting."""
 
     def test_vp_engineering_votes(
-        self, mock_llm_client, sample_topics, sample_vote_response
+        self,
+        mock_llm_client,
+        sample_topics,
+        sample_vote_response,
     ):
         """Test VP of Engineering persona votes on topics."""
         with patch("editorial_board.call_llm") as mock_call_llm:
@@ -105,7 +107,10 @@ class TestPersonaAgents:
             member_info = BOARD_MEMBERS[member_id]
 
             result = get_board_vote(
-                mock_llm_client, member_id, member_info, sample_topics
+                mock_llm_client,
+                member_id,
+                member_info,
+                sample_topics,
             )
 
             # Verify vote structure
@@ -124,7 +129,10 @@ class TestPersonaAgents:
             assert "TOPIC 2" in call_args[0][2]
 
     def test_senior_qe_lead_votes(
-        self, mock_llm_client, sample_topics, sample_vote_response
+        self,
+        mock_llm_client,
+        sample_topics,
+        sample_vote_response,
     ):
         """Test Senior QE Lead persona votes on topics."""
         with patch("editorial_board.call_llm") as mock_call_llm:
@@ -134,7 +142,10 @@ class TestPersonaAgents:
             member_info = BOARD_MEMBERS[member_id]
 
             result = get_board_vote(
-                mock_llm_client, member_id, member_info, sample_topics
+                mock_llm_client,
+                member_id,
+                member_info,
+                sample_topics,
             )
 
             assert result["member_id"] == member_id
@@ -143,7 +154,10 @@ class TestPersonaAgents:
             assert len(result["votes"]) == 2
 
     def test_data_skeptic_votes(
-        self, mock_llm_client, sample_topics, sample_vote_response
+        self,
+        mock_llm_client,
+        sample_topics,
+        sample_vote_response,
     ):
         """Test Data Skeptic persona votes on topics."""
         with patch("editorial_board.call_llm") as mock_call_llm:
@@ -153,7 +167,10 @@ class TestPersonaAgents:
             member_info = BOARD_MEMBERS[member_id]
 
             result = get_board_vote(
-                mock_llm_client, member_id, member_info, sample_topics
+                mock_llm_client,
+                member_id,
+                member_info,
+                sample_topics,
             )
 
             assert result["member_id"] == member_id
@@ -161,7 +178,10 @@ class TestPersonaAgents:
             assert result["weight"] == 1.1
 
     def test_career_climber_votes(
-        self, mock_llm_client, sample_topics, sample_vote_response
+        self,
+        mock_llm_client,
+        sample_topics,
+        sample_vote_response,
     ):
         """Test Career Climber persona votes on topics."""
         with patch("editorial_board.call_llm") as mock_call_llm:
@@ -171,7 +191,10 @@ class TestPersonaAgents:
             member_info = BOARD_MEMBERS[member_id]
 
             result = get_board_vote(
-                mock_llm_client, member_id, member_info, sample_topics
+                mock_llm_client,
+                member_id,
+                member_info,
+                sample_topics,
             )
 
             assert result["member_id"] == member_id
@@ -179,7 +202,10 @@ class TestPersonaAgents:
             assert result["weight"] == 0.8
 
     def test_economist_editor_votes(
-        self, mock_llm_client, sample_topics, sample_vote_response
+        self,
+        mock_llm_client,
+        sample_topics,
+        sample_vote_response,
     ):
         """Test Economist Editor persona votes on topics."""
         with patch("editorial_board.call_llm") as mock_call_llm:
@@ -189,7 +215,10 @@ class TestPersonaAgents:
             member_info = BOARD_MEMBERS[member_id]
 
             result = get_board_vote(
-                mock_llm_client, member_id, member_info, sample_topics
+                mock_llm_client,
+                member_id,
+                member_info,
+                sample_topics,
             )
 
             assert result["member_id"] == member_id
@@ -197,7 +226,10 @@ class TestPersonaAgents:
             assert result["weight"] == 1.3  # Highest weight
 
     def test_busy_reader_votes(
-        self, mock_llm_client, sample_topics, sample_vote_response
+        self,
+        mock_llm_client,
+        sample_topics,
+        sample_vote_response,
     ):
         """Test Busy Reader persona votes on topics."""
         with patch("editorial_board.call_llm") as mock_call_llm:
@@ -207,7 +239,10 @@ class TestPersonaAgents:
             member_info = BOARD_MEMBERS[member_id]
 
             result = get_board_vote(
-                mock_llm_client, member_id, member_info, sample_topics
+                mock_llm_client,
+                member_id,
+                member_info,
+                sample_topics,
             )
 
             assert result["member_id"] == member_id
@@ -224,7 +259,11 @@ class TestVoteCollection:
     """Test vote collection from all board members."""
 
     def test_collect_votes_all_personas(
-        self, mock_llm_client, sample_topics, sample_vote_response, capsys
+        self,
+        mock_llm_client,
+        sample_topics,
+        sample_vote_response,
+        capsys,
     ):
         """Test collecting votes from all 6 board members."""
         with patch("editorial_board.call_llm") as mock_call_llm:
@@ -255,7 +294,10 @@ class TestVoteCollection:
             assert "VOTING RESULTS" in captured.out
 
     def test_collect_votes_with_api_failure(
-        self, mock_llm_client, sample_topics, sample_vote_response
+        self,
+        mock_llm_client,
+        sample_topics,
+        sample_vote_response,
     ):
         """Test handling of API failures during voting."""
         with patch("editorial_board.call_llm") as mock_call_llm:
@@ -307,7 +349,10 @@ class TestAggregation:
     """Test weighted score aggregation and ranking."""
 
     def test_weighted_scoring_calculation(
-        self, mock_llm_client, sample_topics, sample_vote_response
+        self,
+        mock_llm_client,
+        sample_topics,
+        sample_vote_response,
     ):
         """Test weighted score calculation with different weights."""
         with patch("editorial_board.call_llm") as mock_call_llm:
@@ -321,7 +366,7 @@ class TestAggregation:
                         ],
                         "top_pick": 1,
                         "top_pick_reason": "...",
-                    }
+                    },
                 )
 
             # VP (weight 1.2): Topic1=8, Topic2=6
@@ -352,7 +397,10 @@ class TestAggregation:
             assert result["rankings"][1]["rank"] == 2
 
     def test_aggregate_board_decision(
-        self, mock_llm_client, sample_topics, sample_vote_response
+        self,
+        mock_llm_client,
+        sample_topics,
+        sample_vote_response,
     ):
         """Test complete board decision aggregation."""
         with patch("editorial_board.call_llm") as mock_call_llm:
@@ -387,7 +435,7 @@ class TestAggregation:
                     ],
                     "top_pick": 1,  # All agree on topic 1
                     "top_pick_reason": "Best choice",
-                }
+                },
             )
             mock_call_llm.return_value = unanimous_vote
 
@@ -408,7 +456,7 @@ class TestAggregation:
                         ],
                         "top_pick": top_pick_idx,
                         "top_pick_reason": "My choice",
-                    }
+                    },
                 )
 
             mock_call_llm.side_effect = [
@@ -452,7 +500,12 @@ class TestOutput:
             assert result["top_pick"]["weighted_score"] > 0
 
     def test_save_board_decision(
-        self, mock_llm_client, sample_topics, sample_vote_response, tmp_path, capsys
+        self,
+        mock_llm_client,
+        sample_topics,
+        sample_vote_response,
+        tmp_path,
+        capsys,
     ):
         """Test saving board decision to files."""
         with (
@@ -468,7 +521,7 @@ class TestOutput:
             # Mock file read for content_queue.json
             with patch("builtins.open", mock_open(read_data='{"topics": []}')) as mf:
                 mf.return_value.read.return_value = json.dumps(
-                    {"topics": sample_topics}
+                    {"topics": sample_topics},
                 )
 
                 # Need to patch open separately for reading and writing
@@ -529,7 +582,10 @@ class TestIntegration:
     """Integration tests for full board workflow."""
 
     def test_format_board_report(
-        self, mock_llm_client, sample_topics, sample_vote_response
+        self,
+        mock_llm_client,
+        sample_topics,
+        sample_vote_response,
     ):
         """Test markdown report generation."""
         with patch("editorial_board.call_llm") as mock_call_llm:
@@ -548,7 +604,10 @@ class TestIntegration:
             assert "Weighted Score:" in report
 
     def test_parallel_vs_sequential_voting(
-        self, mock_llm_client, sample_topics, sample_vote_response
+        self,
+        mock_llm_client,
+        sample_topics,
+        sample_vote_response,
     ):
         """Test parallel and sequential voting produce same results."""
         with patch("editorial_board.call_llm") as mock_call_llm:
@@ -556,7 +615,9 @@ class TestIntegration:
 
             # Run sequentially
             result_seq = run_editorial_board(
-                mock_llm_client, sample_topics, parallel=False
+                mock_llm_client,
+                sample_topics,
+                parallel=False,
             )
 
         with patch("editorial_board.call_llm") as mock_call_llm:
@@ -564,7 +625,9 @@ class TestIntegration:
 
             # Run in parallel
             result_par = run_editorial_board(
-                mock_llm_client, sample_topics, parallel=True
+                mock_llm_client,
+                sample_topics,
+                parallel=True,
             )
 
         # Both should produce same rankings
@@ -584,7 +647,11 @@ class TestMainFunction:
     """Test main() entry point with different scenarios."""
 
     def test_main_with_environment_variable(
-        self, mock_llm_client, sample_topics, sample_vote_response, capsys
+        self,
+        mock_llm_client,
+        sample_topics,
+        sample_vote_response,
+        capsys,
     ):
         """Test main() with TOPICS environment variable."""
         with (
@@ -631,7 +698,11 @@ class TestMainFunction:
             assert "No topics to evaluate" in captured.out
 
     def test_main_with_github_output(
-        self, mock_llm_client, sample_topics, sample_vote_response, tmp_path
+        self,
+        mock_llm_client,
+        sample_topics,
+        sample_vote_response,
+        tmp_path,
     ):
         """Test main() writes to GITHUB_OUTPUT."""
         github_output = tmp_path / "github_output.txt"

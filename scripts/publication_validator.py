@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Publication Validator - Final Quality Gate (v2 with Defect Prevention)
+"""Publication Validator - Final Quality Gate (v2 with Defect Prevention)
 
 Blocks publication of articles that don't meet minimum quality standards.
 This is the LAST line of defense before an article goes live.
@@ -79,10 +78,10 @@ class PublicationValidator:
     }
 
     def __init__(self, expected_date: str | None = None):
-        """
-        Args:
-            expected_date: Expected publication date (YYYY-MM-DD).
-                          Defaults to today.
+        """Args:
+        expected_date: Expected publication date (YYYY-MM-DD).
+                      Defaults to today.
+
         """
         self.expected_date = expected_date or datetime.now().strftime("%Y-%m-%d")
         self.issues = []
@@ -94,10 +93,11 @@ class PublicationValidator:
             self.defect_checker = None
 
     def validate(
-        self, article_content: str, article_path: str | None = None
+        self,
+        article_content: str,
+        article_path: str | None = None,
     ) -> tuple[bool, list[dict[str, str]]]:
-        """
-        Validate article for publication.
+        """Validate article for publication.
 
         Args:
             article_content: Full article text including front matter
@@ -106,6 +106,7 @@ class PublicationValidator:
         Returns:
             (is_valid, list_of_issues)
             is_valid is False if any CRITICAL issues found
+
         """
         self.issues = []
 
@@ -177,7 +178,7 @@ class PublicationValidator:
                     "message": f"Found {len(matches)} unverified claims: {set(matches)}",
                     "details": "All [NEEDS SOURCE] and [UNVERIFIED] tags must be resolved",
                     "fix": "Remove flags by adding proper sources or removing unsourced claims",
-                }
+                },
             )
 
     def _check_yaml_format(self, content: str):
@@ -190,7 +191,7 @@ class PublicationValidator:
                     "message": "YAML front matter wrapped in code fence",
                     "details": "Jekyll requires front matter to use --- delimiters",
                     "fix": "Replace ```yaml with --- at start and end",
-                }
+                },
             )
             return
 
@@ -202,7 +203,7 @@ class PublicationValidator:
                     "message": "Missing YAML front matter",
                     "details": "Article must start with --- delimiter",
                     "fix": "Add YAML front matter at top of file",
-                }
+                },
             )
 
     def _check_date(self, content: str):
@@ -216,7 +217,9 @@ class PublicationValidator:
                     article_date = str(front_matter.get("date", ""))
 
                     # Normalize date format
-                    article_date = article_date.split()[0]  # Remove time if present
+                    article_date = article_date.split(maxsplit=1)[
+                        0
+                    ]  # Remove time if present
 
                     if article_date != self.expected_date:
                         self.issues.append(
@@ -226,7 +229,7 @@ class PublicationValidator:
                                 "message": f"Date mismatch: article shows {article_date}, expected {self.expected_date}",
                                 "details": "Publication date must match current date",
                                 "fix": f"Update date to {self.expected_date}",
-                            }
+                            },
                         )
         except Exception as e:
             self.issues.append(
@@ -236,7 +239,7 @@ class PublicationValidator:
                     "message": f"Could not parse date from front matter: {e}",
                     "details": "Ensure date field is properly formatted",
                     "fix": "Check YAML syntax and date format",
-                }
+                },
             )
 
     def _check_title(self, content: str):
@@ -258,7 +261,7 @@ class PublicationValidator:
                                     "message": f'Title too generic: "{title}"',
                                     "details": "Title should be specific and include topic context",
                                     "fix": 'Add topic keywords to title (e.g., "Self-Healing Tests: Myth vs Reality")',
-                                }
+                                },
                             )
                             break
 
@@ -275,7 +278,7 @@ class PublicationValidator:
                                 "message": f'Title may be too short: "{title}" ({word_count} words)',
                                 "details": "Unless this is a clever pun, consider adding context",
                                 "fix": "Add subtitle or expand title with topic keywords",
-                            }
+                            },
                         )
         except Exception:
             pass  # Title check is non-critical if YAML parsing fails
@@ -301,7 +304,7 @@ class PublicationValidator:
                     "message": f"Found {len(found_placeholders)} placeholder(s)",
                     "details": "\n".join(found_placeholders),
                     "fix": "Remove or replace all placeholder text",
-                }
+                },
             )
 
     def _check_weak_endings(self, content: str):
@@ -351,7 +354,7 @@ class PublicationValidator:
                         "phrase": match.group(),
                         "reason": reason,
                         "context": f"...{context}...",
-                    }
+                    },
                 )
 
         if violations:
@@ -359,7 +362,7 @@ class PublicationValidator:
                 [
                     f'  • "{v["phrase"]}" ({v["reason"]}) in: {v["context"]}'
                     for v in violations
-                ]
+                ],
             )
 
             self.issues.append(
@@ -369,7 +372,7 @@ class PublicationValidator:
                     "message": f"Weak/hedging ending detected ({len(violations)} violations)",
                     "details": details,
                     "fix": "Rewrite ending with definitive statement or clear prediction",
-                }
+                },
             )
 
     def _check_word_count(self, content: str) -> None:
@@ -394,7 +397,7 @@ class PublicationValidator:
                     "message": f"Article too short: {word_count} words (minimum 700 required)",
                     "details": "Economist-style articles require 700-1200 words for adequate depth",
                     "fix": "Expand article with additional examples, data points, or deeper analysis",
-                }
+                },
             )
 
     def _check_description(self, content: str) -> None:
@@ -422,7 +425,7 @@ class PublicationValidator:
                                 "message": "Front matter missing 'description' field",
                                 "details": "description is required for SEO and social sharing",
                                 "fix": "Add description: '<summary ≤160 chars>' to front matter",
-                            }
+                            },
                         )
                     elif isinstance(description, str) and len(description) > 160:
                         self.issues.append(
@@ -435,7 +438,7 @@ class PublicationValidator:
                                 ),
                                 "details": "Search engines truncate descriptions beyond 160 characters",
                                 "fix": "Shorten description to ≤160 characters",
-                            }
+                            },
                         )
         except Exception:
             pass  # YAML parse errors are caught by _check_yaml_format
@@ -462,7 +465,7 @@ class PublicationValidator:
                                     "Add categories: [<category>] with one of: "
                                     + ", ".join(self.VALID_CATEGORIES)
                                 ),
-                            }
+                            },
                         )
                         return
 
@@ -485,7 +488,7 @@ class PublicationValidator:
                                     "details": "Category must map to a valid blog category",
                                     "fix": "Use one of: "
                                     + ", ".join(self.VALID_CATEGORIES),
-                                }
+                                },
                             )
         except Exception:
             pass  # YAML parse errors are caught by _check_yaml_format
@@ -508,7 +511,7 @@ class PublicationValidator:
                                 "message": f'Invalid author "{author}". Expected "Ouray Viney"',
                                 "details": "Published blog posts must use the production author metadata contract",
                                 "fix": 'Set author to "Ouray Viney"',
-                            }
+                            },
                         )
         except Exception:
             pass
@@ -526,7 +529,7 @@ class PublicationValidator:
                     image = str(front_matter.get("image", "") or "").strip()
                     image_alt = str(front_matter.get("image_alt", "") or "").strip()
                     image_caption = str(
-                        front_matter.get("image_caption", "") or ""
+                        front_matter.get("image_caption", "") or "",
                     ).strip()
 
                     if not image:
@@ -537,7 +540,7 @@ class PublicationValidator:
                                 "message": "Article missing hero image",
                                 "details": "Production blog posts require article-specific hero imagery",
                                 "fix": "Set image to a real article asset path",
-                            }
+                            },
                         )
                     elif "blog-default.svg" in image:
                         self.issues.append(
@@ -547,7 +550,7 @@ class PublicationValidator:
                                 "message": "Article still uses blog-default.svg fallback",
                                 "details": "Default hero fallback must not pass the publication gate",
                                 "fix": "Generate or assign article-specific hero art before publishing",
-                            }
+                            },
                         )
 
                     if not image_alt:
@@ -558,7 +561,7 @@ class PublicationValidator:
                                 "message": "Article missing image_alt",
                                 "details": "Published posts require reader-facing alt text for hero art",
                                 "fix": "Add concise image_alt describing the visible scene",
-                            }
+                            },
                         )
 
                     if not image_caption:
@@ -569,7 +572,7 @@ class PublicationValidator:
                                 "message": "Article missing image_caption",
                                 "details": "Published posts require an editorial hero caption",
                                 "fix": "Add image_caption explaining the image's editorial point",
-                            }
+                            },
                         )
         except Exception:
             pass
@@ -589,7 +592,7 @@ class PublicationValidator:
                     "message": "Heading markers are embedded inside paragraph text",
                     "details": "Malformed markdown like '... sentence. ## Heading' must not publish",
                     "fix": "Move each markdown heading to its own line with surrounding paragraph breaks",
-                }
+                },
             )
 
     # Banned closing phrases aligned with stage4_crew._BANNED_CLOSINGS + extras.
@@ -670,7 +673,7 @@ class PublicationValidator:
                     "message": f"Weak/hedging ending detected ({len(violations)} violations)",
                     "details": details,
                     "fix": "Rewrite ending with a vivid prediction, metaphor, or concrete forward-looking statement",
-                }
+                },
             )
 
     def _check_chart_references(self, content: str):
@@ -687,7 +690,7 @@ class PublicationValidator:
                     "details": "Charts are mandatory per Economist editorial standards. "
                     "A chart image must be embedded as ![...](/assets/charts/<slug>.png)",
                     "fix": "Run the graphics_agent to generate a chart and embed it in the article body",
-                }
+                },
             )
             return
 
@@ -708,12 +711,11 @@ class PublicationValidator:
                         "message": f"Chart embedded but never referenced: {chart_file}",
                         "details": 'Chart should be mentioned in the article text (e.g., "As the chart shows...")',
                         "fix": "Add a sentence referencing the chart near where it appears",
-                    }
+                    },
                 )
 
     def _check_references_section(self, content: str):
-        """
-        Check for References section (FEATURE-001)
+        """Check for References section (FEATURE-001)
 
         Validates:
         - References section present (## References header)
@@ -723,7 +725,7 @@ class PublicationValidator:
         """
         # Check if References section exists
         has_references_header = bool(
-            re.search(r"^## References", content, re.MULTILINE)
+            re.search(r"^## References", content, re.MULTILINE),
         )
 
         if not has_references_header:
@@ -734,13 +736,15 @@ class PublicationValidator:
                     "message": "Article missing References section",
                     "details": "All articles must include '## References' section before closing paragraph",
                     "fix": "Add '## References' section with minimum 3 authoritative sources",
-                }
+                },
             )
             return
 
         # Extract references section (match content after header until next section or end)
         refs_match = re.search(
-            r"## References\s*\n(.*?)(?=^##|\Z)", content, re.DOTALL | re.MULTILINE
+            r"## References\s*\n(.*?)(?=^##|\Z)",
+            content,
+            re.DOTALL | re.MULTILINE,
         )
         if not refs_match:
             # Check if header exists but with no content before next section
@@ -752,7 +756,7 @@ class PublicationValidator:
                         "message": "References section header exists but is empty",
                         "details": "References section must contain at least 3 sources",
                         "fix": "Add authoritative sources with proper formatting",
-                    }
+                    },
                 )
             return
 
@@ -767,7 +771,7 @@ class PublicationValidator:
                     "message": "References section header exists but is empty",
                     "details": "References section must contain at least 3 sources",
                     "fix": "Add authoritative sources with proper formatting",
-                }
+                },
             )
             return
 
@@ -783,7 +787,7 @@ class PublicationValidator:
                     "message": f"Only {reference_count} reference(s) found, minimum 3 required",
                     "details": "Articles must cite at least 3 authoritative sources",
                     "fix": "Add additional authoritative sources (academic, government, industry reports)",
-                }
+                },
             )
 
         # Check for bad link text patterns
@@ -803,7 +807,7 @@ class PublicationValidator:
 
         if violations:
             details = "\n".join(
-                [f"  • {v['text']} - {v['reason']}" for v in violations]
+                [f"  • {v['text']} - {v['reason']}" for v in violations],
             )
             self.issues.append(
                 {
@@ -812,12 +816,11 @@ class PublicationValidator:
                     "message": f"Found {len(violations)} reference(s) with poor link text",
                     "details": details,
                     "fix": "Use descriptive anchor text (e.g., 'World Quality Report 2024')",
-                }
+                },
             )
 
     def _check_defect_patterns(self, content: str, article_path: str = None):
-        """
-        Check for historical defect patterns (learned from RCA)
+        """Check for historical defect patterns (learned from RCA)
 
         NEW in v2: Integrates DefectPrevention rules from 6 documented bugs
         Prevents: BUG-016 (chart not embedded), BUG-015 (missing category), etc.
@@ -856,7 +859,9 @@ class PublicationValidator:
             # Clean message
             clean_message = re.sub(r"^\[\w+\]\s*", "", violation)
             clean_message = re.sub(
-                r"\s*\(Pattern: BUG-\d+-pattern\)\s*$", "", clean_message
+                r"\s*\(Pattern: BUG-\d+-pattern\)\s*$",
+                "",
+                clean_message,
             )
 
             self.issues.append(
@@ -866,7 +871,7 @@ class PublicationValidator:
                     "message": clean_message,
                     "details": f"Historical pattern from {pattern_id}",
                     "fix": "See message for specific remediation",
-                }
+                },
             )
 
     def format_report(self, is_valid: bool, issues: list[dict]) -> str:
@@ -909,8 +914,7 @@ class PublicationValidator:
 
 
 def validate_file(file_path: str, expected_date: str = None) -> tuple[bool, str]:
-    """
-    Validate a file for publication.
+    """Validate a file for publication.
 
     Args:
         file_path: Path to article file
@@ -918,6 +922,7 @@ def validate_file(file_path: str, expected_date: str = None) -> tuple[bool, str]
 
     Returns:
         (is_valid, report_text)
+
     """
     validator = PublicationValidator(expected_date)
 

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Integration Tests for Agent Pipeline (Sprint 8 Story 3)
+"""Integration Tests for Agent Pipeline (Sprint 8 Story 3)
 
 Tests the COMPLETE workflow: Research → Writer → Editor → Validator → Publication
 
@@ -226,12 +225,11 @@ def mock_call_llm():
         # Accept temperature and other kwargs but ignore them
         if "Research Analyst" in system_prompt:
             return MOCK_RESEARCH_RESPONSE
-        elif "senior writer" in system_prompt:
+        if "senior writer" in system_prompt:
             return MOCK_WRITER_RESPONSE
-        elif "chief editor" in system_prompt:
+        if "chief editor" in system_prompt:
             return MOCK_EDITOR_RESPONSE
-        else:
-            return '{"status": "ok"}'
+        return '{"status": "ok"}'
 
     return _mock_call
 
@@ -245,10 +243,12 @@ class TestAgentPipeline:
     """Test complete agent pipeline integration"""
 
     def test_happy_path_end_to_end(
-        self, mock_llm_client, mock_call_llm, temp_output_dir
+        self,
+        mock_llm_client,
+        mock_call_llm,
+        temp_output_dir,
     ):
         """Test: Complete pipeline produces valid article"""
-
         with (
             patch("llm_client.call_llm", mock_call_llm),
             patch("agents.research_agent.call_llm", mock_call_llm),
@@ -290,10 +290,12 @@ class TestAgentPipeline:
             assert "## References" in content, "Must have References section"
 
     def test_chart_integration_workflow(
-        self, mock_llm_client, mock_call_llm, temp_output_dir
+        self,
+        mock_llm_client,
+        mock_call_llm,
+        temp_output_dir,
     ):
         """Test: Chart generation → embedding → validation"""
-
         # Mock chart generation
         with (
             patch("llm_client.call_llm", mock_call_llm),
@@ -325,7 +327,6 @@ class TestAgentPipeline:
 
     def test_editor_rejects_bad_content(self, mock_llm_client):
         """Test: Editor quality gates block bad content"""
-
         bad_draft = """---
 layout: post
 title: "Bad Article"
@@ -358,7 +359,6 @@ In conclusion, the future remains to be seen!"""
 
     def test_publication_validator_blocks_invalid(self, temp_output_dir):
         """Test: Publication validator blocks known issues"""
-
         # Article with unverified claims and weak ending
         bad_article = """---
 layout: post
@@ -389,7 +389,6 @@ In conclusion, this is the end."""
 
     def test_chart_embedding_validation(self):
         """Test: Validator catches missing chart embedding (BUG-016 pattern)"""
-
         # Article with NO chart despite chart_data existing
         article_no_chart = """---
 layout: post
@@ -407,7 +406,6 @@ Some content about data. No chart embedded."""
 
     def test_agent_data_flow(self, mock_llm_client, mock_call_llm):
         """Test: Data flows correctly between agents"""
-
         with (
             patch("llm_client.call_llm", mock_call_llm),
             patch("agents.research_agent.call_llm", mock_call_llm),
@@ -427,7 +425,6 @@ Some content about data. No chart embedded."""
 
     def test_error_handling_graceful_degradation(self, mock_llm_client):
         """Test: Pipeline handles errors gracefully by raising proper exceptions"""
-
         # Import research agent
         from economist_agent import run_research_agent
 

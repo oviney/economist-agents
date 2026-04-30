@@ -79,6 +79,7 @@ class QualityMetricsPipeline:
             evals_path: Path to article evaluations JSON (from ArticleEvaluator).
             runs_path: Path to pipeline run metadata JSON (optional).
             dashboard_path: Path to write the output dashboard JSON.
+
         """
         self.evals_path = Path(evals_path)
         self.runs_path = Path(runs_path)
@@ -93,6 +94,7 @@ class QualityMetricsPipeline:
 
         Returns:
             List of eval records, or empty list if file absent or corrupt.
+
         """
         if not self.evals_path.exists():
             logger.info("Evals file not found: %s", self.evals_path)
@@ -108,6 +110,7 @@ class QualityMetricsPipeline:
 
         Returns:
             List of run records, or empty list if file absent or corrupt.
+
         """
         if not self.runs_path.exists():
             logger.info("Pipeline runs file not found: %s", self.runs_path)
@@ -116,7 +119,9 @@ class QualityMetricsPipeline:
             return orjson.loads(self.runs_path.read_bytes())
         except Exception as exc:
             logger.error(
-                "Failed to load pipeline runs from %s: %s", self.runs_path, exc
+                "Failed to load pipeline runs from %s: %s",
+                self.runs_path,
+                exc,
             )
             return []
 
@@ -141,6 +146,7 @@ class QualityMetricsPipeline:
         Returns:
             Dict with ``total_articles``, ``first_attempt_publish_rate``, and
             ``overall_publish_rate``.
+
         """
         total = len(evals)
         if total == 0:
@@ -188,6 +194,7 @@ class QualityMetricsPipeline:
 
         Returns:
             Dict mapping failure mode name to occurrence count.
+
         """
         counts: dict[str, int] = defaultdict(int)
 
@@ -260,6 +267,7 @@ class QualityMetricsPipeline:
             Tuple of (``weekly_trends`` list, ``dimension_trends`` dict).
             ``dimension_trends`` always contains all five dimension keys even
             when the lists are empty.
+
         """
         by_week: dict[str, list[dict[str, Any]]] = defaultdict(list)
 
@@ -315,7 +323,7 @@ class QualityMetricsPipeline:
                     "avg_score": round(avg_score, 2),
                     "avg_retries": avg_retries,
                     "top_failure_modes": top_failures,
-                }
+                },
             )
 
             for dim in _DIMENSIONS:
@@ -324,7 +332,7 @@ class QualityMetricsPipeline:
                 ]
                 if dim_scores:
                     dimension_weekly[dim].append(
-                        round(sum(dim_scores) / len(dim_scores), 2)
+                        round(sum(dim_scores) / len(dim_scores), 2),
                     )
 
         return weekly_trends, dimension_weekly
@@ -339,6 +347,7 @@ class QualityMetricsPipeline:
             Dict with ``avg_retries``, ``zero_revision_pct``,
             ``one_revision_pct``, ``two_plus_revision_pct``, and
             ``top_revision_triggers``.
+
         """
         if not runs:
             return {
@@ -362,7 +371,9 @@ class QualityMetricsPipeline:
                 trigger_counts[reason] += 1
 
         top_triggers = sorted(
-            trigger_counts, key=lambda k: trigger_counts[k], reverse=True
+            trigger_counts,
+            key=lambda k: trigger_counts[k],
+            reverse=True,
         )[:3]
 
         return {
@@ -391,6 +402,7 @@ class QualityMetricsPipeline:
         Returns:
             List of alert dicts with ``type``, ``dimension``, ``message``,
             and ``severity`` keys.
+
         """
         alerts: list[dict[str, str]] = []
 
@@ -406,7 +418,7 @@ class QualityMetricsPipeline:
                         f"{first_attempt_rate:.0%}"
                     ),
                     "severity": "critical",
-                }
+                },
             )
         elif first_attempt_rate < _WARN_PASS_RATE:
             alerts.append(
@@ -418,7 +430,7 @@ class QualityMetricsPipeline:
                         f"{first_attempt_rate:.0%}"
                     ),
                     "severity": "warn",
-                }
+                },
             )
 
         # Average score alerts
@@ -430,7 +442,7 @@ class QualityMetricsPipeline:
                     "dimension": "avg_eval_score",
                     "message": f"Average eval score critically low: {avg_score:.1f}/50",
                     "severity": "critical",
-                }
+                },
             )
         elif avg_score < _WARN_AVG_SCORE:
             alerts.append(
@@ -441,7 +453,7 @@ class QualityMetricsPipeline:
                         f"Average eval score below threshold: {avg_score:.1f}/50"
                     ),
                     "severity": "warn",
-                }
+                },
             )
 
         # Dimension-level alerts
@@ -458,7 +470,7 @@ class QualityMetricsPipeline:
                             f"{dim} scores critically low: avg {avg_dim:.1f}/10"
                         ),
                         "severity": "critical",
-                    }
+                    },
                 )
             elif avg_dim < _WARN_DIMENSION_AVG:
                 alerts.append(
@@ -469,7 +481,7 @@ class QualityMetricsPipeline:
                             f"{dim} scores below threshold: avg {avg_dim:.1f}/10"
                         ),
                         "severity": "warn",
-                    }
+                    },
                 )
 
         # Failure mode streak alerts
@@ -481,7 +493,7 @@ class QualityMetricsPipeline:
                         "dimension": mode,
                         "message": f"Failure mode '{mode}' occurred {count} times",
                         "severity": "critical",
-                    }
+                    },
                 )
             elif count >= _WARN_FAILURE_STREAK:
                 alerts.append(
@@ -490,7 +502,7 @@ class QualityMetricsPipeline:
                         "dimension": mode,
                         "message": f"Failure mode '{mode}' occurred {count} times",
                         "severity": "warn",
-                    }
+                    },
                 )
 
         return alerts
@@ -505,6 +517,7 @@ class QualityMetricsPipeline:
         Returns:
             Dashboard dict matching the schema in
             ``skills/observability/SKILL.md``.
+
         """
         evals = self._load_evals()
         runs = self._load_pipeline_runs()
@@ -549,11 +562,12 @@ class QualityMetricsPipeline:
 
         Returns:
             The dashboard dict (also written to ``dashboard_path``).
+
         """
         dashboard = self.generate_dashboard()
         self.dashboard_path.parent.mkdir(parents=True, exist_ok=True)
         self.dashboard_path.write_bytes(
-            orjson.dumps(dashboard, option=orjson.OPT_INDENT_2)
+            orjson.dumps(dashboard, option=orjson.OPT_INDENT_2),
         )
         logger.info("Dashboard written to %s", self.dashboard_path)
         return dashboard
@@ -571,6 +585,7 @@ class QualityMetricsPipeline:
 
         Returns:
             True when all required keys are present, False otherwise.
+
         """
         required = {"scores", "total_score", "percentage", "timestamp"}
         return isinstance(record, dict) and required.issubset(record.keys())
@@ -583,6 +598,7 @@ class QualityMetricsPipeline:
 
         Returns:
             List of up to three failure mode names, sorted by frequency.
+
         """
         modes = self.categorize_failure_modes(evals)
         return sorted(modes, key=lambda k: modes[k], reverse=True)[:3]
@@ -604,6 +620,6 @@ if __name__ == "__main__":
         f"  Total articles : {summary['total_articles']}\n"
         f"  Pass rate (1st): {summary['first_attempt_publish_rate']:.0%}\n"
         f"  Avg eval score : {summary['avg_eval_score']:.1f}/50\n"
-        f"  Alerts         : {len(result['alerts'])}"
+        f"  Alerts         : {len(result['alerts'])}",
     )
     sys.exit(0)

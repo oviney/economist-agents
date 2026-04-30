@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Writer Agent Tasks
+"""Writer Agent Tasks
 
 CrewAI-compatible task definitions for the Writer Agent.
 These tasks can be used with CrewAI's Task class or standalone.
@@ -38,6 +37,7 @@ def create_writer_task_config(
         ...     current_date="2026-01-02"
         ... )
         >>> task = Task(**config, agent=writer_agent)
+
     """
     if expected_output is None:
         expected_output = """An Economist-style article with:
@@ -86,7 +86,9 @@ Style guidelines:
 
 
 def create_article_refinement_task_config(
-    draft: str, validation_issues: list[str], expected_output: str | None = None
+    draft: str,
+    validation_issues: list[str],
+    expected_output: str | None = None,
 ) -> dict[str, Any]:
     """Create a task configuration for refining an article draft.
 
@@ -104,6 +106,7 @@ def create_article_refinement_task_config(
         ...     validation_issues=["Missing chart embed", "Banned phrase: game-changer"]
         ... )
         >>> task = Task(**config, agent=writer_agent)
+
     """
     if expected_output is None:
         expected_output = """A refined article that:
@@ -158,6 +161,7 @@ def validate_article_structure(article: str) -> dict[str, Any]:
         >>> results = validate_article_structure(article)
         >>> if results['issues']:
         ...     print(f"Found {len(results['issues'])} issues")
+
     """
     results = {
         "has_frontmatter": False,
@@ -214,11 +218,11 @@ def validate_article_structure(article: str) -> dict[str, Any]:
     # Check word count
     if results["word_count"] < 800:
         results["issues"].append(
-            f"Article too short: {results['word_count']} words (target: 800-1200)"
+            f"Article too short: {results['word_count']} words (target: 800-1200)",
         )
     elif results["word_count"] > 1200:
         results["issues"].append(
-            f"Article too long: {results['word_count']} words (target: 800-1200)"
+            f"Article too long: {results['word_count']} words (target: 800-1200)",
         )
 
     # Check for banned phrases
@@ -254,6 +258,7 @@ def extract_chart_references(article: str) -> dict[str, Any]:
         >>> refs = extract_chart_references(article)
         >>> if refs['chart_images'] and refs['chart_mentions'] == 0:
         ...     print("Chart embedded but not referenced in text!")
+
     """
     import re
 

@@ -85,7 +85,7 @@ class TestValidateArticleStructure:
 
     def test_missing_title_field(self) -> None:
         article = "---\nlayout: post\ndate: 2026-04-03\n---\n\n" + " ".join(
-            ["word"] * 850
+            ["word"] * 850,
         )
         result = validate_article_structure(article)
         assert result["has_title"] is False
@@ -98,7 +98,7 @@ class TestValidateArticleStructure:
 
     def test_missing_layout_field(self) -> None:
         article = '---\ntitle: "Test"\ndate: 2026-04-03\n---\n\n' + " ".join(
-            ["word"] * 850
+            ["word"] * 850,
         )
         result = validate_article_structure(article)
         assert result["has_layout"] is False

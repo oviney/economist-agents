@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Generate Economist-style chart: AI Adoption vs Maintenance Reduction
+"""Generate Economist-style chart: AI Adoption vs Maintenance Reduction
 
 Follows CHART_DESIGN_SPEC.md:
 - Clear zone separation (no overlaps)

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Quick Setup Test - Verify API keys and LLM client
+"""Quick Setup Test - Verify API keys and LLM client
 
 Tests:
 1. Environment loading (.env or system vars)

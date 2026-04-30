@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-GitHub Integration Test Suite
+"""GitHub Integration Test Suite
 
 Tests all GitHub integration components:
 1. Local sprint validator still works
@@ -42,13 +41,13 @@ class GitHubIntegrationTests:
             print(f"   ❌ FAIL: {e}")
             self.results["failed"] += 1
             self.results["tests"].append(
-                {"name": name, "status": "FAIL", "error": str(e)}
+                {"name": name, "status": "FAIL", "error": str(e)},
             )
         except Exception as e:
             print(f"   ❌ ERROR: {e}")
             self.results["failed"] += 1
             self.results["tests"].append(
-                {"name": name, "status": "ERROR", "error": str(e)}
+                {"name": name, "status": "ERROR", "error": str(e)},
             )
 
     # TEST 1: Sprint Validator Still Works
@@ -251,9 +250,8 @@ class GitHubIntegrationTests:
         if self.results["failed"] == 0:
             print("\n🎉 ALL TESTS PASSED - GitHub integration fully operational!")
             return 0
-        else:
-            print(f"\n⚠️  {self.results['failed']} test(s) failed")
-            return 1
+        print(f"\n⚠️  {self.results['failed']} test(s) failed")
+        return 1
 
 
 if __name__ == "__main__":

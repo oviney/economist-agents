@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Tests for the Image Generator MCP Server
+"""Tests for the Image Generator MCP Server
 
 Validates mcp_servers/image_generator_server.py without making real API calls.
 All OpenAI interactions are mocked.
@@ -391,7 +390,7 @@ class TestGenerateEditorialImageErrors:
         ):
             mock_client = mock_client_cls.return_value
             mock_client.images.generate.side_effect = requests.RequestException(
-                "Network timeout"
+                "Network timeout",
             )
 
             result = generate_editorial_image(

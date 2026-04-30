@@ -63,13 +63,13 @@ def _sample_gsc_rows() -> list[dict[str, Any]]:
     ]
 
 
-@pytest.fixture()
+@pytest.fixture
 def tmp_db(tmp_path: Path) -> Path:
     """Return a temporary database path."""
     return tmp_path / "test_performance.db"
 
 
-@pytest.fixture()
+@pytest.fixture
 def sample_keyword_rows() -> list[dict[str, Any]]:
     """Parsed keyword rows (output of parse_rows)."""
     return parse_rows(_sample_gsc_rows())
@@ -87,7 +87,7 @@ class TestInitDb:
         """Tables are created when the database does not exist yet."""
         conn = init_db(tmp_db)
         cursor = conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
+            "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name",
         )
         tables = [row[0] for row in cursor.fetchall()]
         conn.close()
@@ -136,7 +136,8 @@ class TestContentGaps:
     """Tests for identify_content_gaps."""
 
     def test_flags_high_impression_low_ctr(
-        self, sample_keyword_rows: list[dict[str, Any]]
+        self,
+        sample_keyword_rows: list[dict[str, Any]],
     ) -> None:
         """Rows with impressions > median AND ctr < 0.03 are flagged."""
         result = identify_content_gaps(sample_keyword_rows)
@@ -154,7 +155,8 @@ class TestContentGaps:
         assert econ_row["is_content_gap"] is False
 
     def test_no_flag_low_impressions(
-        self, sample_keyword_rows: list[dict[str, Any]]
+        self,
+        sample_keyword_rows: list[dict[str, Any]],
     ) -> None:
         """Rows below median impressions are not flagged."""
         result = identify_content_gaps(sample_keyword_rows)
@@ -175,7 +177,8 @@ class TestAggregateByPage:
     """Tests for aggregate_by_page."""
 
     def test_aggregation_counts(
-        self, sample_keyword_rows: list[dict[str, Any]]
+        self,
+        sample_keyword_rows: list[dict[str, Any]],
     ) -> None:
         """Each unique page_url produces one aggregate row."""
         pages = aggregate_by_page(sample_keyword_rows)
@@ -225,7 +228,7 @@ class TestStoreResults:
                 "total_clicks": 10,
                 "avg_ctr": 0.1,
                 "avg_position": 5.0,
-            }
+            },
         ]
         keyword_rows = [
             {
@@ -236,7 +239,7 @@ class TestStoreResults:
                 "ctr": 0.1,
                 "position": 5.0,
                 "is_content_gap": False,
-            }
+            },
         ]
         store_results(conn, page_rows, keyword_rows, "2026-04-05T00:00:00+00:00")
 

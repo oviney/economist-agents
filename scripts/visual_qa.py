@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Visual QA Agent
+"""Visual QA Agent
 
 Validates Economist-style charts against visual quality standards.
 Catches rendering bugs like overlapping text, clipped elements, and style violations.
@@ -147,8 +146,7 @@ def get_image_media_type(image_path: str) -> str:
 
 
 def run_visual_qa(client, image_path: str, chart_context: dict = None) -> dict:
-    """
-    Run Visual QA on a chart image.
+    """Run Visual QA on a chart image.
 
     Args:
         client: Anthropic client
@@ -157,6 +155,7 @@ def run_visual_qa(client, image_path: str, chart_context: dict = None) -> dict:
 
     Returns:
         Dict with gate results, issues, and fix suggestions
+
     """
     print(f"🔍 Visual QA Agent: Inspecting {image_path}...")
 
@@ -198,7 +197,7 @@ def run_visual_qa(client, image_path: str, chart_context: dict = None) -> dict:
                         "text": f"Review this chart for visual quality issues.{context_msg}",
                     },
                 ],
-            }
+            },
         ],
     )
 
@@ -241,14 +240,14 @@ def run_visual_qa(client, image_path: str, chart_context: dict = None) -> dict:
 
 
 def validate_chart_before_publish(image_path: str, auto_fix: bool = False) -> tuple:
-    """
-    Validate a chart and optionally suggest fixes.
+    """Validate a chart and optionally suggest fixes.
 
     Uses Agent Registry to get visual QA agent with Claude vision support.
     Per ADR-002, this provides centralized LLM client management.
 
     Returns:
         (passed: bool, result: dict)
+
     """
     # Get visual QA agent from registry
     # This agent uses Claude Sonnet 4 with vision capabilities
@@ -278,8 +277,7 @@ def validate_chart_before_publish(image_path: str, auto_fix: bool = False) -> tu
 
 
 def validate_chart_file(image_path: str) -> dict:
-    """
-    Basic file-level validation (no AI required).
+    """Basic file-level validation (no AI required).
 
     Checks:
     - File exists
@@ -336,7 +334,6 @@ def validate_chart_file(image_path: str) -> dict:
 
 def main():
     """Run visual QA on a chart from command line or environment."""
-
     image_path = os.environ.get("CHART_PATH", "")
 
     if not image_path:

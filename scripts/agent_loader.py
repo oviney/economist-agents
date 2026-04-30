@@ -50,6 +50,7 @@ class AgentConfig:
         tools: List of tool names available to this agent.
         weight: Voting weight for editorial board agents (default 1.0).
         metadata: Metadata dict with version, created, author, category.
+
     """
 
     name: str
@@ -68,6 +69,7 @@ def _load_schema() -> dict[str, Any] | None:
     Returns:
         Parsed schema dict, or None if schema file is missing or jsonschema
         is not installed.
+
     """
     try:
         import json
@@ -76,7 +78,8 @@ def _load_schema() -> dict[str, Any] | None:
 
         if not SCHEMA_PATH.exists():
             logger.warning(
-                "Schema file not found at %s — skipping validation", SCHEMA_PATH
+                "Schema file not found at %s — skipping validation",
+                SCHEMA_PATH,
             )
             return None
 
@@ -96,6 +99,7 @@ def _validate_against_schema(data: dict[str, Any], yaml_path: Path) -> None:
 
     Raises:
         ValueError: If the data fails schema validation.
+
     """
     schema = _load_schema()
     if schema is None:
@@ -107,7 +111,7 @@ def _validate_against_schema(data: dict[str, Any], yaml_path: Path) -> None:
         jsonschema.validate(instance=data, schema=schema)
     except jsonschema.ValidationError as exc:
         raise ValueError(
-            f"Agent config '{yaml_path}' failed schema validation: {exc.message}"
+            f"Agent config '{yaml_path}' failed schema validation: {exc.message}",
         ) from exc
 
 
@@ -123,13 +127,14 @@ def load_agent(yaml_path: Path | str) -> AgentConfig:
     Raises:
         FileNotFoundError: If the YAML file does not exist.
         ValueError: If the YAML is missing required fields or fails schema validation.
+
     """
     path = Path(yaml_path)
 
     if not path.exists():
         raise FileNotFoundError(
             f"Agent YAML not found: {path}. "
-            "Ensure the file exists under agents/<category>/<name>.yaml"
+            "Ensure the file exists under agents/<category>/<name>.yaml",
         )
 
     with path.open() as f:
@@ -176,6 +181,7 @@ def load_board_members() -> dict[str, dict[str, Any]]:
 
     Raises:
         FileNotFoundError: If any board member YAML is missing.
+
     """
     board_dir = AGENTS_DIR / "editorial_board"
     result: dict[str, dict[str, Any]] = {}
@@ -203,6 +209,7 @@ def load_scout_prompts() -> dict[str, str]:
     Raises:
         FileNotFoundError: If topic_scout.yaml is missing.
         ValueError: If required prompt fields are absent.
+
     """
     yaml_path = AGENTS_DIR / "discovery" / "topic_scout.yaml"
 
@@ -236,11 +243,12 @@ def load_content_agent(agent_name: str) -> AgentConfig:
     Raises:
         ValueError: If agent_name is not a recognised content agent.
         FileNotFoundError: If the corresponding YAML file is missing.
+
     """
     valid_names = ("researcher", "writer", "editor", "graphics")
     if agent_name not in valid_names:
         raise ValueError(
-            f"Unknown content agent '{agent_name}'. Valid names: {valid_names}"
+            f"Unknown content agent '{agent_name}'. Valid names: {valid_names}",
         )
 
     yaml_path = AGENTS_DIR / "content_generation" / f"{agent_name}.yaml"
@@ -252,6 +260,7 @@ def validate_all() -> bool:
 
     Returns:
         True if all files are valid, False if any errors were found.
+
     """
     all_valid = True
     errors: list[str] = []

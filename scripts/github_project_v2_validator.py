@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-GitHub Project V2 Integration Validator - Story 3 Implementation
+"""GitHub Project V2 Integration Validator - Story 3 Implementation
 
 Standalone validation script for GitHub Project V2 integration that:
 1. Tests the github_project_add_issue functionality
@@ -26,7 +25,8 @@ from pathlib import Path
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
 
@@ -43,6 +43,7 @@ class GitHubProjectV2Validator:
 
         Args:
             dry_run: If True, only validate setup without making changes
+
         """
         self.dry_run = dry_run
         self.results = {
@@ -78,7 +79,7 @@ class GitHubProjectV2Validator:
         logger.info(f"{status} {test_name}: {message}")
 
         self.results["details"].append(
-            {"test": test_name, "success": success, "message": message}
+            {"test": test_name, "success": success, "message": message},
         )
 
         if success:
@@ -93,7 +94,10 @@ class GitHubProjectV2Validator:
         # Test 1: GitHub CLI availability
         try:
             result = subprocess.run(
-                ["gh", "--version"], capture_output=True, text=True, timeout=10
+                ["gh", "--version"],
+                capture_output=True,
+                text=True,
+                timeout=10,
             )
             if result.returncode == 0:
                 version = result.stdout.strip().split("\n")[0]
@@ -108,7 +112,10 @@ class GitHubProjectV2Validator:
         # Test 2: Authentication status
         try:
             result = subprocess.run(
-                ["gh", "auth", "status"], capture_output=True, text=True, timeout=10
+                ["gh", "auth", "status"],
+                capture_output=True,
+                text=True,
+                timeout=10,
             )
             if result.returncode == 0:
                 self.log_result("GitHub Authentication", True, "Authenticated")
@@ -142,7 +149,9 @@ class GitHubProjectV2Validator:
                     )
                 else:
                     self.log_result(
-                        "Project Boards Access", False, "No target projects found"
+                        "Project Boards Access",
+                        False,
+                        "No target projects found",
                     )
                     return False
             else:
@@ -170,11 +179,15 @@ class GitHubProjectV2Validator:
                 )
                 if result.returncode == 0:
                     self.log_result(
-                        f"Issue #{issue['number']} Exists", True, "Accessible"
+                        f"Issue #{issue['number']} Exists",
+                        True,
+                        "Accessible",
                     )
                 else:
                     self.log_result(
-                        f"Issue #{issue['number']} Exists", False, result.stderr
+                        f"Issue #{issue['number']} Exists",
+                        False,
+                        result.stderr,
                     )
                     return False
             except subprocess.TimeoutExpired as e:
@@ -188,7 +201,9 @@ class GitHubProjectV2Validator:
         logger.info("🔧 Phase 2: Testing GitHub Project Function Logic")
 
         def github_project_add_issue_standalone(
-            project_number: int, issue_url: str, owner: str = "oviney"
+            project_number: int,
+            issue_url: str,
+            owner: str = "oviney",
         ) -> str:
             """Standalone version of github_project_add_issue for testing"""
             command = [
@@ -204,7 +219,11 @@ class GitHubProjectV2Validator:
 
             try:
                 result = subprocess.run(
-                    command, capture_output=True, text=True, check=False, timeout=30
+                    command,
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                    timeout=30,
                 )
 
                 if result.returncode != 0:
@@ -215,7 +234,7 @@ class GitHubProjectV2Validator:
                     return f"Error: {error_msg}"
 
                 logger.info(
-                    f"Successfully added {issue_url} to Project {project_number}"
+                    f"Successfully added {issue_url} to Project {project_number}",
                 )
                 return f"Success: Added {issue_url} to Project {project_number}"
 
@@ -236,7 +255,8 @@ class GitHubProjectV2Validator:
 
         # Test 1: Invalid project number
         result = github_project_add_issue_standalone(
-            99999, "https://github.com/oviney/economist-agents/issues/95"
+            99999,
+            "https://github.com/oviney/economist-agents/issues/95",
         )
         if "Error" in result:
             self.log_result(
@@ -246,7 +266,9 @@ class GitHubProjectV2Validator:
             )
         else:
             self.log_result(
-                "Invalid Project Number Handling", False, "Should have failed"
+                "Invalid Project Number Handling",
+                False,
+                "Should have failed",
             )
 
         # Test 2: Invalid owner
@@ -257,7 +279,9 @@ class GitHubProjectV2Validator:
         )
         if "Error" in result:
             self.log_result(
-                "Invalid Owner Handling", True, "Correctly handled invalid owner"
+                "Invalid Owner Handling",
+                True,
+                "Correctly handled invalid owner",
             )
         else:
             self.log_result("Invalid Owner Handling", False, "Should have failed")
@@ -354,13 +378,17 @@ class GitHubProjectV2Validator:
                     self.results["operations_successful"] += 1
                 else:
                     self.log_result(
-                        f"Batch Operation Issue #{issue['number']}", False, result
+                        f"Batch Operation Issue #{issue['number']}",
+                        False,
+                        result,
                     )
                     self.results["operations_failed"] += 1
 
             except Exception as e:
                 self.log_result(
-                    f"Batch Operation Issue #{issue['number']}", False, str(e)
+                    f"Batch Operation Issue #{issue['number']}",
+                    False,
+                    str(e),
                 )
                 self.results["operations_failed"] += 1
 
@@ -372,11 +400,12 @@ class GitHubProjectV2Validator:
                 f"{successful_operations}/{len(self.sprint_16_issues)} successful",
             )
             return True
-        else:
-            self.log_result(
-                "Batch Operations Overall", False, "No successful operations"
-            )
-            return False
+        self.log_result(
+            "Batch Operations Overall",
+            False,
+            "No successful operations",
+        )
+        return False
 
     def validate_integration_patterns(self) -> bool:
         """Phase 5: Validate MCP + CLI integration patterns"""
@@ -545,7 +574,7 @@ class GitHubProjectV2Validator:
         print("\n🎯 STORY 3 VALIDATION STATUS:")
         if overall_success:
             print(
-                "   🎉 STORY 3 COMPLETE: GitHub Project V2 Integration Fully Validated!"
+                "   🎉 STORY 3 COMPLETE: GitHub Project V2 Integration Fully Validated!",
             )
             print("   ✓ All prerequisites met")
             print("   ✓ GitHub Project V2 tool functionality confirmed")
@@ -572,7 +601,7 @@ class GitHubProjectV2Validator:
 def main():
     """Main entry point for GitHub Project V2 validation"""
     parser = argparse.ArgumentParser(
-        description="GitHub Project V2 Integration Validator - Story 3 Implementation"
+        description="GitHub Project V2 Integration Validator - Story 3 Implementation",
     )
     parser.add_argument(
         "--dry-run",
@@ -580,7 +609,9 @@ def main():
         help="Run validation without making actual changes to project boards",
     )
     parser.add_argument(
-        "--issue-url", type=str, help="Specific issue URL to test (optional)"
+        "--issue-url",
+        type=str,
+        help="Specific issue URL to test (optional)",
     )
 
     args = parser.parse_args()

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-CrewAI Shared Context System - Usage Examples
+"""CrewAI Shared Context System - Usage Examples
 
 Demonstrates how to use ContextManager for efficient multi-agent coordination.
 
@@ -18,6 +17,7 @@ Requirements:
 
 Usage:
     python3 examples/crew_context_usage.py
+
 """
 
 import sys
@@ -74,7 +74,10 @@ def example_2_multi_agent_sharing():
     # Simulate Agent 1: Developer
     print("\n👨‍💻 Developer Agent:")
     dev_context = create_task_context(
-        ctx, task_id="DEV-implement", assigned_to="Developer Agent", priority="P0"
+        ctx,
+        task_id="DEV-implement",
+        assigned_to="Developer Agent",
+        priority="P0",
     )
 
     print(f"  - Task ID: {dev_context['task_id']}")
@@ -115,10 +118,10 @@ def example_2_multi_agent_sharing():
     all_context = ctx.to_dict()
     print(f"  - Total context keys: {len(all_context)}")
     print(
-        f"  - Implementation status: {all_context.get('implementation_status', 'unknown')}"
+        f"  - Implementation status: {all_context.get('implementation_status', 'unknown')}",
     )
     print(
-        f"  - Test results: {all_context.get('test_results', {}).get('passed', 0)} tests passed"
+        f"  - Test results: {all_context.get('test_results', {}).get('passed', 0)} tests passed",
     )
 
     print("\n💡 All 3 agents shared the same context (0% duplication)")
@@ -148,7 +151,7 @@ def example_3_context_updates():
             "status": "complete",
             "completion_date": "2026-01-02",
             "sprint": "Sprint 7",
-        }
+        },
     )
     print("  ✅ Updated 3 keys atomically")
 
@@ -376,7 +379,7 @@ Benefits:
 ✅ Automatic updates visible to all agents
 ✅ Thread-safe concurrent access
 ✅ Complete audit trail for compliance
-"""
+""",
     )
 
     print("\n💡 Key Pattern: Load once, share across all agents")
@@ -428,7 +431,7 @@ Next Steps:
 - Review Architecture: docs/CREWAI_CONTEXT_ARCHITECTURE.md
 - Run tests: pytest tests/test_context_manager.py
 - Integrate with your CrewAI agents
-"""
+""",
         )
 
     except Exception as e:

@@ -26,6 +26,7 @@ Example:
        - quality_gates.editorial_gate_failure (HIGH severity)
        - data_verification.unverified_claims (MEDIUM severity)
     💾 Saved patterns to data/skills_state/writer_agent_skills.json
+
 """
 
 import argparse
@@ -111,12 +112,15 @@ class LogParser:
 
         Returns:
             Dictionary with structured failure information
+
         """
         failures = []
 
         # Extract quality gate failures
         gate_match = re.search(
-            r"Quality gates:\s*(\d+)\s*passed,\s*(\d+)\s*failed", content, re.IGNORECASE
+            r"Quality gates:\s*(\d+)\s*passed,\s*(\d+)\s*failed",
+            content,
+            re.IGNORECASE,
         )
         if gate_match:
             passed = int(gate_match.group(1))
@@ -128,12 +132,14 @@ class LogParser:
                         "passed": passed,
                         "failed": failed,
                         "location": f"line {content[: gate_match.start()].count(chr(10)) + 1}",
-                    }
+                    },
                 )
 
         # Extract unverified claims
         unverified_match = re.search(
-            r"(\d+)\s+unverified claims flagged", content, re.IGNORECASE
+            r"(\d+)\s+unverified claims flagged",
+            content,
+            re.IGNORECASE,
         )
         if unverified_match:
             count = int(unverified_match.group(1))
@@ -143,12 +149,14 @@ class LogParser:
                         "type": "unverified_claims",
                         "count": count,
                         "location": f"line {content[: unverified_match.start()].count(chr(10)) + 1}",
-                    }
+                    },
                 )
 
         # Extract Visual QA failures
         visual_qa_match = re.search(
-            r"Visual gates:\s*(\d+)/(\d+)\s*passed", content, re.IGNORECASE
+            r"Visual gates:\s*(\d+)/(\d+)\s*passed",
+            content,
+            re.IGNORECASE,
         )
         if visual_qa_match:
             passed = int(visual_qa_match.group(1))
@@ -160,7 +168,7 @@ class LogParser:
                         "passed": passed,
                         "total": total,
                         "location": f"line {content[: visual_qa_match.start()].count(chr(10)) + 1}",
-                    }
+                    },
                 )
 
         # Extract word count issues
@@ -174,7 +182,7 @@ class LogParser:
                         "count": words,
                         "target": 700,
                         "location": f"line {content[: word_match.start()].count(chr(10)) + 1}",
-                    }
+                    },
                 )
 
         return {
@@ -192,6 +200,7 @@ class LogParser:
 
         Returns:
             Dictionary with structured failure information
+
         """
         failures = []
 
@@ -200,12 +209,13 @@ class LogParser:
         if failed_match:
             count = int(failed_match.group(1))
             failures.append(
-                {"type": "test_failures", "count": count, "location": "pytest summary"}
+                {"type": "test_failures", "count": count, "location": "pytest summary"},
             )
 
         # Extract specific test errors
         error_pattern = re.compile(
-            r"FAILED\s+([\w/:.]+)\s*-\s*(.+?)(?=\n|$)", re.MULTILINE
+            r"FAILED\s+([\w/:.]+)\s*-\s*(.+?)(?=\n|$)",
+            re.MULTILINE,
         )
         for match in error_pattern.finditer(content):
             test_name = match.group(1)
@@ -216,7 +226,7 @@ class LogParser:
                     "test": test_name,
                     "error": error_msg,
                     "location": f"line {content[: match.start()].count(chr(10)) + 1}",
-                }
+                },
             )
 
         return {"format": "pytest_output", "failures": failures, "raw_content": content}
@@ -230,6 +240,7 @@ class LogParser:
 
         Returns:
             Dictionary with structured failure information
+
         """
         failures = []
 
@@ -244,7 +255,7 @@ class LogParser:
                     "type": "python_traceback",
                     "traceback": match.group(0),
                     "location": f"line {content[: match.start()].count(chr(10)) + 1}",
-                }
+                },
             )
 
         # Extract error keywords
@@ -258,7 +269,7 @@ class LogParser:
                         "severity": keyword.lower(),
                         "message": match.group(0).strip(),
                         "location": f"line {content[: match.start()].count(chr(10)) + 1}",
-                    }
+                    },
                 )
 
         return {"format": "generic_error", "failures": failures, "raw_content": content}
@@ -272,18 +283,18 @@ class LogParser:
 
         Returns:
             Parsed log data with failure information
+
         """
         # Detect generation.log format
         if "Research Agent:" in content or "Writer Agent:" in content:
             return cls.parse_generation_log(content)
 
         # Detect pytest format
-        elif "passed" in content and "failed" in content and "test" in content.lower():
+        if "passed" in content and "failed" in content and "test" in content.lower():
             return cls.parse_pytest_output(content)
 
         # Default to generic
-        else:
-            return cls.parse_generic_error(content)
+        return cls.parse_generic_error(content)
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -299,11 +310,15 @@ class SkillSynthesizer:
 
         Args:
             llm_client: Optional pre-configured LLM client
+
         """
         self.llm_client = llm_client or create_llm_client()
 
     def synthesize_patterns(
-        self, log_content: str, role_name: str, category: str | None = None
+        self,
+        log_content: str,
+        role_name: str,
+        category: str | None = None,
     ) -> list[dict[str, Any]]:
         """Synthesize learnable patterns from log content.
 
@@ -314,6 +329,7 @@ class SkillSynthesizer:
 
         Returns:
             List of pattern dictionaries ready for SkillsManager.learn_pattern()
+
         """
         logger.info(f"Synthesizing patterns from {len(log_content)} bytes of log data")
 
@@ -370,6 +386,7 @@ class SkillSynthesizer:
 
         Returns:
             Number of patterns successfully applied
+
         """
         applied = 0
 
@@ -382,14 +399,14 @@ class SkillSynthesizer:
             missing = [f for f in required_fields if f not in pattern]
             if missing:
                 logger.warning(
-                    f"Skipping pattern {pattern_id}: missing fields {missing}"
+                    f"Skipping pattern {pattern_id}: missing fields {missing}",
                 )
                 continue
 
             if not dry_run:
                 skills_manager.learn_pattern(category, pattern_id, pattern)
                 logger.info(
-                    f"   - {category}.{pattern_id} ({pattern['severity']} severity)"
+                    f"   - {category}.{pattern_id} ({pattern['severity']} severity)",
                 )
             else:
                 logger.info(f"   [DRY RUN] Would learn: {category}.{pattern_id}")
@@ -430,7 +447,10 @@ Examples:
     )
 
     parser.add_argument(
-        "--log", required=True, type=Path, help="Path to log file to analyze"
+        "--log",
+        required=True,
+        type=Path,
+        help="Path to log file to analyze",
     )
     parser.add_argument(
         "--role",
@@ -439,7 +459,9 @@ Examples:
     )
     parser.add_argument("--category", help="Optional category filter for patterns")
     parser.add_argument(
-        "--dry-run", action="store_true", help="Analyze but don't save patterns"
+        "--dry-run",
+        action="store_true",
+        help="Analyze but don't save patterns",
     )
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
 
@@ -478,7 +500,7 @@ Examples:
 
     if not patterns:
         logger.warning(
-            "⚠️  No patterns identified - log may not contain actionable failures"
+            "⚠️  No patterns identified - log may not contain actionable failures",
         )
         sys.exit(0)
 

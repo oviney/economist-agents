@@ -52,7 +52,9 @@ class TestRequiredFields:
         ["layout", "title", "date", "categories", "image", "description"],
     )
     def test_each_required_field_enforced(
-        self, schema: FrontmatterSchema, missing_field: str
+        self,
+        schema: FrontmatterSchema,
+        missing_field: str,
     ) -> None:
         fm = {**VALID_FRONTMATTER}
         del fm[missing_field]

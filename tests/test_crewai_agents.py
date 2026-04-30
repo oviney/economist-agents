@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Unit tests for CrewAI Agent Factory
+"""Unit tests for CrewAI Agent Factory
 
 Tests agent loading, creation, validation, and error handling.
 """
@@ -17,7 +16,7 @@ import yaml
 # crewai; skip the whole module when crewai is not installed.
 pytest.importorskip("crewai")
 
-from scripts.crewai_agents import AgentFactory  # noqa: E402
+from scripts.crewai_agents import AgentFactory
 
 # Sample agent configurations for testing
 SAMPLE_AGENTS_YAML = """
@@ -81,7 +80,6 @@ def temp_malformed_file():
     Path(temp_path).unlink()
 
 
-@requires_crewai
 class TestAgentFactoryInit:
     """Test AgentFactory initialization"""
 
@@ -165,7 +163,7 @@ class TestCreateAgent:
 
     @patch("scripts.crewai_agents.Agent")
     def test_create_agent_with_optional_params(
-        self, mock_agent_class, temp_agents_file
+        self, mock_agent_class, temp_agents_file,
     ):
         """Should include optional parameters when present"""
         mock_agent = MagicMock()
@@ -178,7 +176,6 @@ class TestCreateAgent:
         assert "max_iter" in call_kwargs
         assert call_kwargs["max_iter"] == 10
 
-    @requires_crewai
     def test_create_agent_invalid_id(self, temp_agents_file):
         """Should raise ValueError for nonexistent agent_id"""
         factory = AgentFactory(config_path=temp_agents_file)
@@ -208,7 +205,6 @@ class TestCreateAllAgents:
         assert mock_agent_class.call_count == 2
 
 
-@requires_crewai
 class TestGetAgentConfig:
     """Test retrieving agent configuration"""
 
@@ -241,7 +237,6 @@ class TestGetAgentConfig:
         assert config2["role"] == "Test Agent"  # Original unchanged
 
 
-@requires_crewai
 class TestListAgents:
     """Test listing available agents"""
 
@@ -304,7 +299,6 @@ class TestCLI:
 class TestRealAgentsYAML:
     """Integration tests with actual schemas/agents.yaml"""
 
-    @requires_crewai
     def test_load_real_agents_yaml(self):
         """Should successfully load schemas/agents.yaml if it exists"""
         agents_yaml = Path(__file__).parent.parent / "schemas" / "agents.yaml"

@@ -12,6 +12,7 @@ Replaces the now-skipped ``tests/test_economist_flow.py`` and the
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 from unittest.mock import Mock, patch
 
@@ -355,3 +356,189 @@ class TestPatchFrontmatter:
     def test_no_op_when_not_frontmatter(self) -> None:
         article = "Plain text without delimiters."
         assert EconomistContentFlow._patch_frontmatter(article, "/x.png") == article
+
+
+# ─── BUG-037: image_alt + image_caption pipeline contract ────────────────
+#
+# RED tests — these must fail until implementation is complete.
+# Do not implement the fix until all four tests are verified failing.
+
+
+class TestWriterPromptImageMetadata:
+    """Writer prompt must instruct the agent to emit image_alt and image_caption
+    in the article frontmatter.  Fails until stage3_runner.py is updated."""
+
+    def test_writer_prompt_requires_image_alt(self) -> None:
+        import inspect
+
+        import src.agent_sdk.stage3_runner as m
+
+        source = inspect.getsource(m)
+        assert "image_alt" in source, (
+            "stage3_runner writer prompt must require image_alt in frontmatter"
+        )
+
+    def test_writer_prompt_requires_image_caption(self) -> None:
+        import inspect
+
+        import src.agent_sdk.stage3_runner as m
+
+        source = inspect.getsource(m)
+        assert "image_caption" in source, (
+            "stage3_runner writer prompt must require image_caption in frontmatter"
+        )
+
+
+class TestVisionRefinement:
+    """After image generation, a Claude vision call grounds image_alt and
+    image_caption against the actual visual.  Fails until the refinement
+    function is added to stage3_runner."""
+
+    def test_refine_image_metadata_function_exists(self) -> None:
+        import src.agent_sdk.stage3_runner as m
+
+        assert hasattr(m, "refine_image_metadata"), (
+            "stage3_runner must expose a refine_image_metadata(image_path, "
+            "draft_alt, draft_caption) function"
+        )
+
+    def test_refine_image_metadata_returns_grounded_fields(
+        self, tmp_path: Path
+    ) -> None:
+        """When Anthropic returns a vision response, refine_image_metadata
+        parses and returns grounded image_alt and image_caption."""
+        import os
+        from unittest.mock import MagicMock, patch
+
+        import src.agent_sdk.stage3_runner as m
+
+        assert hasattr(m, "refine_image_metadata"), (
+            "refine_image_metadata not yet implemented"
+        )
+
+        # Create a real file so the path.exists() guard passes
+        img = tmp_path / "test.png"
+        img.write_bytes(b"PNG")
+
+        mock_msg = MagicMock()
+        mock_msg.content = [
+            MagicMock(
+                text='{"image_alt": "A grounded alt", "image_caption": "The caption"}'
+            )
+        ]
+        with (
+            patch("src.agent_sdk.stage3_runner.anthropic") as mock_lib,
+            patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}),
+        ):
+            mock_lib.Anthropic.return_value.messages.create.return_value = mock_msg
+            result = m.refine_image_metadata(
+                image_path=str(img),
+                draft_alt="draft alt",
+                draft_caption="draft caption",
+            )
+        assert result["image_alt"] == "A grounded alt"
+        assert result["image_caption"] == "The caption"
+
+
+class TestPatchFrontmatterImageMetadata:
+    """_patch_frontmatter must inject image_alt and image_caption when provided.
+    Fails until the method signature and body are extended."""
+
+    def test_injects_image_alt(self) -> None:
+        article = "---\nlayout: post\ntitle: T\nimage: /x.png\n---\n\nBody"
+        patched = EconomistContentFlow._patch_frontmatter(
+            article,
+            "/x.png",
+            image_alt="An editorial illustration of a pipeline",
+        )
+        assert "image_alt:" in patched
+        assert "editorial illustration" in patched
+
+    def test_injects_image_caption(self) -> None:
+        article = "---\nlayout: post\ntitle: T\nimage: /x.png\n---\n\nBody"
+        patched = EconomistContentFlow._patch_frontmatter(
+            article,
+            "/x.png",
+            image_caption="The gap between promise and delivery",
+        )
+        assert "image_caption:" in patched
+        assert "gap between promise" in patched
+
+    def test_no_injection_when_fields_absent(self) -> None:
+        """Calling without the new kwargs must not break existing behaviour."""
+        article = "---\nlayout: post\ntitle: T\nimage: /x.png\n---\n\nBody"
+        patched = EconomistContentFlow._patch_frontmatter(article, "/x.png")
+        assert "image_alt" not in patched
+        assert "image_caption" not in patched
+
+
+class TestQualityGateImageMetadataGates:
+    """End-to-end: an article carrying image_alt and image_caption must pass
+    the publication validator's CRITICAL image metadata gates and route to
+    'publish', not 'revision'.  Fails until the full pipeline change lands."""
+
+    _ALT = "An Economist-style editorial illustration of a quality pipeline"
+    _CAPTION = "The gap between coverage metrics and shipping confidence"
+
+    def _draft_with_image_metadata(self) -> dict[str, Any]:
+        article = (
+            "---\n"
+            "layout: post\n"
+            'title: "AI Testing: The 80-Percent Problem"\n'
+            "date: 2026-04-30\n"
+            'author: "Ouray Viney"\n'
+            'categories: ["Quality Engineering"]\n'
+            "image: /assets/images/ai-testing.png\n"
+            f'image_alt: "{self._ALT}"\n'
+            f'image_caption: "{self._CAPTION}"\n'
+            'description: "Why AI test generators optimise for coverage not quality"\n'
+            "---\n\n"
+            + " ".join(["word"] * 850)
+            + "\n\nAs the chart shows, the data is clear.\n\n"
+            "![Chart](/assets/charts/ai-testing.png)\n\n"
+            "## References\n\n"
+            '1. Gartner, ["Report"](https://gartner.com), *Gartner*, 2024\n'
+            '2. Forrester, ["Study"](https://forrester.com), *Forrester*, 2024\n'
+            '3. IEEE, ["Standards"](https://ieee.org), *IEEE*, 2024\n'
+        )
+        return {
+            "article": article,
+            "featured_image": "/assets/images/ai-testing.png",
+            "image_alt": self._ALT,
+            "image_caption": self._CAPTION,
+            "editorial_score": 88,
+            "gates_passed": 5,
+            "publication_validator_passed": True,
+            "publication_validator_issues": [],
+        }
+
+    def test_image_metadata_present_routes_to_publish(self) -> None:
+        flow = EconomistContentFlow()
+        draft = self._draft_with_image_metadata()
+        decision = flow.quality_gate(draft)
+        assert decision == "publish", (
+            f"Expected 'publish' but got '{decision}'. "
+            f"Revision reason: {flow.state.get('revision_reason')}"
+        )
+
+    def test_validator_passes_image_metadata_gates(self) -> None:
+        from scripts.publication_validator import PublicationValidator
+
+        draft = self._draft_with_image_metadata()
+        validator = PublicationValidator(expected_date="2026-04-30")
+        is_valid, issues = validator.validate(draft["article"])
+        image_critical = [
+            i
+            for i in issues
+            if i["check"]
+            in (
+                "missing_image",
+                "default_image_fallback",
+                "missing_image_alt",
+                "missing_image_caption",
+            )
+            and i["severity"] == "CRITICAL"
+        ]
+        assert image_critical == [], (
+            f"Image metadata CRITICAL gates fired: {image_critical}"
+        )

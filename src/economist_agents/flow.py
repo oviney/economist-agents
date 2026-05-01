@@ -412,8 +412,14 @@ class EconomistContentFlow:
     # ─── helpers ───────────────────────────────────────────────────────
 
     @staticmethod
-    def _patch_frontmatter(article_text: str, featured_image: str) -> str:
-        """Force the image path and rename `summary:` → `description:`."""
+    def _patch_frontmatter(
+        article_text: str,
+        featured_image: str,
+        *,
+        image_alt: str = "",
+        image_caption: str = "",
+    ) -> str:
+        """Force image path, inject image metadata, rename summary→description."""
         if not article_text.startswith("---"):
             return article_text
         parts = article_text.split("---", 2)
@@ -425,6 +431,18 @@ class EconomistContentFlow:
                 fm = re.sub(r"image:.*", f"image: {featured_image}", fm)
             else:
                 fm = fm.rstrip() + f"\nimage: {featured_image}\n"
+        if image_alt:
+            if "image_alt:" in fm:
+                fm = re.sub(r"image_alt:.*", f'image_alt: "{image_alt}"', fm)
+            else:
+                fm = fm.rstrip() + f'\nimage_alt: "{image_alt}"\n'
+        if image_caption:
+            if "image_caption:" in fm:
+                fm = re.sub(
+                    r"image_caption:.*", f'image_caption: "{image_caption}"', fm
+                )
+            else:
+                fm = fm.rstrip() + f'\nimage_caption: "{image_caption}"\n'
         if "summary:" in fm and "description:" not in fm:
             fm = fm.replace("summary:", "description:", 1)
         return "---" + fm + "---" + parts[2]

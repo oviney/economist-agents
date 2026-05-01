@@ -576,6 +576,51 @@
       "prevention_actions": [
         "See BUG-034 \u2014 same prevention applies."
       ]
+    },
+    {
+      "id": "BUG-037",
+      "severity": "high",
+      "discovered_in": "development",
+      "discovered_date": "2026-04-30T20:04:27.734803",
+      "description": "Stage 3 writer agent produces articles without image_alt or image_caption fields; publication validator now requires both as CRITICAL gates",
+      "component": "stage3_runner",
+      "status": "ready_for_implementation",
+      "github_issue": 321,
+      "is_production_escape": false,
+      "root_cause": "requirements_gap",
+      "root_cause_notes": "Output contract for stage3_runner.py was never defined to include image_alt and image_caption. CRITICAL validator gates were added (GH #319) without updating the generator that must satisfy them. Deeper design flaw: the Anthropic Agent SDK migration retained DALL-E for image generation but added no Claude vision step to ground image metadata against the actual visual. The writer agent should emit both fields in its structured output; a Claude vision call should then refine them against the generated image before frontmatter is written.",
+      "missed_by_test_type": "integration_test",
+      "test_gap_description": "No integration test asserts that stage3_runner output contains image_alt and image_caption fields that satisfy the publication validator contract. unit tests for the validator check the gate logic but not the pipeline's ability to satisfy it end-to-end.",
+      "prevention_strategy": [
+        "new_validation",
+        "enhanced_prompt"
+      ],
+      "prevention_actions": [
+        "Add image_alt and image_caption to Stage 3 structured output contract",
+        "Wire Claude vision call post-image-generation to ground fields against actual visual",
+        "Add integration test: stage3_runner output -> publication_validator passes image metadata gates"
+      ],
+      "testability_review": {
+        "reviewed_by": "test-specialist",
+        "reviewed_date": "2026-04-30T20:09:12.842899",
+        "findings": {
+          "writer_output_shape": "Writer returns a raw string (not a dataclass). No SpikeResult field changes needed. Fix is: update writer PROMPT at stage3_runner.py lines 253-256 to require image_alt and image_caption as YAML frontmatter fields.",
+          "patch_frontmatter_extensible": "_patch_frontmatter (flow.py ~line 413) uses regex string injection. Straightforward to extend. Existing tests in TestPatchFrontmatter (test_flow_agent_sdk.py lines 339-357) cover the pattern.",
+          "anthropic_mock_pattern": "conftest.py has mock_anthropic_client fixture (lines 26-38). Claude vision calls use the same query() async generator path. Mockable via patch of src.agent_sdk.stage3_runner.query.",
+          "gaps_identified": [
+            "_FakePipelineResult (test_flow_agent_sdk.py lines 28-45) has no image_alt or image_caption fields \u2014 must be extended.",
+            "No test currently validates stage3 output through publication_validator image metadata CRITICAL gates end-to-end."
+          ],
+          "critical_blocker": "Writer prompt (stage3_runner.py lines 253-256) MUST be updated first to require both fields. Vision refinement and frontmatter injection have nothing to refine until the writer emits these fields.",
+          "recommended_test_plan": {
+            "test_writer_emits_fields": "tests/test_flow_agent_sdk.py \u2014 new TestWriterFrontmatter class",
+            "test_vision_refinement": "tests/test_flow_agent_sdk.py \u2014 new TestVisionRefinement class, patch query()",
+            "test_integration": "tests/test_flow_agent_sdk.py \u2014 extend TestQualityGate: mock pipeline \u2192 validator passes image gates",
+            "test_patch_frontmatter": "tests/test_flow_agent_sdk.py \u2014 extend TestPatchFrontmatter",
+            "sequence": "TDD: RED (write failing tests) \u2192 update prompt \u2192 GREEN \u2192 add vision step \u2192 REFACTOR"
+          }
+        }
+      }
     }
   ],
   "summary": {

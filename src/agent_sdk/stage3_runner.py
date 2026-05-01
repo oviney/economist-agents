@@ -27,7 +27,6 @@ import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-import anthropic
 import orjson
 from claude_agent_sdk import (
     AssistantMessage,
@@ -315,97 +314,6 @@ async def run_stage3_spike(
         article_chars=len(article),
         stat_audit_removed=max(stat_audit_removed, 0),
     )
-
-
-def refine_image_metadata(
-    image_path: str,
-    draft_alt: str,
-    draft_caption: str,
-) -> dict[str, str]:
-    """Ground image_alt and image_caption against the actual generated image.
-
-    The writer drafts both fields from the article thesis before the image
-    exists. Once DALL-E produces the image this function passes it to Claude
-    vision to refine the text against what is actually visible, returning
-    more accurate alt text and a tighter editorial caption.
-
-    Falls back gracefully to the writer's drafts if the image file is missing,
-    the ANTHROPIC_API_KEY is absent, or the vision call fails — so the
-    publication validator's CRITICAL gates are still satisfied even when
-    image generation partially fails.
-
-    Args:
-        image_path: Absolute or relative path to the generated image file.
-        draft_alt: image_alt draft from the writer agent.
-        draft_caption: image_caption draft from the writer agent.
-
-    Returns:
-        Dict with ``image_alt`` and ``image_caption`` keys.
-    """
-    fallback = {"image_alt": draft_alt, "image_caption": draft_caption}
-
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
-        logger.warning("ANTHROPIC_API_KEY not set — skipping vision refinement")
-        return fallback
-
-    path = Path(image_path)
-    if not path.exists():
-        logger.warning("Image not found at %s — skipping vision refinement", image_path)
-        return fallback
-
-    try:
-        import base64
-
-        image_data = base64.standard_b64encode(path.read_bytes()).decode()
-        suffix = path.suffix.lower().lstrip(".")
-        media_type = {
-            "png": "image/png",
-            "jpg": "image/jpeg",
-            "webp": "image/webp",
-        }.get(suffix, "image/png")
-
-        client = anthropic.Anthropic(api_key=api_key)
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=256,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image",
-                            "source": {
-                                "type": "base64",
-                                "media_type": media_type,
-                                "data": image_data,
-                            },
-                        },
-                        {
-                            "type": "text",
-                            "text": (
-                                "This is the hero image for an Economist-style article.\n\n"
-                                f"Writer's draft alt text: {draft_alt}\n"
-                                f"Writer's draft caption: {draft_caption}\n\n"
-                                "Refine both to match what is *actually visible* in the image. "
-                                "Return JSON only:\n"
-                                '{"image_alt": "<one sentence for screen readers>", '
-                                '"image_caption": "<one punchy editorial sentence>"}'
-                            ),
-                        },
-                    ],
-                }
-            ],
-        )
-        raw = response.content[0].text.strip()
-        refined = json.loads(raw)
-        return {
-            "image_alt": refined.get("image_alt", draft_alt),
-            "image_caption": refined.get("image_caption", draft_caption),
-        }
-    except Exception as exc:
-        logger.warning("Vision refinement failed (%s) — using writer drafts", exc)
-        return fallback
 
 
 def main() -> None:

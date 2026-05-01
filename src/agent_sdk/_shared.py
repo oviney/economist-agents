@@ -464,3 +464,114 @@ def parse_research_for_verification(research_text: str) -> dict[str, Any]:
             },
         )
     return {"data_points": data_points}
+
+
+# ─── Vision refinement: Claude grounds image_alt / image_caption ────────
+
+_MAX_IMAGE_BYTES = 4_000_000  # ~4 MB — Anthropic API hard limit for base64
+
+
+async def refine_image_metadata(
+    image_path: str,
+    draft_alt: str,
+    draft_caption: str,
+) -> dict[str, str]:
+    """Ground image_alt and image_caption against the actual generated image.
+
+    The writer drafts both fields from the article thesis before the image
+    exists.  Once DALL-E produces the image this function passes it to Claude
+    vision to refine the text against what is actually visible, returning more
+    accurate alt text and a tighter editorial caption.
+
+    Uses ``anthropic.AsyncAnthropic`` so the call is non-blocking inside the
+    async pipeline.  Fails gracefully (returns writer drafts) when:
+    - ``ANTHROPIC_API_KEY`` is absent
+    - The image file is missing or exceeds 4 MB
+    - The API call raises any exception (including JSON parse failure)
+
+    Args:
+        image_path: Path to the generated image file.
+        draft_alt: ``image_alt`` draft from the writer agent.
+        draft_caption: ``image_caption`` draft from the writer agent.
+
+    Returns:
+        Dict with ``image_alt`` and ``image_caption`` keys.
+    """
+    import base64
+    import json as _stdlib_json
+    import os
+    from pathlib import Path as _Path
+
+    fallback = {"image_alt": draft_alt, "image_caption": draft_caption}
+
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        logger.warning("ANTHROPIC_API_KEY not set — skipping vision refinement")
+        return fallback
+
+    path = _Path(image_path)
+    if not path.exists():
+        logger.warning("Image not found at %s — skipping vision refinement", image_path)
+        return fallback
+
+    if path.stat().st_size > _MAX_IMAGE_BYTES:
+        logger.warning(
+            "Image %s is %.1f MB — exceeds 4 MB API limit, skipping vision refinement",
+            image_path,
+            path.stat().st_size / 1_000_000,
+        )
+        return fallback
+
+    try:
+        import anthropic as _anthropic
+
+        suffix = path.suffix.lower().lstrip(".")
+        media_type = {
+            "png": "image/png",
+            "jpg": "image/jpeg",
+            "jpeg": "image/jpeg",
+            "webp": "image/webp",
+        }.get(suffix, "image/png")
+        image_data = base64.standard_b64encode(path.read_bytes()).decode()
+
+        client = _anthropic.AsyncAnthropic(api_key=api_key)
+        response = await client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=256,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image",
+                            "source": {
+                                "type": "base64",
+                                "media_type": media_type,
+                                "data": image_data,
+                            },
+                        },
+                        {
+                            "type": "text",
+                            "text": (
+                                "This is the hero image for an Economist-style article.\n\n"
+                                f"Writer's draft alt text: {draft_alt}\n"
+                                f"Writer's draft caption: {draft_caption}\n\n"
+                                "Refine both to match what is *actually visible* in the image. "
+                                "Return JSON only:\n"
+                                '{"image_alt": "<one sentence for screen readers>", '
+                                '"image_caption": "<one punchy editorial sentence>"}'
+                            ),
+                        },
+                    ],
+                }
+            ],
+        )
+        raw = response.content[0].text.strip()
+        refined = _stdlib_json.loads(raw)
+        return {
+            "image_alt": refined.get("image_alt", draft_alt),
+            "image_caption": refined.get("image_caption", draft_caption),
+        }
+    except Exception as exc:
+        logger.warning("Vision refinement failed (%s) — using writer drafts", exc)
+        return fallback

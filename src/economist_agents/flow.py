@@ -36,6 +36,7 @@ from typing import Any
 
 from scripts.article_evaluator import ArticleEvaluator
 from scripts.frontmatter_schema import FrontmatterSchema
+from src.agent_sdk._shared import refine_image_metadata
 from src.agent_sdk.pipeline import run_pipeline
 from src.economist_agents.adapters import (
     create_llm_client,
@@ -211,11 +212,32 @@ class EconomistContentFlow:
         except Exception as exc:
             print(f"   ℹ️  Image generation failed ({exc}), using default")
 
+        # Extract image_alt / image_caption drafts emitted by the writer
+        import yaml as _yaml
+
+        _image_alt, _image_caption = "", ""
+        if article.startswith("---"):
+            _parts = article.split("---", 2)
+            if len(_parts) >= 2:
+                try:
+                    _fm = _yaml.safe_load(_parts[1]) or {}
+                    _image_alt = _fm.get("image_alt", "") or ""
+                    _image_caption = _fm.get("image_caption", "") or ""
+                except Exception:
+                    pass
+
+        # Ground image metadata with Claude vision (async; falls back on failure)
+        _refined = asyncio.get_event_loop().run_until_complete(
+            refine_image_metadata(image_path, _image_alt, _image_caption)
+        )
+
         return {
             "article": article,
             "chart_data": result.chart_data,
             "featured_image": featured_image,
             "featured_image_local": image_path,
+            "image_alt": _refined["image_alt"],
+            "image_caption": _refined["image_caption"],
             "stage4_already_run": True,
             "publication_validator_passed": result.publication_validator_passed,
             "publication_validator_issues": result.publication_validator_issues,
@@ -232,6 +254,8 @@ class EconomistContentFlow:
         article_text = self._patch_frontmatter(
             article_draft.get("article", ""),
             article_draft.get("featured_image", "/assets/images/blog-default.svg"),
+            image_alt=article_draft.get("image_alt", ""),
+            image_caption=article_draft.get("image_caption", ""),
         )
 
         schema_result = FrontmatterSchema().validate_article(article_text)

@@ -395,11 +395,11 @@ class TestVisionRefinement:
     function is added to stage3_runner."""
 
     def test_refine_image_metadata_function_exists(self) -> None:
-        import src.agent_sdk.stage3_runner as m
+        import src.agent_sdk._shared as m
 
         assert hasattr(m, "refine_image_metadata"), (
-            "stage3_runner must expose a refine_image_metadata(image_path, "
-            "draft_alt, draft_caption) function"
+            "_shared must expose a refine_image_metadata(image_path, "
+            "draft_alt, draft_caption) async function"
         )
 
     def test_refine_image_metadata_returns_grounded_fields(
@@ -407,34 +407,38 @@ class TestVisionRefinement:
     ) -> None:
         """When Anthropic returns a vision response, refine_image_metadata
         parses and returns grounded image_alt and image_caption."""
+        import asyncio
         import os
-        from unittest.mock import MagicMock, patch
+        from unittest.mock import AsyncMock, MagicMock, patch
 
-        import src.agent_sdk.stage3_runner as m
+        import src.agent_sdk._shared as m
 
         assert hasattr(m, "refine_image_metadata"), (
-            "refine_image_metadata not yet implemented"
+            "refine_image_metadata not yet implemented in _shared"
         )
 
         # Create a real file so the path.exists() guard passes
         img = tmp_path / "test.png"
         img.write_bytes(b"PNG")
 
-        mock_msg = MagicMock()
-        mock_msg.content = [
+        mock_response = MagicMock()
+        mock_response.content = [
             MagicMock(
                 text='{"image_alt": "A grounded alt", "image_caption": "The caption"}'
             )
         ]
+        mock_create = AsyncMock(return_value=mock_response)
         with (
-            patch("src.agent_sdk.stage3_runner.anthropic") as mock_lib,
+            patch("anthropic.AsyncAnthropic") as mock_async_class,
             patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}),
         ):
-            mock_lib.Anthropic.return_value.messages.create.return_value = mock_msg
-            result = m.refine_image_metadata(
-                image_path=str(img),
-                draft_alt="draft alt",
-                draft_caption="draft caption",
+            mock_async_class.return_value.messages.create = mock_create
+            result = asyncio.run(
+                m.refine_image_metadata(
+                    image_path=str(img),
+                    draft_alt="draft alt",
+                    draft_caption="draft caption",
+                )
             )
         assert result["image_alt"] == "A grounded alt"
         assert result["image_caption"] == "The caption"
@@ -470,6 +474,39 @@ class TestPatchFrontmatterImageMetadata:
         patched = EconomistContentFlow._patch_frontmatter(article, "/x.png")
         assert "image_alt" not in patched
         assert "image_caption" not in patched
+
+    def test_replaces_existing_image_alt_not_duplicates(self) -> None:
+        """If the writer already emitted image_alt, the grounded value must win
+        and there must be exactly one image_alt key — no duplicate YAML keys."""
+        article = (
+            "---\nlayout: post\ntitle: T\nimage: /x.png\n"
+            'image_alt: "writer draft version"\n---\n\nBody'
+        )
+        patched = EconomistContentFlow._patch_frontmatter(
+            article,
+            "/x.png",
+            image_alt="Grounded by Claude vision",
+        )
+        assert "Grounded by Claude vision" in patched
+        assert "writer draft version" not in patched
+        assert patched.count("image_alt:") == 1, (
+            "duplicate image_alt key in frontmatter"
+        )
+
+    def test_replaces_existing_image_caption_not_duplicates(self) -> None:
+        """Same collision guard for image_caption."""
+        article = (
+            "---\nlayout: post\ntitle: T\nimage: /x.png\n"
+            'image_caption: "writer draft caption"\n---\n\nBody'
+        )
+        patched = EconomistContentFlow._patch_frontmatter(
+            article,
+            "/x.png",
+            image_caption="Grounded caption",
+        )
+        assert "Grounded caption" in patched
+        assert "writer draft caption" not in patched
+        assert patched.count("image_caption:") == 1, "duplicate image_caption key"
 
 
 class TestQualityGateImageMetadataGates:

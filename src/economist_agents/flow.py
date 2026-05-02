@@ -184,7 +184,8 @@ class EconomistContentFlow:
             return {
                 "article": "",
                 "chart_data": {},
-                "featured_image": "/assets/images/blog-default.svg",
+                # Empty string lets _patch_frontmatter on retry use the writer's own image field.
+                "featured_image": "",
                 "featured_image_local": "",
                 "image_alt": "",
                 "image_caption": "",
@@ -194,6 +195,7 @@ class EconomistContentFlow:
                     {
                         "check": "malformed_output",
                         "severity": "CRITICAL",
+                        # exc contains the first 120 chars of raw LLM output — internal only.
                         "message": f"Writer returned malformed output: {exc}",
                     }
                 ],
@@ -400,7 +402,17 @@ class EconomistContentFlow:
             f"Fix these issues:\n{feedback_text}"
         )
 
-        result = asyncio.run(run_pipeline(enhanced_topic))
+        try:
+            result = asyncio.run(run_pipeline(enhanced_topic))
+        except MalformedArticleError as exc:
+            logger.warning("Writer returned malformed output on revision — quarantining: %s", exc)
+            return {
+                "status": "needs_revision",
+                "editorial_score": 0,
+                "gates_passed": 0,
+                "revision_reason": f"Malformed output on revision attempt: {exc}",
+                "retry_count": retry_count + 1,
+            }
         edited_article = self._patch_frontmatter(
             result.article,
             self.state.get("article_draft", {}).get("featured_image", ""),

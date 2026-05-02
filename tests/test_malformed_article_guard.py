@@ -32,10 +32,11 @@ class TestMalformedArticleError:
 
         prose = "I apologise, but I cannot write that article at this time."
 
-        with patch(
-            "src.agent_sdk.stage3_runner._collect_text",
-            new=AsyncMock(return_value=(prose, 0.01)),
-        ):
+        with patch("src.agent_sdk.stage3_runner.build_research_brief", return_value="brief"), \
+             patch(
+                 "src.agent_sdk.stage3_runner._collect_text",
+                 new=AsyncMock(return_value=(prose, 0.01)),
+             ):
             with pytest.raises(MalformedArticleError):
                 asyncio.run(run_stage3_spike("AI Testing"))
 
@@ -45,10 +46,11 @@ class TestMalformedArticleError:
 
         no_body = "---\nlayout: post\ntitle: Test\n---\n"
 
-        with patch(
-            "src.agent_sdk.stage3_runner._collect_text",
-            new=AsyncMock(return_value=(no_body, 0.01)),
-        ):
+        with patch("src.agent_sdk.stage3_runner.build_research_brief", return_value="brief"), \
+             patch(
+                 "src.agent_sdk.stage3_runner._collect_text",
+                 new=AsyncMock(return_value=(no_body, 0.01)),
+             ):
             with pytest.raises(MalformedArticleError):
                 asyncio.run(run_stage3_spike("AI Testing"))
 
@@ -67,10 +69,11 @@ class TestMalformedArticleError:
             "3. IEEE, [\"Report\"](https://example.com), 2024\n"
         )
 
-        with patch(
-            "src.agent_sdk.stage3_runner._collect_text",
-            new=AsyncMock(side_effect=[(valid, 0.01), ('{"title":"Chart","data":[]}', 0.005)]),
-        ):
+        with patch("src.agent_sdk.stage3_runner.build_research_brief", return_value="brief"), \
+             patch(
+                 "src.agent_sdk.stage3_runner._collect_text",
+                 new=AsyncMock(side_effect=[(valid, 0.01), ('{"title":"Chart","data":[]}', 0.005)]),
+             ):
             result = asyncio.run(run_stage3_spike("AI Testing"))
             assert result.article.startswith("---")
 

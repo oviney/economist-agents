@@ -283,12 +283,15 @@ async def run_stage3_spike(
     )
     pre_audit_article = _strip_duplicate_article(raw_writer_output)
 
-    parts = pre_audit_article.split("---", 2)
-    if not pre_audit_article.startswith("---") or len(parts) < 3 or not parts[2].strip():
+    # Require opening ---, a closing --- on its own line, and a non-empty body.
+    # re.DOTALL so the frontmatter block can contain newlines.
+    _fm_match = re.match(r"^---\n.*?\n---\n(.+)", pre_audit_article, re.DOTALL)
+    body_is_empty = _fm_match is None or not _fm_match.group(1).strip()
+    if not pre_audit_article.startswith("---") or body_is_empty:
         raise MalformedArticleError(
             f"Writer output is not a well-formed article "
             f"(starts_with_dash={pre_audit_article.startswith('---')!r}, "
-            f"body_empty={len(parts) < 3 or not parts[2].strip()!r}). "
+            f"body_empty={body_is_empty!r}). "
             f"First 120 chars: {pre_audit_article[:120]!r}"
         )
 

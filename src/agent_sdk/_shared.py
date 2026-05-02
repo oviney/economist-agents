@@ -70,6 +70,7 @@ def build_research_brief(topic: str) -> str:
             "Use ONLY statistics and claims from these sources.",
             "If you need a statistic not listed below, tag it [NEEDS SOURCE].",
             "Do NOT invent statistics, researcher names, or URLs.",
+            "Every sentence containing a percentage, multiplier, or quantified claim must name the source inline (e.g. 'According to Gartner, 2024, …' or '…, per the ASQ report (2023)').",
             "",
             raw,
         ],

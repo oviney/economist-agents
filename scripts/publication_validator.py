@@ -15,6 +15,7 @@ CRITICAL CHECKS (any failure = REJECT):
 NEW in v2: Integrated DefectPrevention rules from defect_tracker.py RCA
 """
 
+import os
 import re
 from datetime import datetime
 from pathlib import Path
@@ -28,6 +29,27 @@ try:
     DEFECT_PREVENTION_AVAILABLE = True
 except ImportError:
     DEFECT_PREVENTION_AVAILABLE = False
+
+
+# ── Check 17 ──────────────────────────────────────────────────────────────
+_FILENAME_DATE_SLUG = re.compile(r"^(\d{4}-\d{2}-\d{2})-(.+)\.md$")
+
+# ── Check 18 ──────────────────────────────────────────────────────────────
+_QUANTIFIED_CLAIM = re.compile(
+    r"\d+(?:\.\d+)?%|\d+[×x]|\d+-fold|\d+ times",
+    re.IGNORECASE,
+)
+_ATTRIBUTION_PHRASES = re.compile(
+    r"according to|per |reported by|finds? that|shows? that|data from|"
+    r"study by|research by|published by|\([A-Z][^)]+,\s*\d{4}\)",
+    re.IGNORECASE,
+)
+
+# ── Check 19 ──────────────────────────────────────────────────────────────
+_PERCENTAGE = re.compile(r"\d+(?:\.\d+)?%")
+
+# ── Check 20 ──────────────────────────────────────────────────────────────
+_INTERNAL_PERMALINK = re.compile(r"^/\d{4}/\d{2}/\d{2}/[a-z0-9-]+/?$")
 
 
 class PublicationValidator:
@@ -158,6 +180,18 @@ class PublicationValidator:
 
         # Check 16: Ending quality (banned closings from stage4_crew)
         self._check_ending(article_content)
+
+        # Check 17: Slug / canonical-metadata consistency
+        self._check_slug_consistency(article_content, article_path)
+
+        # Check 18: Claim-level attribution
+        self._check_claim_attribution(article_content)
+
+        # Check 19: Front-matter / body stat drift
+        self._check_frontmatter_stat_drift(article_content)
+
+        # Check 20: Internal-link integrity
+        self._check_internal_links(article_content)
 
         # Determine if valid (no CRITICAL issues)
         critical_issues = [i for i in self.issues if i["severity"] == "CRITICAL"]
@@ -873,6 +907,198 @@ class PublicationValidator:
                     "fix": "See message for specific remediation",
                 },
             )
+
+    def _check_slug_consistency(self, content: str, article_path: str | None) -> None:
+        """Flag filename/date/slug mismatches against front-matter metadata."""
+        if not article_path:
+            return
+
+        m = _FILENAME_DATE_SLUG.match(Path(article_path).name)
+        if not m:
+            return
+
+        filename_date, filename_slug = m.group(1), m.group(2)
+
+        try:
+            if not content.startswith("---"):
+                return
+            parts = content.split("---", 2)
+            if len(parts) < 2:
+                return
+            fm = yaml.safe_load(parts[1])
+            if not isinstance(fm, dict):
+                return
+        except Exception:
+            return
+
+        fm_date = str(fm.get("date", ""))[:10]
+        if fm_date and fm_date != filename_date:
+            self.issues.append(
+                {
+                    "check": "slug_date_mismatch",
+                    "severity": "CRITICAL",
+                    "message": (
+                        f"Filename date {filename_date} does not match "
+                        f"front-matter date {fm_date}"
+                    ),
+                    "details": "Filename date, date: field, and canonical URL must all agree",
+                    "fix": (
+                        f"Rename file to {fm_date}-{filename_slug}.md "
+                        f"or update date: to {filename_date}"
+                    ),
+                },
+            )
+
+        slug_field = fm.get("slug")
+        if slug_field:
+            canonical = str(slug_field).strip()
+        else:
+            title = str(fm.get("title", ""))
+            canonical = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")
+
+        if canonical and filename_slug != canonical and not canonical.startswith(filename_slug):
+            self.issues.append(
+                {
+                    "check": "slug_drift",
+                    "severity": "HIGH",
+                    "message": (
+                        f"Filename slug '{filename_slug}' does not match "
+                        f"canonical slug '{canonical}'"
+                    ),
+                    "details": "Filename slug must equal or be a prefix of the canonical slug",
+                    "fix": (
+                        f"Rename file to use slug '{canonical[:50]}' "
+                        f"or add slug: {filename_slug} to front matter"
+                    ),
+                },
+            )
+
+    def _check_claim_attribution(self, content: str) -> None:
+        """Flag quantified claims (%, ×, -fold) that lack an inline source attribution."""
+        if content.startswith("---"):
+            parts = content.split("---", 2)
+            body = parts[2] if len(parts) >= 3 else ""
+        else:
+            body = content
+
+        for pattern in (r"\n## References\b", r"\n## Sources\b", r"\n## Bibliography\b"):
+            ref_m = re.search(pattern, body, re.IGNORECASE)
+            if ref_m:
+                body = body[: ref_m.start()]
+                break
+
+        sentences = re.split(r"(?<=[.!?])\s+", body)
+        unattributed: list[str] = []
+        for i, sentence in enumerate(sentences):
+            if not _QUANTIFIED_CLAIM.search(sentence):
+                continue
+            window = " ".join(sentences[max(0, i - 1) : i + 2])
+            if not _ATTRIBUTION_PHRASES.search(window):
+                unattributed.append(sentence.strip())
+
+        if unattributed:
+            details = "\n".join(f"  • {s[:120]}" for s in unattributed[:3])
+            self.issues.append(
+                {
+                    "check": "unattributed_claims",
+                    "severity": "HIGH",
+                    "message": (
+                        f"{len(unattributed)} quantified claim(s) lack inline attribution"
+                    ),
+                    "details": details,
+                    "fix": (
+                        "Add inline attribution: "
+                        "'According to [Source, Year], ...' or '(Org, YYYY)'"
+                    ),
+                },
+            )
+
+    def _check_frontmatter_stat_drift(self, content: str) -> None:
+        """Flag percentages in description: that are absent from the article body."""
+        try:
+            if not content.startswith("---"):
+                return
+            parts = content.split("---", 2)
+            if len(parts) < 2:
+                return
+            fm = yaml.safe_load(parts[1])
+            if not isinstance(fm, dict):
+                return
+            description = str(fm.get("description") or "")
+        except Exception:
+            return
+
+        stats = _PERCENTAGE.findall(description)
+        if not stats:
+            return
+
+        body = parts[2] if len(parts) >= 3 else ""
+        missing = [s for s in stats if s not in body]
+
+        if missing:
+            self.issues.append(
+                {
+                    "check": "frontmatter_stat_drift",
+                    "severity": "HIGH",
+                    "message": (
+                        f"description: contains {len(missing)} stat(s) not found "
+                        f"in article body: {', '.join(missing)}"
+                    ),
+                    "details": "Front-matter summary statistics must match body content",
+                    "fix": (
+                        "Update description: to match the statistics used in the article body"
+                    ),
+                },
+            )
+
+    def _check_internal_links(self, content: str) -> None:
+        """Flag internal blog links that don't match /:year/:month/:day/:title/."""
+        blog_posts_dir = os.environ.get("BLOG_POSTS_DIR")
+
+        for m in re.finditer(r"\[([^\]]*)\]\(([^)]+)\)", content):
+            url = m.group(2).strip()
+
+            if url.startswith(("http://", "https://", "mailto:", "#", "/assets/")):
+                continue
+            if not url.startswith("/"):
+                continue
+
+            if not _INTERNAL_PERMALINK.match(url):
+                self.issues.append(
+                    {
+                        "check": "malformed_internal_link",
+                        "severity": "HIGH",
+                        "message": (
+                            f"Internal link '{url}' does not match blog permalink "
+                            f"pattern /:year/:month/:day/:title/"
+                        ),
+                        "details": "Blog uses permalink: /:year/:month/:day/:title/ (see _config.yml)",
+                        "fix": "Update link to match the format /YYYY/MM/DD/slug/",
+                    },
+                )
+                continue
+
+            if blog_posts_dir:
+                seg = url.strip("/").split("/")
+                if len(seg) == 4:
+                    year, month, day, slug = seg
+                    expected = f"{year}-{month}-{day}-{slug}.md"
+                    if not (Path(blog_posts_dir) / expected).exists():
+                        self.issues.append(
+                            {
+                                "check": "broken_internal_link",
+                                "severity": "CRITICAL",
+                                "message": (
+                                    f"Internal link '{url}' resolves to missing "
+                                    f"file '{expected}'"
+                                ),
+                                "details": f"File not found in BLOG_POSTS_DIR={blog_posts_dir}",
+                                "fix": (
+                                    f"Create {expected} in {blog_posts_dir} "
+                                    f"or fix the link target"
+                                ),
+                            },
+                        )
 
     def format_report(self, is_valid: bool, issues: list[dict]) -> str:
         """Generate human-readable validation report"""

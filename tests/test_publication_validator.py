@@ -601,3 +601,260 @@ class TestProductionEscapes319:
             )
         ]
         assert new_gate_issues == [], f"New gates should pass: {new_gate_issues}"
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# T1 — Check 17: slug consistency
+# ═══════════════════════════════════════════════════════════════════════════
+
+def _make_article_with_slug(slug_field: str) -> str:
+    """Build an article that includes an explicit front-matter slug: field."""
+    fm = (
+        f"layout: post\n"
+        f'title: "Specific Descriptive Title for Testing"\n'
+        f"date: 2026-04-03\n"
+        f'author: "Ouray Viney"\n'
+        f'categories: ["Quality Engineering"]\n'
+        f'description: "A concise test description for SEO purposes"\n'
+        f"image: /assets/images/test-article.png\n"
+        f'image_alt: "A testing rig catching defects before release"\n'
+        f'image_caption: "Illustration: stronger gates catch weaker drafts"\n'
+        f"slug: {slug_field}\n"
+    )
+    return f"---\n{fm}---\n\n{VALID_BODY}\n{VALID_CHART_EMBED}\n{VALID_REFERENCES}\n"
+
+
+class TestSlugConsistency:
+    """Check 17 — filename/date/slug alignment."""
+
+    def test_passes_when_slug_matches_title(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article()
+        _, issues = validator.validate(
+            article, "2026-04-03-specific-descriptive-title-for-testing.md"
+        )
+        slug_issues = [i for i in issues if i["check"] in ("slug_date_mismatch", "slug_drift")]
+        assert slug_issues == []
+
+    def test_critical_when_filename_date_mismatches_frontmatter(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(date="2026-04-03")
+        _, issues = validator.validate(
+            article, "2026-04-05-specific-descriptive-title-for-testing.md"
+        )
+        date_issues = [i for i in issues if i["check"] == "slug_date_mismatch"]
+        assert len(date_issues) == 1
+        assert date_issues[0]["severity"] == "CRITICAL"
+
+    def test_high_when_slug_drifts_from_title(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article()
+        _, issues = validator.validate(
+            article, "2026-04-03-completely-different-slug.md"
+        )
+        slug_issues = [i for i in issues if i["check"] == "slug_drift"]
+        assert len(slug_issues) == 1
+        assert slug_issues[0]["severity"] == "HIGH"
+
+    def test_passes_when_explicit_slug_field_matches_filename(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article_with_slug("custom-slug")
+        _, issues = validator.validate(article, "2026-04-03-custom-slug.md")
+        slug_issues = [i for i in issues if i["check"] == "slug_drift"]
+        assert slug_issues == []
+
+    def test_high_when_explicit_slug_field_mismatches_filename(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article_with_slug("custom-slug")
+        _, issues = validator.validate(article, "2026-04-03-different-slug.md")
+        slug_issues = [i for i in issues if i["check"] == "slug_drift"]
+        assert len(slug_issues) == 1
+
+    def test_skipped_when_no_article_path(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article()
+        _, issues = validator.validate(article)
+        slug_issues = [i for i in issues if i["check"] in ("slug_date_mismatch", "slug_drift")]
+        assert slug_issues == []
+
+    def test_passes_when_filename_slug_is_prefix_of_title_slug(self) -> None:
+        """Truncated filename slugs are acceptable as long as they are a prefix."""
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article()
+        # "specific-descriptive-title-for" is a prefix of "specific-descriptive-title-for-testing"
+        _, issues = validator.validate(
+            article, "2026-04-03-specific-descriptive-title-for.md"
+        )
+        slug_issues = [i for i in issues if i["check"] == "slug_drift"]
+        assert slug_issues == []
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# T2 — Check 18: claim attribution
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+class TestClaimAttribution:
+    """Check 18 — quantified claims must carry inline attribution."""
+
+    def test_passes_when_all_claims_attributed_with_according_to(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        body = (
+            " ".join(["word"] * 200)
+            + " According to Gartner (2024), 73% of teams report faster delivery."
+            + " " + " ".join(["word"] * 600)
+        )
+        article = _make_article(body=body)
+        _, issues = validator.validate(article)
+        attr_issues = [i for i in issues if i["check"] == "unattributed_claims"]
+        assert attr_issues == []
+
+    def test_high_when_bare_percentage_has_no_attribution(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        body = (
+            " ".join(["word"] * 200)
+            + " Teams report a 73% improvement in delivery speed."
+            + " " + " ".join(["word"] * 600)
+        )
+        article = _make_article(body=body)
+        _, issues = validator.validate(article)
+        attr_issues = [i for i in issues if i["check"] == "unattributed_claims"]
+        assert len(attr_issues) == 1
+        assert attr_issues[0]["severity"] == "HIGH"
+
+    def test_passes_with_parenthetical_citation(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        body = (
+            " ".join(["word"] * 200)
+            + " Adoption rates reached 58% (Forrester, 2023) across the industry."
+            + " " + " ".join(["word"] * 600)
+        )
+        article = _make_article(body=body)
+        _, issues = validator.validate(article)
+        attr_issues = [i for i in issues if i["check"] == "unattributed_claims"]
+        assert attr_issues == []
+
+    def test_references_section_excluded_from_check(self) -> None:
+        """Stats inside ## References must not trigger attribution check."""
+        validator = PublicationValidator(expected_date="2026-04-03")
+        body = " ".join(["word"] * 850)
+        refs = (
+            "## References\n\n"
+            "1. Gartner, [\"Report shows 45% growth\"](https://example.com), 2024\n"
+            "2. Forrester, [\"State of Test Automation\"](https://example.com), 2024\n"
+            "3. IEEE, [\"Software Testing Practices\"](https://example.com), 2024\n"
+        )
+        article = _make_article(body=body, references=refs)
+        _, issues = validator.validate(article)
+        attr_issues = [i for i in issues if i["check"] == "unattributed_claims"]
+        assert attr_issues == []
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# T3 — Check 19: front-matter stat drift
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+class TestFrontmatterStatDrift:
+    """Check 19 — stats in description: must appear verbatim in article body."""
+
+    def test_passes_when_description_stat_appears_in_body(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        body = (
+            " ".join(["word"] * 200)
+            + " Studies show that 42% of teams benefit from this approach."
+            + " " + " ".join(["word"] * 600)
+        )
+        article = _make_article(description="Research finds 42% adoption rate", body=body)
+        _, issues = validator.validate(article)
+        drift_issues = [i for i in issues if i["check"] == "frontmatter_stat_drift"]
+        assert drift_issues == []
+
+    def test_high_when_description_stat_absent_from_body(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(description="Research finds 99% adoption rate")
+        _, issues = validator.validate(article)
+        drift_issues = [i for i in issues if i["check"] == "frontmatter_stat_drift"]
+        assert len(drift_issues) == 1
+        assert drift_issues[0]["severity"] == "HIGH"
+
+    def test_skipped_when_no_stat_in_description(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(description="A concise test description for SEO purposes")
+        _, issues = validator.validate(article)
+        drift_issues = [i for i in issues if i["check"] == "frontmatter_stat_drift"]
+        assert drift_issues == []
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# T4 — Check 20: internal-link integrity
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+class TestInternalLinks:
+    """Check 20 — internal blog links must match /:year/:month/:day/:title/ pattern."""
+
+    def test_passes_on_external_links(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        body = (
+            " ".join(["word"] * 400)
+            + " See [Gartner report](https://gartner.com/report) for details."
+            + " " + " ".join(["word"] * 400)
+        )
+        article = _make_article(body=body)
+        _, issues = validator.validate(article)
+        link_issues = [i for i in issues if i["check"] in ("malformed_internal_link", "broken_internal_link")]
+        assert link_issues == []
+
+    def test_passes_on_valid_internal_permalink(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        body = (
+            " ".join(["word"] * 400)
+            + " See [previous article](/2026/01/18/quality-metrics-executives/) for context."
+            + " " + " ".join(["word"] * 400)
+        )
+        article = _make_article(body=body)
+        _, issues = validator.validate(article)
+        link_issues = [i for i in issues if i["check"] == "malformed_internal_link"]
+        assert link_issues == []
+
+    def test_high_when_internal_path_has_wrong_format(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        body = (
+            " ".join(["word"] * 400)
+            + " See [previous article](/posts/quality-metrics/) for context."
+            + " " + " ".join(["word"] * 400)
+        )
+        article = _make_article(body=body)
+        _, issues = validator.validate(article)
+        link_issues = [i for i in issues if i["check"] == "malformed_internal_link"]
+        assert len(link_issues) == 1
+        assert link_issues[0]["severity"] == "HIGH"
+
+    def test_asset_links_ignored(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        body = (
+            " ".join(["word"] * 400)
+            + " ![Chart](/assets/charts/my-chart.png)"
+            + " " + " ".join(["word"] * 400)
+        )
+        article = _make_article(body=body)
+        _, issues = validator.validate(article)
+        link_issues = [i for i in issues if i["check"] == "malformed_internal_link"]
+        assert link_issues == []
+
+    def test_critical_when_blog_posts_dir_set_and_file_missing(
+        self, tmp_path, monkeypatch
+    ) -> None:
+        monkeypatch.setenv("BLOG_POSTS_DIR", str(tmp_path))
+        validator = PublicationValidator(expected_date="2026-04-03")
+        body = (
+            " ".join(["word"] * 400)
+            + " See [prior post](/2026/01/18/nonexistent-article/) for context."
+            + " " + " ".join(["word"] * 400)
+        )
+        article = _make_article(body=body)
+        _, issues = validator.validate(article)
+        link_issues = [i for i in issues if i["check"] == "broken_internal_link"]
+        assert len(link_issues) == 1
+        assert link_issues[0]["severity"] == "CRITICAL"

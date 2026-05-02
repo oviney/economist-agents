@@ -8,6 +8,9 @@ tools:
 skills:
   - skills/sprint-management
   - skills/agent-delegation
+  - skills/spec-driven-development
+  - skills/idea-refine
+  - skills/planning-and-task-breakdown
 ---
 
 # Product Owner Agent
@@ -358,15 +361,8 @@ Recommendation: "Decompose into 3 sprints: Foundation → Coordination → Auton
 
 ## Skills
 
-- `skills/sprint-management` — for DoR checks, story point estimation guidelines, and acceptance-criteria formatting conventions.
-- `skills/agent-delegation` — applied when deciding which agent runtime (Claude Code, Copilot, human) should execute a story, and to validate that stories are sized for autonomous execution.
-
-**Sprint 8 Story 1 Acceptance Criteria**:
-- [x] PO Agent specification complete with capabilities defined
-- [x] Integration with SM Agent documented
-- [x] Human touch points identified (approval gates)
-- [x] Success metrics defined (>90% AC acceptance, 50% time reduction)
-- [x] Implementation notes with class structure
-- [x] Testing strategy specified
-- [ ] scripts/po_agent.py implemented (Sprint 8 execution)
-- [ ] tests/test_po_agent.py created with 5+ test cases (Sprint 8 execution)
+- `skills/sprint-management` — DoR checks, estimation, AC formatting.
+- `skills/agent-delegation` — runtime selection per story.
+- `skills/spec-driven-development` — every story must pass SPECIFY → human review before entering the backlog.
+- `skills/idea-refine` — applied when the incoming request is vague or ambiguous.
+- `skills/planning-and-task-breakdown` — produces a dependency-ordered task list as part of every story definition.

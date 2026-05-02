@@ -9,6 +9,8 @@ skills:
   - skills/architecture-patterns
   - skills/agent-delegation
   - skills/adr-governance
+  - skills/spec-driven-development
+  - skills/using-agent-skills
 ---
 
 # AI Architect Agent
@@ -165,3 +167,11 @@ For audit runs, prefer the script wrapper: `python scripts/architecture_audit.py
 - Architects own architecture. Everything else is delegation.
 
 When delegating, apply `skills/agent-delegation` to determine the right runtime (Claude Code sub-agent, Copilot, human) and to check parallelism safety before dispatching work.
+
+## Skills
+
+- `skills/architecture-patterns` — rubric, anti-patterns, ADR discipline.
+- `skills/agent-delegation` — runtime selection and parallelism safety.
+- `skills/adr-governance` — ADR numbering, required sections, supersession chain.
+- `skills/spec-driven-development` — architectural decisions require a spec before the ADR; code without a spec is guessing.
+- `skills/using-agent-skills` — routes architectural requests to the correct workflow before engaging.

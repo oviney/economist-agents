@@ -7,6 +7,9 @@ tools:
   - github_project_add_issue
 skills:
   - skills/sprint-management
+  - skills/planning-and-task-breakdown
+  - skills/shipping-and-launch
+  - skills/using-agent-skills
 ---
 
 # Scrum Master Agent
@@ -423,3 +426,10 @@ Apply `skills/sprint-management` for story point estimation, DoR/DoD checks, and
 **Agent Version**: 2.0
 **Last Updated**: 2026-01-02
 **Status**: Production-ready with full GitHub integration
+
+## Skills
+
+- `skills/sprint-management` — ceremony formats, DoR/DoD, sprint metrics.
+- `skills/using-agent-skills` — applied at session start to route incoming tasks to the correct skill.
+- `skills/planning-and-task-breakdown` — builds the dependency graph before committing stories to a sprint.
+- `skills/shipping-and-launch` — pre-launch checklist must be satisfied before approving any production deployment.

@@ -9,6 +9,7 @@ skills:
   - skills/python-quality
   - skills/article-evaluation
   - skills/defect-prevention
+  - skills/incremental-implementation
 ---
 
 # Code Quality Specialist Agent
@@ -228,12 +229,6 @@ Your work is complete when:
 - Documentation updates
 - Code review standards
 
-## Skills
-
-- `skills/python-quality` — type hints, docstrings, error handling, modernisation rules.
-- `skills/article-evaluation` — used when refactoring article-pipeline modules so behaviour is preserved.
-- `skills/defect-prevention` — applied during refactor to add prevention tests for any RCA-tagged bug touched.
-
 ## Output
 
 After completing a refactor or quality task, emit a Markdown result block:
@@ -252,3 +247,10 @@ After completing a refactor or quality task, emit a Markdown result block:
 ```
 
 If `ruff` or `mypy` violations remain, list them explicitly — do not emit `completed` until both are clean.
+
+## Skills
+
+- `skills/python-quality` — type hints, docstrings, error handling, modernisation rules.
+- `skills/article-evaluation` — used when refactoring article-pipeline modules so behaviour is preserved.
+- `skills/defect-prevention` — applied during refactor to add prevention tests for any RCA-tagged bug touched.
+- `skills/incremental-implementation` — all refactoring work delivered as thin vertical slices, each tested and committed independently.

@@ -7,6 +7,7 @@ tools:
 skills:
   - skills/sprint-management
   - skills/python-quality
+  - skills/incremental-implementation
 ---
 
 # Git Operator Agent
@@ -80,11 +81,6 @@ Before pushing, ALWAYS run:
 - **ALWAYS** reference a Story Number.
 - **ALWAYS** pull before push if working on shared branch.
 
-## Skills
-
-- `skills/sprint-management` — for story numbering, status values, and the "Story N:" commit message template above.
-- `skills/python-quality` — for understanding which pre-commit hooks (ruff, mypy) modify files and trigger the Double Commit Protocol.
-
 ## Output
 
 Every git workflow reports its result in this format so the orchestrator can confirm success and continue:
@@ -101,3 +97,9 @@ Every git workflow reports its result in this format so the orchestrator can con
 **Status**: success | failed
 **Message**: <one-line summary of what changed>
 ```
+
+## Skills
+
+- `skills/sprint-management` — story numbering, status values, commit message template.
+- `skills/python-quality` — pre-commit hooks (ruff, mypy) that trigger the Double Commit Protocol.
+- `skills/incremental-implementation` — every commit must represent a single, tested, working increment; batch commits mixing unrelated changes are rejected.

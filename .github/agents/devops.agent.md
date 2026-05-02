@@ -8,6 +8,7 @@ tools:
 skills:
   - skills/devops
   - skills/observability
+  - skills/shipping-and-launch
 ---
 
 # DevOps Agent
@@ -266,12 +267,6 @@ python3 scripts/sync_github_project.py --debug --sprint 10
 - Time to resolution for CI failures (target: <1 hour)
 - Badge accuracy (target: 100% real-time data)
 
-## Skills
-
-- `skills/quality-gates` — for the gate definitions, CI rules, and pre-commit configuration this agent enforces.
-- `skills/devops` — operational playbooks for CI failures, environment recreation, and deployment automation.
-- `skills/observability` — applied when configuring monitoring, alerting, and logging for the CI/CD and content pipelines.
-
 ## Output
 
 Every DevOps task emits a structured result. Include this in your response so the orchestrator and scrum master can track state:
@@ -296,3 +291,10 @@ Every DevOps task emits a structured result. Include this in your response so th
   - Assigned GitHub Projects evolution ownership
   - Documented current state and Sprint 10 targets
   - Created comprehensive capability documentation
+
+## Skills
+
+- `skills/quality-gates` — gate definitions, CI rules, pre-commit configuration.
+- `skills/devops` — CI failure playbooks, environment recreation, deployment automation.
+- `skills/observability` — metrics selection, alert thresholds, monitoring configuration.
+- `skills/shipping-and-launch` — pre-launch checklist, staged rollout thresholds, rollback plan required for every deploy.

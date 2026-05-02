@@ -46,6 +46,10 @@ from src.agent_sdk._shared import (
 
 logger = logging.getLogger(__name__)
 
+
+class MalformedArticleError(ValueError):
+    """Raised when the writer agent returns output that is not a well-formed article."""
+
 DEFAULT_WRITER_MODEL = os.environ.get("WRITER_MODEL", "claude-sonnet-4-6")
 DEFAULT_GRAPHICS_MODEL = os.environ.get("GRAPHICS_MODEL", "claude-sonnet-4-6")
 
@@ -278,6 +282,15 @@ async def run_stage3_spike(
         max_budget_usd=writer_budget_usd,
     )
     pre_audit_article = _strip_duplicate_article(raw_writer_output)
+
+    parts = pre_audit_article.split("---", 2)
+    if not pre_audit_article.startswith("---") or len(parts) < 3 or not parts[2].strip():
+        raise MalformedArticleError(
+            f"Writer output is not a well-formed article "
+            f"(starts_with_dash={pre_audit_article.startswith('---')!r}, "
+            f"body_empty={len(parts) < 3 or not parts[2].strip()!r}). "
+            f"First 120 chars: {pre_audit_article[:120]!r}"
+        )
 
     audited = _audit_article_stats(pre_audit_article, research_brief)
     stat_audit_removed = pre_audit_article.count(".") - audited.count(".")

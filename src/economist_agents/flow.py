@@ -38,6 +38,7 @@ from scripts.article_evaluator import ArticleEvaluator
 from scripts.frontmatter_schema import FrontmatterSchema
 from src.agent_sdk._shared import refine_image_metadata
 from src.agent_sdk.pipeline import run_pipeline
+from src.agent_sdk.stage3_runner import MalformedArticleError
 from src.economist_agents.adapters import (
     create_llm_client,
     generate_featured_image,
@@ -171,7 +172,34 @@ class EconomistContentFlow:
         print("✍️  Flow Stage 3: Content Generation (Agent SDK pipeline)")
         print(f"   Topic: {topic}")
 
-        result = asyncio.run(run_pipeline(topic))
+        try:
+            result = asyncio.run(run_pipeline(topic))
+        except MalformedArticleError as exc:
+            logger.warning("Writer returned malformed output — routing to revision: %s", exc)
+            self.state["revision_reason"] = str(exc)
+            self.state["revision_feedback"] = [
+                "Writer returned malformed output with no YAML frontmatter. "
+                "Retry: output must start with --- and include a non-empty body."
+            ]
+            return {
+                "article": "",
+                "chart_data": {},
+                "featured_image": "/assets/images/blog-default.svg",
+                "featured_image_local": "",
+                "image_alt": "",
+                "image_caption": "",
+                "stage4_already_run": False,
+                "publication_validator_passed": False,
+                "publication_validator_issues": [
+                    {
+                        "check": "malformed_output",
+                        "severity": "CRITICAL",
+                        "message": f"Writer returned malformed output: {exc}",
+                    }
+                ],
+                "editorial_score": 0,
+                "gates_passed": 0,
+            }
         article = result.article
         print(f"   ✅ Article generated: {len(article.split())} words")
         print(

@@ -1,4 +1,9 @@
-"""Tests for ``scripts/validate_skills.py`` — issue #294."""
+"""Tests for ``scripts/validate_skills.py`` — issue #294.
+
+Updated to match the addyosmani/agent-skills format: skills use skill-specific
+section names (e.g. "The TDD Cycle", "Skill Discovery") so validation checks
+minimum section count rather than fixed section names.
+"""
 
 from __future__ import annotations
 
@@ -7,23 +12,35 @@ from pathlib import Path
 import pytest
 
 from scripts.validate_skills import (
-    REQUIRED_SECTIONS,
+    MIN_SECTION_COUNT,
     discover_skill_files,
     main,
     validate_skill,
 )
+
+# Build a minimal valid body with exactly MIN_SECTION_COUNT sections.
+_SECTION_NAMES = [
+    "Overview",
+    "When to Use",
+    "The Core Process",
+    "Common Rationalizations",
+    "Red Flags",
+    "Verification",
+]
+assert len(_SECTION_NAMES) >= MIN_SECTION_COUNT
+
+
+def _valid_body() -> str:
+    return "\n\n".join(f"## {s}\nFiller text." for s in _SECTION_NAMES)
 
 
 def _write_skill(tmp_path: Path, name: str, *, body: str | None = None) -> Path:
     skill_dir = tmp_path / name
     skill_dir.mkdir()
     skill = skill_dir / "SKILL.md"
-    if body is None:
-        body = "\n\n".join(
-            f"## {section}\nFiller text." for section in REQUIRED_SECTIONS
-        )
     skill.write_text(
-        f"---\nname: {name}\ndescription: Use to test the validator.\n---\n\n{body}\n",
+        f"---\nname: {name}\ndescription: Use to test the validator.\n---\n\n"
+        f"{body if body is not None else _valid_body()}\n",
     )
     return skill
 
@@ -45,9 +62,8 @@ class TestValidateSkill:
     def test_name_mismatch(self, tmp_path: Path) -> None:
         skill_dir = tmp_path / "actual-dir"
         skill_dir.mkdir()
-        body = "\n\n".join(f"## {s}\nFiller." for s in REQUIRED_SECTIONS)
         (skill_dir / "SKILL.md").write_text(
-            f"---\nname: wrong-name\ndescription: Use to test.\n---\n\n{body}\n",
+            f"---\nname: wrong-name\ndescription: Use to test.\n---\n\n{_valid_body()}\n",
         )
         report = validate_skill(skill_dir / "SKILL.md")
         assert not report.ok
@@ -56,35 +72,39 @@ class TestValidateSkill:
     def test_extra_frontmatter_key_rejected(self, tmp_path: Path) -> None:
         skill_dir = tmp_path / "extra-key"
         skill_dir.mkdir()
-        body = "\n\n".join(f"## {s}\nFiller." for s in REQUIRED_SECTIONS)
         (skill_dir / "SKILL.md").write_text(
             "---\n"
             "name: extra-key\n"
             "description: Use to test.\n"
             "version: 1.0\n"
             "---\n\n"
-            f"{body}\n",
+            f"{_valid_body()}\n",
         )
         report = validate_skill(skill_dir / "SKILL.md")
         assert not report.ok
         assert any("unexpected frontmatter key" in e for e in report.errors)
 
-    def test_missing_section(self, tmp_path: Path) -> None:
-        body = "\n\n".join(
-            f"## {s}\nFiller." for s in REQUIRED_SECTIONS if s != "Verification"
+    def test_too_few_sections_fails(self, tmp_path: Path) -> None:
+        """A skill with fewer than MIN_SECTION_COUNT ## headings should fail."""
+        thin_body = "\n\n".join(
+            f"## Section {i}\nFiller." for i in range(MIN_SECTION_COUNT - 1)
         )
-        skill = _write_skill(tmp_path, "no-verify", body=body)
+        skill = _write_skill(tmp_path, "thin-skill", body=thin_body)
         report = validate_skill(skill)
         assert not report.ok
-        assert any("Verification" in e for e in report.errors)
+        assert any("too few ## sections" in e for e in report.errors)
 
-    def test_subtitled_heading_accepted(self, tmp_path: Path) -> None:
-        """`## Core Process: subtitle` should still satisfy the rule."""
-        body = []
-        for s in REQUIRED_SECTIONS:
-            heading = f"## {s}: subtitle here" if s == "Core Process" else f"## {s}"
-            body.append(f"{heading}\nFiller.")
-        skill = _write_skill(tmp_path, "subtitle", body="\n\n".join(body))
+    def test_skill_specific_section_names_accepted(self, tmp_path: Path) -> None:
+        """Skills can use any section names — e.g. addyosmani originals."""
+        body = (
+            "## Overview\nSome overview.\n\n"
+            "## Skill Discovery\nHow to route tasks.\n\n"
+            "## Core Operating Behaviors\nThe six behaviors.\n\n"
+            "## Failure Modes to Avoid\nCommon pitfalls.\n\n"
+            "## Skill Rules\nThe rules.\n\n"
+            "## Quick Reference\nTable of skills."
+        )
+        skill = _write_skill(tmp_path, "custom-sections", body=body)
         report = validate_skill(skill)
         assert report.ok, report.errors
 
@@ -94,13 +114,12 @@ class TestValidateSkill:
     ) -> None:
         skill_dir = tmp_path / "no-punct"
         skill_dir.mkdir()
-        body = "\n\n".join(f"## {s}\nFiller." for s in REQUIRED_SECTIONS)
         (skill_dir / "SKILL.md").write_text(
             "---\n"
             "name: no-punct\n"
             "description: A description with no punctuation\n"
             "---\n\n"
-            f"{body}\n",
+            f"{_valid_body()}\n",
         )
         report = validate_skill(skill_dir / "SKILL.md")
         assert not report.ok
@@ -141,16 +160,20 @@ class TestMainExitCodes:
         assert rc == 2
 
     def test_repo_skills_pass(self) -> None:
-        """The repo's own skills must satisfy the validator at all times."""
+        """All 39 repo skills (addyosmani + domain) must satisfy the validator."""
         rc = main(["skills", "--quiet"])
         assert rc == 0
 
 
-@pytest.mark.parametrize("section", list(REQUIRED_SECTIONS))
-def test_each_required_section_is_load_bearing(tmp_path: Path, section: str) -> None:
-    """Removing any single required section should fail validation."""
-    body = "\n\n".join(f"## {s}\nFiller." for s in REQUIRED_SECTIONS if s != section)
-    skill = _write_skill(tmp_path, "load-bearing", body=body)
-    report = validate_skill(skill)
-    assert not report.ok
-    assert any(section in e for e in report.errors)
+def test_min_section_count_is_enforced(tmp_path: Path) -> None:
+    """Exactly MIN_SECTION_COUNT-1 sections fails; MIN_SECTION_COUNT passes."""
+    under = "\n\n".join(
+        f"## S{i}\nFiller." for i in range(MIN_SECTION_COUNT - 1)
+    )
+    at_min = "\n\n".join(
+        f"## S{i}\nFiller." for i in range(MIN_SECTION_COUNT)
+    )
+    skill_under = _write_skill(tmp_path, "under", body=under)
+    skill_at = _write_skill(tmp_path, "at-min", body=at_min)
+    assert not validate_skill(skill_under).ok
+    assert validate_skill(skill_at).ok

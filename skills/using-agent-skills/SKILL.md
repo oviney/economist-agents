@@ -9,19 +9,6 @@ description: Discovers and invokes agent skills. Use when starting a session or 
 
 Agent Skills is a collection of engineering workflow skills organized by development phase. Each skill encodes a specific process that senior engineers follow. This meta-skill helps you discover and apply the right skill for your current task.
 
-
-## When to Use
-
-- At the start of every session to identify which skill applies to the incoming task
-- When a request spans multiple development phases and you need to sequence skills
-- When a task type is ambiguous and you need to route to the correct workflow
-- When switching between tasks within a session
-
-### When NOT to Use
-
-- As a substitute for the actual skill — this is a routing tool, not a doing tool
-- For single-step tasks with an obvious workflow
-
 ## Skill Discovery
 
 When a task arrives, identify the development phase and apply the corresponding skill:
@@ -49,7 +36,7 @@ Task arrives
     └── Deploying/launching? ─────────→ shipping-and-launch
 ```
 
-## Core Process: Operating Behaviors
+## Core Operating Behaviors
 
 These behaviors apply at all times, across all skills. They are non-negotiable.
 
@@ -118,16 +105,7 @@ Your job is surgical precision, not unsolicited renovation.
 
 Every skill includes a verification step. A task is not complete until verification passes. "Seems right" is never sufficient — there must be evidence (passing tests, build output, runtime data).
 
-
-## Common Rationalizations
-
-| Rationalization | Reality |
-|----------------|---------|
-| "I know which skill applies — I don't need to check" | Skipping skill discovery means applying the wrong process; a 30-second check prevents hours of rework |
-| "We can figure out the spec as we go" | Undiscovered requirements surface at the worst time — during implementation, not before it |
-| "The task is small enough to skip planning" | Small tasks aggregate; a missed dependency on a "small" task blocks the next three |
-
-## Red Flags
+## Failure Modes to Avoid
 
 These are the subtle errors that look like productivity but create problems:
 
@@ -194,11 +172,3 @@ Not every task needs every skill. A bug fix might only need: `debugging-and-erro
 | Ship | ci-cd-and-automation | Automated quality gates on every change |
 | Ship | documentation-and-adrs | Document the why, not just the what |
 | Ship | shipping-and-launch | Pre-launch checklist, monitoring, rollback plan |
-
-## Verification
-
-- Every session begins by identifying the task type against the discovery flowchart before writing any code
-- No implementation starts without first confirming which skill governs the work
-- Specs exist for all stories before sprint planning commits to them
-- A plan document with dependency-ordered tasks exists before implementation begins
-- `python scripts/validate_skills.py` passes — every skill in the corpus is reachable from the discovery flowchart

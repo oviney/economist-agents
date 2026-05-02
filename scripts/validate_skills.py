@@ -33,14 +33,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 REQUIRED_FRONTMATTER_KEYS: frozenset[str] = frozenset({"name", "description"})
-REQUIRED_SECTIONS: tuple[str, ...] = (
-    "Overview",
-    "When to Use",
-    "Core Process",
-    "Common Rationalizations",
-    "Red Flags",
-    "Verification",
-)
+
+# Minimum number of ## headings a SKILL.md must contain.
+# The addyosmani originals use skill-specific section names (e.g. "The TDD Cycle",
+# "Skill Discovery") so we cannot require fixed names.  Requiring ≥5 headings
+# still catches empty or skeleton files while accommodating all 21 upstream skills.
+MIN_SECTION_COUNT = 5
 
 _FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL)
 _FRONTMATTER_KEY_RE = re.compile(r"^([A-Za-z_][A-Za-z0-9_-]*)\s*:", re.MULTILINE)
@@ -75,23 +73,9 @@ def _parse_frontmatter(text: str) -> tuple[dict[str, str] | None, str]:
     return fm, text[match.end() :]
 
 
-def _required_sections_present(body: str) -> list[str]:
-    """Return the names of sections missing from the body.
-
-    A heading counts as present when a line starts with ``## <section>``
-    optionally followed by ``:`` or `` —`` and an extension subtitle.
-    Both ``## Core Process`` and ``## Core Process: 4-Layer Architecture``
-    satisfy the requirement.
-    """
-    missing: list[str] = []
-    for section in REQUIRED_SECTIONS:
-        pattern = re.compile(
-            rf"^##\s+{re.escape(section)}(\s*$|[:\s—-])",
-            re.MULTILINE,
-        )
-        if not pattern.search(body):
-            missing.append(section)
-    return missing
+def _count_sections(body: str) -> int:
+    """Return the number of top-level (##) headings in the body."""
+    return len(re.findall(r"^##\s+\S", body, re.MULTILINE))
 
 
 def validate_skill(path: Path) -> SkillReport:
@@ -131,10 +115,10 @@ def validate_skill(path: Path) -> SkillReport:
     if description and not description.endswith((".", "!", "?")):
         report.errors.append("description should end with terminal punctuation")
 
-    missing_sections = _required_sections_present(body)
-    if missing_sections:
+    section_count = _count_sections(body)
+    if section_count < MIN_SECTION_COUNT:
         report.errors.append(
-            f"missing required ## section(s): {', '.join(missing_sections)}",
+            f"too few ## sections: {section_count} (minimum {MIN_SECTION_COUNT})",
         )
 
     return report

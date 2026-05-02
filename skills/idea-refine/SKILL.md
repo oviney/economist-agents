@@ -5,29 +5,9 @@ description: Refines ideas iteratively. Refine ideas through structured divergen
 
 # Idea Refine
 
-## Overview
-
-Refine raw, vague ideas into a clear, actionable concept before committing to a spec or implementation. The goal is to discover the real problem, explore multiple framings, and converge on a focused direction — before a single line of code is written. Consumed by @po-agent when a request arrives as a vague direction rather than a defined feature.
-
-## When to Use
-
-- A request arrives as a vague idea, wish, or complaint ("make it better", "we need X")
-- Requirements are ambiguous enough that different engineers would interpret them differently
-- You need to explore multiple framings before committing to a direction
-- The scope could range from a one-hour fix to a month-long feature
-
-### When NOT to Use
-
-- Requirements are concrete and unambiguous — go directly to `spec-driven-development`
-- The task is a bug fix with a clear reproduction path — go to `debugging-and-error-recovery`
-- A spec already exists — go to `planning-and-task-breakdown`
-
-
-
-
 Refines raw ideas into sharp, actionable concepts worth building through structured divergent and convergent thinking.
 
-## Core Process: How Idea Refinement Works
+## How It Works
 
 1.  **Understand & Expand (Divergent):** Restate the idea, ask sharpening questions, and generate variations.
 2.  **Evaluate & Converge:** Cluster ideas, stress-test them, and surface hidden assumptions.
@@ -174,15 +154,6 @@ Ask the user if they'd like to save this to `docs/ideas/[idea-name].md` (or a lo
 Direct, thoughtful, slightly provocative. You're a sharp thinking partner, not a facilitator reading from a script. Channel the energy of "that's interesting, but what if..." -- always pushing one step further without being exhausting.
 
 Read `examples.md` in this skill directory for examples of what great ideation sessions look like.
-
-
-## Common Rationalizations
-
-| Rationalization | Reality |
-|----------------|---------|
-| "The idea is clear enough to start coding" | Ideas always seem clearer before implementation reveals the gaps; refinement takes 15 minutes, rework takes days |
-| "We'll figure out the MVP scope during development" | Scope defined during implementation always grows; define it upfront so you can say no deliberately |
-| "Exploring multiple framings wastes time" | The wrong framing wastes far more time — the best solutions often come from the second or third interpretation |
 
 ## Red Flags
 

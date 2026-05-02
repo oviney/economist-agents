@@ -1,5 +1,7 @@
-# Agent state
-.claude/
+# Agent state — ignore runtime data but commit slash commands and agent personas
+.claude/*
+!.claude/commands/
+!.claude/agents/
 .gemini/
 
 # Python

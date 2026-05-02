@@ -78,14 +78,29 @@ nav:
     - ADR-0009 — Architecture Audit Rubric: adr/0009-architecture-audit-rubric.md
 
   - Skills:
-    - Workflow:
+    - Workflow (addyosmani/agent-skills):
       - Using Agent Skills: skills/using-agent-skills/SKILL.md
       - Idea Refine: skills/idea-refine/SKILL.md
       - Spec-Driven Development: skills/spec-driven-development/SKILL.md
       - Planning and Task Breakdown: skills/planning-and-task-breakdown/SKILL.md
+      - Context Engineering: skills/context-engineering/SKILL.md
+      - Source-Driven Development: skills/source-driven-development/SKILL.md
       - Incremental Implementation: skills/incremental-implementation/SKILL.md
+      - Test-Driven Development: skills/test-driven-development/SKILL.md
+      - Browser Testing with DevTools: skills/browser-testing-with-devtools/SKILL.md
+      - Debugging and Error Recovery: skills/debugging-and-error-recovery/SKILL.md
+      - Code Review and Quality: skills/code-review-and-quality/SKILL.md
+      - Code Simplification: skills/code-simplification/SKILL.md
+      - Security and Hardening: skills/security-and-hardening/SKILL.md
+      - Performance Optimization: skills/performance-optimization/SKILL.md
+      - Frontend UI Engineering: skills/frontend-ui-engineering/SKILL.md
+      - API and Interface Design: skills/api-and-interface-design/SKILL.md
+      - Git Workflow and Versioning: skills/git-workflow-and-versioning/SKILL.md
+      - CI/CD and Automation: skills/ci-cd-and-automation/SKILL.md
+      - Documentation and ADRs: skills/documentation-and-adrs/SKILL.md
+      - Deprecation and Migration: skills/deprecation-and-migration/SKILL.md
       - Shipping and Launch: skills/shipping-and-launch/SKILL.md
-    - Domain:
+    - Domain (economist-agents):
       - ADR Governance: skills/adr-governance/SKILL.md
       - Agent Delegation: skills/agent-delegation/SKILL.md
       - Agent Traceability: skills/agent-traceability/SKILL.md

@@ -172,7 +172,10 @@ class TestGenerateContent:
         mock_asyncio_run: Mock,
         mock_image: Mock,
     ) -> None:
-        mock_asyncio_run.return_value = _passing_pipeline_result()
+        mock_asyncio_run.side_effect = [
+            _passing_pipeline_result(),
+            {"image_alt": "alt text", "image_caption": "caption text"},
+        ]
         flow = EconomistContentFlow()
 
         result = flow.generate_content({"topic": "AI Testing"})
@@ -195,12 +198,42 @@ class TestGenerateContent:
         mock_asyncio_run: Mock,
         mock_image: Mock,
     ) -> None:
-        mock_asyncio_run.return_value = _passing_pipeline_result()
+        mock_asyncio_run.side_effect = [
+            _passing_pipeline_result(),
+            {"image_alt": "alt text", "image_caption": "caption text"},
+        ]
         flow = EconomistContentFlow()
 
         result = flow.generate_content({"topic": "AI Coding Assistants"})
 
         assert result["featured_image"] == "/assets/images/ai-coding-assistants.png"
+
+    @patch("src.economist_agents.flow.generate_featured_image", return_value=False)
+    @patch("src.economist_agents.flow.asyncio.run")
+    def test_refine_image_metadata_called_via_asyncio_run(
+        self,
+        mock_asyncio_run: Mock,
+        mock_image: Mock,
+    ) -> None:
+        """asyncio.run must be called twice: once for run_pipeline, once for
+        refine_image_metadata. The second call must receive a coroutine."""
+        import asyncio as _asyncio
+
+        mock_asyncio_run.side_effect = [
+            _passing_pipeline_result(),
+            {"image_alt": "editorial alt", "image_caption": "editorial caption"},
+        ]
+        flow = EconomistContentFlow()
+
+        flow.generate_content({"topic": "AI Testing"})
+
+        assert mock_asyncio_run.call_count == 2
+        second_arg = mock_asyncio_run.call_args_list[1][0][0]
+        assert _asyncio.iscoroutine(second_arg), (
+            "Second asyncio.run() call should pass the refine_image_metadata coroutine, "
+            f"got {type(second_arg)}"
+        )
+        second_arg.close()  # prevent ResourceWarning
 
 
 # ─── stage 4 routing ────────────────────────────────────────────────────

@@ -227,7 +227,7 @@ class EconomistContentFlow:
                     pass
 
         # Ground image metadata with Claude vision (async; falls back on failure)
-        _refined = asyncio.get_event_loop().run_until_complete(
+        _refined = asyncio.run(
             refine_image_metadata(image_path, _image_alt, _image_caption)
         )
 

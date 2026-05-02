@@ -78,22 +78,32 @@ nav:
     - ADR-0009 — Architecture Audit Rubric: adr/0009-architecture-audit-rubric.md
 
   - Skills:
-    - Agent Delegation: skills/agent-delegation/SKILL.md
-    - ADR Governance: skills/adr-governance/SKILL.md
-    - Research Sourcing: skills/research-sourcing/SKILL.md
-    - Economist Writing: skills/economist-writing/SKILL.md
-    - Editorial Illustration: skills/editorial-illustration/SKILL.md
-    - Article Evaluation: skills/article-evaluation/SKILL.md
-    - Quality Gates: skills/quality-gates/SKILL.md
-    - Python Quality: skills/python-quality/SKILL.md
-    - Testing: skills/testing/SKILL.md
-    - Defect Prevention: skills/defect-prevention/SKILL.md
-    - DevOps: skills/devops/SKILL.md
-    - Sprint Management: skills/sprint-management/SKILL.md
-    - Scrum Master: skills/scrum-master/SKILL.md
-    - Agent Traceability: skills/agent-traceability/SKILL.md
-    - Observability: skills/observability/SKILL.md
-    - MCP Development: skills/mcp-development/SKILL.md
+    - Workflow:
+      - Using Agent Skills: skills/using-agent-skills/SKILL.md
+      - Idea Refine: skills/idea-refine/SKILL.md
+      - Spec-Driven Development: skills/spec-driven-development/SKILL.md
+      - Planning and Task Breakdown: skills/planning-and-task-breakdown/SKILL.md
+      - Incremental Implementation: skills/incremental-implementation/SKILL.md
+      - Shipping and Launch: skills/shipping-and-launch/SKILL.md
+    - Domain:
+      - ADR Governance: skills/adr-governance/SKILL.md
+      - Agent Delegation: skills/agent-delegation/SKILL.md
+      - Agent Traceability: skills/agent-traceability/SKILL.md
+      - Architecture Patterns: skills/architecture-patterns/SKILL.md
+      - Article Evaluation: skills/article-evaluation/SKILL.md
+      - Defect Prevention: skills/defect-prevention/SKILL.md
+      - DevOps: skills/devops/SKILL.md
+      - Economist Writing: skills/economist-writing/SKILL.md
+      - Editorial Illustration: skills/editorial-illustration/SKILL.md
+      - MCP Development: skills/mcp-development/SKILL.md
+      - Observability: skills/observability/SKILL.md
+      - Python Quality: skills/python-quality/SKILL.md
+      - Quality Gates: skills/quality-gates/SKILL.md
+      - Research Sourcing: skills/research-sourcing/SKILL.md
+      - Scrum Master: skills/scrum-master/SKILL.md
+      - Sprint Management: skills/sprint-management/SKILL.md
+      - Testing: skills/testing/SKILL.md
+      - Visual QA: skills/visual-qa/SKILL.md
 
   - Guides:
     - Workflow Guide: guides/WORKFLOW_GUIDE.md

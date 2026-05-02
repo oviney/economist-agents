@@ -584,7 +584,7 @@
       "discovered_date": "2026-04-30T20:04:27.734803",
       "description": "Stage 3 writer agent produces articles without image_alt or image_caption fields; publication validator now requires both as CRITICAL gates",
       "component": "stage3_runner",
-      "status": "ready_for_implementation",
+      "status": "fixed",
       "github_issue": 321,
       "is_production_escape": false,
       "root_cause": "requirements_gap",
@@ -620,7 +620,12 @@
             "sequence": "TDD: RED (write failing tests) \u2192 update prompt \u2192 GREEN \u2192 add vision step \u2192 REFACTOR"
           }
         }
-      }
+      },
+      "fixed_date": "2026-05-02T05:30:25.261279",
+      "fix_commit": "d1ece1f",
+      "fix_notes": "Full fix across two commits (f689ea6 + d1ece1f). Writer prompt requires image_alt/image_caption. refine_image_metadata async function in _shared.py grounds fields via Claude vision. 4 MB size guard added. _patch_frontmatter wired in quality_gate call site. All 4 agent-review BLOCKs resolved. 12 tests covering happy path, collision, and 3 fallback branches (no key, missing file, JSON parse failure). 1695 passing, 0 failing.",
+      "prevention_test_added": true,
+      "prevention_test_file": "tests/test_flow_agent_sdk.py"
     }
   ],
   "summary": {

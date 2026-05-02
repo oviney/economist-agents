@@ -443,6 +443,77 @@ class TestVisionRefinement:
         assert result["image_alt"] == "A grounded alt"
         assert result["image_caption"] == "The caption"
 
+    def test_returns_drafts_when_no_api_key(self, tmp_path: Path) -> None:
+        """Fallback branch 1: no ANTHROPIC_API_KEY → writer drafts returned."""
+        import asyncio
+        import os
+        from unittest.mock import patch
+
+        import src.agent_sdk._shared as m
+
+        img = tmp_path / "test.png"
+        img.write_bytes(b"PNG")
+
+        with patch.dict(os.environ, {}, clear=True):
+            os.environ.pop("ANTHROPIC_API_KEY", None)
+            result = asyncio.run(
+                m.refine_image_metadata(
+                    image_path=str(img),
+                    draft_alt="draft",
+                    draft_caption="cap",
+                )
+            )
+        assert result == {"image_alt": "draft", "image_caption": "cap"}
+
+    def test_returns_drafts_when_image_missing(self) -> None:
+        """Fallback branch 2: image file does not exist → writer drafts returned."""
+        import asyncio
+        import os
+        from unittest.mock import patch
+
+        import src.agent_sdk._shared as m
+
+        with patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}):
+            result = asyncio.run(
+                m.refine_image_metadata(
+                    image_path="/tmp/does_not_exist_xyz.png",
+                    draft_alt="draft",
+                    draft_caption="cap",
+                )
+            )
+        assert result == {"image_alt": "draft", "image_caption": "cap"}
+
+    def test_returns_drafts_when_vision_response_is_prose(self, tmp_path: Path) -> None:
+        """Fallback branch 3: Claude returns prose instead of JSON →
+        json.loads raises, except catches it, writer drafts returned."""
+        import asyncio
+        import os
+        from unittest.mock import AsyncMock, MagicMock, patch
+
+        import src.agent_sdk._shared as m
+
+        img = tmp_path / "test.png"
+        img.write_bytes(b"PNG")
+
+        mock_response = MagicMock()
+        mock_response.content = [
+            MagicMock(text="Here is your alt text: great picture.")
+        ]
+        mock_create = AsyncMock(return_value=mock_response)
+        with (
+            patch("anthropic.AsyncAnthropic") as mock_async_class,
+            patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}),
+        ):
+            mock_async_class.return_value.messages.create = mock_create
+            result = asyncio.run(
+                m.refine_image_metadata(
+                    image_path=str(img),
+                    draft_alt="draft",
+                    draft_caption="cap",
+                )
+            )
+        assert result == {"image_alt": "draft", "image_caption": "cap"}
+
 
 class TestPatchFrontmatterImageMetadata:
     """_patch_frontmatter must inject image_alt and image_caption when provided.

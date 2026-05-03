@@ -61,6 +61,26 @@ class EconomistContentFlow:
         self._deduplicator = TopicDeduplicator()
         self.state: dict[str, Any] = {}
 
+    @staticmethod
+    def _null_article_draft(check: str, message: str) -> dict[str, Any]:
+        """Zero-score draft that routes quality_gate to revision."""
+        return {
+            "article": "",
+            "chart_data": {},
+            # Empty string lets _patch_frontmatter on retry use the writer's own image field.
+            "featured_image": "",
+            "featured_image_local": "",
+            "image_alt": "",
+            "image_caption": "",
+            "stage4_already_run": False,
+            "publication_validator_passed": False,
+            "publication_validator_issues": [
+                {"check": check, "severity": "CRITICAL", "message": message}
+            ],
+            "editorial_score": 0,
+            "gates_passed": 0,
+        }
+
     # ─── public entry point ────────────────────────────────────────────
 
     def kickoff(self) -> dict[str, Any]:
@@ -182,51 +202,20 @@ class EconomistContentFlow:
                 "Writer returned malformed output with no YAML frontmatter. "
                 "Retry: output must start with --- and include a non-empty body."
             ]
-            return {
-                "article": "",
-                "chart_data": {},
-                # Empty string lets _patch_frontmatter on retry use the writer's own image field.
-                "featured_image": "",
-                "featured_image_local": "",
-                "image_alt": "",
-                "image_caption": "",
-                "stage4_already_run": False,
-                "publication_validator_passed": False,
-                "publication_validator_issues": [
-                    {
-                        "check": "malformed_output",
-                        "severity": "CRITICAL",
-                        "message": "Writer returned malformed output — see logs for details.",
-                    }
-                ],
-                "editorial_score": 0,
-                "gates_passed": 0,
-            }
+            return self._null_article_draft(
+                "malformed_output",
+                "Writer returned malformed output — see logs for details.",
+            )
         except EmptyResearchBriefError as exc:
             logger.warning("Web searches returned no results — routing to revision: %s", exc)
             self.state["revision_reason"] = str(exc)
             self.state["revision_feedback"] = [
                 "Web searches returned no results — check SERPER_API_KEY and retry."
             ]
-            return {
-                "article": "",
-                "chart_data": {},
-                "featured_image": "",
-                "featured_image_local": "",
-                "image_alt": "",
-                "image_caption": "",
-                "stage4_already_run": False,
-                "publication_validator_passed": False,
-                "publication_validator_issues": [
-                    {
-                        "check": "empty_research_brief",
-                        "severity": "CRITICAL",
-                        "message": f"No web search results: {exc}",
-                    }
-                ],
-                "editorial_score": 0,
-                "gates_passed": 0,
-            }
+            return self._null_article_draft(
+                "empty_research_brief",
+                f"No web search results: {exc}",
+            )
         article = result.article
         print(f"   ✅ Article generated: {len(article.split())} words")
         print(
@@ -427,22 +416,13 @@ class EconomistContentFlow:
 
         try:
             result = asyncio.run(run_pipeline(enhanced_topic))
-        except MalformedArticleError as exc:
-            logger.warning("Writer returned malformed output on revision — quarantining: %s", exc)
+        except (MalformedArticleError, EmptyResearchBriefError) as exc:
+            logger.warning("Pipeline error on revision — quarantining: %s", exc)
             return {
                 "status": "needs_revision",
                 "editorial_score": 0,
                 "gates_passed": 0,
-                "revision_reason": f"Malformed output on revision attempt: {exc}",
-                "retry_count": retry_count + 1,
-            }
-        except EmptyResearchBriefError as exc:
-            logger.warning("Web searches empty on revision — quarantining: %s", exc)
-            return {
-                "status": "needs_revision",
-                "editorial_score": 0,
-                "gates_passed": 0,
-                "revision_reason": f"Empty research brief on revision attempt: {exc}",
+                "revision_reason": str(exc),
                 "retry_count": retry_count + 1,
             }
         draft = self.state.get("article_draft", {})

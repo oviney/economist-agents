@@ -119,20 +119,15 @@ jobs:
         env:
           PYTHONPATH: ${{ github.workspace }}
         run: |
-          # Derive status and scores from pipeline outputs.
-          # editorial_score and gates_passed use placeholder values here
-          # because the flow currently emits them only to stdout; a future
-          # improvement is to write a structured JSON result file and read
-          # it here for accurate per-run metrics.
           TOPIC="${{ github.event.inputs.topic }}"
           STATUS="failed"
-          SCORE=0   # placeholder: updated to 80 when article_path.txt exists
-          GATES=0   # placeholder: updated to 5  when article_path.txt exists
+          SCORE=0
+          GATES=0
 
-          if [ -f article_path.txt ]; then
-            STATUS="published"
-            SCORE=80
-            GATES=5
+          if [ -f output/pipeline_result.json ]; then
+            STATUS=$(jq -r '.status // "failed"'        output/pipeline_result.json)
+            SCORE=$(jq -r  '.editorial_score // 0'      output/pipeline_result.json)
+            GATES=$(jq -r  '.gates_passed // 0'         output/pipeline_result.json)
           fi
 
           python scripts/record_metrics.py \

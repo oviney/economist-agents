@@ -90,8 +90,29 @@ class EconomistContentFlow:
         draft = self.generate_content(selected)
         decision = self.quality_gate(draft)
         if decision == "publish":
-            return self.publish_article()
-        return self.request_revision()
+            result = self.publish_article()
+        else:
+            result = self.request_revision()
+        self._write_pipeline_result(result)
+        return result
+
+    def _write_pipeline_result(self, result: dict[str, Any]) -> None:
+        """Write a structured JSON result file for CI metric collection."""
+        import orjson as _orjson
+
+        out_path = pathlib.Path(
+            os.environ.get("PIPELINE_RESULT_PATH", "output/pipeline_result.json")
+        )
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "status": result.get("status", "unknown"),
+            "editorial_score": result.get("editorial_score", 0),
+            "gates_passed": result.get("gates_passed", 0),
+        }
+        try:
+            out_path.write_bytes(_orjson.dumps(payload))
+        except Exception as exc:
+            logger.warning("Failed to write pipeline result file (non-fatal): %s", exc)
 
     # ─── stage 1 ───────────────────────────────────────────────────────
 

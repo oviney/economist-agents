@@ -750,3 +750,90 @@ class TestQualityGateImageMetadataGates:
         assert image_critical == [], (
             f"Image metadata CRITICAL gates fired: {image_critical}"
         )
+
+
+# ─── kickoff: pipeline_result.json ──────────────────────────────────────────
+
+
+class TestKickoffResultFile:
+    """kickoff() must write output/pipeline_result.json with real metrics."""
+
+    def _mock_all_stages(self, mock_asyncio_run: Mock) -> None:
+        mock_asyncio_run.side_effect = [
+            _passing_pipeline_result(),
+            {"image_alt": "alt", "image_caption": "cap"},
+        ]
+
+    @patch("src.economist_agents.flow.generate_featured_image", return_value=False)
+    @patch("src.economist_agents.flow.asyncio.run")
+    @patch("src.economist_agents.flow.run_editorial_board")
+    @patch("src.economist_agents.flow.scout_topics")
+    @patch("src.economist_agents.flow.create_llm_client")
+    def test_kickoff_writes_pipeline_result_json(
+        self,
+        mock_client: Mock,
+        mock_scout: Mock,
+        mock_board: Mock,
+        mock_asyncio_run: Mock,
+        mock_image: Mock,
+        tmp_path,
+        monkeypatch,
+    ) -> None:
+        monkeypatch.setenv("PIPELINE_RESULT_PATH", str(tmp_path / "pipeline_result.json"))
+        mock_client.return_value = Mock()
+        mock_scout.return_value = [{"topic": "AI Testing", "score": 8.0}]
+        flow = EconomistContentFlow()
+        flow._deduplicator = Mock()
+        flow._deduplicator.filter_topics.side_effect = lambda t: (t, [])
+        flow._deduplicator.index_article = Mock()
+        mock_board.return_value = {
+            "topic": "AI Testing", "score": 8.0, "consensus": True,
+            "dissenting_views": [], "hook": "", "thesis": "",
+        }
+        self._mock_all_stages(mock_asyncio_run)
+
+        flow.kickoff()
+
+        result_path = tmp_path / "pipeline_result.json"
+        assert result_path.exists(), "output/pipeline_result.json was not written"
+        import orjson
+        data = orjson.loads(result_path.read_bytes())
+        assert "editorial_score" in data
+        assert "gates_passed" in data
+        assert "status" in data
+
+    @patch("src.economist_agents.flow.generate_featured_image", return_value=False)
+    @patch("src.economist_agents.flow.asyncio.run")
+    @patch("src.economist_agents.flow.run_editorial_board")
+    @patch("src.economist_agents.flow.scout_topics")
+    @patch("src.economist_agents.flow.create_llm_client")
+    def test_kickoff_result_json_reflects_actual_scores(
+        self,
+        mock_client: Mock,
+        mock_scout: Mock,
+        mock_board: Mock,
+        mock_asyncio_run: Mock,
+        mock_image: Mock,
+        tmp_path,
+        monkeypatch,
+    ) -> None:
+        monkeypatch.setenv("PIPELINE_RESULT_PATH", str(tmp_path / "pipeline_result.json"))
+        mock_client.return_value = Mock()
+        mock_scout.return_value = [{"topic": "AI Testing", "score": 8.0}]
+        flow = EconomistContentFlow()
+        flow._deduplicator = Mock()
+        flow._deduplicator.filter_topics.side_effect = lambda t: (t, [])
+        flow._deduplicator.index_article = Mock()
+        mock_board.return_value = {
+            "topic": "AI Testing", "score": 8.0, "consensus": True,
+            "dissenting_views": [], "hook": "", "thesis": "",
+        }
+        self._mock_all_stages(mock_asyncio_run)
+
+        flow.kickoff()
+
+        import orjson
+        data = orjson.loads((tmp_path / "pipeline_result.json").read_bytes())
+        assert data["editorial_score"] == 88  # from _passing_pipeline_result
+        assert data["gates_passed"] == 5
+        assert data["status"] == "published"

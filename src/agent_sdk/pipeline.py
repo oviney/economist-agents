@@ -68,7 +68,7 @@ async def run_pipeline(
     )
     stage4 = run_stage4(stage3.article, stage3.chart_data)
 
-    return PipelineResult(
+    result = PipelineResult(
         topic=topic,
         article=stage4.article,
         chart_data=stage3.chart_data,
@@ -86,6 +86,9 @@ async def run_pipeline(
         stage4_seconds=stage4.wall_seconds,
         article_chars=len(stage4.article),
     )
+    wall_seconds = result.stage3_seconds + result.stage4_seconds
+    _append_cost_log(result, wall_seconds)
+    return result
 
 
 def _append_cost_log(result: PipelineResult, total_wall_seconds: float) -> None:
@@ -164,7 +167,6 @@ def main() -> None:
         ),
     )
     total = time.perf_counter() - start
-    _append_cost_log(result, total)
 
     out_dir = Path("logs/spike")
     out_dir.mkdir(parents=True, exist_ok=True)

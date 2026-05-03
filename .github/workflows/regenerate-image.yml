@@ -73,25 +73,32 @@ jobs:
             --output "output/images/$SLUG.png"
 
       - name: Convert PNG to WebP
+        env:
+          IMG_SLUG: ${{ env.SLUG }}
         run: |
           python3 -c "
+          import os
           from PIL import Image
-          src = 'output/images/$SLUG.png'
-          dst = 'output/images/$SLUG.webp'
+          slug = os.environ['IMG_SLUG']
+          src = f'output/images/{slug}.png'
+          dst = f'output/images/{slug}.webp'
           Image.open(src).save(dst, 'WebP', quality=85)
           print(f'WebP written: {dst}')
           "
 
       - name: Validate output dimensions
+        env:
+          IMG_SLUG: ${{ env.SLUG }}
         run: |
           python3 -c "
+          import os
           from PIL import Image
-          img = Image.open('output/images/$SLUG.png')
+          slug = os.environ['IMG_SLUG']
+          img = Image.open(f'output/images/{slug}.png')
           w, h = img.size
           assert w >= 800 and h >= 400, f'Image too small: {w}x{h}'
           print(f'OK: {w}x{h}')
-          import os
-          sz = os.path.getsize('output/images/$SLUG.png')
+          sz = os.path.getsize(f'output/images/{slug}.png')
           assert sz > 100_000, f'Suspiciously small ({sz} bytes) — likely not a real DALL-E image'
           print(f'File size OK: {sz/1024:.0f} KB')
           "

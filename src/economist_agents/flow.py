@@ -35,6 +35,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+import orjson
+
 from scripts.article_evaluator import ArticleEvaluator
 from scripts.frontmatter_schema import FrontmatterSchema
 from src.agent_sdk._shared import EmptyResearchBriefError, refine_image_metadata
@@ -52,6 +54,9 @@ logger = logging.getLogger(__name__)
 
 PUBLISH_THRESHOLD = 70
 MAX_REVISIONS = 2
+PIPELINE_RESULT_PATH = Path(
+    os.environ.get("PIPELINE_RESULT_PATH", "output/pipeline_result.json")
+)
 
 
 class EconomistContentFlow:
@@ -97,20 +102,15 @@ class EconomistContentFlow:
         return result
 
     def _write_pipeline_result(self, result: dict[str, Any]) -> None:
-        """Write a structured JSON result file for CI metric collection."""
-        import orjson as _orjson
-
-        out_path = pathlib.Path(
-            os.environ.get("PIPELINE_RESULT_PATH", "output/pipeline_result.json")
-        )
-        out_path.parent.mkdir(parents=True, exist_ok=True)
+        """Write output/pipeline_result.json for the CI metrics step in content-pipeline.yml."""
+        PIPELINE_RESULT_PATH.parent.mkdir(parents=True, exist_ok=True)
         payload = {
             "status": result.get("status", "unknown"),
             "editorial_score": result.get("editorial_score", 0),
             "gates_passed": result.get("gates_passed", 0),
         }
         try:
-            out_path.write_bytes(_orjson.dumps(payload))
+            PIPELINE_RESULT_PATH.write_bytes(orjson.dumps(payload))
         except Exception as exc:
             logger.warning("Failed to write pipeline result file (non-fatal): %s", exc)
 

@@ -758,11 +758,38 @@ class TestQualityGateImageMetadataGates:
 class TestKickoffResultFile:
     """kickoff() must write output/pipeline_result.json with real metrics."""
 
-    def _mock_all_stages(self, mock_asyncio_run: Mock) -> None:
+    def _run_kickoff(
+        self,
+        tmp_path,
+        monkeypatch,
+        mock_client,
+        mock_scout,
+        mock_board,
+        mock_asyncio_run,
+    ) -> Path:
+        """Wire all mocks and run kickoff(); return the result JSON path."""
+        import src.economist_agents.flow as flow_module
+
+        result_path = tmp_path / "pipeline_result.json"
+        # PIPELINE_RESULT_PATH is a module-level constant evaluated at import;
+        # monkeypatch the attribute directly so _write_pipeline_result uses tmp_path.
+        monkeypatch.setattr(flow_module, "PIPELINE_RESULT_PATH", result_path)
+        mock_client.return_value = Mock()
+        mock_scout.return_value = [{"topic": "AI Testing", "total_score": 25}]
+        flow = EconomistContentFlow()
+        flow._deduplicator = Mock()
+        flow._deduplicator.filter_topics.side_effect = lambda t: (t, [])
+        flow._deduplicator.index_article = Mock()
+        mock_board.return_value = {
+            "topic": "AI Testing", "score": 8.0, "consensus": True,
+            "dissenting_views": [], "hook": "", "thesis": "",
+        }
         mock_asyncio_run.side_effect = [
             _passing_pipeline_result(),
             {"image_alt": "alt", "image_caption": "cap"},
         ]
+        flow.kickoff()
+        return result_path
 
     @patch("src.economist_agents.flow.generate_featured_image", return_value=False)
     @patch("src.economist_agents.flow.asyncio.run")
@@ -779,24 +806,12 @@ class TestKickoffResultFile:
         tmp_path,
         monkeypatch,
     ) -> None:
-        monkeypatch.setenv("PIPELINE_RESULT_PATH", str(tmp_path / "pipeline_result.json"))
-        mock_client.return_value = Mock()
-        mock_scout.return_value = [{"topic": "AI Testing", "score": 8.0}]
-        flow = EconomistContentFlow()
-        flow._deduplicator = Mock()
-        flow._deduplicator.filter_topics.side_effect = lambda t: (t, [])
-        flow._deduplicator.index_article = Mock()
-        mock_board.return_value = {
-            "topic": "AI Testing", "score": 8.0, "consensus": True,
-            "dissenting_views": [], "hook": "", "thesis": "",
-        }
-        self._mock_all_stages(mock_asyncio_run)
-
-        flow.kickoff()
-
-        result_path = tmp_path / "pipeline_result.json"
-        assert result_path.exists(), "output/pipeline_result.json was not written"
         import orjson
+
+        result_path = self._run_kickoff(
+            tmp_path, monkeypatch, mock_client, mock_scout, mock_board, mock_asyncio_run
+        )
+        assert result_path.exists(), "pipeline_result.json was not written"
         data = orjson.loads(result_path.read_bytes())
         assert "editorial_score" in data
         assert "gates_passed" in data
@@ -817,23 +832,12 @@ class TestKickoffResultFile:
         tmp_path,
         monkeypatch,
     ) -> None:
-        monkeypatch.setenv("PIPELINE_RESULT_PATH", str(tmp_path / "pipeline_result.json"))
-        mock_client.return_value = Mock()
-        mock_scout.return_value = [{"topic": "AI Testing", "score": 8.0}]
-        flow = EconomistContentFlow()
-        flow._deduplicator = Mock()
-        flow._deduplicator.filter_topics.side_effect = lambda t: (t, [])
-        flow._deduplicator.index_article = Mock()
-        mock_board.return_value = {
-            "topic": "AI Testing", "score": 8.0, "consensus": True,
-            "dissenting_views": [], "hook": "", "thesis": "",
-        }
-        self._mock_all_stages(mock_asyncio_run)
-
-        flow.kickoff()
-
         import orjson
-        data = orjson.loads((tmp_path / "pipeline_result.json").read_bytes())
+
+        result_path = self._run_kickoff(
+            tmp_path, monkeypatch, mock_client, mock_scout, mock_board, mock_asyncio_run
+        )
+        data = orjson.loads(result_path.read_bytes())
         assert data["editorial_score"] == 88  # from _passing_pipeline_result
         assert data["gates_passed"] == 5
         assert data["status"] == "published"

@@ -70,9 +70,10 @@ def build_research_brief(topic: str) -> str:
     """
     raw = _run_web_searches(topic)
     if not raw.strip():
+        logger.debug("EmptyResearchBriefError: topic=%r", topic)
         raise EmptyResearchBriefError(
-            f"No web search results found for '{topic}'. "
-            f"Check SERPER_API_KEY and network connectivity."
+            "No web search results returned. "
+            "Check SERPER_API_KEY and network connectivity."
         )
     return "\n".join(
         [

@@ -34,6 +34,7 @@ jobs:
       SLUG: ${{ inputs.slug }}
       TOPIC: ${{ inputs.topic }}
       SUMMARY: ${{ inputs.summary }}
+      MOOD: ${{ inputs.mood }}
     steps:
       - name: Validate inputs
         run: |
@@ -47,6 +48,11 @@ jobs:
           fi
           if [[ ${#SUMMARY} -gt 500 ]]; then
             echo "::error::summary exceeds 500 characters"
+            exit 1
+          fi
+          valid_moods="contemplative satirical urgent ironic wry"
+          if [[ ! " $valid_moods " =~ " $MOOD " ]]; then
+            echo "::error::Invalid mood '$MOOD': must be one of: $valid_moods"
             exit 1
           fi
 
@@ -69,7 +75,7 @@ jobs:
           python scripts/featured_image_agent.py \
             --topic "$TOPIC" \
             --summary "$SUMMARY" \
-            --mood "${{ inputs.mood }}" \
+            --mood "$MOOD" \
             --output "output/images/$SLUG.png"
 
       - name: Convert PNG to WebP

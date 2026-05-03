@@ -781,8 +781,13 @@ class TestKickoffResultFile:
         flow._deduplicator.filter_topics.side_effect = lambda t: (t, [])
         flow._deduplicator.index_article = Mock()
         mock_board.return_value = {
-            "topic": "AI Testing", "score": 8.0, "consensus": True,
-            "dissenting_views": [], "hook": "", "thesis": "",
+            "top_pick": {
+                "topic": "AI Testing",
+                "weighted_score": 8.0,
+                "original_topic": {"hook": "", "thesis": ""},
+            },
+            "consensus": True,
+            "dissenting_views": [],
         }
         mock_asyncio_run.side_effect = [
             _passing_pipeline_result(),
@@ -841,3 +846,99 @@ class TestKickoffResultFile:
         assert data["editorial_score"] == 88  # from _passing_pipeline_result
         assert data["gates_passed"] == 5
         assert data["status"] == "published"
+
+    @patch("src.economist_agents.flow.generate_featured_image", return_value=False)
+    @patch("src.economist_agents.flow.asyncio.run")
+    @patch("src.economist_agents.flow.run_editorial_board")
+    @patch("src.economist_agents.flow.scout_topics")
+    @patch("src.economist_agents.flow.create_llm_client")
+    def test_kickoff_result_json_written_on_revision_path(
+        self,
+        mock_client: Mock,
+        mock_scout: Mock,
+        mock_board: Mock,
+        mock_asyncio_run: Mock,
+        mock_image: Mock,
+        tmp_path,
+        monkeypatch,
+    ) -> None:
+        """Result file must be written even when quality_gate routes to revision."""
+        import src.economist_agents.flow as flow_module
+        import orjson
+
+        result_path = tmp_path / "pipeline_result.json"
+        monkeypatch.setattr(flow_module, "PIPELINE_RESULT_PATH", result_path)
+        mock_client.return_value = Mock()
+        mock_scout.return_value = [{"topic": "AI Testing", "total_score": 25}]
+        mock_board.return_value = {
+            "top_pick": {
+                "topic": "AI Testing", "weighted_score": 8.0,
+                "original_topic": {"hook": "", "thesis": ""},
+            },
+            "consensus": True, "dissenting_views": [],
+        }
+        # Return a failing result so quality_gate routes to revision
+        failing = _passing_pipeline_result()
+        failing.editorial_score = 40
+        failing.publication_validator_passed = False
+        mock_asyncio_run.side_effect = [
+            failing,                                            # run_pipeline (generate)
+            {"image_alt": "alt", "image_caption": "cap"},      # refine_image_metadata
+            failing,                                            # run_pipeline (revision)
+        ]
+        flow = EconomistContentFlow()
+        flow._deduplicator = Mock()
+        flow._deduplicator.filter_topics.side_effect = lambda t: (t, [])
+        flow._deduplicator.index_article = Mock()
+
+        flow.kickoff()
+
+        assert result_path.exists(), "pipeline_result.json must be written on revision path"
+        data = orjson.loads(result_path.read_bytes())
+        assert "status" in data
+        assert "editorial_score" in data
+        assert "gates_passed" in data
+
+    @patch("src.economist_agents.flow.generate_featured_image", return_value=False)
+    @patch("src.economist_agents.flow.asyncio.run")
+    @patch("src.economist_agents.flow.run_editorial_board")
+    @patch("src.economist_agents.flow.scout_topics")
+    @patch("src.economist_agents.flow.create_llm_client")
+    def test_kickoff_returns_result_even_when_result_file_write_fails(
+        self,
+        mock_client: Mock,
+        mock_scout: Mock,
+        mock_board: Mock,
+        mock_asyncio_run: Mock,
+        mock_image: Mock,
+        tmp_path,
+        monkeypatch,
+    ) -> None:
+        """A PermissionError writing pipeline_result.json must not abort kickoff()."""
+        import src.economist_agents.flow as flow_module
+
+        result_path = tmp_path / "pipeline_result.json"
+        monkeypatch.setattr(flow_module, "PIPELINE_RESULT_PATH", result_path)
+        mock_client.return_value = Mock()
+        mock_scout.return_value = [{"topic": "AI Testing", "total_score": 25}]
+        mock_board.return_value = {
+            "top_pick": {
+                "topic": "AI Testing", "weighted_score": 8.0,
+                "original_topic": {"hook": "", "thesis": ""},
+            },
+            "consensus": True, "dissenting_views": [],
+        }
+        mock_asyncio_run.side_effect = [
+            _passing_pipeline_result(),
+            {"image_alt": "alt", "image_caption": "cap"},
+        ]
+        flow = EconomistContentFlow()
+        flow._deduplicator = Mock()
+        flow._deduplicator.filter_topics.side_effect = lambda t: (t, [])
+        flow._deduplicator.index_article = Mock()
+
+        with patch.object(result_path.__class__, "write_bytes", side_effect=PermissionError("read-only")):
+            result = flow.kickoff()
+
+        assert result is not None
+        assert result.get("status") == "published"

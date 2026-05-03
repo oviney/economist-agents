@@ -229,3 +229,52 @@ class TestWriterTaskDescription:
     def test_task_expected_output_mentions_headings(self, stage3_source: str) -> None:
         """Writer prompt must mention the heading limit."""
         assert "3-4 headings maximum" in stage3_source
+
+
+# ── _validated_model() allowlist ─────────────────────────────────────────────
+
+
+class TestValidatedModel:
+    """_validated_model validates env vars against _ALLOWED_MODELS."""
+
+    def test_valid_model_returned_verbatim(self, monkeypatch) -> None:
+        from src.agent_sdk.stage3_runner import _validated_model
+
+        monkeypatch.setenv("TEST_MODEL", "claude-sonnet-4-6")
+        assert _validated_model("TEST_MODEL", "claude-sonnet-4-6") == "claude-sonnet-4-6"
+
+    def test_invalid_model_falls_back_to_default(self, monkeypatch) -> None:
+        from src.agent_sdk.stage3_runner import _validated_model
+
+        monkeypatch.setenv("TEST_MODEL", "gpt-4o")
+        result = _validated_model("TEST_MODEL", "claude-sonnet-4-6")
+        assert result == "claude-sonnet-4-6"
+
+    def test_unset_env_var_returns_default(self, monkeypatch) -> None:
+        from src.agent_sdk.stage3_runner import _validated_model
+
+        monkeypatch.delenv("TEST_MODEL", raising=False)
+        assert _validated_model("TEST_MODEL", "claude-sonnet-4-6") == "claude-sonnet-4-6"
+
+    def test_invalid_vision_model_falls_back(self, tmp_path, monkeypatch) -> None:
+        """refine_image_metadata must use the default when VISION_MODEL is invalid."""
+        import asyncio
+        import os
+        from unittest.mock import AsyncMock, MagicMock, patch
+
+        import src.agent_sdk._shared as m
+
+        img = tmp_path / "test.png"
+        img.write_bytes(b"PNG")
+        mock_response = MagicMock()
+        mock_response.content = [MagicMock(text='{"image_alt": "a", "image_caption": "b"}')]
+        mock_create = AsyncMock(return_value=mock_response)
+
+        with (
+            patch("anthropic.AsyncAnthropic") as mock_class,
+            patch.dict(os.environ, {"ANTHROPIC_API_KEY": "key", "VISION_MODEL": "gpt-4-turbo"}),
+        ):
+            mock_class.return_value.messages.create = mock_create
+            asyncio.run(m.refine_image_metadata(str(img), "draft", "cap"))
+
+        assert mock_create.call_args.kwargs["model"] == "claude-sonnet-4-6"

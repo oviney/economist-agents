@@ -30,7 +30,26 @@ on:
 jobs:
   regenerate-image:
     runs-on: ubuntu-latest
+    env:
+      SLUG: ${{ inputs.slug }}
+      TOPIC: ${{ inputs.topic }}
+      SUMMARY: ${{ inputs.summary }}
     steps:
+      - name: Validate inputs
+        run: |
+          if [[ ! "$SLUG" =~ ^[a-z0-9][a-z0-9-]{0,79}$ ]]; then
+            echo "::error::Invalid slug '$SLUG': must match ^[a-z0-9][a-z0-9-]{0,79}$"
+            exit 1
+          fi
+          if [[ ${#TOPIC} -gt 200 ]]; then
+            echo "::error::topic exceeds 200 characters"
+            exit 1
+          fi
+          if [[ ${#SUMMARY} -gt 500 ]]; then
+            echo "::error::summary exceeds 500 characters"
+            exit 1
+          fi
+
       - uses: actions/checkout@v4
 
       - name: Set up Python
@@ -48,17 +67,17 @@ jobs:
         run: |
           mkdir -p output/images
           python scripts/featured_image_agent.py \
-            --topic "${{ inputs.topic }}" \
-            --summary "${{ inputs.summary }}" \
+            --topic "$TOPIC" \
+            --summary "$SUMMARY" \
             --mood "${{ inputs.mood }}" \
-            --output "output/images/${{ inputs.slug }}.png"
+            --output "output/images/$SLUG.png"
 
       - name: Convert PNG to WebP
         run: |
           python3 -c "
           from PIL import Image
-          src = 'output/images/${{ inputs.slug }}.png'
-          dst = 'output/images/${{ inputs.slug }}.webp'
+          src = 'output/images/$SLUG.png'
+          dst = 'output/images/$SLUG.webp'
           Image.open(src).save(dst, 'WebP', quality=85)
           print(f'WebP written: {dst}')
           "
@@ -67,12 +86,12 @@ jobs:
         run: |
           python3 -c "
           from PIL import Image
-          img = Image.open('output/images/${{ inputs.slug }}.png')
+          img = Image.open('output/images/$SLUG.png')
           w, h = img.size
           assert w >= 800 and h >= 400, f'Image too small: {w}x{h}'
           print(f'OK: {w}x{h}')
           import os
-          sz = os.path.getsize('output/images/${{ inputs.slug }}.png')
+          sz = os.path.getsize('output/images/$SLUG.png')
           assert sz > 100_000, f'Suspiciously small ({sz} bytes) — likely not a real DALL-E image'
           print(f'File size OK: {sz/1024:.0f} KB')
           "
@@ -86,25 +105,25 @@ jobs:
           GH_TOKEN: ${{ secrets.BLOG_REPO_TOKEN }}
         run: |
           git clone --depth=1 https://x-access-token:${BLOG_TOKEN}@github.com/${BLOG_OWNER}/${BLOG_REPO}.git blog-repo
-          cp output/images/${{ inputs.slug }}.png blog-repo/assets/images/${{ inputs.slug }}.png
-          cp output/images/${{ inputs.slug }}.webp blog-repo/assets/images/${{ inputs.slug }}.webp
+          cp output/images/$SLUG.png blog-repo/assets/images/$SLUG.png
+          cp output/images/$SLUG.webp blog-repo/assets/images/$SLUG.webp
           cd blog-repo
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b fix/regenerate-image-${{ inputs.slug }}
-          git add assets/images/${{ inputs.slug }}.png assets/images/${{ inputs.slug }}.webp
-          git commit -m "fix: regenerate featured image for ${{ inputs.slug }}
+          git checkout -b fix/regenerate-image-$SLUG
+          git add assets/images/$SLUG.png assets/images/$SLUG.webp
+          git commit -m "fix: regenerate featured image for $SLUG
 
           DALL-E 3 HD 1792x1024 image generated via regenerate-image workflow.
           Replaces stub/placeholder image.
 
           Closes #802"
-          git push origin fix/regenerate-image-${{ inputs.slug }}
+          git push origin fix/regenerate-image-$SLUG
           gh pr create \
             --repo ${BLOG_OWNER}/${BLOG_REPO} \
-            --title "fix: regenerate featured image — ${{ inputs.slug }}" \
+            --title "fix: regenerate featured image — $SLUG" \
             --base main \
-            --head fix/regenerate-image-${{ inputs.slug }} \
+            --head fix/regenerate-image-$SLUG \
             --label "bug,type:content,P2:medium" \
             --body "Regenerated via \`regenerate-image\` workflow using DALL-E 3 HD.
 

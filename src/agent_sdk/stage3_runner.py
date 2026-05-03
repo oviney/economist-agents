@@ -50,8 +50,17 @@ logger = logging.getLogger(__name__)
 class MalformedArticleError(ValueError):
     """Raised when the writer agent returns output that is not a well-formed article."""
 
-DEFAULT_WRITER_MODEL = os.environ.get("WRITER_MODEL", "claude-sonnet-4-6")
-DEFAULT_GRAPHICS_MODEL = os.environ.get("GRAPHICS_MODEL", "claude-sonnet-4-6")
+from src.agent_sdk._shared import _ALLOWED_MODELS as _ALLOWED_MODELS
+
+def _validated_model(env_var: str, default: str) -> str:
+    value = os.environ.get(env_var, default)
+    if value not in _ALLOWED_MODELS:
+        logger.warning("%s=%r is not in the allowlist — falling back to default", env_var, value)
+        return default
+    return value
+
+DEFAULT_WRITER_MODEL = _validated_model("WRITER_MODEL", "claude-sonnet-4-6")
+DEFAULT_GRAPHICS_MODEL = _validated_model("GRAPHICS_MODEL", "claude-sonnet-4-6")
 
 WRITER_SYSTEM_PROMPT = """You are an Economist-style Writer renowned for sharp, witty prose with British flair.
 Every article must satisfy the 10 rules below before submission. Do not attempt to read any files

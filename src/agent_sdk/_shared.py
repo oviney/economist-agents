@@ -20,6 +20,12 @@ class EmptyResearchBriefError(RuntimeError):
 
 
 _DEFAULT_VISION_MODEL = "claude-sonnet-4-6"
+_ALLOWED_MODELS: frozenset[str] = frozenset({
+    "claude-haiku-4-5",
+    "claude-sonnet-4-5",
+    "claude-sonnet-4-6",
+    "claude-opus-4-7",
+})
 
 
 # ─── Stage 3: research brief + stat audit ──────────────────────────────
@@ -63,7 +69,7 @@ def build_research_brief(topic: str) -> str:
     sources from training data instead of using injected tool results).
     """
     raw = _run_web_searches(topic)
-    if not raw:
+    if not raw.strip():
         raise EmptyResearchBriefError(
             f"No web search results found for '{topic}'. "
             f"Check SERPER_API_KEY and network connectivity."
@@ -538,6 +544,12 @@ async def refine_image_metadata(
         image_data = base64.standard_b64encode(path.read_bytes()).decode()
 
         vision_model = os.environ.get("VISION_MODEL", _DEFAULT_VISION_MODEL)
+        if vision_model not in _ALLOWED_MODELS:
+            logger.warning(
+                "VISION_MODEL=%r is not in the allowlist — falling back to default",
+                vision_model,
+            )
+            vision_model = _DEFAULT_VISION_MODEL
         client = _anthropic.AsyncAnthropic(api_key=api_key)
         response = await client.messages.create(
             model=vision_model,

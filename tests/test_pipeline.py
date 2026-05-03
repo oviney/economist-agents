@@ -97,3 +97,17 @@ class TestRunPipeline:
 
         lines = log_path.read_bytes().splitlines()
         assert len(lines) == 2, f"Expected 2 log entries (one per run), got {len(lines)}"
+
+    def test_returns_result_even_when_cost_log_write_fails(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setattr("src.agent_sdk.pipeline.COST_LOG_PATH", tmp_path / "costs.jsonl")
+        stage3 = _fake_stage3()
+
+        with patch("src.agent_sdk.pipeline.run_stage3_spike", return_value=stage3), \
+             patch("src.agent_sdk.pipeline.run_stage4", return_value=_fake_stage4(stage3.article)), \
+             patch("src.agent_sdk.pipeline._append_cost_log", side_effect=PermissionError("read-only")):
+            result = asyncio.run(run_pipeline("AI Testing"))
+
+        assert isinstance(result, PipelineResult)
+        assert result.total_cost_usd == pytest.approx(0.05)

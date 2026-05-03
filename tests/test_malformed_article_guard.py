@@ -118,3 +118,23 @@ class TestGenerateContentMalformedRouting:
 
         decision = flow.quality_gate(draft)
         assert decision == "revision"
+
+
+    def test_request_revision_returns_needs_revision_on_malformed_output(self) -> None:
+        """MalformedArticleError in the retry path must also be handled gracefully."""
+        from src.agent_sdk.stage3_runner import MalformedArticleError
+        from src.economist_agents.flow import EconomistContentFlow
+
+        flow = EconomistContentFlow()
+        flow.state["selected_topic"] = {"topic": "AI Testing"}
+        flow.state["revision_feedback"] = ["fix the frontmatter"]
+        flow.state["article_draft"] = {"featured_image": ""}
+
+        with patch(
+            "src.economist_agents.flow.asyncio.run",
+            side_effect=MalformedArticleError("Prose output on retry"),
+        ):
+            result = flow.request_revision()
+
+        assert result["status"] == "needs_revision"
+        assert result["editorial_score"] == 0

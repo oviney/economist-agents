@@ -214,7 +214,7 @@ class EconomistContentFlow:
             ]
             return self._null_article_draft(
                 "empty_research_brief",
-                f"No web search results: {exc}",
+                "No web search results — check SERPER_API_KEY and retry.",
             )
         article = result.article
         print(f"   ✅ Article generated: {len(article.split())} words")

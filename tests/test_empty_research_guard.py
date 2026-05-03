@@ -34,6 +34,14 @@ class TestEmptyResearchBriefError:
             with pytest.raises(EmptyResearchBriefError, match="SERPER_API_KEY"):
                 build_research_brief("AI Testing")
 
+    def test_build_research_brief_raises_when_searches_return_whitespace_only(self) -> None:
+        """Whitespace-only result must be treated the same as empty — no sources."""
+        from src.agent_sdk._shared import EmptyResearchBriefError, build_research_brief
+
+        with patch("src.agent_sdk._shared._run_web_searches", return_value="\n  \n"):
+            with pytest.raises(EmptyResearchBriefError):
+                build_research_brief("AI Testing")
+
     def test_build_research_brief_does_not_raise_when_searches_return_content(
         self,
     ) -> None:

@@ -36,7 +36,7 @@ from typing import Any
 
 from scripts.article_evaluator import ArticleEvaluator
 from scripts.frontmatter_schema import FrontmatterSchema
-from src.agent_sdk._shared import refine_image_metadata
+from src.agent_sdk._shared import EmptyResearchBriefError, refine_image_metadata
 from src.agent_sdk.pipeline import run_pipeline
 from src.agent_sdk.stage3_runner import MalformedArticleError
 from src.economist_agents.adapters import (
@@ -197,6 +197,31 @@ class EconomistContentFlow:
                         "severity": "CRITICAL",
                         # exc contains the first 120 chars of raw LLM output — internal only.
                         "message": f"Writer returned malformed output: {exc}",
+                    }
+                ],
+                "editorial_score": 0,
+                "gates_passed": 0,
+            }
+        except EmptyResearchBriefError as exc:
+            logger.warning("Web searches returned no results — routing to revision: %s", exc)
+            self.state["revision_reason"] = str(exc)
+            self.state["revision_feedback"] = [
+                "Web searches returned no results — check SERPER_API_KEY and retry."
+            ]
+            return {
+                "article": "",
+                "chart_data": {},
+                "featured_image": "",
+                "featured_image_local": "",
+                "image_alt": "",
+                "image_caption": "",
+                "stage4_already_run": False,
+                "publication_validator_passed": False,
+                "publication_validator_issues": [
+                    {
+                        "check": "empty_research_brief",
+                        "severity": "CRITICAL",
+                        "message": f"No web search results: {exc}",
                     }
                 ],
                 "editorial_score": 0,
@@ -411,6 +436,15 @@ class EconomistContentFlow:
                 "editorial_score": 0,
                 "gates_passed": 0,
                 "revision_reason": f"Malformed output on revision attempt: {exc}",
+                "retry_count": retry_count + 1,
+            }
+        except EmptyResearchBriefError as exc:
+            logger.warning("Web searches empty on revision — quarantining: %s", exc)
+            return {
+                "status": "needs_revision",
+                "editorial_score": 0,
+                "gates_passed": 0,
+                "revision_reason": f"Empty research brief on revision attempt: {exc}",
                 "retry_count": retry_count + 1,
             }
         edited_article = self._patch_frontmatter(

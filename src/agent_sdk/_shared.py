@@ -15,6 +15,10 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 
+class EmptyResearchBriefError(RuntimeError):
+    """Raised when all web searches return no results, preventing an unsourced LLM call."""
+
+
 # ─── Stage 3: research brief + stat audit ──────────────────────────────
 
 GRAPHICS_AGENT_PROMPT = """
@@ -57,10 +61,9 @@ def build_research_brief(topic: str) -> str:
     """
     raw = _run_web_searches(topic)
     if not raw:
-        return (
+        raise EmptyResearchBriefError(
             f"No web search results found for '{topic}'. "
-            f"Write the article using general knowledge but tag every "
-            f"statistic with [NEEDS SOURCE]."
+            f"Check SERPER_API_KEY and network connectivity."
         )
     return "\n".join(
         [

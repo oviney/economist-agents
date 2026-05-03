@@ -538,9 +538,10 @@ async def refine_image_metadata(
         }.get(suffix, "image/png")
         image_data = base64.standard_b64encode(path.read_bytes()).decode()
 
+        vision_model = os.environ.get("VISION_MODEL", "claude-sonnet-4-6")
         client = _anthropic.AsyncAnthropic(api_key=api_key)
         response = await client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model=vision_model,
             max_tokens=256,
             messages=[
                 {

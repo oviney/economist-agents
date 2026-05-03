@@ -547,6 +547,81 @@ class TestVisionRefinement:
             )
         assert result == {"image_alt": "draft", "image_caption": "cap"}
 
+    def test_vision_model_comes_from_env_var(self, tmp_path: Path) -> None:
+        """Model passed to messages.create must be VISION_MODEL env var, not hardcoded."""
+        import asyncio
+        import os
+        from unittest.mock import AsyncMock, MagicMock, patch
+
+        import src.agent_sdk._shared as m
+
+        img = tmp_path / "test.png"
+        img.write_bytes(b"PNG")
+
+        mock_response = MagicMock()
+        mock_response.content = [
+            MagicMock(text='{"image_alt": "alt", "image_caption": "cap"}')
+        ]
+        mock_create = AsyncMock(return_value=mock_response)
+
+        with (
+            patch("anthropic.AsyncAnthropic") as mock_async_class,
+            patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key", "VISION_MODEL": "claude-haiku-4-5"}),
+        ):
+            mock_async_class.return_value.messages.create = mock_create
+            asyncio.run(
+                m.refine_image_metadata(
+                    image_path=str(img),
+                    draft_alt="draft alt",
+                    draft_caption="draft caption",
+                )
+            )
+
+        called_model = mock_create.call_args.kwargs.get("model") or mock_create.call_args.args[0] if mock_create.call_args.args else None
+        if called_model is None:
+            called_model = mock_create.call_args[1].get("model")
+        assert called_model == "claude-haiku-4-5", (
+            f"Expected VISION_MODEL env var 'claude-haiku-4-5', got '{called_model}'"
+        )
+
+    def test_vision_model_defaults_to_claude_sonnet_when_env_unset(self, tmp_path: Path) -> None:
+        """When VISION_MODEL is not set, model must default to claude-sonnet-4-6."""
+        import asyncio
+        import os
+        from unittest.mock import AsyncMock, MagicMock, patch
+
+        import src.agent_sdk._shared as m
+
+        img = tmp_path / "test.png"
+        img.write_bytes(b"PNG")
+
+        mock_response = MagicMock()
+        mock_response.content = [
+            MagicMock(text='{"image_alt": "alt", "image_caption": "cap"}')
+        ]
+        mock_create = AsyncMock(return_value=mock_response)
+
+        env = {k: v for k, v in os.environ.items() if k != "VISION_MODEL"}
+        env["ANTHROPIC_API_KEY"] = "test-key"
+
+        with (
+            patch("anthropic.AsyncAnthropic") as mock_async_class,
+            patch.dict(os.environ, env, clear=True),
+        ):
+            mock_async_class.return_value.messages.create = mock_create
+            asyncio.run(
+                m.refine_image_metadata(
+                    image_path=str(img),
+                    draft_alt="draft alt",
+                    draft_caption="draft caption",
+                )
+            )
+
+        called_model = mock_create.call_args.kwargs.get("model") or mock_create.call_args[1].get("model")
+        assert called_model == "claude-sonnet-4-6", (
+            f"Expected default 'claude-sonnet-4-6', got '{called_model}'"
+        )
+
 
 class TestPatchFrontmatterImageMetadata:
     """_patch_frontmatter must inject image_alt and image_caption when provided.

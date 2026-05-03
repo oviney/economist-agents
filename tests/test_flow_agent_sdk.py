@@ -577,12 +577,7 @@ class TestVisionRefinement:
                 )
             )
 
-        called_model = mock_create.call_args.kwargs.get("model") or mock_create.call_args.args[0] if mock_create.call_args.args else None
-        if called_model is None:
-            called_model = mock_create.call_args[1].get("model")
-        assert called_model == "claude-haiku-4-5", (
-            f"Expected VISION_MODEL env var 'claude-haiku-4-5', got '{called_model}'"
-        )
+        assert mock_create.call_args.kwargs["model"] == "claude-haiku-4-5"
 
     def test_vision_model_defaults_to_claude_sonnet_when_env_unset(self, tmp_path: Path) -> None:
         """When VISION_MODEL is not set, model must default to claude-sonnet-4-6."""
@@ -617,10 +612,7 @@ class TestVisionRefinement:
                 )
             )
 
-        called_model = mock_create.call_args.kwargs.get("model") or mock_create.call_args[1].get("model")
-        assert called_model == "claude-sonnet-4-6", (
-            f"Expected default 'claude-sonnet-4-6', got '{called_model}'"
-        )
+        assert mock_create.call_args.kwargs["model"] == "claude-sonnet-4-6"
 
 
 class TestPatchFrontmatterImageMetadata:

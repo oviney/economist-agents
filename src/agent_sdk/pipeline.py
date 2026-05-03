@@ -87,7 +87,10 @@ async def run_pipeline(
         article_chars=len(stage4.article),
     )
     wall_seconds = result.stage3_seconds + result.stage4_seconds
-    _append_cost_log(result, wall_seconds)
+    try:
+        await asyncio.to_thread(_append_cost_log, result, wall_seconds)
+    except Exception as exc:
+        logger.warning("Cost log write failed (non-fatal): %s", exc)
     return result
 
 

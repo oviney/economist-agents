@@ -19,6 +19,9 @@ class EmptyResearchBriefError(RuntimeError):
     """Raised when all web searches return no results, preventing an unsourced LLM call."""
 
 
+_DEFAULT_VISION_MODEL = "claude-sonnet-4-6"
+
+
 # ─── Stage 3: research brief + stat audit ──────────────────────────────
 
 GRAPHICS_AGENT_PROMPT = """
@@ -176,13 +179,9 @@ def audit_article_stats(article: str, research_brief: str) -> str:
             kept.append(sentence)
 
     if removed_count > 0:
-        logger.warning(
-            "Stat audit: removed %d sentence(s) with fabricated stats",
+        logger.info(
+            "Stat audit: removed %d sentence(s) with unverified stats",
             removed_count,
-        )
-        print(
-            f"   🔪 Stat audit: removed {removed_count} sentence(s) with "
-            f"unverified stats",
         )
 
     cleaned_body = " ".join(kept) + refs_section
@@ -538,7 +537,7 @@ async def refine_image_metadata(
         }.get(suffix, "image/png")
         image_data = base64.standard_b64encode(path.read_bytes()).decode()
 
-        vision_model = os.environ.get("VISION_MODEL", "claude-sonnet-4-6")
+        vision_model = os.environ.get("VISION_MODEL", _DEFAULT_VISION_MODEL)
         client = _anthropic.AsyncAnthropic(api_key=api_key)
         response = await client.messages.create(
             model=vision_model,

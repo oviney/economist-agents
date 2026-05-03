@@ -9,7 +9,7 @@ from unittest.mock import MagicMock, patch
 import orjson
 import pytest
 
-from src.agent_sdk.pipeline import PipelineResult
+from src.agent_sdk.pipeline import PipelineResult, run_pipeline
 
 
 # ── helpers ───────────────────────────────────────────────────────────────────
@@ -55,7 +55,7 @@ class TestRunPipeline:
 
         with patch("src.agent_sdk.pipeline.run_stage3_spike", return_value=stage3), \
              patch("src.agent_sdk.pipeline.run_stage4", return_value=_fake_stage4(stage3.article)):
-            result = asyncio.run(__import__("src.agent_sdk.pipeline", fromlist=["run_pipeline"]).run_pipeline("AI Testing"))
+            result = asyncio.run(run_pipeline("AI Testing"))
 
         assert isinstance(result, PipelineResult)
         assert isinstance(result.total_cost_usd, float)
@@ -72,7 +72,7 @@ class TestRunPipeline:
 
         with patch("src.agent_sdk.pipeline.run_stage3_spike", return_value=stage3), \
              patch("src.agent_sdk.pipeline.run_stage4", return_value=_fake_stage4(stage3.article)):
-            asyncio.run(__import__("src.agent_sdk.pipeline", fromlist=["run_pipeline"]).run_pipeline("AI Testing"))
+            asyncio.run(run_pipeline("AI Testing"))
 
         assert log_path.exists(), "Cost log was not created"
         lines = log_path.read_bytes().splitlines()
@@ -89,8 +89,6 @@ class TestRunPipeline:
         log_path = tmp_path / "costs.jsonl"
         monkeypatch.setattr("src.agent_sdk.pipeline.COST_LOG_PATH", log_path)
         stage3 = _fake_stage3()
-
-        from src.agent_sdk.pipeline import run_pipeline
 
         with patch("src.agent_sdk.pipeline.run_stage3_spike", return_value=stage3), \
              patch("src.agent_sdk.pipeline.run_stage4", return_value=_fake_stage4(stage3.article)):

@@ -30,6 +30,7 @@ import logging
 import os
 import pathlib
 import re
+import yaml as _yaml
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -195,8 +196,7 @@ class EconomistContentFlow:
                     {
                         "check": "malformed_output",
                         "severity": "CRITICAL",
-                        # exc contains the first 120 chars of raw LLM output — internal only.
-                        "message": f"Writer returned malformed output: {exc}",
+                        "message": "Writer returned malformed output — see logs for details.",
                     }
                 ],
                 "editorial_score": 0,
@@ -268,8 +268,6 @@ class EconomistContentFlow:
             print(f"   ℹ️  Image generation failed ({exc}), using default")
 
         # Extract image_alt / image_caption drafts emitted by the writer
-        import yaml as _yaml
-
         _image_alt, _image_caption = "", ""
         if article.startswith("---"):
             _parts = article.split("---", 2)
@@ -447,9 +445,12 @@ class EconomistContentFlow:
                 "revision_reason": f"Empty research brief on revision attempt: {exc}",
                 "retry_count": retry_count + 1,
             }
+        draft = self.state.get("article_draft", {})
         edited_article = self._patch_frontmatter(
             result.article,
-            self.state.get("article_draft", {}).get("featured_image", ""),
+            draft.get("featured_image", ""),
+            image_alt=draft.get("image_alt", ""),
+            image_caption=draft.get("image_caption", ""),
         )
 
         editorial_score = result.editorial_score

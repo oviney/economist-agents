@@ -285,7 +285,7 @@ async def run_stage3_spike(
 
     # Require opening ---, a closing --- on its own line, and a non-empty body.
     # re.DOTALL so the frontmatter block can contain newlines.
-    _fm_match = re.match(r"^---\n.*?\n---\n(.+)", pre_audit_article, re.DOTALL)
+    _fm_match = re.match(r"^---\r?\n.*?\r?\n---\r?\n(.+)", pre_audit_article, re.DOTALL)
     body_is_empty = _fm_match is None or not _fm_match.group(1).strip()
     if not pre_audit_article.startswith("---") or body_is_empty:
         raise MalformedArticleError(

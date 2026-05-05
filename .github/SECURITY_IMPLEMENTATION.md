@@ -152,40 +152,20 @@ nano .env  # or vim, VSCode, etc.
 python3 scripts/test_setup.py
 
 # 5. Start using
-python3 scripts/economist_agent.py
+python3 -c "from src.economist_agents.flow import EconomistContentFlow; EconomistContentFlow().kickoff()"
 ```
 
 ### CI/CD (GitHub Actions)
-```yaml
-name: Generate Article
-on: workflow_dispatch
 
-jobs:
-  generate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+The production pipeline runs via the `content-pipeline` GitHub Actions
+workflow, which calls `EconomistContentFlow().kickoff()` directly.
+See `.github/workflows/content-pipeline.yml`.
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Generate content
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_MODEL: gpt-4o
-        run: python3 scripts/economist_agent.py
-```
-
-**Store key in**: Settings → Secrets and variables → Actions → New secret
+**Store keys in**: Settings → Secrets and variables → Actions → New secret
 
 ### Docker Deployment
 ```dockerfile
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 WORKDIR /app
 COPY . .
@@ -193,9 +173,9 @@ RUN pip install -r requirements.txt
 
 # Don't bake keys into image!
 # Pass at runtime:
-# docker run -e OPENAI_API_KEY="$OPENAI_API_KEY" economist-agents
+# docker run -e ANTHROPIC_API_KEY="$ANTHROPIC_API_KEY" economist-agents
 
-ENTRYPOINT ["python3", "scripts/economist_agent.py"]
+ENTRYPOINT ["python3", "-c", "from src.economist_agents.flow import EconomistContentFlow; EconomistContentFlow().kickoff()"]
 ```
 
 ## Testing Checklist

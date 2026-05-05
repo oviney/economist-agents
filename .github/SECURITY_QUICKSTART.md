@@ -15,7 +15,7 @@ nano .env
 python3 scripts/test_setup.py
 
 # 4. Start using
-python3 scripts/economist_agent.py
+python3 -c "from src.economist_agents.flow import EconomistContentFlow; EconomistContentFlow().kickoff()"
 ```
 
 **Done!** Your API keys are now secure.

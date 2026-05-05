@@ -10,7 +10,7 @@
 ### 1. Pipeline Now Auto-Retries API Calls 🔄
 
 **What**: Exponential backoff for Anthropic API rate limits
-**Where**: All agent scripts (`economist_agent.py`, `topic_scout.py`, `editorial_board.py`)
+**Where**: `EconomistContentFlow` orchestrator (`src/economist_agents/flow.py`)
 **Why**: Prevents pipeline failures from temporary rate limits
 **How It Works**: 3 retries with 1s → 2s → 4s delays
 
@@ -44,14 +44,14 @@ ValueError: [RESEARCH_AGENT] Invalid topic. Expected non-empty string, got: None
 # Required or pipeline crashed
 export OUTPUT_DIR="/path/to/output"
 export ANTHROPIC_API_KEY="sk-ant-..."
-python3 scripts/economist_agent.py
+python3 -c "from src.economist_agents.flow import EconomistContentFlow; EconomistContentFlow().kickoff()"
 ```
 
 **After**:
 ```bash
 # Only API key required, OUTPUT_DIR has default
 export ANTHROPIC_API_KEY="sk-ant-..."
-python3 scripts/economist_agent.py
+python3 -c "from src.economist_agents.flow import EconomistContentFlow; EconomistContentFlow().kickoff()"
 # ℹ OUTPUT_DIR not set, using default: output/
 ```
 
@@ -169,7 +169,7 @@ export ANTHROPIC_API_KEY='sk-ant-...'
 python3 tests/test_improvements.py
 
 # 5. Generate an article (uses default output/ directory)
-python3 scripts/economist_agent.py
+python3 -c "from src.economist_agents.flow import EconomistContentFlow; EconomistContentFlow().kickoff()"
 ```
 
 ### Common Commands
@@ -181,7 +181,7 @@ python3 scripts/topic_scout.py
 python3 scripts/editorial_board.py
 
 # Generate article
-python3 scripts/economist_agent.py
+python3 -c "from src.economist_agents.flow import EconomistContentFlow; EconomistContentFlow().kickoff()"
 
 # Validate pipeline data
 python3 schemas/validate_schemas.py --all

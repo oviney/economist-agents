@@ -27,7 +27,7 @@ nano .env
 **Temporary (session only)**:
 ```bash
 export OPENAI_API_KEY='sk-...'
-python3 scripts/economist_agent.py
+python3 -c "from src.economist_agents.flow import EconomistContentFlow; EconomistContentFlow().kickoff()"
 ```
 
 **Permanent (add to ~/.zshrc or ~/.bashrc)**:

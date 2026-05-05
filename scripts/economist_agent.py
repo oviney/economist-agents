@@ -56,14 +56,9 @@ from agents.research_agent import run_research_agent
 # Import extracted Writer Agent
 from agents.writer_agent import run_writer_agent
 
-# Sprint 14 Integration: Flow orchestration, Style Memory RAG, ROI Telemetry
-try:
-    from src.economist_agents.flow import EconomistContentFlow  # noqa: F401
-
-    FLOW_AVAILABLE = True
-except ImportError:
-    FLOW_AVAILABLE = False
-    print("⚠️  EconomistContentFlow not available - using legacy pipeline")
+# Deprecated: this script is the legacy CrewAI-era orchestrator.
+# The production entry point is EconomistContentFlow in src/economist_agents/flow.py,
+# which is invoked by the content-pipeline GitHub Actions workflow.
 
 try:
     from src.tools.style_memory_tool import StyleMemoryTool
@@ -1111,6 +1106,14 @@ CONTENT_QUEUE = [
 
 
 def main():
+    import warnings
+    warnings.warn(
+        "scripts/economist_agent.py is deprecated. "
+        "Use EconomistContentFlow from src.economist_agents.flow, "
+        "or trigger the content-pipeline GitHub Actions workflow.",
+        DeprecationWarning,
+        stacklevel=1,
+    )
     # Parse command-line arguments
     parser = argparse.ArgumentParser(
         description="Generate Economist-style articles with AI agents",

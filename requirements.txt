@@ -1,29 +1,23 @@
-# Core dependencies
-# CrewAI framework (Phase 1 migration - ADR-003)
-# Development dependencies
-# Economist Agents - Python Dependencies
-# Optional dependencies
-# Security (recommended)
-claude-agent-sdk>=0.1.68  # Anthropic Agent SDK — primary agent runtime (ADR-0006 Phase 2, epic #308)
-chromadb>=0.4.0          # Vector database for Style Memory RAG (STORY-006)
+# Production runtime dependencies for economist-agents.
+# Dev-only tools (pytest, streamlit, linters) are in requirements-dev.txt.
+# Pin new deps to a tested minor range; update deliberately, not silently.
 
-matplotlib>=3.7.0        # Chart generation for graphics agent
-numpy>=1.24.0            # Data manipulation for charts
-openai>=1.0.0            # OpenAI API (required)
-PyGithub>=2.1.0          # GitHub API integration for sprint sync
-pytest>=7.0.0            # Testing framework (optional)
-python-dotenv>=1.0.0     # Secure .env file loading
-python-slugify>=8.0.0    # URL-safe filenames
-pyyaml>=6.0              # YAML parsing for config
-jsonschema>=4.0.0        # JSON Schema validation for agent YAML files
-orjson>=3.9.0
-redis>=4.0.0             # Optional Redis cache backend (Story #145)
-requests>=2.31.0         # HTTP requests for image generation
-arxiv>=2.1.0             # arXiv API for cutting-edge research papers
-feedparser>=6.0.0        # RSS feed parsing for additional research sources
-fastmcp>=2.0.0           # MCP server framework for published-topics server (STORY-19.3)
-mcp>=1.0.0               # Model Context Protocol SDK (FastMCP server)
-google-analytics-data>=0.18.0  # GA4 Data API (ADR-002 MEASURE layer)
-google-auth>=2.0.0             # Google service account authentication
-google-api-python-client>=2.0.0  # Google Search Console API
-streamlit>=1.35.0                # Agent Performance Metrics Dashboard (Story #32)
+claude-agent-sdk>=0.1.68,<1.0.0   # Anthropic Agent SDK — primary agent runtime (ADR-0006 Phase 2)
+chromadb>=0.4.0,<1.0.0            # Vector DB for Style Memory RAG; API breaks across major versions
+matplotlib>=3.7.0,<4.0.0          # Chart generation for graphics agent
+numpy>=1.24.0,<3.0.0              # Data manipulation for charts
+openai>=1.0.0,<2.0.0              # OpenAI API (DALL-E image generation)
+PyGithub>=2.1.0,<3.0.0            # GitHub API integration
+python-dotenv>=1.0.0,<2.0.0       # Secure .env file loading
+python-slugify>=8.0.0,<9.0.0      # URL-safe filenames
+pyyaml>=6.0,<7.0                  # YAML parsing
+jsonschema>=4.0.0,<5.0.0          # JSON Schema validation for agent YAML files
+orjson>=3.9.0,<4.0.0              # Fast JSON serialisation (project standard)
+redis>=4.0.0,<6.0.0               # Optional Redis cache backend
+requests>=2.31.0,<3.0.0           # HTTP requests for image generation
+arxiv>=2.1.0,<3.0.0               # arXiv API for research papers
+feedparser>=6.0.0,<7.0.0          # RSS feed parsing for additional research sources
+fastmcp>=2.0.0,<4.0.0             # MCP server framework; mcp is a managed transitive dep
+google-analytics-data>=0.18.0,<1.0.0  # GA4 Data API (ADR-002 MEASURE layer)
+google-auth>=2.0.0,<3.0.0             # Google service account authentication
+google-api-python-client>=2.0.0,<3.0.0  # Google Search Console API

@@ -348,3 +348,49 @@ def test_generate_architecture_compliance_report():
 
     # This test always passes (informational only)
     assert True
+
+
+# ── crewai import guard ───────────────────────────────────────────────────
+
+
+def _crewai_imports_in(directory: Path, pattern: str = "*.py") -> list[str]:
+    """Return 'file:lineno' strings for every AST-level crewai import found."""
+    violations = []
+    for py_file in sorted(directory.rglob(pattern)):
+        try:
+            tree = ast.parse(py_file.read_text(errors="replace"))
+        except SyntaxError:
+            continue
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    if alias.name.split(".")[0] == "crewai":
+                        violations.append(f"{py_file.relative_to(directory.parent)}:{node.lineno}")
+            elif isinstance(node, ast.ImportFrom):
+                if (node.module or "").split(".")[0] == "crewai":
+                    violations.append(f"{py_file.relative_to(directory.parent)}:{node.lineno}")
+    return violations
+
+
+class TestNoCrewAIInSrcOrTests:
+    """src/ and tests/ must have zero live crewai imports.
+
+    Uses AST parsing so string literals containing 'crewai' are not flagged.
+    scripts/ cleanup is tracked in issue #327.
+    """
+
+    def test_src_has_no_crewai_imports(self) -> None:
+        src_dir = Path(__file__).parent.parent / "src"
+        violations = _crewai_imports_in(src_dir)
+        assert violations == [], (
+            "Live crewai imports found in src/ — use the Anthropic Agent SDK:\n"
+            + "\n".join(violations)
+        )
+
+    def test_tests_has_no_crewai_imports(self) -> None:
+        tests_dir = Path(__file__).parent
+        violations = _crewai_imports_in(tests_dir, "*.py")
+        assert violations == [], (
+            "Live crewai imports found in tests/ — delete or convert the test:\n"
+            + "\n".join(violations)
+        )

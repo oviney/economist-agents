@@ -1,85 +1,87 @@
-# Plan: Fix shell injection in regenerate-image.yml (issue #342)
+# Plan: Delete or archive dead files in scripts/ (issue #327)
 
 **Spec**: SPEC.md
-**Date**: 2026-05-03
-
-## Injection inventory
-
-16 `${{ inputs.* }}` references in `run:` blocks:
-- `${{ inputs.slug }}` — 14 instances (lines 54, 60, 61, 70, 75, 89×2, 90×2,
-  94, 95, 96, 102, 105, 107)
-- `${{ inputs.topic }}` — 1 instance (line 51)
-- `${{ inputs.summary }}` — 1 instance (line 52)
-- `${{ inputs.mood }}` — 1 instance (line 53) — SAFE (`type: choice`), no change
+**Date**: 2026-05-10
 
 ## Dependency graph
 
 ```
-T1 (add job-level env: block + validation step)
-  └──► T2 (replace all 16 ${{ inputs.* }} in run: blocks with $SLUG/$TOPIC/$SUMMARY)
-         └──► T3 (grep assertion + manual verification notes + close #342)
+T1 (DELETE 22 files) ──► T2 (fix ALLOWED_FILES in test_architecture_compliance.py)
+                               └──► T3 (ARCHIVE 44 files → scripts/archived/)
+                                          └──► T4 (grep AC4 + full pytest + close #327)
 ```
+
+T1 and T2 are coupled — the ALLOWED_FILES cleanup is only meaningful after
+the run_story*.py files are deleted. T3 is independent of T1/T2 (no imports
+change) but is easiest to verify after T1/T2 are green. T4 is the final gate.
+
+---
 
 ## Tasks
 
-### T1 — Add job-level `env:` and validation step
+### T1 — Delete the 22 confirmed-dead files
 
-**File**: `.github/workflows/regenerate-image.yml`
-
-1. Add `env:` block at the job level (between `runs-on:` and `steps:`):
-   ```yaml
-   env:
-     SLUG: ${{ inputs.slug }}
-     TOPIC: ${{ inputs.topic }}
-     SUMMARY: ${{ inputs.summary }}
-   ```
-
-2. Insert a `Validate inputs` step as the first step (before `actions/checkout`):
-   ```yaml
-   - name: Validate inputs
-     run: |
-       if [[ ! "$SLUG" =~ ^[a-z0-9][a-z0-9-]{0,79}$ ]]; then
-         echo "::error::Invalid slug '$SLUG': must match ^[a-z0-9][a-z0-9-]{0,79}$"
-         exit 1
-       fi
-       if [[ ${#TOPIC} -gt 200 ]]; then
-         echo "::error::topic exceeds 200 characters"
-         exit 1
-       fi
-       if [[ ${#SUMMARY} -gt 500 ]]; then
-         echo "::error::summary exceeds 500 characters"
-         exit 1
-       fi
-   ```
-
-DoD: `grep "SLUG:\|TOPIC:\|SUMMARY:" .github/workflows/regenerate-image.yml`
-shows the env block; `Validate inputs` step exists before `actions/checkout`.
-
----
-
-### T2 — Replace all `${{ inputs.* }}` references in `run:` blocks
-
-**File**: `.github/workflows/regenerate-image.yml`
-
-Replace every occurrence of `${{ inputs.slug }}`, `${{ inputs.topic }}`, and
-`${{ inputs.summary }}` in `run:` blocks with `$SLUG`, `$TOPIC`, and `$SUMMARY`
-respectively. `${{ inputs.mood }}` stays as-is.
-
-14 slug replacements, 1 topic, 1 summary = 16 total.
-
-DoD:
 ```bash
-grep -c '\${{ inputs\.slug\|inputs\.topic\|inputs\.summary' \
-  .github/workflows/regenerate-image.yml
-# Must return 0
+cd scripts && rm \
+  fix_story11_import.py fix_typo.py \
+  run_dev_crew.py run_dev_sprint_crew.py run_meta_sprint.py \
+  run_story2_crew.py run_story7_crew.py run_story10_crew.py \
+  run_story10_fix.py run_story11_crew.py \
+  spike_crewai_baseline.py \
+  test_agent_integration.py test_dev_crew_workflow.py \
+  test_full_workflow_streamlined.py test_gap_analyzer.py \
+  test_git_operations_direct.py test_hybrid_approach_validation.py \
+  test_metrics.py test_real_debug_story.py test_setup.py \
+  test_simple_git_workflow.py test_sprint_15_orchestration.py
 ```
 
+DoD:
+- `ls scripts/run_story*.py scripts/spike_*.py scripts/test_*.py` → all missing
+- `pytest tests/ -q` → same count as before T1
+
 ---
 
-### T3 — Verify and close #342
+### T2 — Remove stale entries from ALLOWED_FILES in test_architecture_compliance.py
 
-1. Run the DoD grep from T2 — confirm 0 injection points remain in `run:` blocks.
-2. Confirm `${{ inputs.mood }}` is unchanged (1 occurrence in the shell step, safe).
-3. Close #342 with a summary.
+`tests/test_architecture_compliance.py` has an `ALLOWED_FILES` set listing
+scripts permitted to import LLM libraries directly. Four deleted files are
+in that set:
+- `run_story2_crew.py`
+- `run_story7_crew.py`
+- `run_story10_crew.py`
+- `run_story11_crew.py`
 
-No pytest tests for workflow YAML. Manual test instructions are in SPEC.md §5.
+Remove those four entries. No other change to the file.
+
+DoD:
+- `grep "run_story" tests/test_architecture_compliance.py` → 0 lines
+- `pytest tests/test_architecture_compliance.py -v` → all pass
+
+---
+
+### T3 — Move 44 ARCHIVE files to scripts/archived/
+
+Create `scripts/archived/` if it doesn't exist (it already does — leave
+`scripts/archived/legacy_sync/` untouched).
+
+Move each of the 44 ARCHIVE files (see SPEC.md §2 ARCHIVE table).
+`templates/mission_template.py` → `scripts/archived/templates/mission_template.py`.
+
+No `src/` imports reference any ARCHIVE file (verified by AC4 grep in T4).
+
+DoD:
+- All 44 files present under `scripts/archived/`
+- None of the 44 remain in `scripts/`
+- `pytest tests/ -q` → same count
+
+---
+
+### T4 — Final verification + close #327
+
+1. AC4: `grep -rn "from scripts\." src/ | grep -v __pycache__`
+   — every match must be a KEEP file
+2. AC5: `pytest tests/test_architecture_compliance.py::TestNoCrewAIInSrcOrTests -v`
+   — both guard tests pass
+3. Full suite: `pytest tests/ -q` — count unchanged from pre-T1 baseline
+4. Commit all three batches (T1+T2 together, T3 separately)
+5. Close #327

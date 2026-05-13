@@ -32,8 +32,10 @@ below.
 | `article_archive.py` | imported by mcp_servers/ |
 | `article_evaluator.py` | imported by src/economist_agents/flow.py |
 | `audit_composite_scores.py` | tests/test_audit_composite_scores.py |
+| `backlog_groomer.py` | scripts/continuous_burndown.py:52,59 † |
 | `blog_quality_audit.py` | called by blog-quality-audit.yml |
 | `chart_metrics.py` | agents/graphics_agent.py:31 † |
+| `ci_health_monitor.py` | scripts/continuous_burndown.py:53,60 † |
 | `citation_verifier.py` | tests/test_citation_verifier.py |
 | `content_intelligence.py` | tests/test_content_intelligence.py |
 | `context_manager.py` | 28 tests in test_context_manager.py ✱ |
@@ -56,6 +58,7 @@ below.
 | `gsc_etl.py` | tests/test_gsc_etl.py |
 | `index_published_articles.py` | tests/test_index_published_articles.py |
 | `llm_client.py` | tests/test_llm_client.py; imported by agent_registry |
+| `migrate_backlog_to_github.py` | scripts/continuous_burndown.py:55,62 † |
 | `orchestrator_agent.py` | imported by mcp_servers/orchestrator_agent_server.py |
 | `po_agent.py` | tests/test_po_agent.py |
 | `pre_commit_arch_check.py` | tested by test_pre_commit_arch_check.py |
@@ -75,7 +78,9 @@ below.
 | `topic_scout_reproducibility.py` | tests/test_topic_scout_reproducibility.py |
 | `topic_trend_grounding.py` | tests/test_topic_trend_grounding.py |
 | `validate_closed_loop.py` | tests/test_closed_loop_validation.py (3× subprocess) † |
+| `validate_documentation_accuracy.py` | scripts/continuous_burndown.py:57,64 † |
 | `validate_skills.py` | called by quality-tests.yml |
+| `visual_qa_zones.py` | scripts/economist_agent.py:515 † |
 | `tools/github_project_tool.py` | used by agent skills |
 | `tools/__init__.py` | package |
 | `benchmarks/measure_sm_effectiveness.py` | called by nightly-eval.yml |
@@ -83,10 +88,12 @@ below.
 | `__init__.py` | package |
 
 ✱ = moved from ARCHIVE to KEEP by staff engineer review (archiving would break pytest)
-† = moved from ARCHIVE to KEEP after second staff-engineer pass on 2026-05-12;
-    `agents/` and several live tests import these modules via the
-    `scripts/` sys.path hack. See [ADR-0010](docs/adr/0010-scripts-to-src-migration.md)
-    for the follow-up migration that will allow these to be properly archived.
+† = moved from ARCHIVE to KEEP after staff-engineer review on 2026-05-12;
+    live callers found in `agents/` (3 files), live tests (3 files), and
+    KEEP scripts `continuous_burndown.py` + `economist_agent.py`. All use
+    the bare-name import path enabled by the `scripts/` sys.path hack.
+    See [ADR-0010](docs/adr/0010-scripts-to-src-migration.md) for the
+    follow-up migration that will allow these to be properly archived.
 
 ---
 
@@ -99,10 +106,8 @@ test file. Preserves git history; does not break any import.
 |---|
 | `agent_dashboard.py` |
 | `architecture_review.py` |
-| `backlog_groomer.py` |
 | `blog_qa_agent.py` |
 | `calculate_quality_score.py` |
-| `ci_health_monitor.py` |
 | `crewai_agents.py` |
 | `editor_agent_diagnostic.py` |
 | `evaluate_architecture_options.py` |
@@ -117,7 +122,6 @@ test file. Preserves git history; does not break any import.
 | `measure_sm_agent.py` |
 | `metrics_dashboard.py` |
 | `metrics_report.py` |
-| `migrate_backlog_to_github.py` |
 | `production_health_check.py` |
 | `secure_env.py` |
 | `skill_synthesizer.py` |
@@ -127,12 +131,10 @@ test file. Preserves git history; does not break any import.
 | `update_sprint_docs.py` |
 | `validate_agile_discipline.py` |
 | `validate_badges.py` |
-| `validate_documentation_accuracy.py` |
 | `validate_editor_fixes.py` |
 | `validate_environment.py` |
 | `validate_sprint_report.py` |
 | `visual_qa.py` |
-| `visual_qa_zones.py` |
 | `web_research.py` | ✱ moved from KEEP (cited test file does not exist; superseded by MCP)
 | `templates/mission_template.py` |
 
@@ -167,9 +169,10 @@ test file. Preserves git history; does not break any import.
 | `test_simple_git_workflow.py` | scripts/test_*.py, not collected by pytest |
 | `test_sprint_15_orchestration.py` | scripts/test_*.py, not collected by pytest |
 
-**Total: 22 delete, 38 archive, 60 keep.** (Updated 2026-05-12: 7 modules
-moved ARCHIVE→KEEP after second staff-engineer pass found live callers in
-`agents/` and test files — see ADR-0010 for follow-up migration plan.)
+**Total: 22 delete, 33 archive, 65 keep.** (Updated 2026-05-12: 12 modules
+moved ARCHIVE→KEEP after staff-engineer review surfaced live callers in
+`agents/`, live tests, and KEEP scripts (`continuous_burndown.py`,
+`economist_agent.py`) — see ADR-0010 for follow-up migration plan.)
 
 ---
 
@@ -177,8 +180,8 @@ moved ARCHIVE→KEEP after second staff-engineer pass found live callers in
 
 **AC1** — All 22 DELETE files are removed.
 
-**AC2** — All 38 ARCHIVE files are in `scripts/archived/`. No `src/`,
-`agents/`, `mcp_servers/`, or live-test import is broken.
+**AC2** — All 33 ARCHIVE files are in `scripts/archived/`. No `src/`,
+`agents/`, `mcp_servers/`, scripts/ (KEEP), or live-test import is broken.
 
 **AC3** — `pytest tests/ -q` passes with the same count (±0).
 

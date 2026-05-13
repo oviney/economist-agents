@@ -2,7 +2,7 @@
 
 ## In Progress
 
-- [ ] T3 — Move 44 ARCHIVE files to scripts/archived/; verify pytest count unchanged
+- [ ] T3 — Move 38 ARCHIVE files to scripts/archived/; verify pytest count unchanged
 
 ## Pending
 
@@ -12,3 +12,4 @@
 
 - [x] T1 — Delete 22 confirmed-dead files from scripts/; verify pytest count unchanged (1817 tests collected)
 - [x] T2 — Remove 4 stale run_story*.py entries from ALLOWED_FILES in test_architecture_compliance.py (13/13 pass)
+- [x] T2.5 — Second staff-engineer pass reclassified 7 ARCHIVE → KEEP (live `agents/` + test callers); SPEC §2 amended; ADR-0010 filed for follow-up `scripts/` → `src/` migration

@@ -1,8 +1,8 @@
 # SPEC: Delete or archive dead files in scripts/ (issue #327)
 
-**Status**: APPROVED (staff engineer review applied 2026-05-10)
+**Status**: APPROVED (staff engineer review applied 2026-05-10; amended 2026-05-12)
 **GitHub issue**: oviney/economist-agents#327
-**Date**: 2026-05-10
+**Date**: 2026-05-10 (amended 2026-05-12 — see [ADR-0010](docs/adr/0010-scripts-to-src-migration.md))
 
 ---
 
@@ -23,7 +23,9 @@ below.
 |---|---|
 | `ab_topic_scout_comparison.py` | 29 tests in test_ab_topic_scout_comparison.py ✱ |
 | `agent_loader.py` | tests/test_agent_loader.py |
+| `agent_metrics.py` | tests/test_quality_dashboard.py (4× `patch("agent_metrics.…")`) † |
 | `agent_registry.py` | imported by src/manager.py |
+| `agent_reviewer.py` | agents/writer_agent.py:31, agents/research_agent.py:25, tests/test_quality_system.py:19 † |
 | `agent_trace_logger.py` | tests/test_agent_trace_logger.py |
 | `architecture_audit.py` | 15 tests in test_architecture_audit.py ✱ |
 | `arxiv_search.py` | imported by mcp_servers/web_researcher_server.py |
@@ -31,11 +33,13 @@ below.
 | `article_evaluator.py` | imported by src/economist_agents/flow.py |
 | `audit_composite_scores.py` | tests/test_audit_composite_scores.py |
 | `blog_quality_audit.py` | called by blog-quality-audit.yml |
+| `chart_metrics.py` | agents/graphics_agent.py:31 † |
 | `citation_verifier.py` | tests/test_citation_verifier.py |
 | `content_intelligence.py` | tests/test_content_intelligence.py |
 | `context_manager.py` | 28 tests in test_context_manager.py ✱ |
 | `continuous_burndown.py` | 2 tests in test_continuous_burndown.py ✱ |
 | `defect_prevention_rules.py` | soft dep of publication_validator.py (try/except import) |
+| `defect_tracker.py` | tests/test_quality_dashboard.py (3× `patch("scripts.defect_tracker.…")`) † |
 | `deploy_to_blog.py` | tests/test_deploy_to_blog.py |
 | `destructive_change_guard.py` | called by ci.yml |
 | `economist_agent.py` | 34 tests in test_economist_agent.py ✱ (deprecated; warning in main()) |
@@ -47,6 +51,7 @@ below.
 | `ga4_etl.py` | tests/test_ga4_etl.py |
 | `generate_chart.py` | 29 tests in test_generate_chart.py ✱ |
 | `github_issue_claim.py` | tests/test_github_issue_claim.py |
+| `governance.py` | agents/writer_agent.py:32, agents/research_agent.py:26 † |
 | `google_search.py` | imported by mcp_servers/web_researcher_server.py |
 | `gsc_etl.py` | tests/test_gsc_etl.py |
 | `index_published_articles.py` | tests/test_index_published_articles.py |
@@ -58,6 +63,7 @@ below.
 | `quality_dashboard.py` | tests/test_quality_dashboard.py |
 | `quality_metrics.py` | called by content-pipeline.yml |
 | `record_metrics.py` | called by content-pipeline.yml |
+| `schema_validator.py` | tests/test_quality_system.py:20; doc ref in mcp_servers/publication_validator_server.py † |
 | `skills_gap_analyzer.py` | tests/test_skills_gap_analyzer.py |
 | `skills_manager.py` | 7 tests in test_closed_loop_validation.py ✱ |
 | `sm_agent.py` | tests/test_sm_agent.py |
@@ -68,6 +74,7 @@ below.
 | `topic_scout.py` | tests/test_topic_scout.py |
 | `topic_scout_reproducibility.py` | tests/test_topic_scout_reproducibility.py |
 | `topic_trend_grounding.py` | tests/test_topic_trend_grounding.py |
+| `validate_closed_loop.py` | tests/test_closed_loop_validation.py (3× subprocess) † |
 | `validate_skills.py` | called by quality-tests.yml |
 | `tools/github_project_tool.py` | used by agent skills |
 | `tools/__init__.py` | package |
@@ -76,6 +83,10 @@ below.
 | `__init__.py` | package |
 
 ✱ = moved from ARCHIVE to KEEP by staff engineer review (archiving would break pytest)
+† = moved from ARCHIVE to KEEP after second staff-engineer pass on 2026-05-12;
+    `agents/` and several live tests import these modules via the
+    `scripts/` sys.path hack. See [ADR-0010](docs/adr/0010-scripts-to-src-migration.md)
+    for the follow-up migration that will allow these to be properly archived.
 
 ---
 
@@ -87,16 +98,12 @@ test file. Preserves git history; does not break any import.
 | File |
 |---|
 | `agent_dashboard.py` |
-| `agent_metrics.py` |
-| `agent_reviewer.py` |
 | `architecture_review.py` |
 | `backlog_groomer.py` |
 | `blog_qa_agent.py` |
 | `calculate_quality_score.py` |
-| `chart_metrics.py` |
 | `ci_health_monitor.py` |
 | `crewai_agents.py` |
-| `defect_tracker.py` |
 | `editor_agent_diagnostic.py` |
 | `evaluate_architecture_options.py` |
 | `evaluate_fresh_data_options.py` |
@@ -105,7 +112,6 @@ test file. Preserves git history; does not break any import.
 | `generate_sprint_badge.py` |
 | `generate_tests_badge.py` |
 | `github_project_v2_validator.py` |
-| `governance.py` |
 | `integration_health_check.py` |
 | `lint_adrs.py` |
 | `measure_sm_agent.py` |
@@ -113,7 +119,6 @@ test file. Preserves git history; does not break any import.
 | `metrics_report.py` |
 | `migrate_backlog_to_github.py` |
 | `production_health_check.py` |
-| `schema_validator.py` |
 | `secure_env.py` |
 | `skill_synthesizer.py` |
 | `sprint_ceremony_tracker.py` | ✱ moved from KEEP (cited test file does not exist)
@@ -122,7 +127,6 @@ test file. Preserves git history; does not break any import.
 | `update_sprint_docs.py` |
 | `validate_agile_discipline.py` |
 | `validate_badges.py` |
-| `validate_closed_loop.py` |
 | `validate_documentation_accuracy.py` |
 | `validate_editor_fixes.py` |
 | `validate_environment.py` |
@@ -163,7 +167,9 @@ test file. Preserves git history; does not break any import.
 | `test_simple_git_workflow.py` | scripts/test_*.py, not collected by pytest |
 | `test_sprint_15_orchestration.py` | scripts/test_*.py, not collected by pytest |
 
-**Total: 22 delete, 44 archive, 53 keep.**
+**Total: 22 delete, 38 archive, 60 keep.** (Updated 2026-05-12: 7 modules
+moved ARCHIVE→KEEP after second staff-engineer pass found live callers in
+`agents/` and test files — see ADR-0010 for follow-up migration plan.)
 
 ---
 
@@ -171,8 +177,8 @@ test file. Preserves git history; does not break any import.
 
 **AC1** — All 22 DELETE files are removed.
 
-**AC2** — All 44 ARCHIVE files are in `scripts/archived/`. No `src/` import
-is broken.
+**AC2** — All 38 ARCHIVE files are in `scripts/archived/`. No `src/`,
+`agents/`, `mcp_servers/`, or live-test import is broken.
 
 **AC3** — `pytest tests/ -q` passes with the same count (±0).
 

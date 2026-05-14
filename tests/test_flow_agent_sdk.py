@@ -868,8 +868,9 @@ class TestKickoffResultFile:
         monkeypatch,
     ) -> None:
         """Result file must be written even when quality_gate routes to revision."""
-        import src.economist_agents.flow as flow_module
         import orjson
+
+        import src.economist_agents.flow as flow_module
 
         result_path = tmp_path / "pipeline_result.json"
         monkeypatch.setattr(flow_module, "PIPELINE_RESULT_PATH", result_path)

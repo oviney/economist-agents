@@ -11,10 +11,9 @@ Verifies that:
 from __future__ import annotations
 
 import asyncio
-from unittest.mock import AsyncMock, patch
+from unittest.mock import patch
 
 import pytest
-
 
 # ── Unit: _shared.py ─────────────────────────────────────────────────────────
 
@@ -30,9 +29,11 @@ class TestEmptyResearchBriefError:
     def test_build_research_brief_raises_when_searches_empty(self) -> None:
         from src.agent_sdk._shared import EmptyResearchBriefError, build_research_brief
 
-        with patch("src.agent_sdk._shared._run_web_searches", return_value=""):
-            with pytest.raises(EmptyResearchBriefError, match="SERPER_API_KEY"):
-                build_research_brief("AI Testing")
+        with (
+            patch("src.agent_sdk._shared._run_web_searches", return_value=""),
+            pytest.raises(EmptyResearchBriefError, match="SERPER_API_KEY"),
+        ):
+            build_research_brief("AI Testing")
 
     def test_build_research_brief_raises_when_searches_return_whitespace_only(
         self,
@@ -40,9 +41,11 @@ class TestEmptyResearchBriefError:
         """Whitespace-only result must be treated the same as empty — no sources."""
         from src.agent_sdk._shared import EmptyResearchBriefError, build_research_brief
 
-        with patch("src.agent_sdk._shared._run_web_searches", return_value="\n  \n"):
-            with pytest.raises(EmptyResearchBriefError):
-                build_research_brief("AI Testing")
+        with (
+            patch("src.agent_sdk._shared._run_web_searches", return_value="\n  \n"),
+            pytest.raises(EmptyResearchBriefError),
+        ):
+            build_research_brief("AI Testing")
 
     def test_build_research_brief_does_not_raise_when_searches_return_content(
         self,
@@ -62,9 +65,11 @@ class TestEmptyResearchBriefError:
         from src.agent_sdk._shared import EmptyResearchBriefError
         from src.agent_sdk.stage3_runner import run_stage3_spike
 
-        with patch("src.agent_sdk._shared._run_web_searches", return_value=""):
-            with pytest.raises(EmptyResearchBriefError):
-                asyncio.run(run_stage3_spike("AI Testing"))
+        with (
+            patch("src.agent_sdk._shared._run_web_searches", return_value=""),
+            pytest.raises(EmptyResearchBriefError),
+        ):
+            asyncio.run(run_stage3_spike("AI Testing"))
 
 
 # ── Integration: flow.py routing ─────────────────────────────────────────────

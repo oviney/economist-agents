@@ -30,12 +30,12 @@ import logging
 import os
 import pathlib
 import re
-import yaml as _yaml
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 import orjson
+import yaml as _yaml
 
 from scripts.article_evaluator import ArticleEvaluator
 from scripts.frontmatter_schema import FrontmatterSchema

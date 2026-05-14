@@ -359,11 +359,13 @@ def _crewai_imports_in(directory: Path, pattern: str = "*.py") -> list[str]:
                         violations.append(
                             f"{py_file.relative_to(directory.parent)}:{node.lineno}"
                         )
-            elif isinstance(node, ast.ImportFrom):
-                if (node.module or "").split(".")[0] == "crewai":
-                    violations.append(
-                        f"{py_file.relative_to(directory.parent)}:{node.lineno}"
-                    )
+            elif (
+                isinstance(node, ast.ImportFrom)
+                and (node.module or "").split(".")[0] == "crewai"
+            ):
+                violations.append(
+                    f"{py_file.relative_to(directory.parent)}:{node.lineno}"
+                )
     return violations
 
 

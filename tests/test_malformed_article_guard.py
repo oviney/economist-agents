@@ -14,7 +14,6 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-
 # ── Unit: stage3_runner ───────────────────────────────────────────────────────
 
 
@@ -40,9 +39,9 @@ class TestMalformedArticleError:
                 "src.agent_sdk.stage3_runner._collect_text",
                 new=AsyncMock(return_value=(prose, 0.01)),
             ),
+            pytest.raises(MalformedArticleError),
         ):
-            with pytest.raises(MalformedArticleError):
-                asyncio.run(run_stage3_spike("AI Testing"))
+            asyncio.run(run_stage3_spike("AI Testing"))
 
     def test_run_stage3_spike_raises_on_empty_body(self) -> None:
         """Frontmatter with no body is also malformed."""
@@ -58,9 +57,9 @@ class TestMalformedArticleError:
                 "src.agent_sdk.stage3_runner._collect_text",
                 new=AsyncMock(return_value=(no_body, 0.01)),
             ),
+            pytest.raises(MalformedArticleError),
         ):
-            with pytest.raises(MalformedArticleError):
-                asyncio.run(run_stage3_spike("AI Testing"))
+            asyncio.run(run_stage3_spike("AI Testing"))
 
     def test_run_stage3_spike_does_not_raise_on_valid_article(self) -> None:
         """Well-formed frontmatter + body must not raise."""

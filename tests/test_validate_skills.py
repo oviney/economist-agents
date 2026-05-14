@@ -9,8 +9,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from scripts.validate_skills import (
     MIN_SECTION_COUNT,
     discover_skill_files,

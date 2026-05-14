@@ -37,6 +37,9 @@ from claude_agent_sdk import (
 )
 
 from src.agent_sdk._shared import (
+    _ALLOWED_MODELS as _ALLOWED_MODELS,
+)
+from src.agent_sdk._shared import (
     GRAPHICS_AGENT_PROMPT,
     build_research_brief,
 )
@@ -49,9 +52,6 @@ logger = logging.getLogger(__name__)
 
 class MalformedArticleError(ValueError):
     """Raised when the writer agent returns output that is not a well-formed article."""
-
-
-from src.agent_sdk._shared import _ALLOWED_MODELS as _ALLOWED_MODELS
 
 
 def _validated_model(env_var: str, default: str) -> str:

@@ -566,7 +566,10 @@ class TestVisionRefinement:
 
         with (
             patch("anthropic.AsyncAnthropic") as mock_async_class,
-            patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key", "VISION_MODEL": "claude-haiku-4-5"}),
+            patch.dict(
+                os.environ,
+                {"ANTHROPIC_API_KEY": "test-key", "VISION_MODEL": "claude-haiku-4-5"},
+            ),
         ):
             mock_async_class.return_value.messages.create = mock_create
             asyncio.run(
@@ -579,7 +582,9 @@ class TestVisionRefinement:
 
         assert mock_create.call_args.kwargs["model"] == "claude-haiku-4-5"
 
-    def test_vision_model_defaults_to_claude_sonnet_when_env_unset(self, tmp_path: Path) -> None:
+    def test_vision_model_defaults_to_claude_sonnet_when_env_unset(
+        self, tmp_path: Path
+    ) -> None:
         """When VISION_MODEL is not set, model must default to claude-sonnet-4-6."""
         import asyncio
         import os
@@ -863,8 +868,9 @@ class TestKickoffResultFile:
         monkeypatch,
     ) -> None:
         """Result file must be written even when quality_gate routes to revision."""
-        import src.economist_agents.flow as flow_module
         import orjson
+
+        import src.economist_agents.flow as flow_module
 
         result_path = tmp_path / "pipeline_result.json"
         monkeypatch.setattr(flow_module, "PIPELINE_RESULT_PATH", result_path)
@@ -872,19 +878,21 @@ class TestKickoffResultFile:
         mock_scout.return_value = [{"topic": "AI Testing", "total_score": 25}]
         mock_board.return_value = {
             "top_pick": {
-                "topic": "AI Testing", "weighted_score": 8.0,
+                "topic": "AI Testing",
+                "weighted_score": 8.0,
                 "original_topic": {"hook": "", "thesis": ""},
             },
-            "consensus": True, "dissenting_views": [],
+            "consensus": True,
+            "dissenting_views": [],
         }
         # Return a failing result so quality_gate routes to revision
         failing = _passing_pipeline_result()
         failing.editorial_score = 40
         failing.publication_validator_passed = False
         mock_asyncio_run.side_effect = [
-            failing,                                            # run_pipeline (generate)
-            {"image_alt": "alt", "image_caption": "cap"},      # refine_image_metadata
-            failing,                                            # run_pipeline (revision)
+            failing,  # run_pipeline (generate)
+            {"image_alt": "alt", "image_caption": "cap"},  # refine_image_metadata
+            failing,  # run_pipeline (revision)
         ]
         flow = EconomistContentFlow()
         flow._deduplicator = Mock()
@@ -893,7 +901,9 @@ class TestKickoffResultFile:
 
         flow.kickoff()
 
-        assert result_path.exists(), "pipeline_result.json must be written on revision path"
+        assert result_path.exists(), (
+            "pipeline_result.json must be written on revision path"
+        )
         data = orjson.loads(result_path.read_bytes())
         assert "status" in data
         assert "editorial_score" in data
@@ -923,10 +933,12 @@ class TestKickoffResultFile:
         mock_scout.return_value = [{"topic": "AI Testing", "total_score": 25}]
         mock_board.return_value = {
             "top_pick": {
-                "topic": "AI Testing", "weighted_score": 8.0,
+                "topic": "AI Testing",
+                "weighted_score": 8.0,
                 "original_topic": {"hook": "", "thesis": ""},
             },
-            "consensus": True, "dissenting_views": [],
+            "consensus": True,
+            "dissenting_views": [],
         }
         mock_asyncio_run.side_effect = [
             _passing_pipeline_result(),
@@ -937,7 +949,11 @@ class TestKickoffResultFile:
         flow._deduplicator.filter_topics.side_effect = lambda t: (t, [])
         flow._deduplicator.index_article = Mock()
 
-        with patch.object(result_path.__class__, "write_bytes", side_effect=PermissionError("read-only")):
+        with patch.object(
+            result_path.__class__,
+            "write_bytes",
+            side_effect=PermissionError("read-only"),
+        ):
             result = flow.kickoff()
 
         assert result is not None

@@ -6,7 +6,7 @@ pattern instead of directly instantiating LLM clients.
 ADR-002 Context:
 - All LLM instantiation should go through AgentRegistry
 - Direct imports of openai, anthropic, or crewai are prohibited
-- Exceptions: agent_registry.py, llm_client.py, crewai_agents.py
+- Exceptions: agent_registry.py, llm_client.py (crewai_agents.py archived in #327)
 
 Target: 100% compliance across scripts/
 """
@@ -30,18 +30,9 @@ sys.path.insert(0, str(SCRIPTS_DIR))
 ALLOWED_FILES = {
     "agent_registry.py",  # Factory for LLM instantiation
     "llm_client.py",  # Unified LLM client wrapper
-    "crewai_agents.py",  # Legacy adapter (to be deprecated)
-    "run_story2_crew.py",
-    "run_story7_crew.py",
-    "run_story10_crew.py",
-    "run_story11_crew.py",  # CrewAI workflow execution script (uses AgentFactory for agents)
-    # TEST FILES: Need direct CrewAI access for testing agent functionality
-    "test_full_workflow_streamlined.py",  # Test complete TDD workflow
-    "test_git_operations_direct.py",  # Test git operations with minimal setup
-    "test_simple_git_workflow.py",  # Test simple git workflow without embeddings
+    # crewai_agents.py and visual_qa.py archived in #327 T3
     # TECHNICAL DEBT: Legacy files predating ADR-002 (to be refactored)
     "featured_image_agent.py",  # TODO: Refactor to use AgentRegistry (Story 10)
-    "visual_qa.py",  # TODO: Refactor to use AgentRegistry (Story 10)
 }
 
 # LLM libraries that should not be imported directly
@@ -163,7 +154,7 @@ def test_no_direct_llm_imports_in_scripts():
     Architecture Rule:
     - All LLM instantiation must go through AgentRegistry
     - Direct imports of openai, anthropic, crewai are prohibited
-    - Exceptions: agent_registry.py, llm_client.py, crewai_agents.py
+    - Exceptions: agent_registry.py, llm_client.py (crewai_agents.py archived in #327)
 
     Why:
     - Prevents agent sprawl and coupling
@@ -272,7 +263,7 @@ from crewai import Agent, Task
     [
         ("agent_registry.py", True),
         ("llm_client.py", True),
-        ("crewai_agents.py", True),
+        ("crewai_agents.py", False),  # archived in #327 T3
         ("economist_agent.py", False),
         ("topic_scout.py", False),
         ("editorial_board.py", False),
@@ -365,10 +356,16 @@ def _crewai_imports_in(directory: Path, pattern: str = "*.py") -> list[str]:
             if isinstance(node, ast.Import):
                 for alias in node.names:
                     if alias.name.split(".")[0] == "crewai":
-                        violations.append(f"{py_file.relative_to(directory.parent)}:{node.lineno}")
-            elif isinstance(node, ast.ImportFrom):
-                if (node.module or "").split(".")[0] == "crewai":
-                    violations.append(f"{py_file.relative_to(directory.parent)}:{node.lineno}")
+                        violations.append(
+                            f"{py_file.relative_to(directory.parent)}:{node.lineno}"
+                        )
+            elif (
+                isinstance(node, ast.ImportFrom)
+                and (node.module or "").split(".")[0] == "crewai"
+            ):
+                violations.append(
+                    f"{py_file.relative_to(directory.parent)}:{node.lineno}"
+                )
     return violations
 
 

@@ -30,12 +30,12 @@ import logging
 import os
 import pathlib
 import re
-import yaml as _yaml
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 import orjson
+import yaml as _yaml
 
 from scripts.article_evaluator import ArticleEvaluator
 from scripts.frontmatter_schema import FrontmatterSchema
@@ -217,7 +217,9 @@ class EconomistContentFlow:
         try:
             result = asyncio.run(run_pipeline(topic))
         except MalformedArticleError as exc:
-            logger.warning("Writer returned malformed output — routing to revision: %s", exc)
+            logger.warning(
+                "Writer returned malformed output — routing to revision: %s", exc
+            )
             self.state["revision_reason"] = str(exc)
             self.state["revision_feedback"] = [
                 "Writer returned malformed output with no YAML frontmatter. "
@@ -228,7 +230,9 @@ class EconomistContentFlow:
                 "Writer returned malformed output — see logs for details.",
             )
         except EmptyResearchBriefError as exc:
-            logger.warning("Web searches returned no results — routing to revision: %s", exc)
+            logger.warning(
+                "Web searches returned no results — routing to revision: %s", exc
+            )
             self.state["revision_reason"] = str(exc)
             self.state["revision_feedback"] = [
                 "Web searches returned no results — check SERPER_API_KEY and retry."

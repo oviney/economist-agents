@@ -14,7 +14,6 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-
 # ── Unit: stage3_runner ───────────────────────────────────────────────────────
 
 
@@ -32,13 +31,17 @@ class TestMalformedArticleError:
 
         prose = "I apologise, but I cannot write that article at this time."
 
-        with patch("src.agent_sdk.stage3_runner.build_research_brief", return_value="brief"), \
-             patch(
-                 "src.agent_sdk.stage3_runner._collect_text",
-                 new=AsyncMock(return_value=(prose, 0.01)),
-             ):
-            with pytest.raises(MalformedArticleError):
-                asyncio.run(run_stage3_spike("AI Testing"))
+        with (
+            patch(
+                "src.agent_sdk.stage3_runner.build_research_brief", return_value="brief"
+            ),
+            patch(
+                "src.agent_sdk.stage3_runner._collect_text",
+                new=AsyncMock(return_value=(prose, 0.01)),
+            ),
+            pytest.raises(MalformedArticleError),
+        ):
+            asyncio.run(run_stage3_spike("AI Testing"))
 
     def test_run_stage3_spike_raises_on_empty_body(self) -> None:
         """Frontmatter with no body is also malformed."""
@@ -46,34 +49,44 @@ class TestMalformedArticleError:
 
         no_body = "---\nlayout: post\ntitle: Test\n---\n"
 
-        with patch("src.agent_sdk.stage3_runner.build_research_brief", return_value="brief"), \
-             patch(
-                 "src.agent_sdk.stage3_runner._collect_text",
-                 new=AsyncMock(return_value=(no_body, 0.01)),
-             ):
-            with pytest.raises(MalformedArticleError):
-                asyncio.run(run_stage3_spike("AI Testing"))
+        with (
+            patch(
+                "src.agent_sdk.stage3_runner.build_research_brief", return_value="brief"
+            ),
+            patch(
+                "src.agent_sdk.stage3_runner._collect_text",
+                new=AsyncMock(return_value=(no_body, 0.01)),
+            ),
+            pytest.raises(MalformedArticleError),
+        ):
+            asyncio.run(run_stage3_spike("AI Testing"))
 
     def test_run_stage3_spike_does_not_raise_on_valid_article(self) -> None:
         """Well-formed frontmatter + body must not raise."""
         from src.agent_sdk.stage3_runner import run_stage3_spike
 
         valid = (
-            "---\nlayout: post\ntitle: \"Test\"\ndate: 2026-01-01\n"
-            "author: \"Ouray Viney\"\ncategories: [\"Quality Engineering\"]\n"
-            "description: \"A test.\"\nimage: /assets/images/test.png\n"
-            "image_alt: \"alt\"\nimage_caption: \"cap\"\n---\n\n"
+            '---\nlayout: post\ntitle: "Test"\ndate: 2026-01-01\n'
+            'author: "Ouray Viney"\ncategories: ["Quality Engineering"]\n'
+            'description: "A test."\nimage: /assets/images/test.png\n'
+            'image_alt: "alt"\nimage_caption: "cap"\n---\n\n'
             + " ".join(["word"] * 900)
-            + "\n\n## References\n\n1. Gartner, [\"Report\"](https://example.com), 2024\n"
-            "2. Forrester, [\"Report\"](https://example.com), 2024\n"
-            "3. IEEE, [\"Report\"](https://example.com), 2024\n"
+            + '\n\n## References\n\n1. Gartner, ["Report"](https://example.com), 2024\n'
+            '2. Forrester, ["Report"](https://example.com), 2024\n'
+            '3. IEEE, ["Report"](https://example.com), 2024\n'
         )
 
-        with patch("src.agent_sdk.stage3_runner.build_research_brief", return_value="brief"), \
-             patch(
-                 "src.agent_sdk.stage3_runner._collect_text",
-                 new=AsyncMock(side_effect=[(valid, 0.01), ('{"title":"Chart","data":[]}', 0.005)]),
-             ):
+        with (
+            patch(
+                "src.agent_sdk.stage3_runner.build_research_brief", return_value="brief"
+            ),
+            patch(
+                "src.agent_sdk.stage3_runner._collect_text",
+                new=AsyncMock(
+                    side_effect=[(valid, 0.01), ('{"title":"Chart","data":[]}', 0.005)]
+                ),
+            ),
+        ):
             result = asyncio.run(run_stage3_spike("AI Testing"))
             assert result.article.startswith("---")
 
@@ -118,7 +131,6 @@ class TestGenerateContentMalformedRouting:
 
         decision = flow.quality_gate(draft)
         assert decision == "revision"
-
 
     def test_request_revision_returns_needs_revision_on_malformed_output(self) -> None:
         """MalformedArticleError in the retry path must also be handled gracefully."""

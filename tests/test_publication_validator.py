@@ -607,6 +607,7 @@ class TestProductionEscapes319:
 # T1 — Check 17: slug consistency
 # ═══════════════════════════════════════════════════════════════════════════
 
+
 def _make_article_with_slug(slug_field: str) -> str:
     """Build an article that includes an explicit front-matter slug: field."""
     fm = (
@@ -633,7 +634,9 @@ class TestSlugConsistency:
         _, issues = validator.validate(
             article, "2026-04-03-specific-descriptive-title-for-testing.md"
         )
-        slug_issues = [i for i in issues if i["check"] in ("slug_date_mismatch", "slug_drift")]
+        slug_issues = [
+            i for i in issues if i["check"] in ("slug_date_mismatch", "slug_drift")
+        ]
         assert slug_issues == []
 
     def test_critical_when_filename_date_mismatches_frontmatter(self) -> None:
@@ -674,7 +677,9 @@ class TestSlugConsistency:
         validator = PublicationValidator(expected_date="2026-04-03")
         article = _make_article()
         _, issues = validator.validate(article)
-        slug_issues = [i for i in issues if i["check"] in ("slug_date_mismatch", "slug_drift")]
+        slug_issues = [
+            i for i in issues if i["check"] in ("slug_date_mismatch", "slug_drift")
+        ]
         assert slug_issues == []
 
     def test_passes_when_filename_slug_is_prefix_of_title_slug(self) -> None:
@@ -702,7 +707,8 @@ class TestClaimAttribution:
         body = (
             " ".join(["word"] * 200)
             + " According to Gartner (2024), 73% of teams report faster delivery."
-            + " " + " ".join(["word"] * 600)
+            + " "
+            + " ".join(["word"] * 600)
         )
         article = _make_article(body=body)
         _, issues = validator.validate(article)
@@ -714,7 +720,8 @@ class TestClaimAttribution:
         body = (
             " ".join(["word"] * 200)
             + " Teams report a 73% improvement in delivery speed."
-            + " " + " ".join(["word"] * 600)
+            + " "
+            + " ".join(["word"] * 600)
         )
         article = _make_article(body=body)
         _, issues = validator.validate(article)
@@ -727,7 +734,8 @@ class TestClaimAttribution:
         body = (
             " ".join(["word"] * 200)
             + " Adoption rates reached 58% (Forrester, 2023) across the industry."
-            + " " + " ".join(["word"] * 600)
+            + " "
+            + " ".join(["word"] * 600)
         )
         article = _make_article(body=body)
         _, issues = validator.validate(article)
@@ -740,9 +748,9 @@ class TestClaimAttribution:
         body = " ".join(["word"] * 850)
         refs = (
             "## References\n\n"
-            "1. Gartner, [\"Report shows 45% growth\"](https://example.com), 2024\n"
-            "2. Forrester, [\"State of Test Automation\"](https://example.com), 2024\n"
-            "3. IEEE, [\"Software Testing Practices\"](https://example.com), 2024\n"
+            '1. Gartner, ["Report shows 45% growth"](https://example.com), 2024\n'
+            '2. Forrester, ["State of Test Automation"](https://example.com), 2024\n'
+            '3. IEEE, ["Software Testing Practices"](https://example.com), 2024\n'
         )
         article = _make_article(body=body, references=refs)
         _, issues = validator.validate(article)
@@ -763,9 +771,12 @@ class TestFrontmatterStatDrift:
         body = (
             " ".join(["word"] * 200)
             + " Studies show that 42% of teams benefit from this approach."
-            + " " + " ".join(["word"] * 600)
+            + " "
+            + " ".join(["word"] * 600)
         )
-        article = _make_article(description="Research finds 42% adoption rate", body=body)
+        article = _make_article(
+            description="Research finds 42% adoption rate", body=body
+        )
         _, issues = validator.validate(article)
         drift_issues = [i for i in issues if i["check"] == "frontmatter_stat_drift"]
         assert drift_issues == []
@@ -780,7 +791,9 @@ class TestFrontmatterStatDrift:
 
     def test_skipped_when_no_stat_in_description(self) -> None:
         validator = PublicationValidator(expected_date="2026-04-03")
-        article = _make_article(description="A concise test description for SEO purposes")
+        article = _make_article(
+            description="A concise test description for SEO purposes"
+        )
         _, issues = validator.validate(article)
         drift_issues = [i for i in issues if i["check"] == "frontmatter_stat_drift"]
         assert drift_issues == []
@@ -799,11 +812,16 @@ class TestInternalLinks:
         body = (
             " ".join(["word"] * 400)
             + " See [Gartner report](https://gartner.com/report) for details."
-            + " " + " ".join(["word"] * 400)
+            + " "
+            + " ".join(["word"] * 400)
         )
         article = _make_article(body=body)
         _, issues = validator.validate(article)
-        link_issues = [i for i in issues if i["check"] in ("malformed_internal_link", "broken_internal_link")]
+        link_issues = [
+            i
+            for i in issues
+            if i["check"] in ("malformed_internal_link", "broken_internal_link")
+        ]
         assert link_issues == []
 
     def test_passes_on_valid_internal_permalink(self) -> None:
@@ -811,7 +829,8 @@ class TestInternalLinks:
         body = (
             " ".join(["word"] * 400)
             + " See [previous article](/2026/01/18/quality-metrics-executives/) for context."
-            + " " + " ".join(["word"] * 400)
+            + " "
+            + " ".join(["word"] * 400)
         )
         article = _make_article(body=body)
         _, issues = validator.validate(article)
@@ -823,7 +842,8 @@ class TestInternalLinks:
         body = (
             " ".join(["word"] * 400)
             + " See [previous article](/posts/quality-metrics/) for context."
-            + " " + " ".join(["word"] * 400)
+            + " "
+            + " ".join(["word"] * 400)
         )
         article = _make_article(body=body)
         _, issues = validator.validate(article)
@@ -836,7 +856,8 @@ class TestInternalLinks:
         body = (
             " ".join(["word"] * 400)
             + " ![Chart](/assets/charts/my-chart.png)"
-            + " " + " ".join(["word"] * 400)
+            + " "
+            + " ".join(["word"] * 400)
         )
         article = _make_article(body=body)
         _, issues = validator.validate(article)
@@ -851,7 +872,8 @@ class TestInternalLinks:
         body = (
             " ".join(["word"] * 400)
             + " See [prior post](/2026/01/18/nonexistent-article/) for context."
-            + " " + " ".join(["word"] * 400)
+            + " "
+            + " ".join(["word"] * 400)
         )
         article = _make_article(body=body)
         _, issues = validator.validate(article)

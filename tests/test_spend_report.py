@@ -6,13 +6,11 @@ RED phase: written before implementation exists.
 from __future__ import annotations
 
 import json
-import textwrap
 from pathlib import Path
 
 import pytest
 
 from scripts.spend_report import (
-    SpendReport,
     aggregate,
     filter_since,
     load_log,

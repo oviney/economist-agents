@@ -956,7 +956,11 @@ class PublicationValidator:
             title = str(fm.get("title", ""))
             canonical = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")
 
-        if canonical and filename_slug != canonical and not canonical.startswith(filename_slug):
+        if (
+            canonical
+            and filename_slug != canonical
+            and not canonical.startswith(filename_slug)
+        ):
             self.issues.append(
                 {
                     "check": "slug_drift",
@@ -981,7 +985,11 @@ class PublicationValidator:
         else:
             body = content
 
-        for pattern in (r"\n## References\b", r"\n## Sources\b", r"\n## Bibliography\b"):
+        for pattern in (
+            r"\n## References\b",
+            r"\n## Sources\b",
+            r"\n## Bibliography\b",
+        ):
             ref_m = re.search(pattern, body, re.IGNORECASE)
             if ref_m:
                 body = body[: ref_m.start()]

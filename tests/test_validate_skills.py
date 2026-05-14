@@ -167,12 +167,8 @@ class TestMainExitCodes:
 
 def test_min_section_count_is_enforced(tmp_path: Path) -> None:
     """Exactly MIN_SECTION_COUNT-1 sections fails; MIN_SECTION_COUNT passes."""
-    under = "\n\n".join(
-        f"## S{i}\nFiller." for i in range(MIN_SECTION_COUNT - 1)
-    )
-    at_min = "\n\n".join(
-        f"## S{i}\nFiller." for i in range(MIN_SECTION_COUNT)
-    )
+    under = "\n\n".join(f"## S{i}\nFiller." for i in range(MIN_SECTION_COUNT - 1))
+    at_min = "\n\n".join(f"## S{i}\nFiller." for i in range(MIN_SECTION_COUNT))
     skill_under = _write_skill(tmp_path, "under", body=under)
     skill_at = _write_skill(tmp_path, "at-min", body=at_min)
     assert not validate_skill(skill_under).ok

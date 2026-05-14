@@ -1107,6 +1107,7 @@ CONTENT_QUEUE = [
 
 def main():
     import warnings
+
     warnings.warn(
         "scripts/economist_agent.py is deprecated. "
         "Use EconomistContentFlow from src.economist_agents.flow, "

@@ -20,12 +20,14 @@ class EmptyResearchBriefError(RuntimeError):
 
 
 _DEFAULT_VISION_MODEL = "claude-sonnet-4-6"
-_ALLOWED_MODELS: frozenset[str] = frozenset({
-    "claude-haiku-4-5",
-    "claude-sonnet-4-5",
-    "claude-sonnet-4-6",
-    "claude-opus-4-7",
-})
+_ALLOWED_MODELS: frozenset[str] = frozenset(
+    {
+        "claude-haiku-4-5",
+        "claude-sonnet-4-5",
+        "claude-sonnet-4-6",
+        "claude-opus-4-7",
+    }
+)
 
 
 # ─── Stage 3: research brief + stat audit ──────────────────────────────

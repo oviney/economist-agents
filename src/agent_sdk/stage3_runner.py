@@ -50,14 +50,19 @@ logger = logging.getLogger(__name__)
 class MalformedArticleError(ValueError):
     """Raised when the writer agent returns output that is not a well-formed article."""
 
+
 from src.agent_sdk._shared import _ALLOWED_MODELS as _ALLOWED_MODELS
+
 
 def _validated_model(env_var: str, default: str) -> str:
     value = os.environ.get(env_var, default)
     if value not in _ALLOWED_MODELS:
-        logger.warning("%s=%r is not in the allowlist — falling back to default", env_var, value)
+        logger.warning(
+            "%s=%r is not in the allowlist — falling back to default", env_var, value
+        )
         return default
     return value
+
 
 DEFAULT_WRITER_MODEL = _validated_model("WRITER_MODEL", "claude-sonnet-4-6")
 DEFAULT_GRAPHICS_MODEL = _validated_model("GRAPHICS_MODEL", "claude-sonnet-4-6")

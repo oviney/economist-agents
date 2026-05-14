@@ -241,7 +241,9 @@ class TestValidatedModel:
         from src.agent_sdk.stage3_runner import _validated_model
 
         monkeypatch.setenv("TEST_MODEL", "claude-sonnet-4-6")
-        assert _validated_model("TEST_MODEL", "claude-sonnet-4-6") == "claude-sonnet-4-6"
+        assert (
+            _validated_model("TEST_MODEL", "claude-sonnet-4-6") == "claude-sonnet-4-6"
+        )
 
     def test_invalid_model_falls_back_to_default(self, monkeypatch) -> None:
         from src.agent_sdk.stage3_runner import _validated_model
@@ -254,7 +256,9 @@ class TestValidatedModel:
         from src.agent_sdk.stage3_runner import _validated_model
 
         monkeypatch.delenv("TEST_MODEL", raising=False)
-        assert _validated_model("TEST_MODEL", "claude-sonnet-4-6") == "claude-sonnet-4-6"
+        assert (
+            _validated_model("TEST_MODEL", "claude-sonnet-4-6") == "claude-sonnet-4-6"
+        )
 
     def test_invalid_vision_model_falls_back(self, tmp_path, monkeypatch) -> None:
         """refine_image_metadata must use the default when VISION_MODEL is invalid."""
@@ -267,12 +271,16 @@ class TestValidatedModel:
         img = tmp_path / "test.png"
         img.write_bytes(b"PNG")
         mock_response = MagicMock()
-        mock_response.content = [MagicMock(text='{"image_alt": "a", "image_caption": "b"}')]
+        mock_response.content = [
+            MagicMock(text='{"image_alt": "a", "image_caption": "b"}')
+        ]
         mock_create = AsyncMock(return_value=mock_response)
 
         with (
             patch("anthropic.AsyncAnthropic") as mock_class,
-            patch.dict(os.environ, {"ANTHROPIC_API_KEY": "key", "VISION_MODEL": "gpt-4-turbo"}),
+            patch.dict(
+                os.environ, {"ANTHROPIC_API_KEY": "key", "VISION_MODEL": "gpt-4-turbo"}
+            ),
         ):
             mock_class.return_value.messages.create = mock_create
             asyncio.run(m.refine_image_metadata(str(img), "draft", "cap"))

@@ -3,7 +3,7 @@
 Verifies that:
 1. build_research_brief raises EmptyResearchBriefError when both web
    searches return nothing, preventing any LLM call on zero sourcing.
-2. run_stage3_spike propagates the error (does not swallow it).
+2. run_stage3 propagates the error (does not swallow it).
 3. EconomistContentFlow.generate_content and request_revision route it
    to revision rather than crashing or publishing fabricated content.
 """
@@ -60,16 +60,16 @@ class TestEmptyResearchBriefError:
 
         assert "Some result" in brief
 
-    def test_run_stage3_spike_propagates_empty_research_error(self) -> None:
-        """EmptyResearchBriefError must not be swallowed by run_stage3_spike."""
+    def test_run_stage3_propagates_empty_research_error(self) -> None:
+        """EmptyResearchBriefError must not be swallowed by run_stage3."""
         from src.agent_sdk._shared import EmptyResearchBriefError
-        from src.agent_sdk.stage3_runner import run_stage3_spike
+        from src.agent_sdk.stage3_runner import run_stage3
 
         with (
             patch("src.agent_sdk._shared._run_web_searches", return_value=""),
             pytest.raises(EmptyResearchBriefError),
         ):
-            asyncio.run(run_stage3_spike("AI Testing"))
+            asyncio.run(run_stage3("AI Testing"))
 
 
 # ── Integration: flow.py routing ─────────────────────────────────────────────

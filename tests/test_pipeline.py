@@ -55,7 +55,7 @@ class TestRunPipeline:
         stage3 = _fake_stage3()
 
         with (
-            patch("src.agent_sdk.pipeline.run_stage3_spike", return_value=stage3),
+            patch("src.agent_sdk.pipeline.run_stage3", return_value=stage3),
             patch(
                 "src.agent_sdk.pipeline.run_stage4",
                 return_value=_fake_stage4(stage3.article),
@@ -77,7 +77,7 @@ class TestRunPipeline:
         stage3 = _fake_stage3()
 
         with (
-            patch("src.agent_sdk.pipeline.run_stage3_spike", return_value=stage3),
+            patch("src.agent_sdk.pipeline.run_stage3", return_value=stage3),
             patch(
                 "src.agent_sdk.pipeline.run_stage4",
                 return_value=_fake_stage4(stage3.article),
@@ -102,7 +102,7 @@ class TestRunPipeline:
         stage3 = _fake_stage3()
 
         with (
-            patch("src.agent_sdk.pipeline.run_stage3_spike", return_value=stage3),
+            patch("src.agent_sdk.pipeline.run_stage3", return_value=stage3),
             patch(
                 "src.agent_sdk.pipeline.run_stage4",
                 return_value=_fake_stage4(stage3.article),
@@ -125,7 +125,7 @@ class TestRunPipeline:
         stage3 = _fake_stage3()
 
         with (
-            patch("src.agent_sdk.pipeline.run_stage3_spike", return_value=stage3),
+            patch("src.agent_sdk.pipeline.run_stage3", return_value=stage3),
             patch(
                 "src.agent_sdk.pipeline.run_stage4",
                 return_value=_fake_stage4(stage3.article),
@@ -162,7 +162,7 @@ class TestRoiTelemetryWiring:
 
         stage3 = _fake_stage3()
         with (
-            patch("src.agent_sdk.pipeline.run_stage3_spike", return_value=stage3),
+            patch("src.agent_sdk.pipeline.run_stage3", return_value=stage3),
             patch(
                 "src.agent_sdk.pipeline.run_stage4",
                 return_value=_fake_stage4(stage3.article),
@@ -198,7 +198,7 @@ class TestRoiTelemetryWiring:
 
         stage3 = _fake_stage3()
         with (
-            patch("src.agent_sdk.pipeline.run_stage3_spike", return_value=stage3),
+            patch("src.agent_sdk.pipeline.run_stage3", return_value=stage3),
             patch(
                 "src.agent_sdk.pipeline.run_stage4",
                 return_value=_fake_stage4(stage3.article),

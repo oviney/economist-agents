@@ -1,7 +1,7 @@
 """Prove-it tests for #323: malformed writer output guard.
 
 Verifies that:
-1. run_stage3_spike raises MalformedArticleError when the LLM returns prose
+1. run_stage3 raises MalformedArticleError when the LLM returns prose
    instead of a well-formed article (unit level).
 2. EconomistContentFlow.generate_content catches MalformedArticleError and
    returns a dict that quality_gate routes to revision (integration level).
@@ -25,9 +25,9 @@ class TestMalformedArticleError:
 
         assert issubclass(MalformedArticleError, ValueError)
 
-    def test_run_stage3_spike_raises_on_prose_output(self) -> None:
+    def test_run_stage3_raises_on_prose_output(self) -> None:
         """When the writer returns plain prose (no ---), raise MalformedArticleError."""
-        from src.agent_sdk.stage3_runner import MalformedArticleError, run_stage3_spike
+        from src.agent_sdk.stage3_runner import MalformedArticleError, run_stage3
 
         prose = "I apologise, but I cannot write that article at this time."
 
@@ -41,11 +41,11 @@ class TestMalformedArticleError:
             ),
             pytest.raises(MalformedArticleError),
         ):
-            asyncio.run(run_stage3_spike("AI Testing"))
+            asyncio.run(run_stage3("AI Testing"))
 
-    def test_run_stage3_spike_raises_on_empty_body(self) -> None:
+    def test_run_stage3_raises_on_empty_body(self) -> None:
         """Frontmatter with no body is also malformed."""
-        from src.agent_sdk.stage3_runner import MalformedArticleError, run_stage3_spike
+        from src.agent_sdk.stage3_runner import MalformedArticleError, run_stage3
 
         no_body = "---\nlayout: post\ntitle: Test\n---\n"
 
@@ -59,11 +59,11 @@ class TestMalformedArticleError:
             ),
             pytest.raises(MalformedArticleError),
         ):
-            asyncio.run(run_stage3_spike("AI Testing"))
+            asyncio.run(run_stage3("AI Testing"))
 
-    def test_run_stage3_spike_does_not_raise_on_valid_article(self) -> None:
+    def test_run_stage3_does_not_raise_on_valid_article(self) -> None:
         """Well-formed frontmatter + body must not raise."""
-        from src.agent_sdk.stage3_runner import run_stage3_spike
+        from src.agent_sdk.stage3_runner import run_stage3
 
         valid = (
             '---\nlayout: post\ntitle: "Test"\ndate: 2026-01-01\n'
@@ -87,7 +87,7 @@ class TestMalformedArticleError:
                 ),
             ),
         ):
-            result = asyncio.run(run_stage3_spike("AI Testing"))
+            result = asyncio.run(run_stage3("AI Testing"))
             assert result.article.startswith("---")
 
 

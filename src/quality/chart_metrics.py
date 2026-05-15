@@ -24,9 +24,9 @@ class ChartMetricsCollector:
 
     def __init__(self, metrics_file: str = None):
         if metrics_file is None:
-            # Default to skills directory
-            script_dir = Path(__file__).parent.parent
-            metrics_file = script_dir / "skills" / "chart_metrics.json"
+            # Repo root is three levels up: src/quality/chart_metrics.py -> repo root
+            repo_root = Path(__file__).resolve().parent.parent.parent
+            metrics_file = repo_root / "skills" / "chart_metrics.json"
 
         self.metrics_file = Path(metrics_file)
         self.metrics = self._load_metrics()

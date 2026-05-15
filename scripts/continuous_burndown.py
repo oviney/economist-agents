@@ -49,12 +49,12 @@ except ModuleNotFoundError:  # pragma: no cover - fallback for minimal envs
     orjson = _OrjsonCompat()
 
 try:
-    from scripts.backlog_groomer import BacklogGroomer
-    from scripts.ci_health_monitor import CIHealthMonitor
     from scripts.github_issue_claim import GitHubIssueClaimer
-    from scripts.migrate_backlog_to_github import BacklogParser
     from scripts.sprint_validator import SprintValidator
-    from scripts.validate_documentation_accuracy import DocumentationValidator
+    from src.backlog.backlog_groomer import BacklogGroomer
+    from src.backlog.ci_health_monitor import CIHealthMonitor
+    from src.backlog.migrate_backlog_to_github import BacklogParser
+    from src.backlog.validate_documentation_accuracy import DocumentationValidator
 except ModuleNotFoundError:  # pragma: no cover - direct script execution fallback
     from backlog_groomer import BacklogGroomer
     from ci_health_monitor import CIHealthMonitor

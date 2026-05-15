@@ -19,8 +19,8 @@ from pathlib import Path
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
-from agent_metrics import AgentMetrics
-from defect_tracker import DefectTracker
+from src.quality.agent_metrics import AgentMetrics
+from src.quality.defect_tracker import DefectTracker
 
 
 class QualityDashboard:

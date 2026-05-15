@@ -1,8 +1,8 @@
 # SPEC: Delete or archive dead files in scripts/ (issue #327)
 
-**Status**: APPROVED (staff engineer review applied 2026-05-10; amended 2026-05-12)
-**GitHub issue**: oviney/economist-agents#327
-**Date**: 2026-05-10 (amended 2026-05-12 — see [ADR-0010](docs/adr/0010-scripts-to-src-migration.md))
+**Status**: APPROVED (staff engineer review applied 2026-05-10; amended 2026-05-12; ADR-0010 implemented 2026-05-15 via #344)
+**GitHub issue**: oviney/economist-agents#327 (ADR-0010 follow-up: #344)
+**Date**: 2026-05-10 (amended 2026-05-12 — see [ADR-0010](docs/adr/0010-scripts-to-src-migration.md); 2026-05-15 — †-rows migrated to src/ via #344)
 
 ---
 
@@ -23,25 +23,19 @@ below.
 |---|---|
 | `ab_topic_scout_comparison.py` | 29 tests in test_ab_topic_scout_comparison.py ✱ |
 | `agent_loader.py` | tests/test_agent_loader.py |
-| `agent_metrics.py` | tests/test_quality_dashboard.py (4× `patch("agent_metrics.…")`) † |
 | `agent_registry.py` | imported by src/manager.py |
-| `agent_reviewer.py` | agents/writer_agent.py:31, agents/research_agent.py:25, tests/test_quality_system.py:19 † |
 | `agent_trace_logger.py` | tests/test_agent_trace_logger.py |
 | `architecture_audit.py` | 15 tests in test_architecture_audit.py ✱ |
 | `arxiv_search.py` | imported by mcp_servers/web_researcher_server.py |
 | `article_archive.py` | imported by mcp_servers/ |
 | `article_evaluator.py` | imported by src/economist_agents/flow.py |
 | `audit_composite_scores.py` | tests/test_audit_composite_scores.py |
-| `backlog_groomer.py` | scripts/continuous_burndown.py:52,59 † |
 | `blog_quality_audit.py` | called by blog-quality-audit.yml |
-| `chart_metrics.py` | agents/graphics_agent.py:31 † |
-| `ci_health_monitor.py` | scripts/continuous_burndown.py:53,60 † |
 | `citation_verifier.py` | tests/test_citation_verifier.py |
 | `content_intelligence.py` | tests/test_content_intelligence.py |
 | `context_manager.py` | 28 tests in test_context_manager.py ✱ |
 | `continuous_burndown.py` | 2 tests in test_continuous_burndown.py ✱ |
 | `defect_prevention_rules.py` | soft dep of publication_validator.py (try/except import) |
-| `defect_tracker.py` | tests/test_quality_dashboard.py (3× `patch("scripts.defect_tracker.…")`) † |
 | `deploy_to_blog.py` | tests/test_deploy_to_blog.py |
 | `destructive_change_guard.py` | called by ci.yml |
 | `economist_agent.py` | 34 tests in test_economist_agent.py ✱ (deprecated; warning in main()) |
@@ -53,12 +47,10 @@ below.
 | `ga4_etl.py` | tests/test_ga4_etl.py |
 | `generate_chart.py` | 29 tests in test_generate_chart.py ✱ |
 | `github_issue_claim.py` | tests/test_github_issue_claim.py |
-| `governance.py` | agents/writer_agent.py:32, agents/research_agent.py:26 † |
 | `google_search.py` | imported by mcp_servers/web_researcher_server.py |
 | `gsc_etl.py` | tests/test_gsc_etl.py |
 | `index_published_articles.py` | tests/test_index_published_articles.py |
 | `llm_client.py` | tests/test_llm_client.py; imported by agent_registry |
-| `migrate_backlog_to_github.py` | scripts/continuous_burndown.py:55,62 † |
 | `orchestrator_agent.py` | imported by mcp_servers/orchestrator_agent_server.py |
 | `po_agent.py` | tests/test_po_agent.py |
 | `pre_commit_arch_check.py` | tested by test_pre_commit_arch_check.py |
@@ -66,7 +58,6 @@ below.
 | `quality_dashboard.py` | tests/test_quality_dashboard.py |
 | `quality_metrics.py` | called by content-pipeline.yml |
 | `record_metrics.py` | called by content-pipeline.yml |
-| `schema_validator.py` | tests/test_quality_system.py:20; doc ref in mcp_servers/publication_validator_server.py † |
 | `skills_gap_analyzer.py` | tests/test_skills_gap_analyzer.py |
 | `skills_manager.py` | 7 tests in test_closed_loop_validation.py ✱ |
 | `sm_agent.py` | tests/test_sm_agent.py |
@@ -77,10 +68,7 @@ below.
 | `topic_scout.py` | tests/test_topic_scout.py |
 | `topic_scout_reproducibility.py` | tests/test_topic_scout_reproducibility.py |
 | `topic_trend_grounding.py` | tests/test_topic_trend_grounding.py |
-| `validate_closed_loop.py` | tests/test_closed_loop_validation.py (3× subprocess) † |
-| `validate_documentation_accuracy.py` | scripts/continuous_burndown.py:57,64 † |
 | `validate_skills.py` | called by quality-tests.yml |
-| `visual_qa_zones.py` | scripts/economist_agent.py:515 † |
 | `tools/github_project_tool.py` | used by agent skills |
 | `tools/__init__.py` | package |
 | `benchmarks/measure_sm_effectiveness.py` | called by nightly-eval.yml |
@@ -88,12 +76,36 @@ below.
 | `__init__.py` | package |
 
 ✱ = moved from ARCHIVE to KEEP by staff engineer review (archiving would break pytest)
-† = moved from ARCHIVE to KEEP after staff-engineer review on 2026-05-12;
-    live callers found in `agents/` (3 files), live tests (3 files), and
-    KEEP scripts `continuous_burndown.py` + `economist_agent.py`. All use
-    the bare-name import path enabled by the `scripts/` sys.path hack.
-    See [ADR-0010](docs/adr/0010-scripts-to-src-migration.md) for the
-    follow-up migration that will allow these to be properly archived.
+
+---
+
+### MIGRATED — moved to `src/` per [ADR-0010](docs/adr/0010-scripts-to-src-migration.md)
+
+The 12 entries previously marked `†` in the KEEP table were domain
+modules with live callers in `agents/`, live tests, and KEEP scripts.
+They could not be archived without breaking those callers, and the
+callers relied on the bare-name import path enabled by the `scripts/`
+`sys.path` hack. Issue #344 implemented ADR-0010 on 2026-05-15:
+
+| Old path | New path | Subpackage |
+|---|---|---|
+| `scripts/agent_reviewer.py` | `src/quality/agent_reviewer.py` | quality |
+| `scripts/agent_metrics.py` | `src/quality/agent_metrics.py` | quality |
+| `scripts/chart_metrics.py` | `src/quality/chart_metrics.py` | quality |
+| `scripts/defect_tracker.py` | `src/quality/defect_tracker.py` | quality |
+| `scripts/governance.py` | `src/quality/governance.py` | quality |
+| `scripts/schema_validator.py` | `src/quality/schema_validator.py` | quality |
+| `scripts/validate_closed_loop.py` | `src/quality/validate_closed_loop.py` | quality |
+| `scripts/visual_qa_zones.py` | `src/quality/visual_qa_zones.py` | quality |
+| `scripts/backlog_groomer.py` | `src/backlog/backlog_groomer.py` | backlog |
+| `scripts/ci_health_monitor.py` | `src/backlog/ci_health_monitor.py` | backlog |
+| `scripts/migrate_backlog_to_github.py` | `src/backlog/migrate_backlog_to_github.py` | backlog |
+| `scripts/validate_documentation_accuracy.py` | `src/backlog/validate_documentation_accuracy.py` | backlog |
+
+The `sys.path.insert(0, str(SCRIPTS_DIR))` hack at
+`tests/test_architecture_compliance.py:22` was removed as part of
+#344 after all callers were updated to use the new fully-qualified
+import paths.
 
 ---
 

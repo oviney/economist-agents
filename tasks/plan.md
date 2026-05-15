@@ -1,87 +1,104 @@
-# Plan: Delete or archive dead files in scripts/ (issue #327)
+# Plan: Migrate domain modules from scripts/ to src/ (issue #344)
 
 **Spec**: SPEC.md
-**Date**: 2026-05-10
+**ADR**: docs/adr/0010-scripts-to-src-migration.md
+**Date**: 2026-05-15
 
 ## Dependency graph
 
 ```
-T1 (DELETE 22 files) ──► T2 (fix ALLOWED_FILES in test_architecture_compliance.py)
-                               └──► T3 (ARCHIVE 44 files → scripts/archived/)
-                                          └──► T4 (grep AC4 + full pytest + close #327)
+T0 (create src/quality/, src/backlog/ packages)
+  │
+  ├──► T1..T8 (migrate Group A — 8 modules, one per slice)
+  │       ├── T1: agent_reviewer (callers: writer_agent, research_agent, test_quality_system)
+  │       ├── T2: governance (callers: writer_agent, research_agent, economist_agent)
+  │       ├── T3: chart_metrics (callers: graphics_agent, economist_agent)
+  │       ├── T4: schema_validator (callers: test_quality_system)
+  │       ├── T5: agent_metrics (callers: economist_agent, quality_dashboard, test_quality_dashboard mocks)
+  │       ├── T6: defect_tracker (callers: quality_dashboard, test_quality_dashboard mocks)
+  │       ├── T7: validate_closed_loop (callers: test_closed_loop_validation subprocess)
+  │       └── T8: visual_qa_zones (callers: economist_agent)
+  │
+  ├──► T9..T12 (migrate Group B — 4 modules, one per slice)
+  │       ├── T9:  backlog_groomer
+  │       ├── T10: ci_health_monitor
+  │       ├── T11: migrate_backlog_to_github
+  │       └── T12: validate_documentation_accuracy
+  │       (all four callers in scripts/continuous_burndown.py)
+  │
+  ├──► T13 (skills_manager: convert to fully-qualified imports)
+  │
+  ├──► T14 (remove sys.path hack from tests/test_architecture_compliance.py)
+  │
+  ├──► T15 (move 12 originals to scripts/archived/)
+  │
+  └──► T16 (update SPEC.md §2 - mark †-rows as MIGRATED; final verification)
 ```
 
-T1 and T2 are coupled — the ALLOWED_FILES cleanup is only meaningful after
-the run_story*.py files are deleted. T3 is independent of T1/T2 (no imports
-change) but is easiest to verify after T1/T2 are green. T4 is the final gate.
+Each task is one commit. Verification after every task:
+- `pytest tests/ -q` shows same pass/skip count as baseline
+- `ruff check --no-fix` and `ruff format --check` clean
 
----
+## Baseline
+
+Before starting, capture baseline test count: `pytest tests/ -q`.
+Expected: 1741 passed, 84 skipped (per worker brief).
 
 ## Tasks
 
-### T1 — Delete the 22 confirmed-dead files
+### T0 — Create empty src/quality/ and src/backlog/ packages
 
-```bash
-cd scripts && rm \
-  fix_story11_import.py fix_typo.py \
-  run_dev_crew.py run_dev_sprint_crew.py run_meta_sprint.py \
-  run_story2_crew.py run_story7_crew.py run_story10_crew.py \
-  run_story10_fix.py run_story11_crew.py \
-  spike_crewai_baseline.py \
-  test_agent_integration.py test_dev_crew_workflow.py \
-  test_full_workflow_streamlined.py test_gap_analyzer.py \
-  test_git_operations_direct.py test_hybrid_approach_validation.py \
-  test_metrics.py test_real_debug_story.py test_setup.py \
-  test_simple_git_workflow.py test_sprint_15_orchestration.py
-```
+- Create `src/quality/__init__.py` (empty)
+- Create `src/backlog/__init__.py` (empty)
+- Verify: `pytest tests/ -q` unchanged
 
-DoD:
-- `ls scripts/run_story*.py scripts/spike_*.py scripts/test_*.py` → all missing
-- `pytest tests/ -q` → same count as before T1
+### T1..T8 — Group A migrations (one module per commit)
 
----
+For each module M (in T1..T8):
+1. `git mv scripts/M.py src/quality/M.py`
+2. Update bare-name imports in all callers to `from src.quality.M import …`
+3. Run `pytest tests/ -q` — must show baseline count
+4. Run ruff — must be clean
+5. Commit: `refactor: migrate scripts/M.py to src/quality/M.py (#344)`
 
-### T2 — Remove stale entries from ALLOWED_FILES in test_architecture_compliance.py
+### T9..T12 — Group B migrations (one module per commit)
 
-`tests/test_architecture_compliance.py` has an `ALLOWED_FILES` set listing
-scripts permitted to import LLM libraries directly. Four deleted files are
-in that set:
-- `run_story2_crew.py`
-- `run_story7_crew.py`
-- `run_story10_crew.py`
-- `run_story11_crew.py`
+For each module M (in T9..T12):
+1. `git mv scripts/M.py src/backlog/M.py`
+2. Update `scripts/continuous_burndown.py` to `from src.backlog.M import …`
+3. Run tests + ruff
+4. Commit: `refactor: migrate scripts/M.py to src/backlog/M.py (#344)`
 
-Remove those four entries. No other change to the file.
+### T13 — Convert skills_manager bare imports to fully-qualified
 
-DoD:
-- `grep "run_story" tests/test_architecture_compliance.py` → 0 lines
-- `pytest tests/test_architecture_compliance.py -v` → all pass
+Files: `tests/test_quality_system.py`, `tests/test_closed_loop_validation.py`.
+Change `from skills_manager import SkillsManager`
+to `from scripts.skills_manager import SkillsManager`.
 
----
+Verify pytest unchanged, commit.
 
-### T3 — Move 44 ARCHIVE files to scripts/archived/
+### T14 — Remove sys.path hack
 
-Create `scripts/archived/` if it doesn't exist (it already does — leave
-`scripts/archived/legacy_sync/` untouched).
+`tests/test_architecture_compliance.py:22`: remove
+`sys.path.insert(0, str(SCRIPTS_DIR))`. Keep `import sys` only if still
+used; otherwise remove that too. Keep `SCRIPTS_DIR` (used for file scan).
 
-Move each of the 44 ARCHIVE files (see SPEC.md §2 ARCHIVE table).
-`templates/mission_template.py` → `scripts/archived/templates/mission_template.py`.
+Verify pytest unchanged, commit.
 
-No `src/` imports reference any ARCHIVE file (verified by AC4 grep in T4).
+### T15 — Move 12 originals to scripts/archived/
 
-DoD:
-- All 44 files present under `scripts/archived/`
-- None of the 44 remain in `scripts/`
-- `pytest tests/ -q` → same count
+Single commit: `git mv` all 12 to `scripts/archived/`. Run full test
+suite + ruff. Commit.
 
----
+### T16 — Update SPEC.md §2 and final verification
 
-### T4 — Final verification + close #327
+Update the 12 KEEP entries marked `†` in SPEC.md §2 — they now
+classify as MIGRATED rather than KEEP. Add a note at the top of §2
+linking to this issue's PR.
 
-1. AC4: `grep -rn "from scripts\." src/ | grep -v __pycache__`
-   — every match must be a KEEP file
-2. AC5: `pytest tests/test_architecture_compliance.py::TestNoCrewAIInSrcOrTests -v`
-   — both guard tests pass
-3. Full suite: `pytest tests/ -q` — count unchanged from pre-T1 baseline
-4. Commit all three batches (T1+T2 together, T3 separately)
-5. Close #327
+Final checks:
+- `pytest tests/ -q` shows baseline count
+- `ruff check --no-fix && ruff format --check` clean
+- `grep -rEn '^(from|import) (agent_reviewer|governance|chart_metrics|schema_validator|agent_metrics|defect_tracker|validate_closed_loop|backlog_groomer|ci_health_monitor|migrate_backlog_to_github|validate_documentation_accuracy|visual_qa_zones)\b' agents/ src/ tests/ mcp_servers/` returns ZERO results
+
+Commit and open PR.

@@ -1,10 +1,23 @@
 # ADR-0010: Migrate domain modules from scripts/ to src/
 
-**Status:** Proposed
-**Date:** 2026-05-12
+**Status:** Implemented (2026-05-15 via PR #357 / issue #344)
+**Date:** 2026-05-12 (implementation 2026-05-15)
 **Decision Maker:** Staff engineer (review on #327)
 **Supersedes:** —
 **Superseded by:** —
+
+## Implementation note (2026-05-15)
+
+This ADR proposed `src/economist_agents/quality/` as the destination subpackage. The actual implementation in #344 chose a **flat** layout under `src/` instead:
+
+| Subpackage | Modules |
+|---|---|
+| `src/quality/` | `agent_reviewer`, `agent_metrics`, `chart_metrics`, `defect_tracker`, `governance`, `schema_validator`, `validate_closed_loop`, `visual_qa_zones` (8 modules) |
+| `src/backlog/` | `backlog_groomer`, `ci_health_monitor`, `migrate_backlog_to_github`, `validate_documentation_accuracy` (4 modules) |
+
+**Rationale for the divergence:** the existing top-level `src/` already contains sibling packages at this depth — `src/agent_sdk/`, `src/economist_agents/`, `src/telemetry/`, `src/tools/`, `src/utils/`. Nesting the new packages under `src/economist_agents/` would have been inconsistent with that convention and would have produced unnecessarily long import paths (`from src.economist_agents.quality.governance import GovernanceTracker` vs. `from src.quality.governance import GovernanceTracker`). The flat layout matches the codebase's revealed preference.
+
+The `sys.path.insert(0, str(SCRIPTS_DIR))` hack at `tests/test_architecture_compliance.py:22` has been removed; all callers in `agents/`, `tests/`, and the KEEP scripts (`continuous_burndown.py`, `economist_agent.py`, `quality_dashboard.py`) now use fully-qualified `from src.quality.X import Y` / `from src.backlog.X import Y` imports.
 
 ## Context
 

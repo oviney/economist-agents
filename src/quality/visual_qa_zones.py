@@ -25,7 +25,7 @@ Zone Layout (from CHART_DESIGN_SPEC.md):
 ```
 
 Usage:
-    from visual_qa_zones import ZoneBoundaryValidator
+    from src.quality.visual_qa_zones import ZoneBoundaryValidator
 
     validator = ZoneBoundaryValidator()
     is_valid, issues = validator.validate_chart('output/chart.png')

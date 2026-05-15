@@ -59,7 +59,10 @@ class TestDashboardMetricsAccuracy:
         metrics_file.write_text(json.dumps(test_data))
 
         # Mock the metrics file location
-        with patch("agent_metrics.AgentMetrics._load_metrics", return_value=test_data):
+        with patch(
+            "src.quality.agent_metrics.AgentMetrics._load_metrics",
+            return_value=test_data,
+        ):
             dashboard = QualityDashboard()
             summary = dashboard._build_agent_summary()
 
@@ -90,7 +93,10 @@ class TestDashboardMetricsAccuracy:
         test_data = {"runs": []}
         metrics_file.write_text(json.dumps(test_data))
 
-        with patch("agent_metrics.AgentMetrics._load_metrics", return_value=test_data):
+        with patch(
+            "src.quality.agent_metrics.AgentMetrics._load_metrics",
+            return_value=test_data,
+        ):
             dashboard = QualityDashboard()
             summary = dashboard._build_agent_summary()
 
@@ -111,7 +117,10 @@ class TestDashboardMetricsAccuracy:
         # Empty data
         test_data = {"runs": []}
 
-        with patch("agent_metrics.AgentMetrics._load_metrics", return_value=test_data):
+        with patch(
+            "src.quality.agent_metrics.AgentMetrics._load_metrics",
+            return_value=test_data,
+        ):
             dashboard = QualityDashboard()
             summary = dashboard._build_agent_summary()
 
@@ -227,7 +236,7 @@ class TestQualityScoreCalculation:
         }
 
         with patch(
-            "scripts.defect_tracker.DefectTracker.get_metrics",
+            "src.quality.defect_tracker.DefectTracker.get_metrics",
             return_value=mock_defects,
         ):
             dashboard = QualityDashboard()
@@ -260,7 +269,7 @@ class TestQualityScoreCalculation:
         }
 
         with patch(
-            "scripts.defect_tracker.DefectTracker.get_metrics",
+            "src.quality.defect_tracker.DefectTracker.get_metrics",
             return_value=mock_defects,
         ):
             dashboard = QualityDashboard()
@@ -292,13 +301,15 @@ class TestDashboardGeneration:
         # Mock minimal data
         with (
             patch(
-                "agent_metrics.AgentMetrics._load_metrics",
+                "src.quality.agent_metrics.AgentMetrics._load_metrics",
                 return_value={"runs": []},
             ),
             patch(
-                "scripts.defect_tracker.DefectTracker.get_metrics",
+                "src.quality.defect_tracker.DefectTracker.get_metrics",
                 return_value={
-                    "summary": {"defect_escape_rate": 40.0, "total_bugs": 10},
+                    "defect_escape_rate": 40.0,
+                    "total_bugs": 10,
+                    "fixed_bugs": 0,
                 },
             ),
         ):

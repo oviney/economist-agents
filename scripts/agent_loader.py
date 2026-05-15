@@ -26,7 +26,11 @@ logger = logging.getLogger(__name__)
 AGENTS_DIR = Path(__file__).parent.parent / "agents"
 SCHEMA_PATH = AGENTS_DIR / "schema.json"
 
-# Map editorial board YAML filenames to BOARD_MEMBERS dict keys
+# Map editorial board YAML filenames to BOARD_MEMBERS dict keys.
+# The "performance_analyst" member is a deterministic, non-LLM persona whose
+# vote is computed from `scripts/content_intelligence.py` rather than from a
+# model call — it is still listed here so the loader returns its config in
+# the BOARD_MEMBERS dict and downstream code can identify it by slug.
 _BOARD_MEMBER_MAP: dict[str, str] = {
     "vp_engineering": "vp_engineering",
     "senior_qe_lead": "senior_qe_lead",
@@ -34,6 +38,7 @@ _BOARD_MEMBER_MAP: dict[str, str] = {
     "career_climber": "career_climber",
     "economist_editor": "economist_editor",
     "busy_reader": "busy_reader",
+    "performance_analyst": "performance_analyst",
 }
 
 

@@ -1,13 +1,14 @@
 """Comprehensive tests for scripts/editorial_board.py
 
-Tests the editorial board voting system with 6 persona agents,
+Tests the editorial board voting system with 7 persona agents
+(6 LLM-driven + the deterministic Performance Analyst added for #341),
 weighted aggregation, and consensus determination.
 
 Target Coverage: 80%+ (105/131 statements)
-Current Coverage: 0% → 80%+
 """
 
 import json
+import sqlite3
 import sys
 from pathlib import Path
 from unittest.mock import Mock, mock_open, patch
@@ -19,8 +20,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
 from editorial_board import (
     BOARD_MEMBERS,
+    PERFORMANCE_ANALYST_ID,
+    _score_topic_against_underperformers,
     format_board_report,
     get_board_vote,
+    get_performance_analyst_vote,
     main,
     run_editorial_board,
 )
@@ -265,16 +269,17 @@ class TestVoteCollection:
         sample_vote_response,
         capsys,
     ):
-        """Test collecting votes from all 6 board members."""
+        """Test collecting votes from all 7 board members (6 LLM + Performance Analyst)."""
         with patch("editorial_board.call_llm") as mock_call_llm:
-            # Each member returns the same vote structure
+            # Each LLM member returns the same vote structure. The
+            # Performance Analyst is deterministic and does not call the LLM.
             mock_call_llm.return_value = sample_vote_response
 
             result = run_editorial_board(mock_llm_client, sample_topics, parallel=False)
 
-            # Verify all 6 members voted
-            assert len(result["all_votes"]) == 6
-            assert result["board_size"] == 6
+            # Verify all 7 members voted (6 LLM + 1 Performance Analyst)
+            assert len(result["all_votes"]) == 7
+            assert result["board_size"] == 7
 
             # Verify each vote has required fields
             for vote_set in result["all_votes"]:
@@ -331,11 +336,18 @@ class TestVoteCollection:
 
             result = run_editorial_board(mock_llm_client, sample_topics, parallel=False)
 
-            # Should handle parse errors gracefully
-            assert len(result["all_votes"]) == 6
+            # Should handle parse errors gracefully — 6 LLM members produce
+            # error votes, the deterministic Performance Analyst still votes.
+            assert len(result["all_votes"]) == 7
 
-            # Each vote should have error field
-            for vote_set in result["all_votes"]:
+            # The 6 LLM-driven members should each have an error field.
+            llm_votes = [
+                v
+                for v in result["all_votes"]
+                if v["member_id"] != "performance_analyst"
+            ]
+            assert len(llm_votes) == 6
+            for vote_set in llm_votes:
                 assert "error" in vote_set
                 assert vote_set["error"] == "Failed to parse votes"
 
@@ -597,7 +609,7 @@ class TestIntegration:
 
             # Verify report structure
             assert "# Editorial Board Decision" in report
-            assert "**Board Size:** 6 members" in report
+            assert "**Board Size:** 7 members" in report
             assert "Final Rankings" in report
             assert "The Agentic AI Testing Paradox" in report
             assert "The Economics of Flaky Tests" in report
@@ -726,3 +738,260 @@ class TestMainFunction:
 
             # Verify GITHUB_OUTPUT was written (mocked, but call was made)
             assert True  # If we got here, no exceptions were raised
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# TEST PERFORMANCE ANALYST (#341)
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+@pytest.fixture
+def underperformer_db(tmp_path: Path) -> Path:
+    """Create a synthetic performance.db whose bottom performers carry
+    distinctive titles that the Performance Analyst can match against.
+    """
+    db_path = tmp_path / "performance.db"
+    conn = sqlite3.connect(db_path)
+    conn.execute(
+        """
+        CREATE TABLE article_performance (
+            page_path           TEXT,
+            page_title          TEXT,
+            pageviews           INTEGER,
+            engagement_rate     REAL,
+            avg_engagement_time REAL,
+            scroll_depth_rate   REAL,
+            composite_score     REAL,
+            fetched_at          TEXT
+        )
+        """,
+    )
+    rows = [
+        # An underperformer about flaky tests in CI/CD pipelines.
+        (
+            "/2025/11/01/flaky-tests-pipeline/",
+            "Flaky Tests Are Killing Your Pipeline Productivity",
+            500,
+            0.10,
+            30.0,
+            0.15,
+            0.080,
+            "2026-05-01",
+        ),
+        # An underperformer about observability dashboards.
+        (
+            "/2025/12/05/observability-dashboard-mistakes/",
+            "Observability Dashboard Mistakes That Cost Engineers Hours",
+            400,
+            0.12,
+            40.0,
+            0.18,
+            0.110,
+            "2026-05-01",
+        ),
+        # A strong performer (should not influence the analyst's penalty).
+        (
+            "/2026/02/10/economist-style-guide/",
+            "Writing Like The Economist",
+            800,
+            0.80,
+            220.0,
+            0.85,
+            0.880,
+            "2026-05-01",
+        ),
+    ]
+    conn.executemany(
+        "INSERT INTO article_performance VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        rows,
+    )
+    conn.commit()
+    conn.close()
+    return db_path
+
+
+class TestPerformanceAnalystSimilarity:
+    """Direct tests of the deterministic similarity scorer."""
+
+    def test_strong_overlap_yields_low_score(self) -> None:
+        """A topic sharing 2+ distinctive tokens with an underperformer
+        should receive the strong-match penalty score."""
+        from content_intelligence import ArticlePerformance
+
+        underperformers = [
+            ArticlePerformance(
+                page_path="/2025/11/01/flaky-tests-pipeline/",
+                page_title="Flaky Tests Are Killing Your Pipeline Productivity",
+                total_pageviews=500,
+                avg_engagement_rate=0.10,
+                avg_engagement_time=30.0,
+                avg_scroll_depth=0.15,
+                avg_composite_score=0.080,
+            ),
+        ]
+        topic = {
+            "topic": "Flaky tests in your pipeline",
+            "thesis": "Flaky tests cost real money",
+            "title_ideas": ["Killing Flaky Tests for Good"],
+        }
+        score, rationale = _score_topic_against_underperformers(
+            topic,
+            underperformers,
+        )
+        assert score <= 4, f"Expected strong-match penalty, got {score}"
+        assert "flaky" in rationale.lower() or "tests" in rationale.lower()
+
+    def test_no_overlap_yields_neutral_high_score(self) -> None:
+        """A topic with no shared distinctive tokens should not be penalised."""
+        from content_intelligence import ArticlePerformance
+
+        underperformers = [
+            ArticlePerformance(
+                page_path="/2025/11/01/flaky-tests-pipeline/",
+                page_title="Flaky Tests Are Killing Your Pipeline Productivity",
+                total_pageviews=500,
+                avg_engagement_rate=0.10,
+                avg_engagement_time=30.0,
+                avg_scroll_depth=0.15,
+                avg_composite_score=0.080,
+            ),
+        ]
+        topic = {
+            "topic": "Economics of database sharding",
+            "thesis": "Sharding has hidden coordination costs",
+            "title_ideas": ["The Sharding Tax"],
+        }
+        score, _rationale = _score_topic_against_underperformers(
+            topic,
+            underperformers,
+        )
+        assert score >= 7, f"Expected neutral score, got {score}"
+
+    def test_empty_underperformers_returns_no_data_score(self) -> None:
+        """When no performance data is available, abstain neutrally."""
+        topic = {"topic": "Anything", "thesis": "Anything"}
+        score, rationale = _score_topic_against_underperformers(topic, [])
+        # _PERF_SCORE_NO_DATA == 7
+        assert score == 7
+        assert "no" in rationale.lower() and "data" in rationale.lower()
+
+
+class TestPerformanceAnalystVote:
+    """End-to-end tests of the Performance Analyst vote function."""
+
+    def test_vote_shape_matches_llm_vote(self, underperformer_db: Path) -> None:
+        """The deterministic vote must match the dict shape produced by
+        :func:`get_board_vote` so the aggregator can consume it unchanged."""
+        topics = [
+            {"topic": "Test topic", "thesis": "Test thesis"},
+        ]
+        vote = get_performance_analyst_vote(
+            BOARD_MEMBERS[PERFORMANCE_ANALYST_ID],
+            topics,
+            db_path=underperformer_db,
+        )
+        assert vote["member_id"] == PERFORMANCE_ANALYST_ID
+        assert vote["member_name"] == "The Performance Analyst"
+        assert vote["weight"] == 1.0
+        assert len(vote["votes"]) == 1
+        assert "topic_index" in vote["votes"][0]
+        assert "score" in vote["votes"][0]
+        assert "rationale" in vote["votes"][0]
+        assert "top_pick" in vote
+        assert "top_pick_reason" in vote
+
+    def test_invalid_topics_raises(self) -> None:
+        with pytest.raises(ValueError, match="Invalid topics"):
+            get_performance_analyst_vote(
+                BOARD_MEMBERS[PERFORMANCE_ANALYST_ID],
+                [],
+            )
+
+
+class TestPenaltyPath:
+    """AC5: a proposal matching a low-performing topic should score lower
+    than an unrelated proposal."""
+
+    def test_matching_proposal_scores_lower_than_unrelated(
+        self,
+        mock_llm_client,
+        underperformer_db: Path,
+    ) -> None:
+        """The proposal whose title overlaps with a known underperformer
+        should end up with a strictly lower weighted score than an
+        unrelated proposal, all else being equal."""
+        topics = [
+            # Strong overlap with "Flaky Tests Are Killing Your Pipeline Productivity"
+            {
+                "topic": "Flaky tests in modern pipelines",
+                "thesis": "Flaky tests rot pipeline trust",
+                "title_ideas": ["The Flaky Pipeline Problem"],
+                "hook": "Flaky tests are everywhere",
+                "data_sources": ["Internal CI logs"],
+                "contrarian_angle": "Most teams accept flake as normal",
+            },
+            # Unrelated proposal — no overlap with any underperformer title.
+            {
+                "topic": "The economics of database sharding",
+                "thesis": "Sharding adds coordination overhead that often dwarfs the speedup",
+                "title_ideas": ["The Sharding Tax"],
+                "hook": "Sharding sounds cheap until it's not",
+                "data_sources": ["AWS pricing", "Internal benchmarks"],
+                "contrarian_angle": "Most teams shard too early",
+            },
+        ]
+
+        # Hold all LLM voters' scores equal so any ranking difference is
+        # attributable to the Performance Analyst's penalty.
+        equal_vote = json.dumps(
+            {
+                "votes": [
+                    {"topic_index": 1, "score": 7, "rationale": "Equal."},
+                    {"topic_index": 2, "score": 7, "rationale": "Equal."},
+                ],
+                "top_pick": 1,
+                "top_pick_reason": "Tied.",
+            },
+        )
+
+        with patch("editorial_board.call_llm") as mock_call_llm:
+            mock_call_llm.return_value = equal_vote
+            result = run_editorial_board(
+                mock_llm_client,
+                topics,
+                parallel=False,
+                db_path=underperformer_db,
+            )
+
+        # 6 LLM voters all rated both topics equal at 7. The Performance
+        # Analyst should penalise Topic 1 (flaky/pipeline overlap) and
+        # rate Topic 2 neutrally, so Topic 2 should rank higher.
+        rankings = result["rankings"]
+        assert len(rankings) == 2
+        topic1_score = next(
+            r["weighted_score"]
+            for r in rankings
+            if r["topic"] == "Flaky tests in modern pipelines"
+        )
+        topic2_score = next(
+            r["weighted_score"]
+            for r in rankings
+            if r["topic"] == "The economics of database sharding"
+        )
+        assert topic2_score > topic1_score, (
+            f"Penalty path failed: matching proposal scored {topic1_score} "
+            f"vs unrelated {topic2_score} (expected matching < unrelated)"
+        )
+
+        # And the Performance Analyst's own vote on Topic 1 should be the
+        # strong-match penalty score.
+        perf_vote = next(
+            v for v in result["all_votes"] if v["member_id"] == PERFORMANCE_ANALYST_ID
+        )
+        topic1_perf_score = next(
+            v["score"] for v in perf_vote["votes"] if v["topic_index"] == 1
+        )
+        topic2_perf_score = next(
+            v["score"] for v in perf_vote["votes"] if v["topic_index"] == 2
+        )
+        assert topic1_perf_score < topic2_perf_score

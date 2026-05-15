@@ -98,14 +98,15 @@ def test_load_agent_file_not_found() -> None:
 
 
 # ---------------------------------------------------------------------------
-# test_load_board_members_returns_all_six
+# test_load_board_members_returns_all_seven
 # ---------------------------------------------------------------------------
 
 
-def test_load_board_members_returns_all_six() -> None:
-    """load_board_members returns exactly 6 board member entries."""
+def test_load_board_members_returns_all_seven() -> None:
+    """load_board_members returns exactly 7 board member entries
+    (6 LLM personas + the Performance Analyst added for #341)."""
     members = load_board_members()
-    assert len(members) == 6
+    assert len(members) == 7
 
 
 # ---------------------------------------------------------------------------
@@ -123,6 +124,7 @@ def test_load_board_members_has_correct_keys() -> None:
         "career_climber",
         "economist_editor",
         "busy_reader",
+        "performance_analyst",
     }
     assert set(members.keys()) == expected_slugs
 

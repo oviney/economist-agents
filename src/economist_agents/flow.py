@@ -489,9 +489,7 @@ class EconomistContentFlow:
             "\n".join(revision_feedback) if revision_feedback else revision_reason
         )
 
-        logger.info(
-            "🔄 Revision attempt %d/%d", retry_count + 1, MAX_REVISIONS
-        )
+        logger.info("🔄 Revision attempt %d/%d", retry_count + 1, MAX_REVISIONS)
         logger.info("   Feedback: %s", feedback_text[:200])
 
         topic = self.state.get("selected_topic", {}).get("topic", "")
@@ -544,9 +542,7 @@ class EconomistContentFlow:
         }
 
         if editorial_score >= PUBLISH_THRESHOLD and validator_passed:
-            logger.info(
-                "   ✅ Revision succeeded (score: %s/100)", editorial_score
-            )
+            logger.info("   ✅ Revision succeeded (score: %s/100)", editorial_score)
             return {
                 "status": "published",
                 "article": edited_article,
@@ -656,15 +652,9 @@ def main() -> None:
         level=logging.INFO,
         format="%(asctime)s %(levelname)s %(name)s: %(message)s",
     )
-    logger.info(
-        "╔════════════════════════════════════════════════════════════════╗"
-    )
-    logger.info(
-        "║ ECONOMIST CONTENT FLOW - End-to-End Pipeline                  ║"
-    )
-    logger.info(
-        "╚════════════════════════════════════════════════════════════════╝"
-    )
+    logger.info("╔════════════════════════════════════════════════════════════════╗")
+    logger.info("║ ECONOMIST CONTENT FLOW - End-to-End Pipeline                  ║")
+    logger.info("╚════════════════════════════════════════════════════════════════╝")
 
     flow = EconomistContentFlow()
     try:

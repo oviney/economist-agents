@@ -41,7 +41,8 @@ class DocumentationValidator:
 
     def __init__(self, repo_root: Path = None):
         if repo_root is None:
-            repo_root = Path(__file__).parent.parent
+            # Repo root is three levels up: src/backlog/validate_documentation_accuracy.py -> repo root
+            repo_root = Path(__file__).resolve().parent.parent.parent
 
         self.repo_root = Path(repo_root)
         self.readme_path = self.repo_root / "README.md"

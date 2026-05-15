@@ -342,7 +342,8 @@ class TestVoteCollection:
 
             # The 6 LLM-driven members should each have an error field.
             llm_votes = [
-                v for v in result["all_votes"]
+                v
+                for v in result["all_votes"]
                 if v["member_id"] != "performance_analyst"
             ]
             assert len(llm_votes) == 6
@@ -834,7 +835,8 @@ class TestPerformanceAnalystSimilarity:
             "title_ideas": ["Killing Flaky Tests for Good"],
         }
         score, rationale = _score_topic_against_underperformers(
-            topic, underperformers,
+            topic,
+            underperformers,
         )
         assert score <= 4, f"Expected strong-match penalty, got {score}"
         assert "flaky" in rationale.lower() or "tests" in rationale.lower()
@@ -860,7 +862,8 @@ class TestPerformanceAnalystSimilarity:
             "title_ideas": ["The Sharding Tax"],
         }
         score, _rationale = _score_topic_against_underperformers(
-            topic, underperformers,
+            topic,
+            underperformers,
         )
         assert score >= 7, f"Expected neutral score, got {score}"
 
@@ -966,11 +969,13 @@ class TestPenaltyPath:
         rankings = result["rankings"]
         assert len(rankings) == 2
         topic1_score = next(
-            r["weighted_score"] for r in rankings
+            r["weighted_score"]
+            for r in rankings
             if r["topic"] == "Flaky tests in modern pipelines"
         )
         topic2_score = next(
-            r["weighted_score"] for r in rankings
+            r["weighted_score"]
+            for r in rankings
             if r["topic"] == "The economics of database sharding"
         )
         assert topic2_score > topic1_score, (
@@ -981,8 +986,7 @@ class TestPenaltyPath:
         # And the Performance Analyst's own vote on Topic 1 should be the
         # strong-match penalty score.
         perf_vote = next(
-            v for v in result["all_votes"]
-            if v["member_id"] == PERFORMANCE_ANALYST_ID
+            v for v in result["all_votes"] if v["member_id"] == PERFORMANCE_ANALYST_ID
         )
         topic1_perf_score = next(
             v["score"] for v in perf_vote["votes"] if v["topic_index"] == 1

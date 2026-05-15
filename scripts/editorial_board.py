@@ -72,15 +72,75 @@ PERFORMANCE_ANALYST_ID = "performance_analyst"
 # tech-blog titles (e.g. every other post mentions "ai" or "the").
 _STOP_WORDS: frozenset[str] = frozenset(
     [
-        "the", "a", "an", "and", "or", "but", "if", "then", "of", "for",
-        "to", "in", "on", "at", "by", "with", "from", "as", "is", "are",
-        "was", "were", "be", "been", "being", "it", "its", "this", "that",
-        "these", "those", "we", "you", "i", "they", "your", "our",
-        "how", "why", "what", "when", "where", "which", "who",
-        "ai", "tech", "post", "article", "blog", "guide", "intro",
-        "introduction", "overview", "review",
-        "vs", "via", "use", "using", "used", "make", "makes", "made",
-        "new", "old", "more", "less", "than", "into", "out",
+        "the",
+        "a",
+        "an",
+        "and",
+        "or",
+        "but",
+        "if",
+        "then",
+        "of",
+        "for",
+        "to",
+        "in",
+        "on",
+        "at",
+        "by",
+        "with",
+        "from",
+        "as",
+        "is",
+        "are",
+        "was",
+        "were",
+        "be",
+        "been",
+        "being",
+        "it",
+        "its",
+        "this",
+        "that",
+        "these",
+        "those",
+        "we",
+        "you",
+        "i",
+        "they",
+        "your",
+        "our",
+        "how",
+        "why",
+        "what",
+        "when",
+        "where",
+        "which",
+        "who",
+        "ai",
+        "tech",
+        "post",
+        "article",
+        "blog",
+        "guide",
+        "intro",
+        "introduction",
+        "overview",
+        "review",
+        "vs",
+        "via",
+        "use",
+        "using",
+        "used",
+        "make",
+        "makes",
+        "made",
+        "new",
+        "old",
+        "more",
+        "less",
+        "than",
+        "into",
+        "out",
     ],
 )
 
@@ -89,9 +149,9 @@ _STOP_WORDS: frozenset[str] = frozenset(
 # completely overwhelm a strong consensus from the other five voters when
 # combined under the existing weighted-average formula.
 _PERF_SCORE_STRONG_MATCH = 3  # ≥2 distinctive shared tokens with an underperformer
-_PERF_SCORE_MILD_MATCH = 5    # exactly 1 distinctive shared token
-_PERF_SCORE_NO_MATCH = 8      # no overlap
-_PERF_SCORE_NO_DATA = 7       # performance database unavailable
+_PERF_SCORE_MILD_MATCH = 5  # exactly 1 distinctive shared token
+_PERF_SCORE_NO_MATCH = 8  # no overlap
+_PERF_SCORE_NO_DATA = 7  # performance database unavailable
 
 # Minimum token length to be considered "distinctive" (filters out
 # 1–2 character noise that survives tokenisation).
@@ -113,10 +173,7 @@ def _tokenise(text: str) -> set[str]:
         return set()
     # Replace any non-word character with a space, then split.
     words = re.findall(r"[a-zA-Z0-9]+", text.lower())
-    return {
-        w for w in words
-        if len(w) >= _MIN_TOKEN_LEN and w not in _STOP_WORDS
-    }
+    return {w for w in words if len(w) >= _MIN_TOKEN_LEN and w not in _STOP_WORDS}
 
 
 def _topic_text(topic: dict) -> str:
@@ -243,7 +300,8 @@ def get_performance_analyst_vote(
     votes = []
     for i, topic in enumerate(topics):
         score, rationale = _score_topic_against_underperformers(
-            topic, underperformers,
+            topic,
+            underperformers,
         )
         votes.append(
             {
@@ -258,9 +316,7 @@ def get_performance_analyst_vote(
     if votes:
         best = max(votes, key=lambda v: v["score"])
         top_pick = best["topic_index"]
-        top_pick_reason = (
-            "Least resemblance to recent underperforming articles."
-        )
+        top_pick_reason = "Least resemblance to recent underperforming articles."
     else:
         top_pick = None
         top_pick_reason = "No topics to evaluate."

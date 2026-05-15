@@ -456,12 +456,85 @@ class EconomistContentFlow:
         if title and article_text:
             self._deduplicator.index_article(title=title, content=article_text)
 
+        # Deploy to the blog repo when credentials are present. In CI this is
+        # invoked instead by the "Publish to Blog Repository" workflow step;
+        # this path covers local runs and the MCP-triggered flow. See #336.
+        deploy_status = self._deploy_to_blog(article_text, title)
+
         return {
             "status": "published",
             "article": article_text,
             "editorial_score": quality_result.get("editorial_score", 0),
             "gates_passed": quality_result.get("gates_passed", 0),
+            "deploy_status": deploy_status,
         }
+
+    def _deploy_to_blog(self, article_text: str, title: str) -> str:
+        """Persist the article and invoke :func:`scripts.deploy_to_blog.deploy`.
+
+        Returns one of:
+          - ``"skipped_no_credentials"``: BLOG_REPO_* env vars not set.
+          - ``"skipped_empty_article"``: nothing to publish.
+          - ``"skipped_in_ci"``: ``GITHUB_ACTIONS=true`` — CI workflow handles it.
+          - The :class:`DeployResult.status` string on success
+            (``"published"``, ``"up_to_date"``, ``"validation_failed"``, ``"dry_run"``).
+          - ``"failed"`` if deploy raises — flow continues, error is logged.
+        """
+        if not article_text:
+            return "skipped_empty_article"
+
+        blog_owner = os.environ.get("BLOG_REPO_OWNER") or os.environ.get(
+            "BLOG_OWNER", ""
+        )
+        blog_repo = os.environ.get("BLOG_REPO_NAME") or os.environ.get("BLOG_REPO", "")
+        token = os.environ.get("BLOG_REPO_TOKEN") or os.environ.get("GITHUB_TOKEN", "")
+        if not (blog_owner and blog_repo and token):
+            logger.info(
+                "🚫 Blog deploy skipped — BLOG_REPO_OWNER/BLOG_REPO_NAME/"
+                "BLOG_REPO_TOKEN not all set"
+            )
+            return "skipped_no_credentials"
+
+        # In CI the workflow's "Publish to Blog Repository" step runs the
+        # script explicitly. Avoid a double-deploy when invoked from there.
+        if os.environ.get("GITHUB_ACTIONS", "").lower() == "true":
+            logger.info("🚫 Blog deploy delegated to CI workflow step")
+            return "skipped_in_ci"
+
+        # Persist the article so deploy() has a real file path to work with.
+        slug = self._slugify(title) or "generated-article"
+        date_str = datetime.now().strftime("%Y-%m-%d")
+        output_dir = Path("output")
+        output_dir.mkdir(parents=True, exist_ok=True)
+        article_path = output_dir / f"{date_str}-{slug}.md"
+        article_path.write_text(article_text)
+        logger.info("📝 Wrote article: %s", article_path)
+
+        # Lazy import keeps test collection fast and avoids loading PIL
+        # transitively until we actually deploy.
+        from scripts.deploy_to_blog import DeployError, deploy
+
+        try:
+            result = deploy(
+                article_path=article_path,
+                blog_owner=blog_owner,
+                blog_repo=blog_repo,
+                token=token,
+            )
+        except DeployError as exc:
+            logger.error("Blog deploy failed (non-fatal): %s", exc)
+            return "failed"
+
+        logger.info("🚀 Blog deploy finished: %s", result.status)
+        return result.status
+
+    @staticmethod
+    def _slugify(text: str) -> str:
+        """Best-effort lowercase-dashed slug suitable for a Jekyll filename."""
+        if not text:
+            return ""
+        slug = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+        return slug[:60]
 
     # ─── revision path ─────────────────────────────────────────────────
 

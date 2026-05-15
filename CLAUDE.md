@@ -19,6 +19,23 @@ Task arrives
 **No implementation starts without a spec. No sprint planning starts without a dependency-ordered task list.**
 Both require human review (a "LGTM") before proceeding.
 
+### Lifecycle discipline (non-negotiable)
+
+For any **non-trivial** response (anything beyond Q&A, status checks, or one-line edits):
+
+1. The **first two tool calls** MUST be:
+   1. `Skill agent-skills:using-agent-skills` — triages the task and points to the right phase skill
+   2. `Skill agent-skills:context-engineering` — sets up focused context for the task
+2. After triage, invoke the phase skill the meta-skill points you at (e.g. `agent-skills:spec-driven-development`, `agent-skills:incremental-implementation`, `agent-skills:test-driven-development`, etc.).
+3. **Improvising the lifecycle as plain workflow labels is a blocker, not a warning.** If you find yourself running DEFINE/PLAN/BUILD by hand without an active `Skill` invocation, stop and invoke the meta-skill first.
+4. Per `agent-skills:using-agent-skills` Core Behavior #1: surface assumptions explicitly before implementing anything non-trivial.
+
+Exempt: simple Q&A, status checks, command output, one-line edits.
+
+### Dispatching worker agents
+
+When dispatching agents via the `Agent` tool (orchestrating the fleet), the brief MUST include the worker discipline contract from `.claude/worker-brief-contract.md`. Workers that produce output without evidence of `Skill` invocations are rejected and re-dispatched.
+
 ## Architecture
 
 - **LLM**: Claude (Anthropic) is the primary LLM. OPENAI_API_KEY only needed for DALL-E images.

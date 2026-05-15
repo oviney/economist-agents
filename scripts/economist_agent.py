@@ -512,7 +512,7 @@ def run_visual_qa_agent(client, image_path: str, chart_record: dict = None) -> d
 
     # STAGE 1: Programmatic zone boundary validation (Sprint 8 Story 2)
     try:
-        from visual_qa_zones import ZoneBoundaryValidator
+        from src.quality.visual_qa_zones import ZoneBoundaryValidator
 
         zone_validator = ZoneBoundaryValidator()
         zones_valid, zone_issues = zone_validator.validate_chart(image_path)

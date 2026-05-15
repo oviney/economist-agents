@@ -2982,10 +2982,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-after-triage-invoke-the-phase-skill" class="md-nav__link">
+  <a href="#2-after-triage-every-phase-skill-is-a-formal-skill-tool-call" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. After triage — invoke the phase skill
+        2. After triage — every phase skill is a formal Skill tool call
       
     </span>
   </a>
@@ -3095,23 +3095,27 @@
 <li><code>Skill agent-skills:context-engineering</code></li>
 </ol>
 <p>Do this <strong>before</strong> any <code>Read</code>, <code>Bash</code>, <code>Edit</code>, <code>Write</code>, <code>Grep</code>, or other tool. Do not skip even if the task seems obvious. The meta-skills exist to triage and orient you — running the lifecycle "by hand" is the failure mode this contract prevents.</p>
-<h3 id="2-after-triage-invoke-the-phase-skill">2. After triage — invoke the phase skill<a class="headerlink" href="#2-after-triage-invoke-the-phase-skill" title="Permanent link">&para;</a></h3>
-<p>The <code>using-agent-skills</code> flowchart will point you at a phase skill (e.g. <code>agent-skills:spec-driven-development</code>, <code>agent-skills:planning-and-task-breakdown</code>, <code>agent-skills:incremental-implementation</code>, <code>agent-skills:test-driven-development</code>, <code>agent-skills:code-review-and-quality</code>, <code>agent-skills:shipping-and-launch</code>). Invoke it via the <code>Skill</code> tool. Do not paraphrase its workflow inline.</p>
+<h3 id="2-after-triage-every-phase-skill-is-a-formal-skill-tool-call">2. After triage — every phase skill is a formal Skill tool call<a class="headerlink" href="#2-after-triage-every-phase-skill-is-a-formal-skill-tool-call" title="Permanent link">&para;</a></h3>
+<p>The <code>using-agent-skills</code> flowchart will point you at a phase skill (e.g. <code>agent-skills:spec-driven-development</code>, <code>agent-skills:planning-and-task-breakdown</code>, <code>agent-skills:incremental-implementation</code>, <code>agent-skills:test-driven-development</code>, <code>agent-skills:code-review-and-quality</code>, <code>agent-skills:shipping-and-launch</code>).</p>
+<p><strong>Each phase skill in your chain MUST be invoked via the <code>Skill</code> tool.</strong> Do not paraphrase the workflow inline. Do not append parenthetical justifications such as "applied as inline practice", "phase collapsed to one atomic slice", "workflow only", or any equivalent.</p>
+<p>If you determine a phase skill genuinely does not apply to your task, <strong>omit it from your chain</strong> — do not invoke it as "workflow only" and do not list it in your manifest with a parenthetical note. An honest manifest with fewer entries is preferred over a padded manifest with notes.</p>
 <p>For a feature implementation from a GitHub issue, the typical chain is:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>using-agent-skills → context-engineering → spec-driven-development (if issue body too thin)
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  → planning-and-task-breakdown → incremental-implementation
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  → test-driven-development → code-review-and-quality
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  → git-workflow-and-versioning → shipping-and-launch
 </code></pre></div>
+<p><strong>Reference model</strong> — Wave 3 PR #354 (worker on issue #334 print→logger): 3 formal <code>Skill</code> invocations (<code>using-agent-skills</code>, <code>context-engineering</code>, <code>incremental-implementation</code>), no claims of additional phases, work shipped clean on first try.</p>
+<p><strong>Anti-pattern</strong> — Wave 2 PR #352 and Wave 3 PR #355: 2 formal invocations followed by <code>(workflow)</code> labels or "inline practice" notes for phase skills. Work was correct in both cases, but the manifest was padded with non-invocations and required this contract amendment.</p>
 <h3 id="3-surface-assumptions-core-operating-behavior-1">3. Surface assumptions (Core Operating Behavior #1)<a class="headerlink" href="#3-surface-assumptions-core-operating-behavior-1" title="Permanent link">&para;</a></h3>
 <p>Before implementing anything non-trivial, emit an <code>ASSUMPTIONS:</code> block listing what you're taking as given. Wait for the parent to redirect, or proceed with explicit acknowledgement that you're going on those assumptions.</p>
 <h3 id="4-output-format">4. Output format<a class="headerlink" href="#4-output-format" title="Permanent link">&para;</a></h3>
 <p>Your final summary MUST include:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>SKILL INVOCATIONS:
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>- &lt;timestamp&gt; Skill agent-skills:using-agent-skills
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>- &lt;timestamp&gt; Skill agent-skills:context-engineering
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>- &lt;timestamp&gt; Skill &lt;phase-skill-1&gt;
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>- &lt;timestamp&gt; Skill &lt;phase-skill-2&gt;
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>- &lt;step&gt; Skill agent-skills:using-agent-skills
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>- &lt;step&gt; Skill agent-skills:context-engineering
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>- &lt;step&gt; Skill &lt;phase-skill-1&gt;
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>- &lt;step&gt; Skill &lt;phase-skill-2&gt;
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>...
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>ASSUMPTIONS:
@@ -3127,7 +3131,32 @@
 <a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>- CI status: &lt;pass|fail|pending&gt;
 <a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>- Acceptance criteria met: &lt;yes|partial|no with explanation&gt;
 </code></pre></div>
-<p>If the SKILL INVOCATIONS list does not start with <code>using-agent-skills</code> followed by <code>context-engineering</code>, your work will be rejected.</p>
+<p><strong>Manifest validation — automatic rejection criteria:</strong></p>
+<p>The <code>SKILL INVOCATIONS:</code> manifest is validated by the parent orchestrator. Your work will be rejected if any of these patterns appear:</p>
+<ol>
+<li>The list does not start with <code>Skill agent-skills:using-agent-skills</code> followed by <code>Skill agent-skills:context-engineering</code>.</li>
+<li>Any entry contains the substring <code>(workflow)</code>, <code>(workflow-only)</code>, <code>(inline)</code>, <code>(applied)</code>, <code>inline practice</code>, <code>collapsed</code>, <code>not separately invoked</code>, or any equivalent non-invocation marker.</li>
+<li>Any entry contains a parenthetical justification, dash-explanation, or trailing prose beyond <code>- &lt;step&gt; Skill &lt;skill-name&gt;</code>.</li>
+<li>The summary justifies skipping a Skill invocation in a paragraph outside the manifest.</li>
+</ol>
+<p><strong>Correct format example:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>SKILL INVOCATIONS:
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>- 1 Skill agent-skills:using-agent-skills
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>- 2 Skill agent-skills:context-engineering
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>- 3 Skill agent-skills:incremental-implementation
+</code></pre></div>
+<p><strong>Incorrect format examples — these will trigger rejection:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>SKILL INVOCATIONS:
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>- 1 Skill agent-skills:using-agent-skills
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>- 2 Skill agent-skills:context-engineering
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>- (workflow) agent-skills:test-driven-development — wrote tests        ← rejected (workflow label)
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>- (workflow) agent-skills:code-review-and-quality                       ← rejected (workflow label)
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>SKILL INVOCATIONS:
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>- 1 Skill agent-skills:using-agent-skills
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>- 2 Skill agent-skills:context-engineering
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>- 3 Skill agent-skills:incremental-implementation (phase collapsed)     ← rejected (parenthetical justification)
+</code></pre></div>
 <h3 id="5-isolation">5. Isolation<a class="headerlink" href="#5-isolation" title="Permanent link">&para;</a></h3>
 <p>You are running with <code>isolation: "worktree"</code> — a fresh git worktree at a path the parent provides. Do all your work there. Do not <code>cd</code> outside it. Do not assume any state from prior conversations.</p>
 <h3 id="6-scope-discipline-core-operating-behavior-5">6. Scope discipline (Core Operating Behavior #5)<a class="headerlink" href="#6-scope-discipline-core-operating-behavior-5" title="Permanent link">&para;</a></h3>

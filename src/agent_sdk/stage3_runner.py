@@ -1,9 +1,9 @@
-"""Stage 3 spike — Writer + Graphics on the Anthropic Agent SDK.
+"""Stage 3 production runtime — Writer + Graphics on the Anthropic Agent SDK.
 
-Replaces ``src/crews/stage3_crew.py`` for the Phase 2 spike (ADR-0006,
-epic #308, story #309). The CrewAI path remains the production code
-path; this module runs side-by-side so the comparison report has data
-from both runtimes on the same topic.
+This is the sole production runtime for Stage 3 (article + chart
+generation). It originated as the Phase 2 spike that replaced
+``src/crews/stage3_crew.py`` (ADR-0006, epic #308, story #309); the
+CrewAI path has since been removed.
 
 Design:
 - Research stays deterministic — calls ``build_research_brief`` from
@@ -116,8 +116,8 @@ FORMATTING:
 
 
 @dataclass
-class SpikeResult:
-    """Captured metrics from a Stage 3 spike run."""
+class Stage3Result:
+    """Captured metrics from a Stage 3 run."""
 
     topic: str
     article: str
@@ -252,13 +252,13 @@ def _parse_chart_json(text: str) -> dict:
         return {"specification": text}
 
 
-async def run_stage3_spike(
+async def run_stage3(
     topic: str,
     writer_budget_usd: float | None = 0.30,
     graphics_budget_usd: float | None = 0.10,
     writer_model: str = DEFAULT_WRITER_MODEL,
     graphics_model: str = DEFAULT_GRAPHICS_MODEL,
-) -> SpikeResult:
+) -> Stage3Result:
     """Generate one article via the Agent SDK and return captured metrics.
 
     Mirrors ``Stage3Crew.kickoff`` so output is comparable.
@@ -278,7 +278,7 @@ async def run_stage3_spike(
             4.6; override with GRAPHICS_MODEL env var.
 
     Returns:
-        SpikeResult with article text, chart dict, cost, and timing.
+        Stage3Result with article text, chart dict, cost, and timing.
 
     """
     start = time.perf_counter()
@@ -352,7 +352,7 @@ async def run_stage3_spike(
 
     elapsed = time.perf_counter() - start
 
-    return SpikeResult(
+    return Stage3Result(
         topic=topic,
         article=article,
         chart_data=chart_data,
@@ -369,7 +369,7 @@ async def run_stage3_spike(
 
 
 def main() -> None:
-    """CLI entrypoint — write spike artefacts to ``logs/spike/``."""
+    """CLI entrypoint — write Stage 3 artefacts to ``logs/spike/``."""
     logging.basicConfig(
         level=logging.INFO,
         format="%(levelname)s %(name)s: %(message)s",
@@ -379,8 +379,8 @@ def main() -> None:
         if len(sys.argv) > 1
         else "developer productivity in the age of AI coding agents"
     )
-    print(f"Running Stage 3 spike on topic: {topic}")
-    result = asyncio.run(run_stage3_spike(topic))
+    print(f"Running Stage 3 on topic: {topic}")
+    result = asyncio.run(run_stage3(topic))
 
     out_dir = Path("logs/spike")
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -396,7 +396,7 @@ def main() -> None:
     )
 
     print(
-        f"Spike complete: ${result.total_cost_usd:.4f} "
+        f"Stage 3 complete: ${result.total_cost_usd:.4f} "
         f"(writer ${result.writer_cost_usd:.4f}, "
         f"graphics ${result.graphics_cost_usd:.4f}), "
         f"{result.wall_seconds:.1f}s, "

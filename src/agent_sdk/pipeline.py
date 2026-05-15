@@ -20,7 +20,7 @@ import orjson
 from src.agent_sdk.stage3_runner import (
     DEFAULT_GRAPHICS_MODEL,
     DEFAULT_WRITER_MODEL,
-    run_stage3_spike,
+    run_stage3,
 )
 from src.agent_sdk.stage4_runner import run_stage4
 from src.telemetry.roi_tracker import ROITracker, get_tracker
@@ -63,7 +63,7 @@ async def run_pipeline(
     graphics_model: str = DEFAULT_GRAPHICS_MODEL,
 ) -> PipelineResult:
     """Generate one article through the Agent SDK pipeline."""
-    stage3 = await run_stage3_spike(
+    stage3 = await run_stage3(
         topic,
         writer_budget_usd=writer_budget_usd,
         graphics_budget_usd=graphics_budget_usd,

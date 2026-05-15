@@ -2959,6 +2959,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#implementation-note-2026-05-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation note (2026-05-15)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#context" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3034,11 +3045,33 @@
 
 
 <h1 id="adr-0010-migrate-domain-modules-from-scripts-to-src">ADR-0010: Migrate domain modules from scripts/ to src/<a class="headerlink" href="#adr-0010-migrate-domain-modules-from-scripts-to-src" title="Permanent link">&para;</a></h1>
-<p><strong>Status:</strong> Proposed
-<strong>Date:</strong> 2026-05-12
+<p><strong>Status:</strong> Implemented (2026-05-15 via PR #357 / issue #344)
+<strong>Date:</strong> 2026-05-12 (implementation 2026-05-15)
 <strong>Decision Maker:</strong> Staff engineer (review on #327)
 <strong>Supersedes:</strong> —
 <strong>Superseded by:</strong> —</p>
+<h2 id="implementation-note-2026-05-15">Implementation note (2026-05-15)<a class="headerlink" href="#implementation-note-2026-05-15" title="Permanent link">&para;</a></h2>
+<p>This ADR proposed <code>src/economist_agents/quality/</code> as the destination subpackage. The actual implementation in #344 chose a <strong>flat</strong> layout under <code>src/</code> instead:</p>
+<table>
+<thead>
+<tr>
+<th>Subpackage</th>
+<th>Modules</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/quality/</code></td>
+<td><code>agent_reviewer</code>, <code>agent_metrics</code>, <code>chart_metrics</code>, <code>defect_tracker</code>, <code>governance</code>, <code>schema_validator</code>, <code>validate_closed_loop</code>, <code>visual_qa_zones</code> (8 modules)</td>
+</tr>
+<tr>
+<td><code>src/backlog/</code></td>
+<td><code>backlog_groomer</code>, <code>ci_health_monitor</code>, <code>migrate_backlog_to_github</code>, <code>validate_documentation_accuracy</code> (4 modules)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Rationale for the divergence:</strong> the existing top-level <code>src/</code> already contains sibling packages at this depth — <code>src/agent_sdk/</code>, <code>src/economist_agents/</code>, <code>src/telemetry/</code>, <code>src/tools/</code>, <code>src/utils/</code>. Nesting the new packages under <code>src/economist_agents/</code> would have been inconsistent with that convention and would have produced unnecessarily long import paths (<code>from src.economist_agents.quality.governance import GovernanceTracker</code> vs. <code>from src.quality.governance import GovernanceTracker</code>). The flat layout matches the codebase's revealed preference.</p>
+<p>The <code>sys.path.insert(0, str(SCRIPTS_DIR))</code> hack at <code>tests/test_architecture_compliance.py:22</code> has been removed; all callers in <code>agents/</code>, <code>tests/</code>, and the KEEP scripts (<code>continuous_burndown.py</code>, <code>economist_agent.py</code>, <code>quality_dashboard.py</code>) now use fully-qualified <code>from src.quality.X import Y</code> / <code>from src.backlog.X import Y</code> imports.</p>
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
 <p>Issue #327 (delete or archive ~80 dead files in <code>scripts/</code>) executed a
 classification pass over the 115-file <code>scripts/</code> directory. The first

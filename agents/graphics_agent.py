@@ -28,7 +28,8 @@ if str(_scripts_dir) not in sys.path:
 from agent_loader import (  # noqa: E402
     load_content_agent as _load_content_agent,  # type: ignore
 )
-from chart_metrics import get_metrics_collector  # type: ignore  # noqa: E402
+
+from src.quality.chart_metrics import get_metrics_collector  # noqa: E402
 
 # Module-level prompt constant loaded from YAML
 _graphics_config = _load_content_agent("graphics")

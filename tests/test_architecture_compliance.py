@@ -12,14 +12,15 @@ Target: 100% compliance across scripts/
 """
 
 import ast
-import sys
 from pathlib import Path
 
 import pytest
 
-# Add scripts directory to path for imports
+# Directory of standalone scripts used by the ADR-002 compliance scan below.
+# The `sys.path.insert(0, str(SCRIPTS_DIR))` hack that used to live here was
+# removed in #344 (ADR-0010) — the 12 domain modules that depended on the
+# bare-name import path have been relocated to src/quality/ and src/backlog/.
 SCRIPTS_DIR = Path(__file__).parent.parent / "scripts"
-sys.path.insert(0, str(SCRIPTS_DIR))
 
 
 # ═══════════════════════════════════════════════════════════════════════════

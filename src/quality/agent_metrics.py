@@ -5,7 +5,7 @@ Tracks per-agent predictions vs actuals to identify improvement opportunities.
 Stores metrics in data/skills_state/agent_metrics.json with historical trends.
 
 Usage:
-    from agent_metrics import AgentMetrics
+    from src.quality.agent_metrics import AgentMetrics
 
     metrics = AgentMetrics()
     metrics.track_research_agent(data_points=10, verified=8, unverified=2)

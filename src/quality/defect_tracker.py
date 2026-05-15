@@ -5,7 +5,7 @@ Tracks bugs discovered, fixed, and leaked to production.
 Provides quality metrics and defect escape rate analysis.
 
 Usage:
-    from defect_tracker import DefectTracker
+    from src.quality.defect_tracker import DefectTracker
 
     tracker = DefectTracker()
 

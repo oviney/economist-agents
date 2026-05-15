@@ -27,7 +27,7 @@ CRITICAL_FILES = [
     "src/crews/stage4_crew.py",
     "scripts/publication_validator.py",
     "scripts/editorial_judge.py",
-    "scripts/agent_reviewer.py",
+    "src/quality/agent_reviewer.py",
     "scripts/frontmatter_schema.py",
     "scripts/article_evaluator.py",
     ".github/workflows/content-pipeline.yml",

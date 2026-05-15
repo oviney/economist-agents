@@ -11,13 +11,8 @@ the bug patterns we discovered (Issues #15, #16, #17).
 """
 
 import sys
-from pathlib import Path
 
-# Add scripts directory to path
-sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
-
-from skills_manager import SkillsManager
-
+from scripts.skills_manager import SkillsManager
 from src.quality.agent_reviewer import review_agent_output
 from src.quality.schema_validator import validate_front_matter
 

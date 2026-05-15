@@ -19,14 +19,36 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-# Model pricing (as of Jan 2026) - USD per 1M tokens
+# Model pricing - USD per 1M tokens (base input / output rates).
+#
+# Source: Anthropic API pricing page,
+# https://platform.claude.com/docs/en/docs/about-claude/pricing
+# (fetched 2026-05-15). OpenAI rates retained for legacy log compatibility.
+#
+# NOTE: Cache-write, cache-read, batch, and fast-mode multipliers are NOT
+# modelled here. The pipeline records the SDK-reported total_cost_usd
+# directly via the ``cost_usd`` override on ``log_llm_call``; this table
+# is the fallback when only token counts are known.
 MODEL_PRICING = {
-    "gpt-4o": {"input": 2.50, "output": 10.00},
-    "gpt-4o-mini": {"input": 0.15, "output": 0.60},
-    "gpt-3.5-turbo": {"input": 0.50, "output": 1.50},
+    # Claude 4 family (current, per claude.com/pricing)
+    "claude-opus-4-7": {"input": 5.00, "output": 25.00},
+    "claude-opus-4-6": {"input": 5.00, "output": 25.00},
+    "claude-opus-4-5": {"input": 5.00, "output": 25.00},
+    "claude-opus-4-1": {"input": 15.00, "output": 75.00},
+    "claude-sonnet-4-6": {"input": 3.00, "output": 15.00},
+    "claude-sonnet-4-5": {"input": 3.00, "output": 15.00},
+    "claude-haiku-4-5": {"input": 1.00, "output": 5.00},
+    # Deprecated Claude 4 model IDs (retained for legacy log compatibility)
+    "claude-opus-4": {"input": 15.00, "output": 75.00},
+    "claude-sonnet-4": {"input": 3.00, "output": 15.00},
+    # Legacy Claude 3.x model IDs (retained for back-compat with older logs)
     "claude-3-5-sonnet-20241022": {"input": 3.00, "output": 15.00},
     "claude-3-5-haiku-20241022": {"input": 0.80, "output": 4.00},
     "claude-3-opus-20240229": {"input": 15.00, "output": 75.00},
+    # OpenAI (legacy; pipeline does not use OpenAI for text generation)
+    "gpt-4o": {"input": 2.50, "output": 10.00},
+    "gpt-4o-mini": {"input": 0.15, "output": 0.60},
+    "gpt-3.5-turbo": {"input": 0.50, "output": 1.50},
 }
 
 # Human-hour benchmarks (hours to complete task manually)
@@ -163,16 +185,23 @@ class ROITracker:
         input_tokens: int,
         output_tokens: int,
         metadata: dict[str, Any] | None = None,
+        cost_usd: float | None = None,
     ) -> None:
         """Log an LLM call with token usage.
 
         Args:
             execution_id: Execution identifier
             agent: Agent name
-            model: Model name (e.g., "gpt-4o")
+            model: Model name (e.g., "claude-sonnet-4-6")
             input_tokens: Input token count
             output_tokens: Output token count
             metadata: Optional metadata (task, stage, etc.)
+            cost_usd: Optional pre-computed cost in USD. When provided, the
+                ``MODEL_PRICING`` table is bypassed and this value is recorded
+                directly. Use this when the caller already has an authoritative
+                cost (e.g., ``ResultMessage.total_cost_usd`` from the Anthropic
+                SDK), which avoids drift between the SDK's price model and the
+                local pricing table.
 
         """
         start_time = time.perf_counter()
@@ -180,11 +209,14 @@ class ROITracker:
         if execution_id not in self.active_executions:
             raise ValueError(f"Execution {execution_id} not started")
 
-        # Calculate cost
-        pricing = MODEL_PRICING.get(model, {"input": 0, "output": 0})
-        input_cost = (input_tokens / 1_000_000) * pricing["input"]
-        output_cost = (output_tokens / 1_000_000) * pricing["output"]
-        total_cost = input_cost + output_cost
+        # Calculate cost (or use authoritative pre-computed value)
+        if cost_usd is not None:
+            total_cost = float(cost_usd)
+        else:
+            pricing = MODEL_PRICING.get(model, {"input": 0, "output": 0})
+            input_cost = (input_tokens / 1_000_000) * pricing["input"]
+            output_cost = (output_tokens / 1_000_000) * pricing["output"]
+            total_cost = input_cost + output_cost
 
         # Log call
         call_record = {

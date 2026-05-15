@@ -82,13 +82,12 @@ class TestValidationScript:
 
     def test_help_command(self):
         """Verify script shows help without errors."""
-        script_path = (
-            Path(__file__).parent.parent / "scripts" / "validate_closed_loop.py"
-        )
+        repo_root = Path(__file__).parent.parent
         result = subprocess.run(
-            [sys.executable, str(script_path), "--help"],
+            [sys.executable, "-m", "src.quality.validate_closed_loop", "--help"],
             capture_output=True,
             text=True,
+            cwd=str(repo_root),
         )
 
         assert result.returncode == 0
@@ -97,14 +96,19 @@ class TestValidationScript:
 
     def test_stage_filter_storage(self):
         """Verify --stage storage runs only storage check."""
-        script_path = (
-            Path(__file__).parent.parent / "scripts" / "validate_closed_loop.py"
-        )
+        repo_root = Path(__file__).parent.parent
         result = subprocess.run(
-            [sys.executable, str(script_path), "--stage", "storage"],
+            [
+                sys.executable,
+                "-m",
+                "src.quality.validate_closed_loop",
+                "--stage",
+                "storage",
+            ],
             capture_output=True,
             text=True,
             timeout=30,
+            cwd=str(repo_root),
         )
 
         # Should pass (exit 0) if storage check passes
@@ -114,14 +118,20 @@ class TestValidationScript:
 
     def test_verbose_output(self):
         """Verify --verbose flag shows detailed output."""
-        script_path = (
-            Path(__file__).parent.parent / "scripts" / "validate_closed_loop.py"
-        )
+        repo_root = Path(__file__).parent.parent
         result = subprocess.run(
-            [sys.executable, str(script_path), "--stage", "storage", "--verbose"],
+            [
+                sys.executable,
+                "-m",
+                "src.quality.validate_closed_loop",
+                "--stage",
+                "storage",
+                "--verbose",
+            ],
             capture_output=True,
             text=True,
             timeout=30,
+            cwd=str(repo_root),
         )
 
         # Verbose mode should show detailed messages

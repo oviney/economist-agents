@@ -43,10 +43,11 @@ from pathlib import Path
 
 import orjson
 
-# Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent))
+from scripts.skills_manager import SkillsManager
 
-from skills_manager import SkillsManager
+# Repo paths: src/quality/validate_closed_loop.py -> repo root -> scripts/
+_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+_SCRIPTS_DIR = _REPO_ROOT / "scripts"
 
 logger = logging.getLogger(__name__)
 
@@ -230,7 +231,7 @@ class SynthesisCheck(ValidationStage):
         """Validate skill synthesizer functionality."""
         try:
             # Verify skill_synthesizer.py exists
-            synthesizer_path = Path(__file__).parent / "skill_synthesizer.py"
+            synthesizer_path = _SCRIPTS_DIR / "skill_synthesizer.py"
             if not synthesizer_path.exists():
                 self.error(f"skill_synthesizer.py not found at: {synthesizer_path}")
                 return False
@@ -338,7 +339,7 @@ class IntegrationCheck(ValidationStage):
         """Validate blog_qa_agent integration."""
         try:
             # Verify blog_qa_agent.py exists
-            agent_path = Path(__file__).parent / "blog_qa_agent.py"
+            agent_path = _SCRIPTS_DIR / "blog_qa_agent.py"
             if not agent_path.exists():
                 self.error(f"blog_qa_agent.py not found at: {agent_path}")
                 return False
@@ -372,9 +373,7 @@ class IntegrationCheck(ValidationStage):
             self.log(f"Created test post: {self.test_post}")
 
             # Check if skills file exists before
-            self.skills_file = (
-                Path(__file__).parent.parent / "skills" / "blog_qa_skills.json"
-            )
+            self.skills_file = _REPO_ROOT / "skills" / "blog_qa_skills.json"
             patterns_before = 0
             if self.skills_file.exists():
                 with open(self.skills_file, "rb") as f:
@@ -448,7 +447,7 @@ class SyncCheck(ValidationStage):
         """Validate sync_copilot_context functionality."""
         try:
             # Verify sync_copilot_context.py exists
-            sync_path = Path(__file__).parent / "sync_copilot_context.py"
+            sync_path = _SCRIPTS_DIR / "sync_copilot_context.py"
             if not sync_path.exists():
                 self.error(f"sync_copilot_context.py not found at: {sync_path}")
                 return False
@@ -456,9 +455,7 @@ class SyncCheck(ValidationStage):
             self.log(f"Found sync_copilot_context.py: {sync_path}")
 
             # Verify copilot instructions file exists
-            copilot_file = (
-                Path(__file__).parent.parent / ".github" / "copilot-instructions.md"
-            )
+            copilot_file = _REPO_ROOT / ".github" / "copilot-instructions.md"
             if not copilot_file.exists():
                 self.error(f"Copilot instructions not found at: {copilot_file}")
                 return False
@@ -521,7 +518,7 @@ class ReportingCheck(ValidationStage):
         """Validate skills_gap_analyzer reporting functionality."""
         try:
             # Verify skills_gap_analyzer.py exists
-            analyzer_path = Path(__file__).parent / "skills_gap_analyzer.py"
+            analyzer_path = _SCRIPTS_DIR / "skills_gap_analyzer.py"
             if not analyzer_path.exists():
                 self.error(f"skills_gap_analyzer.py not found at: {analyzer_path}")
                 return False

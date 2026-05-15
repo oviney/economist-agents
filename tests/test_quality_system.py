@@ -11,10 +11,19 @@ the bug patterns we discovered (Issues #15, #16, #17).
 """
 
 import sys
+from pathlib import Path
 
-from scripts.skills_manager import SkillsManager
-from src.quality.agent_reviewer import review_agent_output
-from src.quality.schema_validator import validate_front_matter
+# When run as a script (python tests/test_quality_system.py), the repo
+# root is not on sys.path. pytest adds it via pythonpath=. in pytest.ini,
+# but direct script execution does not. Add it explicitly so the
+# `scripts.*` and `src.*` package imports below resolve in both contexts.
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
+from scripts.skills_manager import SkillsManager  # noqa: E402
+from src.quality.agent_reviewer import review_agent_output  # noqa: E402
+from src.quality.schema_validator import validate_front_matter  # noqa: E402
 
 
 def test_issue_15_prevention():

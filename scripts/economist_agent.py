@@ -34,9 +34,6 @@ from chart_metrics import get_metrics_collector
 # Import featured image generator
 from featured_image_agent import generate_featured_image
 
-# Import governance system
-from governance import GovernanceTracker
-
 # Import unified LLM client
 from llm_client import call_llm, create_llm_client
 
@@ -55,6 +52,9 @@ from agents.research_agent import run_research_agent
 
 # Import extracted Writer Agent
 from agents.writer_agent import run_writer_agent
+
+# Import governance system
+from src.quality.governance import GovernanceTracker
 
 # Deprecated: this script is the legacy CrewAI-era orchestrator.
 # The production entry point is EconomistContentFlow in src/economist_agents/flow.py,

@@ -28,10 +28,10 @@ if str(_scripts_dir) not in sys.path:
 from agent_loader import (  # noqa: E402
     load_content_agent as _load_content_agent,  # type: ignore
 )
-from governance import GovernanceTracker  # type: ignore  # noqa: E402
 from llm_client import call_llm  # type: ignore  # noqa: E402
 
 from src.quality.agent_reviewer import review_agent_output  # noqa: E402
+from src.quality.governance import GovernanceTracker  # noqa: E402
 
 logger = logging.getLogger(__name__)
 

@@ -500,7 +500,14 @@ class TestRun:
                 _embedding_function=_HASH_EF,
             )
 
-        collection_names = [c.name for c in client.list_collections()]
+        # ChromaDB v0.6 changed list_collections() to return collection-name
+        # strings rather than Collection objects.  Support both shapes so the
+        # test passes regardless of which chromadb version the resolver picks
+        # (the requirements pin allows >=0.4.0,<1.0.0).
+        # See: https://docs.trychroma.com/docs/overview/migration
+        collection_names = [
+            c if isinstance(c, str) else c.name for c in client.list_collections()
+        ]
         assert COLLECTION_NAME in collection_names
 
 

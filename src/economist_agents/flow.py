@@ -112,7 +112,7 @@ class EconomistContentFlow:
 
     def _budget_exceeded_result(self) -> dict[str, Any]:
         """Terminal pipeline result when an Agent SDK call hit max_budget_usd."""
-        print("⛔ Flow aborted: budget exceeded")
+        logger.error("⛔ Flow aborted: budget exceeded")
         return {
             "status": "budget_exceeded",
             "editorial_score": 0,
@@ -142,7 +142,7 @@ class EconomistContentFlow:
     # ─── stage 1 ───────────────────────────────────────────────────────
 
     def discover_topics(self) -> dict[str, Any]:
-        print("🔭 Flow Stage 1: Topic Discovery")
+        logger.info("🔭 Flow Stage 1: Topic Discovery")
         client = create_llm_client()
 
         raw_topics: list[dict[str, Any]] = []
@@ -156,8 +156,9 @@ class EconomistContentFlow:
             )
             if raw_topics:
                 break
-            print(
-                f"   ⚠️  Topic scout returned empty (attempt {attempt + 1}/2), retrying...",
+            logger.warning(
+                "   ⚠️  Topic scout returned empty (attempt %d/2), retrying...",
+                attempt + 1,
             )
 
         if not raw_topics:
@@ -180,27 +181,29 @@ class EconomistContentFlow:
                     "raw": t,
                 },
             )
-        print(f"   Generated {len(topics)} topic candidates")
+        logger.info("   Generated %d topic candidates", len(topics))
 
         topics, rejected = self._deduplicator.filter_topics(topics)
         if rejected:
-            print(
-                f"   🚫 Dedup filtered {len(rejected)} topic(s): "
-                + ", ".join(f"'{t.get('topic', '?')}'" for t in rejected),
+            logger.info(
+                "   🚫 Dedup filtered %d topic(s): %s",
+                len(rejected),
+                ", ".join(f"'{t.get('topic', '?')}'" for t in rejected),
             )
         warned = [t for t in topics if t.get("dedup_warning")]
         if warned:
-            print(
-                f"   ⚠️  Dedup flagged {len(warned)} topic(s) as related coverage: "
-                + ", ".join(f"'{t.get('topic', '?')}'" for t in warned),
+            logger.warning(
+                "   ⚠️  Dedup flagged %d topic(s) as related coverage: %s",
+                len(warned),
+                ", ".join(f"'{t.get('topic', '?')}'" for t in warned),
             )
-        print(f"   {len(topics)} topic(s) forwarded to editorial board")
+        logger.info("   %d topic(s) forwarded to editorial board", len(topics))
         return {"topics": topics, "timestamp": datetime.now().isoformat()}
 
     # ─── stage 2 ───────────────────────────────────────────────────────
 
     def editorial_review(self, topics: dict[str, Any]) -> dict[str, Any]:
-        print("📋 Flow Stage 2: Editorial Review")
+        logger.info("📋 Flow Stage 2: Editorial Review")
 
         topic_list = topics.get("topics", [])
         if not topic_list:
@@ -213,7 +216,7 @@ class EconomistContentFlow:
         top = board_result.get("top_pick")
         if not top:
             selected = max(topic_list, key=lambda t: t.get("score", 0))
-            print(f"   Fallback selection: {selected['topic']}")
+            logger.warning("   Fallback selection: %s", selected["topic"])
             return selected
 
         original = top.get("original_topic", {})
@@ -225,9 +228,9 @@ class EconomistContentFlow:
             "consensus": board_result.get("consensus", False),
             "dissenting_views": board_result.get("dissenting_views", []),
         }
-        print(f"   Selected: {selected['topic']}")
-        print(f"   Score: {selected['score']:.1f}/10")
-        print(f"   Consensus: {selected['consensus']}")
+        logger.info("   Selected: %s", selected["topic"])
+        logger.info("   Score: %.1f/10", selected["score"])
+        logger.info("   Consensus: %s", selected["consensus"])
         return selected
 
     # ─── stage 3 ───────────────────────────────────────────────────────
@@ -236,8 +239,8 @@ class EconomistContentFlow:
         self.state["selected_topic"] = selected_topic
         topic = selected_topic.get("topic", "")
 
-        print("✍️  Flow Stage 3: Content Generation (Agent SDK pipeline)")
-        print(f"   Topic: {topic}")
+        logger.info("✍️  Flow Stage 3: Content Generation (Agent SDK pipeline)")
+        logger.info("   Topic: %s", topic)
 
         try:
             result = asyncio.run(run_pipeline(topic))
@@ -279,12 +282,18 @@ class EconomistContentFlow:
                 f"Agent SDK budget exceeded — pipeline aborted: {exc}",
             )
         article = result.article
-        print(f"   ✅ Article generated: {len(article.split())} words")
-        print(
-            f"   ✅ Cost: ${result.total_cost_usd:.4f} "
-            f"({result.writer_model} + {result.graphics_model})",
+        logger.info("   ✅ Article generated: %d words", len(article.split()))
+        logger.info(
+            "   ✅ Cost: $%.4f (%s + %s)",
+            result.total_cost_usd,
+            result.writer_model,
+            result.graphics_model,
         )
-        print(f"   ✅ Score: {result.editorial_score}% / {result.gates_passed}/5 gates")
+        logger.info(
+            "   ✅ Score: %s%% / %s/5 gates",
+            result.editorial_score,
+            result.gates_passed,
+        )
 
         # Slug for the DALL-E filename
         slug = topic.lower()
@@ -297,12 +306,12 @@ class EconomistContentFlow:
         image_path = str(output_dir / f"{slug}.png")
 
         if not os.environ.get("OPENAI_API_KEY"):
-            print(
+            logger.warning(
                 "   ⚠️  OPENAI_API_KEY not set — DALL-E image generation requires it "
                 "even when Claude is the primary LLM",
             )
 
-        print("🎨 Generating featured image...")
+        logger.info("🎨 Generating featured image...")
         featured_image = "/assets/images/blog-default.svg"
         try:
             generated = generate_featured_image(
@@ -312,11 +321,11 @@ class EconomistContentFlow:
             )
             if generated:
                 featured_image = f"/assets/images/{slug}.png"
-                print(f"   ✅ Featured image: {image_path}")
+                logger.info("   ✅ Featured image: %s", image_path)
             else:
-                print("   ℹ️  Using default image")
+                logger.info("   ℹ️  Using default image")
         except Exception as exc:
-            print(f"   ℹ️  Image generation failed ({exc}), using default")
+            logger.warning("   ℹ️  Image generation failed (%s), using default", exc)
 
         # Extract image_alt / image_caption drafts emitted by the writer
         _image_alt, _image_caption = "", ""
@@ -352,7 +361,7 @@ class EconomistContentFlow:
     # ─── stage 4 ───────────────────────────────────────────────────────
 
     def quality_gate(self, article_draft: dict[str, Any]) -> str:
-        print("🔍 Flow Stage 4: Quality Gate")
+        logger.info("🔍 Flow Stage 4: Quality Gate")
         self.state["article_draft"] = article_draft
 
         article_text = self._patch_frontmatter(
@@ -369,7 +378,7 @@ class EconomistContentFlow:
                 f"Frontmatter schema validation failed: {schema_result.errors}"
             )
             self.state["revision_feedback"] = schema_result.errors
-            print(f"   Decision: REVISION (schema: {schema_result.errors})")
+            logger.warning("   Decision: REVISION (schema: %s)", schema_result.errors)
             return "revision"
 
         editorial_score = article_draft.get("editorial_score", 0)
@@ -377,8 +386,8 @@ class EconomistContentFlow:
         validator_passed = article_draft.get("publication_validator_passed", False)
         validator_issues = article_draft.get("publication_validator_issues", [])
 
-        print(f"   Editorial Score: {editorial_score}/100")
-        print(f"   Gates Passed: {gates_passed}/5")
+        logger.info("   Editorial Score: %s/100", editorial_score)
+        logger.info("   Gates Passed: %s/5", gates_passed)
 
         # The Agent SDK pipeline already ran ArticleEvaluator and
         # PublicationValidator inside Stage 4. Apply the same publish
@@ -400,8 +409,10 @@ class EconomistContentFlow:
             self.state["revision_feedback"] = [
                 f"Score {editorial_score} too low; tighten thesis, evidence, ending.",
             ]
-            print(
-                f"   Decision: REVISION (score {editorial_score} < {PUBLISH_THRESHOLD})",
+            logger.warning(
+                "   Decision: REVISION (score %s < %s)",
+                editorial_score,
+                PUBLISH_THRESHOLD,
             )
             return "revision"
 
@@ -412,13 +423,19 @@ class EconomistContentFlow:
                 f"Publication validation failed: {len(critical)} critical issues"
             )
             self.state["revision_feedback"] = [i.get("message", "") for i in critical]
-            print(f"   Decision: REVISION ({len(critical)} critical validation issues)")
+            logger.warning(
+                "   Decision: REVISION (%d critical validation issues)", len(critical)
+            )
             for ci in critical:
-                print(f"      ❌ {ci.get('check', 'unknown')}: {ci.get('message', '')}")
+                logger.warning(
+                    "      ❌ %s: %s",
+                    ci.get("check", "unknown"),
+                    ci.get("message", ""),
+                )
             return "revision"
 
         self.state["decision"] = "publish"
-        print("   Decision: PUBLISH ✅")
+        logger.info("   Decision: PUBLISH ✅")
         return "publish"
 
     # ─── publish path ──────────────────────────────────────────────────
@@ -427,8 +444,10 @@ class EconomistContentFlow:
         quality_result = self.state.get("quality_result", {})
         article_text = quality_result.get("article", "")
 
-        print("✅ Flow Complete: PUBLISHED")
-        print(f"   Editorial Score: {quality_result.get('editorial_score', 0)}/100")
+        logger.info("✅ Flow Complete: PUBLISHED")
+        logger.info(
+            "   Editorial Score: %s/100", quality_result.get("editorial_score", 0)
+        )
 
         self._run_article_eval(article_text, "published")
 
@@ -450,7 +469,11 @@ class EconomistContentFlow:
         retry_count = self.state.get("retry_count", 0)
         if retry_count >= MAX_REVISIONS:
             quality_result = self.state.get("quality_result", {})
-            print(f"⛔ Revision exhausted ({retry_count}/{MAX_REVISIONS} retries used)")
+            logger.warning(
+                "⛔ Revision exhausted (%d/%d retries used)",
+                retry_count,
+                MAX_REVISIONS,
+            )
             return {
                 "status": "needs_revision",
                 "editorial_score": quality_result.get("editorial_score", 0),
@@ -466,8 +489,8 @@ class EconomistContentFlow:
             "\n".join(revision_feedback) if revision_feedback else revision_reason
         )
 
-        print(f"🔄 Revision attempt {retry_count + 1}/{MAX_REVISIONS}")
-        print(f"   Feedback: {feedback_text[:200]}")
+        logger.info("🔄 Revision attempt %d/%d", retry_count + 1, MAX_REVISIONS)
+        logger.info("   Feedback: %s", feedback_text[:200])
 
         topic = self.state.get("selected_topic", {}).get("topic", "")
         enhanced_topic = (
@@ -519,7 +542,7 @@ class EconomistContentFlow:
         }
 
         if editorial_score >= PUBLISH_THRESHOLD and validator_passed:
-            print(f"   ✅ Revision succeeded (score: {editorial_score}/100)")
+            logger.info("   ✅ Revision succeeded (score: %s/100)", editorial_score)
             return {
                 "status": "published",
                 "article": edited_article,
@@ -529,11 +552,17 @@ class EconomistContentFlow:
             }
 
         critical = [i for i in validator_issues if i.get("severity") == "CRITICAL"]
-        print(
-            f"   ⚠️  Revision still failing (score: {editorial_score}, issues: {len(critical)})",
+        logger.warning(
+            "   ⚠️  Revision still failing (score: %s, issues: %d)",
+            editorial_score,
+            len(critical),
         )
         for ci in critical:
-            print(f"      ❌ {ci.get('check', 'unknown')}: {ci.get('message', '')}")
+            logger.warning(
+                "      ❌ %s: %s",
+                ci.get("check", "unknown"),
+                ci.get("message", ""),
+            )
 
         title_match = re.search(
             r'title:\s*["\']?(.+?)["\']?\s*$',
@@ -548,7 +577,7 @@ class EconomistContentFlow:
             quarantine_dir / f"{datetime.now().strftime('%Y-%m-%d')}-{slug}.md"
         )
         quarantine_path.write_text(edited_article)
-        print(f"   📄 Quarantined article saved: {quarantine_path}")
+        logger.warning("   📄 Quarantined article saved: %s", quarantine_path)
 
         self._run_article_eval(edited_article, "quarantined")
 
@@ -604,35 +633,47 @@ class EconomistContentFlow:
             evaluator = ArticleEvaluator()
             result = evaluator.evaluate(article, filename=status)
             result.persist("logs/article_evals.json")
-            print(
-                f"   📊 Article eval: {result.total_score}/{result.max_score} "
-                f"({result.percentage}%)",
+            logger.info(
+                "   📊 Article eval: %s/%s (%s%%)",
+                result.total_score,
+                result.max_score,
+                result.percentage,
             )
             for dim, score in result.scores.items():
                 detail = result.details.get(dim, "")
-                print(f"      {dim}: {score}/10 — {detail}")
+                logger.info("      %s: %s/10 — %s", dim, score, detail)
         except Exception as exc:
-            print(f"   ⚠️  Article evaluation failed: {exc}")
+            logger.warning("   ⚠️  Article evaluation failed: %s", exc)
 
 
 def main() -> None:
     """CLI entry point for standalone Flow execution."""
-    print("╔════════════════════════════════════════════════════════════════╗")
-    print("║ ECONOMIST CONTENT FLOW - End-to-End Pipeline                  ║")
-    print("╚════════════════════════════════════════════════════════════════╝\n")
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    )
+    logger.info("╔════════════════════════════════════════════════════════════════╗")
+    logger.info("║ ECONOMIST CONTENT FLOW - End-to-End Pipeline                  ║")
+    logger.info("╚════════════════════════════════════════════════════════════════╝")
 
     flow = EconomistContentFlow()
     try:
         result = flow.kickoff()
-        print("\n╔════════════════════════════════════════════════════════════════╗")
-        print("║ FLOW RESULT                                                     ║")
-        print("╚════════════════════════════════════════════════════════════════╝")
-        print(f"Status: {result.get('status', 'unknown')}")
-        print(f"Editorial Score: {result.get('editorial_score', 0)}/100")
+        logger.info(
+            "╔════════════════════════════════════════════════════════════════╗"
+        )
+        logger.info(
+            "║ FLOW RESULT                                                     ║"
+        )
+        logger.info(
+            "╚════════════════════════════════════════════════════════════════╝"
+        )
+        logger.info("Status: %s", result.get("status", "unknown"))
+        logger.info("Editorial Score: %s/100", result.get("editorial_score", 0))
         if result.get("retry_count"):
-            print(f"Retries: {result['retry_count']}")
+            logger.info("Retries: %s", result["retry_count"])
     except Exception as exc:
-        print(f"\n❌ Flow execution failed: {exc}")
+        logger.error("❌ Flow execution failed: %s", exc)
         raise
 
 

@@ -24,9 +24,6 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-# Import agent metrics
-from agent_metrics import AgentMetrics
-
 # Import featured image generator
 from featured_image_agent import generate_featured_image
 
@@ -48,6 +45,9 @@ from agents.research_agent import run_research_agent
 
 # Import extracted Writer Agent
 from agents.writer_agent import run_writer_agent
+
+# Import agent metrics
+from src.quality.agent_metrics import AgentMetrics
 
 # Import automated reviewer
 # Import chart metrics

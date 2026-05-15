@@ -368,13 +368,13 @@ class TestDeployCallable:
             for c in commands
         ), "clone command missing or token not interpolated"
         # PR creation must run against the full owner/repo.
-        assert any(
-            "gh pr create --repo test-owner/test-blog" in c for c in commands
-        ), "PR was not created"
+        assert any("gh pr create --repo test-owner/test-blog" in c for c in commands), (
+            "PR was not created"
+        )
         # Push must target the new branch.
-        assert any(
-            c.startswith("git push origin content/") for c in commands
-        ), "branch push not invoked"
+        assert any(c.startswith("git push origin content/") for c in commands), (
+            "branch push not invoked"
+        )
 
     def test_auth_failure_raises_deploy_error(
         self, article_file: Path, tmp_path: Path
@@ -418,7 +418,7 @@ class TestDeployCallable:
                 return ""
             if cmd.startswith("git commit -m"):
                 raise dtb.DeployError(
-                    "Command failed (exit 1): git commit -m \"…\"\n"
+                    'Command failed (exit 1): git commit -m "…"\n'
                     "nothing to commit, working tree clean"
                 )
             return ""

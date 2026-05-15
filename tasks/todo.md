@@ -1,23 +1,28 @@
-# TODO: Delete or archive dead files in scripts/ (#327)
+# TODO: Migrate domain modules from scripts/ to src/ (#344)
 
 ## In Progress
 
-- [ ] T4 — Open PR + close #327
+- [ ] T0 — Create empty src/quality/ and src/backlog/ packages
 
 ## Pending
 
-## Verification done in T3
-
-- AC1 (22 deleted): ✓ committed in T1
-- AC2 (33 archived): ✓ git mv complete, scripts/archived/ now has 32 + 1 nested
-- AC3 (pytest same count): ✓ 1817 collected pre+post; 1734 pass / 84 skip / 0 fail
-- AC4 (no archive paths in src/agents/tests imports): ✓ all 29 referenced modules are KEEP
-- AC5 (TestNoCrewAIInSrcOrTests): ✓ 2/2 pass
-- AC6 (4 run_story entries removed from ALLOWED_FILES): ✓ committed in T2
+- [ ] T1 — Migrate agent_reviewer.py to src/quality/
+- [ ] T2 — Migrate governance.py to src/quality/
+- [ ] T3 — Migrate chart_metrics.py to src/quality/
+- [ ] T4 — Migrate schema_validator.py to src/quality/
+- [ ] T5 — Migrate agent_metrics.py to src/quality/
+- [ ] T6 — Migrate defect_tracker.py to src/quality/
+- [ ] T7 — Migrate validate_closed_loop.py to src/quality/
+- [ ] T8 — Migrate visual_qa_zones.py to src/quality/
+- [ ] T9 — Migrate backlog_groomer.py to src/backlog/
+- [ ] T10 — Migrate ci_health_monitor.py to src/backlog/
+- [ ] T11 — Migrate migrate_backlog_to_github.py to src/backlog/
+- [ ] T12 — Migrate validate_documentation_accuracy.py to src/backlog/
+- [ ] T13 — Convert skills_manager bare imports to scripts.skills_manager
+- [ ] T14 — Remove sys.path.insert from tests/test_architecture_compliance.py
+- [ ] T15 — git mv 12 originals to scripts/archived/
+- [ ] T16 — Update SPEC.md §2 + final verification
 
 ## Done
 
-- [x] T1 — Delete 22 confirmed-dead files from scripts/; verify pytest count unchanged (1817 tests collected)
-- [x] T2 — Remove 4 stale run_story*.py entries from ALLOWED_FILES in test_architecture_compliance.py (13/13 pass)
-- [x] T2.5 — Staff-engineer reclassification: 12 ARCHIVE → KEEP total (7 from initial pre-execution review for `agents/` + test callers; 5 more after `test_continuous_burndown` collection error revealed callers in KEEP scripts). SPEC §2 amended in two rounds; ADR-0010 filed for follow-up `scripts/` → `src/` migration
-- [x] T3 — Moved 33 ARCHIVE files to scripts/archived/ via git mv; removed `crewai_agents.py` and `visual_qa.py` from ALLOWED_FILES in test_architecture_compliance.py; updated docstring exceptions list; flipped `("crewai_agents.py", True)` → `("crewai_agents.py", False)` in parametrized test
+(empty)

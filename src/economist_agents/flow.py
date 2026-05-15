@@ -39,7 +39,11 @@ import yaml as _yaml
 
 from scripts.article_evaluator import ArticleEvaluator
 from scripts.frontmatter_schema import FrontmatterSchema
-from src.agent_sdk._shared import EmptyResearchBriefError, refine_image_metadata
+from src.agent_sdk._shared import (
+    BudgetExceededError,
+    EmptyResearchBriefError,
+    refine_image_metadata,
+)
 from src.agent_sdk.pipeline import run_pipeline
 from src.agent_sdk.stage3_runner import MalformedArticleError
 from src.economist_agents.adapters import (
@@ -93,22 +97,43 @@ class EconomistContentFlow:
         topics = self.discover_topics()
         selected = self.editorial_review(topics)
         draft = self.generate_content(selected)
-        decision = self.quality_gate(draft)
-        if decision == "publish":
-            result = self.publish_article()
+        # Budget-exceeded is a hard abort — revising won't lower per-call
+        # cost, so skip the quality_gate/revision dance entirely.
+        if self.state.get("abort_reason") == "budget_exceeded":
+            result = self._budget_exceeded_result()
         else:
-            result = self.request_revision()
+            decision = self.quality_gate(draft)
+            if decision == "publish":
+                result = self.publish_article()
+            else:
+                result = self.request_revision()
         self._write_pipeline_result(result)
         return result
+
+    def _budget_exceeded_result(self) -> dict[str, Any]:
+        """Terminal pipeline result when an Agent SDK call hit max_budget_usd."""
+        print("⛔ Flow aborted: budget exceeded")
+        return {
+            "status": "budget_exceeded",
+            "editorial_score": 0,
+            "gates_passed": 0,
+            "revision_reason": self.state.get(
+                "revision_reason", "Agent SDK budget exceeded"
+            ),
+            "budget_usd": self.state.get("budget_usd"),
+        }
 
     def _write_pipeline_result(self, result: dict[str, Any]) -> None:
         """Write output/pipeline_result.json for the CI metrics step in content-pipeline.yml."""
         PIPELINE_RESULT_PATH.parent.mkdir(parents=True, exist_ok=True)
-        payload = {
+        payload: dict[str, Any] = {
             "status": result.get("status", "unknown"),
             "editorial_score": result.get("editorial_score", 0),
             "gates_passed": result.get("gates_passed", 0),
         }
+        if result.get("status") == "budget_exceeded":
+            payload["revision_reason"] = result.get("revision_reason", "")
+            payload["budget_usd"] = result.get("budget_usd")
         try:
             PIPELINE_RESULT_PATH.write_bytes(orjson.dumps(payload))
         except Exception as exc:
@@ -240,6 +265,18 @@ class EconomistContentFlow:
             return self._null_article_draft(
                 "empty_research_brief",
                 "No web search results — check SERPER_API_KEY and retry.",
+            )
+        except BudgetExceededError as exc:
+            # Hard abort. Revising won't lower per-call cost — it just burns
+            # more budget — so we mark the run terminal and let kickoff()
+            # short-circuit to a `status: budget_exceeded` pipeline result.
+            logger.error("Agent SDK budget exceeded — aborting pipeline: %s", exc)
+            self.state["abort_reason"] = "budget_exceeded"
+            self.state["revision_reason"] = str(exc)
+            self.state["budget_usd"] = exc.budget_usd
+            return self._null_article_draft(
+                "budget_exceeded",
+                f"Agent SDK budget exceeded — pipeline aborted: {exc}",
             )
         article = result.article
         print(f"   ✅ Article generated: {len(article.split())} words")
@@ -441,6 +478,17 @@ class EconomistContentFlow:
 
         try:
             result = asyncio.run(run_pipeline(enhanced_topic))
+        except BudgetExceededError as exc:
+            # Budget caps don't get fixed by retrying — abort cleanly.
+            logger.error("Agent SDK budget exceeded on revision — aborting: %s", exc)
+            return {
+                "status": "budget_exceeded",
+                "editorial_score": 0,
+                "gates_passed": 0,
+                "revision_reason": str(exc),
+                "budget_usd": exc.budget_usd,
+                "retry_count": retry_count + 1,
+            }
         except (MalformedArticleError, EmptyResearchBriefError) as exc:
             logger.warning("Pipeline error on revision — quarantining: %s", exc)
             return {

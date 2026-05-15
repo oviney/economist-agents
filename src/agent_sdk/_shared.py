@@ -19,6 +19,22 @@ class EmptyResearchBriefError(RuntimeError):
     """Raised when all web searches return no results, preventing an unsourced LLM call."""
 
 
+class BudgetExceededError(RuntimeError):
+    """Raised when an Agent SDK call hits its ``max_budget_usd`` cap.
+
+    The SDK signals budget exhaustion by emitting a ``ResultMessage`` with
+    ``subtype="error_max_budget_usd"`` and ``is_error=True`` (see
+    ``claude_agent_sdk.types.ClaudeAgentOptions.max_budget_usd`` docstring).
+    The Stage 3 runner inspects that signal and re-raises this typed error so
+    callers (notably ``flow.py:generate_content``) can route a clean abort
+    instead of crashing with an unhandled exception.
+    """
+
+    def __init__(self, message: str, *, budget_usd: float | None = None) -> None:
+        self.budget_usd = budget_usd
+        super().__init__(message)
+
+
 _DEFAULT_VISION_MODEL = "claude-sonnet-4-6"
 _ALLOWED_MODELS: frozenset[str] = frozenset(
     {

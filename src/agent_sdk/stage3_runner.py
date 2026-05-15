@@ -41,6 +41,7 @@ from src.agent_sdk._shared import (
 )
 from src.agent_sdk._shared import (
     GRAPHICS_AGENT_PROMPT,
+    BudgetExceededError,
     build_research_brief,
 )
 from src.agent_sdk._shared import (
@@ -199,6 +200,27 @@ async def _collect_text(
                     text_chunks.append(block.text)
         elif isinstance(msg, ResultMessage):
             cost = float(msg.total_cost_usd or 0.0)
+            # The Agent SDK signals budget exhaustion by returning a
+            # ResultMessage with subtype="error_max_budget_usd" rather than
+            # raising. Surface it as a typed BudgetExceededError so callers
+            # can route a clean abort. See claude_agent_sdk.types
+            # ClaudeAgentOptions.max_budget_usd docstring.
+            if msg.subtype == "error_max_budget_usd":
+                cap_str = (
+                    f"${max_budget_usd:.4f}"
+                    if max_budget_usd is not None
+                    else "<unset>"
+                )
+                logger.warning(
+                    "Agent SDK budget exceeded: cap=%s, cost_at_abort=$%.4f",
+                    cap_str,
+                    cost,
+                )
+                raise BudgetExceededError(
+                    f"Agent SDK budget exceeded: cap={cap_str}, "
+                    f"cost_at_abort=${cost:.4f}",
+                    budget_usd=max_budget_usd,
+                )
 
     pieces: list[str] = []
     for chunk in text_chunks:

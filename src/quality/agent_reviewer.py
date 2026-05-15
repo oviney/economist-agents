@@ -20,9 +20,10 @@ class AgentReviewer:
 
     def __init__(self, standards_file: str | Path | None = None):
         if standards_file is None:
-            script_dir = Path(__file__).parent.parent
+            # Repo root is three levels up: src/quality/agent_reviewer.py -> repo root
+            repo_root = Path(__file__).resolve().parent.parent.parent
             standards_file = (
-                script_dir / "docs" / "conventions" / "AGENT_QUALITY_STANDARDS.md"
+                repo_root / "docs" / "conventions" / "AGENT_QUALITY_STANDARDS.md"
             )
 
         self.standards_file = Path(standards_file)

@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-from src.telemetry.roi_tracker import ROITracker, get_tracker
+from src.telemetry.roi_tracker import MODEL_PRICING, ROITracker, get_tracker
 
 
 class TestROITrackerBasics:
@@ -388,6 +388,51 @@ class TestLogRotation:
             # Verify old execution was removed
             assert len(tracker.log["executions"]) == 1
             assert tracker.log["executions"][0]["execution_id"] != "old_exec"
+
+
+class TestClaude4Pricing:
+    """Issue #333 AC1: Claude 4 model IDs are present with current Anthropic rates.
+
+    Source: https://platform.claude.com/docs/en/docs/about-claude/pricing
+    (fetched 2026-05-15).
+    """
+
+    @pytest.mark.parametrize(
+        "model_id,expected_input,expected_output",
+        [
+            ("claude-sonnet-4-6", 3.00, 15.00),
+            ("claude-sonnet-4-5", 3.00, 15.00),
+            ("claude-opus-4-7", 5.00, 25.00),
+            ("claude-haiku-4-5", 1.00, 5.00),
+        ],
+    )
+    def test_claude_4_model_priced_per_anthropic_rate_card(
+        self, model_id: str, expected_input: float, expected_output: float
+    ):
+        """Each active Claude 4 model ID has the published Anthropic rate."""
+        assert model_id in MODEL_PRICING, (
+            f"{model_id} missing from MODEL_PRICING — production runs would "
+            f"be priced at $0.00 per the .get() fallback."
+        )
+        assert MODEL_PRICING[model_id]["input"] == pytest.approx(expected_input)
+        assert MODEL_PRICING[model_id]["output"] == pytest.approx(expected_output)
+
+    def test_cost_override_bypasses_pricing_table(self):
+        """When ``cost_usd`` is supplied, the pricing table is ignored."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tracker = ROITracker(log_file=str(Path(tmpdir) / "test_roi.json"))
+            execution_id = tracker.start_execution("pipeline")
+            tracker.log_llm_call(
+                execution_id=execution_id,
+                agent="pipeline",
+                model="some-unknown-model",
+                input_tokens=0,
+                output_tokens=0,
+                cost_usd=0.1234,
+            )
+            execution = tracker.active_executions[execution_id]
+            assert execution["total_cost_usd"] == pytest.approx(0.1234)
+            assert execution["llm_calls"][0]["cost_usd"] == pytest.approx(0.1234)
 
 
 if __name__ == "__main__":

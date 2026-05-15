@@ -139,3 +139,72 @@ class TestRunPipeline:
 
         assert isinstance(result, PipelineResult)
         assert result.total_cost_usd == pytest.approx(0.05)
+
+
+class TestRoiTelemetryWiring:
+    """Issue #333 AC2: run_pipeline records cost via ROITracker."""
+
+    def test_pipeline_records_writer_and_graphics_cost_in_roi_log(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Writer + graphics costs from PipelineResult land in execution_roi.json."""
+        from src.telemetry.roi_tracker import ROITracker
+
+        # Isolate the cost log and the ROI tracker singleton.
+        monkeypatch.setattr(
+            "src.agent_sdk.pipeline.COST_LOG_PATH", tmp_path / "costs.jsonl"
+        )
+        roi_log = tmp_path / "execution_roi.json"
+        isolated_tracker = ROITracker(log_file=str(roi_log))
+        monkeypatch.setattr(
+            "src.agent_sdk.pipeline.get_tracker", lambda: isolated_tracker
+        )
+
+        stage3 = _fake_stage3()
+        with (
+            patch("src.agent_sdk.pipeline.run_stage3_spike", return_value=stage3),
+            patch(
+                "src.agent_sdk.pipeline.run_stage4",
+                return_value=_fake_stage4(stage3.article),
+            ),
+        ):
+            asyncio.run(run_pipeline("AI Testing"))
+
+        executions = isolated_tracker.log["executions"]
+        assert len(executions) == 1, "Expected one pipeline execution in ROI log"
+        execution = executions[0]
+        assert execution["agent"] == "pipeline"
+        # Total recorded cost equals writer + graphics from the SDK, not a
+        # token-times-pricing recomputation.
+        assert execution["total_cost_usd"] == pytest.approx(
+            stage3.writer_cost_usd + stage3.graphics_cost_usd
+        )
+        # Both calls are individually recorded so per-model attribution holds.
+        models = [call["model"] for call in execution["llm_calls"]]
+        assert stage3.writer_model in models
+        assert stage3.graphics_model in models
+
+    def test_pipeline_returns_result_when_roi_logging_fails(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """ROI telemetry failure is non-fatal — pipeline still returns a result."""
+        monkeypatch.setattr(
+            "src.agent_sdk.pipeline.COST_LOG_PATH", tmp_path / "costs.jsonl"
+        )
+        monkeypatch.setattr(
+            "src.agent_sdk.pipeline._record_roi",
+            MagicMock(side_effect=RuntimeError("disk full")),
+        )
+
+        stage3 = _fake_stage3()
+        with (
+            patch("src.agent_sdk.pipeline.run_stage3_spike", return_value=stage3),
+            patch(
+                "src.agent_sdk.pipeline.run_stage4",
+                return_value=_fake_stage4(stage3.article),
+            ),
+        ):
+            result = asyncio.run(run_pipeline("AI Testing"))
+
+        assert isinstance(result, PipelineResult)
+        assert result.total_cost_usd == pytest.approx(0.05)

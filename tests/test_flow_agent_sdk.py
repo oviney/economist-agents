@@ -308,9 +308,86 @@ class TestPublishArticle:
         result = flow.publish_article()
 
         assert result["status"] == "published"
+        assert result["deploy_status"] == "skipped_no_credentials"
         flow._deduplicator.index_article.assert_called_once()
         kwargs = flow._deduplicator.index_article.call_args.kwargs
         assert kwargs["title"] == "Indexed Topic"
+
+    def test_publish_calls_deploy_when_credentials_present(
+        self,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """publish_article() must hand off to deploy() when BLOG_REPO_* env vars
+        are set and the process is not running inside GitHub Actions (#336).
+        """
+        # Run in an isolated tmp dir so the 'output/' write doesn't pollute repo.
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("BLOG_REPO_OWNER", "test-owner")
+        monkeypatch.setenv("BLOG_REPO_NAME", "test-blog")
+        monkeypatch.setenv("BLOG_REPO_TOKEN", "fake-token")
+        monkeypatch.delenv("GITHUB_ACTIONS", raising=False)
+
+        flow = EconomistContentFlow()
+        flow._deduplicator = Mock()
+        flow.state["selected_topic"] = {"topic": "Deploy Topic"}
+        flow.state["quality_result"] = {
+            "article": _VALID_FRONTMATTER,
+            "editorial_score": 90,
+            "gates_passed": 5,
+        }
+
+        from dataclasses import dataclass
+
+        @dataclass
+        class _FakeResult:
+            status: str = "published"
+            branch: str = "content/x"
+            article_name: str = "x.md"
+            validation_report: str = ""
+            pushed: bool = True
+
+        with patch(
+            "scripts.deploy_to_blog.deploy", return_value=_FakeResult()
+        ) as mock_deploy:
+            result = flow.publish_article()
+
+        assert result["deploy_status"] == "published"
+        mock_deploy.assert_called_once()
+        kwargs = mock_deploy.call_args.kwargs
+        assert kwargs["blog_owner"] == "test-owner"
+        assert kwargs["blog_repo"] == "test-blog"
+        assert kwargs["token"] == "fake-token"
+        # The article must have been written to ./output/ before deploy.
+        assert kwargs["article_path"].exists()
+        assert kwargs["article_path"].suffix == ".md"
+
+    def test_publish_skips_deploy_in_ci(
+        self,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """In CI the workflow step runs the script; flow must not double-deploy."""
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("BLOG_REPO_OWNER", "test-owner")
+        monkeypatch.setenv("BLOG_REPO_NAME", "test-blog")
+        monkeypatch.setenv("BLOG_REPO_TOKEN", "fake-token")
+        monkeypatch.setenv("GITHUB_ACTIONS", "true")
+
+        flow = EconomistContentFlow()
+        flow._deduplicator = Mock()
+        flow.state["selected_topic"] = {"topic": "CI Topic"}
+        flow.state["quality_result"] = {
+            "article": _VALID_FRONTMATTER,
+            "editorial_score": 90,
+            "gates_passed": 5,
+        }
+
+        with patch("scripts.deploy_to_blog.deploy") as mock_deploy:
+            result = flow.publish_article()
+
+        assert result["deploy_status"] == "skipped_in_ci"
+        mock_deploy.assert_not_called()
 
 
 class TestRequestRevision:

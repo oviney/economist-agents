@@ -2,6 +2,7 @@
 # Dev-only tools (pytest, streamlit, linters) are in requirements-dev.txt.
 # Pin new deps to a tested minor range; update deliberately, not silently.
 
+anthropic>=0.40.0,<1.0.0          # Anthropic Python SDK — used by src/agent_sdk/_shared.py for vision refinement (#345)
 claude-agent-sdk>=0.1.68,<1.0.0   # Anthropic Agent SDK — primary agent runtime (ADR-0006 Phase 2)
 chromadb>=0.4.0,<1.0.0            # Vector DB for Style Memory RAG; API breaks across major versions
 matplotlib>=3.7.0,<4.0.0          # Chart generation for graphics agent

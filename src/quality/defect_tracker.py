@@ -82,7 +82,8 @@ class DefectTracker:
 
     def __init__(self, tracker_file: str = None):
         if tracker_file is None:
-            repo_root = Path(__file__).parent.parent
+            # Repo root is three levels up: src/quality/defect_tracker.py -> repo root
+            repo_root = Path(__file__).resolve().parent.parent.parent
             # The tracker JSON moved from skills/ to data/skills_state/
             # during the Sprint 20-21 restructure. Prefer the new path;
             # fall back to the legacy location for backwards compat.
@@ -423,9 +424,9 @@ class DefectTracker:
 
         """
         # Load requirements registry if available
-        registry_path = (
-            Path(__file__).parent.parent / "docs" / "REQUIREMENTS_REGISTRY.md"
-        )
+        # Repo root is three levels up: src/quality/defect_tracker.py -> repo root
+        repo_root = Path(__file__).resolve().parent.parent.parent
+        registry_path = repo_root / "docs" / "REQUIREMENTS_REGISTRY.md"
         requirements_exist = registry_path.exists()
 
         # Default validation (heuristic-based when registry not available)

@@ -236,7 +236,7 @@ class TestQualityScoreCalculation:
         }
 
         with patch(
-            "scripts.defect_tracker.DefectTracker.get_metrics",
+            "src.quality.defect_tracker.DefectTracker.get_metrics",
             return_value=mock_defects,
         ):
             dashboard = QualityDashboard()
@@ -269,7 +269,7 @@ class TestQualityScoreCalculation:
         }
 
         with patch(
-            "scripts.defect_tracker.DefectTracker.get_metrics",
+            "src.quality.defect_tracker.DefectTracker.get_metrics",
             return_value=mock_defects,
         ):
             dashboard = QualityDashboard()
@@ -305,9 +305,11 @@ class TestDashboardGeneration:
                 return_value={"runs": []},
             ),
             patch(
-                "scripts.defect_tracker.DefectTracker.get_metrics",
+                "src.quality.defect_tracker.DefectTracker.get_metrics",
                 return_value={
-                    "summary": {"defect_escape_rate": 40.0, "total_bugs": 10},
+                    "defect_escape_rate": 40.0,
+                    "total_bugs": 10,
+                    "fixed_bugs": 0,
                 },
             ),
         ):

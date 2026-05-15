@@ -51,6 +51,32 @@ from src.agent_sdk._shared import (
 logger = logging.getLogger(__name__)
 
 
+def _fetch_style_context(topic: str) -> str:
+    """Fetch a style-memory exemplar block for the writer prompt.
+
+    Isolated from ``run_stage3`` so the StyleMemoryTool import (which
+    transitively pulls in ChromaDB) is paid only when the runtime needs
+    it, and so tests can monkeypatch this function without touching the
+    tool itself.
+
+    Returns an empty string when the tool is unavailable, errors out, or
+    returns no exemplars above the relevance threshold — callers must
+    omit the ``## Style Memory`` section entirely in that case.
+    """
+    try:
+        from src.tools.style_memory_tool import StyleMemoryTool
+    except ImportError as exc:
+        logger.info("StyleMemoryTool unavailable (%s); skipping style context", exc)
+        return ""
+
+    try:
+        tool = StyleMemoryTool()
+        return tool.get_style_context(topic)
+    except Exception as exc:  # noqa: BLE001 — style memory is best-effort
+        logger.warning("StyleMemoryTool.get_style_context failed: %s", exc)
+        return ""
+
+
 class MalformedArticleError(ValueError):
     """Raised when the writer agent returns output that is not a well-formed article."""
 
@@ -286,6 +312,13 @@ async def run_stage3(
     research_brief = build_research_brief(topic)
     logger.info("Research brief: %d chars", len(research_brief))
 
+    style_context = _fetch_style_context(topic)
+    if style_context:
+        logger.info("Style memory: %d chars of exemplars", len(style_context))
+        style_section = f"\n\n## Style Memory\n\n{style_context}"
+    else:
+        style_section = ""
+
     writer_prompt = (
         f"Write the complete Economist-style article on this topic: {topic}\n\n"
         f"Output the entire article text with YAML frontmatter at the top. "
@@ -310,6 +343,7 @@ async def run_stage3(
         f"RESEARCH BRIEF (use ONLY these sources and statistics — do NOT "
         f"invent any statistics, researcher names, or URLs):\n\n"
         f"{research_brief}"
+        f"{style_section}"
     )
     raw_writer_output, writer_cost = await _collect_text(
         writer_prompt,

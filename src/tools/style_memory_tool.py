@@ -235,6 +235,63 @@ class StyleMemoryTool:
             print(f"⚠️  Style Memory query failed: {e}")
             return []
 
+    def get_style_context(
+        self,
+        topic: str,
+        n_results: int = 3,
+        min_score: float = 0.7,
+    ) -> str:
+        """Return a formatted markdown block of style exemplars for a topic.
+
+        Designed for injection into the Stage 3 writer prompt. Queries the
+        underlying ChromaDB collection for paragraphs from Gold Standard
+        articles most relevant to ``topic`` and returns them as a markdown
+        snippet the writer can use as voice exemplars.
+
+        Graceful degradation: returns an empty string when ChromaDB is
+        unavailable, the collection is empty, or no results clear the
+        ``min_score`` threshold. Callers should treat an empty return as
+        "omit the section entirely" — never emit an empty heading.
+
+        Args:
+            topic: Article topic to retrieve style exemplars for.
+            n_results: Maximum number of exemplars to return.
+            min_score: Minimum relevance score (0-1) to include.
+
+        Returns:
+            Markdown-formatted style exemplars, or ``""`` if none are
+            available.
+
+        """
+        if not topic or not topic.strip():
+            return ""
+
+        results = self.query(topic, n_results=n_results, min_score=min_score)
+        if not results:
+            return ""
+
+        lines: list[str] = [
+            "Reference these voice exemplars from Gold Standard articles. "
+            "Mirror their cadence, sentence shape, and tone — do not copy "
+            "their facts.",
+            "",
+        ]
+        for idx, result in enumerate(results, 1):
+            source = result.get("source", "unknown")
+            score = result.get("score", 0.0)
+            text = result.get("text", "").strip()
+            if not text:
+                continue
+            lines.append(f"{idx}. (source: {source}, score: {score:.2f})")
+            lines.append(f"   > {text}")
+            lines.append("")
+
+        # If every result had empty text, return "" rather than a header.
+        if len(lines) <= 2:
+            return ""
+
+        return "\n".join(lines).rstrip() + "\n"
+
     def get_stats(self) -> dict[str, Any]:
         """Get Style Memory Tool statistics.
 

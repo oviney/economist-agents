@@ -17,9 +17,13 @@ Your **first two tool calls** MUST be, in order:
 
 Do this **before** any `Read`, `Bash`, `Edit`, `Write`, `Grep`, or other tool. Do not skip even if the task seems obvious. The meta-skills exist to triage and orient you — running the lifecycle "by hand" is the failure mode this contract prevents.
 
-### 2. After triage — invoke the phase skill
+### 2. After triage — every phase skill is a formal Skill tool call
 
-The `using-agent-skills` flowchart will point you at a phase skill (e.g. `agent-skills:spec-driven-development`, `agent-skills:planning-and-task-breakdown`, `agent-skills:incremental-implementation`, `agent-skills:test-driven-development`, `agent-skills:code-review-and-quality`, `agent-skills:shipping-and-launch`). Invoke it via the `Skill` tool. Do not paraphrase its workflow inline.
+The `using-agent-skills` flowchart will point you at a phase skill (e.g. `agent-skills:spec-driven-development`, `agent-skills:planning-and-task-breakdown`, `agent-skills:incremental-implementation`, `agent-skills:test-driven-development`, `agent-skills:code-review-and-quality`, `agent-skills:shipping-and-launch`).
+
+**Each phase skill in your chain MUST be invoked via the `Skill` tool.** Do not paraphrase the workflow inline. Do not append parenthetical justifications such as "applied as inline practice", "phase collapsed to one atomic slice", "workflow only", or any equivalent.
+
+If you determine a phase skill genuinely does not apply to your task, **omit it from your chain** — do not invoke it as "workflow only" and do not list it in your manifest with a parenthetical note. An honest manifest with fewer entries is preferred over a padded manifest with notes.
 
 For a feature implementation from a GitHub issue, the typical chain is:
 
@@ -29,6 +33,10 @@ using-agent-skills → context-engineering → spec-driven-development (if issue
   → test-driven-development → code-review-and-quality
   → git-workflow-and-versioning → shipping-and-launch
 ```
+
+**Reference model** — Wave 3 PR #354 (worker on issue #334 print→logger): 3 formal `Skill` invocations (`using-agent-skills`, `context-engineering`, `incremental-implementation`), no claims of additional phases, work shipped clean on first try.
+
+**Anti-pattern** — Wave 2 PR #352 and Wave 3 PR #355: 2 formal invocations followed by `(workflow)` labels or "inline practice" notes for phase skills. Work was correct in both cases, but the manifest was padded with non-invocations and required this contract amendment.
 
 ### 3. Surface assumptions (Core Operating Behavior #1)
 
@@ -40,10 +48,10 @@ Your final summary MUST include:
 
 ```
 SKILL INVOCATIONS:
-- <timestamp> Skill agent-skills:using-agent-skills
-- <timestamp> Skill agent-skills:context-engineering
-- <timestamp> Skill <phase-skill-1>
-- <timestamp> Skill <phase-skill-2>
+- <step> Skill agent-skills:using-agent-skills
+- <step> Skill agent-skills:context-engineering
+- <step> Skill <phase-skill-1>
+- <step> Skill <phase-skill-2>
 ...
 
 ASSUMPTIONS:
@@ -60,7 +68,40 @@ WORK PRODUCT:
 - Acceptance criteria met: <yes|partial|no with explanation>
 ```
 
-If the SKILL INVOCATIONS list does not start with `using-agent-skills` followed by `context-engineering`, your work will be rejected.
+**Manifest validation — automatic rejection criteria:**
+
+The `SKILL INVOCATIONS:` manifest is validated by the parent orchestrator. Your work will be rejected if any of these patterns appear:
+
+1. The list does not start with `Skill agent-skills:using-agent-skills` followed by `Skill agent-skills:context-engineering`.
+2. Any entry contains the substring `(workflow)`, `(workflow-only)`, `(inline)`, `(applied)`, `inline practice`, `collapsed`, `not separately invoked`, or any equivalent non-invocation marker.
+3. Any entry contains a parenthetical justification, dash-explanation, or trailing prose beyond `- <step> Skill <skill-name>`.
+4. The summary justifies skipping a Skill invocation in a paragraph outside the manifest.
+
+**Correct format example:**
+
+```
+SKILL INVOCATIONS:
+- 1 Skill agent-skills:using-agent-skills
+- 2 Skill agent-skills:context-engineering
+- 3 Skill agent-skills:incremental-implementation
+```
+
+**Incorrect format examples — these will trigger rejection:**
+
+```
+SKILL INVOCATIONS:
+- 1 Skill agent-skills:using-agent-skills
+- 2 Skill agent-skills:context-engineering
+- (workflow) agent-skills:test-driven-development — wrote tests        ← rejected (workflow label)
+- (workflow) agent-skills:code-review-and-quality                       ← rejected (workflow label)
+```
+
+```
+SKILL INVOCATIONS:
+- 1 Skill agent-skills:using-agent-skills
+- 2 Skill agent-skills:context-engineering
+- 3 Skill agent-skills:incremental-implementation (phase collapsed)     ← rejected (parenthetical justification)
+```
 
 ### 5. Isolation
 

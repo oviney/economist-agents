@@ -34,7 +34,7 @@ Exempt: simple Q&A, status checks, command output, one-line edits.
 
 ### Dispatching worker agents
 
-When dispatching agents via the `Agent` tool (orchestrating the fleet), the brief MUST include the worker discipline contract from `.claude/worker-brief-contract.md`. Workers that produce output without evidence of `Skill` invocations are rejected and re-dispatched.
+When dispatching agents via the `Agent` tool (orchestrating the fleet), the brief MUST include the worker discipline contract from `docs/worker-brief-contract.md`. Workers that produce output without evidence of `Skill` invocations are rejected and re-dispatched.
 
 ## Architecture
 

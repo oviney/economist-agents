@@ -115,9 +115,7 @@ class TestStyleMemoryWiring:
         # AC2 — heading must appear after the research brief, not before.
         brief_idx = prompt.index("RESEARCH BRIEF")
         style_idx = prompt.index("## Style Memory")
-        assert style_idx > brief_idx, (
-            "## Style Memory must appear after RESEARCH BRIEF"
-        )
+        assert style_idx > brief_idx, "## Style Memory must appear after RESEARCH BRIEF"
 
     def test_style_section_omitted_when_chromadb_empty(
         self, stub_pipeline, captured_prompts
@@ -152,9 +150,7 @@ class TestGetStyleContextMethod:
 
         tool = StyleMemoryTool.__new__(StyleMemoryTool)
         tool.collection = object()  # truthy — passes the early-return gate
-        with patch.object(
-            StyleMemoryTool, "query", return_value=[]
-        ):
+        with patch.object(StyleMemoryTool, "query", return_value=[]):
             assert tool.get_style_context("anything") == ""
 
     def test_returns_empty_for_empty_topic(self) -> None:
@@ -216,6 +212,5 @@ class TestFetchStyleContextHelper:
             return_value=_FakeTool(),
         ):
             assert (
-                stage3_runner._fetch_style_context("a topic")
-                == "exemplars for a topic"
+                stage3_runner._fetch_style_context("a topic") == "exemplars for a topic"
             )

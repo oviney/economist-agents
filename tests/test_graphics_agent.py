@@ -180,7 +180,7 @@ class TestChartGeneration:
         with pytest.raises(ValueError, match="Invalid output_path"):
             agent.generate_chart(valid_chart_spec, None)
 
-    @patch("llm_client.call_llm")
+    @patch("scripts.llm_client.call_llm")
     @patch("subprocess.run")
     def test_generate_chart_success(
         self,
@@ -204,7 +204,7 @@ class TestChartGeneration:
         mock_subprocess.assert_called_once()
         mock_metrics_collector.record_generation.assert_called_once()
 
-    @patch("llm_client.call_llm")
+    @patch("scripts.llm_client.call_llm")
     @patch("subprocess.run")
     def test_generate_chart_subprocess_failure(
         self,
@@ -226,7 +226,7 @@ class TestChartGeneration:
         assert result is None
         mock_metrics_collector.record_generation.assert_called()
 
-    @patch("llm_client.call_llm")
+    @patch("scripts.llm_client.call_llm")
     def test_generate_chart_llm_exception(
         self,
         mock_call_llm,
@@ -248,7 +248,7 @@ class TestChartGeneration:
 class TestMatplotlibCodeGeneration:
     """Test matplotlib code generation."""
 
-    @patch("llm_client.call_llm")
+    @patch("scripts.llm_client.call_llm")
     def test_generate_matplotlib_code(
         self,
         mock_call_llm,
@@ -265,7 +265,7 @@ class TestMatplotlibCodeGeneration:
         assert "import matplotlib.pyplot" in code
         mock_call_llm.assert_called_once()
 
-    @patch("llm_client.call_llm")
+    @patch("scripts.llm_client.call_llm")
     def test_extract_code_from_python_block(
         self,
         mock_call_llm,
@@ -280,7 +280,7 @@ class TestMatplotlibCodeGeneration:
 
         assert code.strip() == "print('test')"
 
-    @patch("llm_client.call_llm")
+    @patch("scripts.llm_client.call_llm")
     def test_extract_code_from_generic_block(
         self,
         mock_call_llm,
@@ -372,7 +372,7 @@ class TestMatplotlibCodeExecution:
 class TestBackwardCompatibility:
     """Test backward compatibility with economist_agent.py."""
 
-    @patch("llm_client.call_llm")
+    @patch("scripts.llm_client.call_llm")
     @patch("subprocess.run")
     def test_run_graphics_agent_function(
         self,
@@ -510,7 +510,7 @@ class TestTaskTemplates:
 class TestMetricsIntegration:
     """Test metrics collection integration."""
 
-    @patch("llm_client.call_llm")
+    @patch("scripts.llm_client.call_llm")
     @patch("subprocess.run")
     def test_metrics_start_chart_called(
         self,
@@ -534,7 +534,7 @@ class TestMetricsIntegration:
             valid_chart_spec,
         )
 
-    @patch("llm_client.call_llm")
+    @patch("scripts.llm_client.call_llm")
     @patch("subprocess.run")
     def test_metrics_record_generation_success(
         self,
@@ -559,7 +559,7 @@ class TestMetricsIntegration:
         # Check kwargs instead of positional args
         assert calls[0].kwargs["success"] is True
 
-    @patch("llm_client.call_llm")
+    @patch("scripts.llm_client.call_llm")
     def test_metrics_record_generation_failure(
         self,
         mock_call_llm,
@@ -589,7 +589,7 @@ class TestMetricsIntegration:
 class TestIntegration:
     """Integration tests."""
 
-    @patch("llm_client.call_llm")
+    @patch("scripts.llm_client.call_llm")
     @patch("subprocess.run")
     def test_full_chart_generation_flow(
         self,

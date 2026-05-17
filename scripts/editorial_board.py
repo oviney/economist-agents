@@ -48,14 +48,14 @@ from pathlib import Path
 # ═══════════════════════════════════════════════════════════════════════════
 # BOARD MEMBER PERSONAS
 # ═══════════════════════════════════════════════════════════════════════════
-from agent_loader import load_board_members as _load_board_members
-from content_intelligence import (
+from scripts.agent_loader import load_board_members as _load_board_members
+from scripts.content_intelligence import (
     ArticlePerformance,
     get_bottom_performers,
 )
 
 # Import unified LLM client
-from llm_client import call_llm, create_llm_client
+from scripts.llm_client import call_llm, create_llm_client
 
 logger = logging.getLogger(__name__)
 

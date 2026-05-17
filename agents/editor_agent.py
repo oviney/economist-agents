@@ -16,10 +16,10 @@ from typing import Any
 # Add scripts directory to path for llm_client import
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-from agent_loader import (
+from scripts.agent_loader import (
     load_content_agent as _load_content_agent,  # type: ignore
 )
-from llm_client import call_llm  # type: ignore
+from scripts.llm_client import call_llm  # type: ignore
 
 # Sprint 14 Integration: Style Memory RAG
 try:

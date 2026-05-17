@@ -49,7 +49,8 @@ if str(_SCRIPTS_DIR) not in sys.path:
 
 import content_intelligence  # noqa: E402
 import topic_scout  # noqa: E402
-from llm_client import create_llm_client  # noqa: E402
+
+from scripts.llm_client import create_llm_client  # noqa: E402
 
 logger = logging.getLogger(__name__)
 

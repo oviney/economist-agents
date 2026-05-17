@@ -49,8 +49,8 @@ import orjson
 # Ensure scripts/ is on the import path when running directly.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from content_intelligence import get_performance_context
-from topic_scout import create_client, scout_topics
+from scripts.content_intelligence import get_performance_context
+from scripts.topic_scout import create_client, scout_topics
 
 logger = logging.getLogger(__name__)
 

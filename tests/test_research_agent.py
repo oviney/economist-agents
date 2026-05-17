@@ -420,7 +420,7 @@ class TestIntegrationScenarios:
 
     @patch("agents.research_agent.call_llm")
     @patch("agents.research_agent.review_agent_output")
-    @patch("citation_verifier.verify_citations", side_effect=lambda x: x)
+    @patch("scripts.citation_verifier.verify_citations", side_effect=lambda x: x)
     def test_full_research_pipeline(
         self,
         mock_verify,

@@ -12,11 +12,11 @@ _scripts_dir = str(Path(__file__).parent.parent.parent / "scripts")
 if _scripts_dir not in sys.path:
     sys.path.insert(0, _scripts_dir)
 
-from editorial_board import run_editorial_board  # noqa: E402
-from featured_image_agent import generate_featured_image  # noqa: E402
-from llm_client import create_llm_client  # noqa: E402
-from publication_validator import PublicationValidator  # noqa: E402
-from topic_scout import scout_topics  # noqa: E402
+from scripts.editorial_board import run_editorial_board  # noqa: E402
+from scripts.featured_image_agent import generate_featured_image  # noqa: E402
+from scripts.llm_client import create_llm_client  # noqa: E402
+from scripts.publication_validator import PublicationValidator  # noqa: E402
+from scripts.topic_scout import scout_topics  # noqa: E402
 
 __all__ = [
     "PublicationValidator",

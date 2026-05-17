@@ -25,11 +25,10 @@ _scripts_dir = Path(__file__).parent.parent / "scripts"
 if str(_scripts_dir) not in sys.path:
     sys.path.insert(0, str(_scripts_dir))
 
-from agent_loader import (  # noqa: E402
+from scripts.agent_loader import (  # noqa: E402
     load_content_agent as _load_content_agent,  # type: ignore
 )
-from llm_client import call_llm  # type: ignore  # noqa: E402
-
+from scripts.llm_client import call_llm  # type: ignore  # noqa: E402
 from src.quality.agent_reviewer import review_agent_output  # noqa: E402
 from src.quality.governance import GovernanceTracker  # noqa: E402
 

@@ -34,7 +34,7 @@ import pytest
 scripts_dir = Path(__file__).parent.parent / "scripts"
 sys.path.insert(0, str(scripts_dir))
 
-import economist_agent as ea  # noqa: E402
+from scripts import economist_agent as ea  # noqa: E402
 
 # ============================================================================
 # FIXTURES
@@ -740,8 +740,8 @@ class TestMain:
         """Test main function with default arguments."""
         with (
             patch("sys.argv", ["economist_agent.py"]),
-            patch("economist_agent.generate_economist_post") as mock_generate,
-            patch("economist_agent.create_client") as mock_client,
+            patch("scripts.economist_agent.generate_economist_post") as mock_generate,
+            patch("scripts.economist_agent.create_client") as mock_client,
             patch.dict(os.environ, {}, clear=True),
         ):
             mock_generate.return_value = {"article_path": "/tmp/article.md"}
@@ -755,9 +755,9 @@ class TestMain:
         """Test main function with interactive mode enabled."""
         with (
             patch("sys.argv", ["economist_agent.py", "--interactive"]),
-            patch("economist_agent.generate_economist_post") as mock_generate,
-            patch("economist_agent.create_client") as mock_client,
-            patch("economist_agent.GovernanceTracker") as mock_governance,
+            patch("scripts.economist_agent.generate_economist_post") as mock_generate,
+            patch("scripts.economist_agent.create_client") as mock_client,
+            patch("scripts.economist_agent.GovernanceTracker") as mock_governance,
             patch.dict(os.environ, {"TOPIC": "Test Topic"}, clear=True),
         ):
             mock_generate.return_value = {"article_path": "/tmp/article.md"}
@@ -781,9 +781,9 @@ class TestMain:
                     str(governance_dir),
                 ],
             ),
-            patch("economist_agent.generate_economist_post") as mock_generate,
-            patch("economist_agent.create_client") as mock_client,
-            patch("economist_agent.GovernanceTracker") as mock_governance,
+            patch("scripts.economist_agent.generate_economist_post") as mock_generate,
+            patch("scripts.economist_agent.create_client") as mock_client,
+            patch("scripts.economist_agent.GovernanceTracker") as mock_governance,
             patch.dict(os.environ, {"TOPIC": "Test Topic"}, clear=True),
         ):
             mock_generate.return_value = {"article_path": "/tmp/article.md"}
@@ -808,8 +808,8 @@ class TestMain:
 
         with (
             patch("sys.argv", ["economist_agent.py"]),
-            patch("economist_agent.generate_economist_post") as mock_generate,
-            patch("economist_agent.create_client") as mock_client,
+            patch("scripts.economist_agent.generate_economist_post") as mock_generate,
+            patch("scripts.economist_agent.create_client") as mock_client,
             patch.dict(os.environ, env_vars),
         ):
             mock_generate.return_value = {
@@ -829,8 +829,8 @@ class TestMain:
         """Test main function writes to GITHUB_OUTPUT."""
         with (
             patch("sys.argv", ["economist_agent.py"]),
-            patch("economist_agent.generate_economist_post") as mock_generate,
-            patch("economist_agent.create_client") as mock_client,
+            patch("scripts.economist_agent.generate_economist_post") as mock_generate,
+            patch("scripts.economist_agent.create_client") as mock_client,
             patch("builtins.open", mock_open()) as mock_file,
             patch.dict(
                 os.environ,

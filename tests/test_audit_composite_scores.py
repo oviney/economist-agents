@@ -17,8 +17,6 @@ import pytest
 # pattern used by the scripts themselves at runtime).
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "scripts"))
 
-from ga4_etl import COMPOSITE_WEIGHTS
-
 from scripts.audit_composite_scores import (
     _ACTIVE_WEIGHT_SUM,
     _ZERO_WEIGHT_SUM,
@@ -30,6 +28,7 @@ from scripts.audit_composite_scores import (
     run_sanity_checks,
     select_sample,
 )
+from scripts.ga4_etl import COMPOSITE_WEIGHTS
 
 # ---------------------------------------------------------------------------
 # Helpers & fixtures

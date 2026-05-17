@@ -32,7 +32,7 @@ with (
     patch("matplotlib.pyplot.close", _mock_close),
 ):
     # Import with coverage tracking enabled
-    import generate_chart  # This will execute the script safely
+    from scripts import generate_chart  # noqa: F401  # imported for coverage
 
 
 # ============================================================================

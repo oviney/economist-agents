@@ -7,17 +7,13 @@ are made during the test suite.
 
 from __future__ import annotations
 
-import sys
 from datetime import datetime
-from pathlib import Path
 from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
-
-from topic_trend_grounding import (
+from scripts.topic_trend_grounding import (
     EvidenceItem,
     TrendEvidence,
     _default_queries,
@@ -188,7 +184,9 @@ class TestFetchHnTopStories:
                     return mock_resp
             return MagicMock()  # pragma: no cover
 
-        with patch("topic_trend_grounding.requests.get", side_effect=get_side_effect):
+        with patch(
+            "scripts.topic_trend_grounding.requests.get", side_effect=get_side_effect
+        ):
             stories = _fetch_hn_top_stories(max_items=3)
 
         assert len(stories) == 3
@@ -201,7 +199,7 @@ class TestFetchHnTopStories:
         import requests
 
         with patch(
-            "topic_trend_grounding.requests.get",
+            "scripts.topic_trend_grounding.requests.get",
             side_effect=requests.RequestException("timeout"),
         ):
             stories = _fetch_hn_top_stories()
@@ -224,7 +222,9 @@ class TestFetchHnTopStories:
                 return mock_top_resp
             return mock_item_resp
 
-        with patch("topic_trend_grounding.requests.get", side_effect=get_side_effect):
+        with patch(
+            "scripts.topic_trend_grounding.requests.get", side_effect=get_side_effect
+        ):
             stories = _fetch_hn_top_stories()
         assert stories == []
 
@@ -252,7 +252,9 @@ class TestFetchHnTopStories:
                 return mock_top_resp
             return mock_item_resp
 
-        with patch("topic_trend_grounding.requests.get", side_effect=get_side_effect):
+        with patch(
+            "scripts.topic_trend_grounding.requests.get", side_effect=get_side_effect
+        ):
             stories = _fetch_hn_top_stories()
         assert stories == []
 
@@ -274,7 +276,9 @@ class TestFetchHnTopStories:
             mock_item.raise_for_status = MagicMock()
             return mock_item
 
-        with patch("topic_trend_grounding.requests.get", side_effect=get_side_effect):
+        with patch(
+            "scripts.topic_trend_grounding.requests.get", side_effect=get_side_effect
+        ):
             stories = _fetch_hn_top_stories(max_items=2)
         assert len(stories) == 2
 
@@ -295,8 +299,13 @@ class TestGatherTrendEvidence:
         mock_searcher.search_web.return_value = _make_web_results(2)
 
         with (
-            patch("topic_trend_grounding._get_searcher", return_value=mock_searcher),
-            patch("topic_trend_grounding._fetch_hn_top_stories", return_value=[]),
+            patch(
+                "scripts.topic_trend_grounding._get_searcher",
+                return_value=mock_searcher,
+            ),
+            patch(
+                "scripts.topic_trend_grounding._fetch_hn_top_stories", return_value=[]
+            ),
         ):
             evidence = gather_trend_evidence(queries=["q1", "q2"], include_hn=True)
 
@@ -322,11 +331,11 @@ class TestGatherTrendEvidence:
 
         with (
             patch(
-                "topic_trend_grounding._get_searcher",
+                "scripts.topic_trend_grounding._get_searcher",
                 return_value=mock_searcher,
             ),
             patch(
-                "topic_trend_grounding._fetch_hn_top_stories",
+                "scripts.topic_trend_grounding._fetch_hn_top_stories",
                 return_value=[hn_item],
             ),
         ):
@@ -345,10 +354,10 @@ class TestGatherTrendEvidence:
 
         with (
             patch(
-                "topic_trend_grounding._get_searcher",
+                "scripts.topic_trend_grounding._get_searcher",
                 return_value=mock_searcher,
             ),
-            patch("topic_trend_grounding._fetch_hn_top_stories") as mock_hn,
+            patch("scripts.topic_trend_grounding._fetch_hn_top_stories") as mock_hn,
         ):
             evidence = gather_trend_evidence(queries=["q1"], include_hn=False)
 
@@ -367,10 +376,12 @@ class TestGatherTrendEvidence:
 
         with (
             patch(
-                "topic_trend_grounding._get_searcher",
+                "scripts.topic_trend_grounding._get_searcher",
                 return_value=mock_searcher,
             ),
-            patch("topic_trend_grounding._fetch_hn_top_stories", return_value=[]),
+            patch(
+                "scripts.topic_trend_grounding._fetch_hn_top_stories", return_value=[]
+            ),
         ):
             evidence = gather_trend_evidence(queries=None, include_hn=False)
 
@@ -389,7 +400,7 @@ class TestGatherTrendEvidence:
         )
 
         with patch(
-            "topic_trend_grounding._fetch_hn_top_stories",
+            "scripts.topic_trend_grounding._fetch_hn_top_stories",
             return_value=[hn_item],
         ):
             evidence = gather_trend_evidence(queries=["q1"], include_hn=True)
@@ -551,7 +562,7 @@ class TestBuildGroundedTrendContext:
             ),
         ]
         with patch(
-            "topic_trend_grounding.gather_trend_evidence",
+            "scripts.topic_trend_grounding.gather_trend_evidence",
             return_value=evidence,
         ):
             context = build_grounded_trend_context()
@@ -574,7 +585,7 @@ class TestBuildGroundedTrendContext:
             return []
 
         with patch(
-            "topic_trend_grounding.gather_trend_evidence",
+            "scripts.topic_trend_grounding.gather_trend_evidence",
             side_effect=mock_gather,
         ):
             build_grounded_trend_context(focus_area="test automation")
@@ -591,7 +602,9 @@ class TestBuildGroundedTrendContext:
         """Returns fallback text when no evidence collected."""
         monkeypatch.delenv("SERPER_API_KEY", raising=False)
 
-        with patch("topic_trend_grounding.gather_trend_evidence", return_value=[]):
+        with patch(
+            "scripts.topic_trend_grounding.gather_trend_evidence", return_value=[]
+        ):
             context = build_grounded_trend_context()
 
         assert "[UNVERIFIED]" in context
@@ -613,7 +626,7 @@ class TestBuildGroundedTrendContext:
             return []
 
         with patch(
-            "topic_trend_grounding.gather_trend_evidence",
+            "scripts.topic_trend_grounding.gather_trend_evidence",
             side_effect=mock_gather,
         ):
             build_grounded_trend_context(focus_area=None)

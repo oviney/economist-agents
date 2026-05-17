@@ -15,7 +15,7 @@ import argparse
 import json
 from datetime import datetime
 
-from chart_metrics import ChartMetricsCollector
+from src.quality.chart_metrics import ChartMetricsCollector
 
 
 def generate_console_report(

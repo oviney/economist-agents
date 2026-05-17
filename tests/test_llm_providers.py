@@ -524,24 +524,10 @@ class TestAgentRegistryCoveragePaths:
         with pytest.raises(ValueError, match="Agent directory not found"):
             AgentRegistry(agents_dir=nonexistent)
 
-    def test_instantiate_tools_none_factory_result(self):
-        """Tool factory returning None is filtered out with a warning."""
+    def test_instantiate_tools_returns_mock_tools(self):
+        """_instantiate_tools returns MockTool objects with name+description."""
         registry = _registry()
-        # Patch github_project_add_issue at module level to None to trigger
-        # the "tool factory returned None" warning branch
-        with patch("scripts.agent_registry.github_project_add_issue", None):
-            result = registry._instantiate_tools(["github_project_add_issue"])
-            # None tools are filtered out
-            assert isinstance(result, list)
-            assert all(t is not None for t in result)
-
-    def test_instantiate_tools_mock_mode_when_crewai_unavailable(self):
-        """Mock tools are created when CREWAI_TOOLS_AVAILABLE is False."""
-        registry = _registry()
-        # Temporarily disable crewai tools to exercise the mock-tools else-branch
-        with patch("scripts.agent_registry.CREWAI_TOOLS_AVAILABLE", False):
-            result = registry._instantiate_tools(["file_read", "bash"])
-        # Both tools should be instantiated as MockTool objects
+        result = registry._instantiate_tools(["file_read", "bash"])
         assert len(result) == 2
         for tool in result:
             assert hasattr(tool, "name")

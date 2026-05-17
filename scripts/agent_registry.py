@@ -200,37 +200,6 @@ class AnthropicProvider:
         return LLMClient("anthropic", client, resolved_model)
 
 
-# CrewAI Tools - Optional dependency for testing
-try:
-    from crewai_tools import (
-        CodeInterpreterTool,
-        DirectoryReadTool,
-        DirectorySearchTool,
-        FileReadTool,
-        FileWriterTool,
-        GithubSearchTool,
-        TXTSearchTool,
-    )
-
-    CREWAI_TOOLS_AVAILABLE = True
-except ImportError:  # pragma: no cover
-    # For testing without full CrewAI installation
-    CREWAI_TOOLS_AVAILABLE = False
-    CodeInterpreterTool = None
-    DirectoryReadTool = None
-    DirectorySearchTool = None
-    FileReadTool = None
-    FileWriterTool = None
-    GithubSearchTool = None
-    TXTSearchTool = None
-
-# Import existing GitHub tools
-try:
-    from scripts.tools.github_project_tool import github_project_add_issue
-except ImportError as err:  # pragma: no cover
-    logger.warning(f"GitHub Project V2 tool not available: {err}")
-    github_project_add_issue = None
-
 # Agile Discipline: Process Compliance System Prompt
 # Injected into every agent to enforce Agile team discipline
 AGILE_MINDSET = """
@@ -405,76 +374,42 @@ class AgentRegistry:
             tool_names: List of tool names from agent config (e.g., ['file_read', 'file_write'])
 
         Returns:
-            List of instantiated CrewAI tool objects
+            List of instantiated tool objects
 
         Raises:
             ValueError: If unknown tool name provided
 
         """
-        # Get the current working directory for search tools
-        project_dir = Path.cwd()
 
-        # Tool factory mapping with directory-aware instantiation
-        # Configure src_dir for limited scope to prevent embedding context limits
-        src_dir = project_dir / "src"
-        src_dir.mkdir(exist_ok=True)  # Ensure src directory exists
+        def _create_mock_tool(tool_name: str):
+            """Create a structured mock tool for testing."""
+            return type(
+                "MockTool",
+                (),
+                {
+                    "name": tool_name,
+                    "description": f"Mock implementation of {tool_name}",
+                    "run": lambda *args, **kwargs: f"Mock {tool_name} executed",
+                    "__str__": lambda self: f"MockTool({tool_name})",
+                    "__repr__": lambda self: f"MockTool(name='{tool_name}')",
+                },
+            )()
 
-        if CREWAI_TOOLS_AVAILABLE:
-            TOOL_FACTORY = {
-                "file_read": lambda: FileReadTool(),
-                "file_write": lambda: FileWriterTool(),
-                "directory_read": lambda: DirectoryReadTool(),
-                "directory_search": lambda: DirectorySearchTool(
-                    directory=str(src_dir),  # Limit to src/ directory only
-                    chunk_size=500,  # Smaller chunks to prevent token limit issues
-                ),
-                "file_search": lambda: DirectorySearchTool(
-                    directory=str(src_dir),  # Limit to src/ directory only
-                    chunk_size=500,  # Smaller chunks to prevent token limit issues
-                ),  # Map file_search to directory_search
-                "bash": lambda: (
-                    CodeInterpreterTool()
-                ),  # Map bash commands to code interpreter
-                "pytest": lambda: (
-                    CodeInterpreterTool()
-                ),  # Map pytest to code interpreter
-                "txt_search": lambda: TXTSearchTool(),
-                # GitHub tools using existing integrations
-                "github_search": lambda: GithubSearchTool(),
-                "github_project_add_issue": lambda: github_project_add_issue,
-                # Add more tool mappings here as needed
-            }
-        else:
-            # Mock tools for testing with better structure
-            def _create_mock_tool(tool_name: str):
-                """Create a structured mock tool for testing."""
-                return type(
-                    "MockTool",
-                    (),
-                    {
-                        "name": tool_name,
-                        "description": f"Mock implementation of {tool_name}",
-                        "run": lambda *args, **kwargs: f"Mock {tool_name} executed",
-                        "__str__": lambda self: f"MockTool({tool_name})",
-                        "__repr__": lambda self: f"MockTool(name='{tool_name}')",
-                    },
-                )()
-
-            TOOL_FACTORY = {
-                tool_name: lambda name=tool_name: _create_mock_tool(name)
-                for tool_name in [
-                    "file_read",
-                    "file_write",
-                    "directory_read",
-                    "directory_search",
-                    "file_search",
-                    "bash",
-                    "pytest",
-                    "txt_search",
-                    "github_search",
-                    "github_project_add_issue",
-                ]
-            }
+        TOOL_FACTORY = {
+            tool_name: lambda name=tool_name: _create_mock_tool(name)
+            for tool_name in [
+                "file_read",
+                "file_write",
+                "directory_read",
+                "directory_search",
+                "file_search",
+                "bash",
+                "pytest",
+                "txt_search",
+                "github_search",
+                "github_project_add_issue",
+            ]
+        }
 
         instantiated = []
         for tool_name in tool_names:

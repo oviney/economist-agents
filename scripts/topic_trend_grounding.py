@@ -104,7 +104,7 @@ def _get_searcher() -> Any:
     # Import lazily to keep module importable even when google_search has
     # heavy optional deps.
     try:
-        from google_search import GoogleSearcher
+        from scripts.google_search import GoogleSearcher
     except ImportError as exc:
         logger.warning(
             "SERPER_API_KEY is set but google_search is unavailable; "

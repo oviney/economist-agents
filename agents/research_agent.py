@@ -29,7 +29,7 @@ from src.quality.governance import GovernanceTracker  # noqa: E402
 
 # Import arXiv integration (optional dependency)
 try:
-    from arxiv_search import search_arxiv_for_topic  # type: ignore
+    from scripts.arxiv_search import search_arxiv_for_topic
 
     ARXIV_AVAILABLE = True
 except ImportError:
@@ -37,7 +37,7 @@ except ImportError:
 
 # Import Google Search integration (optional dependency)
 try:
-    from google_search import search_google_for_topic  # type: ignore
+    from scripts.google_search import search_google_for_topic
 
     GOOGLE_SEARCH_AVAILABLE = True
 except ImportError:

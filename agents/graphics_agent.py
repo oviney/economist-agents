@@ -25,10 +25,9 @@ if str(_scripts_dir) not in sys.path:
     sys.path.insert(0, str(_scripts_dir))
 
 # Import chart metrics and agent loader
-from agent_loader import (  # noqa: E402
+from scripts.agent_loader import (  # noqa: E402
     load_content_agent as _load_content_agent,  # type: ignore
 )
-
 from src.quality.chart_metrics import get_metrics_collector  # noqa: E402
 
 # Module-level prompt constant loaded from YAML
@@ -143,7 +142,7 @@ class GraphicsAgent:
         max_tokens: int,
     ) -> str:
         """Generate matplotlib code via LLM."""
-        from llm_client import call_llm
+        from scripts.llm_client import call_llm
 
         prompt = self.GRAPHICS_AGENT_PROMPT.format(
             chart_spec=json.dumps(chart_spec, indent=2),

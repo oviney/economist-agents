@@ -14,7 +14,7 @@ import pytest
 # Ensure scripts/ is importable.
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-import orchestrator_agent as oa
+from scripts import orchestrator_agent as oa
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Helpers to build lightweight mock PyGithub objects

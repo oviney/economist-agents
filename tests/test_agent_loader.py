@@ -9,7 +9,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-from agent_loader import (
+from scripts.agent_loader import (
     AGENTS_DIR,
     AgentConfig,
     load_agent,

@@ -15,7 +15,7 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
-import architecture_audit as audit_mod  # noqa: E402
+from scripts import architecture_audit as audit_mod  # noqa: E402
 
 REAL_AGENTS_DIR = REPO_ROOT / ".github" / "agents"
 # Corpus reached the 85% target 2026-04-26 after honest rubric broadening

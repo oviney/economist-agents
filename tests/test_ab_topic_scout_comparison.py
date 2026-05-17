@@ -19,8 +19,8 @@ _SCRIPTS_DIR = Path(__file__).resolve().parent.parent / "scripts"
 if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 
-import topic_scout  # noqa: E402
-from ab_topic_scout_comparison import (  # noqa: E402
+from scripts import topic_scout  # noqa: E402
+from scripts.ab_topic_scout_comparison import (  # noqa: E402
     _topic_title_set,
     jaccard_similarity,
     qualitative_notes,
@@ -30,7 +30,7 @@ from ab_topic_scout_comparison import (  # noqa: E402
     score_deltas,
     verdict,
 )
-from content_intelligence import ArticlePerformance  # noqa: E402
+from scripts.content_intelligence import ArticlePerformance  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Shared fixtures
@@ -507,15 +507,15 @@ class TestRunAbPair:
 
         with (
             patch(
-                "ab_topic_scout_comparison.topic_scout.scout_topics",
+                "scripts.ab_topic_scout_comparison.topic_scout.scout_topics",
                 side_effect=fake_scout_topics,
             ),
             patch(
-                "ab_topic_scout_comparison.content_intelligence.get_top_performers",
+                "scripts.ab_topic_scout_comparison.content_intelligence.get_top_performers",
                 return_value=[],
             ),
             patch(
-                "ab_topic_scout_comparison.content_intelligence.get_bottom_performers",
+                "scripts.ab_topic_scout_comparison.content_intelligence.get_bottom_performers",
                 return_value=[],
             ),
         ):
@@ -553,15 +553,15 @@ class TestRunAbPair:
 
         with (
             patch(
-                "ab_topic_scout_comparison.topic_scout.scout_topics",
+                "scripts.ab_topic_scout_comparison.topic_scout.scout_topics",
                 return_value=sample_topics,
             ),
             patch(
-                "ab_topic_scout_comparison.content_intelligence.get_top_performers",
+                "scripts.ab_topic_scout_comparison.content_intelligence.get_top_performers",
                 return_value=[],
             ),
             patch(
-                "ab_topic_scout_comparison.content_intelligence.get_bottom_performers",
+                "scripts.ab_topic_scout_comparison.content_intelligence.get_bottom_performers",
                 return_value=[],
             ),
         ):

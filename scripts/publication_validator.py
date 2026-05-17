@@ -24,7 +24,7 @@ import yaml
 
 # Import defect prevention rules (learned from historical bugs)
 try:
-    from defect_prevention_rules import DefectPrevention
+    from scripts.defect_prevention_rules import DefectPrevention
 
     DEFECT_PREVENTION_AVAILABLE = True
 except ImportError:

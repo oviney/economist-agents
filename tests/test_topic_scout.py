@@ -13,7 +13,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-from topic_scout import (
+from scripts.topic_scout import (
     SCOUT_AGENT_PROMPT,
     THEME_KEYWORDS,
     TREND_RESEARCH_PROMPT,
@@ -128,7 +128,7 @@ def mock_dedup_passthrough():
     in tests that don't care about dedup logic — it satisfies the
     fail-closed check added for issue #237 without rejecting anything.
     """
-    with patch("topic_scout.TopicDeduplicator") as MockDedup:
+    with patch("scripts.topic_scout.TopicDeduplicator") as MockDedup:
         instance = MockDedup.return_value
         instance.collection = Mock()
         instance.collection.count = Mock(return_value=19)
@@ -188,10 +188,10 @@ def test_scout_topics_success(
 
     with (
         patch(
-            "topic_scout.build_grounded_trend_context",
+            "scripts.topic_scout.build_grounded_trend_context",
             return_value="grounded trends",
         ),
-        patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
+        patch("scripts.topic_scout.call_llm", side_effect=call_llm_side_effect),
     ):
         topics = scout_topics(mock_client)
 
@@ -230,10 +230,10 @@ def test_scout_topics_with_focus_area(
 
     with (
         patch(
-            "topic_scout.build_grounded_trend_context",
+            "scripts.topic_scout.build_grounded_trend_context",
             return_value="grounded trends",
         ) as mock_ground,
-        patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
+        patch("scripts.topic_scout.call_llm", side_effect=call_llm_side_effect),
     ):
         topics = scout_topics(mock_client, focus_area)
 
@@ -256,10 +256,10 @@ def test_scout_topics_empty_results(mock_llm_client, mock_dedup_passthrough):
 
     with (
         patch(
-            "topic_scout.build_grounded_trend_context",
+            "scripts.topic_scout.build_grounded_trend_context",
             return_value="grounded trends",
         ),
-        patch("topic_scout.call_llm", side_effect=["invalid json response"]),
+        patch("scripts.topic_scout.call_llm", side_effect=["invalid json response"]),
     ):
         topics = scout_topics(mock_client)
 
@@ -284,10 +284,10 @@ def test_scout_topics_json_parse_error(mock_llm_client, mock_dedup_passthrough, 
     # Return valid trends but malformed JSON for topics
     with (
         patch(
-            "topic_scout.build_grounded_trend_context",
+            "scripts.topic_scout.build_grounded_trend_context",
             return_value="grounded trends",
         ),
-        patch("topic_scout.call_llm") as mock_call,
+        patch("scripts.topic_scout.call_llm") as mock_call,
     ):
         mock_call.side_effect = ['[{"bad": json}']
         topics = scout_topics(mock_client)
@@ -310,10 +310,10 @@ def test_scout_topics_no_json_array(mock_llm_client, mock_dedup_passthrough, cap
 
     with (
         patch(
-            "topic_scout.build_grounded_trend_context",
+            "scripts.topic_scout.build_grounded_trend_context",
             return_value="grounded trends",
         ),
-        patch("topic_scout.call_llm", side_effect=["No array here"]),
+        patch("scripts.topic_scout.call_llm", side_effect=["No array here"]),
     ):
         topics = scout_topics(mock_client)
 
@@ -333,10 +333,10 @@ def test_scout_topics_api_exception(mock_llm_client):
 
     with (
         patch(
-            "topic_scout.build_grounded_trend_context",
+            "scripts.topic_scout.build_grounded_trend_context",
             return_value="grounded trends",
         ),
-        patch("topic_scout.call_llm", side_effect=Exception("API Error")),
+        patch("scripts.topic_scout.call_llm", side_effect=Exception("API Error")),
         pytest.raises(Exception, match="API Error"),
     ):
         scout_topics(mock_client)
@@ -362,10 +362,10 @@ def test_scout_topics_partial_json(mock_llm_client, mock_dedup_passthrough):
 
     with (
         patch(
-            "topic_scout.build_grounded_trend_context",
+            "scripts.topic_scout.build_grounded_trend_context",
             return_value="grounded trends",
         ),
-        patch("topic_scout.call_llm", side_effect=[json.dumps(partial_topics)]),
+        patch("scripts.topic_scout.call_llm", side_effect=[json.dumps(partial_topics)]),
     ):
         topics = scout_topics(mock_client)
 
@@ -389,7 +389,7 @@ def test_scout_topics_runs_filter_topics(mock_llm_client, mock_dedup_passthrough
     """scout_topics() must call TopicDeduplicator.filter_topics() on every run."""
     mock_client, call_llm_side_effect = mock_llm_client
 
-    with patch("topic_scout.call_llm", side_effect=call_llm_side_effect):
+    with patch("scripts.topic_scout.call_llm", side_effect=call_llm_side_effect):
         scout_topics(mock_client)
 
     assert mock_dedup_passthrough.filter_topics.called, (
@@ -404,8 +404,8 @@ def test_scout_topics_drops_rejected_duplicates(mock_llm_client, sample_topics):
 
     # Mock dedup to reject the first topic and keep the second.
     with (
-        patch("topic_scout.TopicDeduplicator") as MockDedup,
-        patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
+        patch("scripts.topic_scout.TopicDeduplicator") as MockDedup,
+        patch("scripts.topic_scout.call_llm", side_effect=call_llm_side_effect),
     ):
         instance = MockDedup.return_value
         instance.collection = Mock()
@@ -428,8 +428,8 @@ def test_scout_topics_fail_closed_when_collection_missing(mock_llm_client):
     mock_client, call_llm_side_effect = mock_llm_client
 
     with (
-        patch("topic_scout.TopicDeduplicator") as MockDedup,
-        patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
+        patch("scripts.topic_scout.TopicDeduplicator") as MockDedup,
+        patch("scripts.topic_scout.call_llm", side_effect=call_llm_side_effect),
     ):
         instance = MockDedup.return_value
         instance.collection = None  # ChromaDB unavailable
@@ -442,8 +442,8 @@ def test_scout_topics_fail_closed_when_collection_empty(mock_llm_client):
     mock_client, call_llm_side_effect = mock_llm_client
 
     with (
-        patch("topic_scout.TopicDeduplicator") as MockDedup,
-        patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
+        patch("scripts.topic_scout.TopicDeduplicator") as MockDedup,
+        patch("scripts.topic_scout.call_llm", side_effect=call_llm_side_effect),
     ):
         instance = MockDedup.return_value
         instance.collection = Mock()
@@ -457,8 +457,8 @@ def test_scout_topics_allow_empty_archive_override(mock_llm_client, sample_topic
     mock_client, call_llm_side_effect = mock_llm_client
 
     with (
-        patch("topic_scout.TopicDeduplicator") as MockDedup,
-        patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
+        patch("scripts.topic_scout.TopicDeduplicator") as MockDedup,
+        patch("scripts.topic_scout.call_llm", side_effect=call_llm_side_effect),
     ):
         instance = MockDedup.return_value
         instance.collection = Mock()
@@ -789,7 +789,7 @@ def test_create_client_returns_client():
     - Function returns non-None value
     - Return type is LLMClient or compatible
     """
-    with patch("topic_scout.create_llm_client") as mock_create:
+    with patch("scripts.topic_scout.create_llm_client") as mock_create:
         mock_create.return_value = Mock()
 
         client = create_client()
@@ -806,7 +806,9 @@ def test_create_client_propagates_exceptions():
     - No silent failures
     """
     with (
-        patch("topic_scout.create_llm_client", side_effect=Exception("Auth error")),
+        patch(
+            "scripts.topic_scout.create_llm_client", side_effect=Exception("Auth error")
+        ),
         pytest.raises(Exception, match="Auth error"),
     ):
         create_client()
@@ -839,14 +841,14 @@ def test_main_success_flow(
     monkeypatch.chdir(tmp_path)
 
     with (
-        patch("topic_scout.create_client", return_value=mock_client),
+        patch("scripts.topic_scout.create_client", return_value=mock_client),
         patch(
-            "topic_scout.build_grounded_trend_context",
+            "scripts.topic_scout.build_grounded_trend_context",
             return_value="grounded trends",
         ),
-        patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
+        patch("scripts.topic_scout.call_llm", side_effect=call_llm_side_effect),
     ):
-        from topic_scout import main
+        from scripts.topic_scout import main
 
         main()
 
@@ -877,14 +879,14 @@ def test_main_with_focus_area(
     monkeypatch.chdir(tmp_path)
 
     with (
-        patch("topic_scout.create_client", return_value=mock_client),
+        patch("scripts.topic_scout.create_client", return_value=mock_client),
         patch(
-            "topic_scout.build_grounded_trend_context",
+            "scripts.topic_scout.build_grounded_trend_context",
             return_value="grounded trends",
         ) as mock_ground,
-        patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
+        patch("scripts.topic_scout.call_llm", side_effect=call_llm_side_effect),
     ):
-        from topic_scout import main
+        from scripts.topic_scout import main
 
         main()
 
@@ -912,14 +914,14 @@ def test_main_github_actions_output(
     monkeypatch.chdir(tmp_path)
 
     with (
-        patch("topic_scout.create_client", return_value=mock_client),
+        patch("scripts.topic_scout.create_client", return_value=mock_client),
         patch(
-            "topic_scout.build_grounded_trend_context",
+            "scripts.topic_scout.build_grounded_trend_context",
             return_value="grounded trends",
         ),
-        patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
+        patch("scripts.topic_scout.call_llm", side_effect=call_llm_side_effect),
     ):
-        from topic_scout import main
+        from scripts.topic_scout import main
 
         main()
 
@@ -945,10 +947,10 @@ def test_main_no_topics(mock_llm_client, tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
 
     with (
-        patch("topic_scout.create_client", return_value=mock_client),
-        patch("topic_scout.scout_topics", return_value=[]),
+        patch("scripts.topic_scout.create_client", return_value=mock_client),
+        patch("scripts.topic_scout.scout_topics", return_value=[]),
     ):
-        from topic_scout import main
+        from scripts.topic_scout import main
 
         main()
 
@@ -1114,10 +1116,10 @@ def test_scout_topics_single_topic(mock_llm_client, mock_dedup_passthrough):
 
     with (
         patch(
-            "topic_scout.build_grounded_trend_context",
+            "scripts.topic_scout.build_grounded_trend_context",
             return_value="grounded trends",
         ),
-        patch("topic_scout.call_llm", side_effect=[json.dumps(single_topic)]),
+        patch("scripts.topic_scout.call_llm", side_effect=[json.dumps(single_topic)]),
     ):
         topics = scout_topics(mock_client)
 
@@ -1141,10 +1143,10 @@ def test_scout_topics_unsorted_input(
 
     with (
         patch(
-            "topic_scout.build_grounded_trend_context",
+            "scripts.topic_scout.build_grounded_trend_context",
             return_value="grounded trends",
         ),
-        patch("topic_scout.call_llm", side_effect=[json.dumps(unsorted)]),
+        patch("scripts.topic_scout.call_llm", side_effect=[json.dumps(unsorted)]),
     ):
         topics = scout_topics(mock_client)
 
@@ -1204,10 +1206,12 @@ def test_scout_topics_network_timeout(mock_llm_client):
 
     with (
         patch(
-            "topic_scout.build_grounded_trend_context",
+            "scripts.topic_scout.build_grounded_trend_context",
             return_value="grounded trends",
         ),
-        patch("topic_scout.call_llm", side_effect=TimeoutError("Request timeout")),
+        patch(
+            "scripts.topic_scout.call_llm", side_effect=TimeoutError("Request timeout")
+        ),
         pytest.raises(TimeoutError),
     ):
         scout_topics(mock_client)
@@ -1239,16 +1243,18 @@ def test_performance_context_injected_into_scout_prompt(
         "| 0.500 | 1000 | Fake Top Article |\n"
     )
     monkeypatch.setattr(
-        "topic_scout.get_performance_context",
+        "scripts.topic_scout.get_performance_context",
         lambda **kwargs: fake_context,
     )
 
     with (
         patch(
-            "topic_scout.build_grounded_trend_context",
+            "scripts.topic_scout.build_grounded_trend_context",
             return_value="grounded trends",
         ),
-        patch("topic_scout.call_llm", side_effect=call_llm_side_effect) as mock_call,
+        patch(
+            "scripts.topic_scout.call_llm", side_effect=call_llm_side_effect
+        ) as mock_call,
     ):
         scout_topics(mock_client)
 
@@ -1278,16 +1284,16 @@ def test_performance_context_fallback_when_db_missing(
         "to populate `data/performance.db`._\n"
     )
     monkeypatch.setattr(
-        "topic_scout.get_performance_context",
+        "scripts.topic_scout.get_performance_context",
         lambda **kwargs: fallback,
     )
 
     with (
         patch(
-            "topic_scout.build_grounded_trend_context",
+            "scripts.topic_scout.build_grounded_trend_context",
             return_value="grounded trends",
         ),
-        patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
+        patch("scripts.topic_scout.call_llm", side_effect=call_llm_side_effect),
     ):
         topics = scout_topics(mock_client)
 
@@ -1308,16 +1314,18 @@ def test_scout_prompt_explicitly_references_performance_data(
     """
     mock_client, call_llm_side_effect = mock_llm_client
     monkeypatch.setattr(
-        "topic_scout.get_performance_context",
+        "scripts.topic_scout.get_performance_context",
         lambda **kwargs: "## Performance Context\n\nfake data\n",
     )
 
     with (
         patch(
-            "topic_scout.build_grounded_trend_context",
+            "scripts.topic_scout.build_grounded_trend_context",
             return_value="grounded trends",
         ),
-        patch("topic_scout.call_llm", side_effect=call_llm_side_effect) as mock_call,
+        patch(
+            "scripts.topic_scout.call_llm", side_effect=call_llm_side_effect
+        ) as mock_call,
     ):
         scout_topics(mock_client)
 
@@ -1340,14 +1348,14 @@ def test_get_performance_context_called_once_per_scout_run(
         call_count["n"] += 1
         return "## Performance Context\n\nfake\n"
 
-    monkeypatch.setattr("topic_scout.get_performance_context", counting_fake)
+    monkeypatch.setattr("scripts.topic_scout.get_performance_context", counting_fake)
 
     with (
         patch(
-            "topic_scout.build_grounded_trend_context",
+            "scripts.topic_scout.build_grounded_trend_context",
             return_value="grounded trends",
         ),
-        patch("topic_scout.call_llm", side_effect=call_llm_side_effect),
+        patch("scripts.topic_scout.call_llm", side_effect=call_llm_side_effect),
     ):
         scout_topics(mock_client)
 
@@ -1612,11 +1620,11 @@ def test_scout_topics_diversity_check_triggers_regeneration(
 
     with (
         patch(
-            "topic_scout.build_grounded_trend_context",
+            "scripts.topic_scout.build_grounded_trend_context",
             return_value="grounded trends",
         ),
         patch(
-            "topic_scout.call_llm",
+            "scripts.topic_scout.call_llm",
             side_effect=lambda *a, **kw: next(call_responses),
         ) as mock_call,
     ):
@@ -1645,11 +1653,11 @@ def test_scout_topics_diversity_check_skipped_for_two_topics(mock_dedup_passthro
 
     with (
         patch(
-            "topic_scout.build_grounded_trend_context",
+            "scripts.topic_scout.build_grounded_trend_context",
             return_value="grounded trends",
         ),
         patch(
-            "topic_scout.call_llm",
+            "scripts.topic_scout.call_llm",
             side_effect=[json.dumps(two_same_theme)],
         ) as mock_call,
     ):
@@ -1673,11 +1681,11 @@ def test_scout_topics_diversity_passes_no_extra_call(mock_dedup_passthrough):
 
     with (
         patch(
-            "topic_scout.build_grounded_trend_context",
+            "scripts.topic_scout.build_grounded_trend_context",
             return_value="grounded trends",
         ),
         patch(
-            "topic_scout.call_llm",
+            "scripts.topic_scout.call_llm",
             side_effect=[json.dumps(diverse)],
         ) as mock_call,
     ):

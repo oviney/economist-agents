@@ -16,7 +16,7 @@ import pytest
 # Add scripts/ to path so we can import content_intelligence directly
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
-from content_intelligence import (
+from scripts.content_intelligence import (
     ArticlePerformance,
     TrafficSummary,
     _is_article,

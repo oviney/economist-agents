@@ -27,8 +27,7 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from agent_loader import load_scout_prompts as _load_scout_prompts  # noqa: E402
-
+from scripts.agent_loader import load_scout_prompts as _load_scout_prompts  # noqa: E402
 from scripts.topic_trend_grounding import build_grounded_trend_context  # noqa: E402
 from src.tools.topic_deduplicator import TopicDeduplicator  # noqa: E402
 
@@ -141,10 +140,10 @@ THEME_KEYWORDS: dict[str, list[str]] = {
 }
 
 # Content Intelligence: real blog performance data from GA4 ETL (ADR-0007)
-from content_intelligence import get_performance_context  # noqa: E402
+from scripts.content_intelligence import get_performance_context  # noqa: E402
 
 # Import unified LLM client
-from llm_client import call_llm, create_llm_client  # noqa: E402
+from scripts.llm_client import call_llm, create_llm_client  # noqa: E402
 
 _scout_prompts = _load_scout_prompts()
 SCOUT_AGENT_PROMPT = _scout_prompts["scout"]

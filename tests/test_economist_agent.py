@@ -34,7 +34,7 @@ import pytest
 scripts_dir = Path(__file__).parent.parent / "scripts"
 sys.path.insert(0, str(scripts_dir))
 
-import economist_agent as ea  # noqa: E402
+from scripts import economist_agent as ea  # noqa: E402
 
 # ============================================================================
 # FIXTURES
@@ -223,7 +223,9 @@ class TestRunResearchAgent:
                 "agents.research_agent.ResearchAgent._gather_web_research",
                 return_value=None,
             ),
-            patch("citation_verifier.verify_citations", side_effect=lambda x: x),
+            patch(
+                "scripts.citation_verifier.verify_citations", side_effect=lambda x: x
+            ),
         ):
             # Return the properly structured mock response
             mock_call_llm.return_value = json.dumps(sample_research_output)
@@ -284,7 +286,9 @@ class TestRunResearchAgent:
         with (
             patch("agents.research_agent.call_llm") as mock_call_llm,
             patch("agents.research_agent.review_agent_output") as mock_review,
-            patch("citation_verifier.verify_citations", side_effect=lambda x: x),
+            patch(
+                "scripts.citation_verifier.verify_citations", side_effect=lambda x: x
+            ),
         ):
             mock_call_llm.return_value = json.dumps(sample_research_output)
             mock_review.return_value = (True, [])
@@ -335,7 +339,9 @@ class TestRunResearchAgent:
                 "agents.research_agent.ResearchAgent._gather_web_research",
                 return_value=None,
             ),
-            patch("citation_verifier.verify_citations", side_effect=lambda x: x),
+            patch(
+                "scripts.citation_verifier.verify_citations", side_effect=lambda x: x
+            ),
         ):
             mock_call_llm.return_value = json.dumps(sample_research_output)
             mock_review.return_value = (
@@ -539,7 +545,7 @@ class TestRunGraphicsAgent:
         }
 
         with (
-            patch("llm_client.call_llm") as mock_call_llm,
+            patch("scripts.llm_client.call_llm") as mock_call_llm,
             patch("agents.graphics_agent.get_metrics_collector") as mock_metrics,
             patch("subprocess.run") as mock_subprocess,
             patch("builtins.open", mock_open()),
@@ -588,7 +594,7 @@ class TestRunGraphicsAgent:
         chart_spec = {"title": "Test Chart", "data": []}
 
         with (
-            patch("llm_client.call_llm") as mock_call_llm,
+            patch("scripts.llm_client.call_llm") as mock_call_llm,
             patch("agents.graphics_agent.get_metrics_collector") as mock_metrics,
             patch("subprocess.run") as mock_subprocess,
             patch("builtins.open", mock_open()),
@@ -609,7 +615,7 @@ class TestRunGraphicsAgent:
         chart_spec = {"title": "Test Chart", "data": []}
 
         with (
-            patch("llm_client.call_llm") as mock_call_llm,
+            patch("scripts.llm_client.call_llm") as mock_call_llm,
             patch("agents.graphics_agent.get_metrics_collector") as mock_metrics,
             patch("subprocess.run") as mock_subprocess,
             patch("builtins.open", mock_open()),
@@ -734,8 +740,8 @@ class TestMain:
         """Test main function with default arguments."""
         with (
             patch("sys.argv", ["economist_agent.py"]),
-            patch("economist_agent.generate_economist_post") as mock_generate,
-            patch("economist_agent.create_client") as mock_client,
+            patch("scripts.economist_agent.generate_economist_post") as mock_generate,
+            patch("scripts.economist_agent.create_client") as mock_client,
             patch.dict(os.environ, {}, clear=True),
         ):
             mock_generate.return_value = {"article_path": "/tmp/article.md"}
@@ -749,9 +755,9 @@ class TestMain:
         """Test main function with interactive mode enabled."""
         with (
             patch("sys.argv", ["economist_agent.py", "--interactive"]),
-            patch("economist_agent.generate_economist_post") as mock_generate,
-            patch("economist_agent.create_client") as mock_client,
-            patch("economist_agent.GovernanceTracker") as mock_governance,
+            patch("scripts.economist_agent.generate_economist_post") as mock_generate,
+            patch("scripts.economist_agent.create_client") as mock_client,
+            patch("scripts.economist_agent.GovernanceTracker") as mock_governance,
             patch.dict(os.environ, {"TOPIC": "Test Topic"}, clear=True),
         ):
             mock_generate.return_value = {"article_path": "/tmp/article.md"}
@@ -775,9 +781,9 @@ class TestMain:
                     str(governance_dir),
                 ],
             ),
-            patch("economist_agent.generate_economist_post") as mock_generate,
-            patch("economist_agent.create_client") as mock_client,
-            patch("economist_agent.GovernanceTracker") as mock_governance,
+            patch("scripts.economist_agent.generate_economist_post") as mock_generate,
+            patch("scripts.economist_agent.create_client") as mock_client,
+            patch("scripts.economist_agent.GovernanceTracker") as mock_governance,
             patch.dict(os.environ, {"TOPIC": "Test Topic"}, clear=True),
         ):
             mock_generate.return_value = {"article_path": "/tmp/article.md"}
@@ -802,8 +808,8 @@ class TestMain:
 
         with (
             patch("sys.argv", ["economist_agent.py"]),
-            patch("economist_agent.generate_economist_post") as mock_generate,
-            patch("economist_agent.create_client") as mock_client,
+            patch("scripts.economist_agent.generate_economist_post") as mock_generate,
+            patch("scripts.economist_agent.create_client") as mock_client,
             patch.dict(os.environ, env_vars),
         ):
             mock_generate.return_value = {
@@ -823,8 +829,8 @@ class TestMain:
         """Test main function writes to GITHUB_OUTPUT."""
         with (
             patch("sys.argv", ["economist_agent.py"]),
-            patch("economist_agent.generate_economist_post") as mock_generate,
-            patch("economist_agent.create_client") as mock_client,
+            patch("scripts.economist_agent.generate_economist_post") as mock_generate,
+            patch("scripts.economist_agent.create_client") as mock_client,
             patch("builtins.open", mock_open()) as mock_file,
             patch.dict(
                 os.environ,
@@ -865,7 +871,7 @@ class TestIntegration:
             patch("agents.writer_agent.call_llm") as mock_writer_llm,
             patch("agents.editor_agent.call_llm") as mock_editor_llm,
             patch("agents.writer_agent.review_agent_output") as mock_review,
-            patch("llm_client.call_llm") as mock_graphics_llm,
+            patch("scripts.llm_client.call_llm") as mock_graphics_llm,
             patch("agents.graphics_agent.get_metrics_collector") as mock_metrics,
             patch("subprocess.run") as mock_subprocess,
             patch("builtins.open", mock_open()),

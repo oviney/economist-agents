@@ -47,9 +47,11 @@ _SCRIPTS_DIR = Path(__file__).resolve().parent
 if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 
-import content_intelligence  # noqa: E402
-import topic_scout  # noqa: E402
-from llm_client import create_llm_client  # noqa: E402
+from scripts import (  # noqa: E402
+    content_intelligence,
+    topic_scout,
+)
+from scripts.llm_client import create_llm_client  # noqa: E402
 
 logger = logging.getLogger(__name__)
 

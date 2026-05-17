@@ -39,7 +39,7 @@ from typing import Optional
 
 # Allow importing from scripts/ when run directly or via subprocess
 sys.path.insert(0, str(Path(__file__).parent))
-from publication_validator import validate_file  # noqa: E402
+from scripts.publication_validator import validate_file  # noqa: E402
 
 logger = logging.getLogger(__name__)
 

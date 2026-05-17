@@ -34,7 +34,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 _sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from ga4_etl import COMPOSITE_WEIGHTS, normalize
+from scripts.ga4_etl import COMPOSITE_WEIGHTS, normalize
 
 logger = logging.getLogger(__name__)
 

@@ -6,7 +6,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-from citation_verifier import (
+from scripts.citation_verifier import (
     _normalize,
     _stat_appears_in_text,
     verify_citations,

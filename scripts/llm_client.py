@@ -191,7 +191,7 @@ def _call_anthropic(
     )
 
     try:
-        from token_usage import log_token_usage
+        from scripts.token_usage import log_token_usage
 
         log_token_usage(
             model=model,
@@ -225,7 +225,7 @@ def _call_openai(
     )
 
     try:
-        from token_usage import log_token_usage
+        from scripts.token_usage import log_token_usage
 
         usage = response.usage
         if usage is not None:

@@ -38,22 +38,8 @@ jobs:
       - name: Run ruff linter
         run: ruff check .
 
-      - name: Forbid bare-name imports of scripts/ modules (#391, ADR-0010)
-        run: |
-          # Modules whose bare-name imports enable sys.path-based module
-          # spoofing. PR #383 and PR #391 fixed the known instances; this
-          # guard prevents regression. Excludes archived/ and docstring
-          # examples (Usage: blocks in module-level """...""").
-          if grep -rEn '^[[:space:]]*from (google_search|arxiv_search|topic_trend_grounding|agent_registry)[[:space:]]+import' \
-              --include='*.py' \
-              --exclude-dir=archived \
-              src/ scripts/ agents/ tests/ mcp_servers/ 2>/dev/null \
-              | grep -v 'scripts/agent_registry.py:8:'; then
-            echo ""
-            echo "::error::Bare-name import of a scripts/ module detected."
-            echo "Use 'from scripts.<module> import ...' instead — see PR #383, #391."
-            exit 1
-          fi
+      - name: Forbid bare-name imports of scripts/ modules (#395, ADR-0010)
+        run: python scripts/check_bare_name_imports.py
 
       - name: Run mypy type checker
         continue-on-error: true

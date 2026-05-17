@@ -14,7 +14,7 @@ import pytest
 # Import functions from llm_client
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-from llm_client import (
+from scripts.llm_client import (
     LLMClient,
     call_llm,
     create_llm_client,
@@ -276,11 +276,11 @@ def test_main_execution_success(clean_env, mock_openai_client, capsys):
 
     with mock_openai_import(mock_openai_client):
         # Import and execute the main block
-        import llm_client
+        from scripts import llm_client
 
         # Simulate running as main
         with (
-            patch("llm_client.__name__", "__main__"),
+            patch("scripts.llm_client.__name__", "__main__"),
             contextlib.suppress(SystemExit),
         ):
             # This would normally be executed when script is run directly
@@ -319,10 +319,10 @@ def test_main_execution_failure(clean_env, capsys):
     # No API key set, should fail
 
     # Import the module
-    import llm_client
+    from scripts import llm_client
 
     with (
-        patch("llm_client.__name__", "__main__"),
+        patch("scripts.llm_client.__name__", "__main__"),
         contextlib.suppress(SystemExit),
     ):
         exec(

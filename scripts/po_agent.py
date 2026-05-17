@@ -15,7 +15,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from llm_client import call_llm, create_llm_client
+from scripts.llm_client import call_llm, create_llm_client
 
 # ═══════════════════════════════════════════════════════════════════════════
 # PO AGENT SYSTEM PROMPT

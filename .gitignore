@@ -14,7 +14,7 @@ env/
 venv/
 ENV/
 .venv
-.venv-cov/
+.venv-*/
 
 # Agent outputs
 content_queue.json
@@ -79,4 +79,3 @@ github-pages-*.png
 
 home.png
 home-*.png
-.venv-cov/

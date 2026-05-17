@@ -52,7 +52,6 @@ Use [docs/adr/TEMPLATE.md](adr/TEMPLATE.md) when writing a new ADR.
 ### System Architecture
 - **[Flow-Based Orchestration](FLOW_ARCHITECTURE.md)** - Deterministic state-machine design
 - **[Autonomous Orchestration Strategy](AUTONOMOUS_ORCHESTRATION_STRATEGY.md)** - Autonomous agent coordination
-- **[CrewAI Context Architecture](CREWAI_CONTEXT_ARCHITECTURE.md)** - Shared context system
 - **[Architecture Patterns](ARCHITECTURE_PATTERNS.md)** - Prompts-as-code, persona voting, sequential orchestration
 - **[Agent Registry Spec](agent-registry-spec.md)** - Agent registration and discovery
 - **[Quality System](DEFINITION_OF_DONE.md)** - Quality gates and validation layers
@@ -96,7 +95,6 @@ Use [docs/adr/TEMPLATE.md](adr/TEMPLATE.md) when writing a new ADR.
 ## Technical Reference
 
 ### API & Integration
-- **[CrewAI API Reference](CREWAI_API_REFERENCE.md)** - Complete API documentation
 - **[Agent Prompt Patterns](AGENT_PROMPT_PATTERNS.md)** - Prompt engineering patterns
 - **[Agent Quality Gates](AGENT_QUALITY_GATES.md)** - Gate definitions and thresholds
 - **[Quality Dashboard](QUALITY_DASHBOARD.md)** - Metrics and quality tracking
@@ -132,7 +130,7 @@ Use [docs/adr/TEMPLATE.md](adr/TEMPLATE.md) when writing a new ADR.
 
 ### For New Contributors
 1. [Main README](../README.md) -- [Contributing](../CONTRIBUTING.md) -- [Installation](guides/CONTINUE_SETUP.md)
-2. [Agent Overview](../AGENTS.md) -- [Architecture](FLOW_ARCHITECTURE.md) -- [API Reference](CREWAI_API_REFERENCE.md)
+2. [Agent Overview](../AGENTS.md) -- [Architecture](FLOW_ARCHITECTURE.md)
 
 ### For Developers
 1. [Quality System](DEFINITION_OF_DONE.md) -- [Workflow Guide](guides/WORKFLOW_GUIDE.md) -- [Current Sprint](../SPRINT.md)
@@ -140,7 +138,7 @@ Use [docs/adr/TEMPLATE.md](adr/TEMPLATE.md) when writing a new ADR.
 
 ### For Architects
 1. [ADR-0006 Framework](adr/0006-agent-framework-selection.md) — [ADR-0007 Content Intelligence](adr/0007-content-intelligence-engine.md) — [ADR-0008 Skill Governance](adr/0008-agent-skill-governance.md)
-2. [Flow Architecture](FLOW_ARCHITECTURE.md) — [Context System](CREWAI_CONTEXT_ARCHITECTURE.md) — [Architecture Patterns](ARCHITECTURE_PATTERNS.md)
+2. [Flow Architecture](FLOW_ARCHITECTURE.md) — [Architecture Patterns](ARCHITECTURE_PATTERNS.md)
 
 ### For Project Managers
 1. [Current Sprint](../SPRINT.md) -- [Sprint Archive](archive/sprints/) -- [Story Archive](archive/stories/)

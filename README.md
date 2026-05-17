@@ -30,19 +30,11 @@ A sophisticated multi-agent system (6 AI personas collaborate) that produces pub
 - **Green Software:** Self-validating agents reducing token waste by 30%
 - **Quality Gates:** 4-layer validation (automated checkpoints enforce standards)
 
-**Known Issues (Sprint 15 P0):**
-- ✅ **RESOLVED**: Test suite collection errors - Fixed by ensuring Python 3.13.11 environment
-- ✅ **RESOLVED**: Python 3.14 compatibility - Default .venv now uses Python 3.13.11
-- ✅ **RESOLVED**: CrewAI dependency issues - All 538 tests now collect successfully
-
-**Test Suite Status**: ✅ 537 passed, 1 skipped (538 total collected)
-**Environment**: Python 3.13.11 with CrewAI 1.7.2 compatibility confirmed
+**Test Suite Status**: 2112 passed, 84 skipped
 
 ## 🛠️ Installation
 
-**Python Version Requirement:** Python **≤3.13** (tested with 3.13.11)
-
-CrewAI requires Python 3.13 or lower. Python 3.14+ is not currently supported.
+**Python Version Requirement:** Python **≥3.11** (tested with 3.12)
 
 1. **Clone the repository:**
    ```bash
@@ -50,9 +42,9 @@ CrewAI requires Python 3.13 or lower. Python 3.14+ is not currently supported.
    cd economist-agents
    ```
 
-2. **Create virtual environment with Python 3.13:**
+2. **Create virtual environment:**
    ```bash
-   python3.13 -m venv .venv
+   python3 -m venv .venv
    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
    pip install --upgrade pip
    ```
@@ -83,22 +75,21 @@ CrewAI requires Python 3.13 or lower. Python 3.14+ is not currently supported.
 | **test-specialist** | Testing | Comprehensive test writing and quality assurance |
 | **visual-qa-agent** | Visual Quality | Chart and design validation |
 
-### Active Crews (2 operational)
+### Pipeline Runners (Anthropic Agent SDK)
 
-**Stage 3 Crew** (`src/crews/stage3_crew.py`) - Content Generation
+**Stage 3** (`src/agent_sdk/stage3_runner.py`) — Content Generation
 - **Purpose**: Research, writing, and chart creation pipeline
 - **Research**: Deterministic web search (arXiv + Google Scholar) — no LLM in research path
 - **Agents**: Writer Agent → Graphics Agent → Editor Agent (all Claude/Anthropic)
 - **Stat Audit**: Strips sentences with stats not found in the research brief
 - **Output**: Article with verified sources and chart data
-- **Status**: ✅ Operational
-- **Integration**: Via Flow-based orchestration (see Flow Architecture below)
+- **Integration**: Via the sequential pipeline in `src/agent_sdk/pipeline.py`
 
-**Stage 4 Crew** (`src/crews/stage4_crew.py`) - Editorial Review
-- **Purpose**: 5-gate editorial quality validation
-- **Agents**: Editor Agent (multi-gate validation)
+**Stage 4** (`src/agent_sdk/stage4_runner.py`) — Editorial Review
+- **Purpose**: Deterministic post-processing quality gates
 - **Output**: JSON with quality assessment and edited article
-- **Sta Discovery** via `.github/agents/` directory:
+
+### Agent Discovery via `.github/agents/` directory:
 - 🔍 **Discovery**: Agent definitions stored as `.agent.md` files
 - 📋 **Validation**: Each agent has required fields (role, goal, backstory)
 - 🧠 **Context Injection**: Adds AGILE_MINDSET system prompt to all agents
@@ -147,9 +138,9 @@ dev_context = create_task_context(ctx, task_id='DEV-001', assigned_to='Developer
 qe_context = create_task_context(ctx, task_id='QE-001', assigned_to='QE')
 sm_context = create_task_context(ctx, task_id='SM-001', assigned_to='Scrum Master')
 
-# Use with CrewAI Tasks
-dev_task = Task(description="Implement feature", agent=developer, context=dev_context)
-qe_task = Task(description="Validate feature", agent=qe, context=qe_context)
+# Pass into agent prompts as shared brief
+dev_brief = render_brief(dev_context)
+qe_brief = render_brief(qe_context)
 ```
 
 ### Benefits
@@ -189,11 +180,7 @@ ctx.save_audit_log('logs/audit.json')
 
 ### Documentation
 
-- **Architecture Guide**: [docs/CREWAI_CONTEXT_ARCHITECTURE.md](docs/CREWAI_CONTEXT_ARCHITECTURE.md)
-- **API Reference**: [docs/CREWAI_API_REFERENCE.md](docs/CREWAI_API_REFERENCE.md)
-- **Usage Examples**: [examples/crew_context_usage.py](examples/crew_context_usage.py)
 - **Unit Tests**: [tests/test_context_manager.py](tests/test_context_manager.py)
-- **Integration Tests**: [tests/test_crew_context_integration.py](tests/test_crew_context_integration.py)
 
 ## 🛠️ Development Workflow
 
@@ -248,7 +235,7 @@ gh pr create
 |------|------|----------|--------------|
 | `ruff-format` | **commit** | ~300ms | Auto-format Python code |
 | `ruff check` | **commit** | ~200ms | Lint code (checks only) |
-| `pytest` | **push** ⚡ | ~7.5s | Run full test suite (166+ tests) |
+| `pytest` | **push** ⚡ | ~60s | Run full test suite (2100+ tests) |
 | `check-yaml` | **commit** | ~50ms | Validate YAML syntax |
 | `check-json` | **commit** | ~50ms | Validate JSON syntax |
 
@@ -256,62 +243,25 @@ gh pr create
 - ⚡ **Faster commit workflow** (0.5s vs 7.5s)
 - ✅ **Encourages frequent small commits**
 
-## 🔄 Flow-Based Orchestration
+## 🔄 Pipeline Orchestration
 
-**Production-grade deterministic state-machine** replacing hardcoded routing dictionaries.
-
-### What is Flow-Based Orchestration?
-
-CrewAI Flows provide `@start`, `@listen`, and `@router` decorators for zero-agency transitions:
-
-```python
-from src.economist_agents.flow import EconomistContentFlow
-
-class EconomistContentFlow(Flow):
-    @start()  # Entry point
-    def discover_topics(self):
-        return {"topics": [...]}
-    
-    @listen(discover_topics)  # Sequential trigger
-    def editorial_review(self, topics):
-        return selected_topic
-    
-    @router(generate_content)  # Conditional routing
-    def quality_gate(self, article):
-        return "publish" if score >= 8 else "revision"
-```
-
-### Flow Architecture
-
-```
-discover_topics(@start) → editorial_review(@listen) → generate_content(@listen)
-                                                               ↓
-                                                      quality_gate(@router)
-                                                      ↙              ↘
-                                   publish_article(@listen)   request_revision(@listen)
-```
+Sequential Python pipeline over `src.agent_sdk.pipeline.run_pipeline` — topic discovery → editorial review → content generation → quality gates → publish-or-revise.
 
 ### Usage
 
 **CLI Execution:**
 ```bash
-python3 src/economist_agents/flow.py
+python3 -m src.agent_sdk.pipeline "<topic>"
 ```
 
 **Python API:**
 ```python
-from src.economist_agents.flow import EconomistContentFlow
+from src.economist_agents.flow import run_flow
 
-flow = EconomistContentFlow()
-result = flow.kickoff()
-
-if result['status'] == 'published':
-    print(f"✅ Article published (quality: {result['quality_score']}/10)")
+result = run_flow(topic="...")
 ```
 
 **See Full Documentation:** [FLOW_ARCHITECTURE.md](docs/FLOW_ARCHITECTURE.md)
-
-**Migration Guide:** Replacing WORKFLOW_SEQUENCE dict with Flow decorators
 
 - 🧪 **Tests still validate before code reaches remote**
 - 🚀 **Improves local iteration speed**
@@ -340,10 +290,10 @@ economist-agents/
 ├── output/                   # Generated content artifacts
 ├── scripts/                  # Standalone scripts and tools
 ├── skills/*/SKILL.md         # Domain skill definitions (python-quality, testing, etc.)
-├── src/crews/                # CrewAI crew implementations (stage3, stage4)
+├── src/agent_sdk/            # Anthropic Agent SDK runners (stage3, stage4, pipeline)
 ├── src/economist_agents/     # Flow orchestration, adapters
-├── src/tools/                # CrewAI tool wrappers (research_tools.py)
-├── tests/                    # Test suite (1700+ tests)
+├── src/quality/              # Quality gates (governance, validators, metrics)
+├── tests/                    # Test suite (2100+ tests)
 └── README.md                 # This file
 ```
 
@@ -424,7 +374,7 @@ This README provides a project overview and quick start guide. For comprehensive
 ### For Different Audiences
 - **New Contributors**: [README](README.md) → [Contributing](CONTRIBUTING.md) → [Setup Guide](docs/guides/CONTINUE_SETUP.md)
 - **Developers**: [Agents Overview](AGENTS.md) → [Quality System](docs/DEFINITION_OF_DONE.md) → [Workflow Guide](docs/guides/WORKFLOW_GUIDE.md)
-- **Architects**: [ADR Collection](docs/architecture/) → [Flow Architecture](docs/FLOW_ARCHITECTURE.md) → [Context System](docs/CREWAI_CONTEXT_ARCHITECTURE.md)
+- **Architects**: [ADR Collection](docs/architecture/) → [Flow Architecture](docs/FLOW_ARCHITECTURE.md)
 - **Project Managers**: [Current Sprint](SPRINT.md) → [Quality Dashboard](docs/QUALITY_DASHBOARD.md) → [Archive](docs/archive/)
 
 ## 📖 Glossary

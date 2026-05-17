@@ -62,7 +62,6 @@ nav:
     - Agent Registry: agent-registry-spec.md
     - Flow Architecture: FLOW_ARCHITECTURE.md
     - Autonomous Orchestration: AUTONOMOUS_ORCHESTRATION_STRATEGY.md
-    - Shared Context System: CREWAI_CONTEXT_ARCHITECTURE.md
     - Architecture Patterns: ARCHITECTURE_PATTERNS.md
     - Architecture Review Process: ARCHITECTURE_REVIEW_PROCESS.md
 
@@ -130,7 +129,6 @@ nav:
     - Validation Quick Reference: guides/VALIDATION_QUICK_REF.md
 
   - Reference:
-    - CrewAI API: CREWAI_API_REFERENCE.md
     - Agent Prompt Patterns: AGENT_PROMPT_PATTERNS.md
     - Quality Gates: AGENT_QUALITY_GATES.md
     - Definition of Done: DEFINITION_OF_DONE.md

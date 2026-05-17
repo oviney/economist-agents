@@ -607,7 +607,6 @@ Use [`docs/adr/TEMPLATE.md`](docs/adr/TEMPLATE.md) when proposing a new ADR.
 
 - **[Architecture Patterns](docs/ARCHITECTURE_PATTERNS.md)** — Prompts-as-code, persona voting, sequential orchestration
 - **[Flow Architecture](docs/FLOW_ARCHITECTURE.md)** — Deterministic state-machine design
-- **[CrewAI Context Architecture](docs/CREWAI_CONTEXT_ARCHITECTURE.md)** — Shared context system
 
 ### Skills and Standards
 - **[Python Quality](skills/python-quality/SKILL.md)** — Type hints, docstrings, `orjson`, logging

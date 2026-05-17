@@ -16,7 +16,28 @@ logger = logging.getLogger(__name__)
 
 
 class EmptyResearchBriefError(RuntimeError):
-    """Raised when all web searches return no results, preventing an unsourced LLM call."""
+    """Base error for any condition that produces a research brief with zero usable sources.
+
+    Concrete cause is conveyed by subclass. CLI catches all three and prints
+    a tailored, traceback-free message before exiting non-zero.
+    """
+
+
+class SearchProvidersFailedError(EmptyResearchBriefError):
+    """Both research providers errored (HTTP error, network failure, or library exception).
+
+    Likely transient (provider outage) or environmental (bad/missing API key,
+    misformatted query rejected at provider). Retry or rephrase the topic.
+    """
+
+
+class SearchProvidersEmptyError(EmptyResearchBriefError):
+    """Providers responded successfully but returned zero usable sources for the topic.
+
+    The topic is likely too narrow, too recent, or phrased in a way that
+    matches nothing in arXiv/Google Scholar/Google Web. Try broadening or
+    rephrasing it as a noun-phrase rather than a question.
+    """
 
 
 class BudgetExceededError(RuntimeError):
@@ -85,14 +106,24 @@ def build_research_brief(topic: str) -> str:
     No LLM is involved; this is the deterministic research path that
     replaces the original CrewAI Research Agent (which hallucinated
     sources from training data instead of using injected tool results).
+
+    Raises one of the typed ``EmptyResearchBriefError`` subclasses if the
+    combined source count across all providers is zero — preventing an
+    unsourced LLM call.
     """
-    raw = _run_web_searches(topic)
-    if not raw.strip():
-        logger.debug("EmptyResearchBriefError: topic=%r", topic)
-        raise EmptyResearchBriefError(
-            "No web search results returned. "
-            "Check SERPER_API_KEY and network connectivity."
+    raw, diagnostics = _run_web_searches(topic)
+    total_sources = sum(diagnostics["source_counts"].values())
+    if total_sources == 0:
+        any_failed = any(diagnostics["provider_failed"].values())
+        msg = (
+            f"No usable sources returned for topic {topic!r}. "
+            f"provider_failed={diagnostics['provider_failed']}, "
+            f"source_counts={diagnostics['source_counts']}."
         )
+        logger.debug("EmptyResearchBriefError: %s", msg)
+        if any_failed:
+            raise SearchProvidersFailedError(msg)
+        raise SearchProvidersEmptyError(msg)
     return "\n".join(
         [
             f"# Research Brief: {topic}",
@@ -108,16 +139,36 @@ def build_research_brief(topic: str) -> str:
     )
 
 
-def _run_web_searches(topic: str) -> str:
-    """Combine arXiv and Google search results for ``topic``."""
+def _run_web_searches(topic: str) -> tuple[str, dict[str, Any]]:
+    """Combine arXiv and Google search results for ``topic``.
+
+    Returns a tuple of (formatted_markdown, diagnostics) where diagnostics is:
+
+        {
+            "source_counts": {"arxiv": int, "google_web": int, "google_scholar": int},
+            "provider_failed": {"arxiv": bool, "google": bool},
+        }
+
+    A provider is considered ``failed`` if it raised an exception during
+    import or call, or if its top-level response shape signals an error
+    (``success=False`` for arxiv; the topic-level wrapper for google also
+    sets ``success=False`` on transport failures). A provider that ran
+    cleanly but returned zero results is **not** marked failed.
+    """
     results: list[str] = []
+    source_counts: dict[str, int] = {"arxiv": 0, "google_web": 0, "google_scholar": 0}
+    provider_failed: dict[str, bool] = {"arxiv": False, "google": False}
+
     try:
         from scripts.arxiv_search import search_arxiv_for_topic
 
         arxiv = search_arxiv_for_topic(topic, max_papers=5)
-        if arxiv.get("success"):
+        if not arxiv.get("success", False):
+            provider_failed["arxiv"] = True
+        else:
             papers = arxiv.get("insights", {}).get("papers_analyzed", [])
             if papers:
+                source_counts["arxiv"] = len(papers[:5])
                 results.append("## arXiv Papers")
                 for p in papers[:5]:
                     results.append(
@@ -128,14 +179,18 @@ def _run_web_searches(topic: str) -> str:
                     )
     except Exception as exc:
         logger.warning("arXiv search failed: %s", exc)
+        provider_failed["arxiv"] = True
 
     try:
         from scripts.google_search import search_google_for_topic
 
         google = search_google_for_topic(topic, max_results=5)
-        if google.get("success"):
+        if not google.get("success", False):
+            provider_failed["google"] = True
+        else:
             web = google.get("web_results", [])
             if web:
+                source_counts["google_web"] = len(web[:5])
                 results.append("\n## Web Sources")
                 for r in web[:5]:
                     results.append(
@@ -145,6 +200,7 @@ def _run_web_searches(topic: str) -> str:
                     )
             scholar = google.get("scholar_results", [])
             if scholar:
+                source_counts["google_scholar"] = len(scholar[:5])
                 results.append("\n## Google Scholar")
                 for r in scholar[:5]:
                     results.append(
@@ -154,8 +210,13 @@ def _run_web_searches(topic: str) -> str:
                     )
     except Exception as exc:
         logger.warning("Google search failed: %s", exc)
+        provider_failed["google"] = True
 
-    return "\n".join(results)
+    diagnostics: dict[str, Any] = {
+        "source_counts": source_counts,
+        "provider_failed": provider_failed,
+    }
+    return "\n".join(results), diagnostics
 
 
 def audit_article_stats(article: str, research_brief: str) -> str:

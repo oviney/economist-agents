@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import logging
+import sys
 import time
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
@@ -17,6 +18,10 @@ from pathlib import Path
 
 import orjson
 
+from src.agent_sdk._shared import (
+    SearchProvidersEmptyError,
+    SearchProvidersFailedError,
+)
 from src.agent_sdk.stage3_runner import (
     DEFAULT_GRAPHICS_MODEL,
     DEFAULT_WRITER_MODEL,
@@ -185,6 +190,14 @@ def main() -> None:
         default=DEFAULT_GRAPHICS_MODEL,
         help=f"Graphics model id (default {DEFAULT_GRAPHICS_MODEL})",
     )
+    parser.add_argument(
+        "--research-only",
+        action="store_true",
+        help=(
+            "Run only Stage 0 (web search + brief assembly), print the brief, "
+            "exit. No LLM calls. Useful for iterating on topic phrasing."
+        ),
+    )
     args = parser.parse_args()
     topic = (
         " ".join(args.topic)
@@ -198,16 +211,65 @@ def main() -> None:
         f"graphics ${args.graphics_budget:.2f}",
     )
 
+    if args.research_only:
+        from src.agent_sdk._shared import build_research_brief
+
+        try:
+            brief = build_research_brief(topic)
+        except SearchProvidersFailedError as exc:
+            print(
+                "\nResearch aborted: providers failed.\n"
+                f"  {exc}\n"
+                "  Likely causes: provider outage, missing/invalid "
+                "SERPER_API_KEY, or query rejected by provider (HTTP 4xx). "
+                "Retry in a few minutes or rephrase the topic.",
+                file=sys.stderr,
+            )
+            sys.exit(2)
+        except SearchProvidersEmptyError as exc:
+            print(
+                "\nResearch aborted: providers ran but returned zero sources.\n"
+                f"  {exc}\n"
+                "  Likely cause: topic too narrow, too recent, or phrased in "
+                "a way that matches nothing. Try broadening or rephrasing.",
+                file=sys.stderr,
+            )
+            sys.exit(3)
+        print("\n--- Research brief ---\n")
+        print(brief)
+        return
+
     start = time.perf_counter()
-    result = asyncio.run(
-        run_pipeline(
-            topic,
-            writer_budget_usd=args.writer_budget,
-            graphics_budget_usd=args.graphics_budget,
-            writer_model=args.writer_model,
-            graphics_model=args.graphics_model,
-        ),
-    )
+    try:
+        result = asyncio.run(
+            run_pipeline(
+                topic,
+                writer_budget_usd=args.writer_budget,
+                graphics_budget_usd=args.graphics_budget,
+                writer_model=args.writer_model,
+                graphics_model=args.graphics_model,
+            ),
+        )
+    except SearchProvidersFailedError as exc:
+        print(
+            "\nPipeline aborted: research providers failed.\n"
+            f"  {exc}\n"
+            "  Likely causes: provider outage, missing/invalid SERPER_API_KEY, "
+            "or query rejected by provider (HTTP 4xx). Retry in a few minutes "
+            "or rephrase the topic as a noun-phrase rather than a question.",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+    except SearchProvidersEmptyError as exc:
+        print(
+            "\nPipeline aborted: search providers ran but returned zero sources.\n"
+            f"  {exc}\n"
+            "  Likely cause: topic too narrow, too recent, or phrased in a way "
+            "that matches nothing in arXiv/Google Scholar/Google Web. Try "
+            "broadening it or rephrasing as a noun-phrase.",
+            file=sys.stderr,
+        )
+        sys.exit(3)
     total = time.perf_counter() - start
 
     out_dir = Path("logs/spike")

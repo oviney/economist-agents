@@ -190,6 +190,14 @@ def main() -> None:
         default=DEFAULT_GRAPHICS_MODEL,
         help=f"Graphics model id (default {DEFAULT_GRAPHICS_MODEL})",
     )
+    parser.add_argument(
+        "--research-only",
+        action="store_true",
+        help=(
+            "Run only Stage 0 (web search + brief assembly), print the brief, "
+            "exit. No LLM calls. Useful for iterating on topic phrasing."
+        ),
+    )
     args = parser.parse_args()
     topic = (
         " ".join(args.topic)
@@ -202,6 +210,34 @@ def main() -> None:
         f"  Budgets: writer ${args.writer_budget:.2f}, "
         f"graphics ${args.graphics_budget:.2f}",
     )
+
+    if args.research_only:
+        from src.agent_sdk._shared import build_research_brief
+
+        try:
+            brief = build_research_brief(topic)
+        except SearchProvidersFailedError as exc:
+            print(
+                "\nResearch aborted: providers failed.\n"
+                f"  {exc}\n"
+                "  Likely causes: provider outage, missing/invalid "
+                "SERPER_API_KEY, or query rejected by provider (HTTP 4xx). "
+                "Retry in a few minutes or rephrase the topic.",
+                file=sys.stderr,
+            )
+            sys.exit(2)
+        except SearchProvidersEmptyError as exc:
+            print(
+                "\nResearch aborted: providers ran but returned zero sources.\n"
+                f"  {exc}\n"
+                "  Likely cause: topic too narrow, too recent, or phrased in "
+                "a way that matches nothing. Try broadening or rephrasing.",
+                file=sys.stderr,
+            )
+            sys.exit(3)
+        print("\n--- Research brief ---\n")
+        print(brief)
+        return
 
     start = time.perf_counter()
     try:

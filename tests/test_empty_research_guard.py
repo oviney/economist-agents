@@ -109,6 +109,51 @@ class TestEmptyResearchBriefError:
 
         assert "Some result" in brief
 
+    def test_provider_error_stubs_are_filtered_and_categorised_as_failed(
+        self,
+    ) -> None:
+        """When search_web/search_scholar return [{"error": "..."}] stubs
+        (HTTPError caught internally), they must NOT be counted as sources
+        and the provider must be marked failed so the gate categorises as
+        SearchProvidersFailedError rather than SearchProvidersEmptyError.
+
+        Reproduces the regression discovered post-#385 with --research-only
+        on a Serper-rejected query.
+        """
+        from src.agent_sdk._shared import (
+            SearchProvidersFailedError,
+            _run_web_searches,
+            build_research_brief,
+        )
+
+        # arxiv: clean empty success; google: success=True but results are
+        # all error stubs from the underlying search_web/scholar methods
+        def fake_arxiv(*args, **kwargs):
+            return {"success": True, "insights": {"papers_analyzed": []}}
+
+        def fake_google(*args, **kwargs):
+            return {
+                "success": True,
+                "topic": "x",
+                "web_results": [{"error": "HTTP error from Serper API: 400"}],
+                "scholar_results": [{"error": "HTTP error from Serper API: 400"}],
+            }
+
+        with (
+            patch("scripts.arxiv_search.search_arxiv_for_topic", fake_arxiv),
+            patch("scripts.google_search.search_google_for_topic", fake_google),
+        ):
+            _, diag = _run_web_searches("AI Testing")
+            assert diag["source_counts"] == {
+                "arxiv": 0,
+                "google_web": 0,
+                "google_scholar": 0,
+            }
+            assert diag["provider_failed"]["google"] is True
+
+            with pytest.raises(SearchProvidersFailedError):
+                build_research_brief("AI Testing")
+
     def test_run_stage3_propagates_empty_research_error(self) -> None:
         """EmptyResearchBriefError (and subclasses) must not be swallowed by run_stage3."""
         from src.agent_sdk._shared import EmptyResearchBriefError

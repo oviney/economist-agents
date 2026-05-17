@@ -188,7 +188,13 @@ def _run_web_searches(topic: str) -> tuple[str, dict[str, Any]]:
         if not google.get("success", False):
             provider_failed["google"] = True
         else:
-            web = google.get("web_results", [])
+            # search_web and search_scholar in scripts/google_search.py catch
+            # requests.HTTPError internally and return [{"error": "..."}] as
+            # the result list. search_google_for_topic does NOT filter those
+            # out, so success=True can coexist with error-stub results. Filter
+            # them here so they don't get counted as real sources or rendered
+            # as fake bullets with "Unknown" titles.
+            web = [r for r in google.get("web_results", []) if "error" not in r]
             if web:
                 source_counts["google_web"] = len(web[:5])
                 results.append("\n## Web Sources")
@@ -198,7 +204,9 @@ def _run_web_searches(topic: str) -> tuple[str, dict[str, Any]]:
                         f"  Snippet: {r.get('snippet', 'N/A')}\n"
                         f"  Date: {r.get('date', 'N/A')}",
                     )
-            scholar = google.get("scholar_results", [])
+            scholar = [
+                r for r in google.get("scholar_results", []) if "error" not in r
+            ]
             if scholar:
                 source_counts["google_scholar"] = len(scholar[:5])
                 results.append("\n## Google Scholar")
@@ -208,6 +216,15 @@ def _run_web_searches(topic: str) -> tuple[str, dict[str, Any]]:
                         f"  Year: {r.get('year', 'N/A')}\n"
                         f"  Cited by: {r.get('cited_by', 'N/A')}",
                     )
+            # If google reported success but ALL results were error stubs that
+            # we just filtered out, the provider effectively failed. Mark it
+            # so the gate categorises this as SearchProvidersFailedError
+            # (transient/environmental) rather than SearchProvidersEmptyError
+            # (topic too narrow).
+            if not web and not scholar and (
+                google.get("web_results") or google.get("scholar_results")
+            ):
+                provider_failed["google"] = True
     except Exception as exc:
         logger.warning("Google search failed: %s", exc)
         provider_failed["google"] = True

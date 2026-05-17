@@ -92,7 +92,7 @@ Each agent definition includes:
 - **Metrics**: 88% pass rate, 28.6% escape rate baseline
 
 #### **@architect**
-- **Role**: AI Architect for CrewAI multi-agent system design, validation, and audit
+- **Role**: AI Architect for multi-agent system design, validation, and audit
 - **Responsibilities**: Architecture design, agent config validation, workflow evaluation, compliance audits, ADR authoring
 - **Tools**: bash, file_search
 - **Skills**: skills/architecture-patterns, skills/agent-delegation, skills/adr-governance
@@ -124,22 +124,17 @@ Each agent definition includes:
 @visual-qa-agent Validate chart quality for Q4 report
 ```
 
-## 🔧 Agent Integration with CrewAI
+## 🔧 Pipeline Integration
 
-### Stage 3 Crew (Content Generation)
-- **Research Agent**: Market analysis and content research
-  - ✨ **NEW**: Fresh Academic Sources via arXiv API integration
-  - 🔬 Access to cutting-edge 2026 research papers (vs stale 2023-2024 training data)
-  - 📊 Real-time competitive intelligence from pre-publication academic research
-  - 🎯 Business Value: Eliminates "dated sources" limitation, provides fresh insights
-- **Writer Agent**: Article writing in Economist style
-- **Graphics Agent**: Chart and visualization creation
-- **Status**: ✅ Operational (100% test pass rate)
+Content generation runs through `src/agent_sdk/` (Anthropic Agent SDK) — the CrewAI runtime was removed in Phase 2 (ADR-0006).
 
-### Stage 4 Crew (Editorial Review)
-- **Editor Agent**: 5-gate quality validation system
-- **Quality Gates**: Opening, Evidence, Voice, Structure, Chart
-- **Status**: ✅ Operational (95% gate pass rate target)
+### Stage 3 (Content Generation — `src/agent_sdk/stage3_runner.py`)
+- **Research Agent**: Deterministic web search (arXiv + Google Scholar via Serper) — no LLM in the research path
+- **Writer Agent**: Article writing in Economist style (Claude via Agent SDK)
+- **Graphics Agent**: Chart and visualization creation (Claude via Agent SDK)
+
+### Stage 4 (Editorial Review — `src/agent_sdk/stage4_runner.py`)
+- **Quality Gates**: Deterministic post-processing — stat audit, frontmatter validation, ending checks, hedging removal, chart embedding
 
 ## 🛠️ Skills System Integration
 
@@ -237,7 +232,6 @@ ctx = ContextManager("docs/STORY_N_CONTEXT.md")
 ## 📚 Related Documentation
 
 - **Agent Registry Pattern**: [ADR-002](docs/ADR-002-agent-registry-pattern.md)
-- **CrewAI Integration**: [docs/CREWAI_CONTEXT_ARCHITECTURE.md](docs/CREWAI_CONTEXT_ARCHITECTURE.md)
 - **Skills System**: [skills/README.md](skills/README.md)
 - **Flow Architecture**: [docs/FLOW_ARCHITECTURE.md](docs/FLOW_ARCHITECTURE.md)
 - **Quality System**: [docs/DEFINITION_OF_DONE.md](docs/DEFINITION_OF_DONE.md)

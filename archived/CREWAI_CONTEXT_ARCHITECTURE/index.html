@@ -10,31 +10,27 @@
       
       
       
-        <link rel="canonical" href="https://oviney.github.io/economist-agents/CREWAI_CONTEXT_ARCHITECTURE/">
+        <link rel="canonical" href="https://oviney.github.io/economist-agents/archived/CREWAI_CONTEXT_ARCHITECTURE/">
       
       
-        <link rel="prev" href="../AUTONOMOUS_ORCHESTRATION_STRATEGY/">
-      
-      
-        <link rel="next" href="../ARCHITECTURE_PATTERNS/">
       
       
         
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Shared Context System - Economist Agents</title>
+        <title>CrewAI Shared Context Architecture - Economist Agents</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -53,7 +49,7 @@
       
     
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -92,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="Economist Agents" class="md-header__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+    <a href="../.." title="Economist Agents" class="md-header__button md-logo" aria-label="Economist Agents" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -112,7 +108,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Shared Context System
+              CrewAI Shared Context Architecture
             
           </span>
         </div>
@@ -225,7 +221,7 @@
   
   
     <li class="md-tabs__item">
-      <a href=".." class="md-tabs__link">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -244,7 +240,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../getting-started/" class="md-tabs__link">
+      <a href="../../getting-started/" class="md-tabs__link">
         
   
   
@@ -261,13 +257,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../agent-registry-spec/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../agent-registry-spec/" class="md-tabs__link">
           
   
   
@@ -287,7 +281,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../adr/0001-extract-agent-definitions-to-yaml/" class="md-tabs__link">
+        <a href="../../adr/0001-extract-agent-definitions-to-yaml/" class="md-tabs__link">
           
   
   
@@ -314,7 +308,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../skills/using-agent-skills/SKILL/" class="md-tabs__link">
+        <a href="../../skills/using-agent-skills/SKILL/" class="md-tabs__link">
           
   
   
@@ -337,7 +331,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../guides/WORKFLOW_GUIDE/" class="md-tabs__link">
+        <a href="../../guides/WORKFLOW_GUIDE/" class="md-tabs__link">
           
   
   
@@ -357,7 +351,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../CREWAI_API_REFERENCE/" class="md-tabs__link">
+        <a href="../../AGENT_PROMPT_PATTERNS/" class="md-tabs__link">
           
   
   
@@ -377,7 +371,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../AGENT_VELOCITY_ANALYSIS/" class="md-tabs__link">
+        <a href="../../AGENT_VELOCITY_ANALYSIS/" class="md-tabs__link">
           
   
   
@@ -411,7 +405,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="Economist Agents" class="md-nav__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+    <a href="../.." title="Economist Agents" class="md-nav__button md-logo" aria-label="Economist Agents" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -441,7 +435,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -468,7 +462,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../getting-started/" class="md-nav__link">
+      <a href="../../getting-started/" class="md-nav__link">
         
   
   
@@ -492,31 +486,28 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   
@@ -534,7 +525,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -552,7 +543,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../agent-registry-spec/" class="md-nav__link">
+      <a href="../../agent-registry-spec/" class="md-nav__link">
         
   
   
@@ -580,7 +571,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../FLOW_ARCHITECTURE/" class="md-nav__link">
+      <a href="../../FLOW_ARCHITECTURE/" class="md-nav__link">
         
   
   
@@ -608,7 +599,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../AUTONOMOUS_ORCHESTRATION_STRATEGY/" class="md-nav__link">
+      <a href="../../AUTONOMOUS_ORCHESTRATION_STRATEGY/" class="md-nav__link">
         
   
   
@@ -633,569 +624,10 @@
                 
   
   
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Shared Context System
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Shared Context System
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Overview
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#architecture-diagram" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Architecture Diagram
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#key-components" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Key Components
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Key Components">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-contextmanager-singleton" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. ContextManager (Singleton)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-create_task_context-helper" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. create_task_context() Helper
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#data-flow" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Data Flow
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Data Flow">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#stage-1-context-loading-once-per-sprint-story" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Stage 1: Context Loading (Once per Sprint Story)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#stage-2-agent-task-creation-per-agent" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Stage 2: Agent Task Creation (Per Agent)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#stage-3-agent-updates-during-execution" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Stage 3: Agent Updates (During Execution)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#threading-model" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Threading Model
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Threading Model">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#concurrent-access-pattern" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Concurrent Access Pattern
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#performance-characteristics" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Performance Characteristics
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Performance Characteristics">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#measured-performance-pytest-benchmark" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Measured Performance (pytest-benchmark)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#briefing-time-reduction-analysis" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Briefing Time Reduction Analysis
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#integration-with-crewai-172" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Integration with CrewAI 1.7.2
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Integration with CrewAI 1.7.2">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#task-level-context-pattern" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Task-Level Context Pattern
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#context-updates-during-execution" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Context Updates During Execution
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#security-auditability" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Security &amp; Auditability
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Security &amp; Auditability">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#audit-log" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Audit Log
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#use-cases" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Use Cases:
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#error-handling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Error Handling
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Error Handling">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#custom-exceptions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Custom Exceptions
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#graceful-degradation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Graceful Degradation
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#best-practices" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Best Practices
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Best Practices">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-load-context-once" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Load Context Once
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-use-immutable-copies" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Use Immutable Copies
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-provide-task-specific-params" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Provide Task-Specific Params
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-update-shared-context-sparingly" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Update Shared Context Sparingly
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#migration-guide" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Migration Guide
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Migration Guide">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#from-manual-briefing-to-shared-context" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        From Manual Briefing to Shared Context
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Troubleshooting
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Troubleshooting">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#issue-contextfilenotfounderror" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Issue: "ContextFileNotFoundError"
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#issue-contextparseerror" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Issue: "ContextParseError"
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#issue-contextsizeexceedederror" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Issue: "ContextSizeExceededError"
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#issue-race-conditions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Issue: Race Conditions
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#future-enhancements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Future Enhancements
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Future Enhancements">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#planned-features-sprint-8" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Planned Features (Sprint 8+)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#references" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        References
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
   
   
     <li class="md-nav__item">
-      <a href="../ARCHITECTURE_PATTERNS/" class="md-nav__link">
+      <a href="../../ARCHITECTURE_PATTERNS/" class="md-nav__link">
         
   
   
@@ -1223,7 +655,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ARCHITECTURE_REVIEW_PROCESS/" class="md-nav__link">
+      <a href="../../ARCHITECTURE_REVIEW_PROCESS/" class="md-nav__link">
         
   
   
@@ -1312,7 +744,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0001-extract-agent-definitions-to-yaml/" class="md-nav__link">
+      <a href="../../adr/0001-extract-agent-definitions-to-yaml/" class="md-nav__link">
         
   
   
@@ -1340,7 +772,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0002-agent-registry-pattern/" class="md-nav__link">
+      <a href="../../adr/0002-agent-registry-pattern/" class="md-nav__link">
         
   
   
@@ -1368,7 +800,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0003-phased-crewai-migration/" class="md-nav__link">
+      <a href="../../adr/0003-phased-crewai-migration/" class="md-nav__link">
         
   
   
@@ -1396,7 +828,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0004-python-version-constraint/" class="md-nav__link">
+      <a href="../../adr/0004-python-version-constraint/" class="md-nav__link">
         
   
   
@@ -1424,7 +856,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0005-agile-discipline-enforcement/" class="md-nav__link">
+      <a href="../../adr/0005-agile-discipline-enforcement/" class="md-nav__link">
         
   
   
@@ -1452,7 +884,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0006-agent-framework-selection/" class="md-nav__link">
+      <a href="../../adr/0006-agent-framework-selection/" class="md-nav__link">
         
   
   
@@ -1480,7 +912,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0007-content-intelligence-engine/" class="md-nav__link">
+      <a href="../../adr/0007-content-intelligence-engine/" class="md-nav__link">
         
   
   
@@ -1508,7 +940,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0008-agent-skill-governance/" class="md-nav__link">
+      <a href="../../adr/0008-agent-skill-governance/" class="md-nav__link">
         
   
   
@@ -1536,7 +968,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0009-architecture-audit-rubric/" class="md-nav__link">
+      <a href="../../adr/0009-architecture-audit-rubric/" class="md-nav__link">
         
   
   
@@ -1679,7 +1111,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/using-agent-skills/SKILL/" class="md-nav__link">
+      <a href="../../skills/using-agent-skills/SKILL/" class="md-nav__link">
         
   
   
@@ -1707,7 +1139,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/idea-refine/SKILL/" class="md-nav__link">
+      <a href="../../skills/idea-refine/SKILL/" class="md-nav__link">
         
   
   
@@ -1735,7 +1167,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/spec-driven-development/SKILL/" class="md-nav__link">
+      <a href="../../skills/spec-driven-development/SKILL/" class="md-nav__link">
         
   
   
@@ -1763,7 +1195,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/planning-and-task-breakdown/SKILL/" class="md-nav__link">
+      <a href="../../skills/planning-and-task-breakdown/SKILL/" class="md-nav__link">
         
   
   
@@ -1791,7 +1223,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/context-engineering/SKILL/" class="md-nav__link">
+      <a href="../../skills/context-engineering/SKILL/" class="md-nav__link">
         
   
   
@@ -1819,7 +1251,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/source-driven-development/SKILL/" class="md-nav__link">
+      <a href="../../skills/source-driven-development/SKILL/" class="md-nav__link">
         
   
   
@@ -1847,7 +1279,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/incremental-implementation/SKILL/" class="md-nav__link">
+      <a href="../../skills/incremental-implementation/SKILL/" class="md-nav__link">
         
   
   
@@ -1875,7 +1307,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/test-driven-development/SKILL/" class="md-nav__link">
+      <a href="../../skills/test-driven-development/SKILL/" class="md-nav__link">
         
   
   
@@ -1903,7 +1335,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/browser-testing-with-devtools/SKILL/" class="md-nav__link">
+      <a href="../../skills/browser-testing-with-devtools/SKILL/" class="md-nav__link">
         
   
   
@@ -1931,7 +1363,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/debugging-and-error-recovery/SKILL/" class="md-nav__link">
+      <a href="../../skills/debugging-and-error-recovery/SKILL/" class="md-nav__link">
         
   
   
@@ -1959,7 +1391,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/code-review-and-quality/SKILL/" class="md-nav__link">
+      <a href="../../skills/code-review-and-quality/SKILL/" class="md-nav__link">
         
   
   
@@ -1987,7 +1419,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/code-simplification/SKILL/" class="md-nav__link">
+      <a href="../../skills/code-simplification/SKILL/" class="md-nav__link">
         
   
   
@@ -2015,7 +1447,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/security-and-hardening/SKILL/" class="md-nav__link">
+      <a href="../../skills/security-and-hardening/SKILL/" class="md-nav__link">
         
   
   
@@ -2043,7 +1475,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/performance-optimization/SKILL/" class="md-nav__link">
+      <a href="../../skills/performance-optimization/SKILL/" class="md-nav__link">
         
   
   
@@ -2071,7 +1503,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/frontend-ui-engineering/SKILL/" class="md-nav__link">
+      <a href="../../skills/frontend-ui-engineering/SKILL/" class="md-nav__link">
         
   
   
@@ -2099,7 +1531,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/api-and-interface-design/SKILL/" class="md-nav__link">
+      <a href="../../skills/api-and-interface-design/SKILL/" class="md-nav__link">
         
   
   
@@ -2127,7 +1559,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/git-workflow-and-versioning/SKILL/" class="md-nav__link">
+      <a href="../../skills/git-workflow-and-versioning/SKILL/" class="md-nav__link">
         
   
   
@@ -2155,7 +1587,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/ci-cd-and-automation/SKILL/" class="md-nav__link">
+      <a href="../../skills/ci-cd-and-automation/SKILL/" class="md-nav__link">
         
   
   
@@ -2183,7 +1615,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/documentation-and-adrs/SKILL/" class="md-nav__link">
+      <a href="../../skills/documentation-and-adrs/SKILL/" class="md-nav__link">
         
   
   
@@ -2211,7 +1643,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/deprecation-and-migration/SKILL/" class="md-nav__link">
+      <a href="../../skills/deprecation-and-migration/SKILL/" class="md-nav__link">
         
   
   
@@ -2239,7 +1671,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/shipping-and-launch/SKILL/" class="md-nav__link">
+      <a href="../../skills/shipping-and-launch/SKILL/" class="md-nav__link">
         
   
   
@@ -2329,7 +1761,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/adr-governance/SKILL/" class="md-nav__link">
+      <a href="../../skills/adr-governance/SKILL/" class="md-nav__link">
         
   
   
@@ -2357,7 +1789,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/agent-delegation/SKILL/" class="md-nav__link">
+      <a href="../../skills/agent-delegation/SKILL/" class="md-nav__link">
         
   
   
@@ -2385,7 +1817,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/agent-traceability/SKILL/" class="md-nav__link">
+      <a href="../../skills/agent-traceability/SKILL/" class="md-nav__link">
         
   
   
@@ -2413,7 +1845,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/architecture-patterns/SKILL/" class="md-nav__link">
+      <a href="../../skills/architecture-patterns/SKILL/" class="md-nav__link">
         
   
   
@@ -2441,7 +1873,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/article-evaluation/SKILL/" class="md-nav__link">
+      <a href="../../skills/article-evaluation/SKILL/" class="md-nav__link">
         
   
   
@@ -2469,7 +1901,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/defect-prevention/SKILL/" class="md-nav__link">
+      <a href="../../skills/defect-prevention/SKILL/" class="md-nav__link">
         
   
   
@@ -2497,7 +1929,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/devops/SKILL/" class="md-nav__link">
+      <a href="../../skills/devops/SKILL/" class="md-nav__link">
         
   
   
@@ -2525,7 +1957,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/economist-writing/SKILL/" class="md-nav__link">
+      <a href="../../skills/economist-writing/SKILL/" class="md-nav__link">
         
   
   
@@ -2553,7 +1985,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/editorial-illustration/SKILL/" class="md-nav__link">
+      <a href="../../skills/editorial-illustration/SKILL/" class="md-nav__link">
         
   
   
@@ -2581,7 +2013,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/mcp-development/SKILL/" class="md-nav__link">
+      <a href="../../skills/mcp-development/SKILL/" class="md-nav__link">
         
   
   
@@ -2609,7 +2041,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/observability/SKILL/" class="md-nav__link">
+      <a href="../../skills/observability/SKILL/" class="md-nav__link">
         
   
   
@@ -2637,7 +2069,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/python-quality/SKILL/" class="md-nav__link">
+      <a href="../../skills/python-quality/SKILL/" class="md-nav__link">
         
   
   
@@ -2665,7 +2097,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/quality-gates/SKILL/" class="md-nav__link">
+      <a href="../../skills/quality-gates/SKILL/" class="md-nav__link">
         
   
   
@@ -2693,7 +2125,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/research-sourcing/SKILL/" class="md-nav__link">
+      <a href="../../skills/research-sourcing/SKILL/" class="md-nav__link">
         
   
   
@@ -2721,7 +2153,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/scrum-master/SKILL/" class="md-nav__link">
+      <a href="../../skills/scrum-master/SKILL/" class="md-nav__link">
         
   
   
@@ -2749,7 +2181,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/sprint-management/SKILL/" class="md-nav__link">
+      <a href="../../skills/sprint-management/SKILL/" class="md-nav__link">
         
   
   
@@ -2777,7 +2209,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/testing/SKILL/" class="md-nav__link">
+      <a href="../../skills/testing/SKILL/" class="md-nav__link">
         
   
   
@@ -2805,7 +2237,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/visual-qa/SKILL/" class="md-nav__link">
+      <a href="../../skills/visual-qa/SKILL/" class="md-nav__link">
         
   
   
@@ -2902,7 +2334,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/WORKFLOW_GUIDE/" class="md-nav__link">
+      <a href="../../guides/WORKFLOW_GUIDE/" class="md-nav__link">
         
   
   
@@ -2930,7 +2362,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/BLOG_DEPLOYMENT/" class="md-nav__link">
+      <a href="../../guides/BLOG_DEPLOYMENT/" class="md-nav__link">
         
   
   
@@ -2958,7 +2390,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/COPILOT_SYNC/" class="md-nav__link">
+      <a href="../../guides/COPILOT_SYNC/" class="md-nav__link">
         
   
   
@@ -2986,7 +2418,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/CI_MONITORING_GUIDE/" class="md-nav__link">
+      <a href="../../guides/CI_MONITORING_GUIDE/" class="md-nav__link">
         
   
   
@@ -3014,7 +2446,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/PYTHON_VERSION_TROUBLESHOOTING/" class="md-nav__link">
+      <a href="../../guides/PYTHON_VERSION_TROUBLESHOOTING/" class="md-nav__link">
         
   
   
@@ -3042,7 +2474,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/IMPLEMENTATION_ROADMAP/" class="md-nav__link">
+      <a href="../../guides/IMPLEMENTATION_ROADMAP/" class="md-nav__link">
         
   
   
@@ -3070,7 +2502,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/VALIDATION_QUICK_REF/" class="md-nav__link">
+      <a href="../../guides/VALIDATION_QUICK_REF/" class="md-nav__link">
         
   
   
@@ -3159,35 +2591,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../CREWAI_API_REFERENCE/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    CrewAI API
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../AGENT_PROMPT_PATTERNS/" class="md-nav__link">
+      <a href="../../AGENT_PROMPT_PATTERNS/" class="md-nav__link">
         
   
   
@@ -3215,7 +2619,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../AGENT_QUALITY_GATES/" class="md-nav__link">
+      <a href="../../AGENT_QUALITY_GATES/" class="md-nav__link">
         
   
   
@@ -3243,7 +2647,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../DEFINITION_OF_DONE/" class="md-nav__link">
+      <a href="../../DEFINITION_OF_DONE/" class="md-nav__link">
         
   
   
@@ -3271,7 +2675,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../DEFECT_PREVENTION/" class="md-nav__link">
+      <a href="../../DEFECT_PREVENTION/" class="md-nav__link">
         
   
   
@@ -3299,7 +2703,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../CHART_DESIGN_SPEC/" class="md-nav__link">
+      <a href="../../CHART_DESIGN_SPEC/" class="md-nav__link">
         
   
   
@@ -3388,7 +2792,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../AGENT_VELOCITY_ANALYSIS/" class="md-nav__link">
+      <a href="../../AGENT_VELOCITY_ANALYSIS/" class="md-nav__link">
         
   
   
@@ -3416,7 +2820,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../SPRINT_DISCIPLINE_GUIDE/" class="md-nav__link">
+      <a href="../../SPRINT_DISCIPLINE_GUIDE/" class="md-nav__link">
         
   
   
@@ -3444,7 +2848,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../CHANGELOG/" class="md-nav__link">
+      <a href="../../CHANGELOG/" class="md-nav__link">
         
   
   
@@ -4494,7 +3898,7 @@
 <li><strong>Integration Tests:</strong> <a href="../tests/test_crew_context_integration.py">tests/test_crew_context_integration.py</a></li>
 <li><strong>Usage Example:</strong> <a href="../examples/crew_context_usage.py">examples/crew_context_usage.py</a></li>
 <li><strong>API Reference:</strong> <a href="../CREWAI_API_REFERENCE/">docs/CREWAI_API_REFERENCE.md</a></li>
-<li><strong>Story 2 Context:</strong> <a href="../STORY_2_CONTEXT/">docs/STORY_2_CONTEXT.md</a></li>
+<li><strong>Story 2 Context:</strong> <a href="STORY_2_CONTEXT.md">docs/STORY_2_CONTEXT.md</a></li>
 </ul>
 
 
@@ -4551,10 +3955,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>

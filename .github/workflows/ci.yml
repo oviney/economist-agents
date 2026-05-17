@@ -93,10 +93,11 @@ jobs:
       - name: Run tests with coverage
         run: |
           pytest tests/ -v \
+            --cov=src \
             --cov=scripts \
             --cov-report=term-missing \
             --cov-report=xml \
-            --cov-fail-under=35
+            --cov-fail-under=70
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 

@@ -14,6 +14,7 @@ env/
 venv/
 ENV/
 .venv
+.venv-cov/
 
 # Agent outputs
 content_queue.json

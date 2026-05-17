@@ -18,55 +18,102 @@ import pytest
 # ── Unit: _shared.py ─────────────────────────────────────────────────────────
 
 
+def _diag(
+    arxiv: int = 0,
+    google_web: int = 0,
+    google_scholar: int = 0,
+    *,
+    arxiv_failed: bool = False,
+    google_failed: bool = False,
+) -> dict[str, object]:
+    """Build the diagnostics dict matching _run_web_searches' new return shape."""
+    return {
+        "source_counts": {
+            "arxiv": arxiv,
+            "google_web": google_web,
+            "google_scholar": google_scholar,
+        },
+        "provider_failed": {"arxiv": arxiv_failed, "google": google_failed},
+    }
+
+
 class TestEmptyResearchBriefError:
-    """EmptyResearchBriefError must exist and gate build_research_brief."""
+    """EmptyResearchBriefError and its typed subclasses gate build_research_brief."""
 
     def test_error_class_is_runtime_error_subclass(self) -> None:
         from src.agent_sdk._shared import EmptyResearchBriefError
 
         assert issubclass(EmptyResearchBriefError, RuntimeError)
 
-    def test_build_research_brief_raises_when_searches_empty(self) -> None:
-        from src.agent_sdk._shared import EmptyResearchBriefError, build_research_brief
+    def test_typed_subclasses_inherit_from_empty_research_brief_error(self) -> None:
+        from src.agent_sdk._shared import (
+            EmptyResearchBriefError,
+            SearchProvidersEmptyError,
+            SearchProvidersFailedError,
+        )
+
+        assert issubclass(SearchProvidersFailedError, EmptyResearchBriefError)
+        assert issubclass(SearchProvidersEmptyError, EmptyResearchBriefError)
+
+    def test_raises_search_providers_failed_when_any_provider_errored(self) -> None:
+        """If a provider raised/returned success=False and total sources is 0,
+        the failure-class error is raised (transient/environmental).
+        """
+        from src.agent_sdk._shared import (
+            SearchProvidersFailedError,
+            build_research_brief,
+        )
 
         with (
-            patch("src.agent_sdk._shared._run_web_searches", return_value=""),
-            pytest.raises(EmptyResearchBriefError, match="SERPER_API_KEY"),
+            patch(
+                "src.agent_sdk._shared._run_web_searches",
+                return_value=("", _diag(arxiv_failed=True, google_failed=True)),
+            ),
+            pytest.raises(SearchProvidersFailedError, match="provider_failed"),
         ):
             build_research_brief("AI Testing")
 
-    def test_build_research_brief_raises_when_searches_return_whitespace_only(
+    def test_raises_search_providers_empty_when_providers_succeeded_but_found_nothing(
         self,
     ) -> None:
-        """Whitespace-only result must be treated the same as empty — no sources."""
-        from src.agent_sdk._shared import EmptyResearchBriefError, build_research_brief
+        """If providers ran cleanly but returned 0 sources, the empty-class
+        error is raised (topic likely too narrow / search-hostile phrasing).
+        """
+        from src.agent_sdk._shared import (
+            SearchProvidersEmptyError,
+            build_research_brief,
+        )
 
         with (
-            patch("src.agent_sdk._shared._run_web_searches", return_value="\n  \n"),
-            pytest.raises(EmptyResearchBriefError),
+            patch(
+                "src.agent_sdk._shared._run_web_searches",
+                return_value=("", _diag()),
+            ),
+            pytest.raises(SearchProvidersEmptyError, match="source_counts"),
         ):
             build_research_brief("AI Testing")
 
-    def test_build_research_brief_does_not_raise_when_searches_return_content(
-        self,
-    ) -> None:
+    def test_does_not_raise_when_at_least_one_source_returned(self) -> None:
         from src.agent_sdk._shared import build_research_brief
 
         with patch(
             "src.agent_sdk._shared._run_web_searches",
-            return_value="## Web Sources\n- Some result",
+            return_value=("## Web Sources\n- Some result", _diag(google_web=1)),
         ):
             brief = build_research_brief("AI Testing")
 
         assert "Some result" in brief
 
     def test_run_stage3_propagates_empty_research_error(self) -> None:
-        """EmptyResearchBriefError must not be swallowed by run_stage3."""
+        """EmptyResearchBriefError (and subclasses) must not be swallowed by run_stage3."""
         from src.agent_sdk._shared import EmptyResearchBriefError
         from src.agent_sdk.stage3_runner import run_stage3
 
         with (
-            patch("src.agent_sdk._shared._run_web_searches", return_value=""),
+            patch(
+                "src.agent_sdk._shared._run_web_searches",
+                return_value=("", _diag(arxiv_failed=True, google_failed=True)),
+            ),
             pytest.raises(EmptyResearchBriefError),
         ):
             asyncio.run(run_stage3("AI Testing"))

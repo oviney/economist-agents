@@ -112,7 +112,7 @@ def _run_web_searches(topic: str) -> str:
     """Combine arXiv and Google search results for ``topic``."""
     results: list[str] = []
     try:
-        from arxiv_search import search_arxiv_for_topic
+        from scripts.arxiv_search import search_arxiv_for_topic
 
         arxiv = search_arxiv_for_topic(topic, max_papers=5)
         if arxiv.get("success"):
@@ -130,7 +130,7 @@ def _run_web_searches(topic: str) -> str:
         logger.warning("arXiv search failed: %s", exc)
 
     try:
-        from google_search import search_google_for_topic
+        from scripts.google_search import search_google_for_topic
 
         google = search_google_for_topic(topic, max_results=5)
         if google.get("success"):

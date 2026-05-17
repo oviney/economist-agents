@@ -21,8 +21,8 @@ _scripts_dir = Path(__file__).parent.parent / "scripts"
 if str(_scripts_dir) not in sys.path:
     sys.path.insert(0, str(_scripts_dir))
 
-from publication_validator import PublicationValidator  # noqa: E402
-from writer_agent import WriterAgent  # noqa: E402
+from agents.writer_agent import WriterAgent  # noqa: E402
+from scripts.publication_validator import PublicationValidator  # noqa: E402
 
 
 class TestWriterAgentReferences:
@@ -371,7 +371,7 @@ Content.
 class TestReferencesIntegration:
     """Integration tests for references feature"""
 
-    @patch("writer_agent.call_llm")
+    @patch("agents.writer_agent.call_llm")
     def test_writer_agent_includes_references_guidance(self, mock_llm):
         """Should include references guidance in system prompt"""
         mock_llm.return_value = """---

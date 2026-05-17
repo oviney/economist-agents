@@ -22,7 +22,7 @@ import pytest
 # ---------------------------------------------------------------------------
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-from featured_image_agent import (
+from scripts.featured_image_agent import (
     ECONOMIST_IMAGE_STYLE,
     create_image_prompt,
     generate_featured_image,
@@ -162,7 +162,7 @@ class TestCreateImagePrompt:
 
     def test_prompt_truncated_to_dalle_max_length(self) -> None:
         """Prompt must never exceed DALLE_MAX_PROMPT_LENGTH (3900 chars)."""
-        from featured_image_agent import DALLE_MAX_PROMPT_LENGTH
+        from scripts.featured_image_agent import DALLE_MAX_PROMPT_LENGTH
 
         # Use an extremely long summary to trigger truncation
         long_summary = "A" * 5000

@@ -10,7 +10,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-from token_usage import (
+from scripts.token_usage import (
     MODEL_COSTS,
     estimate_cost,
     log_token_usage,
@@ -138,7 +138,7 @@ class TestLogTokenUsage:
 
         log_file = tmp_path / "usage.jsonl"
         with (
-            patch("token_usage.Path.open", side_effect=OSError("disk full")),
+            patch("scripts.token_usage.Path.open", side_effect=OSError("disk full")),
             caplog.at_level(logging.WARNING, logger="token_usage"),
         ):
             # Should not raise
@@ -371,7 +371,7 @@ class TestLLMClientLogsUsage:
     def test_call_openai_logs_usage(self, tmp_path, capsys):
         from unittest.mock import Mock, patch
 
-        import llm_client
+        from scripts import llm_client
 
         log_file = tmp_path / "usage.jsonl"
 
@@ -385,7 +385,7 @@ class TestLLMClientLogsUsage:
         mock_response.usage = mock_usage
         mock_client.chat.completions.create.return_value = mock_response
 
-        with patch("token_usage._DEFAULT_LOG_FILE", log_file):
+        with patch("scripts.token_usage._DEFAULT_LOG_FILE", log_file):
             result = llm_client._call_openai(
                 mock_client,
                 "gpt-4o",

@@ -18,7 +18,7 @@ import pytest
 # Add scripts directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-from sm_agent import (
+from scripts.sm_agent import (
     AgentStatusMonitor,
     EscalationManager,
     QualityGateValidator,
@@ -341,9 +341,9 @@ class TestScrumMasterAgent:
             "backlog_file": str(backlog_file),
         }
 
-    @patch("sm_agent.TaskQueueManager")
-    @patch("sm_agent.AgentStatusMonitor")
-    @patch("sm_agent.EscalationManager")
+    @patch("scripts.sm_agent.TaskQueueManager")
+    @patch("scripts.sm_agent.AgentStatusMonitor")
+    @patch("scripts.sm_agent.EscalationManager")
     def test_agent_initialization(self, mock_esc, mock_monitor, mock_queue):
         """Test SM Agent initialization"""
         agent = ScrumMasterAgent()

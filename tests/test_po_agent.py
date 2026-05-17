@@ -16,7 +16,7 @@ import pytest
 # Add scripts directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-from po_agent import ProductOwnerAgent
+from scripts.po_agent import ProductOwnerAgent
 
 
 @pytest.fixture
@@ -45,7 +45,7 @@ def temp_backlog():
 @pytest.fixture
 def mock_llm_client():
     """Mock LLM client for deterministic testing"""
-    with patch("po_agent.create_llm_client") as mock_create:
+    with patch("scripts.po_agent.create_llm_client") as mock_create:
         mock_client = MagicMock()
         mock_create.return_value = mock_client
         yield mock_client
@@ -84,7 +84,7 @@ class TestProductOwnerAgent:
             "implementation_notes": "Integrate with existing test infrastructure",
         }
 
-        with patch("po_agent.call_llm") as mock_call:
+        with patch("scripts.po_agent.call_llm") as mock_call:
             mock_call.return_value = json.dumps(mock_response)
             agent = ProductOwnerAgent(backlog_file=temp_backlog)
             story = agent.parse_user_request("We need automated test coverage analysis")
@@ -118,7 +118,7 @@ class TestProductOwnerAgent:
             "implementation_notes": "Needs clarification before implementation",
         }
 
-        with patch("po_agent.call_llm") as mock_call:
+        with patch("scripts.po_agent.call_llm") as mock_call:
             mock_call.return_value = json.dumps(mock_response)
             agent = ProductOwnerAgent(backlog_file=temp_backlog)
             story = agent.parse_user_request("Improve chart quality")
@@ -135,7 +135,7 @@ class TestProductOwnerAgent:
             "[ ] Quality: Generation completes in <2 minutes",
         ]
 
-        with patch("po_agent.call_llm") as mock_call:
+        with patch("scripts.po_agent.call_llm") as mock_call:
             mock_call.return_value = json.dumps(mock_response)
             agent = ProductOwnerAgent(backlog_file=temp_backlog)
             criteria = agent.generate_acceptance_criteria(

@@ -16,7 +16,7 @@ import pytest
 SCRIPTS_DIR = Path(__file__).parent.parent / "scripts"
 sys.path.insert(0, str(SCRIPTS_DIR))
 
-from pre_commit_arch_check import (  # noqa: E402
+from scripts.pre_commit_arch_check import (  # noqa: E402
     LLM_IMPORT_EXCEPTIONS,
     CheckResult,
     Violation,

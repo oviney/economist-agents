@@ -20,7 +20,7 @@ from pathlib import Path
 # Add scripts to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-from sprint_validator import SprintValidator
+from scripts.sprint_validator import SprintValidator
 
 
 class GitHubIntegrationTests:

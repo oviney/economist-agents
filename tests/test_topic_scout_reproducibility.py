@@ -15,7 +15,7 @@ import pytest
 # Make scripts/ importable.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
-from topic_scout_reproducibility import (
+from scripts.topic_scout_reproducibility import (
     _compute_tf,
     _cosine_similarity,
     _extract_top_performer_keywords,
@@ -550,8 +550,10 @@ def test_run_reproducibility_check_writes_report(tmp_path: Path) -> None:
     mock_client.model = "gpt-4o-mock"
 
     with (
-        patch("topic_scout_reproducibility.get_performance_context") as mock_ctx,
-        patch("topic_scout_reproducibility.scout_topics") as mock_scout,
+        patch(
+            "scripts.topic_scout_reproducibility.get_performance_context"
+        ) as mock_ctx,
+        patch("scripts.topic_scout_reproducibility.scout_topics") as mock_scout,
     ):
         mock_ctx.return_value = "## Performance Context\n\nSome data\n"
         mock_scout.return_value = topics_payload
@@ -579,8 +581,10 @@ def test_run_reproducibility_check_counts_failed_run(tmp_path: Path) -> None:
     mock_client.model = "gpt-4o"
 
     with (
-        patch("topic_scout_reproducibility.get_performance_context") as mock_ctx,
-        patch("topic_scout_reproducibility.scout_topics") as mock_scout,
+        patch(
+            "scripts.topic_scout_reproducibility.get_performance_context"
+        ) as mock_ctx,
+        patch("scripts.topic_scout_reproducibility.scout_topics") as mock_scout,
     ):
         mock_ctx.return_value = "## Performance Context\n\nSome data\n"
         # First call succeeds; second returns empty (simulates JSON failure).
@@ -605,8 +609,10 @@ def test_run_reproducibility_check_handles_exception(tmp_path: Path) -> None:
     mock_client.model = "gpt-4o"
 
     with (
-        patch("topic_scout_reproducibility.get_performance_context") as mock_ctx,
-        patch("topic_scout_reproducibility.scout_topics") as mock_scout,
+        patch(
+            "scripts.topic_scout_reproducibility.get_performance_context"
+        ) as mock_ctx,
+        patch("scripts.topic_scout_reproducibility.scout_topics") as mock_scout,
     ):
         mock_ctx.return_value = "## Performance Context\n\nSome data\n"
         mock_scout.side_effect = RuntimeError("API quota exceeded")
@@ -628,8 +634,10 @@ def test_run_reproducibility_check_creates_output_dir(tmp_path: Path) -> None:
     nested = tmp_path / "deep" / "nested" / "output"
 
     with (
-        patch("topic_scout_reproducibility.get_performance_context") as mock_ctx,
-        patch("topic_scout_reproducibility.scout_topics") as mock_scout,
+        patch(
+            "scripts.topic_scout_reproducibility.get_performance_context"
+        ) as mock_ctx,
+        patch("scripts.topic_scout_reproducibility.scout_topics") as mock_scout,
     ):
         mock_ctx.return_value = "## Performance Context\n\nSome data\n"
         mock_scout.return_value = [_make_topic(i) for i in range(3)]

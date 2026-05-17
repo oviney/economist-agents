@@ -204,9 +204,7 @@ def _run_web_searches(topic: str) -> tuple[str, dict[str, Any]]:
                         f"  Snippet: {r.get('snippet', 'N/A')}\n"
                         f"  Date: {r.get('date', 'N/A')}",
                     )
-            scholar = [
-                r for r in google.get("scholar_results", []) if "error" not in r
-            ]
+            scholar = [r for r in google.get("scholar_results", []) if "error" not in r]
             if scholar:
                 source_counts["google_scholar"] = len(scholar[:5])
                 results.append("\n## Google Scholar")
@@ -221,8 +219,10 @@ def _run_web_searches(topic: str) -> tuple[str, dict[str, Any]]:
             # so the gate categorises this as SearchProvidersFailedError
             # (transient/environmental) rather than SearchProvidersEmptyError
             # (topic too narrow).
-            if not web and not scholar and (
-                google.get("web_results") or google.get("scholar_results")
+            if (
+                not web
+                and not scholar
+                and (google.get("web_results") or google.get("scholar_results"))
             ):
                 provider_failed["google"] = True
     except Exception as exc:

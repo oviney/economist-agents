@@ -140,25 +140,48 @@ def build_research_brief(topic: str) -> str:
 
 
 def _run_web_searches(topic: str) -> tuple[str, dict[str, Any]]:
-    """Combine arXiv and Google search results for ``topic``.
+    """Combine multi-provider search results for ``topic`` (#388).
 
-    Returns a tuple of (formatted_markdown, diagnostics) where diagnostics is:
+    Fans out to arXiv, Google (via Serper, when ``SERPER_API_KEY`` is set),
+    Semantic Scholar (no key required), Brave (when ``BRAVE_API_KEY`` is
+    set), and Tavily (when ``TAVILY_API_KEY`` is set). Each provider is
+    isolated in its own try/except so a single outage / missing key
+    cannot poison the others. Diagnostics shape:
 
         {
-            "source_counts": {"arxiv": int, "google_web": int, "google_scholar": int},
-            "provider_failed": {"arxiv": bool, "google": bool},
+            "source_counts": {
+                "arxiv": int, "google_web": int, "google_scholar": int,
+                "semantic_scholar": int, "brave": int, "tavily": int,
+            },
+            "provider_failed": {
+                "arxiv": bool, "google": bool, "semantic_scholar": bool,
+                "brave": bool, "tavily": bool,
+            },
         }
 
-    A provider is considered ``failed`` if it raised an exception during
-    import or call, or if its top-level response shape signals an error
-    (``success=False`` for arxiv; the topic-level wrapper for google also
-    sets ``success=False`` on transport failures). A provider that ran
-    cleanly but returned zero results is **not** marked failed.
+    A provider is ``failed`` if it raised, returned ``success=False``,
+    or returned only error-stub results. A provider that ran cleanly
+    but returned zero results is **not** marked failed (lets the gate
+    distinguish topic-too-narrow from provider-outage).
     """
     results: list[str] = []
-    source_counts: dict[str, int] = {"arxiv": 0, "google_web": 0, "google_scholar": 0}
-    provider_failed: dict[str, bool] = {"arxiv": False, "google": False}
+    source_counts: dict[str, int] = {
+        "arxiv": 0,
+        "google_web": 0,
+        "google_scholar": 0,
+        "semantic_scholar": 0,
+        "brave": 0,
+        "tavily": 0,
+    }
+    provider_failed: dict[str, bool] = {
+        "arxiv": False,
+        "google": False,
+        "semantic_scholar": False,
+        "brave": False,
+        "tavily": False,
+    }
 
+    # ── arXiv ────────────────────────────────────────────────────────
     try:
         from scripts.arxiv_search import search_arxiv_for_topic
 
@@ -181,6 +204,7 @@ def _run_web_searches(topic: str) -> tuple[str, dict[str, Any]]:
         logger.warning("arXiv search failed: %s", exc)
         provider_failed["arxiv"] = True
 
+    # ── Google (Serper) ──────────────────────────────────────────────
     try:
         from scripts.google_search import search_google_for_topic
 
@@ -197,7 +221,7 @@ def _run_web_searches(topic: str) -> tuple[str, dict[str, Any]]:
             web = [r for r in google.get("web_results", []) if "error" not in r]
             if web:
                 source_counts["google_web"] = len(web[:5])
-                results.append("\n## Web Sources")
+                results.append("\n## Web Sources (Google)")
                 for r in web[:5]:
                     results.append(
                         f"- [{r.get('title', 'Unknown')}]({r.get('link', '')})\n"
@@ -228,6 +252,84 @@ def _run_web_searches(topic: str) -> tuple[str, dict[str, Any]]:
     except Exception as exc:
         logger.warning("Google search failed: %s", exc)
         provider_failed["google"] = True
+
+    # ── Semantic Scholar ─────────────────────────────────────────────
+    try:
+        from scripts.semantic_scholar_search import search_semantic_scholar_for_topic
+
+        ss = search_semantic_scholar_for_topic(topic, max_papers=5)
+        if not ss.get("success", False):
+            provider_failed["semantic_scholar"] = True
+        else:
+            papers = ss.get("papers", [])
+            if papers:
+                source_counts["semantic_scholar"] = len(papers[:5])
+                results.append("\n## Semantic Scholar")
+                for p in papers[:5]:
+                    citation_str = (
+                        f" — cited {p['citation_count']}x"
+                        if p.get("citation_count")
+                        else ""
+                    )
+                    results.append(
+                        f"- [{p.get('title', 'Unknown')}]({p.get('url', '')})\n"
+                        f"  Authors: {p.get('authors', 'Unknown')} "
+                        f"({p.get('year', 'N/A')}){citation_str}\n"
+                        f"  DOI: {p.get('doi', '')}\n"
+                        f"  Abstract: {p.get('abstract', '')}",
+                    )
+    except Exception as exc:
+        logger.warning("Semantic Scholar search failed: %s", exc)
+        provider_failed["semantic_scholar"] = True
+
+    # ── Brave ────────────────────────────────────────────────────────
+    try:
+        from scripts.brave_search import search_brave_for_topic
+
+        brave = search_brave_for_topic(topic, max_results=5)
+        if not brave.get("success", False):
+            provider_failed["brave"] = True
+        else:
+            br = brave.get("results", [])
+            if br:
+                source_counts["brave"] = len(br[:5])
+                results.append("\n## Web Sources (Brave)")
+                for r in br[:5]:
+                    age_str = f" ({r['age']})" if r.get("age") else ""
+                    results.append(
+                        f"- [{r.get('title', 'Unknown')}]({r.get('url', '')})"
+                        f"{age_str}\n"
+                        f"  Snippet: {r.get('snippet', 'N/A')}",
+                    )
+    except Exception as exc:
+        logger.warning("Brave search failed: %s", exc)
+        provider_failed["brave"] = True
+
+    # ── Tavily ───────────────────────────────────────────────────────
+    try:
+        from scripts.tavily_search import search_tavily_for_topic
+
+        tavily = search_tavily_for_topic(topic, max_results=5)
+        if not tavily.get("success", False):
+            provider_failed["tavily"] = True
+        else:
+            tv = tavily.get("results", [])
+            if tv:
+                source_counts["tavily"] = len(tv[:5])
+                results.append("\n## Web Sources (Tavily, AI-ranked)")
+                answer = tavily.get("answer", "")
+                if answer:
+                    results.append(f"_Synthesis:_ {answer}\n")
+                for r in tv[:5]:
+                    score_str = f" (score {r['score']:.2f})" if r.get("score") else ""
+                    results.append(
+                        f"- [{r.get('title', 'Unknown')}]({r.get('url', '')})"
+                        f"{score_str}\n"
+                        f"  Snippet: {r.get('snippet', 'N/A')}",
+                    )
+    except Exception as exc:
+        logger.warning("Tavily search failed: %s", exc)
+        provider_failed["tavily"] = True
 
     diagnostics: dict[str, Any] = {
         "source_counts": source_counts,

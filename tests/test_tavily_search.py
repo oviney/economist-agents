@@ -48,17 +48,13 @@ class TestNormalise:
 
 
 class TestTavilySearcher:
-    def test_has_credentials_follows_env(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_has_credentials_follows_env(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.delenv("TAVILY_API_KEY", raising=False)
         assert TavilySearcher().has_credentials is False
         monkeypatch.setenv("TAVILY_API_KEY", "tok")
         assert TavilySearcher().has_credentials is True
 
-    def test_search_raises_when_no_key(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_search_raises_when_no_key(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.delenv("TAVILY_API_KEY", raising=False)
         with pytest.raises(RuntimeError, match="TAVILY_API_KEY"):
             TavilySearcher().search("x")

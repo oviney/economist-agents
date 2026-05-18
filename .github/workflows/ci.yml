@@ -104,6 +104,15 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
+      - name: Enforce src/quality/ per-module coverage gate (#393)
+        # The aggregate --cov-fail-under=70 above does not defend the
+        # per-module gains in src/quality/ (currently ~98%). Without this
+        # secondary gate, deleting any single src/quality test file
+        # would silently drop that module from ~100% to 0% while the
+        # aggregate barely moves. 90% leaves ~8 points of breathing
+        # room above current; any larger regression trips CI.
+        run: coverage report --include='src/quality/*' --fail-under=90
+
       - name: Token usage summary
         if: always()
         run: |

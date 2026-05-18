@@ -16,9 +16,27 @@ Verifies that:
 from __future__ import annotations
 
 import asyncio
+import inspect
+from typing import Any
 from unittest.mock import patch
 
 import pytest
+
+
+def _close_coros_then(action):
+    """Build a stand-in for ``asyncio.run`` that closes any coroutine args
+    before invoking *action*. Without the close, the mock receives an
+    unawaited coroutine and Python emits ``RuntimeWarning: coroutine
+    ... was never awaited``, polluting test output."""
+
+    def _stub(*args: Any, **kwargs: Any) -> Any:
+        for a in args:
+            if inspect.iscoroutine(a):
+                a.close()
+        return action(*args, **kwargs)
+
+    return _stub
+
 
 # ── Unit: _shared.py ─────────────────────────────────────────────────────────
 
@@ -182,9 +200,12 @@ class TestEmptyResearchFlowRouting:
 
         flow = EconomistContentFlow()
 
+        def _raise(*a, **k):
+            raise EmptyResearchBriefError("No results")
+
         with patch(
             "src.economist_agents.flow.asyncio.run",
-            side_effect=EmptyResearchBriefError("No results"),
+            new=_close_coros_then(_raise),
         ):
             result = flow.generate_content({"topic": "AI Testing"})
 
@@ -198,9 +219,12 @@ class TestEmptyResearchFlowRouting:
 
         flow = EconomistContentFlow()
 
+        def _raise(*a, **k):
+            raise EmptyResearchBriefError("No results")
+
         with patch(
             "src.economist_agents.flow.asyncio.run",
-            side_effect=EmptyResearchBriefError("No results"),
+            new=_close_coros_then(_raise),
         ):
             draft = flow.generate_content({"topic": "AI Testing"})
 
@@ -217,9 +241,12 @@ class TestEmptyResearchFlowRouting:
         flow.state["revision_feedback"] = ["fix it"]
         flow.state["article_draft"] = {"featured_image": ""}
 
+        def _raise(*a, **k):
+            raise EmptyResearchBriefError("No results")
+
         with patch(
             "src.economist_agents.flow.asyncio.run",
-            side_effect=EmptyResearchBriefError("No results"),
+            new=_close_coros_then(_raise),
         ):
             result = flow.request_revision()
 
@@ -243,12 +270,14 @@ class TestPipelineCliErrorSurfacing:
         from src.agent_sdk._shared import SearchProvidersFailedError
 
         monkeypatch.setattr("sys.argv", ["pipeline.py", "AI Testing"])
+
+        def _raise_failed(*a, **k):
+            raise SearchProvidersFailedError("simulated outage")
+
         monkeypatch.setattr(
             pl.asyncio,
             "run",
-            lambda *a, **k: (_ for _ in ()).throw(
-                SearchProvidersFailedError("simulated outage")
-            ),
+            _close_coros_then(_raise_failed),
         )
 
         with pytest.raises(SystemExit) as exc_info:
@@ -269,12 +298,14 @@ class TestPipelineCliErrorSurfacing:
         from src.agent_sdk._shared import SearchProvidersEmptyError
 
         monkeypatch.setattr("sys.argv", ["pipeline.py", "AI Testing"])
+
+        def _raise_empty(*a, **k):
+            raise SearchProvidersEmptyError("zero results")
+
         monkeypatch.setattr(
             pl.asyncio,
             "run",
-            lambda *a, **k: (_ for _ in ()).throw(
-                SearchProvidersEmptyError("zero results")
-            ),
+            _close_coros_then(_raise_empty),
         )
 
         with pytest.raises(SystemExit) as exc_info:
@@ -296,11 +327,15 @@ class TestPipelineCliErrorSurfacing:
         monkeypatch.setattr(
             "sys.argv", ["pipeline.py", "--research-only", "AI Testing"]
         )
+
         # asyncio.run must NOT be called when --research-only is set
+        def _should_not_run(*a, **k):
+            pytest.fail("asyncio.run called under --research-only")
+
         monkeypatch.setattr(
             pl.asyncio,
             "run",
-            lambda *a, **k: pytest.fail("asyncio.run called under --research-only"),
+            _close_coros_then(_should_not_run),
         )
         monkeypatch.setattr(
             "src.agent_sdk._shared.build_research_brief",
@@ -336,3 +371,33 @@ class TestPipelineCliErrorSurfacing:
 
         assert exc_info.value.code == 2
         assert "providers failed" in capsys.readouterr().err
+
+    def test_research_only_with_providers_empty_exits_3(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        from src.agent_sdk import pipeline as pl
+        from src.agent_sdk._shared import SearchProvidersEmptyError
+
+        monkeypatch.setattr(
+            "sys.argv", ["pipeline.py", "--research-only", "AI Testing"]
+        )
+        monkeypatch.setattr(
+            "src.agent_sdk._shared.build_research_brief",
+            lambda topic: (_ for _ in ()).throw(
+                SearchProvidersEmptyError("zero results")
+            ),
+        )
+
+        with pytest.raises(SystemExit) as exc_info:
+            pl.main()
+
+        assert exc_info.value.code == 3
+        err = capsys.readouterr().err
+        assert "zero sources" in err
+        # --research-only's printer uses a shorter "Try broadening or
+        # rephrasing" (no "it") vs the full-pipeline path's
+        # "broadening it or rephrasing as a noun-phrase."
+        assert "broadening or rephrasing" in err
+        assert "Traceback" not in err

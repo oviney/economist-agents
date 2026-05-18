@@ -111,23 +111,18 @@ class TestInitialization:
         assert collector.metrics["summary"]["total_charts_generated"] == 0
 
     def test_default_metrics_file_path_resolves_to_repo_skills_dir(self) -> None:
-        # Avoid touching the real file by inspecting the resolved path only
-        collector = ChartMetricsCollector.__new__(ChartMetricsCollector)
-        # Reproduce the path-resolution code from __init__ without executing
-        # the _load_metrics side effect by calling __init__ with a tmp path.
-        # Re-instantiating with default would write to the repo; instead we
-        # assert the default path computation is consistent with the module
-        # layout (three levels up from chart_metrics.py).
+        # Actually invoke ChartMetricsCollector() with no args and assert
+        # the resolved path matches the documented repo layout: three levels
+        # up from chart_metrics.py + skills/chart_metrics.json. __init__
+        # only reads the file (no write on construction), so this is safe.
+        collector = ChartMetricsCollector()
+
         module_file = Path(chart_metrics.__file__).resolve()
         expected = module_file.parent.parent.parent / "skills" / "chart_metrics.json"
 
-        # Sanity: parents chain works as documented
-        assert expected.name == "chart_metrics.json"
-        assert expected.parent.name == "skills"
-
-        # And the collector class is still constructable without args once
-        # an isolated path is provided.
-        del collector
+        assert collector.metrics_file == expected
+        assert collector.metrics_file.name == "chart_metrics.json"
+        assert collector.metrics_file.parent.name == "skills"
 
 
 # ═══════════════════════════════════════════════════════════════════════════

@@ -85,7 +85,9 @@ def new_function():
 
 - ✅ **Type hints on all functions** (`mypy scripts/` passes)
 - ✅ **Docstrings for all public functions** (Google style)
-- ✅ **>80% test coverage** (100% for refactored code)
+- ✅ **>70% aggregate test coverage** (CI gate: `--cov-fail-under=70` across `src/` + `scripts/`)
+- ✅ **>90% coverage on `src/quality/*`** (CI gate: per-module floor; see `.github/workflows/ci.yml` step "Enforce src/quality/ per-module coverage gate (#393)")
+- ✅ **>80% target on new code** (100% for refactored code)
 - ✅ **Zero linting violations** (`ruff check .` passes)
 - ✅ **Proper error handling** with specific exceptions
 - ✅ **Use `orjson` instead of `json`**

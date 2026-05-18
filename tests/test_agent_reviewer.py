@@ -466,6 +466,21 @@ def test_dispatch_unknown_agent_returns_false_with_explanatory_issue(
     assert "AUTOMATED REVIEW" not in capsys.readouterr().out
 
 
+def test_dispatch_research_agent_invokes_research_review(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    research_data = {
+        "headline_stat": {"value": "80%", "source": "Gartner", "verified": True},
+        "data_points": [
+            {"stat": "50%", "source": "Forrester", "verified": True},
+        ],
+    }
+    is_valid, issues = review_agent_output("research_agent", research_data)
+    assert is_valid is True
+    assert issues == []
+    assert "research_agent" in capsys.readouterr().out
+
+
 def test_dispatch_writer_agent_passes_chart_filename_context(
     capsys: pytest.CaptureFixture[str],
 ) -> None:

@@ -60,9 +60,7 @@ class TestBraveSearcher:
         monkeypatch.delenv("BRAVE_API_KEY", raising=False)
         assert BraveSearcher().has_credentials is False
 
-    def test_search_raises_when_no_key(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_search_raises_when_no_key(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.delenv("BRAVE_API_KEY", raising=False)
         with pytest.raises(RuntimeError, match="BRAVE_API_KEY"):
             BraveSearcher().search("x")

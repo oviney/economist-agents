@@ -49,6 +49,7 @@ mcp = FastMCP("publication-validator")
 def validate_for_publication(
     content: str,
     expected_date: str | None = None,
+    require_image_file: bool = False,
 ) -> dict:
     """Validate an article against publication quality gates.
 
@@ -59,6 +60,12 @@ def validate_for_publication(
         content: Full article text including YAML front matter.
         expected_date: Expected publication date in ``YYYY-MM-DD`` format.
             Defaults to today's date when omitted.
+        require_image_file: When True, an article with an ``image:`` line
+            must have the referenced PNG present on disk under
+            ``output/posts/images/``. Defaults to False because the MCP
+            tool is typically called on drafts before the hero asset
+            has been generated; deploy-time validation passes True
+            (#403).
 
     Returns:
         A dictionary with the following keys:
@@ -75,7 +82,10 @@ def validate_for_publication(
         len(content),
     )
 
-    validator = PublicationValidator(expected_date=expected_date)
+    validator = PublicationValidator(
+        expected_date=expected_date,
+        require_image_file=require_image_file,
+    )
     try:
         is_valid, issues = validator.validate(content)
     except Exception as exc:

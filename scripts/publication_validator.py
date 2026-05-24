@@ -99,13 +99,25 @@ class PublicationValidator:
         },
     }
 
-    def __init__(self, expected_date: str | None = None):
+    def __init__(
+        self,
+        expected_date: str | None = None,
+        *,
+        require_image_file: bool = True,
+    ):
         """Args:
         expected_date: Expected publication date (YYYY-MM-DD).
                       Defaults to today.
+        require_image_file: When True (default), an article whose
+                      ``image:`` line points to ``/assets/images/X.png``
+                      must have a real file at ``output/posts/images/X.png``
+                      (#403). Set False in unit tests that don't care
+                      about hero-image presence or in pipeline modes that
+                      have not yet reached the deploy gate.
 
         """
         self.expected_date = expected_date or datetime.now().strftime("%Y-%m-%d")
+        self.require_image_file = require_image_file
         self.issues = []
 
         # Initialize defect prevention checker
@@ -551,65 +563,117 @@ class PublicationValidator:
             pass
 
     def _check_image_contract(self, content: str) -> None:
-        """Reject placeholder or incomplete image metadata for publication."""
+        """Validate hero-image metadata, with hero now optional (#403 slice 2).
+
+        Path A from docs/specs/featured-image-handshake.md: an article may
+        ship chart-only (no hero image at all). When the writer omits the
+        ``image:`` field, no hero-related metadata is required.
+
+        When ``image:`` IS present:
+        - The file it points to must exist on disk (caller resolves
+          ``/assets/images/X.png`` to ``output/posts/images/X.png``;
+          this matches what deploy_to_blog.py copies from).
+        - ``image_alt`` and ``image_caption`` are still required (a real
+          hero needs accessible alt + an editorial caption).
+        - ``blog-default.svg`` is still rejected as a fallback.
+        """
         try:
-            if content.startswith("---"):
-                parts = content.split("---", 2)
-                if len(parts) >= 2:
-                    front_matter = yaml.safe_load(parts[1])
-                    if not isinstance(front_matter, dict):
-                        return
+            if not content.startswith("---"):
+                return
+            parts = content.split("---", 2)
+            if len(parts) < 2:
+                return
+            front_matter = yaml.safe_load(parts[1])
+            if not isinstance(front_matter, dict):
+                return
 
-                    image = str(front_matter.get("image", "") or "").strip()
-                    image_alt = str(front_matter.get("image_alt", "") or "").strip()
-                    image_caption = str(
-                        front_matter.get("image_caption", "") or "",
-                    ).strip()
+            image = str(front_matter.get("image", "") or "").strip()
 
-                    if not image:
-                        self.issues.append(
-                            {
-                                "check": "missing_image",
-                                "severity": "CRITICAL",
-                                "message": "Article missing hero image",
-                                "details": "Production blog posts require article-specific hero imagery",
-                                "fix": "Set image to a real article asset path",
-                            },
-                        )
-                    elif "blog-default.svg" in image:
-                        self.issues.append(
-                            {
-                                "check": "default_image_fallback",
-                                "severity": "CRITICAL",
-                                "message": "Article still uses blog-default.svg fallback",
-                                "details": "Default hero fallback must not pass the publication gate",
-                                "fix": "Generate or assign article-specific hero art before publishing",
-                            },
-                        )
+            # Chart-only mode: no hero, no alt/caption requirements either.
+            if not image:
+                return
 
-                    if not image_alt:
-                        self.issues.append(
-                            {
-                                "check": "missing_image_alt",
-                                "severity": "CRITICAL",
-                                "message": "Article missing image_alt",
-                                "details": "Published posts require reader-facing alt text for hero art",
-                                "fix": "Add concise image_alt describing the visible scene",
-                            },
-                        )
+            image_alt = str(front_matter.get("image_alt", "") or "").strip()
+            image_caption = str(
+                front_matter.get("image_caption", "") or "",
+            ).strip()
 
-                    if not image_caption:
-                        self.issues.append(
-                            {
-                                "check": "missing_image_caption",
-                                "severity": "CRITICAL",
-                                "message": "Article missing image_caption",
-                                "details": "Published posts require an editorial hero caption",
-                                "fix": "Add image_caption explaining the image's editorial point",
-                            },
-                        )
+            if "blog-default.svg" in image:
+                self.issues.append(
+                    {
+                        "check": "default_image_fallback",
+                        "severity": "CRITICAL",
+                        "message": "Article still uses blog-default.svg fallback",
+                        "details": "Default hero fallback must not pass the publication gate",
+                        "fix": "Generate or assign article-specific hero art before publishing",
+                    },
+                )
+            elif self.require_image_file:
+                # Resolve /assets/images/X.png to the local working copy.
+                # Pre-deploy that's output/posts/images/X.png; during deploy
+                # the script CDs into the blog repo, so a relative path also
+                # picks up the just-copied file there.
+                resolved = self._resolve_image_path(image)
+                if resolved is not None and not resolved.exists():
+                    self.issues.append(
+                        {
+                            "check": "missing_image_file",
+                            "severity": "CRITICAL",
+                            "message": (
+                                f"Article references hero image {image!r} "
+                                f"but no file exists at {resolved}"
+                            ),
+                            "details": (
+                                "image: must point to a real PNG on disk; "
+                                "either generate the hero (run the prompt "
+                                "handshake) or remove the image: line to "
+                                "ship chart-only."
+                            ),
+                            "fix": (
+                                f"Drop the file at {resolved}, "
+                                f"or remove the image: line from frontmatter"
+                            ),
+                        },
+                    )
+
+            if not image_alt:
+                self.issues.append(
+                    {
+                        "check": "missing_image_alt",
+                        "severity": "CRITICAL",
+                        "message": "Article missing image_alt",
+                        "details": "Published posts require reader-facing alt text for hero art",
+                        "fix": "Add concise image_alt describing the visible scene",
+                    },
+                )
+
+            if not image_caption:
+                self.issues.append(
+                    {
+                        "check": "missing_image_caption",
+                        "severity": "CRITICAL",
+                        "message": "Article missing image_caption",
+                        "details": "Published posts require an editorial hero caption",
+                        "fix": "Add image_caption explaining the image's editorial point",
+                    },
+                )
         except Exception:
             pass
+
+    @staticmethod
+    def _resolve_image_path(image: str) -> Path | None:
+        """Map a Jekyll-style image: path to a local working-copy path.
+
+        ``/assets/images/X.png`` -> ``output/posts/images/X.png`` (the
+        location the human drops the file at after the prompt handshake
+        and the location deploy_to_blog.py copies from).
+
+        Returns None for paths that don't match the expected /assets/images/
+        prefix (covers absolute URLs and any other shapes we shouldn't
+        spuriously fail on)."""
+        if not image.startswith("/assets/images/"):
+            return None
+        return Path("output/posts/images") / Path(image).name
 
     def _check_heading_structure(self, content: str) -> None:
         """Reject inline markdown headings embedded inside paragraphs."""

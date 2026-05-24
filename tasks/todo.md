@@ -5,7 +5,7 @@
 
 ## In Progress
 
-- **Slice 5** — docs + smoke
+- **Open PR for #403** — branch ready, smoke deferred to human verification
 
 ## Slice 1 — chart actually renders ✅ (commit aaf56f3)
 
@@ -31,6 +31,12 @@
 
 - [x] **Task 4.1**: `src/agent_sdk/image_gate.py` + wired into `_run_resume` (exits 11 on fail)
 - [x] **Checkpoint D**: pytest 2218 green (+11 gate tests covering missing/too-small/wrong-magic/wrong-dims + 4 wire-up cases)
+
+## Slice 5 — docs + smoke
+
+- [x] **Task 5.1**: `CONTRIBUTING.md` — "Generating an article — the image handshake (#403)" section with exit codes table + workflow steps
+- [ ] **Task 5.2**: end-to-end smoke (deferred to human verification post-merge; requires ~$0.30 pipeline run + image generation in ChatGPT)
+- [ ] **Checkpoint E**: PR opened (next), #402 closed in same PR, human approves merge
 
 ## Slice 2 — validator accepts chart-only articles
 

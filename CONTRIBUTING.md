@@ -47,6 +47,73 @@ Thank you for your interest in contributing to the Economist-Agents project! Thi
    make quality  # Runs format, lint, type-check, and tests
    ```
 
+## ✏️ Generating an article — the image handshake (#403)
+
+The pipeline is **two-step** to keep the cost of a featured image zero
+(no paid DALL-E/Imagen/etc. API). Stage 3 produces the article + chart
+and pauses with a paste-ready prompt; you generate the image yourself
+in chat.openai.com (or any web image tool) and drop the PNG at a known
+path; `--resume` then runs Stage 4 and finalises the article.
+
+### Step 1 — run Stage 3
+
+```bash
+python -m src.agent_sdk.pipeline "your noun-phrasey topic"
+```
+
+Stage 3 writes:
+
+- `output/posts/<slug>.md` — the article draft
+- `output/charts/<slug>.png` — the rendered chart (matplotlib, no API)
+- `output/posts/<slug>.image_prompt.md` — the prompt to paste into ChatGPT
+- `output/state/<slug>.json` — handshake state for `--resume`
+
+Then it **exits 10** and prints the prompt + the exact drop path + the
+resume command. Cost so far is the Stage 3 LLM spend only (~$0.30).
+
+### Step 2 — generate the hero image
+
+Open chat.openai.com, paste the prompt from
+`output/posts/<slug>.image_prompt.md`, generate the image, and save the
+PNG (1792×1024 landscape) to:
+
+```
+output/posts/images/<slug>.png
+```
+
+The deterministic gate enforces format/dimensions/size; visual quality
+is your call.
+
+### Step 3 — resume
+
+```bash
+# With a hero image:
+python -m src.agent_sdk.pipeline --resume <slug>
+
+# Or chart-only (no hero — the chart becomes the visual anchor):
+python -m src.agent_sdk.pipeline --resume <slug> --no-image
+```
+
+Stage 4 polishes the article, runs the publication validator, and
+writes the final version back to `output/posts/<slug>.md`.
+
+### Exit codes
+
+| Code | Meaning |
+| ---- | ------- |
+| 0    | Stage 4 complete (full pipeline done) |
+| 1    | Operator error (unknown slug, missing article) |
+| 2    | Research providers failed (transient — retry or rephrase) |
+| 3    | Research providers returned zero sources (topic too narrow) |
+| 10   | Stage 3 complete — awaiting image-prompt handshake |
+| 11   | `--resume` image-gate failed (missing/wrong-size/wrong-dims PNG) |
+
+### Deploying
+
+After Stage 4 passes, the article at `output/posts/<slug>.md` is ready
+for `python -m scripts.deploy_to_blog --article output/posts/<slug>.md`.
+See the deploy script's `--help` for blog-repo config.
+
 ## 🎯 Development Workflow
 
 We follow a **quality-first workflow** with automated gates (checkpoints) to ensure code excellence.

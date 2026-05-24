@@ -5,7 +5,7 @@
 
 ## In Progress
 
-- **Slice 4** — deterministic image gate
+- **Slice 5** — docs + smoke
 
 ## Slice 1 — chart actually renders ✅ (commit aaf56f3)
 
@@ -26,6 +26,11 @@
 - [x] **Task 3.3**: `pipeline.py` `--resume <slug>` + `--no-image` + exit code 10
 - [x] **Task 3.4**: `stage3_runner` writes `output/posts/<slug>.image_prompt.md` + verbose handoff message
 - [x] **Checkpoint C**: pytest 2207 green (+12 handshake tests, +12 prompt synth tests)
+
+## Slice 4 — deterministic image gate ✅
+
+- [x] **Task 4.1**: `src/agent_sdk/image_gate.py` + wired into `_run_resume` (exits 11 on fail)
+- [x] **Checkpoint D**: pytest 2218 green (+11 gate tests covering missing/too-small/wrong-magic/wrong-dims + 4 wire-up cases)
 
 ## Slice 2 — validator accepts chart-only articles
 

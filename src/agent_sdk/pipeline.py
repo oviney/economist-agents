@@ -23,6 +23,7 @@ from src.agent_sdk._shared import (
     SearchProvidersEmptyError,
     SearchProvidersFailedError,
 )
+from src.agent_sdk.image_gate import ImageGateError, check_hero_image
 from src.agent_sdk.stage3_runner import (
     DEFAULT_GRAPHICS_MODEL,
     DEFAULT_WRITER_MODEL,
@@ -36,12 +37,16 @@ logger = logging.getLogger(__name__)
 
 COST_LOG_PATH = Path("logs/agent_sdk_costs.jsonl")
 
-# #403 slice 3: distinct exit codes so callers can branch on outcome.
+# Distinct exit codes so callers (CI, scripts, the operator) can branch
+# on outcome without parsing stderr.
 # 0  = full pipeline complete (Stage 3 + Stage 4 ran)
+# 1  = operator error (unknown slug, missing article)
 # 2  = SearchProvidersFailedError (transient/environmental)
 # 3  = SearchProvidersEmptyError (topic too narrow)
-# 10 = Stage 3 complete, awaiting image-prompt handshake
+# 10 = Stage 3 complete, awaiting image-prompt handshake (#403 slice 3)
+# 11 = --resume image-gate failure (missing/wrong-size/wrong-dims PNG) (#403 slice 4)
 EXIT_HANDSHAKE_PENDING = 10
+EXIT_IMAGE_GATE_FAILED = 11
 
 # #403 slice 3: slug-keyed canonical artefacts. logs/spike/* stays as
 # telemetry only (gitignored at the project level for the spike dir).
@@ -523,6 +528,16 @@ def _run_resume(slug: str, *, no_image: bool) -> None:
         logger.info(
             "Stripped image: / image_alt: / image_caption: from %s", article_path
         )
+    else:
+        # #403 slice 4: deterministic gate before Stage 4 — the dropped hero
+        # PNG must exist, be a real PNG, and match the expected aspect ratio.
+        # Visual-quality grade is human-orchestrated post-resume.
+        hero_path = IMAGE_DROP_DIR / f"{slug}.png"
+        try:
+            check_hero_image(hero_path)
+        except ImageGateError as exc:
+            print(f"\nImage gate failed: {exc}", file=sys.stderr)
+            sys.exit(EXIT_IMAGE_GATE_FAILED)
 
     start = time.perf_counter()
     stage4 = run_stage4(article, state["chart_data"])

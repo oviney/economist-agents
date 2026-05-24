@@ -47,6 +47,7 @@ from src.agent_sdk._shared import (
 from src.agent_sdk._shared import (
     audit_article_stats as _audit_article_stats,
 )
+from src.agent_sdk.chart_renderer import ChartRenderError, render_chart
 
 logger = logging.getLogger(__name__)
 
@@ -157,6 +158,26 @@ class Stage3Result:
     research_brief_chars: int
     article_chars: int
     stat_audit_removed: int
+    chart_path: Path | None = None  # #403 slice 1: rendered chart PNG
+
+
+_IMAGE_FIELD_PATTERN = re.compile(r"^image:\s*[^\n]*?/([^/\s]+)\.png", re.MULTILINE)
+
+
+def _slug_for_chart(article: str, topic: str) -> str:
+    """Derive the slug to use when naming the chart PNG.
+
+    Preferred source is the article's frontmatter ``image:`` line, since
+    that's what the deploy script and the in-article chart reference both
+    point at. Falls back to a kebab-cased topic when the writer omitted
+    the image field (slice 2 makes that optional). Slice 3 will replace
+    this with a single canonical slug derivation."""
+    match = _IMAGE_FIELD_PATTERN.search(article)
+    if match:
+        return match.group(1)
+    # Conservative kebab-case: lowercase, ASCII alnum + hyphens only.
+    safe = re.sub(r"[^a-z0-9]+", "-", topic.lower()).strip("-")
+    return safe or "untitled"
 
 
 _INLINE_HEADING_PATTERN = re.compile(r"[ \t]+(##+ +[A-Z][^\n]*)")
@@ -384,6 +405,17 @@ async def run_stage3(
     )
     chart_data = _parse_chart_json(graphics_text)
 
+    # #403 slice 1: render the chart spec to a real PNG. A render failure
+    # is not fatal — articles can still ship chart-only or text-only;
+    # the deploy + validator slices handle missing PNGs gracefully.
+    slug = _slug_for_chart(article, topic)
+    chart_path: Path | None = None
+    try:
+        chart_path = render_chart(chart_data, Path("output/charts") / f"{slug}.png")
+        logger.info("Rendered chart: %s", chart_path)
+    except ChartRenderError as exc:
+        logger.warning("Chart render skipped (%s); proceeding without PNG", exc)
+
     elapsed = time.perf_counter() - start
 
     return Stage3Result(
@@ -399,6 +431,7 @@ async def run_stage3(
         research_brief_chars=len(research_brief),
         article_chars=len(article),
         stat_audit_removed=max(stat_audit_removed, 0),
+        chart_path=chart_path,
     )
 
 

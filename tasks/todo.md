@@ -1,43 +1,47 @@
-# TODO: Migrate domain modules from scripts/ to src/ (#344)
+# TODO: Path A — chart-rendered hero, human-in-the-loop featured image
+
+**Plan**: [`tasks/plan.md`](./plan.md)
+**Spec**: [`docs/specs/featured-image-handshake.md`](../docs/specs/featured-image-handshake.md)
 
 ## In Progress
 
-- [ ] T16 — Open PR + close #344
+_(none — awaiting human "go" before Phase 4 implementation)_
+
+## Slice 1 — chart actually renders
+
+- [ ] **Task 1.1**: create `src/agent_sdk/chart_renderer.py` + `tests/test_chart_renderer.py` (≥5 tests)
+- [ ] **Task 1.2**: wire `chart_renderer` into `stage3_runner.run_stage3`; `Stage3Result.chart_path` exposed
+- [ ] **Checkpoint A**: pytest green; manual eyeball of `output/charts/<slug>.png`
+
+## Slice 2 — validator accepts chart-only articles
+
+- [ ] **Task 2.1**: `publication_validator.py` — `image:` becomes optional, file-must-exist when present
+- [ ] **Task 2.2**: BUG-017 false-positive fix (path comparison; closes #402)
+- [ ] **Checkpoint B**: pytest green; manual re-validate yesterday's article
+
+## Slice 3 — image prompt handshake
+
+- [ ] **Task 3.1**: `src/agent_sdk/image_prompt_synth.py` + tests
+- [ ] **Task 3.2**: slug-keyed output dirs (`output/posts/<slug>.md`, `output/charts/<slug>.png`, `output/state/<slug>.json`)
+- [ ] **Task 3.3**: `pipeline.py` `--resume <slug>` + `--no-image` + exit code 10
+- [ ] **Task 3.4**: `stage3_runner` writes `output/posts/<slug>.image_prompt.md` + verbose handoff message
+- [ ] **Checkpoint C**: pytest green; manual run-pipeline → exit 10 → resume --no-image → article finalised
+
+## Slice 4 — deterministic image gate
+
+- [ ] **Task 4.1**: dims/format/size/exists check in `--resume`; exit 11 on fail
+- [ ] **Checkpoint D**: pytest green; manual wrong-dims rejection + correct-image acceptance
+
+## Slice 5 — docs + smoke
+
+- [ ] **Task 5.1**: `docs/CONTRIBUTING.md` — "Generating a featured image" section
+- [ ] **Task 5.2**: end-to-end smoke via deploy `--dry-run`
+- [ ] **Checkpoint E**: PR opened, #402 closed in same PR, human approves merge
 
 ## Done
 
-- [x] T0  — Scaffold src/quality/ and src/backlog/ packages
-- [x] T1  — Migrate agent_reviewer.py to src/quality/
-- [x] T2  — Migrate governance.py to src/quality/
-- [x] T3  — Migrate chart_metrics.py to src/quality/
-- [x] T4  — Migrate schema_validator.py to src/quality/
-- [x] T5  — Migrate agent_metrics.py to src/quality/
-- [x] T6  — Migrate defect_tracker.py to src/quality/ (+ fix latent test mock bug)
-- [x] T7  — Migrate validate_closed_loop.py to src/quality/
-- [x] T8  — Migrate visual_qa_zones.py to src/quality/
-- [x] T9–T12 — Migrate backlog modules to src/backlog/ (single commit;
-       scripts/continuous_burndown.py imports all four atomically)
-- [x] T13 — Convert skills_manager bare imports to scripts.skills_manager
-- [x] T14 — Remove sys.path.insert from tests/test_architecture_compliance.py
-- [x] T15 — Originals removed from scripts/ via git mv (AC6 satisfied —
-       no empty stubs left to archive)
-- [x] T16 — Update SPEC.md §2 (12 †-rows moved to new MIGRATED section)
+_(none yet — implementation has not started)_
 
-## Verification
+## Blocked / Deferred
 
-- Pytest: 1756 passed, 84 skipped (matches baseline ±0)
-- Ruff check: All checks passed!
-- Ruff format: 229 files already formatted
-- No bare-name imports of any of the 12 migrated modules remain in
-  agents/, src/, tests/, or mcp_servers/
-- sys.path.insert(0, str(SCRIPTS_DIR)) removed from test_architecture_compliance.py:22
-
-## Acceptance criteria
-
-- AC1 (12 modules to src/): ✓
-- AC2 (callers updated): ✓ (agents/* + tests + scripts/continuous_burndown.py
-  + scripts/economist_agent.py + scripts/quality_dashboard.py)
-- AC3 (sys.path hack removed): ✓
-- AC4 (pytest same count): ✓ (1756 + 84 vs 1756 + 84 baseline)
-- AC5 (mock patch paths updated): ✓ (4× agent_metrics, 3× defect_tracker)
-- AC6 (originals archived/removed): ✓ (originals removed via git mv)
+_(none)_

@@ -48,6 +48,7 @@ from src.agent_sdk._shared import (
     audit_article_stats as _audit_article_stats,
 )
 from src.agent_sdk.chart_renderer import ChartRenderError, render_chart
+from src.agent_sdk.image_prompt_synth import PromptSynthError, compose_prompt
 
 logger = logging.getLogger(__name__)
 
@@ -159,9 +160,30 @@ class Stage3Result:
     article_chars: int
     stat_audit_removed: int
     chart_path: Path | None = None  # #403 slice 1: rendered chart PNG
+    prompt_path: Path | None = None  # #403 slice 3: image-prompt artefact
+    slug: str = ""  # #403 slice 3: canonical slug for downstream resume
+    image_prompt: str = ""  # #403 slice 3: the prompt text itself
 
 
 _IMAGE_FIELD_PATTERN = re.compile(r"^image:\s*[^\n]*?/([^/\s]+)\.png", re.MULTILINE)
+_TITLE_FIELD_PATTERN = re.compile(r'^title:\s*["\']?(.*?)["\']?\s*$', re.MULTILINE)
+_IMAGE_ALT_PATTERN = re.compile(r'^image_alt:\s*["\']?(.*?)["\']?\s*$', re.MULTILINE)
+_IMAGE_CAPTION_PATTERN = re.compile(
+    r'^image_caption:\s*["\']?(.*?)["\']?\s*$', re.MULTILINE
+)
+
+
+def _extract_frontmatter_field(article: str, pattern: re.Pattern[str]) -> str:
+    """Return the first capture from ``pattern`` in the article's
+    frontmatter, or ``''`` if not found. Frontmatter is the block
+    between the first two ``---`` lines."""
+    if not article.startswith("---"):
+        return ""
+    parts = article.split("---", 2)
+    if len(parts) < 3:
+        return ""
+    match = pattern.search(parts[1])
+    return match.group(1).strip() if match else ""
 
 
 def _slug_for_chart(article: str, topic: str) -> str:
@@ -416,6 +438,33 @@ async def run_stage3(
     except ChartRenderError as exc:
         logger.warning("Chart render skipped (%s); proceeding without PNG", exc)
 
+    # #403 slice 3: synthesise the ChatGPT-handoff prompt and persist it
+    # as a sibling artefact. The prompt is built from the article's own
+    # image_alt + image_caption fields (already LLM-generated visual
+    # concepts) wrapped in the Economist hard constraints. Failure is
+    # non-fatal — the operator can still ship chart-only via --no-image.
+    image_prompt = ""
+    prompt_path: Path | None = None
+    try:
+        title = _extract_frontmatter_field(article, _TITLE_FIELD_PATTERN) or topic
+        image_alt = _extract_frontmatter_field(article, _IMAGE_ALT_PATTERN)
+        image_caption = _extract_frontmatter_field(article, _IMAGE_CAPTION_PATTERN)
+        if image_alt:
+            image_prompt = compose_prompt(
+                title=title, image_alt=image_alt, image_caption=image_caption
+            )
+            prompt_path = Path("output/posts") / f"{slug}.image_prompt.md"
+            prompt_path.parent.mkdir(parents=True, exist_ok=True)
+            prompt_path.write_text(image_prompt)
+            logger.info("Wrote image prompt artefact: %s", prompt_path)
+        else:
+            logger.info(
+                "No image_alt in frontmatter — skipping prompt artefact "
+                "(article will need --no-image at resume time)"
+            )
+    except PromptSynthError as exc:
+        logger.warning("Image prompt synthesis skipped (%s)", exc)
+
     elapsed = time.perf_counter() - start
 
     return Stage3Result(
@@ -432,6 +481,9 @@ async def run_stage3(
         article_chars=len(article),
         stat_audit_removed=max(stat_audit_removed, 0),
         chart_path=chart_path,
+        prompt_path=prompt_path,
+        slug=slug,
+        image_prompt=image_prompt,
     )
 
 

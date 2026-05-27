@@ -261,6 +261,9 @@ class AgentConfig:
     backstory: str
     system_message: str
     tools: list[str]
+    skills: list[str]
+    reasoning: bool
+    knowledge_sources: list[str]
     metadata: dict[str, str]
     scoring_criteria: dict[str, str] | None = None
 
@@ -324,6 +327,9 @@ class AgentRegistry:
                     backstory=config.get("backstory", ""),
                     system_message=system_message,
                     tools=config.get("tools", []),
+                    skills=config.get("skills", []),
+                    reasoning=bool(config.get("reasoning", False)),
+                    knowledge_sources=config.get("knowledge_sources", []),
                     metadata=config.get("metadata", {}),
                     scoring_criteria=config.get("scoring_criteria"),
                 )
@@ -580,6 +586,9 @@ class AgentRegistry:
             "backstory": backstory_with_discipline,
             "system_message": config.system_message,
             "tools": tool_instances,  # Now actual tool instances, not strings
+            "skills": config.skills,
+            "reasoning": config.reasoning,
+            "knowledge_sources": config.knowledge_sources,
         }
 
     def list_agents(

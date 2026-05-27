@@ -1,6 +1,6 @@
 # Multi-Agent System Documentation
 
-The Economist-Agents project uses a sophisticated multi-agent architecture with 9 specialized AI agents that collaborate to produce publication-quality content and maintain development excellence.
+The Economist-Agents project uses a sophisticated multi-agent architecture with 10 specialized AI agents that collaborate to produce publication-quality content and maintain development excellence.
 
 ## 🤖 Agent Registry System
 
@@ -12,7 +12,7 @@ Agents are automatically discovered via the Agent Registry Pattern (ADR-002). Ag
 # Automatic agent discovery
 registry = AgentRegistry()
 all_agents = registry.create_all_agents()
-available_agents = registry.list_agents()  # Returns 9 agents
+available_agents = registry.list_agents()  # Returns 10 agents
 
 # Get specific agent
 po_agent = registry.get_agent("po-agent")
@@ -55,6 +55,13 @@ Each agent definition includes:
 - **Responsibilities**: Code review, architecture validation, best practices enforcement
 - **Tools**: bash, file_search
 - **Standards**: SOLID principles, maintainability, performance
+
+#### **@architect**
+- **Role**: Agentic AI system architecture and technical decision validation
+- **Responsibilities**: Multi-agent system design, agent configuration review, workflow bottleneck analysis, ADR drafting, trade-off recommendations, security and performance review
+- **Tools**: bash, file_search
+- **Skills**: skills/agent-architecture, skills/adr-governance, skills/agent-delegation
+- **Standards**: C4 or Mermaid diagrams, evidence-based recommendations, architecture compliance score >85%
 
 ### Project Management Agents
 
@@ -102,6 +109,7 @@ Each agent definition includes:
 
 # Code review
 @code-reviewer Review PR #123 for architectural compliance
+@architect Design the Agent SDK migration architecture for a new publishing workflow
 @devops Set up CI/CD pipeline for new microservice
 ```
 
@@ -143,6 +151,7 @@ Each agent has access to domain-specific skills stored in the `skills/` director
 - **skills/testing**: Testing patterns, coverage standards, TDD workflows
 - **skills/quality-gates**: CI/CD setup, pre-commit hooks, automation
 - **skills/sprint-management**: Agile ceremonies, story management, velocity tracking
+- **skills/agent-architecture**: Multi-agent design, architecture review, ADRs, trade-off analysis
 
 ### Skills Loading
 ```python
@@ -188,6 +197,7 @@ ctx = ContextManager("docs/STORY_N_CONTEXT.md")
 | Agent | Success Rate | Average Response Time | Key Metrics |
 |-------|-------------|-------------------|-------------|
 | **code-quality-specialist** | 95% | ~30s | 0 ruff violations, 100% type coverage |
+| **architect** | baseline | target <30m | Architecture compliance score >85%, ADR-quality recommendations |
 | **test-specialist** | 92% | ~45s | >80% test coverage, 100% for refactored code |
 | **scrum-master** | 98% | ~15s | Accurate story points, clear acceptance criteria |
 | **visual-qa-agent** | 88% | ~25s | 28.6% escape rate baseline |

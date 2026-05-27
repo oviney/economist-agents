@@ -437,7 +437,12 @@ class TestAggregation:
 
     def test_consensus_determination(self, mock_llm_client, sample_topics):
         """Test consensus determination (unanimous vs split)."""
-        with patch("scripts.editorial_board.call_llm") as mock_call_llm:
+        with (
+            patch("scripts.editorial_board.call_llm") as mock_call_llm,
+            patch(
+                "scripts.editorial_board.get_performance_analyst_vote",
+            ) as mock_perf_vote,
+        ):
             # All members pick topic 1 as top pick
             unanimous_vote = json.dumps(
                 {
@@ -450,6 +455,17 @@ class TestAggregation:
                 },
             )
             mock_call_llm.return_value = unanimous_vote
+            mock_perf_vote.return_value = {
+                "member_id": "performance_analyst",
+                "member_name": "The Performance Analyst",
+                "weight": 1.0,
+                "votes": [
+                    {"topic_index": 1, "score": 9, "rationale": "Excellent"},
+                    {"topic_index": 2, "score": 5, "rationale": "Mediocre"},
+                ],
+                "top_pick": 1,
+                "top_pick_reason": "Best choice",
+            }
 
             result = run_editorial_board(mock_llm_client, sample_topics, parallel=False)
 

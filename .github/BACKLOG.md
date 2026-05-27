@@ -145,11 +145,12 @@ This file tracks architectural improvements and technical debt identified throug
 
 ---
 
-### 🟢 Chart Regression Tests
-**Status**: Ready
+### ✅ Chart Regression Tests
+**Status**: Complete
 **Priority**: P2 (Medium)
 **Effort**: Large
 **Created**: 2025-12-31
+**Completed**: 2026-05-27
 
 **Problem**: Known chart bugs (5 documented in code) have no automated prevention.
 
@@ -160,18 +161,18 @@ This file tracks architectural improvements and technical debt identified throug
 4. Label-to-label overlap
 5. Clipped elements at edges
 
-**Solution Approach**:
-- Create test chart generator with known bad configurations
-- Use visual QA agent to detect issues programmatically
-- Add to CI/CD pipeline
+**Solution**: Added deterministic regression tests and bad-chart fixtures that exercise the known chart layout failures through `ZoneBoundaryValidator`.
 
-**Files to Create**:
+**Files Changed**:
+- `src/quality/visual_qa_zones.py`
 - `tests/test_chart_layouts.py`
-- `tests/fixtures/bad_charts/` (example bad configurations)
+- `tests/test_visual_qa_zones.py`
+- `tests/fixtures/bad_charts/scripts/` (known bad configurations)
+- `docs/STORY_CHART_REGRESSION_TESTS_SPEC.md`
 
-**Blocked By**: Need test data fixtures
-
-**Estimate**: 4-6 hours
+**Testing**:
+- `env MPLBACKEND=Agg .venv/bin/pytest tests/test_chart_layouts.py tests/test_visual_qa_zones.py tests/test_generate_chart.py -q` - 61 passed
+- `.venv/bin/ruff check src/quality/visual_qa_zones.py tests/test_chart_layouts.py tests/test_visual_qa_zones.py tests/fixtures/bad_charts/scripts` - passed
 
 ---
 

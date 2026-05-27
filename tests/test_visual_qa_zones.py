@@ -35,10 +35,9 @@ def _make_compliant_chart(path: Path, width: int = 100, height: int = 100) -> Pa
     img = Image.new("RGB", (width, height), BG_RGB)
     pixels = np.array(img)
 
-    # Pixel rows are top-down; the validator slices ``int(height * 0.96):``
-    # for the red bar zone — i.e. the bottom 4% of the array.
-    red_bar_start = int(height * 0.96)
-    pixels[red_bar_start:, :, :] = RED_BAR_RGB
+    # Pixel rows are top-down; the red bar zone is the top 4% of the array.
+    red_bar_end = int(height * 0.04)
+    pixels[:red_bar_end, :, :] = RED_BAR_RGB
 
     # Title zone (rows 0.85..0.94) should already be the beige bg above.
     Image.fromarray(pixels).save(path)
@@ -144,10 +143,7 @@ class TestValidateMatplotlibCode:
             'fig.text(0.5, 0.87, "Subtitle here", ha="center")\n'
             'fig.text(0.5, 0.03, "Source: BLS", ha="center")\n'
             "ax.add_patch(Rectangle((0, 0.97), 1, 0.03))\n"
-            # NB: the validator's annotate regex stops at the first ')', so the
-            # ``xytext`` keyword must appear *before* any parenthesised expression
-            # (such as ``xy=(1, 2)``) to be detected.
-            'ax.annotate("label", xytext=(5, 5), textcoords="offset points")\n'
+            'ax.annotate("label", xy=(1, 2), xytext=(5, 5), textcoords="offset points")\n'
         )
         chart_path = _setup_script_alongside_chart(tmp_path, code)
 
@@ -165,6 +161,21 @@ class TestValidateMatplotlibCode:
         _, issues = validator.validate_chart(str(chart_path))
 
         assert any("Title y=0.5 outside TITLE ZONE" in i for i in issues)
+
+    def test_multiline_title_in_red_bar_zone_is_flagged(self, tmp_path: Path) -> None:
+        validator = ZoneBoundaryValidator()
+        code = """
+fig.text(
+    0.5,
+    0.97,
+    "Big Title here",
+)
+"""
+        chart_path = _setup_script_alongside_chart(tmp_path, code)
+
+        _, issues = validator.validate_chart(str(chart_path))
+
+        assert any("Title y=0.97 intrudes into RED BAR ZONE" in i for i in issues)
 
     def test_subtitle_outside_zone_is_flagged(self, tmp_path: Path) -> None:
         validator = ZoneBoundaryValidator()

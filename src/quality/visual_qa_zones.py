@@ -34,6 +34,7 @@ Usage:
         print(f"Zone violations: {issues}")
 """
 
+import ast
 import re
 from pathlib import Path
 
@@ -124,37 +125,8 @@ class ZoneBoundaryValidator:
         with open(script_path) as f:
             code = f.read()
 
-        # Check 1: Title position (should be y=0.90 in figure coords)
-        title_matches = re.findall(
-            r'fig\.text\([^,]+,\s*(0\.\d+),.*?["\'].*?title',
-            code,
-            re.IGNORECASE,
-        )
-        for y_pos in title_matches:
-            y = float(y_pos)
-            if y < 0.85 or y > 0.94:
-                issues.append(f"Title y={y} outside TITLE ZONE (0.85-0.94)")
-
-        # Check 2: Subtitle position (should be y=0.85)
-        subtitle_matches = re.findall(
-            r'fig\.text\([^,]+,\s*(0\.\d+),.*?["\'].*?subtitle',
-            code,
-            re.IGNORECASE,
-        )
-        for y_pos in subtitle_matches:
-            y = float(y_pos)
-            if y < 0.85 or y > 0.94:
-                issues.append(f"Subtitle y={y} outside TITLE ZONE (0.85-0.94)")
-
-        # Check 3: Source line position (should be y=0.03 in source zone)
-        source_matches = re.findall(
-            r'fig\.text\([^,]+,\s*(0\.\d+),.*?["\'].*?[Ss]ource',
-            code,
-        )
-        for y_pos in source_matches:
-            y = float(y_pos)
-            if y < 0.01 or y > 0.06:
-                issues.append(f"Source y={y} outside SOURCE ZONE (0.01-0.06)")
+        # Check 1-3: Figure text zones
+        issues.extend(self._validate_figure_text_layout(code))
 
         # Check 4: Red bar position (should be y=0.96-1.00)
         redbar_matches = re.findall(r"Rectangle\(\(0,\s*(0\.\d+)\)", code)
@@ -164,14 +136,216 @@ class ZoneBoundaryValidator:
                 issues.append(f"Red bar y={y} below RED BAR ZONE (0.96-1.00)")
 
         # Check 5: Inline labels (ax.annotate) should have appropriate offsets
-        # Look for labels without xytext offset
-        annotate_matches = re.findall(r"ax\.annotate\([^)]+\)", code)
-        for match in annotate_matches:
-            if "xytext" not in match:
+        issues.extend(self._validate_annotation_layout(code))
+        return issues
+
+    def _validate_figure_text_layout(self, code: str) -> list[str]:
+        """Validate title, subtitle, source, and canvas bounds for figure text."""
+        issues: list[str] = []
+        for text_call in self._iter_figure_text_calls(code):
+            x = text_call["x"]
+            y = text_call["y"]
+            label = str(text_call["label"])
+            label_lower = label.lower()
+
+            if not isinstance(x, float) or not isinstance(y, float):
+                continue
+
+            if "title" in label_lower:
+                if y >= 0.96:
+                    issues.append(
+                        f"Title y={y:g} intrudes into RED BAR ZONE (0.96-1.00)",
+                    )
+                elif y < 0.85 or y > 0.94:
+                    issues.append(f"Title y={y:g} outside TITLE ZONE (0.85-0.94)")
+
+            if "subtitle" in label_lower and (y < 0.85 or y > 0.94):
+                issues.append(f"Subtitle y={y:g} outside TITLE ZONE (0.85-0.94)")
+
+            if "source" in label_lower and (y < 0.01 or y > 0.06):
+                issues.append(f"Source y={y:g} outside SOURCE ZONE (0.01-0.06)")
+
+            if x < 0.0 or x > 0.98 or y < 0.0 or y > 1.0:
                 issues.append(
-                    f"Inline label missing xytext offset (will overlap data): {match[:50]}...",
+                    f"Figure text at ({x:g}, {y:g}) may be clipped at chart edge",
+                )
+        return issues
+
+    def _validate_annotation_layout(self, code: str) -> list[str]:
+        """Validate inline label offsets and label-to-label spacing."""
+        issues: list[str] = []
+        annotations: list[dict[str, float | str]] = []
+
+        for annotation in self._iter_annotation_calls(code):
+            label = str(annotation["label"])
+            xy = annotation["xy"]
+            xytext = annotation["xytext"]
+
+            if xytext is None:
+                if not annotation["has_xytext"]:
+                    source = str(annotation["source"])
+                    issues.append(
+                        "Inline label missing xytext offset "
+                        f"(will overlap data): {source[:50]}...",
+                    )
+                continue
+
+            offset_x, offset_y = xytext
+            if abs(offset_x) <= 2 and abs(offset_y) <= 2:
+                issues.append(
+                    f"Inline label '{label}' has near-zero xytext offset; it will overlap data line",
                 )
 
+            if xy is not None:
+                anchor_x, anchor_y = xy
+                annotations.append(
+                    {
+                        "label": label,
+                        "anchor_x": anchor_x,
+                        "anchor_y": anchor_y,
+                        "offset_x": offset_x,
+                        "offset_y": offset_y,
+                    },
+                )
+                if anchor_y <= 15 and offset_y < 0:
+                    issues.append(
+                        f"Inline label '{label}' uses negative offset near low data and may intrude into X-axis zone",
+                    )
+
+        issues.extend(self._detect_label_collisions(annotations))
+        return issues
+
+    def _iter_annotation_calls(self, code: str) -> list[dict[str, object]]:
+        """Return literal details from ``ax.annotate`` calls in chart code."""
+        try:
+            tree = ast.parse(code)
+        except SyntaxError:
+            return []
+
+        annotations: list[dict[str, object]] = []
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            if not isinstance(node.func, ast.Attribute) or node.func.attr != "annotate":
+                continue
+            if not isinstance(node.func.value, ast.Name) or node.func.value.id != "ax":
+                continue
+
+            xy_node = self._find_keyword_node(node, "xy")
+            xytext_node = self._find_keyword_node(node, "xytext")
+            annotations.append(
+                {
+                    "label": self._extract_annotation_label(node),
+                    "xy": self._extract_numeric_tuple(xy_node),
+                    "xytext": self._extract_numeric_tuple(xytext_node),
+                    "has_xytext": xytext_node is not None,
+                    "source": ast.get_source_segment(code, node) or "ax.annotate(...)",
+                },
+            )
+        return annotations
+
+    def _iter_figure_text_calls(self, code: str) -> list[dict[str, object]]:
+        """Return literal details from ``fig.text`` calls in chart code."""
+        try:
+            tree = ast.parse(code)
+        except SyntaxError:
+            return []
+
+        text_calls: list[dict[str, object]] = []
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            if not isinstance(node.func, ast.Attribute) or node.func.attr != "text":
+                continue
+            if not isinstance(node.func.value, ast.Name) or node.func.value.id != "fig":
+                continue
+
+            text_calls.append(
+                {
+                    "x": self._extract_numeric_arg(node, 0),
+                    "y": self._extract_numeric_arg(node, 1),
+                    "label": self._extract_string_arg(node, 2),
+                },
+            )
+        return text_calls
+
+    def _find_keyword_node(self, call: ast.Call, name: str) -> ast.AST | None:
+        """Find a keyword argument node in a Matplotlib call."""
+        for keyword in call.keywords:
+            if keyword.arg == name:
+                return keyword.value
+        return None
+
+    def _extract_annotation_label(self, call: ast.Call) -> str:
+        """Return the first string argument from an ``ax.annotate`` call."""
+        return self._extract_string_arg(call, 0)
+
+    def _extract_string_arg(self, call: ast.Call, index: int) -> str:
+        """Extract a string-like positional argument from a parsed call."""
+        if len(call.args) <= index:
+            return "<unknown>"
+        first_arg = call.args[index]
+        if isinstance(first_arg, ast.Constant) and isinstance(first_arg.value, str):
+            return first_arg.value
+        if isinstance(first_arg, ast.JoinedStr):
+            return "<dynamic>"
+        return "<unknown>"
+
+    def _extract_numeric_arg(self, call: ast.Call, index: int) -> float | None:
+        """Extract a numeric positional argument from a parsed call."""
+        if len(call.args) <= index:
+            return None
+        return self._extract_numeric_value(call.args[index])
+
+    def _extract_numeric_tuple(
+        self,
+        node: ast.AST | None,
+    ) -> tuple[float, float] | None:
+        """Extract a literal numeric two-item tuple from parsed Python."""
+        if not isinstance(node, ast.Tuple) or len(node.elts) != 2:
+            return None
+
+        values: list[float] = []
+        for item in node.elts:
+            value = self._extract_numeric_value(item)
+            if value is None:
+                return None
+            values.append(value)
+        return (values[0], values[1])
+
+    def _extract_numeric_value(self, node: ast.AST) -> float | None:
+        """Extract a literal numeric value from parsed Python."""
+        if isinstance(node, ast.Constant) and isinstance(node.value, int | float):
+            return float(node.value)
+        if (
+            isinstance(node, ast.UnaryOp)
+            and isinstance(node.op, ast.USub)
+            and isinstance(node.operand, ast.Constant)
+            and isinstance(node.operand.value, int | float)
+        ):
+            return -float(node.operand.value)
+        return None
+
+    def _detect_label_collisions(
+        self,
+        annotations: list[dict[str, float | str]],
+    ) -> list[str]:
+        """Detect labels anchored too close together with similar offsets."""
+        issues: list[str] = []
+        for index, first in enumerate(annotations):
+            for second in annotations[index + 1 :]:
+                same_x = abs(float(first["anchor_x"]) - float(second["anchor_x"])) < 0.5
+                close_anchor_y = (
+                    abs(float(first["anchor_y"]) - float(second["anchor_y"])) < 5
+                )
+                similar_offset = (
+                    abs(float(first["offset_y"]) - float(second["offset_y"])) < 8
+                )
+                if same_x and close_anchor_y and similar_offset:
+                    issues.append(
+                        "Label-to-label overlap likely between "
+                        f"'{first['label']}' and '{second['label']}'",
+                    )
         return issues
 
     def _validate_pixels(self, chart_path: Path) -> list[str]:
@@ -187,7 +361,7 @@ class ZoneBoundaryValidator:
             height, width = pixels.shape[:2]
 
             # Convert zone boundaries to pixel coordinates
-            red_bar_zone = (int(height * 0.96), height)
+            red_bar_zone = (0, int(height * 0.04))
             title_zone = (int(height * 0.85), int(height * 0.94))
 
             # Check 1: Red bar present at top

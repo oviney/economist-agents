@@ -64,6 +64,7 @@ class SkillsManager:
         logger.info(f"Initializing SkillsManager for role: {self.role_name}")
         logger.debug(f"Skills file path: {self.skills_file}")
         self.skills = self._load_skills()
+        self.ensure_visual_qa_metrics_category()
 
     def _load_skills(self) -> dict[str, Any]:
         """Load existing skills or create new skill set.
@@ -98,7 +99,7 @@ class SkillsManager:
         return {
             "version": "1.0",
             "last_updated": datetime.now().isoformat(),
-            "skills": {},
+            "skills": self._default_skill_categories(),
             "validation_stats": {
                 "total_runs": 0,
                 "issues_found": 0,
@@ -106,6 +107,52 @@ class SkillsManager:
                 "last_run": None,
             },
         }
+
+    def _default_skill_categories(self) -> dict[str, Any]:
+        """Return role-aware default skill categories."""
+        if self.role_name != "blog_qa":
+            return {}
+        return {
+            "visual_qa_metrics": self._visual_qa_metrics_category(),
+        }
+
+    def _visual_qa_metrics_category(self) -> dict[str, Any]:
+        """Describe Visual QA metrics tracked by the blog QA skills system."""
+        return {
+            "description": "Track Visual QA pass rates and recurring chart failures",
+            "patterns": [
+                {
+                    "id": "visual_qa_pass_rate_tracking",
+                    "severity": "medium",
+                    "pattern": "Charts generated without pass/fail rate tracking",
+                    "check": "ChartMetricsCollector summary exposes visual_qa_pass_rate",
+                    "learned_from": "Backlog: Visual QA Metrics Tracking",
+                },
+                {
+                    "id": "recurring_chart_failure_patterns",
+                    "severity": "high",
+                    "pattern": "Recurring chart failures are not surfaced for learning",
+                    "check": "ChartMetricsCollector summary exposes top_failure_patterns",
+                    "learned_from": "Backlog: Visual QA Metrics Tracking",
+                },
+                {
+                    "id": "visual_qa_improvement_trend",
+                    "severity": "medium",
+                    "pattern": "Visual QA pass-rate trend is not monitored over time",
+                    "check": "ChartMetricsCollector summary exposes visual_qa_trend",
+                    "learned_from": "Backlog: Visual QA Metrics Tracking",
+                },
+            ],
+        }
+
+    def ensure_visual_qa_metrics_category(self) -> None:
+        """Ensure blog QA skills include Visual QA metrics tracking patterns."""
+        if self.role_name != "blog_qa":
+            return
+        self.skills.setdefault("skills", {}).setdefault(
+            "visual_qa_metrics",
+            self._visual_qa_metrics_category(),
+        )
 
     def get_patterns(self, category: str | None = None) -> list[dict[str, Any]]:
         """Get validation patterns, optionally filtered by category.

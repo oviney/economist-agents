@@ -152,6 +152,32 @@
         }
       ]
     },
+    "visual_qa_metrics": {
+      "description": "Track Visual QA pass rates and recurring chart failures",
+      "patterns": [
+        {
+          "id": "visual_qa_pass_rate_tracking",
+          "severity": "medium",
+          "pattern": "Charts generated without pass/fail rate tracking",
+          "check": "ChartMetricsCollector summary exposes visual_qa_pass_rate",
+          "learned_from": "Backlog: Visual QA Metrics Tracking"
+        },
+        {
+          "id": "recurring_chart_failure_patterns",
+          "severity": "high",
+          "pattern": "Recurring chart failures are not surfaced for learning",
+          "check": "ChartMetricsCollector summary exposes top_failure_patterns",
+          "learned_from": "Backlog: Visual QA Metrics Tracking"
+        },
+        {
+          "id": "visual_qa_improvement_trend",
+          "severity": "medium",
+          "pattern": "Visual QA pass-rate trend is not monitored over time",
+          "check": "ChartMetricsCollector summary exposes visual_qa_trend",
+          "learned_from": "Backlog: Visual QA Metrics Tracking"
+        }
+      ]
+    },
     "link_validation": {
       "description": "Detect broken or problematic links",
       "patterns": [

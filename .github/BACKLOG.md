@@ -176,18 +176,19 @@ This file tracks architectural improvements and technical debt identified throug
 
 ---
 
-### 🟢 Visual QA Metrics Tracking
-**Status**: Ready
+### ✅ Visual QA Metrics Tracking
+**Status**: Complete
 **Priority**: P2 (Medium)
 **Effort**: Small
 **Created**: 2025-12-31
+**Completed**: 2026-05-29
 
 **Problem**: Visual QA runs manually, no metrics on chart quality over time.
 
 **Solution**:
-- Add metrics to skills system
-- Track pass/fail rate per chart
-- Identify recurring issues
+- Added `visual_qa_metrics` to the blog QA skills system.
+- `ChartMetricsCollector` tracks pass/fail rate per chart via Visual QA records.
+- Summary metrics now expose top recurring failure patterns and pass-rate trend.
 
 **Files to Change**:
 - `scripts/economist_agent.py` - record visual QA results
@@ -200,7 +201,16 @@ This file tracks architectural improvements and technical debt identified throug
 - Most common failures: top 3
 - Improvement trend: pass rate over time
 
-**Estimate**: 2-3 hours
+**Files Changed**:
+- `src/quality/chart_metrics.py`
+- `scripts/skills_manager.py`
+- `data/skills_state/blog_qa_skills.json`
+- `tests/test_chart_metrics.py`
+- `docs/STORY_VISUAL_QA_METRICS_TRACKING_SPEC.md`
+
+**Testing**:
+- `.venv/bin/python -m pytest tests/test_chart_metrics.py -q` - 35 passed
+- `ruff check src/quality/chart_metrics.py scripts/skills_manager.py tests/test_chart_metrics.py` - passed
 
 ---
 

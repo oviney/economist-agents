@@ -116,6 +116,11 @@ def test_matplotlib_imports():
     assert hasattr(generate_chart, "mpatches")
 
 
+def test_headless_backend_configured():
+    """Test chart import uses a non-GUI backend in headless test runs."""
+    assert plt.get_backend().lower() == "agg"
+
+
 def test_font_configuration():
     """Test that DejaVu Sans font is configured."""
     # Font should have been set when module loaded

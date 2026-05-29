@@ -3,7 +3,10 @@
 from pathlib import Path
 from unittest.mock import Mock
 
+import matplotlib
 import pytest
+
+matplotlib.use("Agg", force=True)
 
 
 @pytest.fixture

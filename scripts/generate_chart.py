@@ -8,7 +8,11 @@ Follows CHART_DESIGN_SPEC.md:
 - End-of-line value labels
 """
 
+import matplotlib
 import matplotlib.patches as mpatches
+
+matplotlib.use("Agg", force=True)
+
 import matplotlib.pyplot as plt
 
 # === CONFIGURATION ===

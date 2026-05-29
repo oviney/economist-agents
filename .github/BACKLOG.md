@@ -206,13 +206,23 @@ This file tracks architectural improvements and technical debt identified throug
 
 ## Medium Priority
 
-### 🟡 Migrate Stage 3 Content Generation to CrewAI (Phase 2)
-**Status**: Ready
+### ✅ Migrate Stage 3 Content Generation to CrewAI (Phase 2) — Superseded
+**Status**: Complete — Superseded
 **Priority**: P2 (Medium)
 **Effort**: Large
 **Type**: Technical Enabler
 **Created**: 2026-01-03
-**Related**: ADR-003 CrewAI Migration Strategy
+**Completed**: 2026-05-27
+**Related**: ADR-003 CrewAI Migration Strategy; ADR-0006 Agent Framework Selection
+
+**Resolution**: Superseded by ADR-0006. Stage 3 now runs through the Anthropic Agent SDK runtime (`src/agent_sdk/stage3_runner.py`) and the end-to-end flow calls `src.agent_sdk.pipeline.run_pipeline`. Reintroducing CrewAI for Stage 3 would contradict the accepted framework decision and the April 2026 removal of `src/crews/`.
+
+**Verification**:
+- `docs/adr/0006-agent-framework-selection.md` records ADR-0003 supersession, Agent SDK selection, and CrewAI removal.
+- `src/agent_sdk/stage3_runner.py` documents itself as the sole production Stage 3 runtime.
+- `tests/test_architecture_compliance.py::TestNoCrewAIInSrcOrTests` enforces no live CrewAI imports in `src/` or `tests/`.
+
+**Historical Context**:
 
 **Context**: 
 - Phase 1 COMPLETE: CrewAI 1.7.2 installed, 18/18 tests passing
@@ -271,13 +281,13 @@ Implement Phase 2 of ADR-003 selective migration strategy:
 - `tests/test_agent_integration.py` (validate CrewAI pipeline)
 - `docs/ADR-003-crewai-migration-strategy.md` (Phase 2 status)
 
-**Acceptance Criteria**:
-- [ ] All 3 agents migrated to CrewAI framework
-- [ ] Sequential task dependencies working (Research → Writer → Editor)
-- [ ] Quality metrics match or exceed Sprint 6-8 baselines
-- [ ] 18+ tests passing (existing + new CrewAI integration tests)
-- [ ] End-to-end article generation via CrewAI pipeline successful
-- [ ] Documentation updated with migration patterns
+**Original Acceptance Criteria (not executed because superseded)**:
+- All 3 agents migrated to CrewAI framework
+- Sequential task dependencies working (Research → Writer → Editor)
+- Quality metrics match or exceed Sprint 6-8 baselines
+- 18+ tests passing (existing + new CrewAI integration tests)
+- End-to-end article generation via CrewAI pipeline successful
+- Documentation updated with migration patterns
 
 **Success Metrics**:
 - Research verification rate: ≥90%
@@ -304,9 +314,9 @@ Implement Phase 2 of ADR-003 selective migration strategy:
 - Incremental migration (one agent at a time)
 - Rollback plan if quality degrades >10%
 
-**Estimate**: 13-17 hours (Large effort, 2 sprint story)
+**Original Estimate**: 13-17 hours (Large effort, 2 sprint story)
 
-**Phase 3 Preview**: Migrate Graphics Agent, implement parallel task execution, optimize CrewAI crew performance
+**Supersession Note**: Do not execute these original tasks unless ADR-0006 is superseded by a new accepted ADR.
 
 ---
 
@@ -480,13 +490,24 @@ Self-learning architecture analyzer with skills system.
 - **Quarterly**: Revisit icebox items
 ---
 
-## Story 10: Phase 2 Migration (Stage 3 Content Gen)
+## ✅ Story 10: Phase 2 Migration (Stage 3 Content Gen) — Superseded
 
-**Status**: � In Progress
+**Status**: Complete — Superseded
 **Type**: Technical Enabler
 **Priority**: P1 (High)
 **Effort**: Large (8 story points)
 **Added**: 2026-01-04
+**Completed**: 2026-05-27
+
+**Resolution**: Superseded by ADR-0006. The requested `src/crews/stage3_crew.py` implementation is no longer valid because `src/crews/` was intentionally removed and Stage 3 production execution moved to `src/agent_sdk/stage3_runner.py`.
+
+**Verification**:
+- `docs/adr/0006-agent-framework-selection.md` supersedes ADR-0003 and records Agent SDK as the accepted runtime.
+- `src/agent_sdk/__init__.py` states Agent SDK runners replace CrewAI per ADR-0006.
+- `src/economist_agents/flow.py` documents the flow rewrite from CrewAI decorators to plain Python over `src.agent_sdk.pipeline.run_pipeline`.
+- `tests/test_flow_agent_sdk.py` covers the Stage 3 flow path through the Agent SDK pipeline.
+
+**Historical Original Scope**:
 
 **Problem**: Stage 3 (Content Generation) still uses legacy orchestration. Need to migrate to CrewAI pattern for consistency and maintainability.
 

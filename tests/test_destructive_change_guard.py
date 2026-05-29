@@ -17,11 +17,15 @@ class TestConfiguration:
     def test_flow_py_is_critical(self) -> None:
         assert "src/economist_agents/flow.py" in CRITICAL_FILES
 
-    def test_stage3_is_critical(self) -> None:
-        assert "src/crews/stage3_crew.py" in CRITICAL_FILES
+    def test_stage3_agent_sdk_runner_is_critical(self) -> None:
+        assert "src/agent_sdk/stage3_runner.py" in CRITICAL_FILES
 
-    def test_stage4_is_critical(self) -> None:
-        assert "src/crews/stage4_crew.py" in CRITICAL_FILES
+    def test_stage4_agent_sdk_runner_is_critical(self) -> None:
+        assert "src/agent_sdk/stage4_runner.py" in CRITICAL_FILES
+
+    def test_deleted_crewai_crews_are_not_critical(self) -> None:
+        assert "src/crews/stage3_crew.py" not in CRITICAL_FILES
+        assert "src/crews/stage4_crew.py" not in CRITICAL_FILES
 
     def test_max_deletion_is_50_pct(self) -> None:
         assert MAX_DELETION_PCT == 50
@@ -38,7 +42,7 @@ class TestIntentionalRewriteBypass:
     def test_parses_marker_lines_from_pr_body(self) -> None:
         body = (
             "## Summary\nWhatever.\n\n"
-            "Intentional rewrite: src/crews/stage3_crew.py\n"
+            "Intentional rewrite: src/agent_sdk/stage3_runner.py\n"
             "Intentional rewrite: src/economist_agents/flow.py\n"
             "Some other text.\n"
         )
@@ -49,7 +53,7 @@ class TestIntentionalRewriteBypass:
             mock_run.return_value.returncode = 0
             mock_run.return_value.stdout = body
             allowlist = get_intentional_rewrites()
-        assert "src/crews/stage3_crew.py" in allowlist
+        assert "src/agent_sdk/stage3_runner.py" in allowlist
         assert "src/economist_agents/flow.py" in allowlist
 
     def test_returns_empty_when_gh_call_fails(self) -> None:
@@ -62,7 +66,7 @@ class TestIntentionalRewriteBypass:
             assert get_intentional_rewrites() == set()
 
     def test_extracts_pr_number_from_github_ref(self) -> None:
-        body = "Intentional rewrite: src/crews/stage4_crew.py"
+        body = "Intentional rewrite: src/agent_sdk/stage4_runner.py"
         env = {"GITHUB_REF": "refs/pull/315/merge"}
         with (
             patch.dict("os.environ", env, clear=False),
@@ -71,4 +75,4 @@ class TestIntentionalRewriteBypass:
             mock_run.return_value.returncode = 0
             mock_run.return_value.stdout = body
             allowlist = get_intentional_rewrites()
-        assert "src/crews/stage4_crew.py" in allowlist
+        assert "src/agent_sdk/stage4_runner.py" in allowlist

@@ -23,8 +23,8 @@ logger = logging.getLogger(__name__)
 # Files that must never be gutted — core pipeline infrastructure
 CRITICAL_FILES = [
     "src/economist_agents/flow.py",
-    "src/crews/stage3_crew.py",
-    "src/crews/stage4_crew.py",
+    "src/agent_sdk/stage3_runner.py",
+    "src/agent_sdk/stage4_runner.py",
     "scripts/publication_validator.py",
     "scripts/editorial_judge.py",
     "src/quality/agent_reviewer.py",

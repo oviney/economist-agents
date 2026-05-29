@@ -26,7 +26,7 @@ class ChartMetricsCollector:
         if metrics_file is None:
             # Repo root is three levels up: src/quality/chart_metrics.py -> repo root
             repo_root = Path(__file__).resolve().parent.parent.parent
-            metrics_file = repo_root / "skills" / "chart_metrics.json"
+            metrics_file = repo_root / "data" / "skills_state" / "chart_metrics.json"
 
         self.metrics_file = Path(metrics_file)
         self.metrics = self._load_metrics()
@@ -236,7 +236,48 @@ class ChartMetricsCollector:
         else:
             summary["avg_zone_violations_per_chart"] = 0.0
 
+        summary["top_failure_patterns"] = self.get_top_failure_patterns(limit=3)
+        summary["visual_qa_trend"] = self.get_improvement_trend()
+
         return summary
+
+    def get_improvement_trend(self, window: int = 5) -> dict[str, Any]:
+        """Calculate Visual QA pass-rate trend across recent sessions."""
+        sessions = [
+            session
+            for session in self.metrics.get("sessions", [])
+            if session.get("visual_qa_runs", 0) > 0
+        ][-window:]
+        pass_rates = [
+            round(
+                (session.get("visual_qa_passed", 0) / session["visual_qa_runs"]) * 100,
+                1,
+            )
+            for session in sessions
+        ]
+
+        if len(pass_rates) < 2:
+            return {
+                "direction": "insufficient_data",
+                "window": window,
+                "pass_rates": pass_rates,
+                "change_percentage_points": 0.0,
+            }
+
+        change = round(pass_rates[-1] - pass_rates[0], 1)
+        if change > 0:
+            direction = "improving"
+        elif change < 0:
+            direction = "declining"
+        else:
+            direction = "flat"
+
+        return {
+            "direction": direction,
+            "window": window,
+            "pass_rates": pass_rates,
+            "change_percentage_points": change,
+        }
 
     def get_top_failure_patterns(self, limit: int = 10) -> list[dict[str, Any]]:
         """Get most common failure patterns"""
@@ -280,6 +321,7 @@ class ChartMetricsCollector:
             f"  Avg Zone Violations/Chart: {summary['avg_zone_violations_per_chart']:.2f}",
             f"  Total Regenerations: {summary['total_regenerations']}",
             f"  Avg Generation Time: {summary['avg_generation_time_seconds']:.2f}s",
+            f"  Improvement Trend: {summary['visual_qa_trend']['direction']}",
             "",
             "TOP FAILURE PATTERNS:",
             "-" * 70,

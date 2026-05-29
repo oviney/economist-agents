@@ -112,17 +112,34 @@ class TestInitialization:
 
     def test_default_metrics_file_path_resolves_to_repo_skills_dir(self) -> None:
         # Actually invoke ChartMetricsCollector() with no args and assert
-        # the resolved path matches the documented repo layout: three levels
-        # up from chart_metrics.py + skills/chart_metrics.json. __init__
+        # the resolved path matches the tracked skills-state layout. __init__
         # only reads the file (no write on construction), so this is safe.
         collector = ChartMetricsCollector()
 
         module_file = Path(chart_metrics.__file__).resolve()
-        expected = module_file.parent.parent.parent / "skills" / "chart_metrics.json"
+        expected = (
+            module_file.parent.parent.parent
+            / "data"
+            / "skills_state"
+            / "chart_metrics.json"
+        )
 
         assert collector.metrics_file == expected
         assert collector.metrics_file.name == "chart_metrics.json"
-        assert collector.metrics_file.parent.name == "skills"
+        assert collector.metrics_file.parent.name == "skills_state"
+
+    def test_blog_qa_skills_include_visual_qa_metrics_category(self) -> None:
+        skills_path = Path("data/skills_state/blog_qa_skills.json")
+        skills = json.loads(skills_path.read_text())
+
+        category = skills["skills"]["visual_qa_metrics"]
+
+        assert "Visual QA" in category["description"]
+        assert {pattern["id"] for pattern in category["patterns"]} >= {
+            "visual_qa_pass_rate_tracking",
+            "recurring_chart_failure_patterns",
+            "visual_qa_improvement_trend",
+        }
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -488,6 +505,82 @@ class TestTopFailurePatterns:
         # The top entries are the highest-count ones
         top = collector.get_top_failure_patterns(limit=3)
         assert [p["count"] for p in top] == [15, 14, 13]
+
+    def test_summary_exposes_top_three_failures(
+        self,
+        collector: ChartMetricsCollector,
+    ) -> None:
+        for _ in range(4):
+            collector._track_failure_pattern("zone_violation", "title overlap")
+        for _ in range(2):
+            collector._track_failure_pattern("critical_issue", "missing source line")
+        collector._track_failure_pattern("critical_issue", "label clipped")
+        collector._track_failure_pattern("critical_issue", "colour contrast")
+
+        summary = collector.get_summary()
+
+        assert [p["issue"] for p in summary["top_failure_patterns"]] == [
+            "title overlap",
+            "missing source line",
+            "label clipped",
+        ]
+        assert len(summary["top_failure_patterns"]) == 3
+
+
+class TestImprovementTrend:
+    def test_trend_is_flat_when_not_enough_sessions(
+        self,
+        collector: ChartMetricsCollector,
+    ) -> None:
+        assert collector.get_improvement_trend() == {
+            "direction": "insufficient_data",
+            "window": 5,
+            "pass_rates": [],
+            "change_percentage_points": 0.0,
+        }
+
+    def test_trend_reports_improving_pass_rate(
+        self,
+        collector: ChartMetricsCollector,
+    ) -> None:
+        collector.metrics["sessions"] = [
+            {"visual_qa_passed": 1, "visual_qa_runs": 4},
+            {"visual_qa_passed": 2, "visual_qa_runs": 4},
+            {"visual_qa_passed": 3, "visual_qa_runs": 4},
+        ]
+
+        trend = collector.get_improvement_trend(window=3)
+
+        assert trend == {
+            "direction": "improving",
+            "window": 3,
+            "pass_rates": [25.0, 50.0, 75.0],
+            "change_percentage_points": 50.0,
+        }
+
+    def test_trend_reports_declining_pass_rate(
+        self,
+        collector: ChartMetricsCollector,
+    ) -> None:
+        collector.metrics["sessions"] = [
+            {"visual_qa_passed": 4, "visual_qa_runs": 4},
+            {"visual_qa_passed": 2, "visual_qa_runs": 4},
+        ]
+
+        assert collector.get_improvement_trend(window=5)["direction"] == "declining"
+
+    def test_trend_window_ignores_sessions_without_visual_qa(
+        self,
+        collector: ChartMetricsCollector,
+    ) -> None:
+        collector.metrics["sessions"] = [
+            {"visual_qa_passed": 1, "visual_qa_runs": 2},
+            {"visual_qa_passed": 0, "visual_qa_runs": 0},
+            {"visual_qa_passed": 2, "visual_qa_runs": 2},
+            {"visual_qa_passed": 0, "visual_qa_runs": 0},
+        ]
+
+        assert collector.get_improvement_trend(window=2)["pass_rates"] == [50.0, 100.0]
 
 
 # ═══════════════════════════════════════════════════════════════════════════

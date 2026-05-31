@@ -1,43 +1,50 @@
-# TODO: Migrate domain modules from scripts/ to src/ (#344)
+# TODO: Path A — chart-rendered hero, human-in-the-loop featured image
+
+**Plan**: [`tasks/plan.md`](./plan.md)
+**Spec**: [`docs/specs/featured-image-handshake.md`](../docs/specs/featured-image-handshake.md)
 
 ## In Progress
 
-- [ ] T16 — Open PR + close #344
+- [ ] **Task 5.2**: end-to-end smoke (deferred to human verification; requires a live pipeline run + image generation in ChatGPT)
+- [ ] **Checkpoint E**: human approves PR #404 for merge
+
+## Slice 1 — chart actually renders ✅ (commit aaf56f3)
+
+- [x] **Task 1.1**: create `src/agent_sdk/chart_renderer.py` + `tests/test_chart_renderer.py` (15 tests)
+- [x] **Task 1.2**: wire `chart_renderer` into `stage3_runner.run_stage3`; `Stage3Result.chart_path` exposed (+6 wire-up tests)
+- [x] **Checkpoint A**: pytest 2166 green; manual eyeball confirms Economist-style chart on real spec
+
+## Slice 2 — validator accepts chart-only articles ✅ (commit 0f36289)
+
+- [x] **Task 2.1**: `publication_validator.py` — `image:` optional, file-must-exist via `require_image_file=True`
+- [x] **Task 2.2**: BUG-017 false-positive fix (path comparison); closes #402
+- [x] **Checkpoint B**: pytest 2183 green; yesterday's article minus image: validates cleanly
+
+## Slice 3 — image prompt handshake ✅
+
+- [x] **Task 3.1**: `src/agent_sdk/image_prompt_synth.py` + 12 tests
+- [x] **Task 3.2**: slug-keyed output dirs (`output/posts/<slug>.md`, `output/charts/<slug>.png`, `output/state/<slug>.json`)
+- [x] **Task 3.3**: `pipeline.py` `--resume <slug>` + `--no-image` + exit code 10
+- [x] **Task 3.4**: `stage3_runner` writes `output/posts/<slug>.image_prompt.md` + verbose handoff message
+- [x] **Checkpoint C**: pytest 2207 green (+12 handshake tests, +12 prompt synth tests)
+
+## Slice 4 — deterministic image gate ✅
+
+- [x] **Task 4.1**: `src/agent_sdk/image_gate.py` + wired into `_run_resume` (exits 11 on fail)
+- [x] **Checkpoint D**: pytest 2218 green (+11 gate tests covering missing/too-small/wrong-magic/wrong-dims + 4 wire-up cases)
+
+## Slice 5 — docs + smoke
+
+- [x] **Task 5.1**: `CONTRIBUTING.md` — "Generating an article — the image handshake (#403)" section with exit codes table + workflow steps
+- [ ] **Task 5.2**: end-to-end smoke (deferred to human verification post-merge; requires ~$0.30 pipeline run + image generation in ChatGPT)
+- [x] **Checkpoint E**: PR #404 opened; closes #402 in same PR
 
 ## Done
 
-- [x] T0  — Scaffold src/quality/ and src/backlog/ packages
-- [x] T1  — Migrate agent_reviewer.py to src/quality/
-- [x] T2  — Migrate governance.py to src/quality/
-- [x] T3  — Migrate chart_metrics.py to src/quality/
-- [x] T4  — Migrate schema_validator.py to src/quality/
-- [x] T5  — Migrate agent_metrics.py to src/quality/
-- [x] T6  — Migrate defect_tracker.py to src/quality/ (+ fix latent test mock bug)
-- [x] T7  — Migrate validate_closed_loop.py to src/quality/
-- [x] T8  — Migrate visual_qa_zones.py to src/quality/
-- [x] T9–T12 — Migrate backlog modules to src/backlog/ (single commit;
-       scripts/continuous_burndown.py imports all four atomically)
-- [x] T13 — Convert skills_manager bare imports to scripts.skills_manager
-- [x] T14 — Remove sys.path.insert from tests/test_architecture_compliance.py
-- [x] T15 — Originals removed from scripts/ via git mv (AC6 satisfied —
-       no empty stubs left to archive)
-- [x] T16 — Update SPEC.md §2 (12 †-rows moved to new MIGRATED section)
+- [x] Slices 1-5 implementation complete in PR #404
+- [x] Automated regression coverage complete
 
-## Verification
+## Blocked / Deferred
 
-- Pytest: 1756 passed, 84 skipped (matches baseline ±0)
-- Ruff check: All checks passed!
-- Ruff format: 229 files already formatted
-- No bare-name imports of any of the 12 migrated modules remain in
-  agents/, src/, tests/, or mcp_servers/
-- sys.path.insert(0, str(SCRIPTS_DIR)) removed from test_architecture_compliance.py:22
-
-## Acceptance criteria
-
-- AC1 (12 modules to src/): ✓
-- AC2 (callers updated): ✓ (agents/* + tests + scripts/continuous_burndown.py
-  + scripts/economist_agent.py + scripts/quality_dashboard.py)
-- AC3 (sys.path hack removed): ✓
-- AC4 (pytest same count): ✓ (1756 + 84 vs 1756 + 84 baseline)
-- AC5 (mock patch paths updated): ✓ (4× agent_metrics, 3× defect_tracker)
-- AC6 (originals archived/removed): ✓ (originals removed via git mv)
+- [ ] Live end-to-end smoke: requires a paid Stage 3 run and human-generated hero image
+- [ ] `run_flow()` handshake migration: tracked separately in #410

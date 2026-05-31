@@ -49,6 +49,7 @@ mcp = FastMCP("publication-validator")
 def validate_for_publication(
     content: str,
     expected_date: str | None = None,
+    require_image_file: bool = False,
 ) -> dict:
     """Validate an article against publication quality gates.
 
@@ -59,6 +60,12 @@ def validate_for_publication(
         content: Full article text including YAML front matter.
         expected_date: Expected publication date in ``YYYY-MM-DD`` format.
             Defaults to today's date when omitted.
+        require_image_file: When True, an article with an ``image:`` line
+            must have the referenced PNG present on disk under
+            ``output/posts/images/``. Defaults to False because the MCP
+            tool is typically called on drafts before the hero asset
+            has been generated; deploy-time validation passes True
+            (#403).
 
     Returns:
         A dictionary with the following keys:
@@ -75,7 +82,10 @@ def validate_for_publication(
         len(content),
     )
 
-    validator = PublicationValidator(expected_date=expected_date)
+    validator = PublicationValidator(
+        expected_date=expected_date,
+        require_image_file=require_image_file,
+    )
     try:
         is_valid, issues = validator.validate(content)
     except Exception as exc:
@@ -108,14 +118,15 @@ def validate_post(post_path: str) -> dict:
 
     * YAML front-matter delimiters are present (``---`` … ``---``).
     * Required fields are present: ``layout``, ``title``, ``date``,
-      ``author``, ``categories``, ``image``.
+      ``author``, ``categories``.
     * ``layout`` equals ``"post"``.
     * ``title`` is a non-empty string.
     * ``date`` matches ``YYYY-MM-DD`` format.
     * ``author`` is a non-empty string.
     * Every item in ``categories`` is one of :data:`VALID_CATEGORIES`.
-    * ``image`` refers to a path that exists on the filesystem (local paths
-      only; ``http://`` / ``https://`` URLs are accepted without checking).
+    * When present, ``image`` refers to a path that exists on the filesystem
+      (local paths only; ``http://`` / ``https://`` URLs are accepted without
+      checking). Chart-only articles may omit ``image`` (#403).
 
     Args:
         post_path: Absolute or relative path to the markdown post file.
@@ -181,7 +192,7 @@ def validate_post(post_path: str) -> dict:
     # ------------------------------------------------------------------
     # Required fields
     # ------------------------------------------------------------------
-    required_fields = ["layout", "title", "date", "author", "categories", "image"]
+    required_fields = ["layout", "title", "date", "author", "categories"]
     for field in required_fields:
         if field not in frontmatter:
             errors.append(f"Missing required field: {field}")
@@ -242,9 +253,7 @@ def validate_post(post_path: str) -> dict:
     # image — local paths must exist on the filesystem
     # ------------------------------------------------------------------
     image = frontmatter.get("image")
-    if image is None or (isinstance(image, str) and not image.strip()):
-        errors.append("image field must be a non-empty value")
-    else:
+    if image is not None and str(image).strip():
         image_str = str(image).strip()
         if not image_str.startswith(("http://", "https://")):
             image_path = Path(image_str)

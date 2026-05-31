@@ -80,7 +80,12 @@ class TestPublicationValidatorYAML:
     """YAML frontmatter validation checks."""
 
     def test_valid_article_passes(self) -> None:
-        validator = PublicationValidator(expected_date="2026-04-03")
+        # require_image_file=False: this test exercises every OTHER validator
+        # check on a known-good article; #403 added a file-must-exist gate
+        # that is verified in tests/test_publication_validator_image_optional.py.
+        validator = PublicationValidator(
+            expected_date="2026-04-03", require_image_file=False
+        )
         article = _make_article()
         is_valid, issues = validator.validate(article)
         critical = [i for i in issues if i["severity"] == "CRITICAL"]

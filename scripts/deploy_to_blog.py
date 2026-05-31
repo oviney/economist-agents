@@ -35,7 +35,6 @@ import sys
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 # Allow importing from scripts/ when run directly or via subprocess
 sys.path.insert(0, str(Path(__file__).parent))
@@ -64,7 +63,7 @@ class DeployResult:
 # ---------------------------------------------------------------------------
 
 
-def run_command(cmd: str, cwd: Optional[Path] = None) -> str:
+def run_command(cmd: str, cwd: Path | None = None) -> str:
     """Run *cmd* in a shell and return stdout (stripped).
 
     Raises :class:`DeployError` if the command exits non-zero.  When the
@@ -93,7 +92,8 @@ def find_latest_article() -> Path:
     """Find the most recent generated article.
 
     Prefers ``article_path.txt`` written by ``content-pipeline.yml`` (precise).
-    Falls back to mtime scan of ``output/*.md`` with a warning (fragile).
+    Falls back to an mtime scan of canonical ``output/posts/*.md`` and
+    legacy ``output/*.md`` locations with a warning (fragile).
     """
     article_path_file = Path("article_path.txt")
     if article_path_file.exists():
@@ -107,7 +107,7 @@ def find_latest_article() -> Path:
         )
 
     output_dir = Path("output")
-    articles = list(output_dir.glob("*.md"))
+    articles = list(output_dir.glob("posts/*.md")) + list(output_dir.glob("*.md"))
     if not articles:
         raise DeployError(
             "No articles found in output/ directory. "
@@ -225,12 +225,22 @@ def deploy(
     content = content.replace("output/charts/", "/assets/charts/")
     target_article.write_text(content)
 
-    # Copy chart PNG, if present.
-    chart_file = charts_dir / f"{slug}.png"
-    if chart_file.exists():
-        target_chart = assets_dir / f"{slug}.png"
+    # Copy each referenced chart PNG. An embedded chart without a source
+    # asset would ship a broken <img>, so fail before validation instead
+    # of silently skipping the copy.
+    chart_refs = sorted(set(re.findall(r"/assets/charts/([^)\s]+\.png)", content)))
+    chart_files = [charts_dir / Path(ref).name for ref in chart_refs]
+    if not chart_files:
+        fallback_chart = charts_dir / f"{slug}.png"
+        if fallback_chart.exists():
+            chart_files.append(fallback_chart)
+
+    for chart_file in chart_files:
+        if not chart_file.exists():
+            raise DeployError(f"Chart asset not found: {chart_file}")
+        target_chart = assets_dir / chart_file.name
         logger.info("Copying chart: %s → %s", chart_file, target_chart)
-        run_command(f"cp {chart_file} {target_chart}")
+        shutil.copy2(chart_file, target_chart)
 
     # Copy featured PNG + generate WebP — the blog's responsive-image
     # include emits a <source srcset="…webp">, so the .webp must exist
@@ -334,7 +344,7 @@ def deploy(
 - [ ] British spelling
 - [ ] References section
 
-**Charts:** {chart_file.name if chart_file.exists() else "None"}
+**Charts:** {", ".join(chart.name for chart in chart_files) or "None"}
 
 ## Automated Validation
 ```
@@ -369,7 +379,7 @@ def deploy(
 # ---------------------------------------------------------------------------
 
 
-def _parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
+def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Deploy article to blog via Pull Request"
     )
@@ -403,7 +413,7 @@ def _parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def main(argv: Optional[list[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     """CLI entry point. Returns process exit code."""
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     args = _parse_args(argv)

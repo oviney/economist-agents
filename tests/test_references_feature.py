@@ -254,7 +254,12 @@ This is an article.
 
     def test_references_with_three_sources_passes(self):
         """Should pass with 3+ properly formatted references"""
-        validator = PublicationValidator(expected_date="2026-01-02")
+        # require_image_file=False: this test fixture references a hero PNG
+        # that doesn't exist on disk; the #403 file-must-exist gate is
+        # covered separately in tests/test_publication_validator_image_optional.py.
+        validator = PublicationValidator(
+            expected_date="2026-01-02", require_image_file=False
+        )
 
         padding = " ".join(["word"] * 850)
         article = f"""---
@@ -467,7 +472,11 @@ IEEE research confirms these findings. Their September 2024 standards document s
 3. IEEE, ["Software Testing Standards Update"](https://www.ieee.org/testing), *IEEE Computer Society*, August 2024
 """
 
-        validator = PublicationValidator(expected_date="2026-01-02")
+        # require_image_file=False: this test fixture references a hero PNG
+        # that doesn't exist on disk; covered separately in #403 tests.
+        validator = PublicationValidator(
+            expected_date="2026-01-02", require_image_file=False
+        )
         is_valid, issues = validator.validate(article)
 
         # Should pass all checks including references

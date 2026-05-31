@@ -1,104 +1,179 @@
-# Plan: Migrate domain modules from scripts/ to src/ (issue #344)
+# Plan: Path A — chart-rendered hero, human-in-the-loop featured image
 
-**Spec**: SPEC.md
-**ADR**: docs/adr/0010-scripts-to-src-migration.md
-**Date**: 2026-05-15
+**Spec**: [`docs/specs/featured-image-handshake.md`](../docs/specs/featured-image-handshake.md)
+**GitHub issue**: oviney/economist-agents#403
+**Date**: 2026-05-19
+
+## Decisions locked in from spec open questions
+
+- **Q1 (multimodal validation):** pipeline.py runs deterministic checks only (dimensions = 1792×1024 ±5%, file exists, file is PNG, file size > 50 KB). The visual-quality grade is done by the operator reading the file via the Read tool after `--resume` returns, before deploy is called. Keeps pipeline non-interactive.
+- **Q2 (handoff message):** verbose — full prompt embedded inline + exact drop-path + next command, so the user can copy-paste without context-switching back to chat.
+- **Q3 (timeout):** none. `--resume <slug>` is open-ended. State lives on disk; multiple pipelines can coexist identified by slug.
+
+## Structural change
+
+Articles move from `logs/spike/pipeline_article.md` (singleton) to `output/posts/<slug>.md` (slug-keyed). `logs/spike/pipeline_*` becomes telemetry-only. Enables `--resume <slug>` to address a specific in-flight article and matches `deploy_to_blog.py`'s mental model.
 
 ## Dependency graph
 
 ```
-T0 (create src/quality/, src/backlog/ packages)
-  │
-  ├──► T1..T8 (migrate Group A — 8 modules, one per slice)
-  │       ├── T1: agent_reviewer (callers: writer_agent, research_agent, test_quality_system)
-  │       ├── T2: governance (callers: writer_agent, research_agent, economist_agent)
-  │       ├── T3: chart_metrics (callers: graphics_agent, economist_agent)
-  │       ├── T4: schema_validator (callers: test_quality_system)
-  │       ├── T5: agent_metrics (callers: economist_agent, quality_dashboard, test_quality_dashboard mocks)
-  │       ├── T6: defect_tracker (callers: quality_dashboard, test_quality_dashboard mocks)
-  │       ├── T7: validate_closed_loop (callers: test_closed_loop_validation subprocess)
-  │       └── T8: visual_qa_zones (callers: economist_agent)
-  │
-  ├──► T9..T12 (migrate Group B — 4 modules, one per slice)
-  │       ├── T9:  backlog_groomer
-  │       ├── T10: ci_health_monitor
-  │       ├── T11: migrate_backlog_to_github
-  │       └── T12: validate_documentation_accuracy
-  │       (all four callers in scripts/continuous_burndown.py)
-  │
-  ├──► T13 (skills_manager: convert to fully-qualified imports)
-  │
-  ├──► T14 (remove sys.path hack from tests/test_architecture_compliance.py)
-  │
-  ├──► T15 (move 12 originals to scripts/archived/)
-  │
-  └──► T16 (update SPEC.md §2 - mark †-rows as MIGRATED; final verification)
+Task 1.1: chart_renderer module ──┐
+                                  │
+Task 1.2: wire chart_renderer ────┼──► Slice 1 done
+into stage3                       │     (chart PNGs render)
+                                  │
+Task 2.1: validator image:        │
+optional + file-must-exist        ├──► Slice 2 done
+                                  │     (text-only / chart-only articles ship)
+Task 2.2: BUG-017 false-pos fix ──┘
+(#402 root-cause)
+
+                ▼ Slice 1+2 prereq
+
+Task 3.1: image_prompt_synth module
+        │
+        ▼
+Task 3.2: slug-keyed output dirs + state file
+        │
+        ▼
+Task 3.3: pipeline --resume / --no-image / exit code 10
+        │
+        ▼
+Task 3.4: stage3_runner emits prompt artefact + handshake docs
+        │
+        └──► Slice 3 done (handshake works end-to-end)
+
+                ▼ Slice 3 prereq
+
+Task 4.1: deterministic image gate (dims, format, size, exists)
+        │
+        └──► Slice 4 done (--resume rejects malformed images)
+
+                ▼ Slice 4 prereq
+
+Task 5.1: CONTRIBUTING.md update — handoff workflow
+Task 5.2: full end-to-end smoke against last-merged main
 ```
 
-Each task is one commit. Verification after every task:
-- `pytest tests/ -q` shows same pass/skip count as baseline
-- `ruff check --no-fix` and `ruff format --check` clean
+## Task list
 
-## Baseline
+### Phase 1: Chart actually renders (no API path; slice 1)
 
-Before starting, capture baseline test count: `pytest tests/ -q`.
-Expected: 1741 passed, 84 skipped (per worker brief).
+- **Task 1.1**: Create `src/agent_sdk/chart_renderer.py` with `render_chart(spec: dict, output_path: Path) -> Path`
+  - Acceptance: malformed spec raises `ChartRenderError`; valid spec produces a 1200×800 PNG matching Economist style (navy + accent red, single horizontal-bar layout)
+  - Verify: `pytest tests/test_chart_renderer.py -v` (new file), 5+ tests covering: valid render, dimensions, malformed spec, missing data field, output dir auto-created
+  - Files: `src/agent_sdk/chart_renderer.py` (new), `tests/test_chart_renderer.py` (new)
+  - Estimated scope: **S** (1-2 files, ~150 LOC + ~80 LOC tests)
 
-## Tasks
+- **Task 1.2**: Wire `chart_renderer` into `stage3_runner.run_stage3`
+  - Acceptance: after Stage 3, `output/charts/<slug>.png` exists. `Stage3Result` exposes `chart_path: Path`.
+  - Verify: existing `tests/test_stage3_*.py` still pass; new integration test asserts PNG file presence after run
+  - Files: `src/agent_sdk/stage3_runner.py`, `tests/test_stage3_runner.py` (new or extended)
+  - Estimated scope: **S** (1 file modified, 1 test file touched)
 
-### T0 — Create empty src/quality/ and src/backlog/ packages
+### Checkpoint A — after Slice 1
+- [ ] `pytest tests/ -q` green
+- [ ] Manual: run pipeline on a topic, confirm `output/charts/<slug>.png` exists and looks reasonable (eyeball chart visual)
+- [ ] Human reviews
 
-- Create `src/quality/__init__.py` (empty)
-- Create `src/backlog/__init__.py` (empty)
-- Verify: `pytest tests/ -q` unchanged
+### Phase 2: Validator accepts chart-only articles (slice 2)
 
-### T1..T8 — Group A migrations (one module per commit)
+- **Task 2.1**: `scripts/publication_validator.py` — `image:` becomes optional; when present, file must exist on disk
+  - Acceptance: article without `image:` line passes; article with `image: /assets/images/X.png` passes IFF file at expected resolved path exists; missing file → CRITICAL FAIL with file path in message
+  - Verify: new test file `tests/test_publication_validator_image_optional.py` with 4 cases (no-image-line, image-line-file-exists, image-line-file-missing, image-line-malformed-path); existing validator tests still pass
+  - Files: `scripts/publication_validator.py`, `tests/test_publication_validator_image_optional.py` (new)
+  - Estimated scope: **S**
 
-For each module M (in T1..T8):
-1. `git mv scripts/M.py src/quality/M.py`
-2. Update bare-name imports in all callers to `from src.quality.M import …`
-3. Run `pytest tests/ -q` — must show baseline count
-4. Run ruff — must be clean
-5. Commit: `refactor: migrate scripts/M.py to src/quality/M.py (#344)`
+- **Task 2.2**: Fix BUG-017 false positive (closes #402)
+  - Acceptance: rule only fires when `image:` path and chart embed path resolve to the same basename; rule does NOT fire when hero is `/assets/images/X.png` and chart is `/assets/charts/X.png`
+  - Verify: new test `tests/test_defect_prevention_bug017.py` (or extend existing), 3 cases: same-basename (fires), different-dir-same-name (does not fire), different-name (does not fire)
+  - Files: `scripts/defect_prevention_rules.py`, test file
+  - Estimated scope: **S**
 
-### T9..T12 — Group B migrations (one module per commit)
+### Checkpoint B — after Slice 2
+- [ ] `pytest tests/ -q` green
+- [ ] Manual: re-run validator on `logs/spike/pipeline_article.md` from yesterday with image: REMOVED — should pass cleanly (no BUG-017 false positive, no MISSING_IMAGE)
+- [ ] Human reviews
 
-For each module M (in T9..T12):
-1. `git mv scripts/M.py src/backlog/M.py`
-2. Update `scripts/continuous_burndown.py` to `from src.backlog.M import …`
-3. Run tests + ruff
-4. Commit: `refactor: migrate scripts/M.py to src/backlog/M.py (#344)`
+### Phase 3: Image prompt handshake (slice 3)
 
-### T13 — Convert skills_manager bare imports to fully-qualified
+- **Task 3.1**: Create `src/agent_sdk/image_prompt_synth.py` with `compose_prompt(title: str, summary: str, themes: list[str]) -> str`
+  - Acceptance: returned prompt is non-empty; includes hard constraints (no-text, aspect ratio 1792×1024, Economist palette); does not include code-fence or markdown
+  - Verify: `tests/test_image_prompt_synth.py`, 4 tests (constraints present, no markdown, empty inputs raise, long titles truncated)
+  - Files: new module + new test file
+  - Estimated scope: **S**
 
-Files: `tests/test_quality_system.py`, `tests/test_closed_loop_validation.py`.
-Change `from skills_manager import SkillsManager`
-to `from scripts.skills_manager import SkillsManager`.
+- **Task 3.2**: Slug-keyed output dirs + state file
+  - Acceptance: pipeline writes article to `output/posts/<slug>.md`, chart to `output/charts/<slug>.png`, state JSON to `output/state/<slug>.json` (contains topic, stage-3 timestamp, chart path, prompt path)
+  - Verify: integration test confirms file layout; existing tests that read `logs/spike/pipeline_article.md` updated
+  - Files: `src/agent_sdk/pipeline.py`, `src/agent_sdk/stage3_runner.py`, several test files
+  - Estimated scope: **M** (3-5 files)
 
-Verify pytest unchanged, commit.
+- **Task 3.3**: `pipeline.py` flags `--resume <slug>` and `--no-image`; exit code 10 from default Stage 3 completion
+  - Acceptance: bare `pipeline "topic"` does Stage 3, writes artefacts, prints handoff message, exits 10. `--resume <slug>` reads state, runs Stage 4. `--no-image` strips `image:` from frontmatter and runs Stage 4 without expecting a file.
+  - Verify: `tests/test_pipeline_handshake.py` with 3 cases (default-exits-10, resume-with-image, resume-no-image)
+  - Files: `src/agent_sdk/pipeline.py`, new test file
+  - Estimated scope: **M**
 
-### T14 — Remove sys.path hack
+- **Task 3.4**: stage3_runner writes prompt artefact + handoff message text
+  - Acceptance: after Stage 3, `output/posts/<slug>.image_prompt.md` exists with the full prompt; handoff message printed to stdout contains the prompt, the drop path, and the resume command
+  - Verify: existing tests still pass; new assertion checks file presence + content
+  - Files: `src/agent_sdk/stage3_runner.py`
+  - Estimated scope: **S**
 
-`tests/test_architecture_compliance.py:22`: remove
-`sys.path.insert(0, str(SCRIPTS_DIR))`. Keep `import sys` only if still
-used; otherwise remove that too. Keep `SCRIPTS_DIR` (used for file scan).
+### Checkpoint C — after Slice 3
+- [ ] `pytest tests/ -q` green
+- [ ] Manual: run pipeline on a topic. Confirm exit 10. Confirm prompt artefact exists. Run `--resume <slug> --no-image`. Confirm article finalised without `image:`.
+- [ ] Human reviews
 
-Verify pytest unchanged, commit.
+### Phase 4: Deterministic image gate (slice 4)
 
-### T15 — Move 12 originals to scripts/archived/
+- **Task 4.1**: Deterministic image validation in `--resume <slug>` (no `--no-image`)
+  - Acceptance: when image at `output/posts/images/<slug>.png` is missing or not 1792×1024 (±5%) or not PNG or <50 KB, `--resume` exits with code 11 and a clear message (separate from research errors 2/3 and handoff 10)
+  - Verify: `tests/test_image_gate.py` with 4 cases (passes, missing, wrong-dims, wrong-format)
+  - Files: `src/agent_sdk/pipeline.py` (or new `image_gate.py`), test file
+  - Estimated scope: **S**
 
-Single commit: `git mv` all 12 to `scripts/archived/`. Run full test
-suite + ruff. Commit.
+### Checkpoint D — after Slice 4
+- [ ] `pytest tests/ -q` green
+- [ ] Manual: drop a non-1792×1024 image, confirm exit 11. Drop a correct one, confirm Stage 4 completes.
+- [ ] Human reviews
 
-### T16 — Update SPEC.md §2 and final verification
+### Phase 5: Docs + smoke (slice 5)
 
-Update the 12 KEEP entries marked `†` in SPEC.md §2 — they now
-classify as MIGRATED rather than KEEP. Add a note at the top of §2
-linking to this issue's PR.
+- **Task 5.1**: `CONTRIBUTING.md` — handoff workflow section (3-paragraph + example commands)
+  - Acceptance: section "Generating a featured image" with the exact paste-prompt-into-ChatGPT workflow, drop path, and resume command
+  - Verify: manual review
+  - Files: `CONTRIBUTING.md`
+  - Estimated scope: **XS**
 
-Final checks:
-- `pytest tests/ -q` shows baseline count
-- `ruff check --no-fix && ruff format --check` clean
-- `grep -rEn '^(from|import) (agent_reviewer|governance|chart_metrics|schema_validator|agent_metrics|defect_tracker|validate_closed_loop|backlog_groomer|ci_health_monitor|migrate_backlog_to_github|validate_documentation_accuracy|visual_qa_zones)\b' agents/ src/ tests/ mcp_servers/` returns ZERO results
+- **Task 5.2**: End-to-end smoke against last-merged main
+  - Acceptance: run pipeline on a topic; do handshake; deploy to blog repo (dry-run); confirm no broken-image regressions
+  - Verify: deploy `--dry-run` exits 0 and the validation report inside it shows no MISSING_IMAGE or BUG-017
+  - Files: none — orchestration step
+  - Estimated scope: **XS**
 
-Commit and open PR.
+### Checkpoint E — done
+- [ ] All slices verified
+- [ ] PR opened (one branch, multiple commits per slice — matches the #388 / #395 pattern from this session)
+- [ ] Issue #402 closed in same PR
+- [ ] Human approves merge
+
+## Risks and mitigations
+
+| Risk | Impact | Mitigation |
+|---|---|---|
+| Chart spec schema varies across topics | Medium | Task 1.1 raises `ChartRenderError` with clear field-by-field validation; test with 3 real captured spec JSONs |
+| Slug derivation differs from existing deploy script | High | Verify existing slug logic before Task 3.2; reuse the same function |
+| `output/posts/<slug>.md` collides across runs | Low | State file includes timestamp; same slug overwrites (current single-pipeline behaviour) |
+| Image-gate `±5% dimension tolerance` is wrong target | Low | Make tolerance configurable via env var; default 5% |
+| User runs `--resume` without ever running default | Low | State file absent → clear error: "no state for slug X; run pipeline 'topic' first" |
+
+## Parallelization
+
+- Tasks 1.1 + 2.1 + 2.2 + 3.1 are **independent** — could run in parallel if the workforce allowed. I will do them sequentially since I am the workforce.
+- Tasks 1.2 and 3.2 both touch `stage3_runner.py` — must be sequential.
+
+## Open questions
+
+None — Q1/Q2/Q3 from the spec are now locked. Will surface anything new in implementation.

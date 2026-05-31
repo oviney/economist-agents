@@ -6,8 +6,13 @@ and returns the expected result structure.
 """
 
 import asyncio
+from pathlib import Path
 
-from mcp_servers.publication_validator_server import mcp, validate_for_publication
+from mcp_servers.publication_validator_server import (
+    mcp,
+    validate_for_publication,
+    validate_post,
+)
 
 # ---------------------------------------------------------------------------
 # Article helpers (mirrors test_publication_validator.py helpers)
@@ -262,3 +267,22 @@ class TestMcpToolRegistered:
         tools = asyncio.run(mcp.list_tools())
         tool = next(t for t in tools if t.name == "validate_for_publication")
         assert tool.description
+
+
+def test_validate_post_accepts_chart_only_article(tmp_path: Path) -> None:
+    """The MCP file validator must match #403's optional-hero contract."""
+    article = tmp_path / "chart-only.md"
+    article.write_text(
+        "---\n"
+        "layout: post\n"
+        'title: "Chart Only"\n'
+        "date: 2026-05-30\n"
+        'author: "Ouray Viney"\n'
+        'categories: ["software-engineering"]\n'
+        "---\n\n"
+        "Body.\n"
+    )
+
+    result = validate_post(str(article))
+
+    assert result["valid"] is True

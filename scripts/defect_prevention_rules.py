@@ -195,12 +195,18 @@ class DefectPrevention:
         return ""
 
     def _check_duplicate_chart(self, content: str, metadata: dict) -> str:
-        """BUG-017 Prevention: Detect duplicate chart display paths
+        """BUG-017 Prevention: Detect duplicate chart display paths.
 
-        Pattern: Jekyll 'image:' field + markdown embed = duplicate display
-        Root Cause: Requirements gap - unclear featured image vs embed
+        Pattern: Jekyll 'image:' field + markdown embed referencing the
+                 SAME file = the same chart renders twice on the page.
+        Root Cause: Requirements gap - unclear featured image vs embed.
 
-        Check: If chart markdown present, YAML must NOT have 'image:' field
+        Check: Only flag when the hero 'image:' path and a body chart
+        embed point at the SAME file. Different paths (e.g. hero at
+        /assets/images/X.png and chart at /assets/charts/X.png) are TWO
+        different assets — that's a hero + chart layout, not a duplicate
+        (#402 false-positive fix). Same basename in different
+        directories counts as different (treated as distinct files).
         """
         # Extract YAML frontmatter
         yaml_match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
@@ -209,18 +215,30 @@ class DefectPrevention:
 
         frontmatter = yaml_match.group(1)
 
-        # Check for image field in frontmatter
-        has_image_field = bool(re.search(r"^image:", frontmatter, re.MULTILINE))
+        # Hero image path from frontmatter
+        image_match = re.search(r"^image:\s*(\S+)", frontmatter, re.MULTILINE)
+        if not image_match:
+            return ""
+        hero_path = image_match.group(1).strip()
 
-        # Check for chart markdown in body
-        chart_pattern = r"!\[.*?\]\(.*?\.png\)"
-        has_chart_embed = bool(re.search(chart_pattern, content))
+        # All chart-like embeds in the body (PNG only — Jekyll convention)
+        chart_paths = re.findall(r"!\[[^\]]*\]\((\S+\.png)\)", content)
+        if not chart_paths:
+            return ""
 
-        if has_image_field and has_chart_embed:
+        # Normalise once (strip trailing slashes, collapse double-slashes)
+        def _norm(p: str) -> str:
+            return re.sub(r"/+", "/", p.rstrip("/"))
+
+        hero_norm = _norm(hero_path)
+        duplicates = [c for c in chart_paths if _norm(c) == hero_norm]
+        if duplicates:
             return (
-                "Duplicate chart display detected: 'image:' field in frontmatter "
-                "AND chart markdown in body. Remove 'image:' field. "
-                "This prevents BUG-017 (duplicate chart rendering)."
+                f"Duplicate chart display detected: hero image and body "
+                f"chart embed both reference {hero_norm!r}. Use distinct "
+                f"paths (e.g. hero in /assets/images/, chart in "
+                f"/assets/charts/) or remove one of the references. "
+                f"This prevents BUG-017 (duplicate chart rendering)."
             )
 
         return ""

@@ -24,13 +24,13 @@ from __future__ import annotations
 
 import asyncio
 import re
+from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import pytest
 
 import src.agent_sdk.stage3_runner as stage3_runner
 from src.agent_sdk.stage3_runner import run_stage3
-
 
 VALID_ARTICLE = (
     "---\n"
@@ -73,7 +73,7 @@ def stub_pipeline(captured_prompts):
             captured_prompts["writer"] = prompt
             return VALID_ARTICLE, 0.0
         captured_prompts["graphics"] = prompt
-        return '{"title": "t", "data": []}', 0.0
+        return '{"title": "t", "data": [{"metric": "A", "value": 1}]}', 0.0
 
     with (
         patch.object(
@@ -85,6 +85,11 @@ def stub_pipeline(captured_prompts):
             stage3_runner,
             "_collect_text",
             AsyncMock(side_effect=fake_collect_text),
+        ),
+        patch.object(
+            stage3_runner,
+            "render_chart",
+            return_value=Path("output/charts/test.png"),
         ),
     ):
         yield

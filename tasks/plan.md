@@ -51,7 +51,7 @@ Task 4.1: deterministic image gate (dims, format, size, exists)
 
                 ▼ Slice 4 prereq
 
-Task 5.1: docs/CONTRIBUTING.md update — handoff workflow
+Task 5.1: CONTRIBUTING.md update — handoff workflow
 Task 5.2: full end-to-end smoke against last-merged main
 ```
 
@@ -141,10 +141,10 @@ Task 5.2: full end-to-end smoke against last-merged main
 
 ### Phase 5: Docs + smoke (slice 5)
 
-- **Task 5.1**: `docs/CONTRIBUTING.md` — handoff workflow section (3-paragraph + example commands)
+- **Task 5.1**: `CONTRIBUTING.md` — handoff workflow section (3-paragraph + example commands)
   - Acceptance: section "Generating a featured image" with the exact paste-prompt-into-ChatGPT workflow, drop path, and resume command
   - Verify: manual review
-  - Files: `docs/CONTRIBUTING.md`
+  - Files: `CONTRIBUTING.md`
   - Estimated scope: **XS**
 
 - **Task 5.2**: End-to-end smoke against last-merged main

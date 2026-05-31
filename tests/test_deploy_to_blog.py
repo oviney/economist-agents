@@ -355,7 +355,7 @@ class TestDeployCallable:
                 article_path=article_file,
                 blog_owner="test-owner",
                 blog_repo="test-blog",
-                token="fake-token",
+                token="t",
             )
 
         assert result.status == "published"
@@ -363,7 +363,7 @@ class TestDeployCallable:
         assert result.article_name.endswith("-callable-deploy.md")
         # Token must appear in the clone URL (used to push as well).
         assert any(
-            "git clone https://x-access-token:fake-token@github.com/test-owner/test-blog.git"
+            "git clone https://x-access-token:t@github.com/test-owner/test-blog.git"
             in c
             for c in commands
         ), "clone command missing or token not interpolated"
@@ -402,7 +402,7 @@ class TestDeployCallable:
                 article_path=article_file,
                 blog_owner="test-owner",
                 blog_repo="test-blog",
-                token="bad-token",
+                token="t",
             )
 
     def test_already_up_to_date_returns_status(
@@ -434,7 +434,7 @@ class TestDeployCallable:
                 article_path=article_file,
                 blog_owner="test-owner",
                 blog_repo="test-blog",
-                token="fake-token",
+                token="t",
             )
 
         assert result.status == "up_to_date"
@@ -466,7 +466,7 @@ class TestDeployCallable:
                 article_path=article_file,
                 blog_owner="test-owner",
                 blog_repo="test-blog",
-                token="fake-token",
+                token="t",
             )
 
         assert result.status == "validation_failed"
@@ -509,7 +509,7 @@ class TestDeployCallable:
                 article_path=article_file,
                 blog_owner="test-owner",
                 blog_repo="test-blog",
-                token="fake-token",
+                token="t",
                 dry_run=True,
             )
 
@@ -517,3 +517,46 @@ class TestDeployCallable:
         assert result.pushed is False
         assert not any(c.startswith("git push") for c in commands)
         assert not any("gh pr create" in c for c in commands)
+
+    def test_missing_referenced_chart_blocks_deploy(
+        self, article_file: Path, tmp_path: Path
+    ) -> None:
+        """A chart embed without a source PNG must never reach the blog."""
+        article_file.write_text(
+            article_file.read_text()
+            + f"\n![Chart](/assets/charts/{article_file.stem}.png)\n"
+        )
+
+        def fake_run_command(cmd: str, cwd=None) -> str:
+            if cmd.startswith("git clone"):
+                self._prepare_blog_clone(cwd)
+            return ""
+
+        with (
+            patch.object(dtb, "run_command", side_effect=fake_run_command),
+            patch(
+                "scripts.deploy_to_blog.validate_file",
+                return_value=(True, "All checks passed"),
+            ),
+            pytest.raises(dtb.DeployError, match="Chart asset not found"),
+        ):
+            dtb.deploy(
+                article_path=article_file,
+                blog_owner="test-owner",
+                blog_repo="test-blog",
+                token="t",
+                dry_run=True,
+            )
+
+
+def test_find_latest_article_falls_back_to_output_posts(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The handshake stores canonical articles under output/posts/."""
+    monkeypatch.chdir(tmp_path)
+    posts = tmp_path / "output" / "posts"
+    posts.mkdir(parents=True)
+    article = posts / "newest.md"
+    article.write_text(_make_article())
+
+    assert dtb.find_latest_article() == Path("output/posts/newest.md")

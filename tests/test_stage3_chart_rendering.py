@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from src.agent_sdk.chart_renderer import ChartRenderError
 from src.agent_sdk.stage3_runner import _slug_for_chart, run_stage3
 
 # ── slug derivation ──────────────────────────────────────────────────
@@ -96,12 +97,11 @@ def test_run_stage3_renders_chart_png_to_output_charts_dir(
     assert result.chart_path.stat().st_size > 0
 
 
-def test_run_stage3_continues_without_chart_path_when_render_fails(
+def test_run_stage3_fails_when_chart_render_fails(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """A malformed chart spec must NOT crash the pipeline — render
-    failure logs a warning and Stage3Result.chart_path stays None."""
+    """A malformed chart spec must block a non-shippable article."""
 
     monkeypatch.chdir(tmp_path)
 
@@ -126,6 +126,5 @@ def test_run_stage3_continues_without_chart_path_when_render_fails(
         lambda topic: "",
     )
 
-    result = asyncio.run(run_stage3("test"))
-    assert result.chart_path is None
-    assert result.article  # article itself still produced
+    with pytest.raises(ChartRenderError, match="non-empty list"):
+        asyncio.run(run_stage3("test"))

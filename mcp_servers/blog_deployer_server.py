@@ -15,6 +15,7 @@ Usage:
 
 import logging
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -77,7 +78,7 @@ def list_deployable_articles(output_dir: str = "output") -> list[str]:
         return []
 
     articles = sorted(
-        output_path.glob("*.md"),
+        [*output_path.glob("posts/*.md"), *output_path.glob("*.md")],
         key=lambda p: p.stat().st_mtime,
         reverse=True,
     )
@@ -159,11 +160,25 @@ def deploy_article(
         content = content.replace("output/charts/", "/assets/charts/")
         (posts_dir / article.name).write_text(content)
 
-        # Copy associated charts
-        charts_dir = article.parent / "charts"
-        chart_file = charts_dir / f"{slug}.png"
-        if chart_file.exists():
-            shutil.copy2(chart_file, assets_charts / f"{slug}.png")
+        # Canonical handshake articles live under output/posts/, while
+        # legacy articles live directly under output/.
+        output_dir = (
+            article.parent.parent if article.parent.name == "posts" else article.parent
+        )
+
+        # Copy associated charts. A referenced chart without a source PNG
+        # would publish a broken <img>, so block the deploy explicitly.
+        charts_dir = output_dir / "charts"
+        chart_refs = sorted(set(re.findall(r"/assets/charts/([^)\s]+\.png)", content)))
+        chart_files = [charts_dir / Path(ref).name for ref in chart_refs]
+        if not chart_files:
+            fallback_chart = charts_dir / f"{slug}.png"
+            if fallback_chart.exists():
+                chart_files.append(fallback_chart)
+        for chart_file in chart_files:
+            if not chart_file.exists():
+                raise FileNotFoundError(f"Chart asset not found: {chart_file}")
+            shutil.copy2(chart_file, assets_charts / chart_file.name)
 
         # Copy associated images
         images_dir = article.parent / "images"

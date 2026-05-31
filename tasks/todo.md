@@ -5,7 +5,8 @@
 
 ## In Progress
 
-- **Open PR for #403** — branch ready, smoke deferred to human verification
+- [ ] **Task 5.2**: end-to-end smoke (deferred to human verification; requires a live pipeline run + image generation in ChatGPT)
+- [ ] **Checkpoint E**: human approves PR #404 for merge
 
 ## Slice 1 — chart actually renders ✅ (commit aaf56f3)
 
@@ -36,37 +37,14 @@
 
 - [x] **Task 5.1**: `CONTRIBUTING.md` — "Generating an article — the image handshake (#403)" section with exit codes table + workflow steps
 - [ ] **Task 5.2**: end-to-end smoke (deferred to human verification post-merge; requires ~$0.30 pipeline run + image generation in ChatGPT)
-- [ ] **Checkpoint E**: PR opened (next), #402 closed in same PR, human approves merge
-
-## Slice 2 — validator accepts chart-only articles
-
-- [ ] **Task 2.1**: `publication_validator.py` — `image:` becomes optional, file-must-exist when present
-- [ ] **Task 2.2**: BUG-017 false-positive fix (path comparison; closes #402)
-- [ ] **Checkpoint B**: pytest green; manual re-validate yesterday's article
-
-## Slice 3 — image prompt handshake
-
-- [ ] **Task 3.1**: `src/agent_sdk/image_prompt_synth.py` + tests
-- [ ] **Task 3.2**: slug-keyed output dirs (`output/posts/<slug>.md`, `output/charts/<slug>.png`, `output/state/<slug>.json`)
-- [ ] **Task 3.3**: `pipeline.py` `--resume <slug>` + `--no-image` + exit code 10
-- [ ] **Task 3.4**: `stage3_runner` writes `output/posts/<slug>.image_prompt.md` + verbose handoff message
-- [ ] **Checkpoint C**: pytest green; manual run-pipeline → exit 10 → resume --no-image → article finalised
-
-## Slice 4 — deterministic image gate
-
-- [ ] **Task 4.1**: dims/format/size/exists check in `--resume`; exit 11 on fail
-- [ ] **Checkpoint D**: pytest green; manual wrong-dims rejection + correct-image acceptance
-
-## Slice 5 — docs + smoke
-
-- [ ] **Task 5.1**: `docs/CONTRIBUTING.md` — "Generating a featured image" section
-- [ ] **Task 5.2**: end-to-end smoke via deploy `--dry-run`
-- [ ] **Checkpoint E**: PR opened, #402 closed in same PR, human approves merge
+- [x] **Checkpoint E**: PR #404 opened; closes #402 in same PR
 
 ## Done
 
-_(none yet — implementation has not started)_
+- [x] Slices 1-5 implementation complete in PR #404
+- [x] Automated regression coverage complete
 
 ## Blocked / Deferred
 
-_(none)_
+- [ ] Live end-to-end smoke: requires a paid Stage 3 run and human-generated hero image
+- [ ] `run_flow()` handshake migration: tracked separately in #410

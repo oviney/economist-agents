@@ -118,14 +118,15 @@ def validate_post(post_path: str) -> dict:
 
     * YAML front-matter delimiters are present (``---`` … ``---``).
     * Required fields are present: ``layout``, ``title``, ``date``,
-      ``author``, ``categories``, ``image``.
+      ``author``, ``categories``.
     * ``layout`` equals ``"post"``.
     * ``title`` is a non-empty string.
     * ``date`` matches ``YYYY-MM-DD`` format.
     * ``author`` is a non-empty string.
     * Every item in ``categories`` is one of :data:`VALID_CATEGORIES`.
-    * ``image`` refers to a path that exists on the filesystem (local paths
-      only; ``http://`` / ``https://`` URLs are accepted without checking).
+    * When present, ``image`` refers to a path that exists on the filesystem
+      (local paths only; ``http://`` / ``https://`` URLs are accepted without
+      checking). Chart-only articles may omit ``image`` (#403).
 
     Args:
         post_path: Absolute or relative path to the markdown post file.
@@ -191,7 +192,7 @@ def validate_post(post_path: str) -> dict:
     # ------------------------------------------------------------------
     # Required fields
     # ------------------------------------------------------------------
-    required_fields = ["layout", "title", "date", "author", "categories", "image"]
+    required_fields = ["layout", "title", "date", "author", "categories"]
     for field in required_fields:
         if field not in frontmatter:
             errors.append(f"Missing required field: {field}")
@@ -252,9 +253,7 @@ def validate_post(post_path: str) -> dict:
     # image — local paths must exist on the filesystem
     # ------------------------------------------------------------------
     image = frontmatter.get("image")
-    if image is None or (isinstance(image, str) and not image.strip()):
-        errors.append("image field must be a non-empty value")
-    else:
+    if image is not None and str(image).strip():
         image_str = str(image).strip()
         if not image_str.startswith(("http://", "https://")):
             image_path = Path(image_str)

@@ -47,7 +47,7 @@ from src.agent_sdk._shared import (
 from src.agent_sdk._shared import (
     audit_article_stats as _audit_article_stats,
 )
-from src.agent_sdk.chart_renderer import ChartRenderError, render_chart
+from src.agent_sdk.chart_renderer import render_chart
 from src.agent_sdk.image_prompt_synth import PromptSynthError, compose_prompt
 
 logger = logging.getLogger(__name__)
@@ -427,16 +427,11 @@ async def run_stage3(
     )
     chart_data = _parse_chart_json(graphics_text)
 
-    # #403 slice 1: render the chart spec to a real PNG. A render failure
-    # is not fatal — articles can still ship chart-only or text-only;
-    # the deploy + validator slices handle missing PNGs gracefully.
+    # #403 slice 1: render the chart spec to a real PNG. Render failures
+    # are fatal because a missing chart would leave a broken body embed.
     slug = _slug_for_chart(article, topic)
-    chart_path: Path | None = None
-    try:
-        chart_path = render_chart(chart_data, Path("output/charts") / f"{slug}.png")
-        logger.info("Rendered chart: %s", chart_path)
-    except ChartRenderError as exc:
-        logger.warning("Chart render skipped (%s); proceeding without PNG", exc)
+    chart_path = render_chart(chart_data, Path("output/charts") / f"{slug}.png")
+    logger.info("Rendered chart: %s", chart_path)
 
     # #403 slice 3: synthesise the ChatGPT-handoff prompt and persist it
     # as a sibling artefact. The prompt is built from the article's own

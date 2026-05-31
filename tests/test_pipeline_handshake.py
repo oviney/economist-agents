@@ -202,6 +202,7 @@ class TestPipelineMain:
         assert "image:" not in polished_input.split("---")[1]
         assert "image_alt:" not in polished_input.split("---")[1]
         assert "image_caption:" not in polished_input.split("---")[1]
+        assert "![Chart](/assets/charts/test-slug.png)" in polished_input
 
     def test_resume_with_unknown_slug_exits_1_with_clear_message(
         self,

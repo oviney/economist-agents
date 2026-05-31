@@ -83,6 +83,19 @@ class TestListDeployableArticles:
         assert len(result) == 1
         assert "real-article" in result[0]
 
+    def test_returns_articles_from_canonical_output_posts_dir(
+        self, tmp_path: Path
+    ) -> None:
+        from mcp_servers.blog_deployer_server import list_deployable_articles
+
+        posts_dir = tmp_path / "output" / "posts"
+        posts_dir.mkdir(parents=True)
+        (posts_dir / "canonical-article.md").write_text("---\n---\n")
+
+        result = list_deployable_articles(str(tmp_path / "output"))
+
+        assert result == [str(posts_dir / "canonical-article.md")]
+
 
 class TestDeployArticle:
     """Tests for deploy_article tool."""
@@ -180,6 +193,9 @@ class TestDeployArticle:
         # Article with output/charts/ path that needs rewriting
         output_dir = tmp_path / "output"
         output_dir.mkdir()
+        charts_dir = output_dir / "charts"
+        charts_dir.mkdir()
+        (charts_dir / "my-chart.png").write_bytes(b"png")
         article = output_dir / "2026-04-05-chart-article.md"
         article.write_text(
             "---\nlayout: post\ntitle: Charts\ndate: 2026-04-05\n---\n\n"
@@ -188,6 +204,62 @@ class TestDeployArticle:
 
         result = deploy_article(str(article), "oviney/blog")
         assert result["success"] is True
+
+    @patch("mcp_servers.blog_deployer_server._run_command")
+    def test_missing_referenced_chart_blocks_canonical_deploy(
+        self,
+        mock_run: MagicMock,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        from mcp_servers.blog_deployer_server import deploy_article
+
+        monkeypatch.setenv("GITHUB_TOKEN", "ghp_test123")
+        mock_run.return_value = "https://github.com/oviney/blog/pull/1"
+
+        posts_dir = tmp_path / "output" / "posts"
+        posts_dir.mkdir(parents=True)
+        article = posts_dir / "chart-article.md"
+        article.write_text(
+            "---\nlayout: post\ntitle: Charts\ndate: 2026-04-05\n---\n\n"
+            "![Chart](/assets/charts/chart-article.png)\n",
+        )
+
+        result = deploy_article(str(article), "oviney/blog")
+
+        assert result["success"] is False
+        assert "Chart asset not found" in result["error"]
+
+    @patch("mcp_servers.blog_deployer_server.shutil.copy2")
+    @patch("mcp_servers.blog_deployer_server._run_command")
+    def test_copies_referenced_chart_from_canonical_output_layout(
+        self,
+        mock_run: MagicMock,
+        mock_copy: MagicMock,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        from mcp_servers.blog_deployer_server import deploy_article
+
+        monkeypatch.setenv("GITHUB_TOKEN", "ghp_test123")
+        mock_run.return_value = "https://github.com/oviney/blog/pull/1"
+
+        posts_dir = tmp_path / "output" / "posts"
+        posts_dir.mkdir(parents=True)
+        charts_dir = tmp_path / "output" / "charts"
+        charts_dir.mkdir()
+        chart = charts_dir / "chart-article.png"
+        chart.write_bytes(b"png")
+        article = posts_dir / "chart-article.md"
+        article.write_text(
+            "---\nlayout: post\ntitle: Charts\ndate: 2026-04-05\n---\n\n"
+            "![Chart](/assets/charts/chart-article.png)\n",
+        )
+
+        result = deploy_article(str(article), "oviney/blog")
+
+        assert result["success"] is True
+        assert any(call.args[0] == chart for call in mock_copy.call_args_list)
 
 
 class TestMcpServerRegistration:

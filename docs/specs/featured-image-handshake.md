@@ -1,6 +1,6 @@
 # SPEC: Path A — chart-rendered hero, human-in-the-loop featured image
 
-**Status**: DRAFT (awaiting human approval)
+**Status**: IMPLEMENTED in PR #404 (end-to-end human smoke pending)
 **GitHub issue**: oviney/economist-agents#403
 **Date**: 2026-05-19
 **Supersedes for default path**: `scripts/featured_image_agent.py` (DALL-E auto path remains opt-in for users with `OPENAI_API_KEY`)
@@ -72,7 +72,7 @@ logs/spike/
 docs/specs/
   featured-image-handshake.md     ← THIS FILE
 
-docs/CONTRIBUTING.md       ← +handoff workflow section
+CONTRIBUTING.md            ← +handoff workflow section
 
 tasks/
   plan.md                  ← per-feature plan

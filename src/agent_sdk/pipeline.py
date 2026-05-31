@@ -22,6 +22,7 @@ import orjson
 from src.agent_sdk._shared import (
     SearchProvidersEmptyError,
     SearchProvidersFailedError,
+    _auto_embed_chart,
 )
 from src.agent_sdk.image_gate import ImageGateError, check_hero_image
 from src.agent_sdk.stage3_runner import (
@@ -522,6 +523,10 @@ def _run_resume(slug: str, *, no_image: bool) -> None:
 
     article = article_path.read_text()
     if no_image:
+        # Stage 4 normally inserts the chart embed using the hero-image
+        # slug. Preserve that derivation before chart-only mode removes
+        # the hero metadata.
+        article = _auto_embed_chart(article)
         article = _strip_image_frontmatter(article)
         # Persist the stripped version so Stage 4 + deploy see the same shape
         article_path.write_text(article)

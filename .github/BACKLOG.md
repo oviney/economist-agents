@@ -1,6 +1,6 @@
 # Project Backlog
 
-Last updated: 2025-12-31
+Last updated: 2026-05-31
 
 This file tracks architectural improvements and technical debt identified through architecture reviews and development.
 
@@ -145,11 +145,12 @@ This file tracks architectural improvements and technical debt identified throug
 
 ---
 
-### 🟢 Chart Regression Tests
-**Status**: Ready
+### ✅ Chart Regression Tests
+**Status**: Complete
 **Priority**: P2 (Medium)
 **Effort**: Large
 **Created**: 2025-12-31
+**Completed**: 2026-05-31
 
 **Problem**: Known chart bugs (5 documented in code) have no automated prevention.
 
@@ -160,18 +161,26 @@ This file tracks architectural improvements and technical debt identified throug
 4. Label-to-label overlap
 5. Clipped elements at edges
 
-**Solution Approach**:
-- Create test chart generator with known bad configurations
-- Use visual QA agent to detect issues programmatically
-- Add to CI/CD pipeline
+**Solution**:
+- Added five minimal bad-chart fixture scripts and deterministic regression
+  tests discovered by the existing CI test suite.
+- Replaced regex-only Matplotlib layout inspection with AST-backed checks for
+  figure text, annotation offsets, low-label X-axis intrusion, likely label
+  collisions, and clipped figure text.
+- Corrected pixel validation to inspect the top 4% of raster images for the
+  Economist red bar.
 
-**Files to Create**:
+**Files Changed**:
 - `tests/test_chart_layouts.py`
 - `tests/fixtures/bad_charts/` (example bad configurations)
+- `src/quality/visual_qa_zones.py`
+- `tests/test_visual_qa_zones.py`
+- `docs/STORY_CHART_REGRESSION_TESTS_SPEC.md`
+- `docs/STORY_CHART_REGRESSION_TESTS_PLAN.md`
 
-**Blocked By**: Need test data fixtures
-
-**Estimate**: 4-6 hours
+**Testing**:
+- `MPLBACKEND=Agg .venv/bin/python -m pytest tests/test_chart_layouts.py tests/test_visual_qa_zones.py tests/test_generate_chart.py -q` - 61 passed
+- `.venv/bin/ruff check src/quality/visual_qa_zones.py tests/test_chart_layouts.py tests/test_visual_qa_zones.py tests/fixtures/bad_charts/scripts` - passed
 
 ---
 

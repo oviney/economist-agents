@@ -35,12 +35,11 @@ def _make_compliant_chart(path: Path, width: int = 100, height: int = 100) -> Pa
     img = Image.new("RGB", (width, height), BG_RGB)
     pixels = np.array(img)
 
-    # Pixel rows are top-down; the validator slices ``int(height * 0.96):``
-    # for the red bar zone — i.e. the bottom 4% of the array.
-    red_bar_start = int(height * 0.96)
-    pixels[red_bar_start:, :, :] = RED_BAR_RGB
+    # Pixel rows are top-down, so the red bar occupies the first 4%.
+    red_bar_end = max(1, int(height * 0.04))
+    pixels[:red_bar_end, :, :] = RED_BAR_RGB
 
-    # Title zone (rows 0.85..0.94) should already be the beige bg above.
+    # Raster rows 0.06..0.15 correspond to the figure-coordinate title zone.
     Image.fromarray(pixels).save(path)
     return path
 
@@ -52,6 +51,16 @@ def _make_blank_chart(path: Path, width: int = 100, height: int = 100) -> Path:
     background (#f1f0e9) to exceed the validator's 10/30 tolerance windows.
     """
     Image.new("RGB", (width, height), (0, 0, 0)).save(path)
+    return path
+
+
+def _make_bottom_bar_chart(path: Path, width: int = 100, height: int = 100) -> Path:
+    """Create a chart with the red bar incorrectly placed at the bottom."""
+    img = Image.new("RGB", (width, height), BG_RGB)
+    pixels = np.array(img)
+    red_bar_start = int(height * 0.96)
+    pixels[red_bar_start:, :, :] = RED_BAR_RGB
+    Image.fromarray(pixels).save(path)
     return path
 
 
@@ -174,6 +183,7 @@ class TestValidateMatplotlibCode:
         _, issues = validator.validate_chart(str(chart_path))
 
         assert any("Subtitle y=0.2 outside TITLE ZONE" in i for i in issues)
+        assert not any("Title y=0.2 outside TITLE ZONE" in i for i in issues)
 
     def test_source_outside_zone_is_flagged(self, tmp_path: Path) -> None:
         validator = ZoneBoundaryValidator()
@@ -241,6 +251,15 @@ class TestValidatePixels:
         joined = "\n".join(issues)
         assert "Red bar not detected" in joined
         assert "Background color #f1f0e9 not dominant" in joined
+
+    def test_bottom_red_bar_is_rejected(self, tmp_path: Path) -> None:
+        validator = ZoneBoundaryValidator()
+        chart = _make_bottom_bar_chart(tmp_path / "pixel-bottom-bar.png")
+
+        is_valid, issues = validator.validate_chart(str(chart))
+
+        assert is_valid is False
+        assert any("Red bar not detected" in issue for issue in issues)
 
     def test_pixel_validation_swallows_unexpected_errors(
         self,

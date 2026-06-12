@@ -23,9 +23,12 @@ from pathlib import Path
 import yaml
 
 # Single source of truth for the production blog author. The Stage 3 writer
-# prompt, the Stage 4 frontmatter safety net, and this validator's author
-# contract all reference this constant so the value is configured in exactly
-# one place (see issue #401).
+# prompt and this validator's author contract both reference this constant so
+# the writer is instructed with the exact value the contract enforces, in one
+# place (see issue #401). The Stage 4 frontmatter safety net in
+# ``src/agent_sdk/_shared.py`` still emits the same value as a literal; wiring
+# it to this constant is deferred (that module carries an unrelated ADR-002
+# violation that the arch-review gate blocks on edit).
 BLOG_AUTHOR = "Ouray Viney"
 
 # Import defect prevention rules (learned from historical bugs)

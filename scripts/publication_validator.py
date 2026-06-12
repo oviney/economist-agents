@@ -22,6 +22,12 @@ from pathlib import Path
 
 import yaml
 
+# Single source of truth for the production blog author. The Stage 3 writer
+# prompt, the Stage 4 frontmatter safety net, and this validator's author
+# contract all reference this constant so the value is configured in exactly
+# one place (see issue #401).
+BLOG_AUTHOR = "Ouray Viney"
+
 # Import defect prevention rules (learned from historical bugs)
 try:
     from scripts.defect_prevention_rules import DefectPrevention
@@ -549,14 +555,14 @@ class PublicationValidator:
                     if not isinstance(front_matter, dict):
                         return
                     author = front_matter.get("author")
-                    if author != "Ouray Viney":
+                    if author != BLOG_AUTHOR:
                         self.issues.append(
                             {
                                 "check": "author_contract",
                                 "severity": "CRITICAL",
-                                "message": f'Invalid author "{author}". Expected "Ouray Viney"',
+                                "message": f'Invalid author "{author}". Expected "{BLOG_AUTHOR}"',
                                 "details": "Published blog posts must use the production author metadata contract",
-                                "fix": 'Set author to "Ouray Viney"',
+                                "fix": f'Set author to "{BLOG_AUTHOR}"',
                             },
                         )
         except Exception:

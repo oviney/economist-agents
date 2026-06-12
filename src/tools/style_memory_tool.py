@@ -20,8 +20,11 @@ Usage:
         print(result["text"], result["score"])
 """
 
+import logging
 from pathlib import Path
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 try:
     import chromadb
@@ -30,7 +33,9 @@ try:
     CHROMADB_AVAILABLE = True
 except ImportError:
     CHROMADB_AVAILABLE = False
-    print("⚠️  ChromaDB not installed. Style Memory Tool in fallback mode.")
+    # Must not print to stdout: this module is imported by a stdio MCP server,
+    # where stdout carries the JSON-RPC stream. Log to stderr via logging.
+    logger.warning("ChromaDB not installed. Style Memory Tool in fallback mode.")
 
 
 class StyleMemoryTool:

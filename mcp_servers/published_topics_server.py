@@ -21,11 +21,20 @@ Usage:
 """
 
 import logging
+import sys
+from pathlib import Path
 from typing import Any
 
-from mcp.server.fastmcp import FastMCP
+# Ensure the repo root is on sys.path so the scripts package is importable
+# when this server is launched directly (python mcp_servers/<name>.py), where
+# sys.path[0] is the mcp_servers/ directory rather than the project root.
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
 
-from scripts.article_archive import ArticleArchive
+from mcp.server.fastmcp import FastMCP  # noqa: E402
+
+from scripts.article_archive import ArticleArchive  # noqa: E402
 
 logger = logging.getLogger(__name__)
 

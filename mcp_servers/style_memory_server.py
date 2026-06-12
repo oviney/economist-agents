@@ -14,7 +14,16 @@ Transport: stdio (FastMCP)
 from __future__ import annotations
 
 import logging
+import sys
+from pathlib import Path
 from typing import Any
+
+# Ensure the repo root is on sys.path so the src package is importable when this
+# server is launched directly (python mcp_servers/<name>.py), where sys.path[0]
+# is the mcp_servers/ directory rather than the project root.
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
 
 try:
     import chromadb
@@ -29,9 +38,9 @@ try:
 except ImportError:
     _UPSERT_ERRORS = (ValueError, RuntimeError, OSError)
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP  # noqa: E402
 
-from src.tools.style_memory_tool import StyleMemoryTool
+from src.tools.style_memory_tool import StyleMemoryTool  # noqa: E402
 
 logger = logging.getLogger(__name__)
 

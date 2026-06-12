@@ -212,6 +212,49 @@ class TestValidateMatplotlibCode:
 
         assert any("Inline label missing xytext offset" in i for i in issues)
 
+    def test_positional_xy_anchor_triggers_xaxis_intrusion(
+        self, tmp_path: Path
+    ) -> None:
+        """Matplotlib accepts the anchor positionally: annotate(text, xy, ...).
+
+        Regression for #413: the parser previously read only the ``xy`` keyword,
+        so a positional anchor recorded ``xy=None`` and silently skipped the
+        X-axis intrusion check. The positional form must behave like the keyword
+        form below.
+        """
+        validator = ZoneBoundaryValidator()
+        code = 'ax.annotate("label", (5, 10), xytext=(0, -5))\n'
+        chart_path = _setup_script_alongside_chart(tmp_path, code)
+
+        _, issues = validator.validate_chart(str(chart_path))
+
+        assert any("may intrude into X-axis zone" in i for i in issues)
+
+    def test_keyword_xy_anchor_triggers_xaxis_intrusion(self, tmp_path: Path) -> None:
+        """Parity baseline: keyword ``xy`` must fire the same check as positional."""
+        validator = ZoneBoundaryValidator()
+        code = 'ax.annotate("label", xy=(5, 10), xytext=(0, -5))\n'
+        chart_path = _setup_script_alongside_chart(tmp_path, code)
+
+        _, issues = validator.validate_chart(str(chart_path))
+
+        assert any("may intrude into X-axis zone" in i for i in issues)
+
+    def test_positional_xy_anchor_triggers_label_collision(
+        self, tmp_path: Path
+    ) -> None:
+        """Positional anchors must also feed label-collision detection (#413)."""
+        validator = ZoneBoundaryValidator()
+        code = (
+            'ax.annotate("a", (5, 50), xytext=(0, 5))\n'
+            'ax.annotate("b", (5, 50), xytext=(0, 5))\n'
+        )
+        chart_path = _setup_script_alongside_chart(tmp_path, code)
+
+        _, issues = validator.validate_chart(str(chart_path))
+
+        assert any("collide" in i.lower() or "overlap" in i.lower() for i in issues)
+
     def test_no_script_means_no_code_issues(self, tmp_path: Path) -> None:
         """When no sibling script exists the code-validation step is skipped."""
         validator = ZoneBoundaryValidator()

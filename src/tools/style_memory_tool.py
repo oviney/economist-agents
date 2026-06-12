@@ -69,7 +69,7 @@ class StyleMemoryTool:
         self.indexed_count = 0
 
         if not CHROMADB_AVAILABLE:
-            print("⚠️  ChromaDB unavailable - Style Memory Tool disabled")
+            logger.warning("ChromaDB unavailable - Style Memory Tool disabled")
             return
 
         try:
@@ -95,10 +95,12 @@ class StyleMemoryTool:
                 self._index_archive()
             else:
                 self.indexed_count = self.collection.count()
-                print(f"✅ Style Memory loaded: {self.indexed_count} patterns indexed")
+                logger.info(
+                    "Style Memory loaded: %d patterns indexed", self.indexed_count
+                )
 
         except Exception as e:
-            print(f"⚠️  Style Memory Tool initialization failed: {e}")
+            logger.warning("Style Memory Tool initialization failed: %s", e)
             self.client = None
             self.collection = None
 
@@ -108,16 +110,16 @@ class StyleMemoryTool:
         Graceful degradation: If archive is empty, continues without error.
         """
         if not self.archive_path.exists():
-            print(f"ℹ️  Archive directory not found: {self.archive_path}")
+            logger.info("Archive directory not found: %s", self.archive_path)
             return
 
         # Find all markdown files
         md_files = list(self.archive_path.glob("**/*.md"))
         if not md_files:
-            print(f"ℹ️  No Gold Standard articles found in {self.archive_path}")
+            logger.info("No Gold Standard articles found in %s", self.archive_path)
             return
 
-        print(f"📚 Indexing {len(md_files)} Gold Standard articles...")
+        logger.info("Indexing %d Gold Standard articles...", len(md_files))
 
         documents = []
         metadatas = []
@@ -149,20 +151,22 @@ class StyleMemoryTool:
                     ids.append(doc_id)
 
             except Exception as e:
-                print(f"⚠️  Failed to index {md_file.name}: {e}")
+                logger.warning("Failed to index %s: %s", md_file.name, e)
                 continue
 
         if documents:
             try:
                 self.collection.add(documents=documents, metadatas=metadatas, ids=ids)
                 self.indexed_count = len(documents)
-                print(
-                    f"✅ Indexed {self.indexed_count} style patterns from {len(md_files)} articles",
+                logger.info(
+                    "Indexed %d style patterns from %d articles",
+                    self.indexed_count,
+                    len(md_files),
                 )
             except Exception as e:
-                print(f"❌ Failed to add documents to ChromaDB: {e}")
+                logger.error("Failed to add documents to ChromaDB: %s", e)
         else:
-            print("ℹ️  No valid content found to index")
+            logger.info("No valid content found to index")
 
     def query(
         self,
@@ -237,7 +241,7 @@ class StyleMemoryTool:
             return formatted_results
 
         except Exception as e:
-            print(f"⚠️  Style Memory query failed: {e}")
+            logger.warning("Style Memory query failed: %s", e)
             return []
 
     def get_style_context(

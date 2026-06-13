@@ -983,6 +983,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#image-policy-cli-handshake-vs-python-api-410" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Image policy: CLI handshake vs. Python API (#410)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3646,6 +3657,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#image-policy-cli-handshake-vs-python-api-410" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Image policy: CLI handshake vs. Python API (#410)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3892,6 +3914,23 @@
 <li><strong>STORY-005 Implementation</strong>: <a href="../SPRINT.md">Sprint 14 Story 005</a></li>
 <li><strong>Flow Source Code</strong>: <a href="../src/economist_agents/flow.py">src/economist_agents/flow.py</a></li>
 <li><strong>Integration Tests</strong>: <a href="../tests/test_economist_flow.py">tests/test_economist_flow.py</a></li>
+</ul>
+<hr />
+<h2 id="image-policy-cli-handshake-vs-python-api-410">Image policy: CLI handshake vs. Python API (#410)<a class="headerlink" href="#image-policy-cli-handshake-vs-python-api-410" title="Permanent link">&para;</a></h2>
+<p>The featured-image step differs by entry point:</p>
+<ul>
+<li><strong>CLI</strong> (<code>python -m src.agent_sdk.pipeline</code>) implements the #403 human
+  handshake: after Stage 3 it persists slug-keyed state, writes a prompt
+  artefact, and exits with <strong>code 10</strong> to pause for a human-dropped hero image;
+  <code>--resume &lt;slug&gt;</code> validates the dropped PNG and continues to Stage 4.</li>
+<li><strong>Python API</strong> (<code>EconomistContentFlow</code>) does <strong>not</strong> pause. The policy is
+  chosen at construction via <code>image_mode</code>:</li>
+<li><code>"chart_only"</code> (default) — ships on the chart alone. No paid image API is
+    called, and <code>run_pipeline(..., image_mode="chart_only")</code> strips the hero
+    frontmatter before Stage 4 so a not-yet-generated hero never routes a valid
+    draft to revision.</li>
+<li><code>"hero"</code> — explicit opt-in to a DALL-E hero image after Stage 3 (requires
+    <code>OPENAI_API_KEY</code>).</li>
 </ul>
 <hr />
 <p><strong>Status</strong>: ✅ Production-Ready (Sprint 14 Story 005 Complete)<br />

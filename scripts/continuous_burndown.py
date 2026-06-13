@@ -48,22 +48,13 @@ except ModuleNotFoundError:  # pragma: no cover - fallback for minimal envs
 
     orjson = _OrjsonCompat()
 
-try:
-    from scripts.github_issue_claim import GitHubIssueClaimer
-    from scripts.sprint_validator import SprintValidator
-    from src.backlog.backlog_groomer import BacklogGroomer
-    from src.backlog.ci_health_monitor import CIHealthMonitor
-    from src.backlog.migrate_backlog_to_github import BacklogParser
-    from src.backlog.validate_documentation_accuracy import DocumentationValidator
-except ModuleNotFoundError:  # pragma: no cover - direct script execution fallback
-    from backlog_groomer import BacklogGroomer
-    from ci_health_monitor import CIHealthMonitor
-    from migrate_backlog_to_github import BacklogParser
-    from validate_documentation_accuracy import DocumentationValidator
-
-    from scripts.github_issue_claim import GitHubIssueClaimer
-    from scripts.sprint_validator import SprintValidator
 from schemas.validate_schemas import validate_json_file
+from scripts.github_issue_claim import GitHubIssueClaimer
+from scripts.sprint_validator import SprintValidator
+from src.backlog.backlog_groomer import BacklogGroomer
+from src.backlog.ci_health_monitor import CIHealthMonitor
+from src.backlog.migrate_backlog_to_github import BacklogParser
+from src.backlog.validate_documentation_accuracy import DocumentationValidator
 
 DEFAULT_REPORT = "logs/continuous_burndown_report.json"
 

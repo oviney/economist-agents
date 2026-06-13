@@ -119,6 +119,7 @@ def _seed_state(tmp_path: Path) -> None:
         total_cost_usd=0.1,
         writer_cost_usd=0.08,
         graphics_cost_usd=0.02,
+        research_cost_usd=0.0,
         writer_model="claude-sonnet-4-6",
         graphics_model="claude-sonnet-4-6",
         wall_seconds=1.0,

@@ -202,7 +202,7 @@ class TestGenerateContent:
             _passing_pipeline_result(),
             {"image_alt": "alt text", "image_caption": "caption text"},
         ]
-        flow = EconomistContentFlow()
+        flow = EconomistContentFlow(image_mode="hero")
 
         result = flow.generate_content({"topic": "AI Coding Assistants"})
 
@@ -223,7 +223,7 @@ class TestGenerateContent:
             _passing_pipeline_result(),
             {"image_alt": "editorial alt", "image_caption": "editorial caption"},
         ]
-        flow = EconomistContentFlow()
+        flow = EconomistContentFlow(image_mode="hero")
 
         flow.generate_content({"topic": "AI Testing"})
 
@@ -966,9 +966,10 @@ class TestKickoffResultFile:
         failing = _passing_pipeline_result()
         failing.editorial_score = 40
         failing.publication_validator_passed = False
+        # chart_only (default) makes no refine_image_metadata call, so the only
+        # asyncio.run calls are the two run_pipeline invocations.
         mock_asyncio_run.side_effect = [
             failing,  # run_pipeline (generate)
-            {"image_alt": "alt", "image_caption": "cap"},  # refine_image_metadata
             failing,  # run_pipeline (revision)
         ]
         flow = EconomistContentFlow()

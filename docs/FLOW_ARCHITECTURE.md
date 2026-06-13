@@ -264,6 +264,25 @@ class EconomistContentFlow(Flow):
 
 ---
 
+## Image policy: CLI handshake vs. Python API (#410)
+
+The featured-image step differs by entry point:
+
+- **CLI** (`python -m src.agent_sdk.pipeline`) implements the #403 human
+  handshake: after Stage 3 it persists slug-keyed state, writes a prompt
+  artefact, and exits with **code 10** to pause for a human-dropped hero image;
+  `--resume <slug>` validates the dropped PNG and continues to Stage 4.
+- **Python API** (`EconomistContentFlow`) does **not** pause. The policy is
+  chosen at construction via `image_mode`:
+  - `"chart_only"` (default) — ships on the chart alone. No paid image API is
+    called, and `run_pipeline(..., image_mode="chart_only")` strips the hero
+    frontmatter before Stage 4 so a not-yet-generated hero never routes a valid
+    draft to revision.
+  - `"hero"` — explicit opt-in to a DALL-E hero image after Stage 3 (requires
+    `OPENAI_API_KEY`).
+
+---
+
 **Status**: ✅ Production-Ready (Sprint 14 Story 005 Complete)  
 **Test Coverage**: 100% (9/9 integration tests passing)  
 **Documentation**: Complete (architecture, usage, migration guide)

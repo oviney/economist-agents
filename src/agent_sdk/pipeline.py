@@ -100,8 +100,17 @@ async def run_pipeline(
     graphics_budget_usd: float | None = 0.10,
     writer_model: str = DEFAULT_WRITER_MODEL,
     graphics_model: str = DEFAULT_GRAPHICS_MODEL,
+    image_mode: str = "hero",
 ) -> PipelineResult:
-    """Generate one article through the Agent SDK pipeline."""
+    """Generate one article through the Agent SDK pipeline.
+
+    ``image_mode`` controls how Stage 4 treats the hero image (#410):
+    - ``"hero"`` (default): validate the writer's article as-is, including its
+      ``image:`` reference (the caller is responsible for the image existing).
+    - ``"chart_only"``: strip the hero ``image*`` frontmatter before Stage 4 so
+      the draft validates on its chart alone and is not rejected for a hero
+      image that has not been generated. No paid image API is involved.
+    """
     stage3 = await run_stage3(
         topic,
         writer_budget_usd=writer_budget_usd,
@@ -109,7 +118,10 @@ async def run_pipeline(
         writer_model=writer_model,
         graphics_model=graphics_model,
     )
-    stage4 = run_stage4(stage3.article, stage3.chart_data)
+    article_for_stage4 = stage3.article
+    if image_mode == "chart_only":
+        article_for_stage4 = _strip_image_frontmatter(stage3.article)
+    stage4 = run_stage4(article_for_stage4, stage3.chart_data)
 
     result = PipelineResult(
         topic=topic,

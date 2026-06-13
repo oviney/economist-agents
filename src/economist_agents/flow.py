@@ -11,10 +11,22 @@ to test, and one fewer framework dependency.
 Stages:
     1. discover_topics — topic scout + dedup gate
     2. editorial_review — 6-persona weighted board vote
-    3. generate_content — Agent SDK Stage 3 (Writer + Graphics) + DALL-E
+    3. generate_content — Agent SDK Stage 3 (Writer + Graphics); hero image
+       only when ``image_mode="hero"`` (see Image policy below)
     4. quality_gate — frontmatter schema + Agent SDK Stage 4 + validator
     5a. publish — index + persist
     5b. revise — one retry with feedback, then quarantine
+
+Image policy (#410):
+    The CLI (``python -m src.agent_sdk.pipeline``) implements the #403
+    human handshake — it pauses after Stage 3 (exit code 10) for a
+    human-dropped hero image and resumes via ``--resume``. This Python
+    API does NOT pause; instead ``EconomistContentFlow(image_mode=...)``
+    chooses the policy up front:
+    - ``"chart_only"`` (default): ship on the chart alone; no paid image
+      API; Stage 4 validates without a hero so a missing hero never
+      forces a revision.
+    - ``"hero"``: explicit opt-in to generate a DALL-E hero after Stage 3.
 
 Usage:
     from src.economist_agents.flow import EconomistContentFlow
@@ -66,7 +78,23 @@ PIPELINE_RESULT_PATH = Path(
 class EconomistContentFlow:
     """Sequential orchestrator for the end-to-end content pipeline."""
 
-    def __init__(self) -> None:
+    def __init__(self, image_mode: str = "chart_only") -> None:
+        """Construct the flow.
+
+        ``image_mode`` is the Python-API image policy (#410). Unlike the CLI
+        handshake (``python -m src.agent_sdk.pipeline``, which pauses for a
+        human-dropped hero image), the flow does not pause:
+        - ``"chart_only"`` (default): ship the article on its chart alone. No
+          paid image API is called, and Stage 4 is told to validate without a
+          hero image so a missing hero never routes a valid draft to revision.
+        - ``"hero"``: explicit opt-in to generate a DALL-E hero image after
+          Stage 3 (requires ``OPENAI_API_KEY``).
+        """
+        if image_mode not in {"chart_only", "hero"}:
+            raise ValueError(
+                f"image_mode must be 'chart_only' or 'hero', got {image_mode!r}"
+            )
+        self.image_mode = image_mode
         self._deduplicator = TopicDeduplicator()
         self.state: dict[str, Any] = {}
 
@@ -243,7 +271,7 @@ class EconomistContentFlow:
         logger.info("   Topic: %s", topic)
 
         try:
-            result = asyncio.run(run_pipeline(topic))
+            result = asyncio.run(run_pipeline(topic, image_mode=self.image_mode))
         except MalformedArticleError as exc:
             logger.warning(
                 "Writer returned malformed output — routing to revision: %s", exc
@@ -295,6 +323,27 @@ class EconomistContentFlow:
             result.gates_passed,
         )
 
+        if self.image_mode != "hero":
+            # chart_only (default): ship on the chart alone. No paid image API,
+            # no vision refine. run_pipeline already stripped the hero
+            # frontmatter before Stage 4, so the validator result reflects a
+            # chart-only draft and a missing hero never forces a revision.
+            logger.info("   🖼️  image_mode=chart_only — skipping hero image generation")
+            return {
+                "article": article,
+                "chart_data": result.chart_data,
+                "featured_image": "/assets/images/blog-default.svg",
+                "featured_image_local": "",
+                "image_alt": "",
+                "image_caption": "",
+                "stage4_already_run": True,
+                "publication_validator_passed": result.publication_validator_passed,
+                "publication_validator_issues": result.publication_validator_issues,
+                "editorial_score": result.editorial_score,
+                "gates_passed": result.gates_passed,
+            }
+
+        # ── hero mode (explicit opt-in): generate a DALL-E featured image ──
         # Slug for the DALL-E filename
         slug = topic.lower()
         for ch in " :?!,.'\"()":

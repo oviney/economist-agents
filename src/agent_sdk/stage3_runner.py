@@ -36,6 +36,7 @@ from claude_agent_sdk import (
     query,
 )
 
+from scripts.publication_validator import BLOG_AUTHOR
 from src.agent_sdk._shared import (
     _ALLOWED_MODELS as _ALLOWED_MODELS,
 )
@@ -141,6 +142,42 @@ FORMATTING:
 - Separate paragraphs with a blank line
 - Place a blank line before and after every `## ` heading
 - Do not emit the article more than once; output exactly one article per response"""
+
+
+def _build_writer_prompt(topic: str, research_brief: str, style_section: str) -> str:
+    """Build the Stage 3 writer user-prompt.
+
+    The author is pinned to ``BLOG_AUTHOR`` (the single source of truth shared
+    with the publication validator) so the model does not invent an author name
+    that Stage 4's author contract would then reject (issue #401).
+    """
+    return (
+        f"Write the complete Economist-style article on this topic: {topic}\n\n"
+        f"Output the entire article text with YAML frontmatter at the top. "
+        f"Start directly with `---` — no preamble, no commentary.\n\n"
+        f"Frontmatter must include: layout, title, date, author (set exactly "
+        f'to "{BLOG_AUTHOR}" — do not invent an author name), categories '
+        f"(Title Case from: Quality Engineering, Software Engineering, "
+        f"Test Automation, Security), image (/assets/images/SLUG.png), "
+        f"description (160 chars max), "
+        f"image_alt (one sentence describing the ideal editorial illustration "
+        f"for accessibility — written from the article thesis, e.g. "
+        f"'An Economist-style editorial illustration of a developer staring at "
+        f"a dashboard filled with green checkmarks while a production server burns'), "
+        f"and image_caption (one punchy editorial sentence framing the image's "
+        f"point, e.g. 'Coverage metrics and shipping confidence are not the same thing').\n\n"
+        f"Body must be at least 850 words (the publication validator "
+        f"rejects anything under 700, so leave a margin). End with a "
+        f"`## References` section containing 3+ numbered citations.\n\n"
+        f"At least one paragraph in the body must reference the chart "
+        f"explicitly — write something like 'as the chart shows', "
+        f"'the chart makes clear', or 'the chart below illustrates'. "
+        f"This is required by the publication validator.\n\n"
+        f"RESEARCH BRIEF (use ONLY these sources and statistics — do NOT "
+        f"invent any statistics, researcher names, or URLs):\n\n"
+        f"{research_brief}"
+        f"{style_section}"
+    )
 
 
 @dataclass
@@ -362,32 +399,7 @@ async def run_stage3(
     else:
         style_section = ""
 
-    writer_prompt = (
-        f"Write the complete Economist-style article on this topic: {topic}\n\n"
-        f"Output the entire article text with YAML frontmatter at the top. "
-        f"Start directly with `---` — no preamble, no commentary.\n\n"
-        f"Frontmatter must include: layout, title, date, author, categories "
-        f"(Title Case from: Quality Engineering, Software Engineering, "
-        f"Test Automation, Security), image (/assets/images/SLUG.png), "
-        f"description (160 chars max), "
-        f"image_alt (one sentence describing the ideal editorial illustration "
-        f"for accessibility — written from the article thesis, e.g. "
-        f"'An Economist-style editorial illustration of a developer staring at "
-        f"a dashboard filled with green checkmarks while a production server burns'), "
-        f"and image_caption (one punchy editorial sentence framing the image's "
-        f"point, e.g. 'Coverage metrics and shipping confidence are not the same thing').\n\n"
-        f"Body must be at least 850 words (the publication validator "
-        f"rejects anything under 700, so leave a margin). End with a "
-        f"`## References` section containing 3+ numbered citations.\n\n"
-        f"At least one paragraph in the body must reference the chart "
-        f"explicitly — write something like 'as the chart shows', "
-        f"'the chart makes clear', or 'the chart below illustrates'. "
-        f"This is required by the publication validator.\n\n"
-        f"RESEARCH BRIEF (use ONLY these sources and statistics — do NOT "
-        f"invent any statistics, researcher names, or URLs):\n\n"
-        f"{research_brief}"
-        f"{style_section}"
-    )
+    writer_prompt = _build_writer_prompt(topic, research_brief, style_section)
     raw_writer_output, writer_cost = await _collect_text(
         writer_prompt,
         WRITER_SYSTEM_PROMPT,

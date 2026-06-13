@@ -22,6 +22,15 @@ from pathlib import Path
 
 import yaml
 
+# Single source of truth for the production blog author. The Stage 3 writer
+# prompt and this validator's author contract both reference this constant so
+# the writer is instructed with the exact value the contract enforces, in one
+# place (see issue #401). The Stage 4 frontmatter safety net in
+# ``src/agent_sdk/_shared.py`` still emits the same value as a literal; wiring
+# it to this constant is deferred (that module carries an unrelated ADR-002
+# violation that the arch-review gate blocks on edit).
+BLOG_AUTHOR = "Ouray Viney"
+
 # Import defect prevention rules (learned from historical bugs)
 try:
     from scripts.defect_prevention_rules import DefectPrevention
@@ -549,14 +558,14 @@ class PublicationValidator:
                     if not isinstance(front_matter, dict):
                         return
                     author = front_matter.get("author")
-                    if author != "Ouray Viney":
+                    if author != BLOG_AUTHOR:
                         self.issues.append(
                             {
                                 "check": "author_contract",
                                 "severity": "CRITICAL",
-                                "message": f'Invalid author "{author}". Expected "Ouray Viney"',
+                                "message": f'Invalid author "{author}". Expected "{BLOG_AUTHOR}"',
                                 "details": "Published blog posts must use the production author metadata contract",
-                                "fix": 'Set author to "Ouray Viney"',
+                                "fix": f'Set author to "{BLOG_AUTHOR}"',
                             },
                         )
         except Exception:

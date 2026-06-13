@@ -408,8 +408,17 @@ async def run_stage3(
     start = time.perf_counter()
 
     # Research path is deterministic by default; "deep" (#390) opts into the
-    # recursive multi-hop loop. RESEARCH_MODE env overrides the argument.
+    # recursive multi-hop loop. RESEARCH_MODE env overrides the argument. An
+    # unrecognised value fails closed to deterministic (a typo must not silently
+    # disable the expensive deep path) and is logged so operators can confirm.
     resolved_research_mode = os.environ.get("RESEARCH_MODE", research_mode)
+    if resolved_research_mode not in ("deterministic", "deep"):
+        logger.warning(
+            "Unrecognised research mode %r; using deterministic",
+            resolved_research_mode,
+        )
+        resolved_research_mode = "deterministic"
+    logger.info("Research mode: %s", resolved_research_mode)
     if resolved_research_mode == "deep":
         research_brief, research_cost = await build_deep_research_brief(topic)
     else:

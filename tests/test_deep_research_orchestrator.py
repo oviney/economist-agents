@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import asyncio
 
+import pytest
+
 from src.agent_sdk.research import deep_research
 from src.agent_sdk.research.deep_research import build_deep_research_brief
 
@@ -26,7 +28,7 @@ def _wire(
     verdicts: list[dict] | None = None,
 ) -> dict:
     """Patch the four layer functions; return counters."""
-    counters = {"plan": 0, "search": 0, "extract": [], "assess": 0}
+    counters = {"plan": 0, "search": 0, "extract": [], "assess": 0, "budgets": []}
     sources_per_q = (
         [{"title": "S", "url": "https://s", "snippet": f"stat for {0}"}]
         if sources_per_q is None
@@ -44,6 +46,7 @@ def _wire(
 
     async def fake_extract(subquestion, sources, model=None, max_budget_usd=None):
         counters["extract"].append(subquestion)
+        counters["budgets"].append(max_budget_usd)
         passages = [f"passage for {subquestion}"] if sources else []
         return _finding(subquestion, passages), extract_cost
 
@@ -133,6 +136,33 @@ def test_budget_cap_stops_after_first_iteration(monkeypatch) -> None:
     # budget exceeded after iter0 → no synthesizer, no further iterations
     assert set(counters["extract"]) == {"q1?", "q2?"}
     assert counters["assess"] == 0
+
+
+def test_budget_divided_across_parallel_subquestions(monkeypatch) -> None:
+    """Each parallel sub-question gets the REMAINING budget divided by the
+    fan-out width, so one iteration cannot collectively overspend (#429 review)."""
+    counters = _wire(monkeypatch, subquestions=["a?", "b?", "c?"])
+
+    asyncio.run(
+        build_deep_research_brief("Topic", max_iterations=1, research_budget_usd=3.0)
+    )
+
+    # remaining after the planner's 0.02 is 2.98, split three ways
+    assert len(counters["budgets"]) == 3
+    for budget in counters["budgets"]:
+        assert budget == pytest.approx((3.0 - 0.02) / 3)
+
+
+def test_budget_exhausted_before_iteration_breaks(monkeypatch) -> None:
+    """If the planner alone exhausts the budget, no extraction runs."""
+    counters = _wire(monkeypatch, subquestions=["a?"])
+
+    # planner costs 0.02 > 0.01 budget → remaining negative before iteration 0
+    asyncio.run(
+        build_deep_research_brief("Topic", max_iterations=2, research_budget_usd=0.01)
+    )
+
+    assert counters["extract"] == []
 
 
 def test_zero_source_subquestion_records_no_evidence(monkeypatch) -> None:

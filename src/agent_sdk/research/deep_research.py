@@ -27,15 +27,30 @@ from src.agent_sdk.tools.research_tools import _run_provider_search
 logger = logging.getLogger(__name__)
 
 MAX_ITERATIONS = 2
+MAX_ITERATIONS_CEILING = 3  # spec: "Ask first to exceed"; clamp as a backstop
 DEFAULT_RESEARCH_BUDGET_USD = 2.50
 SOURCES_PER_SUBQUESTION = 5
+
+# The same anti-fabrication guardrails the deterministic build_research_brief
+# prepends. Duplicated here (not imported) because the source lives in
+# _shared.py, which the arch-review gate blocks from editing (ADR-002);
+# single-sourcing both briefs is tracked in #420.
+_RESEARCH_BRIEF_GUARDRAILS = (
+    "The following sources were found via live web search.",
+    "Use ONLY statistics and claims from these sources.",
+    "If you need a statistic not listed below, tag it [NEEDS SOURCE].",
+    "Do NOT invent statistics, researcher names, or URLs.",
+    "Every sentence containing a percentage, multiplier, or quantified claim "
+    "must name the source inline (e.g. 'According to Gartner, 2024, …').",
+)
 
 
 def _format_brief(topic: str, findings: list[dict[str, Any]]) -> str:
     """Render findings as a research brief (same string contract as the
-    deterministic ``build_research_brief``: a sourced text block the writer
-    embeds and the stat audit greps for cited numbers)."""
-    lines = [f"# Research Brief: {topic}", ""]
+    deterministic ``build_research_brief``: the anti-fabrication guardrail
+    header plus a sourced text block the writer embeds and the stat audit
+    greps for cited numbers)."""
+    lines = [f"# Research Brief: {topic}", "", *_RESEARCH_BRIEF_GUARDRAILS, ""]
     for finding in findings:
         passages = finding.get("passages") or []
         heading = finding.get("subquestion", "")
@@ -70,7 +85,12 @@ async def build_deep_research_brief(
     The brief string has the same shape contract as ``build_research_brief`` (so
     the writer + stat audit are unchanged); the cost is surfaced so the pipeline
     can record research spend in the cost log.
+
+    Budget is enforced cumulatively: each call receives the *remaining* budget as
+    its per-call ceiling, and the parallel fan-out divides the remainder across
+    the in-flight sub-questions so a single iteration cannot overspend.
     """
+    max_iterations = max(1, min(max_iterations, MAX_ITERATIONS_CEILING))
     spent = 0.0
 
     subquestions, cost = await plan_subquestions(
@@ -88,8 +108,19 @@ async def build_deep_research_brief(
 
     findings: list[dict[str, Any]] = []
     for iteration in range(max_iterations):
+        remaining = research_budget_usd - spent
+        if remaining <= 0:
+            logger.warning(
+                "Deep research budget $%.2f exhausted before iteration %d; stopping",
+                research_budget_usd,
+                iteration + 1,
+            )
+            break
+        # Divide the remaining budget across the parallel sub-questions so the
+        # fan-out cannot collectively overspend within a single iteration.
+        per_call = remaining / len(subquestions)
         results = await asyncio.gather(
-            *(_research_one(q, research_budget_usd) for q in subquestions)
+            *(_research_one(q, per_call) for q in subquestions)
         )
         for finding, call_cost in results:
             findings.append(finding)
@@ -102,11 +133,13 @@ async def build_deep_research_brief(
                 iteration + 1,
             )
             break
+        # Last iteration: skip the synthesizer (a wasted Sonnet call — we won't
+        # loop again regardless of its verdict).
         if iteration == max_iterations - 1:
             break
 
         verdict, call_cost = await assess_completeness(
-            topic, findings, max_budget_usd=research_budget_usd
+            topic, findings, max_budget_usd=research_budget_usd - spent
         )
         spent += call_cost
         if verdict["enough"] or not verdict["gaps"]:

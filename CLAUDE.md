@@ -32,6 +32,38 @@ For any **non-trivial** response (anything beyond Q&A, status checks, or one-lin
 
 Exempt: simple Q&A, status checks, command output, one-line edits.
 
+### Skill Routing Contract (non-negotiable)
+
+Skill routing follows the upstream agent-skills guide
+(https://github.com/addyosmani/agent-skills/blob/main/docs/getting-started.md)
+as the **single source of truth** for skill semantics and lifecycle. This
+governs how the next skill is chosen — especially when the user asks "what
+agent-skill should we use next?" (see #405).
+
+1. **Only `SKILL.md` workflows are agent-skills.** Plugin commands, MCP tools,
+   GitHub plugin skills (e.g. `github:yeet`), and repo-local agent personas
+   (e.g. `@git-operator`) are **never** agent-skills and must never be presented
+   as the next skill.
+2. **Follow the lifecycle phase order** — do not invent substitutes:
+
+   | Phase | Skill |
+   |-------|-------|
+   | `/spec` | `spec-driven-development` |
+   | `/plan` | `planning-and-task-breakdown` |
+   | `/build` | `incremental-implementation` + `test-driven-development` |
+   | `/test` | `test-driven-development` |
+   | `/review` | `code-review-and-quality` |
+   | `/ship` | `shipping-and-launch` |
+
+3. **Missing-skill rule.** If the next lifecycle skill is not installed locally,
+   say so explicitly — e.g. "The next agent-skill is `shipping-and-launch`, but
+   it is not installed here; we should add it before proceeding" — rather than
+   substituting a plugin skill, MCP tool, or repo persona.
+4. **Answer by name.** When asked for the next skill, name the lifecycle's next
+   phase skill (or state the install gap per rule 3). Nothing else.
+
+The six lifecycle skills are currently installed under `skills/`.
+
 ### Dispatching worker agents
 
 When dispatching agents via the `Agent` tool (orchestrating the fleet), the brief MUST include the worker discipline contract from `docs/worker-brief-contract.md`. Workers that produce output without evidence of `Skill` invocations are rejected and re-dispatched.

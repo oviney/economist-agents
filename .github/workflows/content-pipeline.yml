@@ -55,7 +55,9 @@ jobs:
           from datetime import datetime
           import json
 
-          flow = EconomistContentFlow()
+          # Production ships hero images (OPENAI_API_KEY is provided below).
+          # Made explicit after #410 flipped the library default to chart_only.
+          flow = EconomistContentFlow(image_mode='hero')
           result = flow.kickoff()
 
           status = result.get('status', 'unknown')

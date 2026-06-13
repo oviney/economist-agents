@@ -188,8 +188,8 @@ class TestGenerateContent:
         assert result["publication_validator_passed"] is True
         assert result["editorial_score"] == 88
         assert result["gates_passed"] == 5
-        # image generation attempted; default returned
-        assert result["featured_image"] == "/assets/images/blog-default.svg"
+        # default flow is chart_only (#410): ships image-less, no DALL-E
+        assert result["featured_image"] == ""
 
     @patch("src.economist_agents.flow.generate_featured_image", return_value=True)
     @patch("src.economist_agents.flow.asyncio.run")

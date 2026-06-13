@@ -44,7 +44,7 @@ import pathlib
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import orjson
 import yaml as _yaml
@@ -78,7 +78,9 @@ PIPELINE_RESULT_PATH = Path(
 class EconomistContentFlow:
     """Sequential orchestrator for the end-to-end content pipeline."""
 
-    def __init__(self, image_mode: str = "chart_only") -> None:
+    def __init__(
+        self, image_mode: Literal["chart_only", "hero"] = "chart_only"
+    ) -> None:
         """Construct the flow.
 
         ``image_mode`` is the Python-API image policy (#410). Unlike the CLI
@@ -323,16 +325,20 @@ class EconomistContentFlow:
             result.gates_passed,
         )
 
-        if self.image_mode != "hero":
-            # chart_only (default): ship on the chart alone. No paid image API,
-            # no vision refine. run_pipeline already stripped the hero
-            # frontmatter before Stage 4, so the validator result reflects a
-            # chart-only draft and a missing hero never forces a revision.
+        if self.image_mode == "chart_only":
+            # Ship on the chart alone. No paid image API, no vision refine.
+            # run_pipeline already stripped the hero frontmatter before Stage 4,
+            # so a missing hero never forces a revision. featured_image is left
+            # EMPTY (not blog-default.svg): _patch_frontmatter's
+            # `if featured_image:` guard then leaves the article image-less,
+            # which the publication validator accepts ("no image → pass"). The
+            # default-image fallback would instead be a CRITICAL deploy-time
+            # rejection (publication_validator default_image_fallback).
             logger.info("   🖼️  image_mode=chart_only — skipping hero image generation")
             return {
                 "article": article,
                 "chart_data": result.chart_data,
-                "featured_image": "/assets/images/blog-default.svg",
+                "featured_image": "",
                 "featured_image_local": "",
                 "image_alt": "",
                 "image_caption": "",
@@ -622,7 +628,12 @@ class EconomistContentFlow:
         )
 
         try:
-            result = asyncio.run(run_pipeline(enhanced_topic))
+            # Must carry the flow's image policy: a chart_only flow that runs
+            # revision in the default "hero" mode would re-introduce the #403
+            # missing-image-file false rejection (no DALL-E runs on this path).
+            result = asyncio.run(
+                run_pipeline(enhanced_topic, image_mode=self.image_mode)
+            )
         except BudgetExceededError as exc:
             # Budget caps don't get fixed by retrying — abort cleanly.
             logger.error("Agent SDK budget exceeded on revision — aborting: %s", exc)

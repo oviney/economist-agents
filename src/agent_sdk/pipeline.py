@@ -16,6 +16,7 @@ import time
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Literal
 
 import orjson
 
@@ -100,7 +101,7 @@ async def run_pipeline(
     graphics_budget_usd: float | None = 0.10,
     writer_model: str = DEFAULT_WRITER_MODEL,
     graphics_model: str = DEFAULT_GRAPHICS_MODEL,
-    image_mode: str = "hero",
+    image_mode: Literal["chart_only", "hero"] = "hero",
 ) -> PipelineResult:
     """Generate one article through the Agent SDK pipeline.
 

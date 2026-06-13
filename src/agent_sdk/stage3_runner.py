@@ -26,6 +26,7 @@ import sys
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
+from typing import Any
 
 import orjson
 from claude_agent_sdk import (
@@ -33,6 +34,7 @@ from claude_agent_sdk import (
     ClaudeAgentOptions,
     ResultMessage,
     TextBlock,
+    create_sdk_mcp_server,
     query,
 )
 
@@ -50,6 +52,7 @@ from src.agent_sdk._shared import (
 )
 from src.agent_sdk.chart_renderer import render_chart
 from src.agent_sdk.image_prompt_synth import PromptSynthError, compose_prompt
+from src.agent_sdk.tools.research_tools import SourceFetchSession, build_search_tool
 
 logger = logging.getLogger(__name__)
 
@@ -98,8 +101,11 @@ DEFAULT_WRITER_MODEL = _validated_model("WRITER_MODEL", "claude-sonnet-4-6")
 DEFAULT_GRAPHICS_MODEL = _validated_model("GRAPHICS_MODEL", "claude-sonnet-4-6")
 
 WRITER_SYSTEM_PROMPT = """You are an Economist-style Writer renowned for sharp, witty prose with British flair.
-Every article must satisfy the 10 rules below before submission. Do not attempt to read any files
-or use any tools — write the article directly from this brief.
+Every article must satisfy the 10 rules below before submission. Do not read files. Write primarily
+from the brief. You MAY call the `search_for_source` tool sparingly (at most 3 times per article)
+to find a source for a specific claim the brief does not cover — for example to strengthen a weak
+claim, anchor the opening with a recent statistic, or cite counter-evidence. Prefer the brief's
+pre-vetted sources; only search when a claim genuinely needs support the brief lacks.
 
 STRUCTURE RULES:
 - State a specific, debatable THESIS in the first two paragraphs — not a topic, an argument
@@ -196,6 +202,7 @@ class Stage3Result:
     research_brief_chars: int
     article_chars: int
     stat_audit_removed: int
+    writer_search_calls: int = 0  # #389: on-demand source searches the writer made
     chart_path: Path | None = None  # #403 slice 1: rendered chart PNG
     prompt_path: Path | None = None  # #403 slice 3: image-prompt artefact
     slug: str = ""  # #403 slice 3: canonical slug for downstream resume
@@ -280,20 +287,28 @@ async def _collect_text(
     system_prompt: str,
     model: str = DEFAULT_WRITER_MODEL,
     max_budget_usd: float | None = None,
+    mcp_servers: dict[str, Any] | None = None,
+    allowed_tools: list[str] | None = None,
+    max_turns: int = 1,
 ) -> tuple[str, float]:
-    """Run a single Agent SDK query and return ``(text, cost_usd)``.
+    """Run an Agent SDK query and return ``(text, cost_usd)``.
 
     Streaming text chunks are joined with a space when the boundary
     between two chunks looks like an unintended word concatenation
     (lowercase letter followed by uppercase letter), to avoid artefacts
     such as "OrganisationsDoubleDown" seen in the Story 1 spike output.
+
+    By default no tools are exposed and the query runs in a single turn. Pass
+    ``mcp_servers``/``allowed_tools`` with ``max_turns > 1`` to enable a tool-use
+    loop (e.g. the writer's on-demand source search, #389).
     """
     options = ClaudeAgentOptions(
         system_prompt=system_prompt,
         model=model,
-        max_turns=1,
+        max_turns=max_turns,
         permission_mode="bypassPermissions",
-        allowed_tools=[],
+        allowed_tools=allowed_tools or [],
+        mcp_servers=mcp_servers or {},
         stderr=lambda line: logger.warning("agent-sdk stderr: %s", line),
         max_budget_usd=max_budget_usd,
     )
@@ -400,12 +415,31 @@ async def run_stage3(
         style_section = ""
 
     writer_prompt = _build_writer_prompt(topic, research_brief, style_section)
+    # #389 hybrid research: expose a budget-capped source-search tool the writer
+    # can call mid-draft. A fresh session per article isolates budget/dedupe.
+    # max_turns must exceed 1 so the SDK can drive the tool-use loop.
+    search_session = SourceFetchSession()
+    research_server = create_sdk_mcp_server(
+        "research", tools=[build_search_tool(search_session)]
+    )
     raw_writer_output, writer_cost = await _collect_text(
         writer_prompt,
         WRITER_SYSTEM_PROMPT,
         model=writer_model,
         max_budget_usd=writer_budget_usd,
+        mcp_servers={"research": research_server},
+        allowed_tools=["mcp__research__search_for_source"],
+        # Each search costs 2 turns (the tool_use, then consuming the
+        # tool_result); plus the initial draft and 1 turn of headroom.
+        max_turns=2 * search_session.max_calls + 2,
     )
+    if search_session.calls_made:
+        logger.info(
+            "Writer made %d on-demand source search(es)", search_session.calls_made
+        )
+    # Append writer-fetched sources to the brief so the stat audit does not
+    # strip statistics the writer legitimately cited from them (#389).
+    research_brief = research_brief + search_session.brief_supplement()
     pre_audit_article = _strip_duplicate_article(raw_writer_output)
 
     # Require opening ---, a closing --- on its own line, and a non-empty body.
@@ -487,6 +521,7 @@ async def run_stage3(
         research_brief_chars=len(research_brief),
         article_chars=len(article),
         stat_audit_removed=max(stat_audit_removed, 0),
+        writer_search_calls=search_session.calls_made,
         chart_path=chart_path,
         prompt_path=prompt_path,
         slug=slug,

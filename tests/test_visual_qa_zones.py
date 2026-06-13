@@ -255,6 +255,34 @@ class TestValidateMatplotlibCode:
 
         assert any("collide" in i.lower() or "overlap" in i.lower() for i in issues)
 
+    def test_positional_xytext_not_flagged_as_missing(self, tmp_path: Path) -> None:
+        """Matplotlib accepts xytext positionally: annotate(text, xy, xytext, ...).
+
+        Regression for #418: the parser previously read only the ``xytext``
+        keyword, so a fully-positional call recorded ``has_xytext=False`` and
+        wrongly emitted the "missing xytext offset" warning.
+        """
+        validator = ZoneBoundaryValidator()
+        code = 'ax.annotate("label", (5, 50), (0, 5))\n'
+        chart_path = _setup_script_alongside_chart(tmp_path, code)
+
+        _, issues = validator.validate_chart(str(chart_path))
+
+        assert not any("missing xytext offset" in i for i in issues)
+
+    def test_positional_xytext_near_zero_offset_is_flagged(
+        self, tmp_path: Path
+    ) -> None:
+        """A positional xytext with a near-zero offset must fire the same
+        overlap warning as the keyword form (#418)."""
+        validator = ZoneBoundaryValidator()
+        code = 'ax.annotate("label", (5, 50), (0, 0))\n'
+        chart_path = _setup_script_alongside_chart(tmp_path, code)
+
+        _, issues = validator.validate_chart(str(chart_path))
+
+        assert any("near-zero xytext offset" in i for i in issues)
+
     def test_no_script_means_no_code_issues(self, tmp_path: Path) -> None:
         """When no sibling script exists the code-validation step is skipped."""
         validator = ZoneBoundaryValidator()

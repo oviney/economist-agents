@@ -238,14 +238,17 @@ class ZoneBoundaryValidator:
             if not isinstance(node.func.value, ast.Name) or node.func.value.id != "ax":
                 continue
 
-            # Matplotlib's annotate signature is annotate(text, xy, ...), so the
-            # anchor may be supplied positionally as args[1] rather than as the
-            # xy keyword. Fall back to the positional form when the keyword is
-            # absent (#413) so X-axis intrusion and label-collision checks fire.
+            # Matplotlib's annotate signature is annotate(text, xy, xytext, ...),
+            # so the anchor (args[1]) and the offset (args[2]) may be supplied
+            # positionally rather than as keywords. Fall back to the positional
+            # form when each keyword is absent so the X-axis intrusion,
+            # label-collision, and offset checks fire either way (#413, #418).
             xy_node = self._find_keyword_node(node, "xy")
             if xy_node is None and len(node.args) > 1:
                 xy_node = node.args[1]
             xytext_node = self._find_keyword_node(node, "xytext")
+            if xytext_node is None and len(node.args) > 2:
+                xytext_node = node.args[2]
             annotations.append(
                 {
                     "label": self._extract_string_arg(node, 0),

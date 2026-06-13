@@ -88,6 +88,7 @@ class PipelineResult:
     total_cost_usd: float
     writer_cost_usd: float
     graphics_cost_usd: float
+    research_cost_usd: float
     writer_model: str
     graphics_model: str
     stage3_seconds: float
@@ -102,6 +103,7 @@ async def run_pipeline(
     writer_model: str = DEFAULT_WRITER_MODEL,
     graphics_model: str = DEFAULT_GRAPHICS_MODEL,
     image_mode: Literal["chart_only", "hero"] = "hero",
+    research_mode: Literal["deterministic", "deep"] = "deterministic",
 ) -> PipelineResult:
     """Generate one article through the Agent SDK pipeline.
 
@@ -118,6 +120,7 @@ async def run_pipeline(
         graphics_budget_usd=graphics_budget_usd,
         writer_model=writer_model,
         graphics_model=graphics_model,
+        research_mode=research_mode,
     )
     article_for_stage4 = stage3.article
     if image_mode == "chart_only":
@@ -136,6 +139,7 @@ async def run_pipeline(
         total_cost_usd=stage3.total_cost_usd,
         writer_cost_usd=stage3.writer_cost_usd,
         graphics_cost_usd=stage3.graphics_cost_usd,
+        research_cost_usd=stage3.research_cost_usd,
         writer_model=stage3.writer_model,
         graphics_model=stage3.graphics_model,
         stage3_seconds=stage3.wall_seconds,
@@ -291,6 +295,7 @@ def _append_cost_log(result: PipelineResult, total_wall_seconds: float) -> None:
         "total_cost_usd": result.total_cost_usd,
         "writer_cost_usd": result.writer_cost_usd,
         "graphics_cost_usd": result.graphics_cost_usd,
+        "research_cost_usd": result.research_cost_usd,
         "writer_model": result.writer_model,
         "graphics_model": result.graphics_model,
         "stage3_seconds": result.stage3_seconds,

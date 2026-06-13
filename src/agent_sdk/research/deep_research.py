@@ -64,8 +64,13 @@ async def build_deep_research_brief(
     topic: str,
     max_iterations: int = MAX_ITERATIONS,
     research_budget_usd: float = DEFAULT_RESEARCH_BUDGET_USD,
-) -> str:
-    """Run the recursive research loop and return a research-brief string."""
+) -> tuple[str, float]:
+    """Run the recursive research loop and return ``(brief, cost_usd)``.
+
+    The brief string has the same shape contract as ``build_research_brief`` (so
+    the writer + stat audit are unchanged); the cost is surfaced so the pipeline
+    can record research spend in the cost log.
+    """
     spent = 0.0
 
     subquestions, cost = await plan_subquestions(
@@ -79,7 +84,7 @@ async def build_deep_research_brief(
         )
         from src.agent_sdk._shared import build_research_brief
 
-        return build_research_brief(topic)
+        return build_research_brief(topic), spent
 
     findings: list[dict[str, Any]] = []
     for iteration in range(max_iterations):
@@ -113,4 +118,4 @@ async def build_deep_research_brief(
         len(findings),
         spent,
     )
-    return _format_brief(topic, findings)
+    return _format_brief(topic, findings), spent

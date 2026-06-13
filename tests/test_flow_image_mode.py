@@ -201,6 +201,7 @@ def _run_pipeline_capturing_stage4(image_mode: str) -> str:
         total_cost_usd=0.05,
         writer_cost_usd=0.04,
         graphics_cost_usd=0.01,
+        research_cost_usd=0.0,
         writer_model="m",
         graphics_model="m",
         wall_seconds=1.0,

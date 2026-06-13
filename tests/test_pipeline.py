@@ -21,6 +21,7 @@ def _fake_stage3():
     m.total_cost_usd = 0.05
     m.writer_cost_usd = 0.04
     m.graphics_cost_usd = 0.01
+    m.research_cost_usd = 0.0
     m.writer_model = "claude-sonnet-4-6"
     m.graphics_model = "claude-sonnet-4-6"
     m.wall_seconds = 1.2

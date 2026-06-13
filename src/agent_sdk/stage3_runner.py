@@ -52,6 +52,7 @@ from src.agent_sdk._shared import (
 )
 from src.agent_sdk.chart_renderer import render_chart
 from src.agent_sdk.image_prompt_synth import PromptSynthError, compose_prompt
+from src.agent_sdk.research.deep_research import build_deep_research_brief
 from src.agent_sdk.tools.research_tools import SourceFetchSession, build_search_tool
 
 logger = logging.getLogger(__name__)
@@ -196,6 +197,7 @@ class Stage3Result:
     total_cost_usd: float
     writer_cost_usd: float
     graphics_cost_usd: float
+    research_cost_usd: float
     writer_model: str
     graphics_model: str
     wall_seconds: float
@@ -379,6 +381,7 @@ async def run_stage3(
     graphics_budget_usd: float | None = 0.10,
     writer_model: str = DEFAULT_WRITER_MODEL,
     graphics_model: str = DEFAULT_GRAPHICS_MODEL,
+    research_mode: str = "deterministic",
 ) -> Stage3Result:
     """Generate one article via the Agent SDK and return captured metrics.
 
@@ -404,7 +407,13 @@ async def run_stage3(
     """
     start = time.perf_counter()
 
-    research_brief = build_research_brief(topic)
+    # Research path is deterministic by default; "deep" (#390) opts into the
+    # recursive multi-hop loop. RESEARCH_MODE env overrides the argument.
+    resolved_research_mode = os.environ.get("RESEARCH_MODE", research_mode)
+    if resolved_research_mode == "deep":
+        research_brief, research_cost = await build_deep_research_brief(topic)
+    else:
+        research_brief, research_cost = build_research_brief(topic), 0.0
     logger.info("Research brief: %d chars", len(research_brief))
 
     style_context = _fetch_style_context(topic)
@@ -512,9 +521,10 @@ async def run_stage3(
         topic=topic,
         article=article,
         chart_data=chart_data,
-        total_cost_usd=writer_cost + graphics_cost,
+        total_cost_usd=writer_cost + graphics_cost + research_cost,
         writer_cost_usd=writer_cost,
         graphics_cost_usd=graphics_cost,
+        research_cost_usd=research_cost,
         writer_model=writer_model,
         graphics_model=graphics_model,
         wall_seconds=elapsed,

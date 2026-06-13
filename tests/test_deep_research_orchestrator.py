@@ -64,7 +64,7 @@ def _wire(
 def test_happy_path_assembles_brief(monkeypatch) -> None:
     counters = _wire(monkeypatch, subquestions=["q1?", "q2?"])
 
-    brief = asyncio.run(build_deep_research_brief("Topic", max_iterations=1))
+    brief, _cost = asyncio.run(build_deep_research_brief("Topic", max_iterations=1))
 
     assert brief.startswith("# Research Brief: Topic")
     assert "passage for q1?" in brief
@@ -113,7 +113,7 @@ def test_empty_planner_falls_back_to_deterministic(monkeypatch) -> None:
         lambda topic: f"DETERMINISTIC BRIEF for {topic}",
     )
 
-    brief = asyncio.run(build_deep_research_brief("Topic"))
+    brief, _cost = asyncio.run(build_deep_research_brief("Topic"))
 
     assert brief == "DETERMINISTIC BRIEF for Topic"
 
@@ -138,7 +138,7 @@ def test_budget_cap_stops_after_first_iteration(monkeypatch) -> None:
 def test_zero_source_subquestion_records_no_evidence(monkeypatch) -> None:
     _wire(monkeypatch, subquestions=["q1?"], sources_per_q=[])
 
-    brief = asyncio.run(build_deep_research_brief("Topic", max_iterations=1))
+    brief, _cost = asyncio.run(build_deep_research_brief("Topic", max_iterations=1))
 
     assert "## q1?" in brief
     assert "No evidence found." in brief

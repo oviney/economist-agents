@@ -188,8 +188,8 @@ class TestGenerateContent:
         assert result["publication_validator_passed"] is True
         assert result["editorial_score"] == 88
         assert result["gates_passed"] == 5
-        # image generation attempted; default returned
-        assert result["featured_image"] == "/assets/images/blog-default.svg"
+        # default flow is chart_only (#410): ships image-less, no DALL-E
+        assert result["featured_image"] == ""
 
     @patch("src.economist_agents.flow.generate_featured_image", return_value=True)
     @patch("src.economist_agents.flow.asyncio.run")
@@ -202,7 +202,7 @@ class TestGenerateContent:
             _passing_pipeline_result(),
             {"image_alt": "alt text", "image_caption": "caption text"},
         ]
-        flow = EconomistContentFlow()
+        flow = EconomistContentFlow(image_mode="hero")
 
         result = flow.generate_content({"topic": "AI Coding Assistants"})
 
@@ -223,7 +223,7 @@ class TestGenerateContent:
             _passing_pipeline_result(),
             {"image_alt": "editorial alt", "image_caption": "editorial caption"},
         ]
-        flow = EconomistContentFlow()
+        flow = EconomistContentFlow(image_mode="hero")
 
         flow.generate_content({"topic": "AI Testing"})
 
@@ -966,9 +966,10 @@ class TestKickoffResultFile:
         failing = _passing_pipeline_result()
         failing.editorial_score = 40
         failing.publication_validator_passed = False
+        # chart_only (default) makes no refine_image_metadata call, so the only
+        # asyncio.run calls are the two run_pipeline invocations.
         mock_asyncio_run.side_effect = [
             failing,  # run_pipeline (generate)
-            {"image_alt": "alt", "image_caption": "cap"},  # refine_image_metadata
             failing,  # run_pipeline (revision)
         ]
         flow = EconomistContentFlow()

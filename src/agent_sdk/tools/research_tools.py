@@ -52,8 +52,9 @@ def _run_provider_search(query: str, max_results: int) -> list[Source]:
     if sources:
         return sources[:max_results]
 
-    # Fallback: Google web search. Its helper returns a list that may contain a
-    # single ``{"error": ...}`` sentinel on failure; filter those out.
+    # Fallback: Google. search_google_for_topic returns a *dict* with
+    # ``web_results`` / ``scholar_results`` lists (not a flat list) — read those
+    # keys rather than iterating the dict.
     try:
         from scripts.google_search import search_google_for_topic
 
@@ -62,13 +63,16 @@ def _run_provider_search(query: str, max_results: int) -> list[Source]:
         logger.warning("Google fallback failed for '%s': %s", query, exc)
         return []
 
+    items = list(google.get("web_results", [])) + list(
+        google.get("scholar_results", [])
+    )
     return [
         {
             "title": r.get("title", ""),
             "url": r.get("url", r.get("link", "")),
             "snippet": r.get("snippet", ""),
         }
-        for r in google
+        for r in items
         if isinstance(r, dict) and "error" not in r
     ][:max_results]
 
@@ -145,7 +149,12 @@ def build_search_tool(session: SourceFetchSession) -> Any:
         query = str(args.get("query", "")).strip()
         if not query:
             return {"content": [{"type": "text", "text": "[]"}]}
-        max_results = int(args.get("max_results", 3) or 3)
+        # The model may emit a non-numeric max_results (e.g. "three"); never let
+        # a bad arg raise out of the tool handler and break the writer turn.
+        try:
+            max_results = int(args.get("max_results", 3) or 3)
+        except (TypeError, ValueError):
+            max_results = 3
         results = session.search(query, max_results)
         return {
             "content": [{"type": "text", "text": orjson.dumps(results).decode("utf-8")}]

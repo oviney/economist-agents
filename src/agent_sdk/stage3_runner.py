@@ -429,6 +429,8 @@ async def run_stage3(
         max_budget_usd=writer_budget_usd,
         mcp_servers={"research": research_server},
         allowed_tools=["mcp__research__search_for_source"],
+        # Each search costs 2 turns (the tool_use, then consuming the
+        # tool_result); plus the initial draft and 1 turn of headroom.
         max_turns=2 * search_session.max_calls + 2,
     )
     if search_session.calls_made:

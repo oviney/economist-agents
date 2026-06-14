@@ -537,6 +537,10 @@
          <lastmod>2026-06-14</lastmod>
     </url>
     <url>
+         <loc>https://oviney.github.io/economist-agents/adr/0011-opt-in-recursive-deep-research/</loc>
+         <lastmod>2026-06-14</lastmod>
+    </url>
+    <url>
          <loc>https://oviney.github.io/economist-agents/adr/TEMPLATE/</loc>
          <lastmod>2026-06-14</lastmod>
     </url>
@@ -1062,6 +1066,10 @@
     </url>
     <url>
          <loc>https://oviney.github.io/economist-agents/specs/410-run-flow-image-handshake/</loc>
+         <lastmod>2026-06-14</lastmod>
+    </url>
+    <url>
+         <loc>https://oviney.github.io/economist-agents/specs/B-003-adr-lint-governance/</loc>
          <lastmod>2026-06-14</lastmod>
     </url>
     <url>

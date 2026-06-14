@@ -629,7 +629,9 @@ def apply_editorial_fixes(article: str, current_date: str | None = None) -> str:
             if "layout:" not in fm:
                 fm = "\nlayout: post" + fm
             if "author:" not in fm:
-                fm = fm.rstrip() + '\nauthor: "Ouray Viney"\n'
+                from scripts.publication_validator import BLOG_AUTHOR
+
+                fm = fm.rstrip() + f'\nauthor: "{BLOG_AUTHOR}"\n'
             if "categories:" not in fm:
                 fm = fm.rstrip() + '\ncategories: ["Quality Engineering"]\n'
             fm = _normalize_category_casing(fm)

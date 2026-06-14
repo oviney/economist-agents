@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import re
 
+import pytest
+
 from scripts.publication_validator import BLOG_AUTHOR, PublicationValidator
 from src.agent_sdk._shared import apply_editorial_fixes
 from src.agent_sdk.stage3_runner import _build_writer_prompt
@@ -44,13 +46,29 @@ def test_safety_net_emits_the_production_author_when_missing() -> None:
     """Behavioural guard: the Stage 4 frontmatter safety net fills in the
     production author when the writer omits it.
 
-    NB: the safety net currently emits the value as a literal (it is not yet
-    wired to ``BLOG_AUTHOR`` — see the constant's docstring), so this asserts
-    the observable output equals the configured author, not the implementation.
+    The safety net is wired to ``BLOG_AUTHOR`` (B-001), so this asserts the
+    observable output equals the single-source-of-truth constant.
     """
     article = '---\nlayout: post\ntitle: "X"\ncategories: ["Quality Engineering"]\n---\n\nBody text.'
     fixed = apply_editorial_fixes(article)
     assert f'author: "{BLOG_AUTHOR}"' in fixed
+
+
+def test_safety_net_tracks_blog_author_constant_dynamically(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Load-bearing: the injected author must track ``BLOG_AUTHOR``, not a
+    hard-coded literal.
+
+    Patching the constant at its source and seeing the new value flow into the
+    frontmatter proves the safety net reads the constant at runtime. This test
+    fails if the safety net is reverted to emitting a string literal.
+    """
+    monkeypatch.setattr("scripts.publication_validator.BLOG_AUTHOR", "Sentinel Author")
+    article = '---\nlayout: post\ntitle: "X"\ncategories: ["Quality Engineering"]\n---\n\nBody text.'
+    fixed = apply_editorial_fixes(article)
+    assert 'author: "Sentinel Author"' in fixed
+    assert "Ouray Viney" not in fixed
 
 
 def test_validator_accepts_configured_author() -> None:

@@ -26,23 +26,6 @@ _(none)_
 
 ## Todo
 
-### B-002 · P3 · Remove asyncio.run stub in test_flow_agent_sdk.py (was #425)
-
-Residual coroutine warnings. `type:refactor`.
-
-Surfaced by the PR #424 review. `tests/test_flow_agent_sdk.py` (the
-`TestGenerateContent` cases) patch `flow.asyncio.run` to a no-op stub, which
-leaves `run_pipeline()` coroutines un-awaited and emits
-`RuntimeWarning: coroutine ... was never awaited` — the defect class commit
-236cd48 set out to resolve.
-
-`tests/test_flow_image_mode.py` was already migrated (PR #424) to patch
-`run_pipeline`/`refine_image_metadata` as `AsyncMock` and let the real
-`asyncio.run` drive them — no warnings.
-
-**Fix** Migrate the remaining `TestGenerateContent` tests to the same `AsyncMock`
-pattern so the un-awaited-coroutine warnings stop masking a potential future real leak.
-
 ### B-001 · P3 · Wire Stage 4 author safety net to BLOG_AUTHOR constant (was #420)
 
 `type:refactor`.
@@ -64,6 +47,18 @@ arch-review gate blocks on any edit to that file.
    against the constant.
 
 ## Done
+
+### B-002 · Removed asyncio.run stub in test_flow_agent_sdk.py — 2026-06-14
+
+Slice 2 of the sprint. PR #433 (squash-merged to `main`). Migrated all 9
+`asyncio.run`-patching tests across `TestGenerateContent`, `TestRequestRevision`,
+and `TestKickoffResultFile` to the `AsyncMock` pattern from `test_flow_image_mode.py`
+(PR #424), so the real `asyncio.run` drives the mocked coroutines — clearing the
+`RuntimeWarning: coroutine ... was never awaited` class. Whole-file scope (not just
+`TestGenerateContent`) so the warning class is fully gone:
+`pytest tests/test_flow_agent_sdk.py -W error::RuntimeWarning` → 41 passed, 0 warnings.
+The one `asyncio.run`-introspection test was rewritten to assert the `await` directly.
+Test-only; `flow.py` untouched. Spec: `docs/specs/B-002-asyncio-run-stub-removal.md`.
 
 ### B-003 · Repaired adr-lint gate + ADR governance drift — 2026-06-14
 

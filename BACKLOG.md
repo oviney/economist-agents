@@ -37,8 +37,32 @@ which resolves to `scripts/` from `scripts/archived/` — so it must run with
    default for the archived location).
 2. Bring ADR-0010 into compliance (status → `Accepted`; add to `mkdocs.yml`).
 3. Land **ADR-0011 (Deep Research)** — documents the #390 decision; rationale
-   currently lives in `docs/specs/390-deep-research.md`. Draft ADR-0011 text was
-   captured on GitHub issue #428 (closed) for reference.
+   currently lives in `docs/specs/390-deep-research.md`. Draft below (was inlined
+   from closed issue #428 so it survives locally):
+
+   > **ADR-0011: Opt-In Recursive Deep Research**
+   > **Status:** Accepted · **Date:** 2026-06-13 · **Decision Maker:** Ouray Viney (Engineering Lead)
+   >
+   > **Context:** The research phase (`build_research_brief`) is a one-shot,
+   > deterministic, no-LLM search burst. #390 adds a recursive
+   > planner→search→extract→synthesise loop (Deep Research pattern) that produces
+   > report-grade briefs at 5–10× cost ($1.50–3.00 vs ~$0.30), 30–60s vs ~5s, and
+   > introduces LLM calls into a path kept deterministic to prevent source hallucination.
+   >
+   > **Decision:** Add Deep Research as **opt-in**, not a replacement. `research_mode`
+   > (`deterministic` default | `deep`, `RESEARCH_MODE` env override) on
+   > `run_stage3`/`run_pipeline`. New `src/agent_sdk/research/` package reusing the
+   > existing providers. Bounded by a hard iteration cap (2) and `research_budget_usd`
+   > ($2.50). Model tiering: planner/synthesizer Sonnet, extractor Haiku. Brief keeps
+   > the same string contract (writer + stat audit unchanged); research spend recorded
+   > in the cost log.
+   >
+   > **Consequences:** + Report-grade briefs on demand without sacrificing the cheap
+   > default; bounded, observable cost. − Non-deterministic and expensive when opted
+   > in; v1 extracts from snippets only (full-page fetch deferred). Follow-ups:
+   > production trigger for `deep`, cross-article cache, full-page fetch.
+   >
+   > **References:** Issue #390; spec `docs/specs/390-deep-research.md`; companion #389.
 
 ### B-002 · P3 · Remove asyncio.run stub in test_flow_agent_sdk.py (was #425)
 
@@ -79,4 +103,4 @@ arch-review gate blocks on any edit to that file.
 
 ## Done
 
-_(append completed items here with a completion date)_
+_(append completed items here with an ISO completion date, e.g. `YYYY-MM-DD`)_

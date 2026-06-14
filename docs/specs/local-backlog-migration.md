@@ -141,15 +141,15 @@ This is a config + docs migration; no unit tests. Verification is procedural:
 - [ ] A note that the `github` MCP token cost is gone (no github tool schemas load
       next session).
 
-## Open Questions
+## Resolved Decisions
 
-1. **Issue ids vs. backlog ids.** Spec proposes fresh `B-NNN` ids with `(was #N)`
-   provenance, rather than reusing GitHub numbers. OK? (Keeps the local backlog
-   independent of GitHub numbering.)
-2. **Close the 3 open issues now, or leave them open** as a read-only mirror until
-   you confirm the backlog feels right? Default in this spec: **close them** (clean
-   single source of record), but it's a one-flag change either way.
-3. **Should `gh` issue *creation* be discouraged in CLAUDE.md** going forward
-   (backlog items go to BACKLOG.md), while `gh` PR commands stay encouraged?
-   Default: yes.
+These were the open questions at spec time; all resolved by the user's "go with
+your defaults" (2026-06-13) and reflected in the implemented change:
+
+1. **Issue ids vs. backlog ids.** ✅ Fresh `B-NNN` ids with `(was #N)` provenance,
+   not reusing GitHub numbers — keeps the local backlog independent of GitHub.
+2. **Close the 3 open issues vs. leave as mirror.** ✅ Closed (not deleted), each
+   with a comment linking to `BACKLOG.md` — clean single source of record, reversible.
+3. **Discourage `gh` issue creation going forward.** ✅ Yes — backlog items go to
+   `BACKLOG.md`; `gh` PR commands stay encouraged. Documented in CLAUDE.md.
 ```

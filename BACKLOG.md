@@ -6,9 +6,24 @@
 >
 > See `docs/specs/local-backlog-migration.md` for why this file exists.
 
+## Sprint Goal (2026-06-14)
+
+**Clear the backlog: land B-003 → B-002 → B-001 to `main`, one self-contained slice
+per session, clearing context between each to prevent session bloat.**
+
+- **Ordering (dependency-driven):** `B-003` (unblocks ADR gate) → `B-002` (test-only,
+  independent) → `B-001` (largest; requires routing `import anthropic` out of
+  `_shared.py` via `AgentRegistry` to clear the ADR-002 gate before wiring `BLOG_AUTHOR`).
+- **Cadence:** spec → **human LGTM** → build/TDD → PR → merge. Stop for LGTM after each
+  slice's spec.
+- **Session discipline:** one slice per session. On merge, mark Done here, then `/clear`
+  before the next slice. This file is the durable handoff — a fresh session resumes from it.
+- **"Deployed to production" = merged to `main`** via reviewed PR (no separate runtime deploy).
+
 ## In Progress
 
-_(none)_
+### B-003 · P3 · Broken adr-lint pre-commit hook + ADR governance drift (was #428)
+Slice 1 of 3. Started 2026-06-14. See Todo section below for full Fix detail.
 
 ## Todo
 

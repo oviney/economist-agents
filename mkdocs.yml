@@ -75,6 +75,8 @@ nav:
     - ADR-0007 — Content Intelligence Engine: adr/0007-content-intelligence-engine.md
     - ADR-0008 — Agent Skill Governance: adr/0008-agent-skill-governance.md
     - ADR-0009 — Architecture Audit Rubric: adr/0009-architecture-audit-rubric.md
+    - ADR-0010 — Scripts to src Migration: adr/0010-scripts-to-src-migration.md
+    - ADR-0011 — Opt-In Recursive Deep Research: adr/0011-opt-in-recursive-deep-research.md
 
   - Skills:
     - Workflow (addyosmani/agent-skills):

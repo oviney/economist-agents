@@ -1,6 +1,6 @@
 # ADR-0010: Migrate domain modules from scripts/ to src/
 
-**Status:** Implemented (2026-05-15 via PR #357 / issue #344)
+**Status:** Accepted (Implemented 2026-05-15 via PR #357 / issue #344)
 **Date:** 2026-05-12 (implementation 2026-05-15)
 **Decision Maker:** Staff engineer (review on #327)
 **Supersedes:** —

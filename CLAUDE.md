@@ -19,6 +19,21 @@ Task arrives
 **No implementation starts without a spec. No sprint planning starts without a dependency-ordered task list.**
 Both require human review (a "LGTM") before proceeding.
 
+### Backlog & Issue Tracking (hybrid model)
+
+The backlog is **local-first**. The `github` MCP server has been removed (it was a
+token drain); see `docs/specs/local-backlog-migration.md`.
+
+- **Backlog / planning items → `BACKLOG.md`** at repo root. This is the source of
+  record for todo / in-progress / done work items (`B-NNN` ids). Edit the file
+  directly; do **not** open GitHub issues for new backlog items.
+- **PRs + code review → GitHub via the `gh` CLI** (authenticated, near-zero context
+  cost). `gh pr create / view / list` etc. remain the standard PR workflow.
+- **Bugs / defects** still log in `data/skills_state/defect_tracker.json` per the
+  flowchart above, then graduate to a `BACKLOG.md` item if they need scheduling.
+- `data/skills_state/backlog.json` is **machine state for autonomous sprint scripts**
+  (keyed by `STORY-NNN`) — not the human backlog. Don't conflate the two.
+
 ### Lifecycle discipline (non-negotiable)
 
 For any **non-trivial** response (anything beyond Q&A, status checks, or one-line edits):

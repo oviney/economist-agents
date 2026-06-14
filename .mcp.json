@@ -1,10 +1,5 @@
 {
   "mcpServers": {
-    "github": {
-      "type": "http",
-      "url": "https://api.githubcopilot.com/mcp/",
-      "description": "GitHub MCP for PR management, issues, and repository operations"
-    },
     "playwright": {
       "command": "npx",
       "args": [

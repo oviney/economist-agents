@@ -94,6 +94,38 @@ def _create_anthropic_client() -> LLMClient:
     return LLMClient("anthropic", client, model)
 
 
+def create_async_anthropic_client(api_key: str | None = None) -> Any:
+    """Create an ``AsyncAnthropic`` client for async vision/messages calls.
+
+    ADR-002 factory route: keeps the ``anthropic`` import inside this
+    exception-listed factory so callers in ``src/`` (e.g. the Stage 4 vision
+    refinement helper) need not import ``anthropic`` directly.
+
+    Args:
+        api_key: Anthropic API key. Falls back to ``ANTHROPIC_API_KEY`` when
+            not provided.
+
+    Returns:
+        A raw ``anthropic.AsyncAnthropic`` instance (not an ``LLMClient``
+        wrapper — callers drive ``messages.create`` with async image blocks).
+
+    Raises:
+        ImportError: If the ``anthropic`` package is not installed.
+
+    """
+    key = api_key or os.environ["ANTHROPIC_API_KEY"]
+
+    try:
+        from anthropic import AsyncAnthropic
+    except ImportError as err:
+        raise ImportError(
+            "[LLM_CLIENT] anthropic package not installed. "
+            "Install it: pip install anthropic",
+        ) from err
+
+    return AsyncAnthropic(api_key=key)
+
+
 def _create_openai_client(max_retries: int, base_delay: int) -> LLMClient:
     """Create OpenAI client with retry logic."""
     api_key = os.environ.get("OPENAI_API_KEY")

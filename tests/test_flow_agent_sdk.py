@@ -14,7 +14,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
-from unittest.mock import Mock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
@@ -166,16 +166,15 @@ class TestEditorialReview:
 
 class TestGenerateContent:
     @patch("src.economist_agents.flow.generate_featured_image", return_value=False)
-    @patch("src.economist_agents.flow.asyncio.run")
+    @patch("src.economist_agents.flow.run_pipeline", new_callable=AsyncMock)
     def test_calls_pipeline_and_returns_article(
         self,
-        mock_asyncio_run: Mock,
+        mock_run_pipeline: AsyncMock,
         mock_image: Mock,
     ) -> None:
-        mock_asyncio_run.side_effect = [
-            _passing_pipeline_result(),
-            {"image_alt": "alt text", "image_caption": "caption text"},
-        ]
+        # chart_only (default) makes a single asyncio.run(run_pipeline(...)) call;
+        # refine_image_metadata is not invoked.
+        mock_run_pipeline.return_value = _passing_pipeline_result()
         flow = EconomistContentFlow()
 
         result = flow.generate_content({"topic": "AI Testing"})
@@ -191,49 +190,51 @@ class TestGenerateContent:
         # default flow is chart_only (#410): ships image-less, no DALL-E
         assert result["featured_image"] == ""
 
+    @patch("src.economist_agents.flow.refine_image_metadata", new_callable=AsyncMock)
     @patch("src.economist_agents.flow.generate_featured_image", return_value=True)
-    @patch("src.economist_agents.flow.asyncio.run")
+    @patch("src.economist_agents.flow.run_pipeline", new_callable=AsyncMock)
     def test_uses_dalle_image_when_generated(
         self,
-        mock_asyncio_run: Mock,
+        mock_run_pipeline: AsyncMock,
         mock_image: Mock,
+        mock_refine: AsyncMock,
     ) -> None:
-        mock_asyncio_run.side_effect = [
-            _passing_pipeline_result(),
-            {"image_alt": "alt text", "image_caption": "caption text"},
-        ]
+        mock_run_pipeline.return_value = _passing_pipeline_result()
+        mock_refine.return_value = {
+            "image_alt": "alt text",
+            "image_caption": "caption text",
+        }
         flow = EconomistContentFlow(image_mode="hero")
 
         result = flow.generate_content({"topic": "AI Coding Assistants"})
 
         assert result["featured_image"] == "/assets/images/ai-coding-assistants.png"
 
+    @patch("src.economist_agents.flow.refine_image_metadata", new_callable=AsyncMock)
     @patch("src.economist_agents.flow.generate_featured_image", return_value=False)
-    @patch("src.economist_agents.flow.asyncio.run")
-    def test_refine_image_metadata_called_via_asyncio_run(
+    @patch("src.economist_agents.flow.run_pipeline", new_callable=AsyncMock)
+    def test_hero_mode_awaits_refine_image_metadata(
         self,
-        mock_asyncio_run: Mock,
+        mock_run_pipeline: AsyncMock,
         mock_image: Mock,
+        mock_refine: AsyncMock,
     ) -> None:
-        """asyncio.run must be called twice: once for run_pipeline, once for
-        refine_image_metadata. The second call must receive a coroutine."""
-        import asyncio as _asyncio
-
-        mock_asyncio_run.side_effect = [
-            _passing_pipeline_result(),
-            {"image_alt": "editorial alt", "image_caption": "editorial caption"},
-        ]
+        """In hero mode the flow must await refine_image_metadata exactly once, with
+        the generated image path. (Replaces the old asyncio.run-introspection test
+        that asserted call_count/iscoroutine on the seam we've removed.)"""
+        mock_run_pipeline.return_value = _passing_pipeline_result()
+        mock_refine.return_value = {
+            "image_alt": "editorial alt",
+            "image_caption": "editorial caption",
+        }
         flow = EconomistContentFlow(image_mode="hero")
 
         flow.generate_content({"topic": "AI Testing"})
 
-        assert mock_asyncio_run.call_count == 2
-        second_arg = mock_asyncio_run.call_args_list[1][0][0]
-        assert _asyncio.iscoroutine(second_arg), (
-            "Second asyncio.run() call should pass the refine_image_metadata coroutine, "
-            f"got {type(second_arg)}"
-        )
-        second_arg.close()  # prevent ResourceWarning
+        mock_refine.assert_awaited_once()
+        # First positional arg is the DALL-E image path (output/images/<slug>.png).
+        image_path = mock_refine.await_args.args[0]
+        assert image_path.endswith("ai-testing.png")
 
 
 # ─── stage 4 routing ────────────────────────────────────────────────────
@@ -391,9 +392,9 @@ class TestPublishArticle:
 
 
 class TestRequestRevision:
-    @patch("src.economist_agents.flow.asyncio.run")
-    def test_succeeds_on_retry(self, mock_asyncio_run: Mock) -> None:
-        mock_asyncio_run.return_value = _passing_pipeline_result()
+    @patch("src.economist_agents.flow.run_pipeline", new_callable=AsyncMock)
+    def test_succeeds_on_retry(self, mock_run_pipeline: AsyncMock) -> None:
+        mock_run_pipeline.return_value = _passing_pipeline_result()
         flow = EconomistContentFlow()
         flow.state["selected_topic"] = {"topic": "Retry Me"}
         flow.state["revision_feedback"] = ["fix the ending"]
@@ -404,10 +405,10 @@ class TestRequestRevision:
         assert result["status"] == "published"
         assert result["retry_count"] == 1
 
-    @patch("src.economist_agents.flow.asyncio.run")
+    @patch("src.economist_agents.flow.run_pipeline", new_callable=AsyncMock)
     def test_quarantines_when_retry_still_fails(
         self,
-        mock_asyncio_run: Mock,
+        mock_run_pipeline: AsyncMock,
         tmp_path,
     ) -> None:
         failing = _passing_pipeline_result()
@@ -420,7 +421,7 @@ class TestRequestRevision:
             },
         ]
         failing.editorial_score = 40
-        mock_asyncio_run.return_value = failing
+        mock_run_pipeline.return_value = failing
 
         flow = EconomistContentFlow()
         flow.state["selected_topic"] = {"topic": "Stuck Topic"}
@@ -847,7 +848,7 @@ class TestKickoffResultFile:
         mock_client,
         mock_scout,
         mock_board,
-        mock_asyncio_run,
+        mock_run_pipeline,
     ) -> Path:
         """Wire all mocks and run kickoff(); return the result JSON path."""
         import src.economist_agents.flow as flow_module
@@ -871,15 +872,14 @@ class TestKickoffResultFile:
             "consensus": True,
             "dissenting_views": [],
         }
-        mock_asyncio_run.side_effect = [
-            _passing_pipeline_result(),
-            {"image_alt": "alt", "image_caption": "cap"},
-        ]
+        # chart_only (default) publish path: a single run_pipeline await, no
+        # refine_image_metadata call.
+        mock_run_pipeline.return_value = _passing_pipeline_result()
         flow.kickoff()
         return result_path
 
     @patch("src.economist_agents.flow.generate_featured_image", return_value=False)
-    @patch("src.economist_agents.flow.asyncio.run")
+    @patch("src.economist_agents.flow.run_pipeline", new_callable=AsyncMock)
     @patch("src.economist_agents.flow.run_editorial_board")
     @patch("src.economist_agents.flow.scout_topics")
     @patch("src.economist_agents.flow.create_llm_client")
@@ -888,7 +888,7 @@ class TestKickoffResultFile:
         mock_client: Mock,
         mock_scout: Mock,
         mock_board: Mock,
-        mock_asyncio_run: Mock,
+        mock_run_pipeline: AsyncMock,
         mock_image: Mock,
         tmp_path,
         monkeypatch,
@@ -896,7 +896,12 @@ class TestKickoffResultFile:
         import orjson
 
         result_path = self._run_kickoff(
-            tmp_path, monkeypatch, mock_client, mock_scout, mock_board, mock_asyncio_run
+            tmp_path,
+            monkeypatch,
+            mock_client,
+            mock_scout,
+            mock_board,
+            mock_run_pipeline,
         )
         assert result_path.exists(), "pipeline_result.json was not written"
         data = orjson.loads(result_path.read_bytes())
@@ -905,7 +910,7 @@ class TestKickoffResultFile:
         assert "status" in data
 
     @patch("src.economist_agents.flow.generate_featured_image", return_value=False)
-    @patch("src.economist_agents.flow.asyncio.run")
+    @patch("src.economist_agents.flow.run_pipeline", new_callable=AsyncMock)
     @patch("src.economist_agents.flow.run_editorial_board")
     @patch("src.economist_agents.flow.scout_topics")
     @patch("src.economist_agents.flow.create_llm_client")
@@ -914,7 +919,7 @@ class TestKickoffResultFile:
         mock_client: Mock,
         mock_scout: Mock,
         mock_board: Mock,
-        mock_asyncio_run: Mock,
+        mock_run_pipeline: AsyncMock,
         mock_image: Mock,
         tmp_path,
         monkeypatch,
@@ -922,7 +927,12 @@ class TestKickoffResultFile:
         import orjson
 
         result_path = self._run_kickoff(
-            tmp_path, monkeypatch, mock_client, mock_scout, mock_board, mock_asyncio_run
+            tmp_path,
+            monkeypatch,
+            mock_client,
+            mock_scout,
+            mock_board,
+            mock_run_pipeline,
         )
         data = orjson.loads(result_path.read_bytes())
         assert data["editorial_score"] == 88  # from _passing_pipeline_result
@@ -930,7 +940,7 @@ class TestKickoffResultFile:
         assert data["status"] == "published"
 
     @patch("src.economist_agents.flow.generate_featured_image", return_value=False)
-    @patch("src.economist_agents.flow.asyncio.run")
+    @patch("src.economist_agents.flow.run_pipeline", new_callable=AsyncMock)
     @patch("src.economist_agents.flow.run_editorial_board")
     @patch("src.economist_agents.flow.scout_topics")
     @patch("src.economist_agents.flow.create_llm_client")
@@ -939,7 +949,7 @@ class TestKickoffResultFile:
         mock_client: Mock,
         mock_scout: Mock,
         mock_board: Mock,
-        mock_asyncio_run: Mock,
+        mock_run_pipeline: AsyncMock,
         mock_image: Mock,
         tmp_path,
         monkeypatch,
@@ -967,8 +977,8 @@ class TestKickoffResultFile:
         failing.editorial_score = 40
         failing.publication_validator_passed = False
         # chart_only (default) makes no refine_image_metadata call, so the only
-        # asyncio.run calls are the two run_pipeline invocations.
-        mock_asyncio_run.side_effect = [
+        # run_pipeline awaits are the generate + revision invocations.
+        mock_run_pipeline.side_effect = [
             failing,  # run_pipeline (generate)
             failing,  # run_pipeline (revision)
         ]
@@ -988,7 +998,7 @@ class TestKickoffResultFile:
         assert "gates_passed" in data
 
     @patch("src.economist_agents.flow.generate_featured_image", return_value=False)
-    @patch("src.economist_agents.flow.asyncio.run")
+    @patch("src.economist_agents.flow.run_pipeline", new_callable=AsyncMock)
     @patch("src.economist_agents.flow.run_editorial_board")
     @patch("src.economist_agents.flow.scout_topics")
     @patch("src.economist_agents.flow.create_llm_client")
@@ -997,7 +1007,7 @@ class TestKickoffResultFile:
         mock_client: Mock,
         mock_scout: Mock,
         mock_board: Mock,
-        mock_asyncio_run: Mock,
+        mock_run_pipeline: AsyncMock,
         mock_image: Mock,
         tmp_path,
         monkeypatch,
@@ -1018,10 +1028,7 @@ class TestKickoffResultFile:
             "consensus": True,
             "dissenting_views": [],
         }
-        mock_asyncio_run.side_effect = [
-            _passing_pipeline_result(),
-            {"image_alt": "alt", "image_caption": "cap"},
-        ]
+        mock_run_pipeline.return_value = _passing_pipeline_result()
         flow = EconomistContentFlow()
         flow._deduplicator = Mock()
         flow._deduplicator.filter_topics.side_effect = lambda t: (t, [])

@@ -629,7 +629,9 @@ def apply_editorial_fixes(article: str, current_date: str | None = None) -> str:
             if "layout:" not in fm:
                 fm = "\nlayout: post" + fm
             if "author:" not in fm:
-                fm = fm.rstrip() + '\nauthor: "Ouray Viney"\n'
+                from scripts.publication_validator import BLOG_AUTHOR
+
+                fm = fm.rstrip() + f'\nauthor: "{BLOG_AUTHOR}"\n'
             if "categories:" not in fm:
                 fm = fm.rstrip() + '\ncategories: ["Quality Engineering"]\n'
             fm = _normalize_category_casing(fm)
@@ -731,7 +733,7 @@ async def refine_image_metadata(
         return fallback
 
     try:
-        import anthropic as _anthropic
+        from scripts.llm_client import create_async_anthropic_client
 
         suffix = path.suffix.lower().lstrip(".")
         media_type = {
@@ -749,7 +751,7 @@ async def refine_image_metadata(
                 vision_model,
             )
             vision_model = _DEFAULT_VISION_MODEL
-        client = _anthropic.AsyncAnthropic(api_key=api_key)
+        client = create_async_anthropic_client(api_key)
         response = await client.messages.create(
             model=vision_model,
             max_tokens=256,

@@ -26,27 +26,26 @@ _(none)_
 
 ## Todo
 
-### B-001 · P3 · Wire Stage 4 author safety net to BLOG_AUTHOR constant (was #420)
-
-`type:refactor`.
-
-Follow-up from PR #416 (issue #401). `BLOG_AUTHOR`
-(`scripts/publication_validator.py`) is wired into the Stage 3 writer prompt and
-the validator's author contract. The Stage 4 frontmatter safety net at
-`src/agent_sdk/_shared.py:632` still emits the author as a literal
-(`author: "Ouray Viney"`), so it can drift if `BLOG_AUTHOR` changes.
-
-**Why deferred** `_shared.py` carries a pre-existing ADR-002 violation
-(`import anthropic` in the vision-refinement helper, ~line 734) that the
-arch-review gate blocks on any edit to that file.
-
-**Fix (once unblocked)**
-1. Resolve the ADR-002 `anthropic` import (route via AgentRegistry).
-2. Import `BLOG_AUTHOR` and interpolate at line 632.
-3. The behavioural test in `tests/test_author_contract.py` becomes load-bearing
-   against the constant.
+_(none — sprint backlog cleared 2026-06-14: B-003 → B-002 → B-001 all merged)_
 
 ## Done
+
+### B-001 · Wired Stage 4 author safety net to BLOG_AUTHOR — 2026-06-14
+
+Slice 3 (final) of the sprint. PR #435 (squash-merged to `main`). The Stage 4
+frontmatter safety net (`src/agent_sdk/_shared.py`) hard-coded the author as the
+literal `"Ouray Viney"`; it now interpolates `BLOG_AUTHOR`
+(`scripts/publication_validator.py`) via a lazy import, making the constant the
+single source of truth across the Stage 3 prompt, Stage 4 safety net, and the
+validator's author contract. Editing `_shared.py` was blocked by a pre-existing
+ADR-002 violation (`import anthropic` in the vision helper); cleared by adding
+`create_async_anthropic_client()` to the exception-listed `scripts/llm_client.py`
+factory and routing `refine_image_metadata` through it (no behaviour change — the
+factory's lazy `from anthropic import AsyncAnthropic` keeps existing
+`patch("anthropic.AsyncAnthropic")` tests valid). Added a load-bearing regression
+that monkeypatches `BLOG_AUTHOR` at its source and asserts the new value flows
+into the frontmatter (fails if reverted to a literal). Full suite: 2410 passed.
+Spec: `docs/specs/B-001-blog-author-safety-net.md`.
 
 ### B-002 · Removed asyncio.run stub in test_flow_agent_sdk.py — 2026-06-14
 

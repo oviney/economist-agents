@@ -43,20 +43,24 @@ def _close_coros_then(action):
 
 def _diag(
     arxiv: int = 0,
-    google_web: int = 0,
-    google_scholar: int = 0,
+    semantic_scholar: int = 0,
     *,
     arxiv_failed: bool = False,
-    google_failed: bool = False,
+    semantic_scholar_failed: bool = False,
 ) -> dict[str, object]:
-    """Build the diagnostics dict matching _run_web_searches' new return shape."""
+    """Build the diagnostics dict matching _run_web_searches' return shape.
+
+    Free-providers-only after the paid-API removal: arXiv + Semantic Scholar.
+    """
     return {
         "source_counts": {
             "arxiv": arxiv,
-            "google_web": google_web,
-            "google_scholar": google_scholar,
+            "semantic_scholar": semantic_scholar,
         },
-        "provider_failed": {"arxiv": arxiv_failed, "google": google_failed},
+        "provider_failed": {
+            "arxiv": arxiv_failed,
+            "semantic_scholar": semantic_scholar_failed,
+        },
     }
 
 
@@ -90,7 +94,10 @@ class TestEmptyResearchBriefError:
         with (
             patch(
                 "src.agent_sdk._shared._run_web_searches",
-                return_value=("", _diag(arxiv_failed=True, google_failed=True)),
+                return_value=(
+                    "",
+                    _diag(arxiv_failed=True, semantic_scholar_failed=True),
+                ),
             ),
             pytest.raises(SearchProvidersFailedError, match="provider_failed"),
         ):
@@ -121,92 +128,29 @@ class TestEmptyResearchBriefError:
 
         with patch(
             "src.agent_sdk._shared._run_web_searches",
-            return_value=("## Web Sources\n- Some result", _diag(google_web=1)),
+            return_value=(
+                "## Semantic Scholar\n- Some result",
+                _diag(semantic_scholar=1),
+            ),
         ):
             brief = build_research_brief("AI Testing")
 
         assert "Some result" in brief
 
-    def test_provider_error_stubs_are_filtered_and_categorised_as_failed(
+    def test_free_providers_only_aggregate_sources_across_arxiv_and_semantic_scholar(
         self,
     ) -> None:
-        """When search_web/search_scholar return [{"error": "..."}] stubs
-        (HTTPError caught internally), they must NOT be counted as sources
-        and the provider must be marked failed so the gate categorises as
-        SearchProvidersFailedError rather than SearchProvidersEmptyError.
-
-        Reproduces the regression discovered post-#385 with --research-only
-        on a Serper-rejected query.
+        """When arXiv fails but Semantic Scholar returns results, the brief
+        must be built from Semantic Scholar alone and the gate must NOT fire.
+        Proves the free-providers-only fan-out is resilient to a single
+        provider outage (the paid Serper/Brave/Tavily providers were removed).
         """
-        from src.agent_sdk._shared import (
-            SearchProvidersFailedError,
-            _run_web_searches,
-            build_research_brief,
-        )
-
-        # arxiv: clean empty success; google: success=True but results are
-        # all error stubs from the underlying search_web/scholar methods
-        def fake_arxiv(*args, **kwargs):
-            return {"success": True, "insights": {"papers_analyzed": []}}
-
-        def fake_google(*args, **kwargs):
-            return {
-                "success": True,
-                "topic": "x",
-                "web_results": [{"error": "HTTP error from Serper API: 400"}],
-                "scholar_results": [{"error": "HTTP error from Serper API: 400"}],
-            }
-
-        # Stub the three new providers (#388) so the test isolates the
-        # error-stub behaviour of the Google path: each returns a clean
-        # zero-result success so neither counts nor failure flags fire.
-        def fake_empty_success(*args, **kwargs):
-            return {"success": True, "papers": [], "results": [], "answer": ""}
-
-        with (
-            patch("scripts.arxiv_search.search_arxiv_for_topic", fake_arxiv),
-            patch("scripts.google_search.search_google_for_topic", fake_google),
-            patch(
-                "scripts.semantic_scholar_search.search_semantic_scholar_for_topic",
-                fake_empty_success,
-            ),
-            patch("scripts.brave_search.search_brave_for_topic", fake_empty_success),
-            patch("scripts.tavily_search.search_tavily_for_topic", fake_empty_success),
-        ):
-            _, diag = _run_web_searches("AI Testing")
-            # All six counters at zero — error stubs filtered, new providers
-            # returned clean empties.
-            assert sum(diag["source_counts"].values()) == 0
-            assert diag["source_counts"]["google_web"] == 0
-            assert diag["source_counts"]["google_scholar"] == 0
-            # Google must still be marked failed (error-stub provenance);
-            # the new providers ran cleanly so they stay non-failed.
-            assert diag["provider_failed"]["google"] is True
-            assert diag["provider_failed"]["semantic_scholar"] is False
-            assert diag["provider_failed"]["brave"] is False
-            assert diag["provider_failed"]["tavily"] is False
-
-            with pytest.raises(SearchProvidersFailedError):
-                build_research_brief("AI Testing")
-
-    def test_multi_provider_mixed_success_aggregates_sources_across_providers(
-        self,
-    ) -> None:
-        """#388: when arXiv/Google fail but Semantic Scholar + Brave +
-        Tavily return results, the brief must be built from those and
-        the gate must NOT fire. Proves the fan-out makes the pipeline
-        resilient to single-provider outages (the original motivation
-        for filing #388 — Serper credits exhausted, arXiv rate-limited)."""
         from src.agent_sdk._shared import _run_web_searches
 
         with (
             patch(
                 "scripts.arxiv_search.search_arxiv_for_topic",
                 return_value={"success": False, "insights": {}, "error": "rate-limit"},
-            ),
-            patch(
-                "scripts.google_search.search_google_for_topic",
-                return_value={"success": False, "error": "no credits"},
             ),
             patch(
                 "scripts.semantic_scholar_search.search_semantic_scholar_for_topic",
@@ -225,43 +169,17 @@ class TestEmptyResearchBriefError:
                     ],
                 },
             ),
-            patch(
-                "scripts.brave_search.search_brave_for_topic",
-                return_value={
-                    "success": True,
-                    "results": [
-                        {"title": "B", "url": "https://b.example", "snippet": "s"}
-                    ],
-                },
-            ),
-            patch(
-                "scripts.tavily_search.search_tavily_for_topic",
-                return_value={
-                    "success": True,
-                    "results": [
-                        {
-                            "title": "T",
-                            "url": "https://t.example",
-                            "snippet": "s",
-                            "score": 0.9,
-                        }
-                    ],
-                    "answer": "Synthesized insight.",
-                },
-            ),
         ):
             text, diag = _run_web_searches("AI Testing")
 
-        # arXiv + google both failed; the new three carried the load.
+        # arXiv failed; Semantic Scholar carried the load.
         assert diag["provider_failed"]["arxiv"] is True
-        assert diag["provider_failed"]["google"] is True
         assert diag["provider_failed"]["semantic_scholar"] is False
-        assert diag["provider_failed"]["brave"] is False
-        assert diag["provider_failed"]["tavily"] is False
-        # Three sources counted (one from each surviving provider).
-        assert sum(diag["source_counts"].values()) == 3
-        # Tavily's generated answer surfaces in the brief for the writer.
-        assert "Synthesized insight." in text
+        # Exactly one source counted (from Semantic Scholar).
+        assert sum(diag["source_counts"].values()) == 1
+        assert diag["source_counts"]["semantic_scholar"] == 1
+        # The Semantic Scholar paper surfaces in the brief for the writer.
+        assert "Paper" in text
 
     def test_run_stage3_propagates_empty_research_error(self) -> None:
         """EmptyResearchBriefError (and subclasses) must not be swallowed by run_stage3."""
@@ -271,7 +189,10 @@ class TestEmptyResearchBriefError:
         with (
             patch(
                 "src.agent_sdk._shared._run_web_searches",
-                return_value=("", _diag(arxiv_failed=True, google_failed=True)),
+                return_value=(
+                    "",
+                    _diag(arxiv_failed=True, semantic_scholar_failed=True),
+                ),
             ),
             pytest.raises(EmptyResearchBriefError),
         ):
@@ -302,7 +223,7 @@ class TestEmptyResearchFlowRouting:
 
         assert result["publication_validator_passed"] is False
         assert result["editorial_score"] == 0
-        assert "SERPER_API_KEY" in str(flow.state.get("revision_feedback", ""))
+        assert "Research providers" in str(flow.state.get("revision_feedback", ""))
 
     def test_quality_gate_routes_to_revision_after_empty_research(self) -> None:
         from src.agent_sdk._shared import EmptyResearchBriefError

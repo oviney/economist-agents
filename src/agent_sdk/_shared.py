@@ -714,9 +714,13 @@ async def refine_image_metadata(
 
     fallback = {"image_alt": draft_alt, "image_caption": draft_caption}
 
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
-        logger.warning("ANTHROPIC_API_KEY not set — skipping vision refinement")
+    from scripts.llm_client import resolve_anthropic_auth
+
+    if not resolve_anthropic_auth():
+        logger.warning(
+            "No Anthropic credentials (ANTHROPIC_API_KEY / ANTHROPIC_AUTH_TOKEN / "
+            "ant profile) — skipping vision refinement",
+        )
         return fallback
 
     path = _Path(image_path)
@@ -751,7 +755,7 @@ async def refine_image_metadata(
                 vision_model,
             )
             vision_model = _DEFAULT_VISION_MODEL
-        client = create_async_anthropic_client(api_key)
+        client = create_async_anthropic_client()
         response = await client.messages.create(
             model=vision_model,
             max_tokens=256,

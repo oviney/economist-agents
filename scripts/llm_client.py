@@ -19,6 +19,7 @@ Usage:
 
 import logging
 import os
+import subprocess
 import time
 from typing import Any
 
@@ -35,6 +36,56 @@ try:
         load_dotenv(env_path)
 except ImportError:
     pass  # python-dotenv not installed, use system env vars
+
+
+def _load_ant_profile_token() -> str | None:
+    """Return the active ``ant`` profile's OAuth token, or ``None``.
+
+    Shells ``ant auth print-credentials --access-token`` (which refreshes the
+    short-lived token as a side effect). Returns the stripped token on a clean
+    exit with non-empty output; otherwise ``None``. Never raises — a missing
+    ``ant`` binary, a timeout, or any failure resolves to ``None`` so callers
+    can fall through to the next credential source.
+    """
+    try:
+        result = subprocess.run(
+            ["ant", "auth", "print-credentials", "--access-token"],
+            capture_output=True,
+            text=True,
+            timeout=15,
+            check=False,
+        )
+    except (FileNotFoundError, subprocess.TimeoutExpired, OSError) as exc:
+        logger.debug("ant profile token unavailable: %s", exc)
+        return None
+
+    token = result.stdout.strip()
+    return token if result.returncode == 0 and token else None
+
+
+def resolve_anthropic_auth() -> str | None:
+    """Return the available Anthropic auth kind, or ``None``.
+
+    Resolution order:
+        1. ``ANTHROPIC_API_KEY`` env  -> ``"api_key"``
+        2. ``ANTHROPIC_AUTH_TOKEN`` env -> ``"auth_token"``
+        3. active ``ant`` profile      -> ``"auth_token"`` (side effect: sets
+           ``os.environ["ANTHROPIC_AUTH_TOKEN"]`` from the profile token so the
+           ``anthropic`` SDK, which only reads env vars, can authenticate)
+
+    Returns ``None`` when no credential is available. Never raises.
+    """
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        return "api_key"
+    if os.environ.get("ANTHROPIC_AUTH_TOKEN"):
+        return "auth_token"
+
+    token = _load_ant_profile_token()
+    if token:
+        os.environ["ANTHROPIC_AUTH_TOKEN"] = token
+        return "auth_token"
+
+    return None
 
 
 class LLMClient:
@@ -63,7 +114,7 @@ def create_llm_client(max_retries: int = 3, base_delay: int = 1) -> LLMClient:
         ValueError: If neither API key is set.
 
     """
-    if os.environ.get("ANTHROPIC_API_KEY"):
+    if resolve_anthropic_auth():
         print("🤖 LLM Provider: anthropic")
         return _create_anthropic_client()
 
@@ -72,14 +123,19 @@ def create_llm_client(max_retries: int = 3, base_delay: int = 1) -> LLMClient:
         return _create_openai_client(max_retries, base_delay)
 
     raise ValueError(
-        "[LLM_CLIENT] No API key found. Set ANTHROPIC_API_KEY or OPENAI_API_KEY.",
+        "[LLM_CLIENT] No API key found. Set ANTHROPIC_API_KEY or OPENAI_API_KEY, "
+        "or run 'ant auth login'.",
     )
 
 
 def _create_anthropic_client() -> LLMClient:
-    """Create Anthropic client."""
-    api_key = os.environ["ANTHROPIC_API_KEY"]
+    """Create Anthropic client.
 
+    Credentials are resolved by :func:`resolve_anthropic_auth` (env API key, env
+    auth token, or ``ant`` profile) and surfaced via env vars, so the bare
+    ``Anthropic()`` constructor — which honours both ``ANTHROPIC_API_KEY`` and
+    ``ANTHROPIC_AUTH_TOKEN`` — authenticates without an explicit key argument.
+    """
     try:
         from anthropic import Anthropic
     except ImportError as err:
@@ -88,7 +144,7 @@ def _create_anthropic_client() -> LLMClient:
             "Install it: pip install anthropic",
         ) from err
 
-    client = Anthropic(api_key=api_key)
+    client = Anthropic()
     model = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-20250514")
     print(f"   Model: {model}")
     return LLMClient("anthropic", client, model)
@@ -113,7 +169,7 @@ def create_async_anthropic_client(api_key: str | None = None) -> Any:
         ImportError: If the ``anthropic`` package is not installed.
 
     """
-    key = api_key or os.environ["ANTHROPIC_API_KEY"]
+    key = api_key or os.environ.get("ANTHROPIC_API_KEY")
 
     try:
         from anthropic import AsyncAnthropic
@@ -123,7 +179,19 @@ def create_async_anthropic_client(api_key: str | None = None) -> Any:
             "Install it: pip install anthropic",
         ) from err
 
-    return AsyncAnthropic(api_key=key)
+    if key:
+        return AsyncAnthropic(api_key=key)
+
+    # No explicit/env API key — fall back to auth-token resolution (env var or
+    # `ant` profile). ``resolve_anthropic_auth`` populates ANTHROPIC_AUTH_TOKEN,
+    # which the bare ``AsyncAnthropic()`` constructor reads.
+    if resolve_anthropic_auth():
+        return AsyncAnthropic()
+
+    raise ValueError(
+        "[LLM_CLIENT] No Anthropic credentials found. Set ANTHROPIC_API_KEY or "
+        "ANTHROPIC_AUTH_TOKEN, or run 'ant auth login'.",
+    )
 
 
 def _create_openai_client(max_retries: int, base_delay: int) -> LLMClient:

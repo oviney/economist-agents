@@ -42,15 +42,28 @@ def mock_openai_client():
 
 @pytest.fixture
 def clean_env():
-    """Clean environment for testing."""
+    """Clean environment for the OpenAI-isolation tests.
+
+    Also clears the Anthropic credential env vars and disables the ``ant``
+    profile fallback: ``create_llm_client`` now resolves Anthropic auth (incl.
+    an on-disk ``ant`` profile) before OpenAI, so without this these OpenAI-path
+    tests would non-deterministically pick the anthropic provider on any machine
+    that happens to be logged in via ``ant``.
+    """
     # Store original env vars
     original_vars = {}
-    for key in ["OPENAI_API_KEY", "OPENAI_MODEL"]:
+    for key in [
+        "OPENAI_API_KEY",
+        "OPENAI_MODEL",
+        "ANTHROPIC_API_KEY",
+        "ANTHROPIC_AUTH_TOKEN",
+    ]:
         original_vars[key] = os.environ.get(key)
         if key in os.environ:
             del os.environ[key]
 
-    yield
+    with patch("scripts.llm_client._load_ant_profile_token", return_value=None):
+        yield
 
     # Restore original environment
     for key, value in original_vars.items():

@@ -32,48 +32,51 @@ Source = dict[str, str]
 
 
 def _run_provider_search(query: str, max_results: int) -> list[Source]:
-    """Fetch sources for ``query`` via the existing provider stack.
+    """Fetch sources for ``query`` via the free academic provider stack.
 
-    Brave first (lowest latency), Google web as fallback when Brave returns
-    nothing (e.g. no API key). Never raises — returns a possibly-empty list of
+    arXiv first, Semantic Scholar as fallback when arXiv returns nothing. Both
+    are keyless and no-cost — the pay-per-use providers (Brave, Google/Serper)
+    were removed. Never raises — returns a possibly-empty list of
     ``{"title", "url", "snippet"}`` dicts.
     """
-    from scripts.brave_search import search_brave_for_topic
+    try:
+        from scripts.arxiv_search import search_arxiv_for_topic
 
-    brave = search_brave_for_topic(query, max_results=max_results)
+        arxiv = search_arxiv_for_topic(query, max_papers=max_results)
+        papers = arxiv.get("insights", {}).get("papers_analyzed", [])
+    except Exception as exc:  # pragma: no cover - defensive
+        logger.warning("arXiv search failed for '%s': %s", query, exc)
+        papers = []
+
     sources = [
         {
-            "title": r.get("title", ""),
-            "url": r.get("url", ""),
-            "snippet": r.get("snippet", ""),
+            "title": p.get("title", ""),
+            "url": p.get("url", ""),
+            "snippet": p.get("key_insight", ""),
         }
-        for r in brave.get("results", [])
+        for p in papers
     ]
     if sources:
         return sources[:max_results]
 
-    # Fallback: Google. search_google_for_topic returns a *dict* with
-    # ``web_results`` / ``scholar_results`` lists (not a flat list) — read those
-    # keys rather than iterating the dict.
+    # Fallback: Semantic Scholar (keyless). Returns a dict with a ``papers``
+    # list, each carrying title / url / abstract.
     try:
-        from scripts.google_search import search_google_for_topic
+        from scripts.semantic_scholar_search import search_semantic_scholar_for_topic
 
-        google = search_google_for_topic(query, max_results=max_results)
+        ss = search_semantic_scholar_for_topic(query, max_papers=max_results)
     except Exception as exc:  # pragma: no cover - defensive
-        logger.warning("Google fallback failed for '%s': %s", query, exc)
+        logger.warning("Semantic Scholar fallback failed for '%s': %s", query, exc)
         return []
 
-    items = list(google.get("web_results", [])) + list(
-        google.get("scholar_results", [])
-    )
     return [
         {
-            "title": r.get("title", ""),
-            "url": r.get("url", r.get("link", "")),
-            "snippet": r.get("snippet", ""),
+            "title": p.get("title", ""),
+            "url": p.get("url", ""),
+            "snippet": p.get("abstract", ""),
         }
-        for r in items
-        if isinstance(r, dict) and "error" not in r
+        for p in ss.get("papers", [])
+        if isinstance(p, dict)
     ][:max_results]
 
 

@@ -115,55 +115,51 @@ def test_tool_returns_json_results(monkeypatch) -> None:
     assert session.calls_made == 1
 
 
-def test_provider_search_returns_and_maps_brave_results(monkeypatch) -> None:
-    """Brave results are returned and mapped to title/url/snippet; Google is
-    not consulted when Brave has results."""
+def test_provider_search_returns_and_maps_arxiv_results(monkeypatch) -> None:
+    """arXiv papers are returned and mapped to title/url/snippet; Semantic
+    Scholar is not consulted when arXiv has results."""
     monkeypatch.setattr(
-        "scripts.brave_search.search_brave_for_topic",
-        lambda q, max_results: {
-            "results": [
-                {"title": "B", "url": "https://b", "snippet": "brave snip", "age": "1d"}
-            ]
+        "scripts.arxiv_search.search_arxiv_for_topic",
+        lambda q, max_papers: {
+            "insights": {
+                "papers_analyzed": [
+                    {"title": "A", "url": "https://a", "key_insight": "arxiv snip"}
+                ]
+            }
         },
     )
 
-    def _google_must_not_be_called(q, max_results):  # pragma: no cover
-        raise AssertionError("Google should not be called when Brave has results")
+    def _ss_must_not_be_called(q, max_papers):  # pragma: no cover
+        raise AssertionError("Semantic Scholar must not be called when arXiv hits")
 
     monkeypatch.setattr(
-        "scripts.google_search.search_google_for_topic", _google_must_not_be_called
+        "scripts.semantic_scholar_search.search_semantic_scholar_for_topic",
+        _ss_must_not_be_called,
     )
 
     out = research_tools._run_provider_search("q", 3)
 
-    assert out == [{"title": "B", "url": "https://b", "snippet": "brave snip"}]
+    assert out == [{"title": "A", "url": "https://a", "snippet": "arxiv snip"}]
 
 
-def test_provider_search_falls_back_to_google_dict_shape(monkeypatch) -> None:
-    """When Brave returns nothing, the Google *dict* (web_results/scholar_results)
-    is read correctly. Regression for the dead-fallback bug found in #422 review.
-    """
+def test_provider_search_falls_back_to_semantic_scholar(monkeypatch) -> None:
+    """When arXiv returns nothing, Semantic Scholar's ``papers`` list is read
+    and mapped (title / url / abstract)."""
     monkeypatch.setattr(
-        "scripts.brave_search.search_brave_for_topic",
-        lambda q, max_results: {"results": []},
+        "scripts.arxiv_search.search_arxiv_for_topic",
+        lambda q, max_papers: {"insights": {"papers_analyzed": []}},
     )
     monkeypatch.setattr(
-        "scripts.google_search.search_google_for_topic",
-        lambda q, max_results: {
+        "scripts.semantic_scholar_search.search_semantic_scholar_for_topic",
+        lambda q, max_papers: {
             "success": True,
-            "web_results": [{"title": "W", "url": "https://w", "snippet": "web snip"}],
-            "scholar_results": [
-                {"title": "S", "link": "https://s", "snippet": "scholar snip"}
-            ],
-            "error": None,
+            "papers": [{"title": "S", "url": "https://s", "abstract": "ss snip"}],
         },
     )
 
     out = research_tools._run_provider_search("q", 5)
 
-    assert {"title": "W", "url": "https://w", "snippet": "web snip"} in out
-    # scholar item exposes its URL via `link` — must be mapped to `url`.
-    assert {"title": "S", "url": "https://s", "snippet": "scholar snip"} in out
+    assert {"title": "S", "url": "https://s", "snippet": "ss snip"} in out
 
 
 def test_tool_malformed_max_results_does_not_raise(monkeypatch) -> None:

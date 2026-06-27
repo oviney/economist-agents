@@ -293,11 +293,12 @@ class EconomistContentFlow:
             )
             self.state["revision_reason"] = str(exc)
             self.state["revision_feedback"] = [
-                "Web searches returned no results — check SERPER_API_KEY and retry."
+                "Research providers (arXiv, Semantic Scholar) returned no sources "
+                "— try a more research-covered angle on the topic."
             ]
             return self._null_article_draft(
                 "empty_research_brief",
-                "No web search results — check SERPER_API_KEY and retry.",
+                "No research sources found — try a more research-covered topic angle.",
             )
         except BudgetExceededError as exc:
             # Hard abort. Revising won't lower per-call cost — it just burns

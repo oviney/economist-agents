@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
-"""Ground Topic Scout trend research in live web search.
+"""Ground Topic Scout trend research in free, keyless evidence.
 
-Replaces the plain ``call_llm()`` trend-research step in ``topic_scout.py``
-with dated evidence from Google Web Search (via ``scripts/google_search.py``)
-and optional Hacker News front-page scraping.
+Collects dated trend evidence from the Hacker News front page (official HN
+Firebase API — no key, no cost). The previous Google Web Search path (via
+``scripts/google_search.py`` / Serper) was removed: research must never depend
+on a pay-per-use API.
 
 Exports
 -------
 build_grounded_trend_context(focus_area=None) -> str
-    Runs dated search queries, collects evidence, and returns a prompt-ready
-    text block that includes titles, URLs, dates, and snippets.
+    Collects HN front-page evidence and returns a prompt-ready text block that
+    includes titles, URLs, and dates.
 
 TrendEvidence
-    TypedDict describing the shape of evidence returned per query.
+    TypedDict describing the shape of collected evidence.
 
 Usage::
 
@@ -25,9 +26,8 @@ Usage::
 from __future__ import annotations
 
 import logging
-import os
 from datetime import UTC, datetime
-from typing import Any, TypedDict
+from typing import TypedDict
 
 import orjson
 import requests
@@ -57,27 +57,8 @@ class TrendEvidence(TypedDict):
 
 
 # ---------------------------------------------------------------------------
-# Constants – default search queries
+# Constants
 # ---------------------------------------------------------------------------
-
-
-def _current_year() -> int:
-    """Return the current year at call time (avoids stale module-level constant)."""
-    return datetime.now(tz=UTC).year
-
-
-def _default_queries() -> list[str]:
-    """Build default search queries using the current year."""
-    year = _current_year()
-    return [
-        f"quality engineering {year} announcements",
-        f"AI testing tool release {year}",
-        f"DevSecOps survey {year}",
-        f"platform engineering Backstage release {year}",
-        f"SRE conference {year}",
-        f"software testing trends {year}",
-        f"observability OpenTelemetry {year}",
-    ]
 
 
 _HN_TOP_STORIES_URL = "https://hacker-news.firebaseio.com/v0/topstories.json"
@@ -89,77 +70,6 @@ _HN_TIMEOUT = 5
 # ---------------------------------------------------------------------------
 # Internal helpers
 # ---------------------------------------------------------------------------
-
-
-def _get_searcher() -> Any:
-    """Create a ``GoogleSearcher`` instance.
-
-    Returns ``None`` when the ``SERPER_API_KEY`` environment variable is not
-    set, or when the ``google_search`` module cannot be imported or
-    initialised. Callers can then log a warning and skip web search.
-    """
-    if not os.environ.get("SERPER_API_KEY"):
-        return None
-
-    # Import lazily to keep module importable even when google_search has
-    # heavy optional deps.
-    try:
-        from scripts.google_search import GoogleSearcher
-    except ImportError as exc:
-        logger.warning(
-            "SERPER_API_KEY is set but google_search is unavailable; "
-            "skipping web search: %s",
-            exc,
-        )
-        return None
-
-    try:
-        return GoogleSearcher()
-    except Exception as exc:
-        logger.warning(
-            "Failed to initialise GoogleSearcher; skipping web search: %s",
-            exc,
-        )
-        return None
-
-
-def _run_query(searcher: Any, query: str, num_results: int = 5) -> list[EvidenceItem]:
-    """Execute a single web-search query and normalise results.
-
-    Args:
-        searcher: ``GoogleSearcher`` instance.
-        query: Search query string.
-        num_results: Maximum results to return.
-
-    Returns:
-        List of :class:`EvidenceItem` dicts (may be empty on error).
-
-    """
-    try:
-        raw = searcher.search_web(
-            query=query,
-            num_results=num_results,
-            year_start=_current_year(),
-        )
-    except Exception as exc:
-        logger.warning("Search failed for '%s': %s", query, exc)
-        return []
-
-    items: list[EvidenceItem] = []
-    for r in raw:
-        if "error" in r:
-            logger.warning("Search error for '%s': %s", query, r["error"])
-            continue
-        items.append(
-            EvidenceItem(
-                title=r.get("title", ""),
-                url=r.get("url", ""),
-                snippet=r.get("snippet", ""),
-                date=r.get("date", ""),
-                source=r.get("source", "google_search"),
-            ),
-        )
-    return items
 
 
 def _fetch_hn_top_stories(max_items: int = _HN_MAX_ITEMS) -> list[EvidenceItem]:
@@ -216,40 +126,23 @@ def _fetch_hn_top_stories(max_items: int = _HN_MAX_ITEMS) -> list[EvidenceItem]:
 # ---------------------------------------------------------------------------
 
 
-def gather_trend_evidence(
-    queries: list[str] | None = None,
-    include_hn: bool = True,
-    num_results_per_query: int = 5,
-) -> list[TrendEvidence]:
-    """Run web searches and return structured trend evidence.
+def gather_trend_evidence(include_hn: bool = True) -> list[TrendEvidence]:
+    """Collect structured trend evidence from free sources.
+
+    Currently the Hacker News front page is the only no-cost trend signal (the
+    pay-per-use Google/Serper search was removed). ``include_hn=False`` yields
+    an empty list.
 
     Args:
-        queries: Search queries to run.  Defaults to :data:`_DEFAULT_QUERIES`.
-        include_hn: When ``True``, also fetch Hacker News front-page stories.
-        num_results_per_query: Maximum results per query.
+        include_hn: When ``True``, fetch Hacker News front-page stories.
 
     Returns:
-        List of :class:`TrendEvidence` dicts, one per query (plus one for HN
-        if *include_hn* is ``True``).  Each element contains a ``query`` key
-        and a ``results`` list of :class:`EvidenceItem`.
+        A list with at most one :class:`TrendEvidence` entry (the HN front
+        page), each containing a ``query`` key and a ``results`` list of
+        :class:`EvidenceItem`.
 
     """
-    if queries is None:
-        queries = _default_queries()
-
     evidence: list[TrendEvidence] = []
-
-    searcher = _get_searcher()
-    if searcher is None:
-        logger.warning(
-            "SERPER_API_KEY not set — web search disabled; "
-            "trend grounding will be limited to HN stories (if enabled)",
-        )
-    else:
-        for q in queries:
-            results = _run_query(searcher, q, num_results=num_results_per_query)
-            evidence.append(TrendEvidence(query=q, results=results))
-            logger.info("Query '%s' returned %d evidence items", q, len(results))
 
     if include_hn:
         hn_stories = _fetch_hn_top_stories()
@@ -264,45 +157,24 @@ def gather_trend_evidence(
 def build_grounded_trend_context(
     focus_area: str | None = None,
     include_hn: bool = True,
-    num_results_per_query: int = 5,
 ) -> str:
     """Build a prompt-ready text block with dated trend evidence.
 
-    This is the primary entry point for ``topic_scout.py``.  It runs web
-    searches, collects evidence, and formats everything into a structured
-    text block that the scout prompt can consume directly.
+    Primary entry point for ``topic_scout.py``. Collects free trend evidence
+    (Hacker News front page) and formats it for the scout prompt.
 
     Args:
-        focus_area: Optional focus area to add extra targeted queries.
+        focus_area: Retained for API compatibility. No longer drives queries —
+            the free HN front-page signal is not query-scoped.
         include_hn: Include Hacker News front-page stories.
-        num_results_per_query: Maximum results per query.
 
     Returns:
         Formatted string containing dated evidence with URLs, suitable for
-        injection into an LLM prompt.  Returns a fallback message when no
+        injection into an LLM prompt. Returns a fallback message when no
         evidence could be collected.
 
     """
-    queries = _default_queries()
-
-    # Add focus-specific queries when a focus area is provided.
-    if focus_area:
-        # Strip and truncate to avoid injecting unexpected content into queries.
-        safe_focus = focus_area.strip()[:100]
-        year = _current_year()
-        queries.extend(
-            [
-                f"{safe_focus} {year} trends",
-                f"{safe_focus} {year} announcements",
-            ],
-        )
-
-    evidence = gather_trend_evidence(
-        queries=queries,
-        include_hn=include_hn,
-        num_results_per_query=num_results_per_query,
-    )
-
+    evidence = gather_trend_evidence(include_hn=include_hn)
     return format_evidence_as_prompt(evidence)
 
 
@@ -322,9 +194,9 @@ def format_evidence_as_prompt(evidence: list[TrendEvidence]) -> str:
     if total_items == 0:
         return (
             "## Live Trend Evidence\n\n"
-            "_No live evidence could be collected (API keys may be missing). "
-            "Rely on your training knowledge but flag any claims as "
-            "[UNVERIFIED]._\n"
+            "_No live evidence could be collected (Hacker News may be "
+            "unreachable). Rely on your training knowledge but flag any claims "
+            "as [UNVERIFIED]._\n"
         )
 
     # Determine which sources contributed evidence.

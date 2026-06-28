@@ -223,12 +223,14 @@ class ArxivSearcher:
                 "insights": [],
                 "recent_findings": [],
                 "citations": [],
+                "papers_analyzed": [],
                 "source_freshness": "No recent papers found",
             }
 
         insights = []
         citations = []
         recent_findings = []
+        papers_analyzed = []
 
         for paper in papers[:5]:  # Focus on top 5 most relevant
             # Extract key insight from abstract
@@ -239,6 +241,24 @@ class ArxivSearcher:
             # Format academic citation
             citation = self._format_citation(paper)
             citations.append(citation)
+
+            # Render-ready record for downstream consumers (the research brief
+            # fan-out reads ``insights.papers_analyzed`` — title/url/authors/
+            # published/key_insight). Authors are joined to a string here so the
+            # brief doesn't render a raw Python list.
+            authors = paper.get("authors", [])
+            papers_analyzed.append(
+                {
+                    "title": paper.get("title", ""),
+                    "url": paper.get("url", ""),
+                    "authors": ", ".join(authors)
+                    if isinstance(authors, list)
+                    else str(authors),
+                    "published": paper.get("published", ""),
+                    "abstract": paper.get("abstract", ""),
+                    "key_insight": insight,
+                },
+            )
 
             # Highlight recent finding
             if paper["days_old"] <= 7:  # Published this week
@@ -258,6 +278,7 @@ class ArxivSearcher:
             "insights": insights,
             "recent_findings": recent_findings,
             "citations": citations,
+            "papers_analyzed": papers_analyzed,
             "source_freshness": freshness_desc,
             "paper_count": len(papers),
             "average_age_days": round(avg_age, 1),

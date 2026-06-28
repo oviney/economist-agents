@@ -16,6 +16,7 @@ from __future__ import annotations
 import contextlib
 import logging
 import re
+import time
 from datetime import datetime, timedelta
 from typing import Any
 
@@ -31,9 +32,36 @@ if "json" not in locals():
 
 logger = logging.getLogger(__name__)
 
+# Retry policy for transient failures (HTTP 429 / connection errors).
+# arXiv throttles bursts; a single 429 must not zero out the provider.
+# Exponential backoff: 1.5s, 3.0s between three total attempts.
+_MAX_ATTEMPTS = 3
+_BASE_DELAY = 1.5
+
 
 class ArxivSearchError(Exception):
     """Custom exception for arXiv search errors."""
+
+
+def _is_retryable(exc: Exception) -> bool:
+    """Return True for transient errors worth retrying.
+
+    Retryable: HTTP 429 (rate limit), arXiv's ``UnexpectedEmptyPageError``
+    (a flaky empty page mid-stream), and connection-level errors whose type
+    or message indicates a transient transport failure. Everything else —
+    including clean empty results — is not retried.
+    """
+    if arxiv is not None:
+        if isinstance(exc, arxiv.HTTPError):
+            return getattr(exc, "status", None) == 429
+        if isinstance(exc, arxiv.UnexpectedEmptyPageError):
+            return True
+    # Connection-level failures surface via requests under the hood or as
+    # generic ConnectionError/TimeoutError. Match by type or message.
+    if isinstance(exc, (ConnectionError, TimeoutError)):
+        return True
+    transient_markers = ("connection", "timed out", "timeout", "temporarily")
+    return any(marker in str(exc).lower() for marker in transient_markers)
 
 
 class ArxivSearcher:
@@ -117,8 +145,13 @@ class ArxivSearcher:
                 sort_order=arxiv.SortOrder.Descending,
             )
 
+            # Fetch with retry/backoff so a single 429 or transient connection
+            # error doesn't zero out the provider. A clean empty result is not
+            # an error and is not retried.
+            results = self._fetch_results(client, search)
+
             papers = []
-            for result in client.results(search):
+            for result in results:
                 # Filter by date
                 if result.published.replace(tzinfo=None) < self.cutoff_date:
                     continue
@@ -137,6 +170,43 @@ class ArxivSearcher:
         except Exception as e:
             logger.error(f"arXiv search failed: {e}")
             raise ArxivSearchError(f"Search failed: {e}") from e
+
+    def _fetch_results(
+        self,
+        client: arxiv.Client,
+        search: arxiv.Search,
+    ) -> list[arxiv.Result]:
+        """Materialise arXiv search results with retry + exponential backoff.
+
+        Retries only on transient failures — HTTP 429 (rate limit), arXiv's
+        ``UnexpectedEmptyPageError``, and connection-level errors. A clean,
+        successfully-fetched (possibly empty) result list is returned without
+        retrying. After ``_MAX_ATTEMPTS`` the last error is re-raised for the
+        caller to convert into an ``ArxivSearchError``.
+        """
+        last_exc: Exception | None = None
+        for attempt in range(1, _MAX_ATTEMPTS + 1):
+            try:
+                # Materialise the generator here so transient page-fetch
+                # errors surface inside the retry loop, not downstream.
+                return list(client.results(search))
+            except Exception as exc:  # noqa: BLE001 - classified below
+                if not _is_retryable(exc) or attempt == _MAX_ATTEMPTS:
+                    raise
+                last_exc = exc
+                delay = _BASE_DELAY * (2 ** (attempt - 1))
+                logger.warning(
+                    "arXiv transient error (%s); retry %d/%d after %.1fs",
+                    exc,
+                    attempt + 1,
+                    _MAX_ATTEMPTS,
+                    delay,
+                )
+                time.sleep(delay)
+        # Unreachable: loop either returns or raises. Guard for type-checkers.
+        if last_exc is not None:  # pragma: no cover
+            raise last_exc
+        return []  # pragma: no cover
 
     def extract_business_insights(self, papers: list[dict[str, Any]]) -> dict[str, Any]:
         """Extract business-relevant insights from arXiv papers.

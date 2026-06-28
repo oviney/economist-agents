@@ -6,7 +6,7 @@ OpenAI when only OPENAI_API_KEY is available.
 
 Environment Variables:
     ANTHROPIC_API_KEY: Anthropic API key (preferred)
-    ANTHROPIC_MODEL: Anthropic model (default: claude-sonnet-4-20250514)
+    ANTHROPIC_MODEL: Anthropic model (default: claude-sonnet-4-6)
     OPENAI_API_KEY: OpenAI API key (fallback)
     OPENAI_MODEL: OpenAI model (default: gpt-4o)
 
@@ -145,7 +145,7 @@ def _create_anthropic_client() -> LLMClient:
         ) from err
 
     client = Anthropic()
-    model = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-20250514")
+    model = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-6")
     print(f"   Model: {model}")
     return LLMClient("anthropic", client, model)
 

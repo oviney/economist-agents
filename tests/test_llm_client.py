@@ -134,6 +134,27 @@ class TestClientCreation:
             client = create_llm_client()
             assert client.model == "gpt-3.5-turbo"
 
+    def test_anthropic_default_model_is_sonnet_4_6(self):
+        """Default Anthropic model is claude-sonnet-4-6 when ANTHROPIC_MODEL is unset."""
+        import types
+
+        mock_anthropic_instance = MagicMock()
+        fake_module = types.ModuleType("anthropic")
+        fake_module.Anthropic = MagicMock(  # type: ignore[attr-defined]
+            return_value=mock_anthropic_instance,
+        )
+
+        env = {"ANTHROPIC_API_KEY": "sk-ant-test"}
+        with (
+            patch.dict(os.environ, env, clear=True),
+            patch.dict(sys.modules, {"anthropic": fake_module}),
+        ):
+            client = create_llm_client()
+
+        assert isinstance(client, LLMClient)
+        assert client.provider == "anthropic"
+        assert client.model == "claude-sonnet-4-6"
+
 
 # ═══════════════════════════════════════════════════════════════════════════
 # TEST ERROR HANDLING

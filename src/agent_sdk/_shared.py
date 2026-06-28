@@ -534,10 +534,20 @@ def _auto_embed_chart(article: str) -> str:
         return article
 
     slug_match = re.search(r"image:\s*/assets/images/([^.\s]+)", article)
-    if not slug_match:
-        return article
+    if slug_match:
+        slug = slug_match.group(1)
+    else:
+        # chart_only mode strips the hero ``image:`` frontmatter, so derive the
+        # slug from the title instead — otherwise the chart can never be
+        # embedded and the article fails the mandatory-chart validator.
+        title_match = re.search(r"title:\s*[\"']?(.+?)[\"']?\s*\n", article)
+        if not title_match:
+            return article
+        slug = (
+            re.sub(r"[^a-z0-9]+", "-", title_match.group(1).lower()).strip("-")
+            or "untitled"
+        )
 
-    slug = slug_match.group(1)
     chart_embed = f"\n![Chart](/assets/charts/{slug}.png)\n"
 
     ref_match = re.search(r"\n## References", article)

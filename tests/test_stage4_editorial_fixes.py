@@ -201,8 +201,15 @@ class TestChartAutoEmbed:
         result = _apply_editorial_fixes(article)
         assert result.count("![Chart]") == 1
 
-    def test_no_chart_if_no_image_field(self) -> None:
+    def test_chart_embedded_from_title_when_no_image_field(self) -> None:
+        # chart_only mode strips the hero ``image:`` frontmatter; the chart slug
+        # now falls back to the title so the mandatory-chart gate is still met.
         article = "---\ntitle: Test\n---\nBody.\n\n## References\n"
+        result = _apply_editorial_fixes(article)
+        assert "![Chart](/assets/charts/test.png)" in result
+
+    def test_no_chart_if_no_image_and_no_title(self) -> None:
+        article = "---\nlayout: post\n---\nBody.\n\n## References\n"
         result = _apply_editorial_fixes(article)
         assert "![Chart]" not in result
 

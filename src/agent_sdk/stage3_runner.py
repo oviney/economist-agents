@@ -284,6 +284,26 @@ def _strip_duplicate_article(text: str) -> str:
     return text
 
 
+def _strip_code_fence(text: str) -> str:
+    """Strip a markdown code fence the writer may wrap the whole article in.
+
+    LLMs sometimes emit the entire article (frontmatter + body) inside a
+    ```` ```yaml ```` / ```` ``` ```` fence. The well-formed check requires the
+    text to start with the frontmatter ``---``, so peel a single leading fence
+    line and its matching trailing fence. Inner fences (e.g. code blocks in the
+    body) are left untouched — only the outermost wrapper is removed, and only
+    when the text both opens with a fence and ends with one.
+    """
+    stripped = text.strip()
+    if not stripped.startswith("```"):
+        return text
+    lines = stripped.split("\n")
+    if len(lines) < 2 or not lines[-1].strip().startswith("```"):
+        return text  # opening fence with no matching close — leave as-is
+    inner = "\n".join(lines[1:-1]).strip()
+    return inner + "\n" if inner else text
+
+
 async def _collect_text(
     prompt: str,
     system_prompt: str,
@@ -458,7 +478,10 @@ async def run_stage3(
     # Append writer-fetched sources to the brief so the stat audit does not
     # strip statistics the writer legitimately cited from them (#389).
     research_brief = research_brief + search_session.brief_supplement()
-    pre_audit_article = _strip_duplicate_article(raw_writer_output)
+    # Fence-strip BEFORE duplicate-strip: a wrapping ```yaml fence puts a
+    # "\n---\nlayout:" sequence right after the opener, which the duplicate
+    # detector would otherwise mistake for a second article and truncate.
+    pre_audit_article = _strip_duplicate_article(_strip_code_fence(raw_writer_output))
 
     # Require opening ---, a closing --- on its own line, and a non-empty body.
     # re.DOTALL so the frontmatter block can contain newlines.

@@ -98,6 +98,77 @@ class TestMalformedArticleError:
             result = asyncio.run(run_stage3("AI Testing"))
             assert result.article.startswith("---")
 
+    def test_run_stage3_strips_code_fence_wrapped_article(self) -> None:
+        """A valid article wrapped in a ```yaml fence must be unwrapped, not
+        rejected. Prove-It for the writer emitting fenced output."""
+        from src.agent_sdk.stage3_runner import run_stage3
+
+        valid = (
+            '---\nlayout: post\ntitle: "Test"\ndate: 2026-01-01\n'
+            'author: "Ouray Viney"\ncategories: ["Quality Engineering"]\n'
+            'description: "A test."\nimage: /assets/images/test.png\n'
+            'image_alt: "alt"\nimage_caption: "cap"\n---\n\n'
+            + " ".join(["word"] * 900)
+            + '\n\n## References\n\n1. Gartner, ["Report"](https://example.com), 2024\n'
+            '2. Forrester, ["Report"](https://example.com), 2024\n'
+            '3. IEEE, ["Report"](https://example.com), 2024\n'
+        )
+        fenced = "```yaml\n" + valid + "\n```"
+
+        with (
+            patch(
+                "src.agent_sdk.stage3_runner.build_research_brief", return_value="brief"
+            ),
+            patch(
+                "src.agent_sdk.stage3_runner._collect_text",
+                new=AsyncMock(
+                    side_effect=[
+                        (fenced, 0.01),
+                        ('{"title":"Chart","data":[{"metric":"A","value":1}]}', 0.005),
+                    ]
+                ),
+            ),
+            patch(
+                "src.agent_sdk.stage3_runner.render_chart",
+                return_value=Path("output/charts/test.png"),
+            ),
+        ):
+            result = asyncio.run(run_stage3("AI Testing"))
+            assert result.article.startswith("---")
+            assert "```" not in result.article.split("\n", 1)[0]
+
+
+class TestStripCodeFence:
+    """Unit tests for the code-fence stripper."""
+
+    def test_strips_yaml_fence_wrapper(self) -> None:
+        from src.agent_sdk.stage3_runner import _strip_code_fence
+
+        out = _strip_code_fence("```yaml\n---\ntitle: x\n---\nbody\n```")
+        assert out.startswith("---")
+        assert out.rstrip().endswith("body")
+
+    def test_leaves_unfenced_text_untouched(self) -> None:
+        from src.agent_sdk.stage3_runner import _strip_code_fence
+
+        text = "---\ntitle: x\n---\nbody\n"
+        assert _strip_code_fence(text) == text
+
+    def test_preserves_inner_code_blocks(self) -> None:
+        from src.agent_sdk.stage3_runner import _strip_code_fence
+
+        out = _strip_code_fence(
+            "```\n---\nt: x\n---\nsee `code`:\n```py\nx=1\n```\n```"
+        )
+        assert out.startswith("---")
+        assert "```py" in out  # inner fence preserved
+
+    def test_opening_fence_without_close_is_untouched(self) -> None:
+        from src.agent_sdk.stage3_runner import _strip_code_fence
+
+        text = "```yaml\n---\ntitle: x\n---\nbody without trailing fence"
+        assert _strip_code_fence(text) == text
+
 
 # ── Integration: generate_content routes to revision ─────────────────────────
 

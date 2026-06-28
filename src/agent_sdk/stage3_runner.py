@@ -304,6 +304,37 @@ def _strip_code_fence(text: str) -> str:
     return inner + "\n" if inner else text
 
 
+# Real article frontmatter opens with --- immediately followed by a known
+# frontmatter key. Used to discard conversational preamble (and any stray
+# markdown rule) the writer may emit before the article.
+_FRONTMATTER_START = re.compile(
+    r"(?m)^---[ \t]*\r?\n"
+    r"(?=(?:layout|title|date|author|categories|description|image)\s*:)"
+)
+
+
+def _extract_article(text: str) -> str:
+    """Recover the article from noisy writer output.
+
+    Handles three observed writer quirks, in order:
+    1. The whole article wrapped in a ```yaml fence (``_strip_code_fence``).
+    2. Conversational preamble (and/or a stray ``---`` markdown rule) before the
+       real frontmatter — everything before the first genuine ``---\\n<key>:``
+       block is discarded.
+    3. A dangling trailing code fence left after the body once a between-preamble
+       fence's opener is removed.
+
+    Prose with no frontmatter at all is returned unchanged so the downstream
+    well-formed check still rejects it.
+    """
+    text = _strip_code_fence(text)
+    match = _FRONTMATTER_START.search(text)
+    if match and match.start() > 0:
+        text = text[match.start() :]
+    text = re.sub(r"\r?\n[ \t]*```[a-zA-Z]*[ \t]*$", "", text.rstrip())
+    return text.rstrip() + "\n"
+
+
 async def _collect_text(
     prompt: str,
     system_prompt: str,
@@ -481,7 +512,7 @@ async def run_stage3(
     # Fence-strip BEFORE duplicate-strip: a wrapping ```yaml fence puts a
     # "\n---\nlayout:" sequence right after the opener, which the duplicate
     # detector would otherwise mistake for a second article and truncate.
-    pre_audit_article = _strip_duplicate_article(_strip_code_fence(raw_writer_output))
+    pre_audit_article = _strip_duplicate_article(_extract_article(raw_writer_output))
 
     # Require opening ---, a closing --- on its own line, and a non-empty body.
     # re.DOTALL so the frontmatter block can contain newlines.

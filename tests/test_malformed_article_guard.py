@@ -170,6 +170,74 @@ class TestStripCodeFence:
         assert _strip_code_fence(text) == text
 
 
+class TestExtractArticle:
+    """Unit tests for the noisy-writer-output extractor."""
+
+    def test_strips_conversational_preamble_and_fence(self) -> None:
+        from src.agent_sdk.stage3_runner import _extract_article
+
+        raw = (
+            "Topic is fresh — no duplicate. I'll write directly.\n\n"
+            "---\n\n"  # stray markdown rule in the preamble
+            "```yaml\n"
+            '---\nlayout: post\ntitle: "X"\n---\n\nThe body.\n\n## References\n\n1. Y\n'
+            "```"
+        )
+        out = _extract_article(raw)
+        assert out.startswith("---\nlayout: post")
+        assert "The body." in out
+        assert not out.rstrip().endswith("```")
+
+    def test_leaves_clean_article_unchanged(self) -> None:
+        from src.agent_sdk.stage3_runner import _extract_article
+
+        clean = "---\ntitle: X\n---\n\nBody here.\n"
+        assert _extract_article(clean).strip() == clean.strip()
+
+    def test_prose_without_frontmatter_is_unchanged(self) -> None:
+        from src.agent_sdk.stage3_runner import _extract_article
+
+        prose = "I cannot write that article."
+        assert _extract_article(prose).strip() == prose
+
+    def test_run_stage3_recovers_preamble_wrapped_article(self) -> None:
+        """run_stage3 must recover an article buried under preamble + a fence."""
+        from src.agent_sdk.stage3_runner import run_stage3
+
+        valid = (
+            '---\nlayout: post\ntitle: "Test"\ndate: 2026-01-01\n'
+            'author: "Ouray Viney"\ncategories: ["Quality Engineering"]\n'
+            'description: "A test."\nimage: /assets/images/test.png\n'
+            'image_alt: "alt"\nimage_caption: "cap"\n---\n\n'
+            + " ".join(["word"] * 900)
+            + '\n\n## References\n\n1. Gartner, ["R"](https://example.com), 2024\n'
+            '2. Forrester, ["R"](https://example.com), 2024\n'
+            '3. IEEE, ["R"](https://example.com), 2024\n'
+        )
+        noisy = "Topic is fresh. I'll write now.\n\n---\n\n```yaml\n" + valid + "\n```"
+
+        with (
+            patch(
+                "src.agent_sdk.stage3_runner.build_research_brief", return_value="brief"
+            ),
+            patch(
+                "src.agent_sdk.stage3_runner._collect_text",
+                new=AsyncMock(
+                    side_effect=[
+                        (noisy, 0.01),
+                        ('{"title":"Chart","data":[{"metric":"A","value":1}]}', 0.005),
+                    ]
+                ),
+            ),
+            patch(
+                "src.agent_sdk.stage3_runner.render_chart",
+                return_value=Path("output/charts/test.png"),
+            ),
+        ):
+            result = asyncio.run(run_stage3("AI Testing"))
+            assert result.article.startswith("---")
+
+
 # ── Integration: generate_content routes to revision ─────────────────────────
 
 

@@ -109,3 +109,39 @@ class TestArxivRetry:
 
         assert attempts["n"] == 3  # three attempts total
         assert mock_sleep.call_count == 2  # slept between attempts, not after the last
+
+
+class TestPapersAnalyzedContract:
+    """Regression: search_arxiv_for_topic must expose ``insights.papers_analyzed``.
+
+    The research-brief fan-out reads ``arxiv["insights"]["papers_analyzed"]``,
+    but ``extract_business_insights`` never produced that key — so arXiv silently
+    contributed zero sources to every brief (masked while paid providers existed).
+    """
+
+    def test_search_arxiv_for_topic_exposes_papers_analyzed(self) -> None:
+        from scripts.arxiv_search import search_arxiv_for_topic
+
+        with (
+            patch("scripts.arxiv_search.arxiv.Client") as mock_client_cls,
+            patch("scripts.arxiv_search.time.sleep"),
+        ):
+            mock_client = Mock()
+            mock_client.results.return_value = iter([_mock_result("RLHF Survey")])
+            mock_client_cls.return_value = mock_client
+
+            result = search_arxiv_for_topic("rlhf", max_papers=3)
+
+        assert result["success"] is True
+        papers_analyzed = result["insights"]["papers_analyzed"]
+        assert len(papers_analyzed) == 1
+        paper = papers_analyzed[0]
+        assert paper["title"] == "RLHF Survey"
+        assert paper["url"].startswith("http")
+        assert paper["authors"] == "A. One"  # joined from list, not a raw list repr
+        assert paper["key_insight"]  # non-empty insight extracted from the abstract
+
+    def test_empty_results_still_carry_papers_analyzed_key(self) -> None:
+        searcher = ArxivSearcher(max_results=3, days_back=60)
+        out = searcher.extract_business_insights([])
+        assert out["papers_analyzed"] == []

@@ -585,9 +585,13 @@ def _enforce_heading_limit(article: str, max_headings: int = 4) -> str:
     return frontmatter + body
 
 
-#: Fallback hero used only when an article reaches finalize with no image at
-#: all — a placeholder beats quarantining an otherwise-publishable article.
-_DEFAULT_IMAGE = "/assets/images/blog-default.svg"
+#: Value stamped into ``image:`` when an article reaches finalize with no hero
+#: at all. Deliberately EMPTY (chart-only mode), NOT a ``blog-default.svg``
+#: placeholder: the publication validator treats ``blog-default.svg`` as a
+#: CRITICAL ``default_image_fallback`` and a real path as a missing-file
+#: CRITICAL, whereas an empty value is read as "no hero" and passes. The
+#: frontmatter schema only requires the key to be present, which this satisfies.
+_DEFAULT_IMAGE = ""
 
 
 def _yaml_safe(value: str, max_chars: int = 120) -> str:
@@ -646,6 +650,14 @@ def apply_editorial_fixes(article: str, current_date: str | None = None) -> str:
     text = "\n".join(lines)
     text = text.replace("..", ".")
 
+    # Strip leading whitespace once, up front, so every frontmatter check below
+    # (date rewrite, reconstruction) sees a draft that starts with ``---`` when
+    # it has a block. Otherwise a draft beginning with a blank line before
+    # ``---`` skips the date rewrite AND gets a second block injected — a
+    # double-frontmatter corruption. Only when finalizing (current_date given).
+    if current_date:
+        text = text.lstrip()
+
     if current_date and text.startswith("---"):
         text = re.sub(
             r"^(---\n.*?date:\s*)\S+(.*?\n---)",
@@ -663,7 +675,8 @@ def apply_editorial_fixes(article: str, current_date: str | None = None) -> str:
     # signals real pipeline usage: the article MUST leave here with a valid,
     # complete frontmatter block. A missing block or missing date is purely
     # mechanical and must never quarantine an otherwise-publishable article —
-    # so we rebuild it rather than letting the validator reject it.
+    # so we rebuild it rather than letting the validator reject it. (Leading
+    # whitespace was already stripped above, so this check is robust.)
     if current_date and not text.startswith("---"):
         title = _derive_title(text)
         text = (

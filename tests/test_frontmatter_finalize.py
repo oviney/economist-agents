@@ -53,6 +53,27 @@ class TestReconstructsMissingFrontmatter:
         result = _apply_editorial_fixes(f"# Real Title\n\n{_LONG_BODY}", _TODAY)
         assert "Testing quality engineering matters." in result
 
+    def test_image_is_empty_not_default_svg(self) -> None:
+        # A blog-default.svg (or missing-file) hero is itself a CRITICAL; the
+        # reconstruction must stamp an EMPTY image (chart-only), which passes.
+        result = _apply_editorial_fixes(f"# Real Title\n\n{_LONG_BODY}", _TODAY)
+        assert "blog-default.svg" not in result
+        assert _frontmatter_of(result).get("image", "") in ("", None)
+
+
+class TestLeadingWhitespace:
+    """A draft with blank lines before ``---`` must not get a second block."""
+
+    def test_no_double_frontmatter_block(self) -> None:
+        draft = f'\n\n---\nlayout: post\ntitle: "T"\ndate: 2026-01-01\n---\n\n{_LONG_BODY}'
+        result = _apply_editorial_fixes(draft, _TODAY)
+        assert result.count("---") == 2  # exactly one frontmatter block
+
+    def test_date_still_rewritten_despite_leading_blank_lines(self) -> None:
+        draft = f'\n\n---\nlayout: post\ntitle: "T"\ndate: 2026-01-01\n---\n\n{_LONG_BODY}'
+        result = _apply_editorial_fixes(draft, _TODAY)
+        assert str(_frontmatter_of(result)["date"]) == _TODAY
+
 
 class TestBackwardsCompatible:
     """Without a finalize date, behaviour is unchanged (no injection)."""
@@ -98,7 +119,17 @@ class TestEndToEndNoMechanicalRejection:
     def _mechanical_criticals(self, article: str) -> list[str]:
         validator = PublicationValidator(expected_date=_TODAY)
         _, issues = validator.validate(article)
-        mechanical = {"date_mismatch", "yaml_format", "categories", "layout"}
+        # Includes the image checks: finalize stamps image: when missing, and a
+        # blog-default.svg / missing-file value is itself a CRITICAL — so a
+        # naive default would re-quarantine the very articles this fix rescues.
+        mechanical = {
+            "date_mismatch",
+            "yaml_format",
+            "categories",
+            "layout",
+            "default_image_fallback",
+            "missing_image_file",
+        }
         return [
             i["check"]
             for i in issues

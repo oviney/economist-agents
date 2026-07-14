@@ -1,248 +1,132 @@
-# Multi-Agent System Documentation
+# Agents
 
-The Economist-Agents project uses a sophisticated multi-agent architecture with 10 specialized AI agents that collaborate to produce publication-quality content and maintain development excellence.
+This repository uses two distinct sets of agents:
 
-## 🤖 Agent Registry System
+1. **Development & process agents** — the fleet that *builds and maintains* the
+   pipeline (code quality, testing, review, DevOps, planning). Defined in
+   `.github/agents/*.agent.md` and loaded by the registry. **This document covers these.**
+2. **Content-pipeline agents** — the agents that *produce articles* (topic scout,
+   editorial board, researcher, writer, editor, graphics). Defined as YAML under
+   `agents/`. See [`agents/README.md`](agents/README.md).
 
-Agents are automatically discovered via the Agent Registry Pattern (ADR-002). Agent definitions are stored as `.agent.md` files in the `.github/agents/` directory and loaded dynamically at runtime.
+---
 
-### Discovery Mechanism
+## Agent registry
+
+Development agents follow the **Agent Registry Pattern**
+([ADR-0002](docs/adr/0002-agent-registry-pattern.md)). Definitions are stored as
+`.agent.md` files in `.github/agents/` and loaded at runtime by
+`scripts/agent_registry.py`.
 
 ```python
-# Automatic agent discovery
+from agent_registry import AgentRegistry
+
 registry = AgentRegistry()
-all_agents = registry.create_all_agents()
-available_agents = registry.list_agents()  # Returns 10 agents
-
-# Get specific agent
-po_agent = registry.get_agent("po-agent")
+registry.list_agents()               # -> ['architect', 'code-quality-specialist', ...]
+config = registry.get_agent_config("scrum-master")
+agent  = registry.get_agent("po-agent")     # optional model override: get_agent(name, model=...)
 ```
 
-### Agent Configuration Format
+### Definition format
 
-Each agent definition includes:
-- **Name & Description**: Role and responsibilities
-- **Model**: Anthropic Claude Sonnet 4 (claude-sonnet-4-20250514)
-- **Tools**: Available tools (bash, file_search, github_project_add_issue)
-- **Skills**: Domain-specific knowledge patterns
+Each `.agent.md` file is YAML frontmatter followed by the agent's system prompt:
 
-## 📋 Available Agents
+```yaml
+---
+name: architect
+description: AI Architect for designing, validating, and auditing multi-agent systems
+model: claude-sonnet-4-20250514
+tools:
+  - bash
+  - file_search
+skills:
+  - skills/architecture-patterns
+  - skills/agent-delegation
+  - skills/adr-governance
+---
 
-### Development & Quality Agents
-
-#### **@code-quality-specialist**
-- **Role**: TDD-based refactoring and quality standards enforcement
-- **Responsibilities**: Type hints, docstrings, error handling, code modernization
-- **Tools**: bash, file_search
-- **Skills**: skills/python-quality
-- **Workflow**: RED → GREEN → REFACTOR (strict TDD)
-
-#### **@test-specialist**
-- **Role**: Comprehensive test writing and quality assurance
-- **Responsibilities**: Unit tests, integration tests, test coverage, test strategy
-- **Tools**: bash, file_search
-- **Skills**: skills/testing
-- **Standards**: >80% coverage required, 100% for refactored code
-
-#### **@devops**
-- **Role**: CI/CD automation and deployment infrastructure
-- **Responsibilities**: GitHub Actions, deployment pipelines, infrastructure automation
-- **Tools**: bash, file_search
-- **Skills**: skills/quality-gates
-
-#### **@code-reviewer**
-- **Role**: Code review and architectural guidance
-- **Responsibilities**: Code review, architecture validation, best practices enforcement
-- **Tools**: bash, file_search
-- **Standards**: SOLID principles, maintainability, performance
-
-### Project Management Agents
-
-#### **@scrum-master**
-- **Role**: Sprint orchestrator, process enforcer, and team facilitator
-- **Responsibilities**: Sprint planning, backlog management, Agile ceremonies
-- **Tools**: bash, github_project_add_issue
-- **Skills**: skills/sprint-management
-- **Process**: Two-stage intake (Minimal DoR → Full DoR → Sprint Planning)
-
-#### **@po-agent** (Product Owner)
-- **Role**: Product strategy and backlog refinement
-- **Responsibilities**: User stories, acceptance criteria, business value prioritization
-- **Tools**: bash, github_project_add_issue
-- **Skills**: Product management patterns
-
-#### **@product-research-agent**
-- **Role**: Market analysis and competitive intelligence
-- **Responsibilities**: Market research, competitive analysis, user needs assessment
-- **Tools**: bash, file_search
-- **Skills**: Research methodologies, market analysis
-
-### Operations & Specialized Agents
-
-#### **@git-operator**
-- **Role**: Version control and repository management
-- **Responsibilities**: Git workflows, branch management, release coordination
-- **Tools**: bash, file_search
-- **Standards**: Conventional commits, clean history, code review process
-
-#### **@visual-qa-agent**
-- **Role**: Chart and design validation
-- **Responsibilities**: Visual quality assurance, chart validation, design consistency
-- **Tools**: bash, file_search
-- **Metrics**: 88% pass rate, 28.6% escape rate baseline
-
-#### **@architect**
-- **Role**: AI Architect for multi-agent system design, validation, and audit
-- **Responsibilities**: Architecture design, agent config validation, workflow evaluation, compliance audits, ADR authoring
-- **Tools**: bash, file_search
-- **Skills**: skills/architecture-patterns, skills/agent-delegation, skills/adr-governance
-- **Audit script**: `python scripts/architecture_audit.py` (rubric: 6 dimensions × 0–2 pts, ≥85% compliance threshold)
-
-## 🎯 Agent Usage Examples
-
-### Development Workflow
-```bash
-# Quality enforcement
-@code-quality-specialist Fix all ruff/mypy violations in scripts/
-@test-specialist Create comprehensive tests for scripts/editorial_board.py
-@code-quality-specialist Add type hints to scripts/topic_scout.py
-
-# Code review
-@code-reviewer Review PR #123 for architectural compliance
-@devops Set up CI/CD pipeline for new microservice
+# AI Architect Agent
+You are an AI Architect specialising in multi-agent systems...
 ```
 
-### Project Management
-```bash
-# Sprint management
-@scrum-master Plan Sprint 16 with 13 story points capacity
-@po-agent Create user stories for dark mode feature
-@product-research-agent Analyze competitor blog platforms
+Required frontmatter fields: `name`, `description`, `model`, `tools`, `skills`
+(validated by the architecture audit rubric — see
+[ADR-0009](docs/adr/0009-architecture-audit-rubric.md)).
 
-# Operations
-@git-operator Create release branch for v2.1.0
-@visual-qa-agent Validate chart quality for Q4 report
+---
+
+## The 10 development agents
+
+| Agent | Role | Skills |
+|-------|------|--------|
+| **@architect** | Designs, validates, and audits multi-agent architecture; authors ADRs | `architecture-patterns`, `agent-delegation`, `adr-governance`, `spec-driven-development`, `using-agent-skills` |
+| **@code-quality-specialist** | TDD-based refactoring and coding-standard enforcement | `python-quality` |
+| **@code-reviewer** | Code review, architecture validation, best-practice enforcement | `code-review-and-quality` |
+| **@devops** | CI/CD automation and deployment infrastructure | `devops`, `ci-cd-and-automation`, `quality-gates` |
+| **@git-operator** | Git workflows, branch management, release coordination | `git-workflow-and-versioning` |
+| **@po-agent** | Product strategy, user stories, acceptance criteria | product/backlog patterns |
+| **@product-research-agent** | Market analysis and competitive intelligence | research methodologies |
+| **@scrum-master** | Sprint orchestration and Agile ceremonies | `scrum-master`, `sprint-management` |
+| **@test-specialist** | Test strategy, unit/integration tests, coverage | `testing`, `test-driven-development` |
+| **@visual-qa-agent** | Chart and design validation | `visual-qa` |
+
+> The `model`, `tools`, and `skills` for each agent are the source of truth in its
+> `.agent.md` file — the table above summarises them. Run
+> `python scripts/architecture_audit.py` to validate every definition against the
+> compliance rubric (6 dimensions × 0–2 pts; ≥85% threshold).
+
+---
+
+## Using agents
+
+Development agents are invoked by name in the agentic workflow:
+
+```text
+@code-quality-specialist  Fix all ruff/pyright violations in scripts/
+@test-specialist          Add tests for src/agent_sdk/stage4_runner.py
+@code-reviewer            Review the current diff for correctness and security
+@architect                Validate this proposed crew config against the rubric
+@scrum-master             Break B-004 into dependency-ordered tasks
 ```
 
-## 🔧 Pipeline Integration
+### Dispatching worker agents
 
-Content generation runs through `src/agent_sdk/` (Anthropic Agent SDK) — the CrewAI runtime was removed in Phase 2 (ADR-0006).
+When dispatching agents via the `Agent` tool to orchestrate the fleet, the brief
+**must** include the worker discipline contract from
+[`docs/worker-brief-contract.md`](docs/worker-brief-contract.md). Workers that
+produce output without evidence of `Skill` invocations are rejected and re-dispatched.
 
-### Stage 3 (Content Generation — `src/agent_sdk/stage3_runner.py`)
-- **Research Agent**: Deterministic web search (arXiv + Google Scholar via Serper) — no LLM in the research path
-- **Writer Agent**: Article writing in Economist style (Claude via Agent SDK)
-- **Graphics Agent**: Chart and visualization creation (Claude via Agent SDK)
+---
 
-### Stage 4 (Editorial Review — `src/agent_sdk/stage4_runner.py`)
-- **Quality Gates**: Deterministic post-processing — stat audit, frontmatter validation, ending checks, hedging removal, chart embedding
+## How agents relate to skills
 
-## 🛠️ Skills System Integration
+Every agent references one or more `skills/*/SKILL.md` workflows. Skills are the
+**single source of truth** for *how* work is done; agents are *who* does it. The six
+lifecycle skills (`spec-driven-development`, `planning-and-task-breakdown`,
+`incremental-implementation`, `test-driven-development`, `code-review-and-quality`,
+`shipping-and-launch`) govern all work regardless of which agent is acting. See
+[`CLAUDE.md`](CLAUDE.md) for the skill-routing contract and
+[`skills/README.md`](skills/README.md) for the full library.
 
-Each agent has access to domain-specific skills stored in the `skills/` directory:
+---
 
-### Available Skills Categories
-- **skills/python-quality**: Python coding standards and best practices
-- **skills/testing**: Testing patterns, coverage standards, TDD workflows
-- **skills/quality-gates**: CI/CD setup, pre-commit hooks, automation
-- **skills/sprint-management**: Agile ceremonies, story management, velocity tracking
+## Content-pipeline agents
 
-### Skills Loading
-```python
-# Agents automatically load their assigned skills
-code_agent = registry.get_agent("code-quality-specialist")
-# Automatically loads skills/python-quality patterns
-```
+The agents that actually write articles are configured separately as YAML under
+`agents/` and run through the Anthropic Agent SDK
+(`src/agent_sdk/`). They are **not** in the registry above. The pipeline flow is:
 
-## 🚀 Quick Start Guide
+- **Topic scout** (`agents/discovery/`) → candidate topics
+- **Editorial board** (`agents/editorial_board/`) → weighted vote across seven personas
+- **Content generation** (`agents/content_generation/`) → researcher → writer → editor → graphics
 
-### 1. Agent Discovery
-```python
-from src.registry import AgentRegistry
+See [`agents/README.md`](agents/README.md) for their schema, loader, and weights.
 
-# Initialize registry
-registry = AgentRegistry()
+---
 
-# List all available agents
-print(registry.list_agents())
-# Output: ['code-quality-specialist', 'devops', 'git-operator', ...]
-```
+## Related documentation
 
-### 2. Create Agents
-```python
-# Create all agents
-all_agents = registry.create_all_agents()
-
-# Create specific agent
-scrum_master = registry.get_agent("scrum-master")
-```
-
-### 3. Agent Collaboration
-```python
-# Agents work together through the context system
-from scripts.context_manager import ContextManager
-
-ctx = ContextManager("docs/STORY_N_CONTEXT.md")
-# All agents share context automatically
-```
-
-## 📊 Agent Performance Metrics
-
-| Agent | Success Rate | Average Response Time | Key Metrics |
-|-------|-------------|-------------------|-------------|
-| **code-quality-specialist** | 95% | ~30s | 0 ruff violations, 100% type coverage |
-| **test-specialist** | 92% | ~45s | >80% test coverage, 100% for refactored code |
-| **scrum-master** | 98% | ~15s | Accurate story points, clear acceptance criteria |
-| **visual-qa-agent** | 88% | ~25s | 28.6% escape rate baseline |
-| **devops** | 94% | ~60s | CI/CD pipeline success, deployment automation |
-
-## 🔄 Agent Lifecycle
-
-### 1. Discovery Phase
-- Agent definitions loaded from `.github/agents/*.agent.md`
-- Registry validates required fields (name, description, model, tools)
-- Skills patterns loaded and associated
-
-### 2. Instantiation Phase
-- Agent created with context injection (AGILE_MINDSET system prompt)
-- Tool access configured based on agent definition
-- Skills knowledge loaded into agent memory
-
-### 3. Execution Phase
-- Agents collaborate through shared context system
-- Results tracked for performance metrics
-- Skills patterns updated based on outcomes
-
-## 🔗 Integration Points
-
-### GitHub Actions
-- **quality-tests.yml**: Triggered by code quality agents
-- **sprint-discipline.yml**: Monitored by scrum master agent
-- **content-pipeline.yml**: Used by content generation crews
-
-### Quality System
-- **Pre-commit Hooks**: Enforced by code quality agents
-- **Definition of Done**: Validated by test specialist and scrum master
-- **Gate System**: 4-layer validation with agent participation
-
-### Context Sharing
-- **Thread-Safe**: Concurrent agent access with threading.Lock
-- **Performance**: 143ms load, 162ns access, 0.5MB memory
-- **Audit Trail**: Complete modification history for compliance
-
-## 📚 Related Documentation
-
-- **Agent Registry Pattern**: [ADR-002](docs/ADR-002-agent-registry-pattern.md)
-- **Skills System**: [skills/README.md](skills/README.md)
-- **Flow Architecture**: [docs/FLOW_ARCHITECTURE.md](docs/FLOW_ARCHITECTURE.md)
-- **Quality System**: [docs/DEFINITION_OF_DONE.md](docs/DEFINITION_OF_DONE.md)
-
-## 🎯 Success Criteria
-
-Agents are considered successful when they achieve:
-- ✅ **Accuracy**: >90% success rate in task completion
-- ✅ **Performance**: <60s average response time
-- ✅ **Quality**: Meet Definition of Done requirements
-- ✅ **Collaboration**: Effective context sharing and handoffs
-- ✅ **Learning**: Skills patterns improve over time
-
-For agent-specific metrics and detailed usage examples, see the individual agent documentation in `.github/agents/`.
+- **[Agent Registry Pattern (ADR-0002)](docs/adr/0002-agent-registry-pattern.md)**
+- **[Extract Agent Definitions to YAML (ADR-0001)](docs/adr/0001-extract-agent-definitions-to-yaml.md)**
+- **[Agent Framework Selection (ADR-0006)](docs/adr/0006-agent-framework-selection.md)** — CrewAI retired; Anthropic Agent SDK adopted
+- **[Skills library](skills/README.md)** · **[Flow architecture](docs/FLOW_ARCHITECTURE.md)** · **[Definition of Done](docs/DEFINITION_OF_DONE.md)**

@@ -14,7 +14,7 @@ Thank you for your interest in contributing to the Economist-Agents project! Thi
 
 1. **Clone and setup environment:**
    ```bash
-   git clone https://github.com/your-org/economist-agents.git
+   git clone https://github.com/oviney/economist-agents.git
    cd economist-agents
    python3.13 -m venv .venv
    source .venv/bin/activate  # On Windows: .venv\Scripts\activate

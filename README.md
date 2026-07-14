@@ -1,394 +1,226 @@
 # Economist Agents
 
-**Multi-Agent Content Generation Pipeline**
+**Multi-agent content pipeline that generates Economist-style articles with verified sources.**
 
 [![CI](https://github.com/oviney/economist-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/oviney/economist-agents/actions/workflows/ci.yml)
 [![Quality Tests](https://github.com/oviney/economist-agents/actions/workflows/quality-tests.yml/badge.svg)](https://github.com/oviney/economist-agents/actions/workflows/quality-tests.yml)
-[![Sprint Discipline](https://github.com/oviney/economist-agents/actions/workflows/sprint-discipline.yml/badge.svg)](https://github.com/oviney/economist-agents/actions/workflows/sprint-discipline.yml)
-[![Quality Score](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/oviney/economist-agents/main/quality_score.json)](https://github.com/oviney/economist-agents/blob/main/docs/QUALITY_DASHBOARD.md)
-[![Tests](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/oviney/economist-agents/main/tests_badge.json)](https://github.com/oviney/economist-agents/actions/workflows/ci.yml)
-[![Sprint](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/oviney/economist-agents/main/sprint_badge.json)](https://github.com/oviney/economist-agents/blob/main/SPRINT.md)
-![Python](https://img.shields.io/badge/Python-3.11+-blue)
-[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+![Python](https://img.shields.io/badge/Python-3.13-blue)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-A sophisticated multi-agent system (6 AI personas collaborate) that produces publication-quality blog posts in The Economist's signature style. This project orchestrates specialized AI agents for topic discovery, editorial voting, research, writing, editing, and chart generation.
+A pipeline of specialised AI agents that discovers topics, votes on them editorially,
+researches them against verifiable sources, writes them in *The Economist*'s house
+style, generates charts, and runs the result through deterministic quality gates
+before it is published. Claude (Anthropic) does the writing and editing; the research
+path is deterministic (no LLM); the quality gates are plain Python.
 
-## 🚀 Project Status
+---
 
-**Current Phase:** Integration and Production Deployment (Sprint 15 - Day 4)
-**Current Quality Score:** 30/100 (red) - Test suite needs stabilization
-**Sprint 15 Progress:** Story 9 COMPLETE ✅, Story 10 IN PROGRESS (5/13 pts, 38%)
+## How it works
 
-**Recent Achievement (Sprint 14 - Complete ✅):**
-- **Flow-Based Orchestration:** Deterministic state-machine (@start/@listen/@router) - 9/9 tests passing
-- **Style Memory RAG:** ChromaDB integration with <200ms query latency
-- **ROI Telemetry:** Business value tracking (8,333x efficiency gain validated)
-- **Sprint Velocity:** 82% faster than estimates (5h vs 28.5h) with 10/10 quality score
+The pipeline runs in stages, orchestrated by `src/economist_agents/flow.py` over
+`src.agent_sdk.pipeline.run_pipeline`:
 
-**Foundation:**
-- **Defect Prevention:** Automated system catching 83% of historical bug patterns
-- **Green Software:** Self-validating agents reducing token waste by 30%
-- **Quality Gates:** 4-layer validation (automated checkpoints enforce standards)
+1. **Discovery** — `scripts/topic_scout.py` surfaces candidate topics.
+2. **Editorial board** — `scripts/editorial_board.py` runs a weighted vote across
+   seven personas (VP Engineering, Senior QE Lead, Data Skeptic, Career Climber,
+   Economist Editor, Busy Reader, Performance Analyst) to pick what is worth writing.
+3. **Stage 3 — content generation** (`src/agent_sdk/stage3_runner.py`): research →
+   write → charts → edit.
+   - **Research** is deterministic web search (arXiv + Google Scholar via Serper).
+     There is **no LLM in the research path**, so sources are reproducible.
+   - **Writer → Graphics → Editor** all run on Claude via the Anthropic Agent SDK.
+   - A **stat audit** strips any sentence whose statistics are not present in the
+     research brief.
+4. **Stage 4 — editorial review** (`src/agent_sdk/stage4_runner.py`): deterministic
+   post-processing quality gates (see below), then `scripts/publication_validator.py`.
+5. **Publish or revise** — articles are written to `output/` (configurable via
+   `OUTPUT_DIR`). Nothing auto-publishes; a human deploys via `scripts/deploy_to_blog.py`.
 
-**Test Suite Status**: 2112 passed, 84 skipped
+### Quality gates (enforced deterministically)
 
-## 🛠️ Installation
+Post-processing in `src/agent_sdk/_shared.py` and `scripts/publication_validator.py`:
 
-**Python Version Requirement:** Python **≥3.11** (tested with 3.12)
+1. **Stat audit** — removes sentences citing stats absent from the research brief.
+2. **Category normalisation** — normalises categories to Title Case.
+3. **Description truncation** — caps meta descriptions at 160 characters.
+4. **Heading limit** — merges sections when there are more than four headings.
+5. **Hedging removal** — strips "One suspects", "it is worth noting", and similar filler.
+6. **Ending validation** — flags summary endings (HIGH severity).
+7. **Chart auto-embed** — inserts the chart before the References if it is missing.
+8. **British spelling** — applies American → British replacements.
+9. **Publication validator** — checks frontmatter, categories, word count, author,
+   image metadata, and placeholders.
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/your-org/economist-agents.git
-   cd economist-agents
-   ```
+---
 
-2. **Create virtual environment:**
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   pip install --upgrade pip
-   ```
+## Installation
 
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   pip install -r requirements-dev.txt
-   ```
+**Requires Python 3.13.x** (see [ADR-0004](docs/adr/0004-python-version-constraint.md);
+3.14+ is untested).
 
-   **Note**: Includes arXiv integration for fresh academic research sources
-
-4. **Configure environment:**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your ANTHROPIC_API_KEY
-   ```1 total)
-
-**Core Agents:**
-| Agent | Role | Responsibility |
-|-------|------|----------------|
-| **code-quality-specialist** | Code Quality | TDD-based refactoring and quality standards enforcement |
-| **devops** | Infrastructure | CI/CD automation and deployment |
-| **git-operator** | Version Control | Git operations and repo management |
-| **po-agent** | Product | Backlog refinement and story creation |
-| **product-research-agent** | Research | Market analysis and competitive intelligence |
-| **scrum-master** | Orchestration | Sprint coordination and ceremonies |
-| **test-specialist** | Testing | Comprehensive test writing and quality assurance |
-| **visual-qa-agent** | Visual Quality | Chart and design validation |
-
-### Pipeline Runners (Anthropic Agent SDK)
-
-**Stage 3** (`src/agent_sdk/stage3_runner.py`) — Content Generation
-- **Purpose**: Research, writing, and chart creation pipeline
-- **Research**: Deterministic web search (arXiv + Google Scholar) — no LLM in research path
-- **Agents**: Writer Agent → Graphics Agent → Editor Agent (all Claude/Anthropic)
-- **Stat Audit**: Strips sentences with stats not found in the research brief
-- **Output**: Article with verified sources and chart data
-- **Integration**: Via the sequential pipeline in `src/agent_sdk/pipeline.py`
-
-**Stage 4** (`src/agent_sdk/stage4_runner.py`) — Editorial Review
-- **Purpose**: Deterministic post-processing quality gates
-- **Output**: JSON with quality assessment and edited article
-
-### Agent Discovery via `.github/agents/` directory:
-- 🔍 **Discovery**: Agent definitions stored as `.agent.md` files
-- 📋 **Validation**: Each agent has required fields (role, goal, backstory)
-- 🧠 **Context Injection**: Adds AGILE_MINDSET system prompt to all agents
-- 📊 **Count**: 8 active agent definitions
-
-### Agent Definition Files
-
-Agents are defined in `.github/agents/` directory as markdown files:
-- `code-quality-specialist.agent.md`
-- `devops.agent.md`
-- `git-operator.agent.md`
-- `po-agent.agent.md`
-- `product-research-agent.agent.md`
-- `scrum-master.agent.md`
-- `test-specialist.agent.md`
-- `visual-qa-agent.agent.md`
-
-### Usage Example
-```python
-# Create all agents
-all_agents = registry.create_all_agents()
-
-# List available agents
-agent_ids = registry.list_agents()
-```
-
-
-## 🔄 Shared Context System
-
-**Eliminates 99.7% of agent briefing time** by enabling automatic context inheritance between agents.
-
-### Problem Solved
-Traditional multi-agent systems require manual context briefing for each agent (10 minutes per agent). With 3 agents, that's 30 minutes of redundant briefing time and 40% context duplication.
-
-### Solution
-The **ContextManager** loads story context once from `STORY_N_CONTEXT.md` files and shares it across all agents automatically:
-
-```python
-from scripts.context_manager import ContextManager, create_task_context
-
-# Load context ONCE (143ms)
-ctx = ContextManager("docs/STORY_2_CONTEXT.md")
-
-# All agents automatically inherit story context
-dev_context = create_task_context(ctx, task_id='DEV-001', assigned_to='Developer')
-qe_context = create_task_context(ctx, task_id='QE-001', assigned_to='QE')
-sm_context = create_task_context(ctx, task_id='SM-001', assigned_to='Scrum Master')
-
-# Pass into agent prompts as shared brief
-dev_brief = render_brief(dev_context)
-qe_brief = render_brief(qe_context)
-```
-
-### Benefits
-
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| **Briefing Time** | 10 min/agent | 48ms/agent | **99.7% reduction** |
-| **Context Duplication** | 40% | 0% | **Eliminated** |
-| **Memory Usage** | 3× copies | 1 shared | **67% reduction** |
-| **Update Propagation** | Manual | Automatic | **Thread-safe** |
-
-### Key Features
-
-- ✅ **Thread-Safe**: Concurrent agent access with `threading.Lock`
-- ✅ **High Performance**: 143ms load, 162ns access, 0.5MB memory
-- ✅ **Audit Logging**: Complete modification history for compliance
-- ✅ **Error Handling**: Graceful degradation with helpful error messages
-- ✅ **JSON Validation**: Automatic serialization checks
-- ✅ **Size Limits**: 10MB cap prevents memory issues
-
-### Quick Start
-
-```python
-# Step 1: Load shared context
-ctx = ContextManager("docs/STORY_N_CONTEXT.md")
-
-# Step 2: Agent 1 adds data
-ctx.set('implementation_status', 'complete')
-
-# Step 3: Agent 2 automatically sees updates
-status = ctx.get('implementation_status')  # Returns: 'complete'
-
-# Step 4: Review audit log
-audit = ctx.get_audit_log()
-ctx.save_audit_log('logs/audit.json')
-```
-
-### Documentation
-
-- **Unit Tests**: [tests/test_context_manager.py](tests/test_context_manager.py)
-
-## 🛠️ Development Workflow
-
-We follow a strict quality-first workflow enforced by automated gates (checkpoints that validate code).
-
-### 1. Create a Feature Branch
 ```bash
-git checkout -b feature/my-feature
+git clone https://github.com/oviney/economist-agents.git
+cd economist-agents
+
+python3.13 -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+pip install --upgrade pip
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
+
+cp .env.example .env               # then edit in your API keys
 ```
 
-### 2. Make Changes & Commit
+### Environment variables
 
-**Fast commits** (no test suite):
-```bash
-git add .
-git commit -m "feat: add new research capability"
-# Runs: ruff format + ruff check (~0.5s)
-# Tests DO NOT run on commit (for speed)
-```
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `ANTHROPIC_API_KEY` | **Yes** | Claude — the primary LLM for writing and editing |
+| `SERPER_API_KEY` | For research | Google Web + Scholar search via Serper |
+| `OPENAI_API_KEY` | For images only | DALL·E 3 featured-image generation |
+| `OUTPUT_DIR` | No | Output directory for generated articles (default `output/`) |
+| `GOOGLE_APPLICATION_CREDENTIALS`, `GA4_PROPERTY_ID`, `GSC_PROPERTY_URL` | For analytics ETL | Google Analytics 4 / Search Console content-intelligence pipeline |
 
-**Git operations** are optimized for speed:
-- `git commit`: ~0.5 seconds (format + lint only) ⚡
-- `git push`: ~7.5 seconds (includes full test suite) 🧪
+---
 
-### 3. Run Tests Before Push (Automatic)
+## Usage
 
-**Tests run automatically on `git push`** (not on commit):
-```bash
-git push origin feature/my-feature
-# Pre-push hook runs pytest automatically (~7.5s)
-```
+**Run the pipeline from the CLI:**
 
-**Emergency bypass** (use sparingly):
-```bash
-git push --no-verify  # Skip tests (for urgent hotfixes only)
-```
-
-**Or run tests manually** before pushing:
-```bash
-make test          # Quick test run
-make quality       # Full quality checks (format, lint, type-check, test)
-```
-
-### 4. Create Pull Request
-```bash
-gh pr create
-```
-
-### Pre-commit Hook Performance
-
-| Hook | When | Duration | What it doetest suite (447 tests, 5 collection error
-|------|------|----------|--------------|
-| `ruff-format` | **commit** | ~300ms | Auto-format Python code |
-| `ruff check` | **commit** | ~200ms | Lint code (checks only) |
-| `pytest` | **push** ⚡ | ~60s | Run full test suite (2100+ tests) |
-| `check-yaml` | **commit** | ~50ms | Validate YAML syntax |
-| `check-json` | **commit** | ~50ms | Validate JSON syntax |
-
-**Why tests run on push, not commit:**
-- ⚡ **Faster commit workflow** (0.5s vs 7.5s)
-- ✅ **Encourages frequent small commits**
-
-## 🔄 Pipeline Orchestration
-
-Sequential Python pipeline over `src.agent_sdk.pipeline.run_pipeline` — topic discovery → editorial review → content generation → quality gates → publish-or-revise.
-
-### Usage
-
-**CLI Execution:**
 ```bash
 python3 -m src.agent_sdk.pipeline "<topic>"
 ```
 
-**Python API:**
+**Or from Python:**
+
 ```python
 from src.economist_agents.flow import run_flow
 
 result = run_flow(topic="...")
 ```
 
-**See Full Documentation:** [FLOW_ARCHITECTURE.md](docs/FLOW_ARCHITECTURE.md)
+See [`docs/FLOW_ARCHITECTURE.md`](docs/FLOW_ARCHITECTURE.md) for the full orchestration
+design, and [`CONTRIBUTING.md`](CONTRIBUTING.md) for the end-to-end article + hero-image
+handshake used when generating a real post.
 
-- 🧪 **Tests still validate before code reaches remote**
-- 🚀 **Improves local iteration speed**
+---
 
-**Emergency bypass** (use with caution):
+## Development
+
+We follow a strict, quality-first workflow. Full details are in
+[`CONTRIBUTING.md`](CONTRIBUTING.md); the essentials:
+
 ```bash
-git push --no-verify  # Skip pre-push tests (for urgent hotfixes only)
+make quality        # format + lint + type-check + test (the full gate)
+make test           # pytest only
+make lint           # ruff check
+make format         # ruff format
+make type-check     # pyright
 ```
 
-### Re-enabling Pre-commit Hooks
+Git hooks keep commits fast and pushes safe:
 
-If hooks were previously disabled, re-enable them:
+- **`git commit`** runs `ruff format` + `ruff check` only (fast).
+- **`git push`** runs the pytest suite via a pre-push hook.
+- Emergency bypass: `git push --no-verify` (hotfixes only).
+
+Re-enable hooks after a fresh clone:
+
 ```bash
-source .venv/bin/activate
 pre-commit install --install-hooks
 pre-commit install --hook-type pre-push
 ```
 
-## 📂 Project Structure
+### Code standards
+
+Type hints and docstrings are mandatory. Use `orjson`, not `json`. Use a `logger`,
+never `print()`. Mock external APIs in tests; keep coverage above 80%. The full
+standard lives in [`skills/python-quality/SKILL.md`](skills/python-quality/SKILL.md).
+
+### How work is tracked
+
+The backlog is **local-first**:
+
+- **Planning / work items → [`BACKLOG.md`](BACKLOG.md)** (`B-NNN` ids). This is the
+  source of record — edit the file directly.
+- **PRs + code review → GitHub via the `gh` CLI.**
+- **Bugs / defects → `data/skills_state/defect_tracker.json`**, then graduate to a
+  `BACKLOG.md` item if they need scheduling.
+
+See [`docs/specs/local-backlog-migration.md`](docs/specs/local-backlog-migration.md)
+for why the GitHub-issues MCP was retired.
+
+---
+
+## Agents & skills
+
+- **Development / process agents** — 10 definitions in `.github/agents/*.agent.md`
+  (architect, code-quality-specialist, code-reviewer, devops, git-operator, po-agent,
+  product-research-agent, scrum-master, test-specialist, visual-qa-agent). See
+  [`AGENTS.md`](AGENTS.md).
+- **Content-pipeline agents** — YAML configs under `agents/` (topic scout, the
+  seven-persona editorial board, and the researcher / writer / editor / graphics
+  quartet). Reusable public templates live in `agents/skills_configs/`. See
+  [`agents/README.md`](agents/README.md).
+- **Skills** — 39 `SKILL.md` workflow definitions under `skills/`. The six
+  lifecycle skills (`spec-driven-development`, `planning-and-task-breakdown`,
+  `incremental-implementation`, `test-driven-development`, `code-review-and-quality`,
+  `shipping-and-launch`) come from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills)
+  and govern all work; the rest are domain skills. See [`skills/README.md`](skills/README.md).
+
+---
+
+## Architecture notes
+
+- **LLM**: Claude (Anthropic) is the primary LLM. `OPENAI_API_KEY` is needed only for
+  DALL·E images.
+- **Framework**: The Anthropic Agent SDK is the runtime. The earlier CrewAI runtime
+  was removed in Phase 2 (see [ADR-0006](docs/adr/0006-agent-framework-selection.md)).
+- **Research**: Deterministic, LLM-free, and reproducible.
+- **Quality**: Enforced in plain Python, not by an LLM judge.
+
+---
+
+## Project structure
 
 ```
 economist-agents/
-├── agents/skills_configs/    # Agent YAML configs (research-analyst, content-writer, etc.)
-├── data/skills_state/        # Runtime state JSON (sprint tracker, metrics, defect tracker)
-├── docs/                     # Architecture and process documentation
-├── output/                   # Generated content artifacts
-├── scripts/                  # Standalone scripts and tools
-├── skills/*/SKILL.md         # Domain skill definitions (python-quality, testing, etc.)
-├── src/agent_sdk/            # Anthropic Agent SDK runners (stage3, stage4, pipeline)
-├── src/economist_agents/     # Flow orchestration, adapters
-├── src/quality/              # Quality gates (governance, validators, metrics)
-├── tests/                    # Test suite (2100+ tests)
+├── agents/                   # Content-pipeline agent YAML + reusable templates (skills_configs/)
+├── data/skills_state/        # Runtime state JSON (metrics, defect tracker, trackers)
+├── docs/                     # Architecture, ADRs, guides, and historical archive
+├── scripts/                  # Standalone tools (validators, search, ETL, orchestration)
+├── skills/*/SKILL.md         # 39 skill workflow definitions
+├── src/agent_sdk/            # Anthropic Agent SDK runners (stage3, stage4, pipeline, _shared)
+├── src/economist_agents/     # Flow orchestration and adapters
+├── src/quality/              # Quality gates, governance, validators, metrics
+├── src/backlog/, src/telemetry/, src/tools/, src/utils/
+├── tests/                    # pytest suite (2,400+ tests)
+├── .github/agents/           # 10 development/process agent definitions
+├── BACKLOG.md                # Source of record for planning items
+├── CLAUDE.md                 # Operating mode + code standards for AI agents
 └── README.md                 # This file
 ```
 
-**Current Status:**
-- **LLM**: Claude (Anthropic) primary, OpenAI for DALL-E images only
-- **Quality Score:** 100/100
-- **Test Suite:** 447 tests collected, 5 collection errors blocking execution
-- **Defect Escape Rate:** <20% (Target)
-- **Critical Bug TTD:** <2 days (Target)
-- **Gate Pass Rate:** 95% (TargeUALITY_DASHBOARD.md) for detailed metrics.
+---
 
-- **Defect Escape Rate:** <20% (Target)
-- **Critical Bug TTD:** <2 days
-- **Gate Pass Rate:** 95% (Editor Agent)
+## Documentation
 
-## 🧠 Hybrid Copilot Strategy
+- **[Documentation hub](docs/README.md)** — navigation to all guides, architecture, and references
+- **[Contributing](CONTRIBUTING.md)** — workflow, TDD, quality gates, article generation
+- **[Agents](AGENTS.md)** — multi-agent architecture and usage
+- **[ADRs](docs/adr/)** — architecture decision records (single MADR numbering sequence)
+- **[Flow architecture](docs/FLOW_ARCHITECTURE.md)** — orchestration design
+- **[Backlog](BACKLOG.md)** — current planning items
 
-This project uses a **Hybrid Copilot Strategy** that bridges local agent memory with GitHub Copilot's real-time reasoning:
+---
 
-**Architecture:**
-```
-Agent Memory (data/skills_state/*.json) → sync_copilot_context.py → .github/copilot-instructions.md → GitHub Copilot
-```
+## Glossary
 
-**What Gets Synced (58 patterns as of 2026-01-05):**
-- **Defect Prevention**: 8 bugs with RCA (BUG-015 through BUG-028)
-- **Content Quality**: 36 patterns from blog QA and agent validation
-- **Architectural**: 14 best practices from architecture reviews
+- **Editorial board** — seven AI personas that vote (weighted) on which topics to write.
+- **Stat audit** — deterministic gate removing statistics not grounded in the research brief.
+- **Quality gates** — the deterministic post-processing checks a draft must pass before publication.
+- **Source of record** — `BACKLOG.md` for planning, GitHub for PRs, `defect_tracker.json` for bugs.
 
-**Manual Sync:**
-```bash
-.venv/bin/python scripts/sync_copilot_context.py --dry-run  # Preview
-.venv/bin/python scripts/sync_copilot_context.py            # Execute
-```
+## License
 
-**Automatic Sync**: GitHub Actions workflow runs on:
-- Push to `data/skills_state/defect_tracker.json`, `data/skills_state/blog_qa_skills.json`, or `docs/ARCHITECTURE_PATTERNS.md`
-- Weekly schedule (Sundays at midnight UTC)
-- Manual dispatch from Actions tab
-
-See **[COPILOT_SYNC.md](COPILOT_SYNC.md)** for complete documentation, troubleshooting, and best practices.
-
-## 🏷️ Badge Configuration
-
-All badges use shields.io with dynamic JSON endpoints to prevent staleness (BUG-023 fix).
-
-### Badge Data Sources
-
-| Badge | Source | Update Command |
-|-------|--------|----------------|
-| **Quality Score** | `quality_dashboard.py` output | Automated via `quality_score.json` |
-| **Tests** | Actual pytest test count | `python3 scripts/generate_tests_badge.py` |
-| **Sprint** | `data/skills_state/sprint_tracker.json` | `python3 scripts/generate_sprint_badge.py` |
-| **Coverage** | pytest-cov output | `python3 scripts/generate_coverage_badge.py` |
-
-### Badge Validation
-
-Pre-commit hook automatically validates badge accuracy:
-```bash
-python3 scripts/validate_badges.py
-```
-
-All badges use shields.io endpoint format with JSON files in repo root for dynamic updates.
-
-## 📚 Documentation
-
-This README provides a project overview and quick start guide. For comprehensive documentation, see:
-
-**📖 [Complete Documentation Hub](docs/README.md)** - Navigation to all guides, architecture, and references
-
-### Quick Links
-- **[Contributing Guidelines](CONTRIBUTING.md)** - Development workflow, TDD, quality gates
-- **[Agent System](AGENTS.md)** - Multi-agent architecture and usage
-- **[Architecture & ADRs](docs/architecture/)** - Design decisions and system architecture
-- **[User Guides](docs/guides/)** - Step-by-step guides for deployment, CI/CD, and development
-- **[Historical Archive](docs/archive/)** - Sprint reports, story completions, and system history
-
-### For Different Audiences
-- **New Contributors**: [README](README.md) → [Contributing](CONTRIBUTING.md) → [Setup Guide](docs/guides/CONTINUE_SETUP.md)
-- **Developers**: [Agents Overview](AGENTS.md) → [Quality System](docs/DEFINITION_OF_DONE.md) → [Workflow Guide](docs/guides/WORKFLOW_GUIDE.md)
-- **Architects**: [ADR Collection](docs/architecture/) → [Flow Architecture](docs/FLOW_ARCHITECTURE.md)
-- **Project Managers**: [Current Sprint](SPRINT.md) → [Quality Dashboard](docs/QUALITY_DASHBOARD.md) → [Archive](docs/archive/)
-
-## 📖 Glossary
-
-**Multi-Agent System:** AI architecture where specialized agents (personas) collaborate on complex tasks. Each agent has a specific role (research, writing, editing) and they communicate through structured data exchanges.
-
-**Defect Escape Rate:** Percentage of bugs that reach production despite testing and quality gates. Our target is <20% (industry average: 40-60%).
-
-**Gate Pass Rate:** Percentage of quality gate checks that pass during validation. Measured per agent (Editor: 95%, Writer: 87%).
-
-**Editorial Board:** 6 AI personas (VP Engineering, QE Lead, Data Skeptic, Career Climber, Economist Editor, Busy Reader) that vote on content topics using weighted consensus.
-
-**Quality Gates:** Automated checkpoints that enforce coding and content standards. We have 4 layers: Pre-commit hooks, GitHub Actions CI, Agent self-validation, and Publication validator.
-
-## 📜 License
-
-Proprietary. All rights reserved.
+[MIT](LICENSE) © 2026 Ouray Viney.

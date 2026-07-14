@@ -47,6 +47,9 @@ from scripts.llm_client import call_llm, create_llm_client
 # Import publication validator
 from scripts.publication_validator import PublicationValidator
 
+# Deterministic finalize step (stamps date, guarantees valid frontmatter)
+from src.agent_sdk._shared import apply_editorial_fixes
+
 # Import agent metrics
 from src.quality.agent_metrics import AgentMetrics
 
@@ -972,6 +975,13 @@ def generate_economist_post(
         critique = run_critique_agent(client, edited_article)
     else:
         print(f"   ⚠ Skipping critique - {gates_failed} quality gates failed")
+
+    # Deterministic finalize: stamp today's date and guarantee a complete,
+    # valid frontmatter block BEFORE validation. Mechanical defects (stale
+    # date, missing categories/frontmatter) are fixed here rather than
+    # quarantining an otherwise-publishable article — the same safety net
+    # the production flow.py pipeline already applies via Stage 4.
+    edited_article = apply_editorial_fixes(edited_article, current_date=date_str)
 
     # Stage 6: Publication Validation (CRITICAL - blocks bad articles)
     print("🔒 Publication Validator: Final quality gate...")

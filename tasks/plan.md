@@ -17,7 +17,7 @@ fails building the `sgmllib3k` wheel (feedparser dep). Verification therefore re
 | Target | Coupled to (KEEP) | Verdict |
 |---|---|---|
 | Sprint *skills* (`sprint-management`, `scrum-master`) | `validate_skills.py` globs only; `mkdocs.yml` nav | **Safe** — delete + fix nav |
-| Sprint *workflows* (`sprint-discipline`, `sprint-sync`, `remediation-sync`) | none (YAML, not pytest) | **Safe** |
+| Sprint *workflows* (`sprint-discipline`, `sprint-sync`) | none (YAML, not pytest) | **Safe** |
 | Stale artifacts (SPRINT.md, SPRINT_15_*, badges, `.deployment_state`, root `SPEC.md`, `.github/BACKLOG.md`, `.github` sprint docs, root sprint shell wrappers) | `README.md`, `mkdocs.yml`, the sprint workflows themselves | **Safe** — delete + fix README/nav |
 | Instruction dup (`GEMINI.md`, root + `.github/copilot-instructions.md`, `CONTRIBUTING.md`) | none (prose) | **Safe** — shrink to pointers |
 | `.github/agents/*.agent.md` (10 personas) + `AGENTS.md` + `scripts/agent_registry.py` | `test_llm_providers.py` (`list_agents()>0`, `match="scrum-master"`), `test_agent_registry_enhancement.py`, `test_architect_agent.py` — **ADR-002** | **DEFERRED** — architectural; needs ADR |
@@ -33,7 +33,7 @@ Vertical slices; each independently committable; none touches a pytest import.
 
 1. **Stale artifacts** — delete snapshot files + fix `README.md` badges/links + `mkdocs.yml` nav.
 2. **Sprint skills** — delete `skills/sprint-management/`, `skills/scrum-master/` + fix `mkdocs.yml` nav.
-3. **Sprint workflows** — delete `sprint-discipline.yml`, `sprint-sync.yml`, `remediation-sync.yml`; drop the `sprint_validator --validate-sprint || true` step from `quality-tests.yml`.
+3. **Sprint workflows** — delete `sprint-discipline.yml`, `sprint-sync.yml`; drop the `sprint_validator --validate-sprint || true` step from `quality-tests.yml`. (`remediation-sync.yml` is KEEP — content remediation, not sprint.)
 4. **Instruction consolidation** — shrink `GEMINI.md`, root + `.github/copilot-instructions.md`, and `CONTRIBUTING.md`'s duplicated coding-standards/TDD prose to pointers at `CLAUDE.md` + skills.
 5. **CLAUDE.md sync** — remove references to retired machinery so the doc points at nothing deleted.
 

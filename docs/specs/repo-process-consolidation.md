@@ -105,19 +105,21 @@ pytest import**, verifiable by grep + CI. See `tasks/plan.md` for the wave break
 **Skills**
 - `skills/sprint-management/`, `skills/scrum-master/` — sprint ceremony + SPRINT.md↔Issues sync; directly contradict `local-backlog-migration`.
 
-**Executable code + their tests** (⚠ CI-wired — see §6)
+**Executable code + their tests** (⚠ CI-wired — see §6; ⚠ superseded by §2.0)
 - `scripts/po_agent.py`, `scripts/sm_agent.py`, `scripts/orchestrator_agent.py`,
-  `scripts/sprint_validator.py`, `scripts/continuous_burndown.py`,
-  `scripts/skills_gap_analyzer.py`, `scripts/skills_manager.py`
+  `scripts/sprint_validator.py`, `scripts/continuous_burndown.py`
 - Tests: `tests/test_po_agent.py`, `tests/test_sm_agent.py`, `tests/test_orchestrator_agent.py`,
-  `tests/test_continuous_burndown.py`, `tests/test_skills_gap_analyzer.py`
+  `tests/test_continuous_burndown.py`
   (⚠ **verify** `test_orchestrator_agent.py` targets the Regime-B PR-triage orchestrator, not
   `deep_research_orchestrator`; `test_deep_research_orchestrator.py` is research-pipeline — KEEP.)
+- **Not here:** `scripts/skills_manager.py`, `scripts/skills_gap_analyzer.py` (+ their tests) were
+  moved to **KEEP** by the §2.0 correction — they back `src/quality/validate_closed_loop.py`.
 
 **Workflows**
-- `.github/workflows/sprint-discipline.yml`, `sprint-sync.yml`, `remediation-sync.yml`,
+- `.github/workflows/sprint-discipline.yml`, `sprint-sync.yml`,
   `nightly-eval.yml`, `sync-copilot.yml` (+ `scripts/sync_copilot_context.py`,
   `sync_copilot_pre_commit.sh`) — regenerates the very Copilot files §2.2 shrinks.
+  (`remediation-sync.yml` is **KEEP** per §2.0 — it is content remediation, not sprint.)
 
 **Personas / registry**
 - `.github/agents/*.agent.md` (10 files), `AGENTS.md`, `skills/agent-delegation` references to them.

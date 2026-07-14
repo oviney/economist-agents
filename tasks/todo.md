@@ -5,8 +5,8 @@
 
 ## Todo (dependency-ordered)
 
-- [ ] **T0** — Env: reliable keyless `claude-agent-sdk` install + document `IS_SANDBOX=1` under root
-- [ ] **T1** — `src/agent_sdk/research/claude_web.py` → `build_claude_web_brief()` (WebSearch/WebFetch) + test
+- [x] **T0** — Env: `claude-agent-sdk` imports; keyless smoke `query()` proven (install workaround: `--ignore-installed PyJWT`; `IS_SANDBOX=1` under root). Full requirements install fix → T6.
+- [x] **T1** — `src/agent_sdk/research/claude_web.py` → `build_claude_web_brief()` (WebSearch/WebFetch) + 3 tests green
 - [ ] **T2** — Wire `research_mode="claude_web"` through `stage3_runner` + `pipeline` + CLI + test
 - [ ] **— CHECKPOINT A —** keyless article via mocked test; show green, get go
 - [ ] **T3** — Reroute `refine_image_metadata` to `query()` vision, drop key gate + test

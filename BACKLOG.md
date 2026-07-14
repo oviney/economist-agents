@@ -30,6 +30,35 @@ _(none — sprint backlog cleared 2026-06-14: B-003 → B-002 → B-001 all merg
 
 ## Done
 
+### B-005 · Writer word-count contract (single source of truth + structured prompt) — 2026-07-14
+
+Follow-up from B-004. Short drafts (< 700 words) were the one remaining
+un-fixable-by-finalize quarantine cause. Consolidated the drifted word-count
+thresholds into `WORD_COUNT_MIN/TARGET/MAX` constants in `publication_validator.py`
+(the docstring had claimed 800 while the code enforced 700), routed
+`_check_word_count` + the new pure `word_count_shortfall`/`_body_word_count`
+helpers through the single source of truth, and rewrote the `stage3_runner` writer
+prompt into a structured per-section budget (~850 across 3-4 sections, aligned to
+the heading cap) that imports the constants so it can never drift below the floor.
+700 floor unchanged (consolidation, not re-tuning). Shipped in **PR #443**
+(squash-merged to `main` as `ed0453f`, alongside B-004). Behavioural proof (real
+drafts clear the target) is an explicit live-run step — not verifiable in an
+API-key-less CI. Spec: `docs/specs/B-005-writer-word-count-contract.md`.
+
+### B-004 · Deterministic frontmatter finalize so mechanical defects never quarantine — 2026-07-14
+
+Defect **BUG-038**. The pipeline quarantined an otherwise-publishable article
+(`generation.log`) for a single mechanically-fixable `DATE_MISMATCH`, after LLM
+regeneration destroyed the frontmatter. Hardened
+`src/agent_sdk/_shared.py:apply_editorial_fixes` to guarantee a complete, valid
+frontmatter block when a finalize `current_date` is supplied (reconstruct a missing
+block with the H1 as title, stamp today's date, fill categories/description and an
+EMPTY chart-only `image:` — a default hero is itself a CRITICAL), and wired that
+finalizer into the deprecated `scripts/economist_agent.py` before validation.
+Word-count left to B-005. Shipped in **PR #443** (squash-merged to `main` as
+`ed0453f`). A Copilot review caught a real image-fallback regression, fixed
+pre-merge. Spec: `docs/specs/B-004-frontmatter-finalize.md`.
+
 ### B-001 · Wired Stage 4 author safety net to BLOG_AUTHOR — 2026-06-14
 
 Slice 3 (final) of the sprint. PR #435 (squash-merged to `main`). The Stage 4

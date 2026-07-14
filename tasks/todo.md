@@ -21,7 +21,8 @@
 
 ## Wave 2 — Deferred (needs human decision / ADR + runnable test suite — NOT in this pass)
 
-- [ ] **W2-A**: Decide keep-vs-retire the AgentRegistry system (ADR-002): 10 `.github/agents/*.agent.md` personas + `AGENTS.md` + `scripts/agent_registry.py` + `test_llm_providers.py`/`test_agent_registry_enhancement.py`/`test_architect_agent.py`. **← blocking decision**
+- [x] **W2-A** ✅: Retired the AgentRegistry system — `agent_registry.py`, `src/manager.py` (dead), 10 personas, `AGENTS.md`, registry-only tests, SM benchmark + `nightly-eval.yml`. Guardrail re-anchored on `llm_client.py` factory (50 tests pass). ADR-0012 supersedes ADR-002. −5,655 lines. (commit `refactor: retire the AgentRegistry…`)
+  - **Doc-debt (follow-up):** stale how-to prose still names `agent_registry.py` in `scripts/templates/README.md`+`QUICKSTART.md`, `scripts/AGENT_ORCHESTRATION_PROMPTS.md`, `docs/MISSION_TEMPLATE_USAGE.md`, `docs/GITHUB_PROJECT_TOOL.md`, `docs/guides/IMPLEMENTATION_ROADMAP.md`. Not broken links — deferred to a doc sweep. Historical `docs/archive/**`, SPRINT/EPIC/STORY records, ADR-0005 left as immutable history.
 - [ ] **W2-B**: Retire `sm/po/orchestrator_agent`, `continuous_burndown`, `sprint_validator` + their tests; delete `SPRINT.md`; disentangle `sprint_tracker/task_queue/escalations` writers in `src/backlog/*`.
 - [ ] **W2-C**: Retire `nightly-eval.yml` + `scripts/benchmarks/measure_sm_effectiveness.py` + `sync-copilot.yml`; then consolidate the copilot-instructions files.
 - [ ] **W2-D**: Delete root `SPEC.md`, `.github/BACKLOG.md`, sprint ISSUE_TEMPLATEs + fix their KEEP references.

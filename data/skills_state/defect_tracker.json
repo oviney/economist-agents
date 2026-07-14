@@ -634,12 +634,15 @@
       "discovered_date": "2026-07-14T00:00:00",
       "description": "apply_editorial_fixes mangles Markdown image embeds: the exclamation-strip step turns '![alt](path)' into '.[alt](path)', breaking inline chart/hero embeds. Masked in hero mode by the auto-embed safety net running afterwards.",
       "component": "agent_sdk._shared.apply_editorial_fixes",
-      "status": "in_progress",
+      "status": "fixed",
       "github_issue": null,
       "is_production_escape": false,
       "root_cause": "blind_string_replace",
       "root_cause_notes": "line.replace('!','.') applied per-line without excluding the Markdown image token '!['.",
-      "discovered_by": "B-006 keyless chart_only end-to-end (Checkpoint A)"
+      "discovered_by": "B-006 keyless chart_only end-to-end (Checkpoint A)",
+      "fixed_date": "2026-07-14T00:00:00",
+      "fix_notes": "Fixed under B-006; verified by Checkpoint B live keyless run passing the publication validator.",
+      "prevention_test_added": true
     },
     {
       "id": "BUG-039",
@@ -648,12 +651,15 @@
       "discovered_date": "2026-07-14T00:00:00",
       "description": "run_pipeline chart_only strips the image: frontmatter (and its slug) BEFORE Stage 4, so _auto_embed_chart cannot derive the chart path and the required chart is never embedded -> publication_validator missing_chart. _run_resume already embeds-before-strips; run_pipeline does not.",
       "component": "agent_sdk.pipeline.run_pipeline",
-      "status": "in_progress",
+      "status": "fixed",
       "github_issue": null,
       "is_production_escape": false,
       "root_cause": "ordering",
       "root_cause_notes": "_strip_image_frontmatter runs before run_stage4/_auto_embed_chart; mirror _run_resume ordering.",
-      "discovered_by": "B-006 keyless chart_only end-to-end (Checkpoint A)"
+      "discovered_by": "B-006 keyless chart_only end-to-end (Checkpoint A)",
+      "fixed_date": "2026-07-14T00:00:00",
+      "fix_notes": "Fixed under B-006; verified by Checkpoint B live keyless run passing the publication validator.",
+      "prevention_test_added": true
     },
     {
       "id": "BUG-040",
@@ -662,12 +668,15 @@
       "discovered_date": "2026-07-14T00:00:00",
       "description": "Stage 3 writer sometimes wraps the whole article in a Markdown code fence (```...```). The fence is not stripped, so the article does not start with '---' AND _strip_duplicate_article mistakes the real frontmatter (now at a non-zero offset) for a duplicate emission and deletes the entire body, raising MalformedArticleError (body_empty=True).",
       "component": "agent_sdk.stage3_runner",
-      "status": "in_progress",
+      "status": "fixed",
       "github_issue": null,
       "is_production_escape": false,
       "root_cause": "unhandled_output_format",
       "root_cause_notes": "raw_writer_output enclosing code fence not stripped before _strip_duplicate_article / frontmatter validation.",
-      "discovered_by": "B-006 Checkpoint B live keyless subscription run"
+      "discovered_by": "B-006 Checkpoint B live keyless subscription run",
+      "fixed_date": "2026-07-14T00:00:00",
+      "fix_notes": "Fixed under B-006; verified by Checkpoint B live keyless run passing the publication validator.",
+      "prevention_test_added": true
     },
     {
       "id": "BUG-041",
@@ -676,12 +685,15 @@
       "discovered_date": "2026-07-14T00:00:00",
       "description": "Stage 3 graphics _collect_text call uses the default max_turns=1; against the real subscription CLI the graphics agent needs >1 turn and the SDK raises 'Reached maximum number of turns (1)', which _collect_text does not catch, crashing the whole pipeline. Also: claude_web research MAX_TURNS=12 is too low and soft-degrades to an empty brief on complex topics.",
       "component": "agent_sdk.stage3_runner._collect_text / research.claude_web",
-      "status": "in_progress",
+      "status": "fixed",
       "github_issue": null,
       "is_production_escape": false,
       "root_cause": "turn_cap_unhandled",
       "root_cause_notes": "give graphics turn headroom; tolerate turn-cap with partial text; raise claude_web turn cap.",
-      "discovered_by": "B-006 Checkpoint B live keyless subscription run (run 2)"
+      "discovered_by": "B-006 Checkpoint B live keyless subscription run (run 2)",
+      "fixed_date": "2026-07-14T00:00:00",
+      "fix_notes": "Fixed under B-006; verified by Checkpoint B live keyless run passing the publication validator.",
+      "prevention_test_added": true
     },
     {
       "id": "BUG-042",
@@ -690,12 +702,15 @@
       "discovered_date": "2026-07-14T00:00:00",
       "description": "When the graphics model omits the chart 'title' field, render_chart's _validate_spec raises ChartRenderError and crashes the whole pipeline. A missing title is mechanically recoverable and must not abort an otherwise-complete run.",
       "component": "agent_sdk.stage3_runner / chart_renderer",
-      "status": "in_progress",
+      "status": "fixed",
       "github_issue": null,
       "is_production_escape": false,
       "root_cause": "missing_field_hard_fail",
       "root_cause_notes": "backfill chart title from the article title/topic before render_chart.",
-      "discovered_by": "B-006 Checkpoint B live keyless subscription run (run 3)"
+      "discovered_by": "B-006 Checkpoint B live keyless subscription run (run 3)",
+      "fixed_date": "2026-07-14T00:00:00",
+      "fix_notes": "Fixed under B-006; verified by Checkpoint B live keyless run passing the publication validator.",
+      "prevention_test_added": true
     },
     {
       "id": "BUG-043",
@@ -704,12 +719,15 @@
       "discovered_date": "2026-07-14T00:00:00",
       "description": "Stage 3 (run_stage3) generates the writer draft once and raises MalformedArticleError on any malformed output, aborting the whole run. The writer via the subscription CLI is non-deterministic (empty body, bare code fence), so a single bad draft kills an otherwise-keyless run. run_pipeline has no retry, unlike flow.py's revision loop.",
       "component": "agent_sdk.stage3_runner.run_stage3",
-      "status": "in_progress",
+      "status": "fixed",
       "github_issue": null,
       "is_production_escape": false,
       "root_cause": "single_shot_no_retry",
       "root_cause_notes": "bounded writer regeneration (3 attempts) on malformed output, reusing the research brief.",
-      "discovered_by": "B-006 Checkpoint B live keyless subscription run (run 4)"
+      "discovered_by": "B-006 Checkpoint B live keyless subscription run (run 4)",
+      "fixed_date": "2026-07-14T00:00:00",
+      "fix_notes": "Fixed under B-006; verified by Checkpoint B live keyless run passing the publication validator.",
+      "prevention_test_added": true
     }
   ],
   "summary": {

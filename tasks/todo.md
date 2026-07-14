@@ -13,7 +13,7 @@
 - [x] **T4** — `economist_agent._abort_if_keyless()` fail-loud message + 2 tests
 - [x] **T5** — ADR-0012 (keyless claude_web research); registered in mkdocs; adr-lint passes
 - [x] **T6** — `--research-mode`/`--image-mode` CLI + end-to-end chart_only path; runbook `docs/keyless-pipeline-runbook.md`; `BACKLOG.md` B-006
-- [~] **— CHECKPOINT B —** live keyless subscription run (4 runs). **Keyless foundation PROVEN**: research (claude_web WebSearch), writer, and graphics all execute with ANTHROPIC/OPENAI/SERPER unset. Surfaced + fixed 5 pre-existing bugs against the real CLI (BUG-038 writer fence, 039 chart_only strip-order, 040 fence-body-delete, 041 turn-cap crash, 042 chart title). **Not yet a clean validator-pass**: the writer via the CLI is non-deterministic (run1 fence, run4 empty body) and `_run_end_to_end` uses single-shot `run_pipeline` (no retry), whereas `flow.py` EconomistContentFlow has the revision/retry loop built for this. Decision pending: route end-to-end through flow.py's retry loop vs. add a bounded Stage-3 retry.
+- [x] **— CHECKPOINT B — PASSED (run 6)** ✅ Live keyless subscription run with ANTHROPIC/OPENAI/SERPER **all unset** produced a validator-passing 1092-word article (`output/posts/crying-wolf-flaky-tests-...md`), `publication_validator PASSED`, exit 0. Six real sourced stats + URLs, embedded chart. Took 6 runs, each peeling off one pre-existing gap against the real CLI (mocked tests never exercised it): BUG-038 (`!`→`.` on `![`), 039 (chart_only strip-order), 040 (fence body-delete), 041 (graphics turn-cap crash), 042 (missing chart title), 043 (bounded writer retry for non-determinism), + budget-cap headroom for multi-turn CLI calls. All fixed with regression tests.
 
 ## Done
 

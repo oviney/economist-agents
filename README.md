@@ -4,10 +4,6 @@
 
 [![CI](https://github.com/oviney/economist-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/oviney/economist-agents/actions/workflows/ci.yml)
 [![Quality Tests](https://github.com/oviney/economist-agents/actions/workflows/quality-tests.yml/badge.svg)](https://github.com/oviney/economist-agents/actions/workflows/quality-tests.yml)
-[![Sprint Discipline](https://github.com/oviney/economist-agents/actions/workflows/sprint-discipline.yml/badge.svg)](https://github.com/oviney/economist-agents/actions/workflows/sprint-discipline.yml)
-[![Quality Score](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/oviney/economist-agents/main/quality_score.json)](https://github.com/oviney/economist-agents/blob/main/docs/QUALITY_DASHBOARD.md)
-[![Tests](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/oviney/economist-agents/main/tests_badge.json)](https://github.com/oviney/economist-agents/actions/workflows/ci.yml)
-[![Sprint](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/oviney/economist-agents/main/sprint_badge.json)](https://github.com/oviney/economist-agents/blob/main/SPRINT.md)
 ![Python](https://img.shields.io/badge/Python-3.11+-blue)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
@@ -336,27 +332,12 @@ Agent Memory (data/skills_state/*.json) → sync_copilot_context.py → .github/
 
 See **[COPILOT_SYNC.md](COPILOT_SYNC.md)** for complete documentation, troubleshooting, and best practices.
 
-## 🏷️ Badge Configuration
+## 🏷️ Badges
 
-All badges use shields.io with dynamic JSON endpoints to prevent staleness (BUG-023 fix).
-
-### Badge Data Sources
-
-| Badge | Source | Update Command |
-|-------|--------|----------------|
-| **Quality Score** | `quality_dashboard.py` output | Automated via `quality_score.json` |
-| **Tests** | Actual pytest test count | `python3 scripts/generate_tests_badge.py` |
-| **Sprint** | `data/skills_state/sprint_tracker.json` | `python3 scripts/generate_sprint_badge.py` |
-| **Coverage** | pytest-cov output | `python3 scripts/generate_coverage_badge.py` |
-
-### Badge Validation
-
-Pre-commit hook automatically validates badge accuracy:
-```bash
-python3 scripts/validate_badges.py
-```
-
-All badges use shields.io endpoint format with JSON files in repo root for dynamic updates.
+The **CI** and **Quality Tests** badges are served natively by GitHub Actions from the
+`ci.yml` and `quality-tests.yml` workflows — no repo-root JSON files or badge-generator
+scripts are involved. (The former sprint/quality-score/tests JSON badges were retired with
+the autonomous-Scrum machinery — see `docs/specs/repo-process-consolidation.md`.)
 
 ## 📚 Documentation
 

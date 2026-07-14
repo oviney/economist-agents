@@ -1,5 +1,11 @@
 # Sprint Planning - Economist Agents
 
+> ⚠️ **Historical / superseded.** This file is a snapshot of early sprint planning
+> (last updated 2026-01-01) and is **no longer maintained**. Day-to-day planning is
+> now tracked in [`BACKLOG.md`](BACKLOG.md) (the source of record, `B-NNN` items);
+> completed sprints live in [`docs/archive/sprints/`](docs/archive/sprints/). Kept for
+> history — do not treat its status as current.
+
 **Last Updated**: 2026-01-01 (Auto-generated from sprint completion reports)
 
 ## Sprint Framework

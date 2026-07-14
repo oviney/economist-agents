@@ -1,5 +1,12 @@
 # SPEC: Delete or archive dead files in scripts/ (issue #327)
 
+> ℹ️ **Historical / completed spec.** Despite its top-level name, this is **not** the
+> project specification — it is a single feature spec for issue #327 (dead-file cleanup
+> in `scripts/`), which has been **implemented** (see
+> [ADR-0010](docs/adr/0010-scripts-to-src-migration.md)). Kept as a record. For current
+> architecture see [`docs/adr/`](docs/adr/) and [`docs/README.md`](docs/README.md);
+> for current work see [`BACKLOG.md`](BACKLOG.md).
+
 **Status**: APPROVED (staff engineer review applied 2026-05-10; amended 2026-05-12; ADR-0010 implemented 2026-05-15 via #344)
 **GitHub issue**: oviney/economist-agents#327 (ADR-0010 follow-up: #344)
 **Date**: 2026-05-10 (amended 2026-05-12 — see [ADR-0010](docs/adr/0010-scripts-to-src-migration.md); 2026-05-15 — †-rows migrated to src/ via #344)

@@ -30,6 +30,25 @@ _(none — sprint backlog cleared 2026-06-14: B-003 → B-002 → B-001 all merg
 
 ## Done
 
+### B-006 · Keyless subscription pipeline (claude_web research + chart-embed fixes) — 2026-07-14
+
+Makes the production pipeline generate a validator-passing article with **no paid
+API keys** — writer, graphics, research, and vision all run on the Claude
+subscription via the Agent SDK (`claude_agent_sdk.query()`). New opt-in
+`research_mode="claude_web"` has Claude do its own live web research through the
+built-in `WebSearch`/`WebFetch` tools (no Serper; ADR-0012). Vision refinement
+rerouted off the `anthropic` client onto `query()` (also clears the ADR-0002
+concern in `_shared.py`). New `--image-mode chart_only` CLI path runs end-to-end
+(no hero image, no handshake) and writes `output/posts/<slug>.md`; the deprecated
+`economist_agent.py` now fails loud with a pointer to the keyless command.
+Surfaced + fixed two pre-existing chart-embed bugs found by the real validator:
+**BUG-038** (`apply_editorial_fixes` mangled `![...]` image syntax when stripping
+`!`) and **BUG-039** (`run_pipeline` chart_only stripped the image slug before
+`_auto_embed_chart` could fire). Spec: `docs/specs/B-006-keyless-subscription-pipeline.md`;
+plan: `tasks/plan.md`; runbook: `docs/keyless-pipeline-runbook.md`. Deterministic
++ tested (keyless, mocked SDK); behavioural proof is a live subscription run
+(Checkpoint B).
+
 ### B-001 · Wired Stage 4 author safety net to BLOG_AUTHOR — 2026-06-14
 
 Slice 3 (final) of the sprint. PR #435 (squash-merged to `main`). The Stage 4

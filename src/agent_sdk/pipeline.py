@@ -354,6 +354,26 @@ def main() -> None:
         ),
     )
     parser.add_argument(
+        "--research-mode",
+        choices=("deterministic", "deep", "claude_web"),
+        default="deterministic",
+        help=(
+            "Research path: 'deterministic' (default, Serper) | 'deep' (recursive, "
+            "Serper) | 'claude_web' (keyless — Claude's own WebSearch/WebFetch on "
+            "the subscription, no SERPER_API_KEY). See ADR-0012."
+        ),
+    )
+    parser.add_argument(
+        "--image-mode",
+        choices=("hero", "chart_only"),
+        default="hero",
+        help=(
+            "'hero' (default): Stage 3 + pause for the human image handshake. "
+            "'chart_only': run end-to-end with no hero image (chart is the "
+            "visual) and write the finished article — no image API, no handshake."
+        ),
+    )
+    parser.add_argument(
         "--resume",
         metavar="SLUG",
         help=(
@@ -388,6 +408,19 @@ def main() -> None:
         _run_resume(args.resume, no_image=args.no_image)
         return
 
+    # chart_only runs end-to-end with no hero image and no handshake — the only
+    # fully keyless path (pair with --research-mode claude_web for zero keys).
+    if args.image_mode == "chart_only":
+        _run_end_to_end(
+            topic,
+            writer_budget=args.writer_budget,
+            graphics_budget=args.graphics_budget,
+            writer_model=args.writer_model,
+            graphics_model=args.graphics_model,
+            research_mode=args.research_mode,
+        )
+        return
+
     # Default path (Stage 3 only, then pause for image handshake) — #403 slice 3
     print(f"Running Agent SDK pipeline on: {topic}")
     print(f"  Models: writer={args.writer_model}, graphics={args.graphics_model}")
@@ -402,6 +435,70 @@ def main() -> None:
         writer_model=args.writer_model,
         graphics_model=args.graphics_model,
     )
+
+
+def _slug_from_article(article: str, fallback: str) -> str:
+    """Derive a filename slug from the article's title frontmatter (or topic)."""
+    match = re.search(r'^title:\s*["\']?(.+?)["\']?\s*$', article, re.MULTILINE)
+    source = match.group(1) if match else fallback
+    slug = re.sub(r"[^a-z0-9]+", "-", source.lower()).strip("-")
+    return slug or "article"
+
+
+def _run_end_to_end(
+    topic: str,
+    *,
+    writer_budget: float | None,
+    graphics_budget: float | None,
+    writer_model: str,
+    graphics_model: str,
+    research_mode: str,
+) -> None:
+    """Run the full pipeline chart-only (no hero image, no handshake) and write
+    the finished article. With ``--research-mode claude_web`` this is fully
+    keyless — Stage 3 writer/graphics and research all run on the Claude
+    subscription via the Agent SDK; no ANTHROPIC/OPENAI/SERPER key is used.
+    """
+    print(f"Running Agent SDK pipeline (chart_only) on: {topic}")
+    print(f"  Research mode: {research_mode}; models: writer={writer_model}")
+    try:
+        result = asyncio.run(
+            run_pipeline(
+                topic,
+                writer_budget_usd=writer_budget,
+                graphics_budget_usd=graphics_budget,
+                writer_model=writer_model,
+                graphics_model=graphics_model,
+                image_mode="chart_only",
+                research_mode=research_mode,
+            )
+        )
+    except (SearchProvidersFailedError, SearchProvidersEmptyError) as exc:
+        print(f"\nPipeline aborted: research failed.\n  {exc}", file=sys.stderr)
+        sys.exit(2)
+
+    POSTS_DIR.mkdir(parents=True, exist_ok=True)
+    slug = _slug_from_article(result.article, topic)
+    article_path = POSTS_DIR / f"{slug}.md"
+    article_path.write_text(result.article)
+
+    print(
+        f"\nStage 3+4 complete: ${result.total_cost_usd:.4f}, "
+        f"{result.article_chars} chars → {article_path}"
+    )
+    if result.publication_validator_passed:
+        print("✅ Publication validator PASSED — article is publish-ready.")
+        sys.exit(0)
+    print(
+        "❌ Publication validator found issues:", file=sys.stderr
+    )
+    for issue in result.publication_validator_issues:
+        print(
+            f"  [{issue.get('severity')}] {issue.get('check')}: "
+            f"{issue.get('message')}",
+            file=sys.stderr,
+        )
+    sys.exit(1)
 
 
 def _run_research_only(topic: str) -> None:

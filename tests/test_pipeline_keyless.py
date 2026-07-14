@@ -16,8 +16,11 @@ import asyncio
 from pathlib import Path
 from unittest.mock import AsyncMock, Mock
 
+import pytest
+
+import src.agent_sdk.pipeline as pipe
 import src.agent_sdk.stage3_runner as s3
-from src.agent_sdk.pipeline import run_pipeline
+from src.agent_sdk.pipeline import _slug_from_article, run_pipeline
 from src.agent_sdk.stage3_runner import run_stage3
 
 # Minimal draft for the routing tests (mocked at the run_stage3 seam, so it
@@ -174,3 +177,61 @@ def test_checkpoint_a_keyless_chart_only_passes_validator(
     web.assert_awaited_once()
     assert result.publication_validator_passed is True
     assert result.publication_validator_issues == []
+
+
+def test_slug_from_article_uses_title() -> None:
+    art = '---\nlayout: post\ntitle: "The Quiet Reinvention of QA"\n---\n\nBody.\n'
+    assert _slug_from_article(art, "fallback topic") == "the-quiet-reinvention-of-qa"
+
+
+def test_slug_from_article_falls_back_to_topic() -> None:
+    assert _slug_from_article("no frontmatter here", "My Topic!") == "my-topic"
+
+
+def test_end_to_end_cli_writes_article_and_exits_zero(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """The chart_only end-to-end CLI path writes the article and exits 0 when the
+    validator passes, using run_pipeline with the selected research mode."""
+    monkeypatch.chdir(tmp_path)
+    _unset_all_keys(monkeypatch)
+
+    from src.agent_sdk.pipeline import PipelineResult
+
+    async def fake_run_pipeline(topic, **kwargs):
+        assert kwargs["image_mode"] == "chart_only"
+        assert kwargs["research_mode"] == "claude_web"
+        return PipelineResult(
+            topic=topic,
+            article='---\nlayout: post\ntitle: "A Good Title"\n---\n\nBody.\n',
+            chart_data={},
+            editorial_score=1.0,
+            gates_passed=True,
+            publication_ready=True,
+            publication_validator_passed=True,
+            publication_validator_issues=[],
+            total_cost_usd=0.1,
+            writer_cost_usd=0.05,
+            graphics_cost_usd=0.02,
+            research_cost_usd=0.03,
+            writer_model="w",
+            graphics_model="g",
+            stage3_seconds=0.1,
+            stage4_seconds=0.1,
+            article_chars=42,
+        )
+
+    monkeypatch.setattr(pipe, "run_pipeline", fake_run_pipeline)
+
+    with pytest.raises(SystemExit) as exc:
+        pipe._run_end_to_end(
+            "topic",
+            writer_budget=0.3,
+            graphics_budget=0.1,
+            writer_model="w",
+            graphics_model="g",
+            research_mode="claude_web",
+        )
+    assert exc.value.code == 0
+    written = (tmp_path / "output" / "posts" / "a-good-title.md").read_text()
+    assert "A Good Title" in written

@@ -26,7 +26,17 @@ _(none)_
 
 ## Todo
 
-_(none — sprint backlog cleared 2026-06-14: B-003 → B-002 → B-001 all merged)_
+### B-004 · Reconcile the supported Python version policy
+
+**Spec:** [`docs/specs/B-004-python-version-policy.md`](docs/specs/B-004-python-version-policy.md)
+· **Status:** DRAFT — needs a maintainer decision before implementation.
+
+Four sources disagree on which Python the project supports: CI tests **3.11/3.12**
+(`.github/workflows/ci.yml`), the docs now say **3.13.x** (README/CONTRIBUTING),
+packaging declares **nothing** (no `requires-python`), and **ADR-0004**'s ≤3.13 ceiling
+was justified only by CrewAI — which was removed (ADR-0006). Pick one policy (spec §3;
+recommendation: support 3.11–3.13), then make CI, docs, `pyproject.toml`, and a new/amended
+ADR all agree. Surfaced while reconciling docs in PR #445 (merged). One self-contained slice.
 
 ## Done
 

@@ -11,22 +11,14 @@ A sophisticated multi-agent system (6 AI personas collaborate) that produces pub
 
 ## 🚀 Project Status
 
-**Current Phase:** Integration and Production Deployment (Sprint 15 - Day 4)
-**Current Quality Score:** 30/100 (red) - Test suite needs stabilization
-**Sprint 15 Progress:** Story 9 COMPLETE ✅, Story 10 IN PROGRESS (5/13 pts, 38%)
+Planning is tracked in [`BACKLOG.md`](BACKLOG.md) (the source of record). Work follows the
+agent-skills lifecycle (spec → plan → build → test → review → ship) — see [`CLAUDE.md`](CLAUDE.md).
 
-**Recent Achievement (Sprint 14 - Complete ✅):**
-- **Flow-Based Orchestration:** Deterministic state-machine (@start/@listen/@router) - 9/9 tests passing
-- **Style Memory RAG:** ChromaDB integration with <200ms query latency
-- **ROI Telemetry:** Business value tracking (8,333x efficiency gain validated)
-- **Sprint Velocity:** 82% faster than estimates (5h vs 28.5h) with 10/10 quality score
-
-**Foundation:**
-- **Defect Prevention:** Automated system catching 83% of historical bug patterns
-- **Green Software:** Self-validating agents reducing token waste by 30%
-- **Quality Gates:** 4-layer validation (automated checkpoints enforce standards)
-
-**Test Suite Status**: 2112 passed, 84 skipped
+**Capabilities:**
+- **Flow-Based Orchestration:** Deterministic pipeline over `src/agent_sdk/pipeline.py`
+- **Style Memory RAG:** ChromaDB integration for style consistency
+- **Defect Prevention:** Automated pattern → rule → test loop
+- **Quality Gates:** Deterministic post-processing + `publication_validator.py`
 
 ## 🛠️ Installation
 
@@ -57,19 +49,16 @@ A sophisticated multi-agent system (6 AI personas collaborate) that produces pub
    ```bash
    cp .env.example .env
    # Edit .env with your ANTHROPIC_API_KEY
-   ```1 total)
+   ```
 
-**Core Agents:**
+**Content-pipeline agents** (prompts in `agents/skills_configs/*.yaml`, loaded via `scripts/agent_loader.py`):
+
 | Agent | Role | Responsibility |
 |-------|------|----------------|
-| **code-quality-specialist** | Code Quality | TDD-based refactoring and quality standards enforcement |
-| **devops** | Infrastructure | CI/CD automation and deployment |
-| **git-operator** | Version Control | Git operations and repo management |
-| **po-agent** | Product | Backlog refinement and story creation |
-| **product-research-agent** | Research | Market analysis and competitive intelligence |
-| **scrum-master** | Orchestration | Sprint coordination and ceremonies |
-| **test-specialist** | Testing | Comprehensive test writing and quality assurance |
-| **visual-qa-agent** | Visual Quality | Chart and design validation |
+| **research-analyst** | Research | Verified-source research briefs (arXiv + Scholar) |
+| **content-writer** | Writing | Economist-style article drafting |
+| **data-analyst** | Data | Insight summaries and chart specs |
+| **editor-reviewer** | Editorial | Structured quality review |
 
 ### Pipeline Runners (Anthropic Agent SDK)
 
@@ -85,32 +74,11 @@ A sophisticated multi-agent system (6 AI personas collaborate) that produces pub
 - **Purpose**: Deterministic post-processing quality gates
 - **Output**: JSON with quality assessment and edited article
 
-### Agent Discovery via `.github/agents/` directory:
-- 🔍 **Discovery**: Agent definitions stored as `.agent.md` files
-- 📋 **Validation**: Each agent has required fields (role, goal, backstory)
-- 🧠 **Context Injection**: Adds AGILE_MINDSET system prompt to all agents
-- 📊 **Count**: 8 active agent definitions
+### Agent Definitions
 
-### Agent Definition Files
-
-Agents are defined in `.github/agents/` directory as markdown files:
-- `code-quality-specialist.agent.md`
-- `devops.agent.md`
-- `git-operator.agent.md`
-- `po-agent.agent.md`
-- `product-research-agent.agent.md`
-- `scrum-master.agent.md`
-- `test-specialist.agent.md`
-- `visual-qa-agent.agent.md`
-
-### Usage Example
-```python
-# Create all agents
-all_agents = registry.create_all_agents()
-
-# List available agents
-agent_ids = registry.list_agents()
-```
+Content-pipeline agent prompts live in `agents/skills_configs/*.yaml` and are loaded by
+`scripts/agent_loader.py`. (The former `.github/agents/*.agent.md` persona registry and its
+`AgentRegistry` were retired — see [ADR-0012](docs/adr/0012-retire-agent-registry.md).)
 
 
 ## 🔄 Shared Context System
@@ -355,7 +323,7 @@ This README provides a project overview and quick start guide. For comprehensive
 - **New Contributors**: [README](README.md) → [Contributing](CONTRIBUTING.md) → [Setup Guide](docs/guides/CONTINUE_SETUP.md)
 - **Developers**: [Flow Architecture](docs/FLOW_ARCHITECTURE.md) → [Quality System](docs/DEFINITION_OF_DONE.md) → [Workflow Guide](docs/guides/WORKFLOW_GUIDE.md)
 - **Architects**: [ADR Collection](docs/architecture/) → [Flow Architecture](docs/FLOW_ARCHITECTURE.md)
-- **Project Managers**: [Current Sprint](SPRINT.md) → [Quality Dashboard](docs/QUALITY_DASHBOARD.md) → [Archive](docs/archive/)
+- **Project Managers**: [Backlog](BACKLOG.md) → [Quality Dashboard](docs/QUALITY_DASHBOARD.md) → [Archive](docs/archive/)
 
 ## 📖 Glossary
 

@@ -101,7 +101,7 @@ Use [docs/adr/TEMPLATE.md](adr/TEMPLATE.md) when writing a new ADR.
 - **[Changelog](CHANGELOG.md)** - Complete development history
 
 ### Current Development
-- **[Current Sprint](../SPRINT.md)** - Sprint 20 (active); Sprints 16-19 complete
+- **[Backlog](../BACKLOG.md)** - Planning items (source of record)
 - **[Project Standards](../CLAUDE.md)** - Python coding standards and requirements
 - **[Sprint Discipline Guide](SPRINT_DISCIPLINE_GUIDE.md)** - Sprint process and ceremonies
 
@@ -133,7 +133,7 @@ Use [docs/adr/TEMPLATE.md](adr/TEMPLATE.md) when writing a new ADR.
 2. [Flow Architecture](FLOW_ARCHITECTURE.md) -- [Contributing](../CONTRIBUTING.md)
 
 ### For Developers
-1. [Quality System](DEFINITION_OF_DONE.md) -- [Workflow Guide](guides/WORKFLOW_GUIDE.md) -- [Current Sprint](../SPRINT.md)
+1. [Quality System](DEFINITION_OF_DONE.md) -- [Workflow Guide](guides/WORKFLOW_GUIDE.md) -- [Backlog](../BACKLOG.md)
 2. [CI/CD Guide](guides/CI_MONITORING_GUIDE.md) -- [Deployment](guides/BLOG_DEPLOYMENT.md) -- [Validation](guides/VALIDATION_QUICK_REF.md)
 
 ### For Architects
@@ -141,7 +141,7 @@ Use [docs/adr/TEMPLATE.md](adr/TEMPLATE.md) when writing a new ADR.
 2. [Flow Architecture](FLOW_ARCHITECTURE.md) — [Architecture Patterns](ARCHITECTURE_PATTERNS.md)
 
 ### For Project Managers
-1. [Current Sprint](../SPRINT.md) -- [Sprint Archive](archive/sprints/) -- [Story Archive](archive/stories/)
+1. [Backlog](../BACKLOG.md) -- [Sprint Archive](archive/sprints/) -- [Story Archive](archive/stories/)
 2. [Quality Dashboard](QUALITY_DASHBOARD.md) -- [CI Reports](archive/ci-reports/) -- [Velocity Analysis](AGENT_VELOCITY_ANALYSIS.md)
 
 ---

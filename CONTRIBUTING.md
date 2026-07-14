@@ -38,7 +38,7 @@ Thank you for your interest in contributing to the Economist-Agents project! Thi
    cp .env.example .env
    # Edit .env with your API keys:
    # ANTHROPIC_API_KEY (required — primary LLM)
-   # SERPER_API_KEY (required — web search for research)
+   # SERPER_API_KEY (recommended — adds Google Web/Scholar; arXiv + Semantic Scholar work without it)
    # OPENAI_API_KEY (optional — DALL-E image generation only)
    ```
 

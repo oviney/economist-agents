@@ -19,7 +19,7 @@ Development agents follow the **Agent Registry Pattern**
 `scripts/agent_registry.py`.
 
 ```python
-from agent_registry import AgentRegistry
+from scripts.agent_registry import AgentRegistry
 
 registry = AgentRegistry()
 registry.list_agents()               # -> ['architect', 'code-quality-specialist', ...]

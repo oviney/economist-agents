@@ -103,7 +103,8 @@ The `skills/` directory holds **39 `SKILL.md` workflow definitions**. See
 ## Scripts & Tools
 
 ### Key Scripts
-- `python -m src.agent_sdk.pipeline "<topic>"` - Main pipeline entry point (Stage 3 + Stage 4)
+- `python -m src.agent_sdk.pipeline "<topic>"` - Stage 3 (draft + chart), then pauses for the image handshake
+- `python -m src.agent_sdk.pipeline --resume <slug>` - Stage 4 (finalise) after the image is supplied
 - `src/economist_agents/flow.py` - Flow orchestration (`run_flow`)
 - `scripts/topic_scout.py` - Topic discovery and ranking
 - `scripts/editorial_board.py` - Multi-persona voting system

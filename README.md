@@ -51,6 +51,10 @@ Post-processing in `src/agent_sdk/_shared.py` and `scripts/publication_validator
 9. **Publication validator** — checks frontmatter, categories, word count, author,
    image metadata, and placeholders.
 
+> These nine deterministic checks are separate from the article's `gates_passed/N`
+> **quality score**, which Stage 4 derives from the 5-dimension `ArticleEvaluator`
+> (`scripts/article_evaluator.py`).
+
 ---
 
 ## Installation
@@ -76,7 +80,7 @@ cp .env.example .env               # then edit in your API keys
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `ANTHROPIC_API_KEY` | **Yes** | Claude — the primary LLM for writing and editing |
-| `SERPER_API_KEY` | For research | Google Web + Scholar search via Serper |
+| `SERPER_API_KEY` | Recommended | Adds Google Web + Scholar to research (arXiv + Semantic Scholar work without it) |
 | `OPENAI_API_KEY` | For images only | DALL·E 3 featured-image generation |
 | `OUTPUT_DIR` | No | Output directory for generated articles (default `output/`) |
 | `GOOGLE_APPLICATION_CREDENTIALS`, `GA4_PROPERTY_ID`, `GSC_PROPERTY_URL` | For analytics ETL | Google Analytics 4 / Search Console content-intelligence pipeline |
@@ -85,23 +89,23 @@ cp .env.example .env               # then edit in your API keys
 
 ## Usage
 
-**Run the pipeline from the CLI:**
+Generating a real article is a **two-step image handshake**: Stage 3 writes the draft
+and chart and then pauses (exit code 10) so you can supply a featured image at zero API
+cost; `--resume` then runs Stage 4 and finalises the article.
 
 ```bash
+# Step 1 — Stage 3: writes output/posts/<slug>.md + chart, prints the image prompt,
+# drop path, and resume command, then exits 10.
 python3 -m src.agent_sdk.pipeline "<topic>"
+
+# Step 2 — Stage 4: finalise after dropping the hero image
+# (or --no-image for a chart-only post).
+python3 -m src.agent_sdk.pipeline --resume <slug>
 ```
 
-**Or from Python:**
-
-```python
-from src.economist_agents.flow import run_flow
-
-result = run_flow(topic="...")
-```
-
-See [`docs/FLOW_ARCHITECTURE.md`](docs/FLOW_ARCHITECTURE.md) for the full orchestration
-design, and [`CONTRIBUTING.md`](CONTRIBUTING.md) for the end-to-end article + hero-image
-handshake used when generating a real post.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full handshake (image drop path, exit
+codes, deploy step) and [`docs/FLOW_ARCHITECTURE.md`](docs/FLOW_ARCHITECTURE.md) for the
+orchestration design.
 
 ---
 

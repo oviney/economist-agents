@@ -106,6 +106,9 @@ def _validated_model(env_var: str, default: str) -> str:
 DEFAULT_WRITER_MODEL = _validated_model("WRITER_MODEL", "claude-sonnet-4-6")
 DEFAULT_GRAPHICS_MODEL = _validated_model("GRAPHICS_MODEL", "claude-sonnet-4-6")
 
+# Bounded writer regeneration on malformed output (non-deterministic drafts).
+_WRITER_MAX_ATTEMPTS = 3
+
 WRITER_SYSTEM_PROMPT = """You are an Economist-style Writer renowned for sharp, witty prose with British flair.
 Every article must satisfy the 10 rules below before submission. Do not read files. Write primarily
 from the brief. You MAY call the `search_for_source` tool sparingly (at most 3 times per article)
@@ -502,21 +505,59 @@ async def run_stage3(
     # #389 hybrid research: expose a budget-capped source-search tool the writer
     # can call mid-draft. A fresh session per article isolates budget/dedupe.
     # max_turns must exceed 1 so the SDK can drive the tool-use loop.
+    #
+    # Bounded retry (BUG-043): the writer (esp. via the subscription CLI)
+    # is non-deterministic and occasionally emits malformed output — a bare code
+    # fence, or frontmatter with an empty body. Regenerate a few times before
+    # giving up rather than aborting the whole run on a single bad draft. Only
+    # the writer re-runs; the research brief is reused, so retries are cheap.
+    pre_audit_article = ""
+    writer_cost = 0.0
     search_session = SourceFetchSession()
-    research_server = create_sdk_mcp_server(
-        "research", tools=[build_search_tool(search_session)]
-    )
-    raw_writer_output, writer_cost = await _collect_text(
-        writer_prompt,
-        WRITER_SYSTEM_PROMPT,
-        model=writer_model,
-        max_budget_usd=writer_budget_usd,
-        mcp_servers={"research": research_server},
-        allowed_tools=["mcp__research__search_for_source"],
-        # Each search costs 2 turns (the tool_use, then consuming the
-        # tool_result); plus the initial draft and 1 turn of headroom.
-        max_turns=2 * search_session.max_calls + 2,
-    )
+    last_diagnostic = ""
+    for attempt in range(1, _WRITER_MAX_ATTEMPTS + 1):
+        search_session = SourceFetchSession()
+        research_server = create_sdk_mcp_server(
+            "research", tools=[build_search_tool(search_session)]
+        )
+        raw_writer_output, attempt_cost = await _collect_text(
+            writer_prompt,
+            WRITER_SYSTEM_PROMPT,
+            model=writer_model,
+            max_budget_usd=writer_budget_usd,
+            mcp_servers={"research": research_server},
+            allowed_tools=["mcp__research__search_for_source"],
+            # Each search costs 2 turns (the tool_use, then consuming the
+            # tool_result); plus the initial draft and 1 turn of headroom.
+            max_turns=2 * search_session.max_calls + 2,
+        )
+        writer_cost += attempt_cost
+        candidate = _strip_duplicate_article(
+            _strip_enclosing_code_fence(raw_writer_output)
+        )
+        # Require opening ---, a closing --- on its own line, and a non-empty
+        # body. re.DOTALL so the frontmatter block can contain newlines.
+        _fm_match = re.match(r"^---\r?\n.*?\r?\n---\r?\n(.+)", candidate, re.DOTALL)
+        body_is_empty = _fm_match is None or not _fm_match.group(1).strip()
+        if candidate.startswith("---") and not body_is_empty:
+            pre_audit_article = candidate
+            break
+        last_diagnostic = (
+            f"(starts_with_dash={candidate.startswith('---')!r}, "
+            f"body_empty={body_is_empty!r}). First 120 chars: {candidate[:120]!r}"
+        )
+        logger.warning(
+            "Writer attempt %d/%d produced malformed output %s; retrying",
+            attempt,
+            _WRITER_MAX_ATTEMPTS,
+            last_diagnostic,
+        )
+    else:
+        raise MalformedArticleError(
+            f"Writer output is not a well-formed article after "
+            f"{_WRITER_MAX_ATTEMPTS} attempts {last_diagnostic}"
+        )
+
     if search_session.calls_made:
         logger.info(
             "Writer made %d on-demand source search(es)", search_session.calls_made
@@ -524,21 +565,6 @@ async def run_stage3(
     # Append writer-fetched sources to the brief so the stat audit does not
     # strip statistics the writer legitimately cited from them (#389).
     research_brief = research_brief + search_session.brief_supplement()
-    pre_audit_article = _strip_duplicate_article(
-        _strip_enclosing_code_fence(raw_writer_output)
-    )
-
-    # Require opening ---, a closing --- on its own line, and a non-empty body.
-    # re.DOTALL so the frontmatter block can contain newlines.
-    _fm_match = re.match(r"^---\r?\n.*?\r?\n---\r?\n(.+)", pre_audit_article, re.DOTALL)
-    body_is_empty = _fm_match is None or not _fm_match.group(1).strip()
-    if not pre_audit_article.startswith("---") or body_is_empty:
-        raise MalformedArticleError(
-            f"Writer output is not a well-formed article "
-            f"(starts_with_dash={pre_audit_article.startswith('---')!r}, "
-            f"body_empty={body_is_empty!r}). "
-            f"First 120 chars: {pre_audit_article[:120]!r}"
-        )
 
     audited = _audit_article_stats(pre_audit_article, research_brief)
     stat_audit_removed = pre_audit_article.count(".") - audited.count(".")

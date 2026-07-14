@@ -696,6 +696,20 @@
       "root_cause": "missing_field_hard_fail",
       "root_cause_notes": "backfill chart title from the article title/topic before render_chart.",
       "discovered_by": "B-006 Checkpoint B live keyless subscription run (run 3)"
+    },
+    {
+      "id": "BUG-043",
+      "severity": "high",
+      "discovered_in": "development",
+      "discovered_date": "2026-07-14T00:00:00",
+      "description": "Stage 3 (run_stage3) generates the writer draft once and raises MalformedArticleError on any malformed output, aborting the whole run. The writer via the subscription CLI is non-deterministic (empty body, bare code fence), so a single bad draft kills an otherwise-keyless run. run_pipeline has no retry, unlike flow.py's revision loop.",
+      "component": "agent_sdk.stage3_runner.run_stage3",
+      "status": "in_progress",
+      "github_issue": null,
+      "is_production_escape": false,
+      "root_cause": "single_shot_no_retry",
+      "root_cause_notes": "bounded writer regeneration (3 attempts) on malformed output, reusing the research brief.",
+      "discovered_by": "B-006 Checkpoint B live keyless subscription run (run 4)"
     }
   ],
   "summary": {

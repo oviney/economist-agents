@@ -10,19 +10,27 @@ agents/
 ├── README.md                      # This file
 ├── discovery/
 │   └── topic_scout.yaml           # Topic Scout agent (Stage 1)
-├── editorial_board/
-│   ├── vp_engineering.yaml        # VP of Engineering persona (weight: 1.2)
-│   ├── senior_qe_lead.yaml        # Senior QE Lead persona (weight: 1.0)
-│   ├── data_skeptic.yaml          # Data Skeptic persona (weight: 1.1)
-│   ├── career_climber.yaml        # Career Climber persona (weight: 0.8)
+├── editorial_board/               # Weighted-vote personas (Stage 2)
 │   ├── economist_editor.yaml      # Economist Editor persona (weight: 1.3)
-│   └── busy_reader.yaml           # Busy Reader persona (weight: 0.9)
-└── content_generation/
-    ├── researcher.yaml            # Research Analyst agent
-    ├── writer.yaml                # Senior Writer agent
-    ├── editor.yaml                # Chief Editor agent
-    └── graphics.yaml              # Data Visualization Specialist agent
+│   ├── vp_engineering.yaml        # VP of Engineering persona (weight: 1.2)
+│   ├── data_skeptic.yaml          # Data Skeptic persona (weight: 1.1)
+│   ├── senior_qe_lead.yaml        # Senior QE Lead persona (weight: 1.0)
+│   ├── performance_analyst.yaml   # Performance Analyst persona (weight: 1.0)
+│   ├── busy_reader.yaml           # Busy Reader persona (weight: 0.9)
+│   └── career_climber.yaml        # Career Climber persona (weight: 0.8)
+├── content_generation/            # Stage 3 quartet
+│   ├── researcher.yaml            # Research Analyst agent
+│   ├── writer.yaml                # Senior Writer agent
+│   ├── editor.yaml                # Chief Editor agent
+│   └── graphics.yaml              # Data Visualization Specialist agent
+├── skills_configs/                # Reusable public agent templates (see its own README)
+├── archived/                      # Retired task/agent modules (kept for history)
+└── *.py                           # Python wrappers/tasks: writer_agent.py, editor_agent.py,
+                                    #   research_agent.py, graphics_agent.py, *_tasks.py
 ```
+
+There are **seven** editorial-board personas; the weighted vote is tallied by
+`scripts/editorial_board.py`.
 
 ## YAML Schema
 

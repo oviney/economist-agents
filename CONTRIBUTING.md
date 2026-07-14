@@ -14,7 +14,7 @@ Thank you for your interest in contributing to the Economist-Agents project! Thi
 
 1. **Clone and setup environment:**
    ```bash
-   git clone https://github.com/your-org/economist-agents.git
+   git clone https://github.com/oviney/economist-agents.git
    cd economist-agents
    python3.13 -m venv .venv
    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
@@ -38,7 +38,7 @@ Thank you for your interest in contributing to the Economist-Agents project! Thi
    cp .env.example .env
    # Edit .env with your API keys:
    # ANTHROPIC_API_KEY (required — primary LLM)
-   # SERPER_API_KEY (required — web search for research)
+   # SERPER_API_KEY (recommended — adds Google Web/Scholar; arXiv + Semantic Scholar work without it)
    # OPENAI_API_KEY (optional — DALL-E image generation only)
    ```
 
@@ -352,8 +352,6 @@ Agent prompt constants (e.g., `RESEARCH_AGENT_PROMPT`, `WRITER_AGENT_PROMPT`) ar
 | Topic Scout | `scripts/topic_scout.py` | `SCOUT_AGENT_PROMPT` |
 | Editorial Board | `scripts/editorial_board.py` | Per-persona prompt strings |
 
-> **Note**: The Agent Registry Pattern (ADR-0002) externalises newer agents to `.agent.md` files in `.github/agents/`. Both styles are in use; prompts-as-code applies equally to both.
-
 ### Workflow for Agent Changes
 
 ```bash
@@ -493,40 +491,6 @@ The same script runs in pre-commit (`validate-skills` hook) and in the
 Quality Gates CI workflow, so a non-compliant skill blocks the merge.
 
 ---
-
-## 🤝 Agent-Specific Contributions
-
-### Working with Agents
-
-Our project uses 9 specialized AI agents. When contributing, consider which agent domain your work affects:
-
-#### Development Agents
-- **@code-quality-specialist**: Code refactoring and quality enforcement
-- **@test-specialist**: Test writing and coverage improvements
-- **@devops**: CI/CD and deployment automation
-- **@code-reviewer**: Code review and architecture validation
-
-#### Management Agents
-- **@scrum-master**: Sprint planning and process improvements
-- **@po-agent**: User stories and business requirements
-- **@product-research-agent**: Market analysis and feature research
-
-#### Operations Agents
-- **@git-operator**: Repository management and release processes
-- **@visual-qa-agent**: Chart and design quality validation
-
-### Agent Usage in Development
-
-```bash
-# Request code quality improvements
-@code-quality-specialist Fix type hints in scripts/topic_scout.py
-
-# Get test coverage for new code
-@test-specialist Add comprehensive tests for new_feature.py
-
-# Review architectural changes
-@code-reviewer Validate new microservice architecture
-```
 
 ## 📋 Pull Request Process
 

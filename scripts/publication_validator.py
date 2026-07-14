@@ -31,6 +31,52 @@ import yaml
 # violation that the arch-review gate blocks on edit).
 BLOG_AUTHOR = "Ouray Viney"
 
+# Word-count contract — single source of truth (B-005). The writer prompt in
+# ``src/agent_sdk/stage3_runner.py`` imports these so the target can never drift
+# below the floor the validator enforces here.
+WORD_COUNT_MIN = 700  # hard floor: a body under this is a CRITICAL rejection
+WORD_COUNT_TARGET = 850  # writer aim — above the floor for a safety margin
+WORD_COUNT_MAX = 1200  # editorial upper guidance (advisory; not enforced here)
+
+
+def _body_word_count(article: str) -> int:
+    """Word count of the article body (everything after YAML frontmatter).
+
+    Single extraction used by both ``word_count_shortfall`` and the validator's
+    ``_check_word_count`` so the two can never disagree on what "the body" is.
+    """
+    if article.startswith("---"):
+        parts = article.split("---", 2)
+        body = parts[2].strip() if len(parts) >= 3 else ""
+    else:
+        body = article
+    return len(body.split())
+
+
+def word_count_shortfall(article: str) -> str | None:
+    """Return specific expansion feedback when a body is under ``WORD_COUNT_MIN``.
+
+    Pure helper — no side effects. Returns ``None`` when the body meets the floor,
+    otherwise a message naming the actual count and the target so a caller (the
+    validator, or a revision-feedback path) can tell the writer exactly how much
+    to add.
+
+    Args:
+        article: Full article text (optionally with ``---`` frontmatter).
+
+    Returns:
+        Feedback string if short, else ``None``.
+    """
+    count = _body_word_count(article)
+    if count >= WORD_COUNT_MIN:
+        return None
+    return (
+        f"Body is {count} words — under the {WORD_COUNT_MIN}-word floor. "
+        f"Expand to ~{WORD_COUNT_TARGET} words with deeper analysis, concrete "
+        f"examples, or an additional data point (do not pad with filler)."
+    )
+
+
 # Import defect prevention rules (learned from historical bugs)
 try:
     from scripts.defect_prevention_rules import DefectPrevention
@@ -433,24 +479,23 @@ class PublicationValidator:
     def _check_word_count(self, content: str) -> None:
         """Validate article body meets minimum word count (BUG-029).
 
-        Extracts the body (everything after YAML frontmatter) and checks
-        that it contains at least 800 words.
+        Extracts the body (everything after YAML frontmatter) and checks that it
+        contains at least ``WORD_COUNT_MIN`` words.
         """
-        # Extract body after frontmatter
-        if content.startswith("---"):
-            parts = content.split("---", 2)
-            body = parts[2].strip() if len(parts) >= 3 else ""
-        else:
-            body = content
-
-        word_count = len(body.split())
-        if word_count < 700:
+        word_count = _body_word_count(content)
+        if word_count < WORD_COUNT_MIN:
             self.issues.append(
                 {
                     "check": "word_count",
                     "severity": "CRITICAL",
-                    "message": f"Article too short: {word_count} words (minimum 700 required)",
-                    "details": "Economist-style articles require 700-1200 words for adequate depth",
+                    "message": (
+                        f"Article too short: {word_count} words "
+                        f"(minimum {WORD_COUNT_MIN} required)"
+                    ),
+                    "details": (
+                        f"Economist-style articles require "
+                        f"{WORD_COUNT_MIN}-{WORD_COUNT_MAX} words for adequate depth"
+                    ),
                     "fix": "Expand article with additional examples, data points, or deeper analysis",
                 },
             )

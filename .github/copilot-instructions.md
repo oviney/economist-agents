@@ -2062,6 +2062,94 @@ See [SCRUM_MASTER_PROTOCOL.md](../docs/SCRUM_MASTER_PROTOCOL.md) for complete wo
 - **Rationale**: Prevents runaway automation, ensures quality
 - **Check**: Never auto-publish - require explicit human approval
 
+## Learned Anti-Patterns
+
+*Auto-generated from skills/*.json and docs/ARCHITECTURE_PATTERNS.md on 2026-07-14*
+
+### Architectural Patterns
+
+#### Agent Architecture
+
+**Font Preload Warnings** (low)
+- **Pattern**: Font preload resource hints causing warnings
+- **Check**: Review preload strategy in layout templates
+
+**Prompts As Code** (architectural)
+- **Pattern**: Agent behavior defined by large prompt constants at top of files
+- **Rationale**: Makes agent logic explicit, versionable, and reviewable
+- **Check**: When modifying agent behavior, edit prompt constants first
+
+**Persona Based Voting** (architectural)
+- **Pattern**: Editorial board uses weighted persona agents for consensus
+- **Rationale**: Simulates diverse stakeholder perspectives with different priorities
+- **Check**: New personas must define weight, perspective, and decision criteria
+
+#### Data Flow
+
+**Sequential Agent Orchestration** (architectural)
+- **Pattern**: Pipeline stages executed sequentially with data handoffs
+- **Rationale**: Each agent specializes in one task, outputs feed next agent
+- **Check**: Ensure each agent validates its inputs and outputs structured data
+
+**Json Intermediate Format** (architectural)
+- **Pattern**: Pipeline stages communicate via JSON files on disk
+- **Rationale**: Enables inspection between stages, supports manual intervention
+- **Check**: Validate JSON schema compatibility between producer/consumer
+
+#### Dependencies
+
+**Explicit Verification Flags** (architectural)
+- **Pattern**: Research agent flags unverifiable claims with [UNVERIFIED]
+- **Rationale**: Maintains credibility, prevents false claims in output
+- **Check**: Never publish content with verification flags
+
+#### Error Handling
+
+**Explicit Constraint Lists** (best_practice)
+- **Pattern**: Style constraints explicitly listed as BANNED/FORBIDDEN
+- **Rationale**: Learned from manual editing cycles - codified editorial lessons
+- **Check**: Update constraint lists based on editor agent rejections
+
+**Defensive Json Parsing** (best_practice)
+- **Pattern**: Extract JSON from LLM responses with find/rfind before parsing
+- **Rationale**: LLMs may wrap JSON in markdown or explanatory text
+- **Check**: Always use try/except around json.loads()
+
+#### Performance
+
+**Ai Disclosure Compliance** (medium)
+- **Pattern**: Posts with AI-generated content must have ai_assisted: true flag
+- **Check**: Scan content for AI mentions without disclosure flag
+
+#### Prompt Engineering
+
+**Configurable Output Paths** (architectural)
+- **Pattern**: Output paths configurable via environment variables
+- **Rationale**: Supports multiple deployment targets (local, blog repo, CI/CD)
+- **Check**: Provide sensible defaults when env vars not set
+
+**Structured Output Specification** (best_practice)
+- **Pattern**: Prompts explicitly define expected JSON output structure
+- **Rationale**: Reduces parsing errors and improves output consistency
+- **Check**: Every agent that returns structured data must specify format
+
+#### Testing Strategy
+
+**Centralized Llm Client** (architectural)
+- **Pattern**: All agents use Anthropic Claude API via shared client
+- **Rationale**: Consistent model selection, easier rate limiting, unified error handling
+- **Check**: Create client once, pass to agents - don't create per-request
+
+**Continuous Learning Validation** (architectural)
+- **Pattern**: Validation agents learn from each run using skills system
+- **Rationale**: Zero-config improvement, patterns persist across runs
+- **Check**: Call skills_manager.learn_pattern() when new issues discovered
+
+**Human Review Checkpoints** (architectural)
+- **Pattern**: Manual review gates between pipeline stages
+- **Rationale**: Prevents runaway automation, ensures quality
+- **Check**: Never auto-publish - require explicit human approval
+
 
 ## Additional Resources
 

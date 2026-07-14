@@ -502,8 +502,22 @@ class TestWriterPromptImageMetadata:
 
 class TestVisionRefinement:
     """After image generation, a Claude vision call grounds image_alt and
-    image_caption against the actual visual.  Fails until the refinement
-    function is added to stage3_runner."""
+    image_caption against the actual visual. Keyless (B-006): runs through the
+    Agent SDK ``query()`` + ``Read`` tool on the subscription — no
+    ANTHROPIC_API_KEY, no anthropic client."""
+
+    @staticmethod
+    def _fake_query(text: str, captured: dict | None = None):
+        import claude_agent_sdk as sdk
+
+        async def _q(*, prompt, options):
+            if captured is not None:
+                captured["options"] = options
+            yield sdk.AssistantMessage(
+                content=[sdk.TextBlock(text=text)], model="claude-sonnet-4-6"
+            )
+
+        return _q
 
     def test_refine_image_metadata_function_exists(self) -> None:
         import src.agent_sdk._shared as m
@@ -516,34 +530,19 @@ class TestVisionRefinement:
     def test_refine_image_metadata_returns_grounded_fields(
         self, tmp_path: Path
     ) -> None:
-        """When Anthropic returns a vision response, refine_image_metadata
-        parses and returns grounded image_alt and image_caption."""
+        """A JSON SDK response is parsed into grounded image_alt/image_caption."""
         import asyncio
-        import os
-        from unittest.mock import AsyncMock, MagicMock, patch
+        from unittest.mock import patch
 
         import src.agent_sdk._shared as m
 
-        assert hasattr(m, "refine_image_metadata"), (
-            "refine_image_metadata not yet implemented in _shared"
-        )
-
-        # Create a real file so the path.exists() guard passes
         img = tmp_path / "test.png"
         img.write_bytes(b"PNG")
 
-        mock_response = MagicMock()
-        mock_response.content = [
-            MagicMock(
-                text='{"image_alt": "A grounded alt", "image_caption": "The caption"}'
-            )
-        ]
-        mock_create = AsyncMock(return_value=mock_response)
-        with (
-            patch("anthropic.AsyncAnthropic") as mock_async_class,
-            patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}),
-        ):
-            mock_async_class.return_value.messages.create = mock_create
+        fake = self._fake_query(
+            '{"image_alt": "A grounded alt", "image_caption": "The caption"}'
+        )
+        with patch.object(m, "query", fake, create=True):
             result = asyncio.run(
                 m.refine_image_metadata(
                     image_path=str(img),
@@ -554,8 +553,9 @@ class TestVisionRefinement:
         assert result["image_alt"] == "A grounded alt"
         assert result["image_caption"] == "The caption"
 
-    def test_returns_drafts_when_no_api_key(self, tmp_path: Path) -> None:
-        """Fallback branch 1: no ANTHROPIC_API_KEY → writer drafts returned."""
+    def test_refines_without_any_api_key(self, tmp_path: Path) -> None:
+        """Keyless: with ANTHROPIC_API_KEY unset, refinement still runs via the
+        subscription SDK (no longer a skip condition)."""
         import asyncio
         import os
         from unittest.mock import patch
@@ -565,137 +565,105 @@ class TestVisionRefinement:
         img = tmp_path / "test.png"
         img.write_bytes(b"PNG")
 
-        with patch.dict(os.environ, {}, clear=True):
-            os.environ.pop("ANTHROPIC_API_KEY", None)
+        fake = self._fake_query('{"image_alt": "alt", "image_caption": "cap"}')
+        env = {k: v for k, v in os.environ.items() if k != "ANTHROPIC_API_KEY"}
+        with (
+            patch.dict(os.environ, env, clear=True),
+            patch.object(m, "query", fake, create=True),
+        ):
             result = asyncio.run(
                 m.refine_image_metadata(
-                    image_path=str(img),
-                    draft_alt="draft",
-                    draft_caption="cap",
+                    image_path=str(img), draft_alt="d", draft_caption="c"
                 )
             )
-        assert result == {"image_alt": "draft", "image_caption": "cap"}
+        assert result == {"image_alt": "alt", "image_caption": "cap"}
 
     def test_returns_drafts_when_image_missing(self) -> None:
-        """Fallback branch 2: image file does not exist → writer drafts returned."""
+        """Fallback: image file does not exist → writer drafts returned."""
         import asyncio
-        import os
-        from unittest.mock import patch
 
         import src.agent_sdk._shared as m
 
-        with patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}):
-            result = asyncio.run(
-                m.refine_image_metadata(
-                    image_path="/tmp/does_not_exist_xyz.png",
-                    draft_alt="draft",
-                    draft_caption="cap",
-                )
+        result = asyncio.run(
+            m.refine_image_metadata(
+                image_path="/tmp/does_not_exist_xyz.png",
+                draft_alt="draft",
+                draft_caption="cap",
             )
+        )
         assert result == {"image_alt": "draft", "image_caption": "cap"}
 
     def test_returns_drafts_when_vision_response_is_prose(self, tmp_path: Path) -> None:
-        """Fallback branch 3: Claude returns prose instead of JSON →
-        json.loads raises, except catches it, writer drafts returned."""
+        """Fallback: non-JSON SDK response → drafts returned (no crash)."""
         import asyncio
-        import os
-        from unittest.mock import AsyncMock, MagicMock, patch
+        from unittest.mock import patch
 
         import src.agent_sdk._shared as m
 
         img = tmp_path / "test.png"
         img.write_bytes(b"PNG")
 
-        mock_response = MagicMock()
-        mock_response.content = [
-            MagicMock(text="Here is your alt text: great picture.")
-        ]
-        mock_create = AsyncMock(return_value=mock_response)
-        with (
-            patch("anthropic.AsyncAnthropic") as mock_async_class,
-            patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}),
-        ):
-            mock_async_class.return_value.messages.create = mock_create
+        fake = self._fake_query("Here is your alt text: great picture.")
+        with patch.object(m, "query", fake, create=True):
             result = asyncio.run(
                 m.refine_image_metadata(
-                    image_path=str(img),
-                    draft_alt="draft",
-                    draft_caption="cap",
+                    image_path=str(img), draft_alt="draft", draft_caption="cap"
                 )
             )
         assert result == {"image_alt": "draft", "image_caption": "cap"}
 
     def test_vision_model_comes_from_env_var(self, tmp_path: Path) -> None:
-        """Model passed to messages.create must be VISION_MODEL env var, not hardcoded."""
+        """The SDK options model must be the VISION_MODEL env var when allowed."""
         import asyncio
         import os
-        from unittest.mock import AsyncMock, MagicMock, patch
+        from unittest.mock import patch
 
         import src.agent_sdk._shared as m
 
         img = tmp_path / "test.png"
         img.write_bytes(b"PNG")
 
-        mock_response = MagicMock()
-        mock_response.content = [
-            MagicMock(text='{"image_alt": "alt", "image_caption": "cap"}')
-        ]
-        mock_create = AsyncMock(return_value=mock_response)
-
+        captured: dict = {}
+        fake = self._fake_query(
+            '{"image_alt": "alt", "image_caption": "cap"}', captured
+        )
         with (
-            patch("anthropic.AsyncAnthropic") as mock_async_class,
-            patch.dict(
-                os.environ,
-                {"ANTHROPIC_API_KEY": "test-key", "VISION_MODEL": "claude-haiku-4-5"},
-            ),
+            patch.dict(os.environ, {"VISION_MODEL": "claude-haiku-4-5"}),
+            patch.object(m, "query", fake, create=True),
         ):
-            mock_async_class.return_value.messages.create = mock_create
             asyncio.run(
                 m.refine_image_metadata(
-                    image_path=str(img),
-                    draft_alt="draft alt",
-                    draft_caption="draft caption",
+                    image_path=str(img), draft_alt="d", draft_caption="c"
                 )
             )
+        assert captured["options"].model == "claude-haiku-4-5"
 
-        assert mock_create.call_args.kwargs["model"] == "claude-haiku-4-5"
-
-    def test_vision_model_defaults_to_claude_sonnet_when_env_unset(
-        self, tmp_path: Path
-    ) -> None:
-        """When VISION_MODEL is not set, model must default to claude-sonnet-4-6."""
+    def test_vision_model_defaults_when_env_unset(self, tmp_path: Path) -> None:
+        """When VISION_MODEL is unset, options.model defaults to the vision default."""
         import asyncio
         import os
-        from unittest.mock import AsyncMock, MagicMock, patch
+        from unittest.mock import patch
 
         import src.agent_sdk._shared as m
 
         img = tmp_path / "test.png"
         img.write_bytes(b"PNG")
 
-        mock_response = MagicMock()
-        mock_response.content = [
-            MagicMock(text='{"image_alt": "alt", "image_caption": "cap"}')
-        ]
-        mock_create = AsyncMock(return_value=mock_response)
-
+        captured: dict = {}
+        fake = self._fake_query(
+            '{"image_alt": "alt", "image_caption": "cap"}', captured
+        )
         env = {k: v for k, v in os.environ.items() if k != "VISION_MODEL"}
-        env["ANTHROPIC_API_KEY"] = "test-key"
-
         with (
-            patch("anthropic.AsyncAnthropic") as mock_async_class,
             patch.dict(os.environ, env, clear=True),
+            patch.object(m, "query", fake, create=True),
         ):
-            mock_async_class.return_value.messages.create = mock_create
             asyncio.run(
                 m.refine_image_metadata(
-                    image_path=str(img),
-                    draft_alt="draft alt",
-                    draft_caption="draft caption",
+                    image_path=str(img), draft_alt="d", draft_caption="c"
                 )
             )
-
-        assert mock_create.call_args.kwargs["model"] == "claude-sonnet-4-6"
+        assert captured["options"].model == m._DEFAULT_VISION_MODEL
 
 
 class TestPatchFrontmatterImageMetadata:

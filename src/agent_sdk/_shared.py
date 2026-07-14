@@ -12,6 +12,13 @@ import logging
 import re
 from typing import Any
 
+from claude_agent_sdk import (
+    AssistantMessage,
+    ClaudeAgentOptions,
+    TextBlock,
+    query,
+)
+
 logger = logging.getLogger(__name__)
 
 
@@ -761,15 +768,16 @@ async def refine_image_metadata(
     """Ground image_alt and image_caption against the actual generated image.
 
     The writer drafts both fields from the article thesis before the image
-    exists.  Once DALL-E produces the image this function passes it to Claude
-    vision to refine the text against what is actually visible, returning more
-    accurate alt text and a tighter editorial caption.
+    exists.  Once the hero image exists this function has Claude inspect it (via
+    the Agent SDK's ``Read`` tool, which renders images) and refine the text
+    against what is actually visible, returning more accurate alt text and a
+    tighter editorial caption.
 
-    Uses ``anthropic.AsyncAnthropic`` so the call is non-blocking inside the
-    async pipeline.  Fails gracefully (returns writer drafts) when:
-    - ``ANTHROPIC_API_KEY`` is absent
-    - The image file is missing or exceeds 4 MB
-    - The API call raises any exception (including JSON parse failure)
+    Keyless (B-006): runs through ``claude_agent_sdk.query()`` on the Claude
+    subscription — no ``ANTHROPIC_API_KEY`` and no ``anthropic`` client. Fails
+    gracefully (returns writer drafts) when:
+    - the image file is missing or exceeds 4 MB
+    - the SDK call raises, returns no text, or returns non-JSON
 
     Args:
         image_path: Path to the generated image file.
@@ -779,17 +787,12 @@ async def refine_image_metadata(
     Returns:
         Dict with ``image_alt`` and ``image_caption`` keys.
     """
-    import base64
     import json as _stdlib_json
     import os
+    import re as _re
     from pathlib import Path as _Path
 
     fallback = {"image_alt": draft_alt, "image_caption": draft_caption}
-
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
-        logger.warning("ANTHROPIC_API_KEY not set — skipping vision refinement")
-        return fallback
 
     path = _Path(image_path)
     if not path.exists():
@@ -798,65 +801,50 @@ async def refine_image_metadata(
 
     if path.stat().st_size > _MAX_IMAGE_BYTES:
         logger.warning(
-            "Image %s is %.1f MB — exceeds 4 MB API limit, skipping vision refinement",
+            "Image %s is %.1f MB — exceeds 4 MB limit, skipping vision refinement",
             image_path,
             path.stat().st_size / 1_000_000,
         )
         return fallback
 
-    try:
-        from scripts.llm_client import create_async_anthropic_client
-
-        suffix = path.suffix.lower().lstrip(".")
-        media_type = {
-            "png": "image/png",
-            "jpg": "image/jpeg",
-            "jpeg": "image/jpeg",
-            "webp": "image/webp",
-        }.get(suffix, "image/png")
-        image_data = base64.standard_b64encode(path.read_bytes()).decode()
-
-        vision_model = os.environ.get("VISION_MODEL", _DEFAULT_VISION_MODEL)
-        if vision_model not in _ALLOWED_MODELS:
-            logger.warning(
-                "VISION_MODEL=%r is not in the allowlist — falling back to default",
-                vision_model,
-            )
-            vision_model = _DEFAULT_VISION_MODEL
-        client = create_async_anthropic_client(api_key)
-        response = await client.messages.create(
-            model=vision_model,
-            max_tokens=256,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image",
-                            "source": {
-                                "type": "base64",
-                                "media_type": media_type,
-                                "data": image_data,
-                            },
-                        },
-                        {
-                            "type": "text",
-                            "text": (
-                                "This is the hero image for an Economist-style article.\n\n"
-                                f"Writer's draft alt text: {draft_alt}\n"
-                                f"Writer's draft caption: {draft_caption}\n\n"
-                                "Refine both to match what is *actually visible* in the image. "
-                                "Return JSON only:\n"
-                                '{"image_alt": "<one sentence for screen readers>", '
-                                '"image_caption": "<one punchy editorial sentence>"}'
-                            ),
-                        },
-                    ],
-                }
-            ],
+    vision_model = os.environ.get("VISION_MODEL", _DEFAULT_VISION_MODEL)
+    if vision_model not in _ALLOWED_MODELS:
+        logger.warning(
+            "VISION_MODEL=%r is not in the allowlist — falling back to default",
+            vision_model,
         )
-        raw = response.content[0].text.strip()
-        refined = _stdlib_json.loads(raw)
+        vision_model = _DEFAULT_VISION_MODEL
+
+    try:
+        options = ClaudeAgentOptions(
+            model=vision_model,
+            max_turns=2,
+            permission_mode="bypassPermissions",
+            allowed_tools=["Read"],
+            mcp_servers={},
+            stderr=lambda line: logger.warning("vision stderr: %s", line),
+        )
+        prompt = (
+            "Use the Read tool to inspect the hero image for an Economist-style "
+            f"article at this path: {path}\n\n"
+            f"Writer's draft alt text: {draft_alt}\n"
+            f"Writer's draft caption: {draft_caption}\n\n"
+            "Refine both to match what is *actually visible* in the image. "
+            "Return JSON only:\n"
+            '{"image_alt": "<one sentence for screen readers>", '
+            '"image_caption": "<one punchy editorial sentence>"}'
+        )
+
+        text_parts: list[str] = []
+        async for message in query(prompt=prompt, options=options):
+            if isinstance(message, AssistantMessage):
+                for block in message.content:
+                    if isinstance(block, TextBlock):
+                        text_parts.append(block.text)
+        raw = "".join(text_parts).strip()
+        # The model may wrap the JSON in prose or a code fence; extract the object.
+        match = _re.search(r"\{.*\}", raw, _re.DOTALL)
+        refined = _stdlib_json.loads(match.group(0) if match else raw)
         return {
             "image_alt": refined.get("image_alt", draft_alt),
             "image_caption": refined.get("image_caption", draft_caption),

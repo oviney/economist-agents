@@ -646,7 +646,12 @@ def apply_editorial_fixes(article: str, current_date: str | None = None) -> str:
         if line.strip().startswith("```"):
             in_code_block = not in_code_block
         if not in_code_block:
-            lines[i] = line.replace("!", ".")
+            # Strip exclamation marks (Economist style) but preserve the
+            # Markdown image token "![" — otherwise "![alt](chart.png)" becomes
+            # ".[alt](chart.png)" and the chart/hero embed is silently broken
+            # (BUG-038). Replace "!" with "." only when not immediately
+            # followed by "[".
+            lines[i] = re.sub(r"!(?!\[)", ".", line)
     text = "\n".join(lines)
     text = text.replace("..", ".")
 

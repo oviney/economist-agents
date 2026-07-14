@@ -103,7 +103,7 @@ async def run_pipeline(
     writer_model: str = DEFAULT_WRITER_MODEL,
     graphics_model: str = DEFAULT_GRAPHICS_MODEL,
     image_mode: Literal["chart_only", "hero"] = "hero",
-    research_mode: Literal["deterministic", "deep"] = "deterministic",
+    research_mode: Literal["deterministic", "deep", "claude_web"] = "deterministic",
 ) -> PipelineResult:
     """Generate one article through the Agent SDK pipeline.
 
@@ -124,7 +124,13 @@ async def run_pipeline(
     )
     article_for_stage4 = stage3.article
     if image_mode == "chart_only":
-        article_for_stage4 = _strip_image_frontmatter(stage3.article)
+        # Embed the chart while the hero-image slug is still present (the chart
+        # path is derived from it), THEN strip the hero metadata — mirroring
+        # _run_resume. Stripping first would leave _auto_embed_chart with no slug
+        # and the article would fail the validator's required-chart check
+        # (BUG-039).
+        article_for_stage4 = _auto_embed_chart(stage3.article)
+        article_for_stage4 = _strip_image_frontmatter(article_for_stage4)
     stage4 = run_stage4(article_for_stage4, stage3.chart_data)
 
     result = PipelineResult(

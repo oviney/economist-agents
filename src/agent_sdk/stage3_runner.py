@@ -56,6 +56,7 @@ from src.agent_sdk._shared import (
 )
 from src.agent_sdk.chart_renderer import render_chart
 from src.agent_sdk.image_prompt_synth import PromptSynthError, compose_prompt
+from src.agent_sdk.research.claude_web import build_claude_web_brief
 from src.agent_sdk.research.deep_research import build_deep_research_brief
 from src.agent_sdk.tools.research_tools import SourceFetchSession, build_search_tool
 
@@ -418,11 +419,13 @@ async def run_stage3(
     start = time.perf_counter()
 
     # Research path is deterministic by default; "deep" (#390) opts into the
-    # recursive multi-hop loop. RESEARCH_MODE env overrides the argument. An
-    # unrecognised value fails closed to deterministic (a typo must not silently
-    # disable the expensive deep path) and is logged so operators can confirm.
+    # recursive multi-hop loop; "claude_web" (B-006) is the keyless path — Claude
+    # does its own web research via the Agent SDK (no Serper key). RESEARCH_MODE
+    # env overrides the argument. An unrecognised value fails closed to
+    # deterministic (a typo must not silently disable the expensive deep path or
+    # the keyless path) and is logged so operators can confirm.
     resolved_research_mode = os.environ.get("RESEARCH_MODE", research_mode)
-    if resolved_research_mode not in ("deterministic", "deep"):
+    if resolved_research_mode not in ("deterministic", "deep", "claude_web"):
         logger.warning(
             "Unrecognised research mode %r; using deterministic",
             resolved_research_mode,
@@ -431,6 +434,8 @@ async def run_stage3(
     logger.info("Research mode: %s", resolved_research_mode)
     if resolved_research_mode == "deep":
         research_brief, research_cost = await build_deep_research_brief(topic)
+    elif resolved_research_mode == "claude_web":
+        research_brief, research_cost = await build_claude_web_brief(topic)
     else:
         research_brief, research_cost = build_research_brief(topic), 0.0
     logger.info("Research brief: %d chars", len(research_brief))

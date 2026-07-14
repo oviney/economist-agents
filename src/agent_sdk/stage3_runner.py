@@ -38,7 +38,11 @@ from claude_agent_sdk import (
     query,
 )
 
-from scripts.publication_validator import BLOG_AUTHOR
+from scripts.publication_validator import (
+    BLOG_AUTHOR,
+    WORD_COUNT_MIN,
+    WORD_COUNT_TARGET,
+)
 from src.agent_sdk._shared import (
     _ALLOWED_MODELS as _ALLOWED_MODELS,
 )
@@ -173,9 +177,14 @@ def _build_writer_prompt(topic: str, research_brief: str, style_section: str) ->
         f"a dashboard filled with green checkmarks while a production server burns'), "
         f"and image_caption (one punchy editorial sentence framing the image's "
         f"point, e.g. 'Coverage metrics and shipping confidence are not the same thing').\n\n"
-        f"Body must be at least 850 words (the publication validator "
-        f"rejects anything under 700, so leave a margin). End with a "
-        f"`## References` section containing 3+ numbered citations.\n\n"
+        f"Body length is a hard requirement. Target ~{WORD_COUNT_TARGET} words "
+        f"across 4-5 body sections of roughly 180-220 words each — enough for a "
+        f"thesis, two or three evidenced arguments, a counterpoint, and a "
+        f"decisive close. The publication validator rejects anything under "
+        f"{WORD_COUNT_MIN} words, so never come in short; if a section feels "
+        f"thin, add a concrete example or data point from the brief rather than "
+        f"filler. End with a `## References` section containing 3+ numbered "
+        f"citations.\n\n"
         f"At least one paragraph in the body must reference the chart "
         f"explicitly — write something like 'as the chart shows', "
         f"'the chart makes clear', or 'the chart below illustrates'. "

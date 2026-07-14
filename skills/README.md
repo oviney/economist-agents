@@ -1,8 +1,9 @@
 # Skills
 
-This directory holds **39 `SKILL.md` workflow definitions** — the operational
+This directory holds **`SKILL.md` workflow definitions** — the operational
 playbooks that govern how work is done in this repository. Skills are the **single
-source of truth** for *how* to do something; [agents](../AGENTS.md) are *who* does it.
+source of truth** for *how* to do something; the content-pipeline agents
+([`agents/`](../agents/README.md)) are *who* does it.
 
 Skill routing follows the upstream
 [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) guide as the

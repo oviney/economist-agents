@@ -12,7 +12,7 @@ Welcome to the documentation for the Economist-Agents project -- a multi-agent c
 
 1. **[Main README](../README.md)** - Project overview, installation, and quick start
 2. **[Contributing Guidelines](../CONTRIBUTING.md)** - Development workflow, TDD, quality gates
-3. **[Agent System Overview](../AGENTS.md)** - Multi-agent architecture and usage
+3. **[Flow Architecture](FLOW_ARCHITECTURE.md)** - Pipeline architecture and stage design
 4. **[Installation Guide](guides/CONTINUE_SETUP.md)** - Detailed setup instructions
 
 ## User Guides
@@ -39,7 +39,7 @@ Welcome to the documentation for the Economist-Agents project -- a multi-agent c
 All ADRs live in `docs/adr/` with a single global MADR numbering sequence. See [skills/adr-governance](../skills/adr-governance/SKILL.md) for the rules. Consolidated from three competing directories in Sprint 21 (Story #177).
 
 - **[ADR-0001: Extract Agent Definitions to YAML](adr/0001-extract-agent-definitions-to-yaml.md)** — Accepted
-- **[ADR-0002: Agent Registry Pattern](adr/0002-agent-registry-pattern.md)** — Accepted
+- **[ADR-0002: Agent Registry Pattern](adr/0002-agent-registry-pattern.md)** — **Superseded by ADR-0012**
 - **[ADR-0003: Phased CrewAI Migration](adr/0003-phased-crewai-migration.md)** — **Superseded by ADR-0006**
 - **[ADR-0004: Python Version Constraint](adr/0004-python-version-constraint.md)** — Accepted
 - **[ADR-0005: Agile Discipline Enforcement](adr/0005-agile-discipline-enforcement.md)** — Accepted
@@ -49,6 +49,7 @@ All ADRs live in `docs/adr/` with a single global MADR numbering sequence. See [
 - **[ADR-0009: Architecture Audit Rubric](adr/0009-architecture-audit-rubric.md)**
 - **[ADR-0010: Migrate domain modules from scripts/ to src/](adr/0010-scripts-to-src-migration.md)** — Accepted (implemented via #344)
 - **[ADR-0011: Opt-in Recursive Deep Research](adr/0011-opt-in-recursive-deep-research.md)**
+- **[ADR-0012: Retire the AgentRegistry](adr/0012-retire-agent-registry.md)** — supersedes ADR-0002 (AgentRegistry + personas retired)
 
 Use [docs/adr/TEMPLATE.md](adr/TEMPLATE.md) when writing a new ADR.
 
@@ -56,7 +57,6 @@ Use [docs/adr/TEMPLATE.md](adr/TEMPLATE.md) when writing a new ADR.
 - **[Flow-Based Orchestration](FLOW_ARCHITECTURE.md)** - Deterministic state-machine design
 - **[Autonomous Orchestration Strategy](AUTONOMOUS_ORCHESTRATION_STRATEGY.md)** - Autonomous agent coordination
 - **[Architecture Patterns](ARCHITECTURE_PATTERNS.md)** - Prompts-as-code, persona voting, sequential orchestration
-- **[Agent Registry Spec](agent-registry-spec.md)** - Agent registration and discovery
 - **[Quality System](DEFINITION_OF_DONE.md)** - Quality gates and validation layers
 
 ## Skills
@@ -97,8 +97,6 @@ The `skills/` directory holds **39 `SKILL.md` workflow definitions**. See
 - **[agent-traceability](../skills/agent-traceability/SKILL.md)** — structured agent action audit trails
 - **[adr-governance](../skills/adr-governance/SKILL.md)** — ADR numbering, supersession, lifecycle
 - **[mcp-development](../skills/mcp-development/SKILL.md)** — MCP server development standards
-- **[sprint-management](../skills/sprint-management/SKILL.md)** — sprint lifecycle management
-- **[scrum-master](../skills/scrum-master/SKILL.md)** — ceremony enforcement and performance
 
 ## Scripts & Tools
 
@@ -135,8 +133,9 @@ The `skills/` directory holds **39 `SKILL.md` workflow definitions**. See
 - **[Project Operating Mode & Standards](../CLAUDE.md)** - Lifecycle discipline, skill routing, coding standards
 - **[Sprint Discipline Guide](SPRINT_DISCIPLINE_GUIDE.md)** - Sprint process and ceremonies
 
-> Historical sprint planning lives in [`../SPRINT.md`](../SPRINT.md) and the
-> [sprint archive](archive/sprints/). Day-to-day work is now tracked in `BACKLOG.md`.
+> The autonomous-sprint process was retired (see `docs/specs/repo-process-consolidation.md`);
+> historical sprint records live in the [sprint archive](archive/sprints/). Day-to-day work
+> is tracked in `BACKLOG.md`.
 
 ## Historical Archive
 
@@ -163,7 +162,7 @@ The `skills/` directory holds **39 `SKILL.md` workflow definitions**. See
 
 ### For New Contributors
 1. [Main README](../README.md) -- [Contributing](../CONTRIBUTING.md) -- [Installation](guides/CONTINUE_SETUP.md)
-2. [Agent Overview](../AGENTS.md) -- [Architecture](FLOW_ARCHITECTURE.md)
+2. [Flow Architecture](FLOW_ARCHITECTURE.md) -- [Architecture Patterns](ARCHITECTURE_PATTERNS.md)
 
 ### For Developers
 1. [Quality System](DEFINITION_OF_DONE.md) -- [Workflow Guide](guides/WORKFLOW_GUIDE.md) -- [Backlog](../BACKLOG.md)

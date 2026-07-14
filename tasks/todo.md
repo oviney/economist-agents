@@ -1,50 +1,43 @@
-# TODO: Path A — chart-rendered hero, human-in-the-loop featured image
+# TODO: Repo Process Consolidation — ✅ COMPLETE
 
-**Plan**: [`tasks/plan.md`](./plan.md)
-**Spec**: [`docs/specs/featured-image-handshake.md`](../docs/specs/featured-image-handshake.md)
+**Plan**: [`tasks/plan.md`](./plan.md) · **Spec**: [`docs/specs/repo-process-consolidation.md`](../docs/specs/repo-process-consolidation.md)
+**Branch/PR**: `claude/repo-process-agent-skills-p0h0op` → #444
 
-## In Progress
+The autonomous-Scrum regime (Regime B) is retired; the agent-skills lifecycle + `BACKLOG.md`
+are the single process model. ~9,000 lines removed across two waves.
 
-- [ ] **Task 5.2**: end-to-end smoke (deferred to human verification; requires a live pipeline run + image generation in ChatGPT)
-- [ ] **Checkpoint E**: human approves PR #404 for merge
+## Wave 1 — Safe retirement ✅
+- [x] **W1-0** Spec correction + plan/todo (coupling audit)
+- [x] **W1-A** Stale snapshots (SPRINT_15 set, SPRINT_10 cert, 3 badge JSONs) + README badges
+- [x] **W1-B** `skills/sprint-management/` + `skills/scrum-master/` + mkdocs nav (validate_skills 37/37)
+- [x] **W1-C** `sprint-discipline.yml` + `sprint-sync.yml` + sprint step from `quality-tests.yml`
+- [x] **W1-D** `GEMINI.md` → pointer
 
-## Slice 1 — chart actually renders ✅ (commit aaf56f3)
+## Wave 2 — Entangled retirement ✅
+- [x] **W2-A** AgentRegistry: `agent_registry.py`, dead `src/manager.py`, 10 personas, `AGENTS.md`,
+  registry-only tests, SM benchmark, `nightly-eval.yml`. Guardrail re-anchored on `llm_client.py`
+  factory (50 tests pass). **ADR-0012 supersedes ADR-002.** (−5,655 lines)
+- [x] **W2-B** Autonomous agents: `po/sm/orchestrator_agent`, `continuous_burndown`, `sprint_validator`
+  + `mcp_servers/orchestrator_server.py` + `src/backlog/` package + their tests; `SPRINT.md`;
+  dead sprint state JSONs. KEEP boundary verified (feedback_loop/quality_dashboard pass).
+- [x] **W2-C** Collapsed root `copilot-instructions.md` → pointer; deleted orphan
+  `sync_copilot_pre_commit.sh`. **Reclassified KEEP:** `sync-copilot.yml` + `sync_copilot_context.py`
+  + `.github/copilot-instructions.md` are wired into the closed-loop quality validator.
+- [x] **W2-D** Deleted root `SPEC.md`, `.github/BACKLOG.md`, `.github/{GITHUB_PROJECT_SETUP,MIGRATE_BACKLOG_QUICKSTART}.md`,
+  sprint ISSUE_TEMPLATEs; replaced Regime-B PR template; corrected README (persona table,
+  `.github/agents` discovery, registry examples, Sprint-15 status) + dangling SPRINT.md links.
+- [x] **Doc-debt** Deleted wholesale Regime-B orchestration/template docs (`AGENT_ORCHESTRATION_PROMPTS.md`,
+  `MISSION_TEMPLATE_USAGE.md`, `scripts/templates/`).
 
-- [x] **Task 1.1**: create `src/agent_sdk/chart_renderer.py` + `tests/test_chart_renderer.py` (15 tests)
-- [x] **Task 1.2**: wire `chart_renderer` into `stage3_runner.run_stage3`; `Stage3Result.chart_path` exposed (+6 wire-up tests)
-- [x] **Checkpoint A**: pytest 2166 green; manual eyeball confirms Economist-style chart on real spec
+## Reclassified KEEP during the audit (NOT Regime B)
+`skills_manager.py`/`skills_gap_analyzer.py`, `feedback_loop.py`, `quality_dashboard.py`,
+`sync_copilot_context.py` + `.github/copilot-instructions.md`, `sprint_history.json`,
+`escalations.json`, `remediation-sync.yml`, `.deployment_state`, `agent_loader.py` + `agents/*.yaml`.
 
-## Slice 2 — validator accepts chart-only articles ✅ (commit 0f36289)
-
-- [x] **Task 2.1**: `publication_validator.py` — `image:` optional, file-must-exist via `require_image_file=True`
-- [x] **Task 2.2**: BUG-017 false-positive fix (path comparison); closes #402
-- [x] **Checkpoint B**: pytest 2183 green; yesterday's article minus image: validates cleanly
-
-## Slice 3 — image prompt handshake ✅
-
-- [x] **Task 3.1**: `src/agent_sdk/image_prompt_synth.py` + 12 tests
-- [x] **Task 3.2**: slug-keyed output dirs (`output/posts/<slug>.md`, `output/charts/<slug>.png`, `output/state/<slug>.json`)
-- [x] **Task 3.3**: `pipeline.py` `--resume <slug>` + `--no-image` + exit code 10
-- [x] **Task 3.4**: `stage3_runner` writes `output/posts/<slug>.image_prompt.md` + verbose handoff message
-- [x] **Checkpoint C**: pytest 2207 green (+12 handshake tests, +12 prompt synth tests)
-
-## Slice 4 — deterministic image gate ✅
-
-- [x] **Task 4.1**: `src/agent_sdk/image_gate.py` + wired into `_run_resume` (exits 11 on fail)
-- [x] **Checkpoint D**: pytest 2218 green (+11 gate tests covering missing/too-small/wrong-magic/wrong-dims + 4 wire-up cases)
-
-## Slice 5 — docs + smoke
-
-- [x] **Task 5.1**: `CONTRIBUTING.md` — "Generating an article — the image handshake (#403)" section with exit codes table + workflow steps
-- [ ] **Task 5.2**: end-to-end smoke (deferred to human verification post-merge; requires ~$0.30 pipeline run + image generation in ChatGPT)
-- [x] **Checkpoint E**: PR #404 opened; closes #402 in same PR
-
-## Done
-
-- [x] Slices 1-5 implementation complete in PR #404
-- [x] Automated regression coverage complete
-
-## Blocked / Deferred
-
-- [ ] Live end-to-end smoke: requires a paid Stage 3 run and human-generated hero image
-- [ ] `run_flow()` handshake migration: tracked separately in #410
+## Remaining (minor, optional follow-ups)
+- [ ] `scripts/tools/github_project_tool.py` + `docs/GITHUB_PROJECT_TOOL.md` — orphaned GitHub-Projects
+  tool (no live importer); code-scope removal, left for a separate call.
+- [ ] Historical docs with stale `agent_registry` mentions (`docs/guides/IMPLEMENTATION_ROADMAP.md`,
+  ADR-0005, `docs/archive/**`, SPRINT/EPIC/STORY records) — left as immutable history by design.
+- [ ] **CI gate:** #444 needs "Approve and run workflows" to validate the full suite (env here can't
+  build the `sgmllib3k`/feedparser wheel).

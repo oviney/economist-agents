@@ -1,9 +1,14 @@
 # ADR-0002: Implement Agent Registry Pattern
 
-**Status:** Accepted
-**Date:** 2026-01-01 (Accepted: 2026-01-03)
+**Status:** Superseded by [ADR-0012](0012-retire-agent-registry.md)
+**Date:** 2026-01-01 (Accepted: 2026-01-03; Superseded: 2026-07-14)
 **Deciders:** Ouray Viney (Agentic AI Architect)
 **Dependencies:** [ADR-0001](0001-extract-agent-definitions-to-yaml.md)
+
+> **Superseded (2026-07-14):** The AgentRegistry pattern and its `.github/agents/*.agent.md`
+> personas were retired as part of the repo-process consolidation — the content pipeline
+> instantiates LLMs through the `scripts/llm_client.py` factory and the Anthropic Agent SDK,
+> not this registry. See [ADR-0012](0012-retire-agent-registry.md).
 
 ## Context
 

@@ -158,10 +158,6 @@ for why the GitHub-issues MCP was retired.
 
 ## Agents & skills
 
-- **Development / process agents** — 10 definitions in `.github/agents/*.agent.md`
-  (architect, code-quality-specialist, code-reviewer, devops, git-operator, po-agent,
-  product-research-agent, scrum-master, test-specialist, visual-qa-agent). See
-  [`AGENTS.md`](AGENTS.md).
 - **Content-pipeline agents** — YAML configs under `agents/` (topic scout, the
   seven-persona editorial board, and the researcher / writer / editor / graphics
   quartet). Reusable public templates live in `agents/skills_configs/`. See
@@ -197,9 +193,8 @@ economist-agents/
 ├── src/agent_sdk/            # Anthropic Agent SDK runners (stage3, stage4, pipeline, _shared)
 ├── src/economist_agents/     # Flow orchestration and adapters
 ├── src/quality/              # Quality gates, governance, validators, metrics
-├── src/backlog/, src/telemetry/, src/tools/, src/utils/
+├── src/telemetry/, src/tools/, src/utils/
 ├── tests/                    # pytest suite (2,400+ tests)
-├── .github/agents/           # 10 development/process agent definitions
 ├── BACKLOG.md                # Source of record for planning items
 ├── CLAUDE.md                 # Operating mode + code standards for AI agents
 └── README.md                 # This file
@@ -211,7 +206,6 @@ economist-agents/
 
 - **[Documentation hub](docs/README.md)** — navigation to all guides, architecture, and references
 - **[Contributing](CONTRIBUTING.md)** — workflow, TDD, quality gates, article generation
-- **[Agents](AGENTS.md)** — multi-agent architecture and usage
 - **[ADRs](docs/adr/)** — architecture decision records (single MADR numbering sequence)
 - **[Flow architecture](docs/FLOW_ARCHITECTURE.md)** — orchestration design
 - **[Backlog](BACKLOG.md)** — current planning items

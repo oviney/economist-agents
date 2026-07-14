@@ -1,12 +1,14 @@
-"""Architecture Compliance Tests - Enforce ADR-002 Agent Registry Pattern.
+"""Architecture Compliance Tests - Centralised LLM instantiation.
 
-This test suite prevents "Agent Sprawl" by ensuring scripts use the AgentRegistry
-pattern instead of directly instantiating LLM clients.
+This test suite prevents "Agent Sprawl" by ensuring scripts route LLM
+instantiation through the ``scripts/llm_client.py`` factory instead of
+importing ``openai``/``anthropic`` directly.
 
-ADR-002 Context:
-- All LLM instantiation should go through AgentRegistry
+Context (ADR-002 was superseded when the AgentRegistry pattern was retired —
+see ADR "Retire the AgentRegistry"):
+- LLM instantiation should go through the ``llm_client.py`` factory
 - Direct imports of openai, anthropic, or crewai are prohibited
-- Exceptions: agent_registry.py, llm_client.py (crewai_agents.py archived in #327)
+- Exception: llm_client.py (the factory itself; crewai_agents.py archived in #327)
 
 Target: 100% compliance across scripts/
 """
@@ -16,7 +18,7 @@ from pathlib import Path
 
 import pytest
 
-# Directory of standalone scripts used by the ADR-002 compliance scan below.
+# Directory of standalone scripts used by the LLM-instantiation compliance scan below.
 # The `sys.path.insert(0, str(SCRIPTS_DIR))` hack that used to live here was
 # removed in #344 (ADR-0010) — the 12 domain modules that depended on the
 # bare-name import path have been relocated to src/quality/ and src/backlog/.
@@ -27,13 +29,12 @@ SCRIPTS_DIR = Path(__file__).parent.parent / "scripts"
 # TEST CONFIGURATION
 # ═══════════════════════════════════════════════════════════════════════════
 
-# Files allowed to import LLM libraries directly (ADR-002 exceptions)
+# Files allowed to import LLM libraries directly (factory + legacy exceptions)
 ALLOWED_FILES = {
-    "agent_registry.py",  # Factory for LLM instantiation
-    "llm_client.py",  # Unified LLM client wrapper
+    "llm_client.py",  # Unified LLM client factory/wrapper
     # crewai_agents.py and visual_qa.py archived in #327 T3
-    # TECHNICAL DEBT: Legacy files predating ADR-002 (to be refactored)
-    "featured_image_agent.py",  # TODO: Refactor to use AgentRegistry (Story 10)
+    # TECHNICAL DEBT: Legacy file predating the centralised factory (to be refactored)
+    "featured_image_agent.py",  # TODO: Route through the llm_client factory
 }
 
 # LLM libraries that should not be imported directly
@@ -150,12 +151,12 @@ def test_scripts_directory_exists():
 
 
 def test_no_direct_llm_imports_in_scripts():
-    """Enforce ADR-002: Scripts must not import LLM libraries directly.
+    """Enforce centralised LLM instantiation: no direct LLM imports in scripts.
 
     Architecture Rule:
-    - All LLM instantiation must go through AgentRegistry
+    - All LLM instantiation must go through the scripts/llm_client.py factory
     - Direct imports of openai, anthropic, crewai are prohibited
-    - Exceptions: agent_registry.py, llm_client.py (crewai_agents.py archived in #327)
+    - Exception: llm_client.py (the factory; crewai_agents.py archived in #327)
 
     Why:
     - Prevents agent sprawl and coupling
@@ -179,7 +180,7 @@ def test_no_direct_llm_imports_in_scripts():
         error_messages = []
         error_messages.append("\n" + "=" * 80)
         error_messages.append(
-            "ARCHITECTURE VIOLATION (ADR-002): Direct LLM imports detected",
+            "ARCHITECTURE VIOLATION: Direct LLM imports detected",
         )
         error_messages.append("=" * 80)
         error_messages.append("")
@@ -188,11 +189,11 @@ def test_no_direct_llm_imports_in_scripts():
             error_messages.append(f"❌ {filename}")
             error_messages.append(f"   Prohibited imports: {', '.join(imports)}")
             error_messages.append(
-                "   Solution: Use AgentRegistry.get_agent() instead of direct instantiation",
+                "   Solution: Use the scripts/llm_client.py factory instead of direct instantiation",
             )
             error_messages.append("")
 
-        error_messages.append("Allowed exceptions (ADR-002):")
+        error_messages.append("Allowed exceptions:")
         for allowed in ALLOWED_FILES:
             error_messages.append(f"  ✓ {allowed}")
         error_messages.append("")
@@ -204,7 +205,7 @@ def test_no_direct_llm_imports_in_scripts():
         error_messages.append("  - Enforces single responsibility principle")
         error_messages.append("")
 
-        error_messages.append("See: docs/ADR-002-agent-registry-pattern.md")
+        error_messages.append("See: docs/adr/ (LLM instantiation is centralised in scripts/llm_client.py)")
         error_messages.append("=" * 80)
 
         pytest.fail("\n".join(error_messages))
@@ -262,7 +263,7 @@ from crewai import Agent, Task
 @pytest.mark.parametrize(
     "filename,should_be_allowed",
     [
-        ("agent_registry.py", True),
+        ("agent_registry.py", False),  # retired with the AgentRegistry pattern
         ("llm_client.py", True),
         ("crewai_agents.py", False),  # archived in #327 T3
         ("economist_agent.py", False),
@@ -317,7 +318,7 @@ def test_generate_architecture_compliance_report():
 
     # Print report (always visible with pytest -v)
     print("\n" + "=" * 80)
-    print("ARCHITECTURE COMPLIANCE REPORT (ADR-002)")
+    print("ARCHITECTURE COMPLIANCE REPORT (centralised LLM instantiation)")
     print("=" * 80)
     print(f"\n✅ Compliant Files: {len(compliant_files)}")
     for filename in compliant_files:

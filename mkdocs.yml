@@ -67,7 +67,7 @@ nav:
 
   - ADRs:
     - ADR-0001 — Extract Agent Definitions to YAML: adr/0001-extract-agent-definitions-to-yaml.md
-    - ADR-0002 — Agent Registry Pattern: adr/0002-agent-registry-pattern.md
+    - ADR-0002 — Agent Registry Pattern (Superseded): adr/0002-agent-registry-pattern.md
     - ADR-0003 — Phased CrewAI Migration (Superseded): adr/0003-phased-crewai-migration.md
     - ADR-0004 — Python Version Constraint: adr/0004-python-version-constraint.md
     - ADR-0005 — Agile Discipline Enforcement: adr/0005-agile-discipline-enforcement.md
@@ -77,6 +77,7 @@ nav:
     - ADR-0009 — Architecture Audit Rubric: adr/0009-architecture-audit-rubric.md
     - ADR-0010 — Scripts to src Migration: adr/0010-scripts-to-src-migration.md
     - ADR-0011 — Opt-In Recursive Deep Research: adr/0011-opt-in-recursive-deep-research.md
+    - ADR-0012 — Retire the AgentRegistry: adr/0012-retire-agent-registry.md
 
   - Skills:
     - Workflow (addyosmani/agent-skills):
@@ -116,8 +117,6 @@ nav:
       - Python Quality: skills/python-quality/SKILL.md
       - Quality Gates: skills/quality-gates/SKILL.md
       - Research Sourcing: skills/research-sourcing/SKILL.md
-      - Scrum Master: skills/scrum-master/SKILL.md
-      - Sprint Management: skills/sprint-management/SKILL.md
       - Testing: skills/testing/SKILL.md
       - Visual QA: skills/visual-qa/SKILL.md
 

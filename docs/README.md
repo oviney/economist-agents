@@ -12,7 +12,7 @@ Welcome to the documentation for the Economist-Agents project -- a multi-agent c
 
 1. **[Main README](../README.md)** - Project overview, installation, and quick start
 2. **[Contributing Guidelines](../CONTRIBUTING.md)** - Development workflow, TDD, quality gates
-3. **[Agent System Overview](../AGENTS.md)** - Multi-agent architecture and usage
+3. **[Flow Architecture](FLOW_ARCHITECTURE.md)** - Pipeline architecture and stage design
 4. **[Installation Guide](guides/CONTINUE_SETUP.md)** - Detailed setup instructions
 
 ## User Guides
@@ -130,7 +130,7 @@ Use [docs/adr/TEMPLATE.md](adr/TEMPLATE.md) when writing a new ADR.
 
 ### For New Contributors
 1. [Main README](../README.md) -- [Contributing](../CONTRIBUTING.md) -- [Installation](guides/CONTINUE_SETUP.md)
-2. [Agent Overview](../AGENTS.md) -- [Architecture](FLOW_ARCHITECTURE.md)
+2. [Flow Architecture](FLOW_ARCHITECTURE.md) -- [Contributing](../CONTRIBUTING.md)
 
 ### For Developers
 1. [Quality System](DEFINITION_OF_DONE.md) -- [Workflow Guide](guides/WORKFLOW_GUIDE.md) -- [Current Sprint](../SPRINT.md)

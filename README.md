@@ -347,14 +347,13 @@ This README provides a project overview and quick start guide. For comprehensive
 
 ### Quick Links
 - **[Contributing Guidelines](CONTRIBUTING.md)** - Development workflow, TDD, quality gates
-- **[Agent System](AGENTS.md)** - Multi-agent architecture and usage
 - **[Architecture & ADRs](docs/architecture/)** - Design decisions and system architecture
 - **[User Guides](docs/guides/)** - Step-by-step guides for deployment, CI/CD, and development
 - **[Historical Archive](docs/archive/)** - Sprint reports, story completions, and system history
 
 ### For Different Audiences
 - **New Contributors**: [README](README.md) → [Contributing](CONTRIBUTING.md) → [Setup Guide](docs/guides/CONTINUE_SETUP.md)
-- **Developers**: [Agents Overview](AGENTS.md) → [Quality System](docs/DEFINITION_OF_DONE.md) → [Workflow Guide](docs/guides/WORKFLOW_GUIDE.md)
+- **Developers**: [Flow Architecture](docs/FLOW_ARCHITECTURE.md) → [Quality System](docs/DEFINITION_OF_DONE.md) → [Workflow Guide](docs/guides/WORKFLOW_GUIDE.md)
 - **Architects**: [ADR Collection](docs/architecture/) → [Flow Architecture](docs/FLOW_ARCHITECTURE.md)
 - **Project Managers**: [Current Sprint](SPRINT.md) → [Quality Dashboard](docs/QUALITY_DASHBOARD.md) → [Archive](docs/archive/)
 

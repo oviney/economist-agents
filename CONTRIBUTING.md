@@ -654,7 +654,7 @@ We track these quality metrics:
 
 ### Getting Started
 - **[README](README.md)** — Project overview and quick start
-- **[Agent System](AGENTS.md)** — Multi-agent architecture and usage
+- **[Flow Architecture](docs/FLOW_ARCHITECTURE.md)** — Pipeline architecture and stage design
 - **[Installation Guide](docs/guides/CONTINUE_SETUP.md)** — Detailed setup instructions
 
 ### Architecture & Design Decisions

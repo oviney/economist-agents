@@ -65,12 +65,16 @@ class TestLeadingWhitespace:
     """A draft with blank lines before ``---`` must not get a second block."""
 
     def test_no_double_frontmatter_block(self) -> None:
-        draft = f'\n\n---\nlayout: post\ntitle: "T"\ndate: 2026-01-01\n---\n\n{_LONG_BODY}'
+        draft = (
+            f'\n\n---\nlayout: post\ntitle: "T"\ndate: 2026-01-01\n---\n\n{_LONG_BODY}'
+        )
         result = _apply_editorial_fixes(draft, _TODAY)
         assert result.count("---") == 2  # exactly one frontmatter block
 
     def test_date_still_rewritten_despite_leading_blank_lines(self) -> None:
-        draft = f'\n\n---\nlayout: post\ntitle: "T"\ndate: 2026-01-01\n---\n\n{_LONG_BODY}'
+        draft = (
+            f'\n\n---\nlayout: post\ntitle: "T"\ndate: 2026-01-01\n---\n\n{_LONG_BODY}'
+        )
         result = _apply_editorial_fixes(draft, _TODAY)
         assert str(_frontmatter_of(result)["date"]) == _TODAY
 

@@ -77,15 +77,20 @@ jobs:
         run: |
           echo "PR Title: $PR_TITLE"
 
-          # Check if title or body references a story or issue
-          if echo "$PR_TITLE $PR_BODY" | grep -iE "(story [0-9]+|#[0-9]+|closes #[0-9]+|fixes #[0-9]+)"; then
-            echo "✅ PR references sprint story"
+          # Check if title or body references a story, a GitHub issue, or a
+          # local backlog item. B-NNN is the source of record for planning work
+          # since the local-backlog migration (see CLAUDE.md / BACKLOG.md), so a
+          # PR that references a B-NNN item satisfies sprint discipline without
+          # opening a GitHub issue the migration deliberately avoids.
+          if echo "$PR_TITLE $PR_BODY" | grep -iE "(story [0-9]+|#[0-9]+|closes #[0-9]+|fixes #[0-9]+|B-[0-9]+)"; then
+            echo "✅ PR references a sprint story, issue, or B-NNN backlog item"
           else
             echo ""
             echo "❌ SPRINT DISCIPLINE VIOLATION"
-            echo "PR must reference a sprint story in title or body:"
+            echo "PR must reference a sprint story or backlog item in title or body:"
             echo "  - 'Story 1: Feature X' in title"
             echo "  - 'Closes #123' in body"
+            echo "  - 'B-004' backlog item (local-first backlog)"
             exit 1
           fi
 

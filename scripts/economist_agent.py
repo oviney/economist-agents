@@ -1116,6 +1116,29 @@ CONTENT_QUEUE = [
 ]
 
 
+def _abort_if_keyless() -> None:
+    """Fail loudly (and helpfully) when this deprecated path is run without a
+    paid API key.
+
+    ``economist_agent.py`` drives Claude through the raw ``anthropic`` client
+    (via ``create_llm_client``), which requires ``ANTHROPIC_API_KEY`` (or
+    ``OPENAI_API_KEY``). A keyless user should not hit a raw ``ValueError`` deep
+    in the run — point them at the keyless subscription pipeline instead.
+    """
+    if os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("OPENAI_API_KEY"):
+        return
+    print(
+        "\nscripts/economist_agent.py is deprecated AND needs a paid API key "
+        "(ANTHROPIC_API_KEY or OPENAI_API_KEY); it cannot run keyless.\n\n"
+        "For a keyless run on your Claude subscription, use the Agent SDK "
+        "pipeline instead:\n"
+        "  IS_SANDBOX=1 python -m src.agent_sdk.pipeline \\\n"
+        "      --image-mode chart_only --research-mode claude_web\n",
+        file=sys.stderr,
+    )
+    sys.exit(2)
+
+
 def main():
     import warnings
 
@@ -1126,6 +1149,7 @@ def main():
         DeprecationWarning,
         stacklevel=1,
     )
+    _abort_if_keyless()
     # Parse command-line arguments
     parser = argparse.ArgumentParser(
         description="Generate Economist-style articles with AI agents",

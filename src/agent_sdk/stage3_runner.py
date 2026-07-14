@@ -277,6 +277,28 @@ def _normalize_paragraphs(text: str) -> str:
     return text
 
 
+def _strip_enclosing_code_fence(text: str) -> str:
+    """Unwrap an article the writer wrapped in a Markdown code fence.
+
+    Some models emit ```` ```markdown\\n---\\n…\\n``` ```` despite the prompt
+    asking for a bare article. The leading fence stops the article starting with
+    ``---`` and makes ``_strip_duplicate_article`` mistake the real frontmatter
+    (now at a non-zero offset) for a duplicate emission — deleting the whole body
+    (BUG-040). Strip a single enclosing fence when the text opens with one.
+    """
+    stripped = text.strip()
+    if not stripped.startswith("```"):
+        return text
+    first_newline = stripped.find("\n")
+    if first_newline == -1:
+        return text
+    body = stripped[first_newline + 1 :].rstrip()
+    fence_close = body.rfind("```")
+    if fence_close != -1:
+        body = body[:fence_close].rstrip()
+    return body + "\n"
+
+
 def _strip_duplicate_article(text: str) -> str:
     """If the model emitted two complete articles, keep only the first.
 
@@ -473,7 +495,9 @@ async def run_stage3(
     # Append writer-fetched sources to the brief so the stat audit does not
     # strip statistics the writer legitimately cited from them (#389).
     research_brief = research_brief + search_session.brief_supplement()
-    pre_audit_article = _strip_duplicate_article(raw_writer_output)
+    pre_audit_article = _strip_duplicate_article(
+        _strip_enclosing_code_fence(raw_writer_output)
+    )
 
     # Require opening ---, a closing --- on its own line, and a non-empty body.
     # re.DOTALL so the frontmatter block can contain newlines.

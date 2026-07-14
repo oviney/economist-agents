@@ -654,6 +654,20 @@
       "root_cause": "ordering",
       "root_cause_notes": "_strip_image_frontmatter runs before run_stage4/_auto_embed_chart; mirror _run_resume ordering.",
       "discovered_by": "B-006 keyless chart_only end-to-end (Checkpoint A)"
+    },
+    {
+      "id": "BUG-040",
+      "severity": "high",
+      "discovered_in": "development",
+      "discovered_date": "2026-07-14T00:00:00",
+      "description": "Stage 3 writer sometimes wraps the whole article in a Markdown code fence (```...```). The fence is not stripped, so the article does not start with '---' AND _strip_duplicate_article mistakes the real frontmatter (now at a non-zero offset) for a duplicate emission and deletes the entire body, raising MalformedArticleError (body_empty=True).",
+      "component": "agent_sdk.stage3_runner",
+      "status": "in_progress",
+      "github_issue": null,
+      "is_production_escape": false,
+      "root_cause": "unhandled_output_format",
+      "root_cause_notes": "raw_writer_output enclosing code fence not stripped before _strip_duplicate_article / frontmatter validation.",
+      "discovered_by": "B-006 Checkpoint B live keyless subscription run"
     }
   ],
   "summary": {

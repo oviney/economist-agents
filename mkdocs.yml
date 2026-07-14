@@ -77,6 +77,7 @@ nav:
     - ADR-0009 — Architecture Audit Rubric: adr/0009-architecture-audit-rubric.md
     - ADR-0010 — Scripts to src Migration: adr/0010-scripts-to-src-migration.md
     - ADR-0011 — Opt-In Recursive Deep Research: adr/0011-opt-in-recursive-deep-research.md
+    - ADR-0012 — Keyless claude_web Research: adr/0012-keyless-claude-web-research.md
 
   - Skills:
     - Workflow (addyosmani/agent-skills):

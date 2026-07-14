@@ -668,6 +668,20 @@
       "root_cause": "unhandled_output_format",
       "root_cause_notes": "raw_writer_output enclosing code fence not stripped before _strip_duplicate_article / frontmatter validation.",
       "discovered_by": "B-006 Checkpoint B live keyless subscription run"
+    },
+    {
+      "id": "BUG-041",
+      "severity": "high",
+      "discovered_in": "development",
+      "discovered_date": "2026-07-14T00:00:00",
+      "description": "Stage 3 graphics _collect_text call uses the default max_turns=1; against the real subscription CLI the graphics agent needs >1 turn and the SDK raises 'Reached maximum number of turns (1)', which _collect_text does not catch, crashing the whole pipeline. Also: claude_web research MAX_TURNS=12 is too low and soft-degrades to an empty brief on complex topics.",
+      "component": "agent_sdk.stage3_runner._collect_text / research.claude_web",
+      "status": "in_progress",
+      "github_issue": null,
+      "is_production_escape": false,
+      "root_cause": "turn_cap_unhandled",
+      "root_cause_notes": "give graphics turn headroom; tolerate turn-cap with partial text; raise claude_web turn cap.",
+      "discovered_by": "B-006 Checkpoint B live keyless subscription run (run 2)"
     }
   ],
   "summary": {

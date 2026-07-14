@@ -317,6 +317,24 @@ def _strip_duplicate_article(text: str) -> str:
     return text
 
 
+def _raise_if_budget_exceeded(
+    msg: ResultMessage, cost: float, max_budget_usd: float | None
+) -> None:
+    """The Agent SDK signals budget exhaustion by returning a ResultMessage with
+    subtype="error_max_budget_usd" rather than raising. Surface it as a typed
+    BudgetExceededError so callers can route a clean abort."""
+    if msg.subtype != "error_max_budget_usd":
+        return
+    cap_str = f"${max_budget_usd:.4f}" if max_budget_usd is not None else "<unset>"
+    logger.warning(
+        "Agent SDK budget exceeded: cap=%s, cost_at_abort=$%.4f", cap_str, cost
+    )
+    raise BudgetExceededError(
+        f"Agent SDK budget exceeded: cap={cap_str}, cost_at_abort=${cost:.4f}",
+        budget_usd=max_budget_usd,
+    )
+
+
 async def _collect_text(
     prompt: str,
     system_prompt: str,
@@ -349,34 +367,29 @@ async def _collect_text(
     )
     text_chunks: list[str] = []
     cost = 0.0
-    async for msg in query(prompt=prompt, options=options):
-        if isinstance(msg, AssistantMessage):
-            for block in msg.content:
-                if isinstance(block, TextBlock):
-                    text_chunks.append(block.text)
-        elif isinstance(msg, ResultMessage):
-            cost = float(msg.total_cost_usd or 0.0)
-            # The Agent SDK signals budget exhaustion by returning a
-            # ResultMessage with subtype="error_max_budget_usd" rather than
-            # raising. Surface it as a typed BudgetExceededError so callers
-            # can route a clean abort. See claude_agent_sdk.types
-            # ClaudeAgentOptions.max_budget_usd docstring.
-            if msg.subtype == "error_max_budget_usd":
-                cap_str = (
-                    f"${max_budget_usd:.4f}"
-                    if max_budget_usd is not None
-                    else "<unset>"
-                )
-                logger.warning(
-                    "Agent SDK budget exceeded: cap=%s, cost_at_abort=$%.4f",
-                    cap_str,
-                    cost,
-                )
-                raise BudgetExceededError(
-                    f"Agent SDK budget exceeded: cap={cap_str}, "
-                    f"cost_at_abort=${cost:.4f}",
-                    budget_usd=max_budget_usd,
-                )
+    try:
+        async for msg in query(prompt=prompt, options=options):
+            if isinstance(msg, AssistantMessage):
+                for block in msg.content:
+                    if isinstance(block, TextBlock):
+                        text_chunks.append(block.text)
+            elif isinstance(msg, ResultMessage):
+                cost = float(msg.total_cost_usd or 0.0)
+                _raise_if_budget_exceeded(msg, cost, max_budget_usd)
+    except BudgetExceededError:
+        raise
+    except Exception as exc:  # noqa: BLE001
+        # The subscription CLI raises (rather than returning a ResultMessage)
+        # when it hits the turn cap. If the agent already emitted text, proceed
+        # with what we have rather than crashing the whole pipeline (BUG-041);
+        # otherwise re-raise so a genuine failure still surfaces.
+        if "maximum number of turns" in str(exc).lower() and text_chunks:
+            logger.warning(
+                "Agent SDK hit the turn cap; proceeding with %d collected chunk(s)",
+                len(text_chunks),
+            )
+        else:
+            raise
 
     pieces: list[str] = []
     for chunk in text_chunks:
@@ -527,6 +540,9 @@ async def run_stage3(
         GRAPHICS_AGENT_PROMPT,
         model=graphics_model,
         max_budget_usd=graphics_budget_usd,
+        # Turn headroom: the subscription CLI can need >1 turn for the JSON
+        # (BUG-041). Kept small — no tools are exposed for graphics.
+        max_turns=4,
     )
     chart_data = _parse_chart_json(graphics_text)
 

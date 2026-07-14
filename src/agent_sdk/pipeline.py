@@ -326,14 +326,22 @@ def main() -> None:
     parser.add_argument(
         "--writer-budget",
         type=float,
-        default=0.30,
-        help="Hard cap on writer cost in USD (default 0.30, sized for Sonnet)",
+        default=0.60,
+        help=(
+            "Hard cap on writer cost in USD (default 0.60). This is a runaway "
+            "guard, not billing — the subscription path is not metered per token; "
+            "sized for Sonnet with retries + tool turns."
+        ),
     )
     parser.add_argument(
         "--graphics-budget",
         type=float,
-        default=0.10,
-        help="Hard cap on graphics cost in USD (default 0.10)",
+        default=0.40,
+        help=(
+            "Hard cap on graphics cost in USD (default 0.40). Higher than the "
+            "library default because the subscription CLI uses multiple turns "
+            "for the chart JSON (see BUG-041)."
+        ),
     )
     parser.add_argument(
         "--writer-model",

@@ -421,6 +421,22 @@ def _parse_chart_json(text: str) -> dict:
         return {"specification": text}
 
 
+def _ensure_chart_title(chart_data: dict, article: str, topic: str) -> dict:
+    """Backfill a chart title when the graphics model omits one (BUG-042).
+
+    The chart is required downstream, so a missing/empty ``title`` must not crash
+    the render. Derive it from the article's title frontmatter, falling back to
+    the topic.
+    """
+    title = chart_data.get("title")
+    if isinstance(title, str) and title.strip():
+        return chart_data
+    match = re.search(r'^title:\s*["\']?(.+?)["\']?\s*$', article, re.MULTILINE)
+    derived = (match.group(1).strip() if match else topic).strip() or topic
+    logger.warning("Graphics output had no chart title; backfilled %r", derived)
+    return {**chart_data, "title": derived}
+
+
 async def run_stage3(
     topic: str,
     writer_budget_usd: float | None = 0.30,
@@ -544,7 +560,7 @@ async def run_stage3(
         # (BUG-041). Kept small — no tools are exposed for graphics.
         max_turns=4,
     )
-    chart_data = _parse_chart_json(graphics_text)
+    chart_data = _ensure_chart_title(_parse_chart_json(graphics_text), article, topic)
 
     # #403 slice 1: render the chart spec to a real PNG. Render failures
     # are fatal because a missing chart would leave a broken body embed.

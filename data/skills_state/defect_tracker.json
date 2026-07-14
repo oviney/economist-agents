@@ -682,6 +682,20 @@
       "root_cause": "turn_cap_unhandled",
       "root_cause_notes": "give graphics turn headroom; tolerate turn-cap with partial text; raise claude_web turn cap.",
       "discovered_by": "B-006 Checkpoint B live keyless subscription run (run 2)"
+    },
+    {
+      "id": "BUG-042",
+      "severity": "medium",
+      "discovered_in": "development",
+      "discovered_date": "2026-07-14T00:00:00",
+      "description": "When the graphics model omits the chart 'title' field, render_chart's _validate_spec raises ChartRenderError and crashes the whole pipeline. A missing title is mechanically recoverable and must not abort an otherwise-complete run.",
+      "component": "agent_sdk.stage3_runner / chart_renderer",
+      "status": "in_progress",
+      "github_issue": null,
+      "is_production_escape": false,
+      "root_cause": "missing_field_hard_fail",
+      "root_cause_notes": "backfill chart title from the article title/topic before render_chart.",
+      "discovered_by": "B-006 Checkpoint B live keyless subscription run (run 3)"
     }
   ],
   "summary": {

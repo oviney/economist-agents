@@ -149,10 +149,6 @@
          <lastmod>2026-07-14</lastmod>
     </url>
     <url>
-         <loc>https://oviney.github.io/economist-agents/MISSION_TEMPLATE_USAGE/</loc>
-         <lastmod>2026-07-14</lastmod>
-    </url>
-    <url>
          <loc>https://oviney.github.io/economist-agents/QUALITY_DASHBOARD/</loc>
          <lastmod>2026-07-14</lastmod>
     </url>
@@ -538,6 +534,10 @@
     </url>
     <url>
          <loc>https://oviney.github.io/economist-agents/adr/0011-opt-in-recursive-deep-research/</loc>
+         <lastmod>2026-07-14</lastmod>
+    </url>
+    <url>
+         <loc>https://oviney.github.io/economist-agents/adr/0012-retire-agent-registry/</loc>
          <lastmod>2026-07-14</lastmod>
     </url>
     <url>
@@ -1017,10 +1017,6 @@
          <lastmod>2026-07-14</lastmod>
     </url>
     <url>
-         <loc>https://oviney.github.io/economist-agents/skills/scrum-master/SKILL/</loc>
-         <lastmod>2026-07-14</lastmod>
-    </url>
-    <url>
          <loc>https://oviney.github.io/economist-agents/skills/security-and-hardening/SKILL/</loc>
          <lastmod>2026-07-14</lastmod>
     </url>
@@ -1034,10 +1030,6 @@
     </url>
     <url>
          <loc>https://oviney.github.io/economist-agents/skills/spec-driven-development/SKILL/</loc>
-         <lastmod>2026-07-14</lastmod>
-    </url>
-    <url>
-         <loc>https://oviney.github.io/economist-agents/skills/sprint-management/SKILL/</loc>
          <lastmod>2026-07-14</lastmod>
     </url>
     <url>
@@ -1094,6 +1086,10 @@
     </url>
     <url>
          <loc>https://oviney.github.io/economist-agents/specs/local-backlog-migration/</loc>
+         <lastmod>2026-07-14</lastmod>
+    </url>
+    <url>
+         <loc>https://oviney.github.io/economist-agents/specs/repo-process-consolidation/</loc>
          <lastmod>2026-07-14</lastmod>
     </url>
     <url>

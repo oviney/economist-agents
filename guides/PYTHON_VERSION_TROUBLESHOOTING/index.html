@@ -785,7 +785,7 @@
   <span class="md-ellipsis">
     
   
-    ADR-0002 — Agent Registry Pattern
+    ADR-0002 — Agent Registry Pattern (Superseded)
   
 
     
@@ -1038,6 +1038,34 @@
     
   
     ADR-0011 — Opt-In Recursive Deep Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0012-retire-agent-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0012 — Retire the AgentRegistry
   
 
     
@@ -2195,62 +2223,6 @@
     
   
     Research Sourcing
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../skills/scrum-master/SKILL/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Scrum Master
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../skills/sprint-management/SKILL/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Sprint Management
   
 
     
@@ -3585,7 +3557,7 @@
 <a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="c1"># Should show: collected 538 items</span>
 <a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>
 <a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="c1"># Run a quick test</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/test_agent_registry_enhancement.py<span class="w"> </span>-v
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/test_llm_client.py<span class="w"> </span>-v
 </code></pre></div>
 <h3 id="environment-management">Environment Management<a class="headerlink" href="#environment-management" title="Permanent link">&para;</a></h3>
 <h4 id="check-available-environments">Check Available Environments<a class="headerlink" href="#check-available-environments" title="Permanent link">&para;</a></h4>
@@ -3652,7 +3624,7 @@
 <li><strong>Activate correct environment</strong>: <code>source .venv/bin/activate</code></li>
 <li><strong>Verify CrewAI import</strong>: <code>python -c "import crewai"</code></li>
 <li><strong>Test collection</strong>: <code>python -m pytest --collect-only tests/</code></li>
-<li><strong>Run sample test</strong>: <code>python -m pytest tests/test_agent_registry_enhancement.py</code></li>
+<li><strong>Run sample test</strong>: <code>python -m pytest tests/test_llm_client.py</code></li>
 </ol>
 <h3 id="success-criteria">Success Criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h3>
 <ul>

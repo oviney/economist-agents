@@ -4,6 +4,17 @@
 - **Primary Agent**: Claude Code is used extensively in this repo.
 - **Shared Memory**: Gemini and Claude do not share internal state. Document all architectural changes in `docs/` or commit messages so both agents stay synchronized.
 - **Ignore State**: Both `.claude/` and `.gemini/` are ignored in `.gitignore`. Do not modify files inside `.claude/`.
+- **Authoritative context**: [`CLAUDE.md`](CLAUDE.md) is the canonical operating-mode and
+  standards file; this file mirrors it for the Gemini CLI. When they diverge, `CLAUDE.md` wins.
+
+## Architecture (quick orientation)
+- **Runtime**: Anthropic Agent SDK (`src/agent_sdk/`). The earlier CrewAI runtime was
+  removed (ADR-0006). Do not add CrewAI back.
+- **Pipeline**: `src/economist_agents/flow.py` orchestrates `src.agent_sdk.pipeline.run_pipeline`
+  (Stage 3 content generation → Stage 4 deterministic quality gates).
+- **Research** is deterministic (arXiv + Google Scholar via Serper) — no LLM in that path.
+- **Python**: 3.13.x (3.14+ untested — see ADR-0004).
+- **Backlog**: `BACKLOG.md` is the source of record (`B-NNN`); PRs go through the `gh` CLI.
 
 ## Coding Standards (Inherited from CLAUDE.md)
 - **Type Hints**: Mandatory for all new Python functions.

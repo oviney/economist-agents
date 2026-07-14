@@ -96,7 +96,7 @@ When dispatching agents via the `Agent` tool (orchestrating the fleet), the brie
 ```
 agents/skills_configs/    # Agent YAML configs (research-analyst, content-writer, etc.)
 data/skills_state/        # Runtime state JSON (sprint tracker, metrics, defect tracker)
-skills/*/SKILL.md         # Domain skill definitions (24 skills — see Key Skills below)
+skills/*/SKILL.md         # Skill workflow definitions (39 skills — see Key Skills below)
 src/agent_sdk/            # Anthropic Agent SDK runners (stage3, stage4, pipeline, _shared)
 src/economist_agents/     # Flow orchestration, adapters
 scripts/                  # Standalone scripts (publication_validator, citation_verifier, etc.)
@@ -133,10 +133,13 @@ See `skills/python-quality/SKILL.md` for complete standards.
 
 ### Workflow (addyosmani/agent-skills — governs all work)
 - `skills/using-agent-skills/SKILL.md` — Meta-skill: maps task type to the right skill
+- `skills/context-engineering/SKILL.md` — Focus context at session start
 - `skills/idea-refine/SKILL.md` — Clarify vague requests before speccing
 - `skills/spec-driven-development/SKILL.md` — Spec → human review → plan → human review → implement
 - `skills/planning-and-task-breakdown/SKILL.md` — Dependency graph before sprint planning
 - `skills/incremental-implementation/SKILL.md` — Thin slices, each tested and committed
+- `skills/test-driven-development/SKILL.md` — RED → GREEN → REFACTOR
+- `skills/code-review-and-quality/SKILL.md` — Multi-axis review before merge
 - `skills/shipping-and-launch/SKILL.md` — Pre-launch checklist, staged rollout, rollback
 
 ### Domain

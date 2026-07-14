@@ -23,7 +23,7 @@
     
     
       
-        <title>Skills Library - Economist Agents</title>
+        <title>Skills - Economist Agents</title>
       
     
     
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#skills-library" class="md-skip">
+        <a href="#skills" class="md-skip">
           Skip to content
         </a>
       
@@ -108,7 +108,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Skills Library
+              Skills
             
           </span>
         </div>
@@ -2959,10 +2959,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#directory-structure" class="md-nav__link">
+  <a href="#lifecycle-skills-govern-all-work" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Directory Structure
+        Lifecycle skills (govern all work)
       
     </span>
   </a>
@@ -2970,60 +2970,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#public-skills-library" class="md-nav__link">
+  <a href="#domain-skills-this-project" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Public Skills Library
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Public Skills Library">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#available-agents" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Available Agents
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#agent-yaml-schema" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Agent YAML Schema
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#quick-start" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quick Start
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#private-skills" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Private Skills
+        Domain skills (this project)
       
     </span>
   </a>
@@ -3031,54 +2981,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#domain-skill-directories" class="md-nav__link">
+  <a href="#adding-or-modifying-a-skill" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Domain Skill Directories
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#contributing-a-new-public-agent" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Contributing a New Public Agent
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#versioning" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Versioning
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#roadmap" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Roadmap
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#licence" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Licence
+        Adding or modifying a skill
       
     </span>
   </a>
@@ -3105,269 +3011,181 @@
   
 
 
-<h1 id="skills-library">Skills Library<a class="headerlink" href="#skills-library" title="Permanent link">&para;</a></h1>
-<p>The <strong>Skills Library</strong> is a collection of reusable agent definitions organised into
-public (generic) and private (organisation-specific) directories.</p>
+<h1 id="skills">Skills<a class="headerlink" href="#skills" title="Permanent link">&para;</a></h1>
+<p>This directory holds <strong>39 <code>SKILL.md</code> workflow definitions</strong> — the operational
+playbooks that govern how work is done in this repository. Skills are the <strong>single
+source of truth</strong> for <em>how</em> to do something; <a href="../AGENTS.md">agents</a> are <em>who</em> does it.</p>
+<p>Skill routing follows the upstream
+<a href="https://github.com/addyosmani/agent-skills">addyosmani/agent-skills</a> guide as the
+single source of truth for skill semantics and lifecycle. See
+<a href="../CLAUDE.md"><code>CLAUDE.md</code></a> for the non-negotiable routing contract.</p>
+<blockquote>
+<p><strong>Not to be confused with</strong> <code>agents/skills_configs/</code> — that directory holds reusable
+<em>agent YAML templates</em>, documented in
+<a href="../agents/skills_configs/README.md"><code>agents/skills_configs/README.md</code></a>. This README
+covers the <code>SKILL.md</code> workflow definitions only.</p>
+</blockquote>
 <hr />
-<h2 id="directory-structure">Directory Structure<a class="headerlink" href="#directory-structure" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>agents/skills_configs/             # Agent YAML configs (formerly skills/public, skills/private)
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── README.md
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>├── research-analyst.yaml          # Research Analyst — verified data briefs
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>├── content-writer.yaml            # Content Writer — evidence-based articles
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>├── data-analyst.yaml              # Data Analyst — insight summaries and chart specs
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>└── editor-reviewer.yaml           # Editor Reviewer — structured quality review
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>skills/                            # Domain skill definitions (SKILL.md files)
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>├── README.md                      # This file
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>└── &lt;domain&gt;/                      # e.g., python-quality, testing, devops, observability
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    └── SKILL.md
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>data/skills_state/                 # Runtime state JSON (metrics, trackers, history)
-</code></pre></div>
-<hr />
-<h2 id="public-skills-library">Public Skills Library<a class="headerlink" href="#public-skills-library" title="Permanent link">&para;</a></h2>
-<p><code>agents/skills_configs/</code> contains <strong>generic, domain-agnostic agent templates</strong> that any team
-can adopt without modification, or customise to their specific context.</p>
-<h3 id="available-agents">Available Agents<a class="headerlink" href="#available-agents" title="Permanent link">&para;</a></h3>
+<h2 id="lifecycle-skills-govern-all-work">Lifecycle skills (govern all work)<a class="headerlink" href="#lifecycle-skills-govern-all-work" title="Permanent link">&para;</a></h2>
+<p>Every non-trivial task moves through these phases in order. Improvising the lifecycle
+by hand instead of invoking the skill is a blocker.</p>
 <table>
 <thead>
 <tr>
-<th>Agent</th>
-<th>File</th>
-<th>Use Cases</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Research Analyst</strong></td>
-<td><code>research-analyst.yaml</code></td>
-<td>Article research, market intelligence, policy briefings</td>
-</tr>
-<tr>
-<td><strong>Content Writer</strong></td>
-<td><code>content-writer.yaml</code></td>
-<td>Blog posts, technical writing, newsletters</td>
-</tr>
-<tr>
-<td><strong>Data Analyst</strong></td>
-<td><code>data-analyst.yaml</code></td>
-<td>Dashboard summaries, data journalism, BI reports</td>
-</tr>
-<tr>
-<td><strong>Editor Reviewer</strong></td>
-<td><code>editor-reviewer.yaml</code></td>
-<td>Editorial review, documentation QA, compliance checks</td>
-</tr>
-</tbody>
-</table>
-<h3 id="agent-yaml-schema">Agent YAML Schema<a class="headerlink" href="#agent-yaml-schema" title="Permanent link">&para;</a></h3>
-<p>All agents follow the schema defined in <code>agents/schema.json</code>.</p>
-<p><strong>Required fields:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>name</code></td>
-<td>string</td>
-<td>Human-readable agent name</td>
-</tr>
-<tr>
-<td><code>role</code></td>
-<td>string</td>
-<td>Short role title</td>
-</tr>
-<tr>
-<td><code>goal</code></td>
-<td>string</td>
-<td>Primary goal the agent pursues</td>
-</tr>
-<tr>
-<td><code>backstory</code></td>
-<td>string</td>
-<td>Background context shaping the persona</td>
-</tr>
-<tr>
-<td><code>system_message</code></td>
-<td>string</td>
-<td>Full system prompt sent to the LLM</td>
-</tr>
-<tr>
-<td><code>metadata.version</code></td>
-<td>string</td>
-<td>Semantic version (e.g., <code>"1.0"</code>)</td>
-</tr>
-<tr>
-<td><code>metadata.created</code></td>
-<td>string</td>
-<td>ISO 8601 creation date (<code>YYYY-MM-DD</code>)</td>
-</tr>
-<tr>
-<td><code>metadata.author</code></td>
-<td>string</td>
-<td>Author or team handle</td>
-</tr>
-<tr>
-<td><code>metadata.category</code></td>
-<td>string</td>
-<td>One of: <code>discovery</code>, <code>editorial_board</code>, <code>content_generation</code></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Additional public-library fields</strong> (recommended):</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>metadata.visibility</code></td>
-<td>string</td>
-<td><code>"public"</code> for library agents</td>
-</tr>
-<tr>
-<td><code>metadata.use_cases</code></td>
-<td>list</td>
-<td>2–4 bullet points describing when to use this agent</td>
-</tr>
-<tr>
-<td><code>metadata.customisation_notes</code></td>
-<td>string</td>
-<td>Tips for adapting the agent to a specific domain</td>
-</tr>
-</tbody>
-</table>
-<h3 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h3>
-<ol>
-<li><strong>Browse</strong> the agents in <code>agents/skills_configs/</code> and pick the one closest to your need.</li>
-<li><strong>Copy</strong> the YAML file into your project's agent directory.</li>
-<li><strong>Customise</strong> using the <code>customisation_notes</code> in the <code>metadata</code> section as a guide.</li>
-<li><strong>Validate</strong> the YAML against <code>agents/schema.json</code>:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="s2">import yaml, json, jsonschema</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="s2">schema = json.load(open(&#39;agents/schema.json&#39;))</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="s2">agent  = yaml.safe_load(open(&#39;agents/skills_configs/research-analyst.yaml&#39;))</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="s2">jsonschema.validate(agent, schema)</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="s2">print(&#39;Valid&#39;)</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="s2">&quot;</span>
-</code></pre></div></li>
-<li><strong>Use</strong> the agent in your CrewAI pipeline or any LLM orchestration framework.</li>
-</ol>
-<hr />
-<h2 id="private-skills">Private Skills<a class="headerlink" href="#private-skills" title="Permanent link">&para;</a></h2>
-<p>Organisation-specific configurations live alongside the public agents under
-<code>agents/skills_configs/</code>. See <a href="../agents/skills_configs/README.md"><code>agents/skills_configs/README.md</code></a> for details.</p>
-<hr />
-<h2 id="domain-skill-directories">Domain Skill Directories<a class="headerlink" href="#domain-skill-directories" title="Permanent link">&para;</a></h2>
-<p>Other directories under <code>skills/</code> contain operational skill documents (<code>SKILL.md</code>)
-that define coding standards, testing patterns, and process guidelines for this
-repository's AI coding agents.</p>
-<table>
-<thead>
-<tr>
-<th>Directory</th>
+<th>Phase</th>
+<th>Skill</th>
 <th>Purpose</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>python-quality/</code></td>
-<td>Python coding standards and type-hint conventions</td>
+<td>triage</td>
+<td><code>using-agent-skills</code></td>
+<td>Meta-skill: maps a task to the right phase skill</td>
 </tr>
 <tr>
-<td><code>testing/</code></td>
-<td>Testing patterns, coverage standards, TDD workflows</td>
+<td>context</td>
+<td><code>context-engineering</code></td>
+<td>Focus context at session start</td>
 </tr>
 <tr>
-<td><code>devops/</code></td>
-<td>CI/CD setup, deployment, and automation standards</td>
+<td>refine</td>
+<td><code>idea-refine</code></td>
+<td>Clarify vague requests before speccing</td>
 </tr>
 <tr>
-<td><code>observability/</code></td>
-<td>Dashboard schemas and alert thresholds</td>
+<td>spec</td>
+<td><code>spec-driven-development</code></td>
+<td>Spec → human review → plan → human review → implement</td>
 </tr>
 <tr>
-<td><code>economist-writing/</code></td>
-<td>Economist editorial style and voice guidelines</td>
+<td>plan</td>
+<td><code>planning-and-task-breakdown</code></td>
+<td>Dependency graph before sprint planning</td>
 </tr>
 <tr>
-<td><code>research-sourcing/</code></td>
-<td>Source freshness and diversity requirements</td>
+<td>build</td>
+<td><code>incremental-implementation</code></td>
+<td>Thin slices, each tested and committed</td>
+</tr>
+<tr>
+<td>test</td>
+<td><code>test-driven-development</code></td>
+<td>RED → GREEN → REFACTOR</td>
+</tr>
+<tr>
+<td>review</td>
+<td><code>code-review-and-quality</code></td>
+<td>Multi-axis review before merge</td>
+</tr>
+<tr>
+<td>ship</td>
+<td><code>shipping-and-launch</code></td>
+<td>Pre-launch checklist, staged rollout, rollback</td>
 </tr>
 </tbody>
 </table>
+<p>Supporting engineering skills used throughout the lifecycle: <code>api-and-interface-design</code>,
+<code>source-driven-development</code>, <code>debugging-and-error-recovery</code>, <code>deprecation-and-migration</code>,
+<code>git-workflow-and-versioning</code>, <code>performance-optimization</code>, <code>security-and-hardening</code>,
+<code>documentation-and-adrs</code>, <code>ci-cd-and-automation</code>, <code>code-simplification</code>,
+<code>frontend-ui-engineering</code>, <code>browser-testing-with-devtools</code>.</p>
 <hr />
-<h2 id="contributing-a-new-public-agent">Contributing a New Public Agent<a class="headerlink" href="#contributing-a-new-public-agent" title="Permanent link">&para;</a></h2>
-<p>We welcome community contributions to the public skills library. To add a new agent:</p>
-<ol>
-<li><strong>Read the contribution guidelines</strong> in <a href="../CONTRIBUTING.md"><code>CONTRIBUTING.md</code></a>,
-   specifically the <em>Contributing to the Public Skills Library</em> section.</li>
-<li><strong>Fork</strong> the repository and create a branch:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>skills/add-my-agent-name
-</code></pre></div></li>
-<li><strong>Create</strong> your agent YAML in <code>agents/skills_configs/&lt;agent-name&gt;.yaml</code>.</li>
-<li><strong>Follow the schema</strong> — ensure all required fields are present.</li>
-<li><strong>Add <code>customisation_notes</code></strong> — tell others how to adapt the agent.</li>
-<li><strong>Open a Pull Request</strong> with the <code>skills-library</code> label.</li>
-</ol>
-<p>See <a href="../CONTRIBUTING.md"><code>CONTRIBUTING.md</code></a> for the full review checklist.</p>
-<hr />
-<h2 id="versioning">Versioning<a class="headerlink" href="#versioning" title="Permanent link">&para;</a></h2>
-<p>Each agent YAML carries its own <code>metadata.version</code>.<br />
-We follow <a href="https://semver.org/">Semantic Versioning</a>:</p>
-<ul>
-<li><strong>Patch</strong> (<code>1.0.1</code>): Typo fixes, clarifications that don't change behaviour.</li>
-<li><strong>Minor</strong> (<code>1.1.0</code>): New optional fields, improved prompts that are backward-compatible.</li>
-<li><strong>Major</strong> (<code>2.0.0</code>): Breaking changes to output format or required inputs.</li>
-</ul>
-<p>When updating an existing public agent, increment the version and document the change
-in your PR description.</p>
-<hr />
-<h2 id="roadmap">Roadmap<a class="headerlink" href="#roadmap" title="Permanent link">&para;</a></h2>
+<h2 id="domain-skills-this-project">Domain skills (this project)<a class="headerlink" href="#domain-skills-this-project" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Phase</th>
-<th>Goal</th>
-<th>Status</th>
+<th>Skill</th>
+<th>Purpose</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Phase 1</td>
-<td>Launch with 4 generic agents</td>
-<td>✅ Complete</td>
+<td><code>economist-writing</code></td>
+<td>The writing standard for every article in the pipeline</td>
 </tr>
 <tr>
-<td>Phase 2</td>
-<td>Add 4 more specialised agents (summariser, fact-checker, interview analyst, social writer)</td>
-<td>Planned</td>
+<td><code>research-sourcing</code></td>
+<td>Source freshness, diversity, and attribution requirements</td>
 </tr>
 <tr>
-<td>Phase 3</td>
-<td>Skills marketplace with tagging and search</td>
-<td>Planned</td>
+<td><code>editorial-illustration</code></td>
+<td>Visual standards for featured images and charts</td>
 </tr>
 <tr>
-<td>Phase 4</td>
-<td>Community-maintained agent registry</td>
-<td>Planned</td>
+<td><code>article-evaluation</code></td>
+<td>Score articles on 5 quality dimensions deterministically</td>
+</tr>
+<tr>
+<td><code>visual-qa</code></td>
+<td>Validate Economist-style charts for publication</td>
+</tr>
+<tr>
+<td><code>quality-gates</code></td>
+<td>Multi-layer automated checks at commit, push, and CI</td>
+</tr>
+<tr>
+<td><code>python-quality</code></td>
+<td>Python coding standards for the pipeline</td>
+</tr>
+<tr>
+<td><code>testing</code></td>
+<td>Testing patterns for the multi-agent system</td>
+</tr>
+<tr>
+<td><code>defect-prevention</code></td>
+<td>Codify failure patterns as deterministic prevention rules</td>
+</tr>
+<tr>
+<td><code>devops</code></td>
+<td>Infrastructure automation and CI/CD health</td>
+</tr>
+<tr>
+<td><code>observability</code></td>
+<td>Track article quality metrics over time and alert on degradation</td>
+</tr>
+<tr>
+<td><code>architecture-patterns</code></td>
+<td>Multi-agent design patterns and audit rubric</td>
+</tr>
+<tr>
+<td><code>agent-delegation</code></td>
+<td>Route stories to the correct agent runtime</td>
+</tr>
+<tr>
+<td><code>agent-traceability</code></td>
+<td>Structured JSON audit trail for every agent action</td>
+</tr>
+<tr>
+<td><code>adr-governance</code></td>
+<td>ADR numbering, supersession, and lifecycle rules</td>
+</tr>
+<tr>
+<td><code>mcp-development</code></td>
+<td>Standards for building MCP servers in this project</td>
+</tr>
+<tr>
+<td><code>sprint-management</code></td>
+<td>Sprint lifecycle management</td>
+</tr>
+<tr>
+<td><code>scrum-master</code></td>
+<td>Ceremony enforcement and data-driven performance</td>
 </tr>
 </tbody>
 </table>
+<p>Each skill lives at <code>skills/&lt;name&gt;/SKILL.md</code>. Some carry <code>references/</code> and
+supporting assets alongside the <code>SKILL.md</code>.</p>
 <hr />
-<h2 id="licence">Licence<a class="headerlink" href="#licence" title="Permanent link">&para;</a></h2>
-<p>All agent YAML files in <code>agents/skills_configs/</code> are released under the project's
-<a href="../LICENSE">MIT Licence</a> and are free to use, modify, and redistribute.</p>
+<h2 id="adding-or-modifying-a-skill">Adding or modifying a skill<a class="headerlink" href="#adding-or-modifying-a-skill" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Follow the structure of an existing <code>SKILL.md</code> (frontmatter + workflow body).</li>
+<li>Keep the skill focused on <strong>one</strong> workflow; cross-reference rather than duplicate.</li>
+<li>If it changes the lifecycle, update the routing contract in <a href="../CLAUDE.md"><code>CLAUDE.md</code></a>.</li>
+<li>See the <a href="documentation-and-adrs/SKILL/">documentation-and-adrs</a> skill for how to
+   record the decision.</li>
+</ol>
+<p>See <a href="../CONTRIBUTING.md"><code>CONTRIBUTING.md</code></a> for the review checklist.</p>
 
 
 

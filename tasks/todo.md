@@ -1,50 +1,24 @@
-# TODO: Path A — chart-rendered hero, human-in-the-loop featured image
+# TODO: Repo Process Consolidation
 
-**Plan**: [`tasks/plan.md`](./plan.md)
-**Spec**: [`docs/specs/featured-image-handshake.md`](../docs/specs/featured-image-handshake.md)
+**Plan**: [`tasks/plan.md`](./plan.md) · **Spec**: [`docs/specs/repo-process-consolidation.md`](../docs/specs/repo-process-consolidation.md)
 
-## In Progress
+## Wave 1 — Safe retirement (executing)
 
-- [ ] **Task 5.2**: end-to-end smoke (deferred to human verification; requires a live pipeline run + image generation in ChatGPT)
-- [ ] **Checkpoint E**: human approves PR #404 for merge
+- [ ] **W1-0**: Correct the spec (skills_manager/skills_gap → KEEP; personas/scripts → Wave 2 deferred)
+- [ ] **W1-1**: Delete stale snapshot artifacts + fix `README.md` + `mkdocs.yml`
+  - AC: files gone; `git grep` finds no dangling ref in README/mkdocs; `docs.yml` builds
+- [ ] **W1-2**: Delete `skills/sprint-management/`, `skills/scrum-master/` + fix `mkdocs.yml` nav
+  - AC: dirs gone; `validate_skills.py` still passes (globs remaining skills); nav clean
+- [ ] **W1-3**: Delete sprint workflows + drop `sprint_validator` step from `quality-tests.yml`
+  - AC: `sprint-discipline.yml`, `sprint-sync.yml`, `remediation-sync.yml` gone; quality-tests.yml valid YAML
+- [ ] **W1-4**: Shrink `GEMINI.md`, both copilot files, `CONTRIBUTING.md` dup → pointers to CLAUDE.md + skills
+  - AC: coding standards stated once (authoritative); other files point, don't restate
+- [ ] **W1-5**: Sync `CLAUDE.md` — remove references to retired machinery
+  - AC: CLAUDE.md points at nothing deleted
+- [ ] **Checkpoint**: push; confirm `ci.yml` / `quality-tests.yml` / `docs.yml` green in CI
 
-## Slice 1 — chart actually renders ✅ (commit aaf56f3)
+## Wave 2 — Deferred (needs human decision / ADR — NOT in this pass)
 
-- [x] **Task 1.1**: create `src/agent_sdk/chart_renderer.py` + `tests/test_chart_renderer.py` (15 tests)
-- [x] **Task 1.2**: wire `chart_renderer` into `stage3_runner.run_stage3`; `Stage3Result.chart_path` exposed (+6 wire-up tests)
-- [x] **Checkpoint A**: pytest 2166 green; manual eyeball confirms Economist-style chart on real spec
-
-## Slice 2 — validator accepts chart-only articles ✅ (commit 0f36289)
-
-- [x] **Task 2.1**: `publication_validator.py` — `image:` optional, file-must-exist via `require_image_file=True`
-- [x] **Task 2.2**: BUG-017 false-positive fix (path comparison); closes #402
-- [x] **Checkpoint B**: pytest 2183 green; yesterday's article minus image: validates cleanly
-
-## Slice 3 — image prompt handshake ✅
-
-- [x] **Task 3.1**: `src/agent_sdk/image_prompt_synth.py` + 12 tests
-- [x] **Task 3.2**: slug-keyed output dirs (`output/posts/<slug>.md`, `output/charts/<slug>.png`, `output/state/<slug>.json`)
-- [x] **Task 3.3**: `pipeline.py` `--resume <slug>` + `--no-image` + exit code 10
-- [x] **Task 3.4**: `stage3_runner` writes `output/posts/<slug>.image_prompt.md` + verbose handoff message
-- [x] **Checkpoint C**: pytest 2207 green (+12 handshake tests, +12 prompt synth tests)
-
-## Slice 4 — deterministic image gate ✅
-
-- [x] **Task 4.1**: `src/agent_sdk/image_gate.py` + wired into `_run_resume` (exits 11 on fail)
-- [x] **Checkpoint D**: pytest 2218 green (+11 gate tests covering missing/too-small/wrong-magic/wrong-dims + 4 wire-up cases)
-
-## Slice 5 — docs + smoke
-
-- [x] **Task 5.1**: `CONTRIBUTING.md` — "Generating an article — the image handshake (#403)" section with exit codes table + workflow steps
-- [ ] **Task 5.2**: end-to-end smoke (deferred to human verification post-merge; requires ~$0.30 pipeline run + image generation in ChatGPT)
-- [x] **Checkpoint E**: PR #404 opened; closes #402 in same PR
-
-## Done
-
-- [x] Slices 1-5 implementation complete in PR #404
-- [x] Automated regression coverage complete
-
-## Blocked / Deferred
-
-- [ ] Live end-to-end smoke: requires a paid Stage 3 run and human-generated hero image
-- [ ] `run_flow()` handshake migration: tracked separately in #410
+- [ ] **W2-A**: Decide keep-vs-retire AgentRegistry (ADR-002): personas + AGENTS.md + agent_registry.py + 3 tests
+- [ ] **W2-B**: Retire sm/po/orchestrator/continuous_burndown/sprint_validator scripts + tests + state disentangle
+- [ ] **W2-C**: Retire nightly-eval.yml + measure_sm_effectiveness.py + sync-copilot.yml

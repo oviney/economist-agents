@@ -48,6 +48,35 @@ Agent-skills are a *workflow discipline*, not a *product runtime*. Anything that
 
 ---
 
+## 2.0 Correction — post-approval coupling audit (2026-07-14)
+
+A dependency audit during `planning-and-task-breakdown` found the first-pass §2.3 over-classified
+several items as RETIRE that are load-bearing for the KEEP test suite. Corrections:
+
+- **`scripts/skills_manager.py`, `scripts/skills_gap_analyzer.py` → KEEP.** Imported by
+  `src/quality/validate_closed_loop.py` (`from scripts.skills_manager import SkillsManager`) and
+  integrated by `src/quality/chart_metrics.py`; exercised by `test_closed_loop_validation.py`,
+  `test_validate_closed_loop.py`, `test_quality_system.py`. Not Regime B.
+- **`.github/agents/*.agent.md` (10) + `AGENTS.md` + `scripts/agent_registry.py` → DEFERRED (needs ADR).**
+  `test_llm_providers.py` builds `AgentRegistry` over the real `.github/agents/` dir and asserts
+  `list_agents() > 0` and `match="scrum-master"`; `test_agent_registry_enhancement.py` and
+  `test_architect_agent.py` also depend on it. This is ADR-002 architecture, not cruft — retiring it
+  is a design change requiring a superseding ADR.
+- **The autonomous agent scripts (`sm/po/orchestrator_agent`, `continuous_burndown`, `sprint_validator`)
+  → DEFERRED.** They share `escalations/task_queue/sprint_tracker.json` writers with `src/backlog/*`
+  and have live tests; safe removal needs the full suite runnable (blocked here — see below).
+- **`SPRINT.md` → DEFERRED.** Read by KEEP code: `src/backlog/validate_documentation_accuracy.py` and
+  `scripts/defect_prevention_rules.py` (soft-dep of `publication_validator`), plus
+  `test_github_integration.py`/`test_continuous_burndown.py`. Delete it *with* those in Wave 2.
+- **`.deployment_state` → KEEP (LIVE).** Read by `scripts/rollback_production.sh` (blue/green rollback).
+- **`.github/BACKLOG.md` → DEFERRED.** Referenced by `src/backlog/migrate_backlog_to_github.py`.
+- **Root `SPEC.md` → DEFERRED.** Referenced by `src/quality/visual_qa_zones.py`.
+- **`remediation-sync.yml` → KEEP.** It is a *content*-remediation workflow (posts/pipeline), not sprint.
+
+**Verification is CI-gated:** the full suite cannot run here (`pip install -r requirements.txt` fails
+building the `sgmllib3k`/feedparser wheel). Wave-1 slices below are config/doc/artifact-only with **no
+pytest import**, verifiable by grep + CI. See `tasks/plan.md` for the wave breakdown.
+
 ## 2. Decision map — KEEP / CONSOLIDATE / RETIRE
 
 ### 2.1 KEEP (live, no lifecycle overlap)

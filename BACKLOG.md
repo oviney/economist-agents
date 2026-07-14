@@ -29,7 +29,7 @@ _(none)_
 ### B-004 · Reconcile the supported Python version policy
 
 **Spec:** [`docs/specs/B-004-python-version-policy.md`](docs/specs/B-004-python-version-policy.md)
-· **Status:** DRAFT — needs a maintainer decision before implementation.
+· **Recommended decision (recorded, proceed unless overridden): support Python 3.11–3.13.**
 
 Four sources disagree on which Python the project supports: CI tests **3.11/3.12**
 (`.github/workflows/ci.yml`), the docs now say **3.13.x** (README/CONTRIBUTING),

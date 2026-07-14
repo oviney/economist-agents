@@ -1,6 +1,12 @@
 # SPEC: Reconcile the supported Python version policy (B-004)
 
-**Status**: DRAFT — awaiting human decision (see §3) then LGTM before implementation
+> ## ✅ RECOMMENDED DECISION: support **Python 3.11–3.13** (Option A)
+> Rationale in one line: CI already proves 3.11 and 3.12 work, and ADR-0004 says 3.13 was
+> tested — so 3.11–3.13 fits every known fact without dropping anything. **A future session
+> should proceed with this unless a maintainer explicitly overrides it** (change to Option B
+> or C in §3). Do not block waiting for a decision that is already recorded here.
+
+**Status**: DRAFT — recommended decision recorded above; implement per §4 (override in §3 only if the maintainer objects)
 **Backlog item**: `B-004` (see [`BACKLOG.md`](../../BACKLOG.md))
 **Date**: 2026-07-14
 **Related**: [ADR-0004](../adr/0004-python-version-constraint.md) (now obsolete rationale),

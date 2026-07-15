@@ -18,11 +18,16 @@ one of these, and never re-litigate them.
    (`claude_agent_sdk` / the authenticated `claude` CLI). The default runtime is
    keyless: writing/graphics/vision via `query()`, research via
    `research_mode="claude_web"` (Claude's own WebSearch), never Serper.
-4. **Images are generated PROCEDURALLY (keyless code), not by an image model.**
-   Claude cannot generate raster images and there is no acceptable image-gen
-   API (see #1). The hero image is drawn deterministically in Python
-   (`src/agent_sdk/hero_image.py`, PIL); the chart via matplotlib
-   (`chart_renderer.py`). Do not reach for DALL-E/Gemini/Midjourney/etc.
+4. **The pipeline does NOT generate the hero image — it generates a PROMPT.**
+   The hero workflow is human-in-the-loop at PR-review time:
+   (a) the pipeline writes a hero-image *prompt* (`image_prompt_synth.py` →
+   `compose_prompt`), surfaces it in the post (inline placeholder comment) and
+   as the `output/posts/<slug>.image_prompt.md` sidecar so it is visible when
+   reviewing the post in the PR; (b) the owner takes that prompt, generates the
+   image themselves, and drops it in. Do **not** add image generation of any
+   kind — not DALL-E/Gemini/Midjourney (violates #1), and not procedural/PIL
+   image generation either. The only pipeline-drawn raster is the **data chart**
+   (`chart_renderer.py`, matplotlib), which is not an illustration.
 5. **No github.com-only workflows for running the pipeline.** It must run
    locally / in the session on the subscription.
 

@@ -1,45 +1,36 @@
-# SPEC: Hero image (keyless + Gemini) and chart polish (B-007)
+# SPEC: Hero-image prompt surfacing + chart polish (B-007)
 
-**Status**: IN PROGRESS (owner delegated: "figure it out, work within constraints")
+**Status**: IN PROGRESS
 **Date**: 2026-07-14
 **Branch**: `claude/pipeline-status-check-mwptdh`
 
 ## Objective
 
-Restore a professional themed **hero image** to every generated post (regressed
-when keyless `chart_only` dropped it) and **polish the chart**, within the
-owner's constraints: **no paid API keys, no ChatGPT**; available assets are the
-**Claude subscription** (this pipeline's auth; cannot generate images) and
-**Google Gemini** (can generate images).
+The pipeline must **not** generate the hero image. Per CLAUDE.md Operating
+Constraint #4, the hero is human-in-the-loop at PR-review time: the pipeline
+produces a hero-image **prompt** and **surfaces it** so the owner can generate
+the image themselves during review and drop it in. Also polish the data chart.
 
-## Constraints → design
+## Design
 
-Per CLAUDE.md **Operating Constraints**: NO API keys of any kind (including
-free-tier), no paid services, no image-generation API. Claude cannot generate
-raster images, so the hero is **drawn procedurally in Python** — a keyless
-editorial "cover" (PIL): red tab, bold serif title, thin rule, editorial dek,
-and a deterministic geometric motif in the Economist palette. It renders every
-run in milliseconds and needs nothing installed beyond Pillow.
+- **Prompt generation** already exists (`image_prompt_synth.compose_prompt` →
+  `Stage3Result.image_prompt` + `output/posts/<slug>.image_prompt.md` sidecar).
+- **Surface it**: in the keyless end-to-end (`chart_only`) path, inject the
+  prompt as a review-visible HTML comment at the top of the post body
+  (`_inject_hero_prompt_comment`) — invisible when rendered, visible in the PR
+  diff and raw markdown, exactly where the hero belongs. The sidecar is kept.
+- **Chart polish**: dynamic left margin sized to the longest label (fixes
+  y-axis truncation) + long-label ellipsis; chart title is data-descriptive,
+  never the article headline.
 
-Every run ships **hero + chart**, fully keyless.
+## Rejected / removed
 
-> **Rejected:** a Gemini/Imagen image-generation tier was prototyped and
-> **removed** — it requires an API key, which violates Operating Constraint #1.
-> Do not reintroduce it.
-
-## Scope
-
-- `src/agent_sdk/hero_image.py` — keyless PIL editorial hero
-  (`render_editorial_hero`) + `generate_hero(...)` entrypoint (keyless-only).
-- Pipeline wiring: `image_mode="auto"` (+ CLI `--image-mode auto`) emits a hero
-  (sets `image:` + guarantees `image_alt`/`image_caption`) and embeds the chart,
-  replacing the OpenAI-only `featured_image_agent` path for this flow.
-- `src/agent_sdk/chart_renderer.py` — dynamic left margin (fix label truncation);
-  chart title discipline (never the article headline).
+- **Procedural (PIL) hero generation** and a **Gemini image tier** were
+  prototyped and **removed**. The pipeline generates no image (Constraint #4);
+  a keyed image API is forbidden (Constraint #1). Do not reintroduce either.
 
 ## Boundaries
 
-- Never require a key or paid service (Operating Constraints #1–#2); the hero is
-  keyless and always renders.
-- Keep the chart-only capability; hero is additive.
-- Prove the keyless path live.
+- No key, no paid service, no image generation of any kind.
+- Chart-only post ships with the prompt surfaced; the owner adds the hero at PR
+  review time.

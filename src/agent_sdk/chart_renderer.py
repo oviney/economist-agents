@@ -159,7 +159,12 @@ def render_chart(spec: dict, output_path: Path) -> Path:
             )
 
         ax.set_yticks(y_pos)
-        ax.set_yticklabels(metrics, fontsize=11, color="black")
+        # Guard against a runaway label blowing out the margin; ellipsize very
+        # long metric names so the axis stays readable.
+        display_metrics = [
+            m if len(str(m)) <= 46 else f"{str(m)[:44]}…" for m in metrics
+        ]
+        ax.set_yticklabels(display_metrics, fontsize=11, color="black")
         ax.invert_yaxis()  # first metric on top — newspaper convention
 
         # X axis: minimal — just a baseline grid for reference.
@@ -181,7 +186,11 @@ def render_chart(spec: dict, output_path: Path) -> Path:
         if source:
             fig.text(0.06, 0.03, f"Source: {source}", fontsize=9, color=_GRAY_TEXT)
 
-        plt.subplots_adjust(left=0.22, right=0.95, top=0.78, bottom=0.10)
+        # Size the left margin to the longest label so y-axis text is never
+        # truncated (previously a fixed 0.22 clipped long metric names).
+        longest = max((len(str(m)) for m in display_metrics), default=0)
+        left_margin = min(0.46, max(0.22, 0.055 + longest * 0.0085))
+        plt.subplots_adjust(left=left_margin, right=0.95, top=0.78, bottom=0.10)
         fig.savefig(output_path, dpi=100, facecolor=_BG_COLOR)
     except Exception as exc:
         raise ChartRenderError(f"matplotlib render failed: {exc}") from exc

@@ -102,17 +102,19 @@ async def run_pipeline(
     graphics_budget_usd: float | None = 0.10,
     writer_model: str = DEFAULT_WRITER_MODEL,
     graphics_model: str = DEFAULT_GRAPHICS_MODEL,
-    image_mode: Literal["chart_only", "hero"] = "hero",
+    image_mode: Literal["chart_only", "hero", "auto"] = "hero",
     research_mode: Literal["deterministic", "deep", "claude_web"] = "deterministic",
 ) -> PipelineResult:
     """Generate one article through the Agent SDK pipeline.
 
-    ``image_mode`` controls how Stage 4 treats the hero image (#410):
+    ``image_mode`` controls the hero image (#410, B-007):
     - ``"hero"`` (default): validate the writer's article as-is, including its
       ``image:`` reference (the caller is responsible for the image existing).
     - ``"chart_only"``: strip the hero ``image*`` frontmatter before Stage 4 so
-      the draft validates on its chart alone and is not rejected for a hero
-      image that has not been generated. No paid image API is involved.
+      the draft validates on its chart alone. No image is produced.
+    - ``"auto"``: generate a hero image (Gemini when a free key is present, else
+      a keyless editorial hero) so the post ships BOTH a themed hero and the
+      data chart — keyless by default, no paid API.
     """
     stage3 = await run_stage3(
         topic,
@@ -131,6 +133,9 @@ async def run_pipeline(
         # (BUG-039).
         article_for_stage4 = _auto_embed_chart(stage3.article)
         article_for_stage4 = _strip_image_frontmatter(article_for_stage4)
+    elif image_mode == "auto":
+        article_for_stage4 = _generate_and_attach_hero(stage3.article, topic)
+        article_for_stage4 = _auto_embed_chart(article_for_stage4)
     stage4 = run_stage4(article_for_stage4, stage3.chart_data)
 
     result = PipelineResult(
@@ -268,6 +273,62 @@ def _load_state(slug: str) -> dict:
 _FRONTMATTER_IMAGE_LINE = re.compile(r"^image(?:_alt|_caption)?:[^\n]*\n", re.MULTILINE)
 
 
+def _frontmatter_field(article: str, field: str) -> str:
+    """Return a frontmatter ``field`` value (unquoted), or '' if absent."""
+    match = re.search(
+        rf'^{re.escape(field)}:\s*["\']?(.*?)["\']?\s*$', article, re.MULTILINE
+    )
+    return match.group(1).strip() if match else ""
+
+
+def _ensure_image_meta(article: str, slug: str, alt: str, caption: str) -> str:
+    """Guarantee image:/image_alt:/image_caption: frontmatter (the validator
+    requires alt+caption whenever image: is present). Existing values are kept;
+    only missing fields are added."""
+    if not article.startswith("---"):
+        return article
+    parts = article.split("---", 2)
+    if len(parts) < 3:
+        return article
+    fm = parts[1]
+    additions = ""
+    if "image:" not in fm:
+        additions += f"image: /assets/images/{slug}.png\n"
+    if "image_alt:" not in fm:
+        additions += f'image_alt: "{alt}"\n'
+    if "image_caption:" not in fm:
+        additions += f'image_caption: "{caption}"\n'
+    if additions:
+        fm = fm.rstrip() + "\n" + additions
+    return f"---{fm}---{parts[2]}"
+
+
+def _generate_and_attach_hero(article: str, topic: str) -> str:
+    """Generate a hero image for ``article`` and ensure its frontmatter (B-007).
+
+    Best tier available (Gemini when a free key is present, else a keyless
+    editorial hero). The PNG is written to the hero drop dir under the article
+    slug; frontmatter image_alt/image_caption are guaranteed so the post ships a
+    complete, validator-clean hero alongside the chart.
+    """
+    from src.agent_sdk.hero_image import generate_hero
+
+    slug = _slug_from_article(article, topic)
+    title = _frontmatter_field(article, "title") or topic
+    alt = _frontmatter_field(article, "image_alt") or (
+        f"An Economist-style editorial illustration for '{title}'."
+    )
+    caption = _frontmatter_field(article, "image_caption") or title
+
+    IMAGE_DROP_DIR.mkdir(parents=True, exist_ok=True)
+    try:
+        generate_hero(title, alt, caption, IMAGE_DROP_DIR / f"{slug}.png")
+    except Exception as exc:  # noqa: BLE001 — never fail the run on the image
+        logger.warning("Hero generation failed (%s); shipping without hero", exc)
+        return _strip_image_frontmatter(article)
+    return _ensure_image_meta(article, slug, alt, caption)
+
+
 def _strip_image_frontmatter(article: str) -> str:
     """Remove image:, image_alt:, image_caption: lines from frontmatter.
 
@@ -373,12 +434,14 @@ def main() -> None:
     )
     parser.add_argument(
         "--image-mode",
-        choices=("hero", "chart_only"),
+        choices=("hero", "chart_only", "auto"),
         default="hero",
         help=(
             "'hero' (default): Stage 3 + pause for the human image handshake. "
-            "'chart_only': run end-to-end with no hero image (chart is the "
-            "visual) and write the finished article — no image API, no handshake."
+            "'auto': run end-to-end and generate a themed hero (Gemini if a free "
+            "GEMINI_API_KEY is set, else a keyless editorial hero) plus the "
+            "chart. 'chart_only': run end-to-end with the chart as the only "
+            "visual. 'auto' and 'chart_only' need no handshake."
         ),
     )
     parser.add_argument(
@@ -416,9 +479,10 @@ def main() -> None:
         _run_resume(args.resume, no_image=args.no_image)
         return
 
-    # chart_only runs end-to-end with no hero image and no handshake — the only
-    # fully keyless path (pair with --research-mode claude_web for zero keys).
-    if args.image_mode == "chart_only":
+    # 'auto' and 'chart_only' run end-to-end with no handshake. Both are fully
+    # keyless (pair with --research-mode claude_web for zero keys); 'auto' also
+    # generates a themed hero image.
+    if args.image_mode in ("auto", "chart_only"):
         _run_end_to_end(
             topic,
             writer_budget=args.writer_budget,
@@ -426,6 +490,7 @@ def main() -> None:
             writer_model=args.writer_model,
             graphics_model=args.graphics_model,
             research_mode=args.research_mode,
+            image_mode=args.image_mode,
         )
         return
 
@@ -461,13 +526,15 @@ def _run_end_to_end(
     writer_model: str,
     graphics_model: str,
     research_mode: str,
+    image_mode: str = "chart_only",
 ) -> None:
-    """Run the full pipeline chart-only (no hero image, no handshake) and write
-    the finished article. With ``--research-mode claude_web`` this is fully
-    keyless — Stage 3 writer/graphics and research all run on the Claude
-    subscription via the Agent SDK; no ANTHROPIC/OPENAI/SERPER key is used.
+    """Run the full pipeline end-to-end (no handshake) and write the finished
+    article. With ``--research-mode claude_web`` this is fully keyless — Stage 3
+    writer/graphics and research run on the Claude subscription via the Agent
+    SDK; no ANTHROPIC/OPENAI/SERPER key is used. ``image_mode="auto"`` also
+    produces a themed hero image (Gemini if a free key is set, else keyless).
     """
-    print(f"Running Agent SDK pipeline (chart_only) on: {topic}")
+    print(f"Running Agent SDK pipeline ({image_mode}) on: {topic}")
     print(f"  Research mode: {research_mode}; models: writer={writer_model}")
     try:
         result = asyncio.run(
@@ -477,7 +544,7 @@ def _run_end_to_end(
                 graphics_budget_usd=graphics_budget,
                 writer_model=writer_model,
                 graphics_model=graphics_model,
-                image_mode="chart_only",
+                image_mode=image_mode,
                 research_mode=research_mode,
             )
         )

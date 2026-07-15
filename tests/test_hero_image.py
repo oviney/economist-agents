@@ -41,27 +41,14 @@ def test_long_headline_still_renders(tmp_path: Path) -> None:
         assert img.size == (1792, 1024)
 
 
-def test_generate_hero_falls_back_to_editorial_without_key(
-    tmp_path: Path, monkeypatch
-) -> None:
-    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
-    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
+def test_generate_hero_is_keyless(tmp_path: Path, monkeypatch) -> None:
+    """generate_hero must draw a hero with NO API key of any kind (Operating
+    Constraint #1/#4: no image-gen API, keyless-only)."""
+    for key in ("GEMINI_API_KEY", "GOOGLE_API_KEY", "OPENAI_API_KEY"):
+        monkeypatch.delenv(key, raising=False)
     out = hero.generate_hero(
         "Headline", "alt text describing the scene", "caption", tmp_path / "h.png"
     )
     assert out.exists()
     with Image.open(out) as img:
         assert img.size == (1792, 1024)
-
-
-def test_generate_hero_uses_gemini_when_it_succeeds(
-    tmp_path: Path, monkeypatch
-) -> None:
-    target = tmp_path / "gem.png"
-    target.write_bytes(b"fake-gemini-bytes")
-
-    import src.agent_sdk.gemini_image as gem
-
-    monkeypatch.setattr(gem, "generate_gemini_hero", lambda prompt, path: target)
-    out = hero.generate_hero("H", "alt", "cap", tmp_path / "unused.png")
-    assert out == target

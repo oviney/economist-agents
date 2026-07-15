@@ -112,9 +112,8 @@ async def run_pipeline(
       ``image:`` reference (the caller is responsible for the image existing).
     - ``"chart_only"``: strip the hero ``image*`` frontmatter before Stage 4 so
       the draft validates on its chart alone. No image is produced.
-    - ``"auto"``: generate a hero image (Gemini when a free key is present, else
-      a keyless editorial hero) so the post ships BOTH a themed hero and the
-      data chart — keyless by default, no paid API.
+    - ``"auto"``: generate a keyless themed hero (drawn procedurally in Python,
+      no API key) so the post ships BOTH a themed hero and the data chart.
     """
     stage3 = await run_stage3(
         topic,
@@ -306,9 +305,9 @@ def _ensure_image_meta(article: str, slug: str, alt: str, caption: str) -> str:
 def _generate_and_attach_hero(article: str, topic: str) -> str:
     """Generate a hero image for ``article`` and ensure its frontmatter (B-007).
 
-    Best tier available (Gemini when a free key is present, else a keyless
-    editorial hero). The PNG is written to the hero drop dir under the article
-    slug; frontmatter image_alt/image_caption are guaranteed so the post ships a
+    Keyless: the hero is drawn procedurally (no API key; see CLAUDE.md Operating
+    Constraints). The PNG is written to the hero drop dir under the article slug;
+    frontmatter image_alt/image_caption are guaranteed so the post ships a
     complete, validator-clean hero alongside the chart.
     """
     from src.agent_sdk.hero_image import generate_hero
@@ -438,10 +437,10 @@ def main() -> None:
         default="hero",
         help=(
             "'hero' (default): Stage 3 + pause for the human image handshake. "
-            "'auto': run end-to-end and generate a themed hero (Gemini if a free "
-            "GEMINI_API_KEY is set, else a keyless editorial hero) plus the "
-            "chart. 'chart_only': run end-to-end with the chart as the only "
-            "visual. 'auto' and 'chart_only' need no handshake."
+            "'auto': run end-to-end and generate a keyless themed hero (drawn "
+            "procedurally, no API key) plus the chart. 'chart_only': run "
+            "end-to-end with the chart as the only visual. 'auto' and "
+            "'chart_only' need no handshake and no keys."
         ),
     )
     parser.add_argument(
@@ -532,7 +531,7 @@ def _run_end_to_end(
     article. With ``--research-mode claude_web`` this is fully keyless — Stage 3
     writer/graphics and research run on the Claude subscription via the Agent
     SDK; no ANTHROPIC/OPENAI/SERPER key is used. ``image_mode="auto"`` also
-    produces a themed hero image (Gemini if a free key is set, else keyless).
+    produces a themed hero image, drawn procedurally (keyless, no API key).
     """
     print(f"Running Agent SDK pipeline ({image_mode}) on: {topic}")
     print(f"  Research mode: {research_mode}; models: writer={writer_model}")

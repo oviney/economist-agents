@@ -3,8 +3,9 @@
 Renders a professional, on-brand "cover" hero for an article with no API key —
 a typographic composition in the Economist palette: a red signature tab, a bold
 serif headline, a thin rule, an editorial kicker, and a deterministic geometric
-motif derived from the title. It is the always-on fallback when no Gemini key is
-present, so a themed hero image is never missing from a generated post.
+motif derived from the title. This is the hero path (see CLAUDE.md Operating
+Constraints: no image-generation API is permitted), so a themed hero image is
+always present in a generated post.
 
 Deterministic: the motif is seeded from a hash of the title, so the same article
 always yields the same hero (reproducible), while different articles differ.
@@ -29,8 +30,8 @@ _NAVY = (12, 35, 64)
 _BURGUNDY = (123, 45, 58)
 _MUTED = (110, 112, 118)  # kicker / caption grey
 
-# 1792×1024 — the DALL-E/Imagen landscape hero size, so downstream layout and
-# aspect-ratio gates are unchanged whichever tier produced the image.
+# 1792×1024 — the standard landscape hero size the downstream layout and
+# aspect-ratio gates already expect.
 _W, _H = 1792, 1024
 
 _SERIF_BOLD_CANDIDATES = (
@@ -194,26 +195,20 @@ def generate_hero(
     image_caption: str,
     output_path: str | Path,
 ) -> Path:
-    """Produce a hero image, best tier available, always returning a path.
+    """Produce a themed hero image for an article — keyless.
 
-    Tier 1: Gemini image model when a (free) ``GEMINI_API_KEY``/``GOOGLE_API_KEY``
-    is present — a real conceptual illustration grounded in ``image_alt``.
-    Tier 2 (fallback, keyless): the programmatic editorial hero, so a themed
-    image is never missing.
+    Draws a deterministic editorial cover in Python (no image model, no API key;
+    see CLAUDE.md Operating Constraints). Claude cannot generate raster images
+    and no image-generation API is permitted, so this is the hero path.
 
     Args:
         title: Article headline.
-        image_alt: The writer's illustration brief (what the image should depict).
-        image_caption: The editorial dek/caption.
+        image_alt: The writer's illustration brief (unused for drawing, kept for
+            signature stability with the caller).
+        image_caption: The editorial dek/caption drawn under the headline.
         output_path: Destination PNG path.
 
     Returns:
-        The path to the rendered/generated hero (always exists on return).
+        The path to the rendered hero (always exists on return).
     """
-    from src.agent_sdk.gemini_image import generate_gemini_hero
-
-    brief = image_alt.strip() or title.strip()
-    gemini = generate_gemini_hero(brief, output_path)
-    if gemini is not None:
-        return gemini
     return render_editorial_hero(title, image_caption or image_alt, output_path)

@@ -14,35 +14,32 @@ owner's constraints: **no paid API keys, no ChatGPT**; available assets are the
 
 ## Constraints → design
 
-Claude cannot generate raster images, so the hero comes from one of two tiers,
-chosen automatically:
+Per CLAUDE.md **Operating Constraints**: NO API keys of any kind (including
+free-tier), no paid services, no image-generation API. Claude cannot generate
+raster images, so the hero is **drawn procedurally in Python** — a keyless
+editorial "cover" (PIL): red tab, bold serif title, thin rule, editorial dek,
+and a deterministic geometric motif in the Economist palette. It renders every
+run in milliseconds and needs nothing installed beyond Pillow.
 
-1. **Gemini image model** (`gemini-2.5-flash-image` / Imagen via `google-genai`)
-   — used when a `GEMINI_API_KEY`/`GOOGLE_API_KEY` is present (free AI-Studio
-   tier). Produces a real conceptual editorial illustration.
-2. **Keyless programmatic editorial hero** (PIL) — the always-on fallback:
-   a typographic "cover" in the Economist palette (red tab, bold serif title,
-   a deterministic geometric motif, off-white ground). Needs no key, renders
-   every run, so a themed hero is *never* missing.
+Every run ships **hero + chart**, fully keyless.
 
-Every run therefore ships **hero + chart**. Zero-key runs get the programmatic
-hero; adding a free Gemini key upgrades the hero to a generated illustration.
+> **Rejected:** a Gemini/Imagen image-generation tier was prototyped and
+> **removed** — it requires an API key, which violates Operating Constraint #1.
+> Do not reintroduce it.
 
 ## Scope
 
-- `src/agent_sdk/hero_image.py` — keyless PIL editorial hero (`render_editorial_hero`).
-- `src/agent_sdk/gemini_image.py` — Gemini hero (`generate_gemini_hero`), returns
-  None on missing key / any failure so the caller falls back.
-- `generate_hero(...)` — unified entrypoint: Gemini → else editorial hero.
-- Pipeline wiring: new default so the keyless end-to-end path emits a hero
-  (sets `image:` + keeps `image_alt`/`image_caption`), replacing the OpenAI-only
-  `featured_image_agent` path for this flow.
+- `src/agent_sdk/hero_image.py` — keyless PIL editorial hero
+  (`render_editorial_hero`) + `generate_hero(...)` entrypoint (keyless-only).
+- Pipeline wiring: `image_mode="auto"` (+ CLI `--image-mode auto`) emits a hero
+  (sets `image:` + guarantees `image_alt`/`image_caption`) and embeds the chart,
+  replacing the OpenAI-only `featured_image_agent` path for this flow.
 - `src/agent_sdk/chart_renderer.py` — dynamic left margin (fix label truncation);
   chart title discipline (never the article headline).
 
 ## Boundaries
 
-- Never require a paid key; never block a run on a missing image key (fall back).
+- Never require a key or paid service (Operating Constraints #1–#2); the hero is
+  keyless and always renders.
 - Keep the chart-only capability; hero is additive.
-- Prove the keyless path live; Gemini path is unit-tested (mocked) + documented
-  (activates when the owner adds a free key).
+- Prove the keyless path live.

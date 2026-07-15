@@ -139,8 +139,9 @@ async def run_pipeline(
     # reviewer generates the image from this prompt at PR-review time — CLAUDE.md
     # Operating Constraint #4). Injected AFTER Stage 4 so validation is unchanged.
     final_article = stage4.article
-    if image_mode == "chart_only" and stage3.image_prompt:
-        final_article = _inject_hero_prompt_comment(final_article, stage3.image_prompt)
+    image_prompt = getattr(stage3, "image_prompt", "")
+    if image_mode == "chart_only" and image_prompt:
+        final_article = _inject_hero_prompt_comment(final_article, image_prompt)
 
     result = PipelineResult(
         topic=topic,

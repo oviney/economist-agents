@@ -1,0 +1,34 @@
+---
+layout: post
+title: "Reviewer Unavailable: The $24,000-per-Developer Tax That AI Has Made Worse"
+date: 2026-07-14
+author: Ouray Viney
+categories:
+ - Software Engineering
+ - Quality Engineering
+description: "AI tools have flooded review queues, inflated pull request sizes, and created a $24,000-per-developer annual drag that most engineering leaders never measure."
+image: ""
+---
+
+Pull request #4,712 is waiting. It has been waiting for four days, its author long since context-switched to a new feature, its reviewer somewhere beneath a cascade of similar submissions. Nobody is blocking it maliciously; nobody has even noticed. This is the ordinary texture of software development in 2026, and its costs are both large and largely invisible. The prevailing narrative around AI coding assistants is flattering to their vendors: engineers write more code, merge more often, and ship faster. That is partially correct. What it elides is that code still requires human scrutiny before reaching production, and the humans who provide that scrutiny have not scaled alongside the machines. The bottleneck this creates is not marginal — it is, according to Worklytics, costing companies roughly $24,000 per developer per year, a figure large enough to erase the productivity gains that justified the AI investment in the first place.
+
+## Flooded Queues, Paralysed Reviewers
+
+The data from Faros.ai, drawn from two years of telemetry across 22,000 developers and 4,000 teams, is startling. Median time spent in code review rose 441.5% as AI coding tools flooded review queues; average review-phase duration climbed a separate 199.6% over the same period. These are not rounding errors in a noisy dataset. They are the signature of a structural failure dressed as a workflow problem. On the teams with the highest AI-tool adoption, the picture grew stranger still. Faros.ai's analysis of 10,000 developers across 1,255 teams found that PR review time rose 91% even as those same teams merged 98% more pull requests — with average pull request size ballooning 154%. Yet no measurable improvement appeared in any DORA metric, the industry's standard gauges of deployment frequency, change failure rate, and recovery time. Engineers were generating more, merging more, and shipping no better. They had, in effect, built industrial-scale backlogs for one another. The underlying constraint is simple and stubborn. AI tools lower the cost of writing code without lowering the cost of reviewing it. The senior engineer whose cognitive bandwidth is finite becomes the rate-limiting step. Teams that deployed coding assistants without rethinking review capacity have not accelerated their pipelines; they have compressed them precisely at the human end.
+
+## The Pickup-Time Penalty
+
+The asymmetry between human and machine-generated code shows up most sharply in how long pull requests wait for attention. LinearB's analysis of 6.1 million pull requests across 4,800 engineering teams found that AI-generated PRs wait 4.6 times longer to receive a first review than their human-written counterparts. Their acceptance rate stands at 32.7%, against 84.4% for human-authored submissions. Reviewers are applying implicit quality filters — and AI-generated code is failing them at a rate that compounds the delay. The chart below illustrates the scale of this idle time starkly. Across 8.1 million pull requests and 4,800 teams spanning 42 countries, LinearB found that one third of all pull requests spend 78% of their entire lifecycle sitting inert — neither merged, nor rejected, nor reviewed, simply parked. The industry-median time before a reviewer even opens a PR is 4.4 days. For a discipline that lionises continuous delivery, four and a half days of inactivity per change is not a velocity problem; it is a management problem wearing an engineering disguise. That idle time is not free. Developers returning to a stale pull request must reconstruct the mental context they held when they wrote it — each additional day of queue growth multiplies the rework required. The drift between a neglected branch and a fast-moving main is the hidden interest rate on review debt, accruing silently until someone finally pays it in the form of a defect.
+
+## Silent Merges and the Financial Reckoning
+
+The most alarming finding in the data is not the slowdown but the workaround. Faros.ai's telemetry shows that 31.3% of pull requests now merge with no human or agentic review whatsoever, as reviewer capacity fails to keep pace with AI-generated volume. The consequences are plainly quantifiable: production incidents per pull request rose 242.7% and bugs per developer rose 54% over the same period. Teams did not solve the bottleneck; they bypassed it and paid the bill in reliability. Worklytics puts the financial arithmetic in sharper relief. Benchmarking against 3.4 million pull requests, the firm estimates that review-lag-driven context switching and rework costs companies roughly $24,000 per developer per year at a fully-loaded salary of around $150,000. With the median software engineering team carrying 3.8-day lead times and a 25th-percentile merge time of 18.4 hours, the gap between the fastest and the typical team represents a substantial compounding drain — not on morale, which is difficult to invoice, but on payroll, which is not. Engineering leaders who justified AI coding assistants on productivity grounds are discovering that productivity is not a pipeline metric; it is a system metric. A faster input with a constrained processor in the middle does not improve throughput. It builds a queue — and queues, left unattended, become policy. The review backlog will not clear itself through better AI writing tools. The fix demands either more reviewers, smarter triage, or automated quality gates that filter low-signal submissions before they reach human attention. Teams that find none of those answers will keep discovering the cost retrospectively — one production incident at a time, each postmortem quietly noting that the offending change sat in the queue for four days before anyone opened it, and then merged without review. 
+![Chart](/assets/charts/reviewer-unavailable-code-review-bottlenecks.png)
+
+## References
+
+1. Faros.ai. "AI Acceleration Whiplash: Takeaways." https://www.faros.ai/blog/ai-acceleration-whiplash-takeaways
+2. Faros.ai. "The AI Productivity Paradox." https://www.faros.ai/ai-productivity-paradox
+3. LinearB. "2025 Engineering Benchmarks & Insights." https://linearb.io/blog/2025-engineering-benchmarks-insights
+4. LinearB. "Engineering Benchmarks." https://linearb.io/resources/engineering-benchmarks
+5. Worklytics. "2025 Employee Productivity Score: Benchmarks for Software Engineering Teams." https://www.worklytics.co/resources/2025-employee-productivity-score-benchmarks-software-engineering-teams

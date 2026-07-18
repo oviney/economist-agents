@@ -537,13 +537,10 @@ def _run_end_to_end(
     if result.publication_validator_passed:
         print("✅ Publication validator PASSED — article is publish-ready.")
         sys.exit(0)
-    print(
-        "❌ Publication validator found issues:", file=sys.stderr
-    )
+    print("❌ Publication validator found issues:", file=sys.stderr)
     for issue in result.publication_validator_issues:
         print(
-            f"  [{issue.get('severity')}] {issue.get('check')}: "
-            f"{issue.get('message')}",
+            f"  [{issue.get('severity')}] {issue.get('check')}: {issue.get('message')}",
             file=sys.stderr,
         )
     sys.exit(1)

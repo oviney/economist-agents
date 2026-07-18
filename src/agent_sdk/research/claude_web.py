@@ -113,9 +113,7 @@ async def build_claude_web_brief(
             elif isinstance(message, ResultMessage):
                 cost = float(message.total_cost_usd or 0.0)
     except Exception as exc:  # noqa: BLE001 — soft-degrade, never crash Stage 3
-        logger.warning(
-            "claude_web research failed (%s) — returning empty brief", exc
-        )
+        logger.warning("claude_web research failed (%s) — returning empty brief", exc)
 
     body = "".join(text_parts)
     if not body.strip():

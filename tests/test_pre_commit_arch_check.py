@@ -360,7 +360,9 @@ class TestFormatReport:
 
     def test_error_report_shows_blocked(self):
         result = CheckResult(
-            violations=[Violation("bad.py", 5, "llm-centralisation", "Direct import", "error")],
+            violations=[
+                Violation("bad.py", 5, "llm-centralisation", "Direct import", "error")
+            ],
             files_checked=1,
         )
         report = format_report(result)

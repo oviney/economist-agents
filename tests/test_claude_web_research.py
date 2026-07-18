@@ -89,9 +89,7 @@ def test_enables_web_tools_and_is_keyless(monkeypatch) -> None:
 
 
 def test_empty_response_still_returns_guardrail_header(monkeypatch) -> None:
-    monkeypatch.setattr(
-        claude_web, "query", _fake_query([_result("success", 0.0)])
-    )
+    monkeypatch.setattr(claude_web, "query", _fake_query([_result("success", 0.0)]))
 
     brief, cost = asyncio.run(claude_web.build_claude_web_brief("topic"))
 

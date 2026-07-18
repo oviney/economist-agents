@@ -279,7 +279,9 @@ class TestValidatedModel:
         async def fake_query(*, prompt, options):
             captured["options"] = options
             yield sdk.AssistantMessage(
-                content=[sdk.TextBlock(text='{"image_alt": "a", "image_caption": "b"}')],
+                content=[
+                    sdk.TextBlock(text='{"image_alt": "a", "image_caption": "b"}')
+                ],
                 model="claude-sonnet-4-6",
             )
 

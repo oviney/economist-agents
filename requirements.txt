@@ -22,4 +22,3 @@ fastmcp>=2.0.0,<4.0.0             # MCP server framework; mcp is a managed trans
 google-analytics-data>=0.18.0,<1.0.0  # GA4 Data API (ADR-002 MEASURE layer)
 google-auth>=2.0.0,<3.0.0             # Google service account authentication
 google-api-python-client>=2.0.0,<3.0.0  # Google Search Console API
-

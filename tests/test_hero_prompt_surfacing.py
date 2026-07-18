@@ -36,3 +36,16 @@ def test_no_frontmatter_still_prepends_prompt() -> None:
     out = _inject_hero_prompt_comment("just a body", _PROMPT)
     assert out.startswith("<!-- HERO IMAGE")
     assert "just a body" in out
+
+
+def test_arrow_in_prompt_cannot_close_comment_early() -> None:
+    """A literal '-->' in the prompt must not terminate the HTML comment early
+    and leak text into the rendered post."""
+    article = "---\ntitle: t\n---\n\nBody paragraph.\n"
+    out = _inject_hero_prompt_comment(article, "before --> after the arrow")
+
+    # Exactly one comment terminator, and it is the intended closing one — the
+    # body text sits after it, the prompt's arrow does not create a second close.
+    assert out.count("-->") == 1
+    assert out.index("-->") > out.index("before")
+    assert out.index("Body paragraph.") > out.index("-->")

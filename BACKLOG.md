@@ -26,7 +26,16 @@ _(none)_
 
 ## Todo
 
-_(none — sprint backlog cleared 2026-06-14: B-003 → B-002 → B-001 all merged)_
+### B-008 · Single canonical slug across article file, chart PNG, and image-prompt sidecar
+
+Low-impact cleanup flagged in the B-006/B-007 code review. The finished article
+file is named via `_slug_from_article` (from `title:`) while the chart PNG and
+the `output/posts/<slug>.image_prompt.md` sidecar are named via `_slug_for_chart`
+(from the `image:` field / topic). In `chart_only` runs these can diverge, so
+`foo.md` may sit beside `bar.image_prompt.md`. No functional break (both files
+exist; the prompt is also embedded inline), but a single shared slug derivation
+would remove the confusion. Also aligns with the validator's title-based
+canonical slug.
 
 ## Done
 

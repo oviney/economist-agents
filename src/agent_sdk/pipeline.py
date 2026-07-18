@@ -287,10 +287,13 @@ def _inject_hero_prompt_comment(article: str, image_prompt: str) -> str:
     comment is invisible in the rendered post but shows in the PR diff and the
     raw markdown, right where the hero belongs.
     """
+    # Neutralise any "-->" in the prompt so it cannot terminate the HTML comment
+    # early and leak prompt text into the rendered post.
+    safe_prompt = image_prompt.strip().replace("-->", "--​>")
     block = (
         "<!-- HERO IMAGE — generate an image from the prompt below, then replace "
         "this whole comment with it (see output/posts/<slug>.image_prompt.md):\n\n"
-        f"{image_prompt.strip()}\n-->\n\n"
+        f"{safe_prompt}\n-->\n\n"
     )
     if not article.startswith("---"):
         return block + article

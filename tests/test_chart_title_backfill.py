@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression for BUG-042 + B-007: a chart spec missing a title must be
+"""Regression for BUG-043 + B-007: a chart spec missing a title must be
 backfilled data-descriptively (subtitle, else a neutral label) — NEVER the
 article headline — and must not crash the render."""
 

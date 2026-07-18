@@ -130,7 +130,7 @@ async def run_pipeline(
         # path is derived from it), THEN strip the hero metadata — mirroring
         # _run_resume. Stripping first would leave _auto_embed_chart with no slug
         # and the article would fail the validator's required-chart check
-        # (BUG-039).
+        # (BUG-040).
         article_for_stage4 = _auto_embed_chart(stage3.article)
         article_for_stage4 = _strip_image_frontmatter(article_for_stage4)
     stage4 = run_stage4(article_for_stage4, stage3.chart_data)
@@ -376,7 +376,7 @@ def main() -> None:
         help=(
             "Hard cap on graphics cost in USD (default 0.40). Higher than the "
             "library default because the subscription CLI uses multiple turns "
-            "for the chart JSON (see BUG-041)."
+            "for the chart JSON (see BUG-042)."
         ),
     )
     parser.add_argument(
@@ -404,7 +404,7 @@ def main() -> None:
         help=(
             "Research path: 'deterministic' (default, Serper) | 'deep' (recursive, "
             "Serper) | 'claude_web' (keyless — Claude's own WebSearch/WebFetch on "
-            "the subscription, no SERPER_API_KEY). See ADR-0012."
+            "the subscription, no SERPER_API_KEY). See ADR-0013."
         ),
     )
     parser.add_argument(

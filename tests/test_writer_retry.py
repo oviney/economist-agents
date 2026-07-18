@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression for BUG-043 (B-006 Checkpoint B run 4): Stage 3 must regenerate the
+"""Regression for BUG-044 (B-006 Checkpoint B run 4): Stage 3 must regenerate the
 writer draft a bounded number of times when it emits malformed output, rather
 than aborting the run on a single bad (non-deterministic) draft."""
 

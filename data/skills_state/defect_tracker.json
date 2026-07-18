@@ -436,7 +436,7 @@
         "Added LENGTH as first MANDATORY rule in writer prompt",
         "Documented gate vs target in prompt (gate=700, target=800-1000)"
       ],
-      "fix_notes": "Aligned word-count gates across codebase to 700 (matches publication_validator.py and skills/economist-writing/SKILL.md sweet-spot floor). Updated agent_reviewer.py, editorial_judge.py, skill_synthesizer.py from 800→700. Strengthened stage3_crew.py writer prompt with explicit LENGTH rule (700-1200 words, target 800-1000) in MANDATORY block."
+      "fix_notes": "Aligned word-count gates across codebase to 700 (matches publication_validator.py and skills/economist-writing/SKILL.md sweet-spot floor). Updated agent_reviewer.py, editorial_judge.py, skill_synthesizer.py from 800\u2192700. Strengthened stage3_crew.py writer prompt with explicit LENGTH rule (700-1200 words, target 800-1000) in MANDATORY block."
     },
     {
       "id": "BUG-030",
@@ -502,7 +502,7 @@
       "status": "fixed",
       "fixed_date": "2026-04-26T16:56:33.701701",
       "fix_commit": "2cf28a4",
-      "fix_notes": "Allow `_client` injection to bypass the availability guard — caller is supplying whatever interface chroma would provide.",
+      "fix_notes": "Allow `_client` injection to bypass the availability guard \u2014 caller is supplying whatever interface chroma would provide.",
       "root_cause": "code_logic",
       "root_cause_notes": "Availability guard checked before honouring injection.",
       "is_production_escape": false,
@@ -531,7 +531,7 @@
         "new_validation"
       ],
       "prevention_actions": [
-        "Add a regression test asserting the dashboard's sprint-trends section renders with non-empty content when sprint_history.json contains ≥2 sprints.",
+        "Add a regression test asserting the dashboard's sprint-trends section renders with non-empty content when sprint_history.json contains \u22652 sprints.",
         "Grep audit: any future state-file relocation must update all readers in one commit."
       ]
     },
@@ -540,20 +540,20 @@
       "severity": "high",
       "discovered_in": "test_failure",
       "discovered_date": "2026-04-26T16:56:33.701701",
-      "description": "scripts/defect_tracker.py reads from legacy `skills/defect_tracker.json` instead of `data/skills_state/defect_tracker.json` — same migration miss as BUG-034",
+      "description": "scripts/defect_tracker.py reads from legacy `skills/defect_tracker.json` instead of `data/skills_state/defect_tracker.json` \u2014 same migration miss as BUG-034",
       "component": "defect_tracker",
       "status": "fixed",
       "fixed_date": "2026-04-26T16:56:33.701701",
       "fix_commit": "2cf28a4",
       "fix_notes": "Path updated to data/skills_state/.",
       "root_cause": "integration_error",
-      "root_cause_notes": "Same migration as BUG-034 — three readers missed when state files moved.",
+      "root_cause_notes": "Same migration as BUG-034 \u2014 three readers missed when state files moved.",
       "is_production_escape": true,
       "prevention_strategy": [
         "new_validation"
       ],
       "prevention_actions": [
-        "See BUG-034 — same prevention applies."
+        "See BUG-034 \u2014 same prevention applies."
       ]
     },
     {
@@ -561,20 +561,20 @@
       "severity": "high",
       "discovered_in": "test_failure",
       "discovered_date": "2026-04-26T16:56:33.701701",
-      "description": "scripts/agent_metrics.py reads from legacy `skills/agent_metrics.json` instead of `data/skills_state/agent_metrics.json` — same migration miss as BUG-034/035",
+      "description": "scripts/agent_metrics.py reads from legacy `skills/agent_metrics.json` instead of `data/skills_state/agent_metrics.json` \u2014 same migration miss as BUG-034/035",
       "component": "agent_metrics",
       "status": "fixed",
       "fixed_date": "2026-04-26T16:56:33.701701",
       "fix_commit": "2cf28a4",
       "fix_notes": "Path updated to data/skills_state/.",
       "root_cause": "integration_error",
-      "root_cause_notes": "Same migration as BUG-034 — three readers missed when state files moved.",
+      "root_cause_notes": "Same migration as BUG-034 \u2014 three readers missed when state files moved.",
       "is_production_escape": true,
       "prevention_strategy": [
         "new_validation"
       ],
       "prevention_actions": [
-        "See BUG-034 — same prevention applies."
+        "See BUG-034 \u2014 same prevention applies."
       ]
     },
     {
@@ -608,16 +608,16 @@
           "patch_frontmatter_extensible": "_patch_frontmatter (flow.py ~line 413) uses regex string injection. Straightforward to extend. Existing tests in TestPatchFrontmatter (test_flow_agent_sdk.py lines 339-357) cover the pattern.",
           "anthropic_mock_pattern": "conftest.py has mock_anthropic_client fixture (lines 26-38). Claude vision calls use the same query() async generator path. Mockable via patch of src.agent_sdk.stage3_runner.query.",
           "gaps_identified": [
-            "_FakePipelineResult (test_flow_agent_sdk.py lines 28-45) has no image_alt or image_caption fields — must be extended.",
+            "_FakePipelineResult (test_flow_agent_sdk.py lines 28-45) has no image_alt or image_caption fields \u2014 must be extended.",
             "No test currently validates stage3 output through publication_validator image metadata CRITICAL gates end-to-end."
           ],
           "critical_blocker": "Writer prompt (stage3_runner.py lines 253-256) MUST be updated first to require both fields. Vision refinement and frontmatter injection have nothing to refine until the writer emits these fields.",
           "recommended_test_plan": {
-            "test_writer_emits_fields": "tests/test_flow_agent_sdk.py — new TestWriterFrontmatter class",
-            "test_vision_refinement": "tests/test_flow_agent_sdk.py — new TestVisionRefinement class, patch query()",
-            "test_integration": "tests/test_flow_agent_sdk.py — extend TestQualityGate: mock pipeline → validator passes image gates",
-            "test_patch_frontmatter": "tests/test_flow_agent_sdk.py — extend TestPatchFrontmatter",
-            "sequence": "TDD: RED (write failing tests) → update prompt → GREEN → add vision step → REFACTOR"
+            "test_writer_emits_fields": "tests/test_flow_agent_sdk.py \u2014 new TestWriterFrontmatter class",
+            "test_vision_refinement": "tests/test_flow_agent_sdk.py \u2014 new TestVisionRefinement class, patch query()",
+            "test_integration": "tests/test_flow_agent_sdk.py \u2014 extend TestQualityGate: mock pipeline \u2192 validator passes image gates",
+            "test_patch_frontmatter": "tests/test_flow_agent_sdk.py \u2014 extend TestPatchFrontmatter",
+            "sequence": "TDD: RED (write failing tests) \u2192 update prompt \u2192 GREEN \u2192 add vision step \u2192 REFACTOR"
           }
         }
       },
@@ -629,6 +629,32 @@
     },
     {
       "id": "BUG-038",
+      "severity": "high",
+      "discovered_in": "development",
+      "discovered_date": "2026-07-14T00:00:00",
+      "description": "Pipeline quarantines an otherwise-publishable article for mechanically-fixable frontmatter defects (stale/missing date, missing categories, missing frontmatter block); LLM regeneration meant to fix them deleted the frontmatter entirely.",
+      "component": "_shared / economist_agent",
+      "status": "fixed",
+      "github_issue": null,
+      "is_production_escape": false,
+      "root_cause": "design_flaw",
+      "root_cause_notes": "Mechanical frontmatter metadata was treated as CRITICAL validator rejections and routed through unreliable LLM regeneration instead of deterministic finalize. apply_editorial_fixes only patched frontmatter when a --- block already existed and only rewrote an existing date; the deprecated economist_agent.py path called no finalizer at all.",
+      "missed_by_test_type": "integration",
+      "test_gap_description": "No test asserted that a draft with missing/stale frontmatter survives finalize as a publishable article against the real PublicationValidator.",
+      "prevention_strategy": "deterministic_gate",
+      "prevention_actions": [
+        "Harden apply_editorial_fixes to guarantee complete frontmatter when current_date is supplied",
+        "Wire finalizer into economist_agent.py before validation"
+      ],
+      "testability_review": "tests/test_frontmatter_finalize.py asserts against real PublicationValidator + FrontmatterSchema, no API required",
+      "fixed_date": "2026-07-14",
+      "fix_commit": "ed0453f",
+      "fix_notes": "PR #443. See docs/specs/B-004-frontmatter-finalize.md. Copilot review caught an image-fallback regression, fixed pre-merge.",
+      "prevention_test_added": true,
+      "prevention_test_file": "tests/test_frontmatter_finalize.py"
+    },
+    {
+      "id": "BUG-039",
       "severity": "high",
       "discovered_in": "development",
       "discovered_date": "2026-07-14T00:00:00",
@@ -645,7 +671,7 @@
       "prevention_test_added": true
     },
     {
-      "id": "BUG-039",
+      "id": "BUG-040",
       "severity": "high",
       "discovered_in": "development",
       "discovered_date": "2026-07-14T00:00:00",
@@ -662,7 +688,7 @@
       "prevention_test_added": true
     },
     {
-      "id": "BUG-040",
+      "id": "BUG-041",
       "severity": "high",
       "discovered_in": "development",
       "discovered_date": "2026-07-14T00:00:00",
@@ -679,7 +705,7 @@
       "prevention_test_added": true
     },
     {
-      "id": "BUG-041",
+      "id": "BUG-042",
       "severity": "high",
       "discovered_in": "development",
       "discovered_date": "2026-07-14T00:00:00",
@@ -696,7 +722,7 @@
       "prevention_test_added": true
     },
     {
-      "id": "BUG-042",
+      "id": "BUG-043",
       "severity": "medium",
       "discovered_in": "development",
       "discovered_date": "2026-07-14T00:00:00",
@@ -713,7 +739,7 @@
       "prevention_test_added": true
     },
     {
-      "id": "BUG-043",
+      "id": "BUG-044",
       "severity": "high",
       "discovered_in": "development",
       "discovered_date": "2026-07-14T00:00:00",
@@ -768,6 +794,7 @@
     "avg_time_to_detect_days": 4.1,
     "avg_time_to_resolve_days": 2.0,
     "avg_critical_ttd_days": 3.7,
-    "last_updated": "2026-01-05T02:07:42.265320"
+    "last_updated": "2026-01-05T02:07:42.265320",
+    "total": 21
   }
 }

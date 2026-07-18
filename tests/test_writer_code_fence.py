@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression for BUG-040 (surfaced by B-006 Checkpoint B).
+"""Regression for BUG-041 (surfaced by B-006 Checkpoint B).
 
 Some models wrap the whole article in a Markdown code fence despite the prompt.
 Stage 3 must unwrap it before dedup/validation, otherwise _strip_duplicate_article

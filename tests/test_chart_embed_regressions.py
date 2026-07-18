@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Regression tests for chart-embed bugs surfaced by B-006 Checkpoint A.
 
-BUG-038: apply_editorial_fixes stripped exclamation marks with a blind
+BUG-039: apply_editorial_fixes stripped exclamation marks with a blind
 ``line.replace("!", ".")`` that also mangled the Markdown image token "![",
 turning ``![alt](chart.png)`` into ``.[alt](chart.png)`` and breaking the embed.
 
-BUG-039: run_pipeline chart_only stripped the ``image:`` slug before Stage 4,
+BUG-040: run_pipeline chart_only stripped the ``image:`` slug before Stage 4,
 so ``_auto_embed_chart`` could not derive the chart path and the required chart
 was never embedded.
 """

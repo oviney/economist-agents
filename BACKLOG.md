@@ -45,18 +45,47 @@ Makes the production pipeline generate a validator-passing article with **no pai
 API keys** — writer, graphics, research, and vision all run on the Claude
 subscription via the Agent SDK (`claude_agent_sdk.query()`). New opt-in
 `research_mode="claude_web"` has Claude do its own live web research through the
-built-in `WebSearch`/`WebFetch` tools (no Serper; ADR-0012). Vision refinement
+built-in `WebSearch`/`WebFetch` tools (no Serper; ADR-0013). Vision refinement
 rerouted off the `anthropic` client onto `query()` (also clears the ADR-0002
 concern in `_shared.py`). New `--image-mode chart_only` CLI path runs end-to-end
 (no hero image, no handshake) and writes `output/posts/<slug>.md`; the deprecated
 `economist_agent.py` now fails loud with a pointer to the keyless command.
 Surfaced + fixed two pre-existing chart-embed bugs found by the real validator:
-**BUG-038** (`apply_editorial_fixes` mangled `![...]` image syntax when stripping
-`!`) and **BUG-039** (`run_pipeline` chart_only stripped the image slug before
+**BUG-039** (`apply_editorial_fixes` mangled `![...]` image syntax when stripping
+`!`) and **BUG-040** (`run_pipeline` chart_only stripped the image slug before
 `_auto_embed_chart` could fire). Spec: `docs/specs/B-006-keyless-subscription-pipeline.md`;
 plan: `tasks/plan.md`; runbook: `docs/keyless-pipeline-runbook.md`. Deterministic
 + tested (keyless, mocked SDK); behavioural proof is a live subscription run
 (Checkpoint B).
+
+### B-005 · Writer word-count contract (single source of truth + structured prompt) — 2026-07-14
+
+Follow-up from B-004. Short drafts (< 700 words) were the one remaining
+un-fixable-by-finalize quarantine cause. Consolidated the drifted word-count
+thresholds into `WORD_COUNT_MIN/TARGET/MAX` constants in `publication_validator.py`
+(the docstring had claimed 800 while the code enforced 700), routed
+`_check_word_count` + the new pure `word_count_shortfall`/`_body_word_count`
+helpers through the single source of truth, and rewrote the `stage3_runner` writer
+prompt into a structured per-section budget (~850 across 3-4 sections, aligned to
+the heading cap) that imports the constants so it can never drift below the floor.
+700 floor unchanged (consolidation, not re-tuning). Shipped in **PR #443**
+(squash-merged to `main` as `ed0453f`, alongside B-004). Behavioural proof (real
+drafts clear the target) is an explicit live-run step — not verifiable in an
+API-key-less CI. Spec: `docs/specs/B-005-writer-word-count-contract.md`.
+
+### B-004 · Deterministic frontmatter finalize so mechanical defects never quarantine — 2026-07-14
+
+Defect **BUG-038**. The pipeline quarantined an otherwise-publishable article
+(`generation.log`) for a single mechanically-fixable `DATE_MISMATCH`, after LLM
+regeneration destroyed the frontmatter. Hardened
+`src/agent_sdk/_shared.py:apply_editorial_fixes` to guarantee a complete, valid
+frontmatter block when a finalize `current_date` is supplied (reconstruct a missing
+block with the H1 as title, stamp today's date, fill categories/description and an
+EMPTY chart-only `image:` — a default hero is itself a CRITICAL), and wired that
+finalizer into the deprecated `scripts/economist_agent.py` before validation.
+Word-count left to B-005. Shipped in **PR #443** (squash-merged to `main` as
+`ed0453f`). A Copilot review caught a real image-fallback regression, fixed
+pre-merge. Spec: `docs/specs/B-004-frontmatter-finalize.md`.
 
 ### B-001 · Wired Stage 4 author safety net to BLOG_AUTHOR — 2026-06-14
 

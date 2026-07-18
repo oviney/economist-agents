@@ -57,7 +57,7 @@ python -m pytest --collect-only tests/ | grep "collected.*items"
 # Should show: collected 538 items
 
 # Run a quick test
-python -m pytest tests/test_agent_registry_enhancement.py -v
+python -m pytest tests/test_llm_client.py -v
 ```
 
 ### Environment Management
@@ -141,7 +141,7 @@ Python 3.13.11
 2. **Activate correct environment**: `source .venv/bin/activate`
 3. **Verify CrewAI import**: `python -c "import crewai"`
 4. **Test collection**: `python -m pytest --collect-only tests/`
-5. **Run sample test**: `python -m pytest tests/test_agent_registry_enhancement.py`
+5. **Run sample test**: `python -m pytest tests/test_llm_client.py`
 
 ### Success Criteria
 

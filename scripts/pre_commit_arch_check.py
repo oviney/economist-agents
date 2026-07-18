@@ -30,10 +30,10 @@ from pathlib import Path
 # Configuration
 # ---------------------------------------------------------------------------
 
-# ADR-002: Files allowed to import LLM libraries directly
+# Files allowed to import LLM libraries directly (centralised via the
+# scripts/llm_client.py factory; the AgentRegistry pattern was retired).
 LLM_IMPORT_EXCEPTIONS: frozenset[str] = frozenset(
     {
-        "agent_registry.py",
         "llm_client.py",
         "crewai_agents.py",
         "run_story2_crew.py",
@@ -201,10 +201,10 @@ def check_llm_imports(path: Path, source: str) -> list[Violation]:
                 Violation(
                     file=str(path),
                     line=lineno,
-                    rule="ADR-002",
+                    rule="llm-centralisation",
                     message=(
-                        f"Direct import of '{module}' violates ADR-002. "
-                        "Use AgentRegistry.get_agent() instead."
+                        f"Direct import of '{module}' is prohibited. "
+                        "Use the scripts/llm_client.py factory instead."
                     ),
                     severity="error",
                 ),

@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 RESEARCH_MODEL = "claude-sonnet-4-6"
 # Turns for the search→fetch→reason loop. Web research fans out across several
 # queries + fetches, so this needs real headroom or the SDK hits the cap and the
-# brief soft-degrades to empty (BUG-041). Bounded to avoid runaway.
+# brief soft-degrades to empty (BUG-042). Bounded to avoid runaway.
 MAX_TURNS = 40
 
 # Mirror the anti-fabrication guardrails the deterministic/deep briefs prepend

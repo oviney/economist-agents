@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression for BUG-041 (surfaced by B-006 Checkpoint B run 2).
+"""Regression for BUG-042 (surfaced by B-006 Checkpoint B run 2).
 
 The subscription CLI raises 'Reached maximum number of turns (N)' instead of
 returning a ResultMessage. _collect_text must proceed with any text already

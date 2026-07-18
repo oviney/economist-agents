@@ -30,7 +30,7 @@ IS_SANDBOX=1 python -m src.agent_sdk.pipeline "your topic here" \
   visual. Runs end-to-end with no image handshake and writes the finished
   article to `output/posts/<slug>.md`.
 - `--research-mode claude_web` — Claude does its own live web research via the
-  built-in `WebSearch`/`WebFetch` tools (no Serper). See ADR-0012.
+  built-in `WebSearch`/`WebFetch` tools (no Serper). See ADR-0013.
 
 Exit code `0` = the publication validator passed (article is publish-ready);
 `1` = validator found issues (printed to stderr); `2` = research failed.
@@ -48,7 +48,7 @@ Exit code `0` = the publication validator passed (article is publish-ready);
 ## Honest limitations
 
 - **`claude_web` research is non-deterministic** and puts an LLM in the research
-  path — a deliberate, opt-in departure from the LLM-free default (ADR-0012).
+  path — a deliberate, opt-in departure from the LLM-free default (ADR-0013).
   Source quality depends on the model's search behaviour; the
   `citation_verifier` / `publication_validator` citation gates still apply.
 - **`chart_only` ships no hero image.** For a hero image, use the default

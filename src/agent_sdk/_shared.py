@@ -656,7 +656,7 @@ def apply_editorial_fixes(article: str, current_date: str | None = None) -> str:
             # Strip exclamation marks (Economist style) but preserve the
             # Markdown image token "![" — otherwise "![alt](chart.png)" becomes
             # ".[alt](chart.png)" and the chart/hero embed is silently broken
-            # (BUG-038). Replace "!" with "." only when not immediately
+            # (BUG-039). Replace "!" with "." only when not immediately
             # followed by "[".
             lines[i] = re.sub(r"!(?!\[)", ".", line)
     text = "\n".join(lines)

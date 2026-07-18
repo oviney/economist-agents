@@ -53,14 +53,14 @@ def tmp_py(tmp_path: Path):
 
 
 class TestCheckLLMImports:
-    """ADR-002: direct LLM imports must not appear outside exception files."""
+    """Direct LLM imports must not appear outside exception files."""
 
     def test_direct_import_flagged(self, tmp_py):
         source = "import openai\n"
         path = tmp_py(source)
         violations = check_llm_imports(path, source)
         assert len(violations) == 1
-        assert violations[0].rule == "ADR-002"
+        assert violations[0].rule == "llm-centralisation"
         assert violations[0].severity == "error"
         assert "openai" in violations[0].message
 
@@ -270,9 +270,9 @@ class TestCheckFile:
         source = "import anthropic\nimport json\ndata = json.loads(response)\n"
         path = tmp_py(source)
         violations = check_file(path)
-        # Should catch ADR-002 and bare json.loads
+        # Should catch the LLM-centralisation rule and bare json.loads
         rules = {v.rule for v in violations}
-        assert "ADR-002" in rules
+        assert "llm-centralisation" in rules
         assert "defensive-json-parsing" in rules
 
     def test_nonexistent_file_returns_empty(self):
@@ -360,12 +360,12 @@ class TestFormatReport:
 
     def test_error_report_shows_blocked(self):
         result = CheckResult(
-            violations=[Violation("bad.py", 5, "ADR-002", "Direct import", "error")],
+            violations=[Violation("bad.py", 5, "llm-centralisation", "Direct import", "error")],
             files_checked=1,
         )
         report = format_report(result)
         assert "BLOCKED" in report
-        assert "ADR-002" in report
+        assert "llm-centralisation" in report
         assert "bad.py" in report
 
     def test_warning_only_not_blocked(self):

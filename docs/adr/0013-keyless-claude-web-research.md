@@ -1,4 +1,4 @@
-# ADR-0012: Keyless `claude_web` Research (LLM in the research path, subscription-only)
+# ADR-0013: Keyless `claude_web` Research (LLM in the research path, subscription-only)
 
 **Status:** Accepted
 **Date:** 2026-07-14

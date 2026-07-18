@@ -287,7 +287,7 @@ def _strip_enclosing_code_fence(text: str) -> str:
     asking for a bare article. The leading fence stops the article starting with
     ``---`` and makes ``_strip_duplicate_article`` mistake the real frontmatter
     (now at a non-zero offset) for a duplicate emission — deleting the whole body
-    (BUG-040). Strip a single enclosing fence when the text opens with one.
+    (BUG-041). Strip a single enclosing fence when the text opens with one.
     """
     stripped = text.strip()
     if not stripped.startswith("```"):
@@ -384,7 +384,7 @@ async def _collect_text(
     except Exception as exc:  # noqa: BLE001
         # The subscription CLI raises (rather than returning a ResultMessage)
         # when it hits the turn cap. If the agent already emitted text, proceed
-        # with what we have rather than crashing the whole pipeline (BUG-041);
+        # with what we have rather than crashing the whole pipeline (BUG-042);
         # otherwise re-raise so a genuine failure still surfaces.
         if "maximum number of turns" in str(exc).lower() and text_chunks:
             logger.warning(
@@ -425,7 +425,7 @@ def _parse_chart_json(text: str) -> dict:
 
 
 def _ensure_chart_title(chart_data: dict, article: str, topic: str) -> dict:
-    """Backfill a chart title when the graphics model omits one (BUG-042).
+    """Backfill a chart title when the graphics model omits one (BUG-043).
 
     The chart is required downstream, so a missing/empty ``title`` must not crash
     the render. The backfill is **data-descriptive and never the article
@@ -512,7 +512,7 @@ async def run_stage3(
     # can call mid-draft. A fresh session per article isolates budget/dedupe.
     # max_turns must exceed 1 so the SDK can drive the tool-use loop.
     #
-    # Bounded retry (BUG-043): the writer (esp. via the subscription CLI)
+    # Bounded retry (BUG-044): the writer (esp. via the subscription CLI)
     # is non-deterministic and occasionally emits malformed output — a bare code
     # fence, or frontmatter with an empty body. Regenerate a few times before
     # giving up rather than aborting the whole run on a single bad draft. Only
@@ -599,7 +599,7 @@ async def run_stage3(
         model=graphics_model,
         max_budget_usd=graphics_budget_usd,
         # Turn headroom: the subscription CLI can need >1 turn for the JSON
-        # (BUG-041). Kept small — no tools are exposed for graphics.
+        # (BUG-042). Kept small — no tools are exposed for graphics.
         max_turns=4,
     )
     chart_data = _ensure_chart_title(_parse_chart_json(graphics_text), article, topic)

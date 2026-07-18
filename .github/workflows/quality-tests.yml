@@ -27,10 +27,6 @@ jobs:
         run: |
           python tests/test_quality_system.py
 
-      - name: Validate sprint discipline
-        run: |
-          python scripts/sprint_validator.py --validate-sprint || true
-
       - name: Check skills system integrity
         run: |
           python -c "import json; json.load(open('data/skills_state/blog_qa_skills.json'))"

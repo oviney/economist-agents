@@ -1,43 +1,20 @@
-# TODO: Repo Process Consolidation — ✅ COMPLETE
+# TODO: Keyless subscription pipeline (B-006)
 
-**Plan**: [`tasks/plan.md`](./plan.md) · **Spec**: [`docs/specs/repo-process-consolidation.md`](../docs/specs/repo-process-consolidation.md)
-**Branch/PR**: `claude/repo-process-agent-skills-p0h0op` → #444
+**Plan**: [`tasks/plan.md`](./plan.md) · **Spec**: [`docs/specs/B-006-keyless-subscription-pipeline.md`](../docs/specs/B-006-keyless-subscription-pipeline.md)
+**Status**: IMPLEMENTED — all tasks + both checkpoints complete (PR #447).
 
-The autonomous-Scrum regime (Regime B) is retired; the agent-skills lifecycle + `BACKLOG.md`
-are the single process model. ~9,000 lines removed across two waves.
+## Todo (dependency-ordered)
 
-## Wave 1 — Safe retirement ✅
-- [x] **W1-0** Spec correction + plan/todo (coupling audit)
-- [x] **W1-A** Stale snapshots (SPRINT_15 set, SPRINT_10 cert, 3 badge JSONs) + README badges
-- [x] **W1-B** `skills/sprint-management/` + `skills/scrum-master/` + mkdocs nav (validate_skills 37/37)
-- [x] **W1-C** `sprint-discipline.yml` + `sprint-sync.yml` + sprint step from `quality-tests.yml`
-- [x] **W1-D** `GEMINI.md` → pointer
+- [x] **T0** — Env: `claude-agent-sdk` imports; keyless smoke `query()` proven (install workaround: `--ignore-installed PyJWT`; `IS_SANDBOX=1` under root). Full requirements install fix → T6.
+- [x] **T1** — `src/agent_sdk/research/claude_web.py` → `build_claude_web_brief()` (WebSearch/WebFetch) + 3 tests green
+- [x] **T2** — Wired `research_mode="claude_web"` through `run_stage3` dispatch + `run_pipeline` type; routing + env-override tests green. (CLI `--research-mode`/`--image-mode` end-to-end flags deferred to the Checkpoint B live-run wiring.)
+- [x] **— CHECKPOINT A —** `run_pipeline(chart_only, claude_web)` with all keys unset → `publication_validator_passed=True`, 0 issues. Surfaced + fixed two pre-existing chart-embed bugs (BUG-038 `!`→`.` mangling of `![`; BUG-039 chart_only strip-before-embed ordering) with regression tests. Full suite: 2234 passed, no regressions.
+- [x] **T3** — Rerouted `refine_image_metadata` to `query()`+Read vision, dropped key gate; 7 vision tests rewritten; arch-check clean
+- [x] **T4** — `economist_agent._abort_if_keyless()` fail-loud message + 2 tests
+- [x] **T5** — ADR-0013 (keyless claude_web research); registered in mkdocs; adr-lint passes
+- [x] **T6** — `--research-mode`/`--image-mode` CLI + end-to-end chart_only path; runbook `docs/keyless-pipeline-runbook.md`; `BACKLOG.md` B-006
+- [x] **— CHECKPOINT B — PASSED (run 6)** ✅ Live keyless subscription run with ANTHROPIC/OPENAI/SERPER **all unset** produced a validator-passing 1092-word article (`output/posts/crying-wolf-flaky-tests-...md`), `publication_validator PASSED`, exit 0. Six real sourced stats + URLs, embedded chart. Took 6 runs, each peeling off one pre-existing gap against the real CLI (mocked tests never exercised it): BUG-038 (`!`→`.` on `![`), 039 (chart_only strip-order), 040 (fence body-delete), 041 (graphics turn-cap crash), 042 (missing chart title), 043 (bounded writer retry for non-determinism), + budget-cap headroom for multi-turn CLI calls. All fixed with regression tests.
 
-## Wave 2 — Entangled retirement ✅
-- [x] **W2-A** AgentRegistry: `agent_registry.py`, dead `src/manager.py`, 10 personas, `AGENTS.md`,
-  registry-only tests, SM benchmark, `nightly-eval.yml`. Guardrail re-anchored on `llm_client.py`
-  factory (50 tests pass). **ADR-0012 supersedes ADR-002.** (−5,655 lines)
-- [x] **W2-B** Autonomous agents: `po/sm/orchestrator_agent`, `continuous_burndown`, `sprint_validator`
-  + `mcp_servers/orchestrator_server.py` + `src/backlog/` package + their tests; `SPRINT.md`;
-  dead sprint state JSONs. KEEP boundary verified (feedback_loop/quality_dashboard pass).
-- [x] **W2-C** Collapsed root `copilot-instructions.md` → pointer; deleted orphan
-  `sync_copilot_pre_commit.sh`. **Reclassified KEEP:** `sync-copilot.yml` + `sync_copilot_context.py`
-  + `.github/copilot-instructions.md` are wired into the closed-loop quality validator.
-- [x] **W2-D** Deleted root `SPEC.md`, `.github/BACKLOG.md`, `.github/{GITHUB_PROJECT_SETUP,MIGRATE_BACKLOG_QUICKSTART}.md`,
-  sprint ISSUE_TEMPLATEs; replaced Regime-B PR template; corrected README (persona table,
-  `.github/agents` discovery, registry examples, Sprint-15 status) + dangling SPRINT.md links.
-- [x] **Doc-debt** Deleted wholesale Regime-B orchestration/template docs (`AGENT_ORCHESTRATION_PROMPTS.md`,
-  `MISSION_TEMPLATE_USAGE.md`, `scripts/templates/`).
+## Done
 
-## Reclassified KEEP during the audit (NOT Regime B)
-`skills_manager.py`/`skills_gap_analyzer.py`, `feedback_loop.py`, `quality_dashboard.py`,
-`sync_copilot_context.py` + `.github/copilot-instructions.md`, `sprint_history.json`,
-`escalations.json`, `remediation-sync.yml`, `.deployment_state`, `agent_loader.py` + `agents/*.yaml`.
-
-## Remaining (minor, optional follow-ups)
-- [ ] `scripts/tools/github_project_tool.py` + `docs/GITHUB_PROJECT_TOOL.md` — orphaned GitHub-Projects
-  tool (no live importer); code-scope removal, left for a separate call.
-- [ ] Historical docs with stale `agent_registry` mentions (`docs/guides/IMPLEMENTATION_ROADMAP.md`,
-  ADR-0005, `docs/archive/**`, SPRINT/EPIC/STORY records) — left as immutable history by design.
-- [ ] **CI gate:** #444 needs "Approve and run workflows" to validate the full suite (env here can't
-  build the `sgmllib3k`/feedparser wheel).
+_(none yet)_

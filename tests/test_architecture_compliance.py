@@ -205,7 +205,9 @@ def test_no_direct_llm_imports_in_scripts():
         error_messages.append("  - Enforces single responsibility principle")
         error_messages.append("")
 
-        error_messages.append("See: docs/adr/ (LLM instantiation is centralised in scripts/llm_client.py)")
+        error_messages.append(
+            "See: docs/adr/ (LLM instantiation is centralised in scripts/llm_client.py)"
+        )
         error_messages.append("=" * 80)
 
         pytest.fail("\n".join(error_messages))

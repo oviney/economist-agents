@@ -26,9 +26,37 @@ _(none)_
 
 ## Todo
 
-_(none — sprint backlog cleared 2026-06-14: B-003 → B-002 → B-001 all merged)_
+### B-008 · Single canonical slug across article file, chart PNG, and image-prompt sidecar
+
+Low-impact cleanup flagged in the B-006/B-007 code review. The finished article
+file is named via `_slug_from_article` (from `title:`) while the chart PNG and
+the `output/posts/<slug>.image_prompt.md` sidecar are named via `_slug_for_chart`
+(from the `image:` field / topic). In `chart_only` runs these can diverge, so
+`foo.md` may sit beside `bar.image_prompt.md`. No functional break (both files
+exist; the prompt is also embedded inline), but a single shared slug derivation
+would remove the confusion. Also aligns with the validator's title-based
+canonical slug.
 
 ## Done
+
+### B-006 · Keyless subscription pipeline (claude_web research + chart-embed fixes) — 2026-07-14
+
+Makes the production pipeline generate a validator-passing article with **no paid
+API keys** — writer, graphics, research, and vision all run on the Claude
+subscription via the Agent SDK (`claude_agent_sdk.query()`). New opt-in
+`research_mode="claude_web"` has Claude do its own live web research through the
+built-in `WebSearch`/`WebFetch` tools (no Serper; ADR-0013). Vision refinement
+rerouted off the `anthropic` client onto `query()` (also clears the ADR-0002
+concern in `_shared.py`). New `--image-mode chart_only` CLI path runs end-to-end
+(no hero image, no handshake) and writes `output/posts/<slug>.md`; the deprecated
+`economist_agent.py` now fails loud with a pointer to the keyless command.
+Surfaced + fixed two pre-existing chart-embed bugs found by the real validator:
+**BUG-039** (`apply_editorial_fixes` mangled `![...]` image syntax when stripping
+`!`) and **BUG-040** (`run_pipeline` chart_only stripped the image slug before
+`_auto_embed_chart` could fire). Spec: `docs/specs/B-006-keyless-subscription-pipeline.md`;
+plan: `tasks/plan.md`; runbook: `docs/keyless-pipeline-runbook.md`. Deterministic
++ tested (keyless, mocked SDK); behavioural proof is a live subscription run
+(Checkpoint B).
 
 ### B-005 · Writer word-count contract (single source of truth + structured prompt) — 2026-07-14
 

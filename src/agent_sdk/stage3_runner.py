@@ -56,6 +56,7 @@ from src.agent_sdk._shared import (
 )
 from src.agent_sdk.chart_renderer import render_chart
 from src.agent_sdk.image_prompt_synth import PromptSynthError, compose_prompt
+from src.agent_sdk.research.claude_web import build_claude_web_brief
 from src.agent_sdk.research.deep_research import build_deep_research_brief
 from src.agent_sdk.tools.research_tools import SourceFetchSession, build_search_tool
 
@@ -104,6 +105,9 @@ def _validated_model(env_var: str, default: str) -> str:
 
 DEFAULT_WRITER_MODEL = _validated_model("WRITER_MODEL", "claude-sonnet-4-6")
 DEFAULT_GRAPHICS_MODEL = _validated_model("GRAPHICS_MODEL", "claude-sonnet-4-6")
+
+# Bounded writer regeneration on malformed output (non-deterministic drafts).
+_WRITER_MAX_ATTEMPTS = 3
 
 WRITER_SYSTEM_PROMPT = """You are an Economist-style Writer renowned for sharp, witty prose with British flair.
 Every article must satisfy the 10 rules below before submission. Do not read files. Write primarily
@@ -276,6 +280,28 @@ def _normalize_paragraphs(text: str) -> str:
     return text
 
 
+def _strip_enclosing_code_fence(text: str) -> str:
+    """Unwrap an article the writer wrapped in a Markdown code fence.
+
+    Some models emit ```` ```markdown\\n---\\n…\\n``` ```` despite the prompt
+    asking for a bare article. The leading fence stops the article starting with
+    ``---`` and makes ``_strip_duplicate_article`` mistake the real frontmatter
+    (now at a non-zero offset) for a duplicate emission — deleting the whole body
+    (BUG-041). Strip a single enclosing fence when the text opens with one.
+    """
+    stripped = text.strip()
+    if not stripped.startswith("```"):
+        return text
+    first_newline = stripped.find("\n")
+    if first_newline == -1:
+        return text
+    body = stripped[first_newline + 1 :].rstrip()
+    fence_close = body.rfind("```")
+    if fence_close != -1:
+        body = body[:fence_close].rstrip()
+    return body + "\n"
+
+
 def _strip_duplicate_article(text: str) -> str:
     """If the model emitted two complete articles, keep only the first.
 
@@ -292,6 +318,24 @@ def _strip_duplicate_article(text: str) -> str:
         )
         return text[: match.start()].rstrip() + "\n"
     return text
+
+
+def _raise_if_budget_exceeded(
+    msg: ResultMessage, cost: float, max_budget_usd: float | None
+) -> None:
+    """The Agent SDK signals budget exhaustion by returning a ResultMessage with
+    subtype="error_max_budget_usd" rather than raising. Surface it as a typed
+    BudgetExceededError so callers can route a clean abort."""
+    if msg.subtype != "error_max_budget_usd":
+        return
+    cap_str = f"${max_budget_usd:.4f}" if max_budget_usd is not None else "<unset>"
+    logger.warning(
+        "Agent SDK budget exceeded: cap=%s, cost_at_abort=$%.4f", cap_str, cost
+    )
+    raise BudgetExceededError(
+        f"Agent SDK budget exceeded: cap={cap_str}, cost_at_abort=${cost:.4f}",
+        budget_usd=max_budget_usd,
+    )
 
 
 async def _collect_text(
@@ -326,34 +370,29 @@ async def _collect_text(
     )
     text_chunks: list[str] = []
     cost = 0.0
-    async for msg in query(prompt=prompt, options=options):
-        if isinstance(msg, AssistantMessage):
-            for block in msg.content:
-                if isinstance(block, TextBlock):
-                    text_chunks.append(block.text)
-        elif isinstance(msg, ResultMessage):
-            cost = float(msg.total_cost_usd or 0.0)
-            # The Agent SDK signals budget exhaustion by returning a
-            # ResultMessage with subtype="error_max_budget_usd" rather than
-            # raising. Surface it as a typed BudgetExceededError so callers
-            # can route a clean abort. See claude_agent_sdk.types
-            # ClaudeAgentOptions.max_budget_usd docstring.
-            if msg.subtype == "error_max_budget_usd":
-                cap_str = (
-                    f"${max_budget_usd:.4f}"
-                    if max_budget_usd is not None
-                    else "<unset>"
-                )
-                logger.warning(
-                    "Agent SDK budget exceeded: cap=%s, cost_at_abort=$%.4f",
-                    cap_str,
-                    cost,
-                )
-                raise BudgetExceededError(
-                    f"Agent SDK budget exceeded: cap={cap_str}, "
-                    f"cost_at_abort=${cost:.4f}",
-                    budget_usd=max_budget_usd,
-                )
+    try:
+        async for msg in query(prompt=prompt, options=options):
+            if isinstance(msg, AssistantMessage):
+                for block in msg.content:
+                    if isinstance(block, TextBlock):
+                        text_chunks.append(block.text)
+            elif isinstance(msg, ResultMessage):
+                cost = float(msg.total_cost_usd or 0.0)
+                _raise_if_budget_exceeded(msg, cost, max_budget_usd)
+    except BudgetExceededError:
+        raise
+    except Exception as exc:  # noqa: BLE001
+        # The subscription CLI raises (rather than returning a ResultMessage)
+        # when it hits the turn cap. If the agent already emitted text, proceed
+        # with what we have rather than crashing the whole pipeline (BUG-042);
+        # otherwise re-raise so a genuine failure still surfaces.
+        if "maximum number of turns" in str(exc).lower() and text_chunks:
+            logger.warning(
+                "Agent SDK hit the turn cap; proceeding with %d collected chunk(s)",
+                len(text_chunks),
+            )
+        else:
+            raise
 
     pieces: list[str] = []
     for chunk in text_chunks:
@@ -383,6 +422,28 @@ def _parse_chart_json(text: str) -> dict:
         return json.loads(cleaned)
     except (json.JSONDecodeError, ValueError):
         return {"specification": text}
+
+
+def _ensure_chart_title(chart_data: dict, article: str, topic: str) -> dict:
+    """Backfill a chart title when the graphics model omits one (BUG-043).
+
+    The chart is required downstream, so a missing/empty ``title`` must not crash
+    the render. The backfill is **data-descriptive and never the article
+    headline** (per B-007): prefer the chart's own ``subtitle`` (which describes
+    the data), else a neutral generic label. ``article``/``topic`` are accepted
+    for signature stability but deliberately not used as the title.
+    """
+    title = chart_data.get("title")
+    if isinstance(title, str) and title.strip():
+        return chart_data
+    subtitle = chart_data.get("subtitle")
+    derived = (
+        subtitle.strip()
+        if isinstance(subtitle, str) and subtitle.strip()
+        else "Key figures"
+    )[:80]
+    logger.warning("Graphics output had no chart title; backfilled %r", derived)
+    return {**chart_data, "title": derived}
 
 
 async def run_stage3(
@@ -418,11 +479,13 @@ async def run_stage3(
     start = time.perf_counter()
 
     # Research path is deterministic by default; "deep" (#390) opts into the
-    # recursive multi-hop loop. RESEARCH_MODE env overrides the argument. An
-    # unrecognised value fails closed to deterministic (a typo must not silently
-    # disable the expensive deep path) and is logged so operators can confirm.
+    # recursive multi-hop loop; "claude_web" (B-006) is the keyless path — Claude
+    # does its own web research via the Agent SDK (no Serper key). RESEARCH_MODE
+    # env overrides the argument. An unrecognised value fails closed to
+    # deterministic (a typo must not silently disable the expensive deep path or
+    # the keyless path) and is logged so operators can confirm.
     resolved_research_mode = os.environ.get("RESEARCH_MODE", research_mode)
-    if resolved_research_mode not in ("deterministic", "deep"):
+    if resolved_research_mode not in ("deterministic", "deep", "claude_web"):
         logger.warning(
             "Unrecognised research mode %r; using deterministic",
             resolved_research_mode,
@@ -431,6 +494,8 @@ async def run_stage3(
     logger.info("Research mode: %s", resolved_research_mode)
     if resolved_research_mode == "deep":
         research_brief, research_cost = await build_deep_research_brief(topic)
+    elif resolved_research_mode == "claude_web":
+        research_brief, research_cost = await build_claude_web_brief(topic)
     else:
         research_brief, research_cost = build_research_brief(topic), 0.0
     logger.info("Research brief: %d chars", len(research_brief))
@@ -446,21 +511,69 @@ async def run_stage3(
     # #389 hybrid research: expose a budget-capped source-search tool the writer
     # can call mid-draft. A fresh session per article isolates budget/dedupe.
     # max_turns must exceed 1 so the SDK can drive the tool-use loop.
+    #
+    # Bounded retry (BUG-044): the writer (esp. via the subscription CLI)
+    # is non-deterministic and occasionally emits malformed output — a bare code
+    # fence, or frontmatter with an empty body. Regenerate a few times before
+    # giving up rather than aborting the whole run on a single bad draft. Only
+    # the writer re-runs; the research brief is reused, so retries are cheap.
+    #
+    # The budget cap is CUMULATIVE across attempts: each attempt gets the
+    # remaining budget, so total writer spend never exceeds ``writer_budget_usd``
+    # even when retries happen (a spent budget makes the next attempt abort via
+    # BudgetExceededError rather than overspend).
+    pre_audit_article = ""
+    writer_cost = 0.0
     search_session = SourceFetchSession()
-    research_server = create_sdk_mcp_server(
-        "research", tools=[build_search_tool(search_session)]
-    )
-    raw_writer_output, writer_cost = await _collect_text(
-        writer_prompt,
-        WRITER_SYSTEM_PROMPT,
-        model=writer_model,
-        max_budget_usd=writer_budget_usd,
-        mcp_servers={"research": research_server},
-        allowed_tools=["mcp__research__search_for_source"],
-        # Each search costs 2 turns (the tool_use, then consuming the
-        # tool_result); plus the initial draft and 1 turn of headroom.
-        max_turns=2 * search_session.max_calls + 2,
-    )
+    last_diagnostic = ""
+    for attempt in range(1, _WRITER_MAX_ATTEMPTS + 1):
+        search_session = SourceFetchSession()
+        research_server = create_sdk_mcp_server(
+            "research", tools=[build_search_tool(search_session)]
+        )
+        remaining_budget = (
+            None
+            if writer_budget_usd is None
+            else max(0.0, writer_budget_usd - writer_cost)
+        )
+        raw_writer_output, attempt_cost = await _collect_text(
+            writer_prompt,
+            WRITER_SYSTEM_PROMPT,
+            model=writer_model,
+            max_budget_usd=remaining_budget,
+            mcp_servers={"research": research_server},
+            allowed_tools=["mcp__research__search_for_source"],
+            # Each search costs 2 turns (the tool_use, then consuming the
+            # tool_result); plus the initial draft and 1 turn of headroom.
+            max_turns=2 * search_session.max_calls + 2,
+        )
+        writer_cost += attempt_cost
+        candidate = _strip_duplicate_article(
+            _strip_enclosing_code_fence(raw_writer_output)
+        )
+        # Require opening ---, a closing --- on its own line, and a non-empty
+        # body. re.DOTALL so the frontmatter block can contain newlines.
+        _fm_match = re.match(r"^---\r?\n.*?\r?\n---\r?\n(.+)", candidate, re.DOTALL)
+        body_is_empty = _fm_match is None or not _fm_match.group(1).strip()
+        if candidate.startswith("---") and not body_is_empty:
+            pre_audit_article = candidate
+            break
+        last_diagnostic = (
+            f"(starts_with_dash={candidate.startswith('---')!r}, "
+            f"body_empty={body_is_empty!r}). First 120 chars: {candidate[:120]!r}"
+        )
+        logger.warning(
+            "Writer attempt %d/%d produced malformed output %s; retrying",
+            attempt,
+            _WRITER_MAX_ATTEMPTS,
+            last_diagnostic,
+        )
+    else:
+        raise MalformedArticleError(
+            f"Writer output is not a well-formed article after "
+            f"{_WRITER_MAX_ATTEMPTS} attempts {last_diagnostic}"
+        )
+
     if search_session.calls_made:
         logger.info(
             "Writer made %d on-demand source search(es)", search_session.calls_made
@@ -468,19 +581,6 @@ async def run_stage3(
     # Append writer-fetched sources to the brief so the stat audit does not
     # strip statistics the writer legitimately cited from them (#389).
     research_brief = research_brief + search_session.brief_supplement()
-    pre_audit_article = _strip_duplicate_article(raw_writer_output)
-
-    # Require opening ---, a closing --- on its own line, and a non-empty body.
-    # re.DOTALL so the frontmatter block can contain newlines.
-    _fm_match = re.match(r"^---\r?\n.*?\r?\n---\r?\n(.+)", pre_audit_article, re.DOTALL)
-    body_is_empty = _fm_match is None or not _fm_match.group(1).strip()
-    if not pre_audit_article.startswith("---") or body_is_empty:
-        raise MalformedArticleError(
-            f"Writer output is not a well-formed article "
-            f"(starts_with_dash={pre_audit_article.startswith('---')!r}, "
-            f"body_empty={body_is_empty!r}). "
-            f"First 120 chars: {pre_audit_article[:120]!r}"
-        )
 
     audited = _audit_article_stats(pre_audit_article, research_brief)
     stat_audit_removed = pre_audit_article.count(".") - audited.count(".")
@@ -498,8 +598,11 @@ async def run_stage3(
         GRAPHICS_AGENT_PROMPT,
         model=graphics_model,
         max_budget_usd=graphics_budget_usd,
+        # Turn headroom: the subscription CLI can need >1 turn for the JSON
+        # (BUG-042). Kept small — no tools are exposed for graphics.
+        max_turns=4,
     )
-    chart_data = _parse_chart_json(graphics_text)
+    chart_data = _ensure_chart_title(_parse_chart_json(graphics_text), article, topic)
 
     # #403 slice 1: render the chart spec to a real PNG. Render failures
     # are fatal because a missing chart would leave a broken body embed.

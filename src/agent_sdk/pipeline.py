@@ -103,16 +103,18 @@ async def run_pipeline(
     writer_model: str = DEFAULT_WRITER_MODEL,
     graphics_model: str = DEFAULT_GRAPHICS_MODEL,
     image_mode: Literal["chart_only", "hero"] = "hero",
-    research_mode: Literal["deterministic", "deep"] = "deterministic",
+    research_mode: Literal["deterministic", "deep", "claude_web"] = "deterministic",
 ) -> PipelineResult:
     """Generate one article through the Agent SDK pipeline.
 
-    ``image_mode`` controls how Stage 4 treats the hero image (#410):
+    ``image_mode`` controls the hero image (#410):
     - ``"hero"`` (default): validate the writer's article as-is, including its
       ``image:`` reference (the caller is responsible for the image existing).
     - ``"chart_only"``: strip the hero ``image*`` frontmatter before Stage 4 so
-      the draft validates on its chart alone and is not rejected for a hero
-      image that has not been generated. No paid image API is involved.
+      the draft validates on its chart alone. The pipeline does NOT generate a
+      hero image (see CLAUDE.md Operating Constraint #4); instead it surfaces the
+      hero-image *prompt* inline so the reviewer can generate the image at PR
+      review time and drop it in.
     """
     stage3 = await run_stage3(
         topic,
@@ -124,12 +126,26 @@ async def run_pipeline(
     )
     article_for_stage4 = stage3.article
     if image_mode == "chart_only":
-        article_for_stage4 = _strip_image_frontmatter(stage3.article)
+        # Embed the chart while the hero-image slug is still present (the chart
+        # path is derived from it), THEN strip the hero metadata — mirroring
+        # _run_resume. Stripping first would leave _auto_embed_chart with no slug
+        # and the article would fail the validator's required-chart check
+        # (BUG-040).
+        article_for_stage4 = _auto_embed_chart(stage3.article)
+        article_for_stage4 = _strip_image_frontmatter(article_for_stage4)
     stage4 = run_stage4(article_for_stage4, stage3.chart_data)
+
+    # Surface the hero-image prompt inline (chart-only ships without a hero; the
+    # reviewer generates the image from this prompt at PR-review time — CLAUDE.md
+    # Operating Constraint #4). Injected AFTER Stage 4 so validation is unchanged.
+    final_article = stage4.article
+    image_prompt = getattr(stage3, "image_prompt", "")
+    if image_mode == "chart_only" and image_prompt:
+        final_article = _inject_hero_prompt_comment(final_article, image_prompt)
 
     result = PipelineResult(
         topic=topic,
-        article=stage4.article,
+        article=final_article,
         chart_data=stage3.chart_data,
         editorial_score=stage4.editorial_score,
         gates_passed=stage4.gates_passed,
@@ -144,7 +160,7 @@ async def run_pipeline(
         graphics_model=stage3.graphics_model,
         stage3_seconds=stage3.wall_seconds,
         stage4_seconds=stage4.wall_seconds,
-        article_chars=len(stage4.article),
+        article_chars=len(final_article),
     )
     wall_seconds = result.stage3_seconds + result.stage4_seconds
     try:
@@ -262,6 +278,32 @@ def _load_state(slug: str) -> dict:
 _FRONTMATTER_IMAGE_LINE = re.compile(r"^image(?:_alt|_caption)?:[^\n]*\n", re.MULTILINE)
 
 
+def _inject_hero_prompt_comment(article: str, image_prompt: str) -> str:
+    """Insert the hero-image prompt as a review-visible HTML comment at the top
+    of the body (CLAUDE.md Operating Constraint #4).
+
+    Chart-only posts ship without a hero; the reviewer generates the image from
+    this prompt at PR-review time and replaces the comment with the image. The
+    comment is invisible in the rendered post but shows in the PR diff and the
+    raw markdown, right where the hero belongs.
+    """
+    # Neutralise any "-->" in the prompt so it cannot terminate the HTML comment
+    # early and leak prompt text into the rendered post.
+    safe_prompt = image_prompt.strip().replace("-->", "--​>")
+    block = (
+        "<!-- HERO IMAGE — generate an image from the prompt below, then replace "
+        "this whole comment with it (see output/posts/<slug>.image_prompt.md):\n\n"
+        f"{safe_prompt}\n-->\n\n"
+    )
+    if not article.startswith("---"):
+        return block + article
+    parts = article.split("---", 2)
+    if len(parts) < 3:
+        return block + article
+    body = parts[2].lstrip("\n")
+    return f"---{parts[1]}---\n\n{block}{body}"
+
+
 def _strip_image_frontmatter(article: str) -> str:
     """Remove image:, image_alt:, image_caption: lines from frontmatter.
 
@@ -320,14 +362,22 @@ def main() -> None:
     parser.add_argument(
         "--writer-budget",
         type=float,
-        default=0.30,
-        help="Hard cap on writer cost in USD (default 0.30, sized for Sonnet)",
+        default=0.60,
+        help=(
+            "Hard cap on writer cost in USD (default 0.60). This is a runaway "
+            "guard, not billing — the subscription path is not metered per token; "
+            "sized for Sonnet with retries + tool turns."
+        ),
     )
     parser.add_argument(
         "--graphics-budget",
         type=float,
-        default=0.10,
-        help="Hard cap on graphics cost in USD (default 0.10)",
+        default=0.40,
+        help=(
+            "Hard cap on graphics cost in USD (default 0.40). Higher than the "
+            "library default because the subscription CLI uses multiple turns "
+            "for the chart JSON (see BUG-042)."
+        ),
     )
     parser.add_argument(
         "--writer-model",
@@ -345,6 +395,27 @@ def main() -> None:
         help=(
             "Run only Stage 0 (web search + brief assembly), print the brief, "
             "exit. No LLM calls. Useful for iterating on topic phrasing."
+        ),
+    )
+    parser.add_argument(
+        "--research-mode",
+        choices=("deterministic", "deep", "claude_web"),
+        default="deterministic",
+        help=(
+            "Research path: 'deterministic' (default, Serper) | 'deep' (recursive, "
+            "Serper) | 'claude_web' (keyless — Claude's own WebSearch/WebFetch on "
+            "the subscription, no SERPER_API_KEY). See ADR-0013."
+        ),
+    )
+    parser.add_argument(
+        "--image-mode",
+        choices=("hero", "chart_only"),
+        default="hero",
+        help=(
+            "'hero' (default): Stage 3 + pause for the human image handshake. "
+            "'chart_only': run end-to-end (no handshake, no keys) with the chart "
+            "as the shipped visual; the hero-image prompt is surfaced inline and "
+            "as a sidecar for the reviewer to generate the image at PR time."
         ),
     )
     parser.add_argument(
@@ -382,6 +453,20 @@ def main() -> None:
         _run_resume(args.resume, no_image=args.no_image)
         return
 
+    # 'chart_only' runs end-to-end with no handshake — fully keyless (pair with
+    # --research-mode claude_web for zero keys). The hero-image prompt is
+    # surfaced inline for the reviewer to generate the image at PR time.
+    if args.image_mode == "chart_only":
+        _run_end_to_end(
+            topic,
+            writer_budget=args.writer_budget,
+            graphics_budget=args.graphics_budget,
+            writer_model=args.writer_model,
+            graphics_model=args.graphics_model,
+            research_mode=args.research_mode,
+        )
+        return
+
     # Default path (Stage 3 only, then pause for image handshake) — #403 slice 3
     print(f"Running Agent SDK pipeline on: {topic}")
     print(f"  Models: writer={args.writer_model}, graphics={args.graphics_model}")
@@ -396,6 +481,69 @@ def main() -> None:
         writer_model=args.writer_model,
         graphics_model=args.graphics_model,
     )
+
+
+def _slug_from_article(article: str, fallback: str) -> str:
+    """Derive a filename slug from the article's title frontmatter (or topic)."""
+    match = re.search(r'^title:\s*["\']?(.+?)["\']?\s*$', article, re.MULTILINE)
+    source = match.group(1) if match else fallback
+    slug = re.sub(r"[^a-z0-9]+", "-", source.lower()).strip("-")
+    return slug or "article"
+
+
+def _run_end_to_end(
+    topic: str,
+    *,
+    writer_budget: float | None,
+    graphics_budget: float | None,
+    writer_model: str,
+    graphics_model: str,
+    research_mode: str,
+    image_mode: str = "chart_only",
+) -> None:
+    """Run the full pipeline end-to-end (no handshake) and write the finished
+    article. With ``--research-mode claude_web`` this is fully keyless — Stage 3
+    writer/graphics and research run on the Claude subscription via the Agent
+    SDK; no ANTHROPIC/OPENAI/SERPER key is used. The hero-image *prompt* is
+    surfaced inline + as a sidecar for the reviewer (no image is generated).
+    """
+    print(f"Running Agent SDK pipeline ({image_mode}) on: {topic}")
+    print(f"  Research mode: {research_mode}; models: writer={writer_model}")
+    try:
+        result = asyncio.run(
+            run_pipeline(
+                topic,
+                writer_budget_usd=writer_budget,
+                graphics_budget_usd=graphics_budget,
+                writer_model=writer_model,
+                graphics_model=graphics_model,
+                image_mode=image_mode,
+                research_mode=research_mode,
+            )
+        )
+    except (SearchProvidersFailedError, SearchProvidersEmptyError) as exc:
+        print(f"\nPipeline aborted: research failed.\n  {exc}", file=sys.stderr)
+        sys.exit(2)
+
+    POSTS_DIR.mkdir(parents=True, exist_ok=True)
+    slug = _slug_from_article(result.article, topic)
+    article_path = POSTS_DIR / f"{slug}.md"
+    article_path.write_text(result.article)
+
+    print(
+        f"\nStage 3+4 complete: ${result.total_cost_usd:.4f}, "
+        f"{result.article_chars} chars → {article_path}"
+    )
+    if result.publication_validator_passed:
+        print("✅ Publication validator PASSED — article is publish-ready.")
+        sys.exit(0)
+    print("❌ Publication validator found issues:", file=sys.stderr)
+    for issue in result.publication_validator_issues:
+        print(
+            f"  [{issue.get('severity')}] {issue.get('check')}: {issue.get('message')}",
+            file=sys.stderr,
+        )
+    sys.exit(1)
 
 
 def _run_research_only(topic: str) -> None:

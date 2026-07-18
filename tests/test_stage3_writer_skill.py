@@ -261,28 +261,33 @@ class TestValidatedModel:
         )
 
     def test_invalid_vision_model_falls_back(self, tmp_path, monkeypatch) -> None:
-        """refine_image_metadata must use the default when VISION_MODEL is invalid."""
+        """refine_image_metadata must use the default when VISION_MODEL is invalid.
+
+        Keyless (B-006): vision runs through the Agent SDK query(), so assert the
+        model on the ClaudeAgentOptions passed to a faked query()."""
         import asyncio
-        import os
-        from unittest.mock import AsyncMock, MagicMock, patch
+
+        import claude_agent_sdk as sdk
 
         import src.agent_sdk._shared as m
 
         img = tmp_path / "test.png"
         img.write_bytes(b"PNG")
-        mock_response = MagicMock()
-        mock_response.content = [
-            MagicMock(text='{"image_alt": "a", "image_caption": "b"}')
-        ]
-        mock_create = AsyncMock(return_value=mock_response)
 
-        with (
-            patch("anthropic.AsyncAnthropic") as mock_class,
-            patch.dict(
-                os.environ, {"ANTHROPIC_API_KEY": "key", "VISION_MODEL": "gpt-4-turbo"}
-            ),
-        ):
-            mock_class.return_value.messages.create = mock_create
-            asyncio.run(m.refine_image_metadata(str(img), "draft", "cap"))
+        captured: dict = {}
 
-        assert mock_create.call_args.kwargs["model"] == "claude-sonnet-4-6"
+        async def fake_query(*, prompt, options):
+            captured["options"] = options
+            yield sdk.AssistantMessage(
+                content=[
+                    sdk.TextBlock(text='{"image_alt": "a", "image_caption": "b"}')
+                ],
+                model="claude-sonnet-4-6",
+            )
+
+        monkeypatch.setenv("VISION_MODEL", "gpt-4-turbo")
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+        monkeypatch.setattr(m, "query", fake_query, raising=False)
+        asyncio.run(m.refine_image_metadata(str(img), "draft", "cap"))
+
+        assert captured["options"].model == "claude-sonnet-4-6"

@@ -2,6 +2,39 @@
 
 Multi-agent content pipeline that generates Economist-style articles with verified sources.
 
+## Operating Constraints (NON-NEGOTIABLE — read before proposing anything)
+
+The owner has stated these repeatedly. Violating them is a hard failure, not a
+judgement call. **Never** propose, add, wire, or require a solution that breaks
+one of these, and never re-litigate them.
+
+1. **NO new API keys. Ever.** This includes "free-tier" keys (they expire and
+   require setup/maintenance the owner will not do). Do not propose DALL-E,
+   OpenAI, Serper, Gemini/Imagen, or *any* service that needs an API key.
+   `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `SERPER_API_KEY`, `GEMINI_API_KEY`,
+   etc. are all forbidden as a requirement.
+2. **NO paid third-party services.** No new subscriptions, no metered APIs.
+3. **The only LLM auth is the Claude subscription** via the Agent SDK
+   (`claude_agent_sdk` / the authenticated `claude` CLI). The default runtime is
+   keyless: writing/graphics/vision via `query()`, research via
+   `research_mode="claude_web"` (Claude's own WebSearch), never Serper.
+4. **The pipeline does NOT generate the hero image — it generates a PROMPT.**
+   The hero workflow is human-in-the-loop at PR-review time:
+   (a) the pipeline writes a hero-image *prompt* (`image_prompt_synth.py` →
+   `compose_prompt`), surfaces it in the post (inline placeholder comment) and
+   as the `output/posts/<slug>.image_prompt.md` sidecar so it is visible when
+   reviewing the post in the PR; (b) the owner takes that prompt, generates the
+   image themselves, and drops it in. Do **not** add image generation of any
+   kind — not DALL-E/Gemini/Midjourney (violates #1), and not procedural/PIL
+   image generation either. The only pipeline-drawn raster is the **data chart**
+   (`chart_renderer.py`, matplotlib), which is not an illustration.
+5. **No github.com-only workflows for running the pipeline.** It must run
+   locally / in the session on the subscription.
+
+If a task *seems* to need a key or a paid service, the answer is "do it keyless
+or say it cannot be done keyless" — not "add a key". Encode any new constraint
+the owner gives into this section immediately.
+
 ## Default Operating Mode
 
 Every task follows the `skills/using-agent-skills` discovery flowchart before any code is written:

@@ -742,7 +742,7 @@ class TestMain:
             patch("sys.argv", ["economist_agent.py"]),
             patch("scripts.economist_agent.generate_economist_post") as mock_generate,
             patch("scripts.economist_agent.create_client") as mock_client,
-            patch.dict(os.environ, {}, clear=True),
+            patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}, clear=True),
         ):
             mock_generate.return_value = {"article_path": "/tmp/article.md"}
             mock_client.return_value = Mock()
@@ -758,7 +758,11 @@ class TestMain:
             patch("scripts.economist_agent.generate_economist_post") as mock_generate,
             patch("scripts.economist_agent.create_client") as mock_client,
             patch("scripts.economist_agent.GovernanceTracker") as mock_governance,
-            patch.dict(os.environ, {"TOPIC": "Test Topic"}, clear=True),
+            patch.dict(
+                os.environ,
+                {"TOPIC": "Test Topic", "ANTHROPIC_API_KEY": "test-key"},
+                clear=True,
+            ),
         ):
             mock_generate.return_value = {"article_path": "/tmp/article.md"}
             mock_client.return_value = Mock()
@@ -784,7 +788,11 @@ class TestMain:
             patch("scripts.economist_agent.generate_economist_post") as mock_generate,
             patch("scripts.economist_agent.create_client") as mock_client,
             patch("scripts.economist_agent.GovernanceTracker") as mock_governance,
-            patch.dict(os.environ, {"TOPIC": "Test Topic"}, clear=True),
+            patch.dict(
+                os.environ,
+                {"TOPIC": "Test Topic", "ANTHROPIC_API_KEY": "test-key"},
+                clear=True,
+            ),
         ):
             mock_generate.return_value = {"article_path": "/tmp/article.md"}
             mock_client.return_value = Mock()
@@ -834,7 +842,11 @@ class TestMain:
             patch("builtins.open", mock_open()) as mock_file,
             patch.dict(
                 os.environ,
-                {"GITHUB_OUTPUT": "/tmp/output.txt", "TOPIC": "Test"},
+                {
+                    "GITHUB_OUTPUT": "/tmp/output.txt",
+                    "TOPIC": "Test",
+                    "ANTHROPIC_API_KEY": "test-key",
+                },
                 clear=True,
             ),
         ):

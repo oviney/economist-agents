@@ -1,52 +1,111 @@
-# Plan: Repo Process Consolidation
+# PLAN: Keyless subscription pipeline (B-006)
 
-Derived from `docs/specs/repo-process-consolidation.md` after a dependency/coupling
-investigation. **The investigation revised the spec:** several artifacts the spec put in
-"RETIRE" are load-bearing for the KEEP test suite and are moved to a deferred, ADR-gated wave.
+**Spec**: `docs/specs/B-006-keyless-subscription-pipeline.md` (approved — go to plan)
+**Branch**: `claude/pipeline-status-check-mwptdh`
+**Status**: IMPLEMENTED — plan executed; keyless pipeline proven live (PR #447)
 
-## Verification constraint
+## Goal restated
 
-The full suite (1433 tests) **cannot be run in this environment** — `pip install -r requirements.txt`
-fails building the `sgmllib3k` wheel (feedparser dep). Verification therefore relies on:
-- **Local inspection/grep** for config + doc + artifact changes (no test imports them).
-- **`scripts/validate_skills.py`** (globs `*/SKILL.md`; frontmatter-only — deleting a skill dir is safe).
-- **CI** (`ci.yml`, `quality-tests.yml`, `docs.yml`) after push for the full-suite green.
+One command, **all three keys unset**, produces a `publication_validator`-passing
+article using only the Claude subscription (Agent SDK). Auth + keyless WebSearch
+already proven in-session.
 
-## Coupling map (the reason for the re-slice)
+## Dependency graph
 
-| Target | Coupled to (KEEP) | Verdict |
-|---|---|---|
-| Sprint *skills* (`sprint-management`, `scrum-master`) | `validate_skills.py` globs only; `mkdocs.yml` nav | **Safe** — delete + fix nav |
-| Sprint *workflows* (`sprint-discipline`, `sprint-sync`) | none (YAML, not pytest) | **Safe** |
-| Stale artifacts (SPRINT.md, SPRINT_15_*, badges, `.deployment_state`, root `SPEC.md`, `.github/BACKLOG.md`, `.github` sprint docs, root sprint shell wrappers) | `README.md`, `mkdocs.yml`, the sprint workflows themselves | **Safe** — delete + fix README/nav |
-| Instruction dup (`GEMINI.md`, root + `.github/copilot-instructions.md`, `CONTRIBUTING.md`) | none (prose) | **Safe** — shrink to pointers |
-| `.github/agents/*.agent.md` (10 personas) + `AGENTS.md` + `scripts/agent_registry.py` | `test_llm_providers.py` (`list_agents()>0`, `match="scrum-master"`), `test_agent_registry_enhancement.py`, `test_architect_agent.py` — **ADR-002** | **DEFERRED** — architectural; needs ADR |
-| `scripts/{sm,po,orchestrator}_agent.py`, `continuous_burndown.py`, `sprint_validator.py` + their tests | share `escalations/task_queue/sprint_tracker.json` writers with `src/backlog/*`, `src/quality/*`; `quality-tests.yml` runs `sprint_validator --validate-sprint || true` | **DEFERRED** — needs per-slice test removal + CI edit |
-| `scripts/skills_manager.py`, `skills_gap_analyzer.py` | `src/quality/validate_closed_loop.py` imports `SkillsManager`; `chart_metrics.py` integrates it; `test_closed_loop_validation.py`, `test_validate_closed_loop.py`, `test_quality_system.py` | **RECLASSIFY → KEEP** (not Regime B) |
-| State JSONs (`agent_metrics`, `chart_metrics`, `feature_registry`) | written by KEEP `src/quality/*`, `economist_agent.py` | **KEEP** |
-| State JSONs (`sprint_tracker`, `task_queue`, `escalations`) | written by both Regime-B scripts **and** `src/backlog/*` | **DEFERRED** — with the scripts |
+```
+T0 env (install SDK + IS_SANDBOX)         ← unblocks all runtime verification
+      │
+      ▼
+T1 claude_web researcher  ──►  T2 wire research_mode through stage3+pipeline+CLI
+                                     │
+                                     ▼
+                              [CHECKPOINT A]  keyless article via mocked test
+                                     │
+      ┌──────────────────────────────┼───────────────────────────┐
+      ▼                              ▼                            ▼
+T3 vision→query() (D3)      T4 economist_agent fail-loud (D1)   T5 ADR (D4)
+      └──────────────────────────────┼───────────────────────────┘
+                                     ▼
+                              T6 runbook + BACKLOG + install fix
+                                     │
+                                     ▼
+                              [CHECKPOINT B]  live keyless run → validator exit 0
+```
 
-## Waves
+T1→T2 is the only hard chain. T3/T4/T5 are independent and parallelizable after
+Checkpoint A. Each task is a vertical slice (produces an observable result), each
+tested and committed per `incremental-implementation`.
 
-### Wave 1 — Safe retirement (execute now, CI-verified)
-Vertical slices; each independently committable; none touches a pytest import.
+## Tasks
 
-1. **Stale artifacts** — delete snapshot files + fix `README.md` badges/links + `mkdocs.yml` nav.
-2. **Sprint skills** — delete `skills/sprint-management/`, `skills/scrum-master/` + fix `mkdocs.yml` nav.
-3. **Sprint workflows** — delete `sprint-discipline.yml`, `sprint-sync.yml`; drop the `sprint_validator --validate-sprint || true` step from `quality-tests.yml`. (`remediation-sync.yml` is KEEP — content remediation, not sprint.)
-4. **Instruction consolidation** — shrink `GEMINI.md`, root + `.github/copilot-instructions.md`, and `CONTRIBUTING.md`'s duplicated coding-standards/TDD prose to pointers at `CLAUDE.md` + skills.
-5. **CLAUDE.md sync** — remove references to retired machinery so the doc points at nothing deleted.
+### T0 — Env: reliable keyless SDK install *(unblocker)*
+- Make `claude-agent-sdk` installable without the `sgmllib3k`/feedparser wheel
+  failure aborting the transaction (pin/isolate, or document a two-step install).
+- Document `IS_SANDBOX=1` requirement when running as root.
+- **AC**: `python -c "import claude_agent_sdk"` succeeds; keyless smoke `query()`
+  returns text. **Verify**: run `scratchpad/smoke.py` with keys unset.
 
-### Wave 2 — Deferred (needs a decision / ADR before code deletion)
-Do **not** execute under this plan. Requires a new spec/ADR:
-- **W2-A** Retire or keep the AgentRegistry system (ADR-002): 10 personas + `AGENTS.md` + `agent_registry.py` + 3 KEEP tests. Decision: delete the whole cluster (write ADR superseding ADR-002) **or** keep it as a decoupled `Agent`-tool roster.
-- **W2-B** Retire the autonomous agent scripts (`sm/po/orchestrator_agent`, `continuous_burndown`, `sprint_validator`) + their tests + disentangle `sprint_tracker/task_queue/escalations` writers in `src/backlog/*`.
-- **W2-C** `nightly-eval.yml` + `scripts/benchmarks/measure_sm_effectiveness.py` (SM benchmark) + `sync-copilot.yml` — retire with W2-B.
+### T1 — `claude_web` researcher
+- New `src/agent_sdk/research/claude_web.py`:
+  `async build_claude_web_brief(topic, max_budget_usd=None) -> tuple[str, float]`.
+- Uses `query()` with `allowed_tools=["WebSearch","WebFetch"]`, research-analyst
+  system prompt; returns a brief **string** matching `_format_brief` shape
+  (claims + source names + URLs) and the SDK cost.
+- **AC**: given a mocked `query()` transcript, returns a non-empty brief string
+  with sources; reads no `SERPER_API_KEY`; constructs no `anthropic` client.
+- **Verify**: `pytest tests/test_claude_web_research.py -q`.
 
-### Spec correction
-Update `docs/specs/repo-process-consolidation.md`: move `skills_manager`/`skills_gap_analyzer` to KEEP;
-move personas/registry/agent-scripts to a Wave-2 "deferred, ADR-gated" section with the coupling evidence.
+### T2 — Wire `research_mode="claude_web"` through the stack
+- `stage3_runner.run_stage3`: add `"claude_web"` to the allowed set
+  (lines 424–435) → dispatch to `build_claude_web_brief`.
+- `pipeline.run_pipeline`: accept/thread `research_mode="claude_web"`.
+- `pipeline.main`: add `--research-mode` choice `claude_web` (+ `--image-mode`).
+- **AC**: `run_pipeline(topic, image_mode="chart_only", research_mode="claude_web")`
+  with mocked `query()` and **all keys unset** returns
+  `publication_validator_passed=True`; asserts no Serper/anthropic client built.
+- **Verify**: `pytest tests/test_pipeline_keyless.py -q`.
 
-## Checkpoints
-- After Wave 1: `git grep` finds no dangling reference to a deleted file in `README.md`, `mkdocs.yml`, `.github/workflows/`, `CLAUDE.md`; `docs.yml` build green; `ci.yml`/`quality-tests.yml` green in CI.
-- Before Wave 2: human decision on W2-A (keep vs retire AgentRegistry).
+> **CHECKPOINT A** — keyless article generated in a deterministic (mocked) test;
+> prove zero paid-client construction. Stop, show green, get go for T3–T6.
+
+### T3 — Vision refinement off the API key (D3)
+- `_shared.refine_image_metadata`: replace `anthropic.AsyncAnthropic` path with
+  `query()` vision (image passed to the SDK); drop the `ANTHROPIC_API_KEY` gate;
+  keep graceful fallback to writer drafts on any error.
+- **AC**: mocked `query()` → refined alt/caption; error → drafts. No
+  `ANTHROPIC_API_KEY` read. (Off critical path for `chart_only`; matters for hero.)
+- **Verify**: `pytest tests/test_vision_refine_keyless.py -q`.
+
+### T4 — `economist_agent.py` fail-loud (D1)
+- Deprecated path: on a keyless invocation, raise/exit with a clear
+  "use `python -m src.agent_sdk.pipeline --research-mode claude_web`" message
+  instead of a raw `KeyError`/`ValueError`.
+- **AC**: keyless run of the deprecated entry prints the guidance, exits non-zero.
+- **Verify**: `pytest tests/test_economist_agent_deprecation.py -q`.
+
+### T5 — ADR: LLM in the research path (keyless mode) (D4)
+- `docs/adr/00NN-llm-research-keyless-mode.md`: record the deliberate departure
+  from "no LLM in research"; scope it to `claude_web` mode only; note
+  non-determinism and that citation gates remain enforced.
+- **AC**: ADR passes the repo's adr-lint gate. **Verify**: adr-lint script green.
+
+### T6 — Runbook + backlog + install fix
+- Doc: keyless run recipe (env + command + the honest research caveat).
+- `BACKLOG.md`: add B-006, mark Done on merge.
+- **AC**: doc committed; `BACKLOG.md` updated.
+
+> **CHECKPOINT B** — behavioural: `IS_SANDBOX=1 python -m src.agent_sdk.pipeline
+> --image-mode chart_only --research-mode claude_web` with **no keys** →
+> article on disk, `publication_validator.py` exit 0. This is the real proof;
+> subscription-billed, not CI. (I can run this here.)
+
+## Non-goals (scope discipline, per spec §8)
+
+Not converging/deleting the two pipelines; not touching hero/DALL-E generation;
+not removing the Serper `deterministic` mode (only adding a keyless sibling).
+
+## Test strategy summary
+
+All new tests keyless + offline via **mocked `query()`** so CI needs no
+subscription. The one subscription-dependent step is Checkpoint B (human/live),
+explicitly out of CI. Existing suite must stay green.

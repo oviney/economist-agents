@@ -436,7 +436,7 @@
         "Added LENGTH as first MANDATORY rule in writer prompt",
         "Documented gate vs target in prompt (gate=700, target=800-1000)"
       ],
-      "fix_notes": "Aligned word-count gates across codebase to 700 (matches publication_validator.py and skills/economist-writing/SKILL.md sweet-spot floor). Updated agent_reviewer.py, editorial_judge.py, skill_synthesizer.py from 800→700. Strengthened stage3_crew.py writer prompt with explicit LENGTH rule (700-1200 words, target 800-1000) in MANDATORY block."
+      "fix_notes": "Aligned word-count gates across codebase to 700 (matches publication_validator.py and skills/economist-writing/SKILL.md sweet-spot floor). Updated agent_reviewer.py, editorial_judge.py, skill_synthesizer.py from 800\u2192700. Strengthened stage3_crew.py writer prompt with explicit LENGTH rule (700-1200 words, target 800-1000) in MANDATORY block."
     },
     {
       "id": "BUG-030",
@@ -502,7 +502,7 @@
       "status": "fixed",
       "fixed_date": "2026-04-26T16:56:33.701701",
       "fix_commit": "2cf28a4",
-      "fix_notes": "Allow `_client` injection to bypass the availability guard — caller is supplying whatever interface chroma would provide.",
+      "fix_notes": "Allow `_client` injection to bypass the availability guard \u2014 caller is supplying whatever interface chroma would provide.",
       "root_cause": "code_logic",
       "root_cause_notes": "Availability guard checked before honouring injection.",
       "is_production_escape": false,
@@ -531,7 +531,7 @@
         "new_validation"
       ],
       "prevention_actions": [
-        "Add a regression test asserting the dashboard's sprint-trends section renders with non-empty content when sprint_history.json contains ≥2 sprints.",
+        "Add a regression test asserting the dashboard's sprint-trends section renders with non-empty content when sprint_history.json contains \u22652 sprints.",
         "Grep audit: any future state-file relocation must update all readers in one commit."
       ]
     },
@@ -540,20 +540,20 @@
       "severity": "high",
       "discovered_in": "test_failure",
       "discovered_date": "2026-04-26T16:56:33.701701",
-      "description": "scripts/defect_tracker.py reads from legacy `skills/defect_tracker.json` instead of `data/skills_state/defect_tracker.json` — same migration miss as BUG-034",
+      "description": "scripts/defect_tracker.py reads from legacy `skills/defect_tracker.json` instead of `data/skills_state/defect_tracker.json` \u2014 same migration miss as BUG-034",
       "component": "defect_tracker",
       "status": "fixed",
       "fixed_date": "2026-04-26T16:56:33.701701",
       "fix_commit": "2cf28a4",
       "fix_notes": "Path updated to data/skills_state/.",
       "root_cause": "integration_error",
-      "root_cause_notes": "Same migration as BUG-034 — three readers missed when state files moved.",
+      "root_cause_notes": "Same migration as BUG-034 \u2014 three readers missed when state files moved.",
       "is_production_escape": true,
       "prevention_strategy": [
         "new_validation"
       ],
       "prevention_actions": [
-        "See BUG-034 — same prevention applies."
+        "See BUG-034 \u2014 same prevention applies."
       ]
     },
     {
@@ -561,20 +561,20 @@
       "severity": "high",
       "discovered_in": "test_failure",
       "discovered_date": "2026-04-26T16:56:33.701701",
-      "description": "scripts/agent_metrics.py reads from legacy `skills/agent_metrics.json` instead of `data/skills_state/agent_metrics.json` — same migration miss as BUG-034/035",
+      "description": "scripts/agent_metrics.py reads from legacy `skills/agent_metrics.json` instead of `data/skills_state/agent_metrics.json` \u2014 same migration miss as BUG-034/035",
       "component": "agent_metrics",
       "status": "fixed",
       "fixed_date": "2026-04-26T16:56:33.701701",
       "fix_commit": "2cf28a4",
       "fix_notes": "Path updated to data/skills_state/.",
       "root_cause": "integration_error",
-      "root_cause_notes": "Same migration as BUG-034 — three readers missed when state files moved.",
+      "root_cause_notes": "Same migration as BUG-034 \u2014 three readers missed when state files moved.",
       "is_production_escape": true,
       "prevention_strategy": [
         "new_validation"
       ],
       "prevention_actions": [
-        "See BUG-034 — same prevention applies."
+        "See BUG-034 \u2014 same prevention applies."
       ]
     },
     {
@@ -608,16 +608,16 @@
           "patch_frontmatter_extensible": "_patch_frontmatter (flow.py ~line 413) uses regex string injection. Straightforward to extend. Existing tests in TestPatchFrontmatter (test_flow_agent_sdk.py lines 339-357) cover the pattern.",
           "anthropic_mock_pattern": "conftest.py has mock_anthropic_client fixture (lines 26-38). Claude vision calls use the same query() async generator path. Mockable via patch of src.agent_sdk.stage3_runner.query.",
           "gaps_identified": [
-            "_FakePipelineResult (test_flow_agent_sdk.py lines 28-45) has no image_alt or image_caption fields — must be extended.",
+            "_FakePipelineResult (test_flow_agent_sdk.py lines 28-45) has no image_alt or image_caption fields \u2014 must be extended.",
             "No test currently validates stage3 output through publication_validator image metadata CRITICAL gates end-to-end."
           ],
           "critical_blocker": "Writer prompt (stage3_runner.py lines 253-256) MUST be updated first to require both fields. Vision refinement and frontmatter injection have nothing to refine until the writer emits these fields.",
           "recommended_test_plan": {
-            "test_writer_emits_fields": "tests/test_flow_agent_sdk.py — new TestWriterFrontmatter class",
-            "test_vision_refinement": "tests/test_flow_agent_sdk.py — new TestVisionRefinement class, patch query()",
-            "test_integration": "tests/test_flow_agent_sdk.py — extend TestQualityGate: mock pipeline → validator passes image gates",
-            "test_patch_frontmatter": "tests/test_flow_agent_sdk.py — extend TestPatchFrontmatter",
-            "sequence": "TDD: RED (write failing tests) → update prompt → GREEN → add vision step → REFACTOR"
+            "test_writer_emits_fields": "tests/test_flow_agent_sdk.py \u2014 new TestWriterFrontmatter class",
+            "test_vision_refinement": "tests/test_flow_agent_sdk.py \u2014 new TestVisionRefinement class, patch query()",
+            "test_integration": "tests/test_flow_agent_sdk.py \u2014 extend TestQualityGate: mock pipeline \u2192 validator passes image gates",
+            "test_patch_frontmatter": "tests/test_flow_agent_sdk.py \u2014 extend TestPatchFrontmatter",
+            "sequence": "TDD: RED (write failing tests) \u2192 update prompt \u2192 GREEN \u2192 add vision step \u2192 REFACTOR"
           }
         }
       },
@@ -652,6 +652,108 @@
       "fix_notes": "PR #443. See docs/specs/B-004-frontmatter-finalize.md. Copilot review caught an image-fallback regression, fixed pre-merge.",
       "prevention_test_added": true,
       "prevention_test_file": "tests/test_frontmatter_finalize.py"
+    },
+    {
+      "id": "BUG-039",
+      "severity": "high",
+      "discovered_in": "development",
+      "discovered_date": "2026-07-14T00:00:00",
+      "description": "apply_editorial_fixes mangles Markdown image embeds: the exclamation-strip step turns '![alt](path)' into '.[alt](path)', breaking inline chart/hero embeds. Masked in hero mode by the auto-embed safety net running afterwards.",
+      "component": "agent_sdk._shared.apply_editorial_fixes",
+      "status": "fixed",
+      "github_issue": null,
+      "is_production_escape": false,
+      "root_cause": "blind_string_replace",
+      "root_cause_notes": "line.replace('!','.') applied per-line without excluding the Markdown image token '!['.",
+      "discovered_by": "B-006 keyless chart_only end-to-end (Checkpoint A)",
+      "fixed_date": "2026-07-14T00:00:00",
+      "fix_notes": "Fixed under B-006; verified by Checkpoint B live keyless run passing the publication validator.",
+      "prevention_test_added": true
+    },
+    {
+      "id": "BUG-040",
+      "severity": "high",
+      "discovered_in": "development",
+      "discovered_date": "2026-07-14T00:00:00",
+      "description": "run_pipeline chart_only strips the image: frontmatter (and its slug) BEFORE Stage 4, so _auto_embed_chart cannot derive the chart path and the required chart is never embedded -> publication_validator missing_chart. _run_resume already embeds-before-strips; run_pipeline does not.",
+      "component": "agent_sdk.pipeline.run_pipeline",
+      "status": "fixed",
+      "github_issue": null,
+      "is_production_escape": false,
+      "root_cause": "ordering",
+      "root_cause_notes": "_strip_image_frontmatter runs before run_stage4/_auto_embed_chart; mirror _run_resume ordering.",
+      "discovered_by": "B-006 keyless chart_only end-to-end (Checkpoint A)",
+      "fixed_date": "2026-07-14T00:00:00",
+      "fix_notes": "Fixed under B-006; verified by Checkpoint B live keyless run passing the publication validator.",
+      "prevention_test_added": true
+    },
+    {
+      "id": "BUG-041",
+      "severity": "high",
+      "discovered_in": "development",
+      "discovered_date": "2026-07-14T00:00:00",
+      "description": "Stage 3 writer sometimes wraps the whole article in a Markdown code fence (```...```). The fence is not stripped, so the article does not start with '---' AND _strip_duplicate_article mistakes the real frontmatter (now at a non-zero offset) for a duplicate emission and deletes the entire body, raising MalformedArticleError (body_empty=True).",
+      "component": "agent_sdk.stage3_runner",
+      "status": "fixed",
+      "github_issue": null,
+      "is_production_escape": false,
+      "root_cause": "unhandled_output_format",
+      "root_cause_notes": "raw_writer_output enclosing code fence not stripped before _strip_duplicate_article / frontmatter validation.",
+      "discovered_by": "B-006 Checkpoint B live keyless subscription run",
+      "fixed_date": "2026-07-14T00:00:00",
+      "fix_notes": "Fixed under B-006; verified by Checkpoint B live keyless run passing the publication validator.",
+      "prevention_test_added": true
+    },
+    {
+      "id": "BUG-042",
+      "severity": "high",
+      "discovered_in": "development",
+      "discovered_date": "2026-07-14T00:00:00",
+      "description": "Stage 3 graphics _collect_text call uses the default max_turns=1; against the real subscription CLI the graphics agent needs >1 turn and the SDK raises 'Reached maximum number of turns (1)', which _collect_text does not catch, crashing the whole pipeline. Also: claude_web research MAX_TURNS=12 is too low and soft-degrades to an empty brief on complex topics.",
+      "component": "agent_sdk.stage3_runner._collect_text / research.claude_web",
+      "status": "fixed",
+      "github_issue": null,
+      "is_production_escape": false,
+      "root_cause": "turn_cap_unhandled",
+      "root_cause_notes": "give graphics turn headroom; tolerate turn-cap with partial text; raise claude_web turn cap.",
+      "discovered_by": "B-006 Checkpoint B live keyless subscription run (run 2)",
+      "fixed_date": "2026-07-14T00:00:00",
+      "fix_notes": "Fixed under B-006; verified by Checkpoint B live keyless run passing the publication validator.",
+      "prevention_test_added": true
+    },
+    {
+      "id": "BUG-043",
+      "severity": "medium",
+      "discovered_in": "development",
+      "discovered_date": "2026-07-14T00:00:00",
+      "description": "When the graphics model omits the chart 'title' field, render_chart's _validate_spec raises ChartRenderError and crashes the whole pipeline. A missing title is mechanically recoverable and must not abort an otherwise-complete run.",
+      "component": "agent_sdk.stage3_runner / chart_renderer",
+      "status": "fixed",
+      "github_issue": null,
+      "is_production_escape": false,
+      "root_cause": "missing_field_hard_fail",
+      "root_cause_notes": "backfill chart title from the article title/topic before render_chart.",
+      "discovered_by": "B-006 Checkpoint B live keyless subscription run (run 3)",
+      "fixed_date": "2026-07-14T00:00:00",
+      "fix_notes": "Fixed under B-006; verified by Checkpoint B live keyless run passing the publication validator.",
+      "prevention_test_added": true
+    },
+    {
+      "id": "BUG-044",
+      "severity": "high",
+      "discovered_in": "development",
+      "discovered_date": "2026-07-14T00:00:00",
+      "description": "Stage 3 (run_stage3) generates the writer draft once and raises MalformedArticleError on any malformed output, aborting the whole run. The writer via the subscription CLI is non-deterministic (empty body, bare code fence), so a single bad draft kills an otherwise-keyless run. run_pipeline has no retry, unlike flow.py's revision loop.",
+      "component": "agent_sdk.stage3_runner.run_stage3",
+      "status": "fixed",
+      "github_issue": null,
+      "is_production_escape": false,
+      "root_cause": "single_shot_no_retry",
+      "root_cause_notes": "bounded writer regeneration (3 attempts) on malformed output, reusing the research brief.",
+      "discovered_by": "B-006 Checkpoint B live keyless subscription run (run 4)",
+      "fixed_date": "2026-07-14T00:00:00",
+      "fix_notes": "Fixed under B-006; verified by Checkpoint B live keyless run passing the publication validator.",
+      "prevention_test_added": true
     }
   ],
   "summary": {

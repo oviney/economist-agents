@@ -1,6 +1,6 @@
 # SPEC: Keyless subscription pipeline (B-006)
 
-**Status**: DRAFT — awaiting human LGTM
+**Status**: IMPLEMENTED — merged-ready via PR #447 (B-006 marked done in BACKLOG.md)
 **Backlog**: B-006 (local `BACKLOG.md` item; no GitHub issue)
 **Date**: 2026-07-14
 **Author path**: spec-driven-development lifecycle

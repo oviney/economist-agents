@@ -160,7 +160,7 @@ async def run_pipeline(
         graphics_model=stage3.graphics_model,
         stage3_seconds=stage3.wall_seconds,
         stage4_seconds=stage4.wall_seconds,
-        article_chars=len(stage4.article),
+        article_chars=len(final_article),
     )
     wall_seconds = result.stage3_seconds + result.stage4_seconds
     try:

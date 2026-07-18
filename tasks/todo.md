@@ -1,7 +1,7 @@
 # TODO: Keyless subscription pipeline (B-006)
 
 **Plan**: [`tasks/plan.md`](./plan.md) · **Spec**: [`docs/specs/B-006-keyless-subscription-pipeline.md`](../docs/specs/B-006-keyless-subscription-pipeline.md)
-**Status**: awaiting LGTM on the plan before starting.
+**Status**: IMPLEMENTED — all tasks + both checkpoints complete (PR #447).
 
 ## Todo (dependency-ordered)
 

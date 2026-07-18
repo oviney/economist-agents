@@ -1,6 +1,6 @@
 # SPEC: Hero-image prompt surfacing + chart polish (B-007)
 
-**Status**: IN PROGRESS
+**Status**: IMPLEMENTED — prompt-surfacing + chart polish shipped via PR #447
 **Date**: 2026-07-14
 **Branch**: `claude/pipeline-status-check-mwptdh`
 

@@ -428,14 +428,20 @@ def _ensure_chart_title(chart_data: dict, article: str, topic: str) -> dict:
     """Backfill a chart title when the graphics model omits one (BUG-042).
 
     The chart is required downstream, so a missing/empty ``title`` must not crash
-    the render. Derive it from the article's title frontmatter, falling back to
-    the topic.
+    the render. The backfill is **data-descriptive and never the article
+    headline** (per B-007): prefer the chart's own ``subtitle`` (which describes
+    the data), else a neutral generic label. ``article``/``topic`` are accepted
+    for signature stability but deliberately not used as the title.
     """
     title = chart_data.get("title")
     if isinstance(title, str) and title.strip():
         return chart_data
-    match = re.search(r'^title:\s*["\']?(.+?)["\']?\s*$', article, re.MULTILINE)
-    derived = (match.group(1).strip() if match else topic).strip() or topic
+    subtitle = chart_data.get("subtitle")
+    derived = (
+        subtitle.strip()
+        if isinstance(subtitle, str) and subtitle.strip()
+        else "Key figures"
+    )[:80]
     logger.warning("Graphics output had no chart title; backfilled %r", derived)
     return {**chart_data, "title": derived}
 
@@ -511,6 +517,11 @@ async def run_stage3(
     # fence, or frontmatter with an empty body. Regenerate a few times before
     # giving up rather than aborting the whole run on a single bad draft. Only
     # the writer re-runs; the research brief is reused, so retries are cheap.
+    #
+    # The budget cap is CUMULATIVE across attempts: each attempt gets the
+    # remaining budget, so total writer spend never exceeds ``writer_budget_usd``
+    # even when retries happen (a spent budget makes the next attempt abort via
+    # BudgetExceededError rather than overspend).
     pre_audit_article = ""
     writer_cost = 0.0
     search_session = SourceFetchSession()
@@ -520,11 +531,16 @@ async def run_stage3(
         research_server = create_sdk_mcp_server(
             "research", tools=[build_search_tool(search_session)]
         )
+        remaining_budget = (
+            None
+            if writer_budget_usd is None
+            else max(0.0, writer_budget_usd - writer_cost)
+        )
         raw_writer_output, attempt_cost = await _collect_text(
             writer_prompt,
             WRITER_SYSTEM_PROMPT,
             model=writer_model,
-            max_budget_usd=writer_budget_usd,
+            max_budget_usd=remaining_budget,
             mcp_servers={"research": research_server},
             allowed_tools=["mcp__research__search_for_source"],
             # Each search costs 2 turns (the tool_use, then consuming the

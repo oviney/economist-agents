@@ -2,7 +2,7 @@
 
 **Spec**: `docs/specs/B-006-keyless-subscription-pipeline.md` (approved — go to plan)
 **Branch**: `claude/pipeline-status-check-mwptdh`
-**Status**: DRAFT — awaiting human LGTM before implementation
+**Status**: IMPLEMENTED — plan executed; keyless pipeline proven live (PR #447)
 
 ## Goal restated
 

@@ -26,6 +26,43 @@ _(none)_
 
 ## Todo
 
+### B-009 · Retire paid-AI GitHub Actions; keyless local run is the only generation path
+
+Executes [ADR-0014](docs/adr/0014-retire-paid-github-actions-generation.md).
+Today four workflows inject paid-AI secrets, contradicting CLAUDE.md #5 and
+ADR-0013; the weekly `content-pipeline.yml` cron has also failed 8 runs straight
+(no live article since 2026-04-27). Make the keyless subscription run the only
+way articles are generated and published.
+
+Scope:
+- Delete `.github/workflows/content-pipeline.yml` (scheduled paid generation) and
+  `.github/workflows/regenerate-image.yml` (DALL-E — violates CLAUDE.md #1/#4).
+- Strip `OPENAI_API_KEY` / paid-AI secrets from `.github/workflows/ci.yml`
+  (tests mock APIs, so this should be inert — **verify a full CI run stays green
+  after removal**, don't assume).
+- Triage `.github/workflows/blog-quality-audit.yml`: strip paid keys, or retire
+  it if it cannot run without paid AI.
+- Reconcile entrypoints so "local run opens the blog PR" works from one keyless,
+  `chart_only` command. The documented command
+  (`python -m src.agent_sdk.pipeline … --research-mode claude_web`) generates +
+  validates but does **not** publish; `_deploy_to_blog` lives only in
+  `EconomistContentFlow.kickoff()` (`src/economist_agents/flow.py`). Publishing
+  uses the free `BLOG_REPO_TOKEN`, no AI key.
+- Promote `docs/keyless-pipeline-runbook.md` to canonical; point README /
+  CLAUDE.md at it. Correct CLAUDE.md's remaining paid-path contradiction — the
+  `OPENAI_API_KEY | For images | DALL-E 3` env-var row (conflicts with
+  constraint #4 and this ADR). Note: the Serper/`SERPER_API_KEY` references were
+  already removed by #438.
+
+Acceptance:
+- No `.github/workflows/*.yml` references `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`,
+  or `SERPER_API_KEY`.
+- A single documented keyless command produces an article **and** opens a PR on
+  `oviney/blog`, verified by one real end-to-end run on the subscription.
+- Remaining GitHub Actions (tests/lint/docs) pass with no paid secrets present.
+
+Out of scope: any unattended/scheduled replacement (see ADR-0014 "Revisit if").
+
 ### B-008 · Single canonical slug across article file, chart PNG, and image-prompt sidecar
 
 Low-impact cleanup flagged in the B-006/B-007 code review. The finished article

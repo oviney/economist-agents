@@ -754,6 +754,23 @@
       "fixed_date": "2026-07-14T00:00:00",
       "fix_notes": "Fixed under B-006; verified by Checkpoint B live keyless run passing the publication validator.",
       "prevention_test_added": true
+    },
+    {
+      "id": "BUG-045",
+      "severity": "high",
+      "discovered_in": "development",
+      "discovered_date": "2026-07-21T00:00:00",
+      "description": "arXiv provider contract mismatch: src/agent_sdk/_shared.py and src/agent_sdk/tools/research_tools.py both read insights.papers_analyzed from search_arxiv_for_topic(), but ArxivSearcher.extract_business_insights() never emitted that key, so arXiv silently contributed zero sources to every research brief. After #438 removed Brave/Google this left a single live research provider (Semantic Scholar) where the code believed it had two. Masked in CI because tests/test_research_tools.py mocked the arXiv return with a papers_analyzed dict the real code never produced.",
+      "component": "agent_sdk._shared / agent_sdk.tools.research_tools / scripts.arxiv_search",
+      "status": "fixed",
+      "github_issue": 439,
+      "is_production_escape": false,
+      "root_cause": "integration_error",
+      "root_cause_notes": "Producer/consumer contract drift: consumers were written against a papers_analyzed key the producer did not emit; the test double encoded the intended contract instead of the real one, hiding the gap.",
+      "discovered_by": "PR #439 pre-merge review (rebase onto post-#438 main)",
+      "fixed_date": "2026-07-21T00:00:00",
+      "fix_notes": "Fixed in #439: extract_business_insights() now emits papers_analyzed with the five fields _shared.py renders (title/url/authors/published/key_insight), authors joined to a string; the empty-papers branch also returns papers_analyzed: [].",
+      "prevention_test_added": true
     }
   ],
   "summary": {

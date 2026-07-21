@@ -6,6 +6,7 @@ from unittest.mock import Mock, patch
 
 import orjson
 import pytest
+import requests
 
 from scripts.semantic_scholar_search import (
     SemanticScholarSearcher,
@@ -18,7 +19,12 @@ def _mock_response(payload: dict, status: int = 200) -> Mock:
     r = Mock()
     r.status_code = status
     r.content = orjson.dumps(payload)
-    r.raise_for_status = Mock()
+    if status >= 400:
+        r.raise_for_status = Mock(
+            side_effect=requests.exceptions.HTTPError(f"HTTP {status}")
+        )
+    else:
+        r.raise_for_status = Mock()
     return r
 
 
@@ -96,12 +102,81 @@ class TestSemanticScholarSearcher:
 
     def test_raises_on_http_error(self) -> None:
         searcher = SemanticScholarSearcher()
-        with patch("scripts.semantic_scholar_search.requests.get") as mock_get:
+        with (
+            patch("scripts.semantic_scholar_search.requests.get") as mock_get,
+            patch("scripts.semantic_scholar_search.time.sleep"),
+        ):
             err_resp = Mock()
-            err_resp.raise_for_status.side_effect = Exception("HTTP 429")
+            err_resp.status_code = 500
+            err_resp.raise_for_status.side_effect = Exception("HTTP 500")
             mock_get.return_value = err_resp
-            with pytest.raises(Exception, match="HTTP 429"):
+            with pytest.raises(Exception, match="HTTP 500"):
                 searcher.search("x")
+
+
+class TestSemanticScholarRetry:
+    def test_retries_on_429_then_succeeds(self) -> None:
+        """A 429 first response retries and recovers, not zeroing the provider."""
+        searcher = SemanticScholarSearcher(max_results=3)
+        rate_limited = _mock_response({}, status=429)
+        ok = _mock_response({"data": [_paper("Recovered")]})
+
+        with (
+            patch("scripts.semantic_scholar_search.requests.get") as mock_get,
+            patch("scripts.semantic_scholar_search.time.sleep") as mock_sleep,
+        ):
+            mock_get.side_effect = [rate_limited, ok]
+            result = searcher.search("flaky tests")
+
+        assert mock_get.call_count == 2  # retried exactly once
+        assert len(result) == 1
+        assert result[0]["title"] == "Recovered"
+        mock_sleep.assert_called()  # backoff slept between attempts
+
+    def test_retries_on_connection_error_then_succeeds(self) -> None:
+        """A transient ConnectionError retries and recovers."""
+        searcher = SemanticScholarSearcher(max_results=3)
+        ok = _mock_response({"data": [_paper("Recovered")]})
+
+        with (
+            patch("scripts.semantic_scholar_search.requests.get") as mock_get,
+            patch("scripts.semantic_scholar_search.time.sleep"),
+        ):
+            mock_get.side_effect = [
+                requests.exceptions.ConnectionError("reset"),
+                ok,
+            ]
+            result = searcher.search("flaky tests")
+
+        assert mock_get.call_count == 2
+        assert result[0]["title"] == "Recovered"
+
+    def test_does_not_retry_clean_empty_results(self) -> None:
+        """An empty 200 response is a clean result, not retried."""
+        searcher = SemanticScholarSearcher(max_results=3)
+        with (
+            patch("scripts.semantic_scholar_search.requests.get") as mock_get,
+            patch("scripts.semantic_scholar_search.time.sleep"),
+        ):
+            mock_get.return_value = _mock_response({"data": []})
+            result = searcher.search("nothing here")
+
+        assert result == []
+        assert mock_get.call_count == 1  # no retry on clean empty result
+
+    def test_gives_up_after_max_attempts_on_persistent_429(self) -> None:
+        """Persistent 429 raises after exhausting retries, backing off each time."""
+        searcher = SemanticScholarSearcher(max_results=3)
+        with (
+            patch("scripts.semantic_scholar_search.requests.get") as mock_get,
+            patch("scripts.semantic_scholar_search.time.sleep") as mock_sleep,
+        ):
+            mock_get.return_value = _mock_response({}, status=429)
+            with pytest.raises(requests.exceptions.HTTPError):
+                searcher.search("flaky tests")
+
+        assert mock_get.call_count == 3  # three attempts total
+        assert mock_sleep.call_count == 2  # slept between attempts, not after last
 
 
 class TestSearchSemanticScholarForTopic:

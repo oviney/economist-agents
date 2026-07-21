@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import logging
 import os
+import time
 from typing import Any
 
 import orjson
@@ -36,6 +37,17 @@ logger = logging.getLogger(__name__)
 _API_URL = "https://api.semanticscholar.org/graph/v1/paper/search"
 _DEFAULT_FIELDS = "title,authors,year,abstract,externalIds,url,citationCount,venue"
 _DEFAULT_TIMEOUT = 10
+
+# Retry policy for transient failures (HTTP 429 / connection errors).
+# Free providers throttle aggressively; a single 429 must not zero out the
+# provider. Exponential backoff: 1.5s, 3.0s between three total attempts.
+_MAX_ATTEMPTS = 3
+_BASE_DELAY = 1.5
+# Connection-level errors worth retrying (DNS hiccups, resets, timeouts).
+_RETRYABLE_EXC = (
+    requests.exceptions.ConnectionError,
+    requests.exceptions.Timeout,
+)
 
 
 class SemanticScholarSearcher:
@@ -57,23 +69,62 @@ class SemanticScholarSearcher:
     def search(self, query: str) -> list[dict[str, Any]]:
         """Return up to ``max_results`` papers for ``query``.
 
-        Raises ``requests.HTTPError`` on transport-level failures so the
-        caller's try/except can mark the provider failed.
+        Wraps the outbound request in retry + exponential backoff so a single
+        HTTP 429 or transient connection error does not zero out the provider.
+        Retries are limited to rate-limit/connection failures; a clean empty
+        result set is returned immediately without retrying.
+
+        Raises ``requests.HTTPError`` (or the last transient error) once retries
+        are exhausted, so the caller's try/except can mark the provider failed.
         """
         params = {
             "query": query,
             "limit": self.max_results,
             "fields": _DEFAULT_FIELDS,
         }
-        resp = requests.get(
-            _API_URL,
-            params=params,
-            headers=self._headers(),
-            timeout=self.timeout,
-        )
+
+        last_exc: Exception | None = None
+        for attempt in range(1, _MAX_ATTEMPTS + 1):
+            try:
+                resp = requests.get(
+                    _API_URL,
+                    params=params,
+                    headers=self._headers(),
+                    timeout=self.timeout,
+                )
+            except _RETRYABLE_EXC as exc:
+                last_exc = exc
+                if attempt < _MAX_ATTEMPTS:
+                    self._backoff(attempt, f"connection error: {exc}")
+                    continue
+                raise
+
+            if resp.status_code == 429 and attempt < _MAX_ATTEMPTS:
+                self._backoff(attempt, "HTTP 429 (rate limited)")
+                continue
+
+            resp.raise_for_status()
+            body = orjson.loads(resp.content)
+            return body.get("data", []) or []
+
+        # Exhausted retries on a persistent 429: surface a real HTTPError.
+        if last_exc is not None:
+            raise last_exc
         resp.raise_for_status()
-        body = orjson.loads(resp.content)
-        return body.get("data", []) or []
+        return []
+
+    @staticmethod
+    def _backoff(attempt: int, reason: str) -> None:
+        """Sleep with exponential backoff before the next attempt."""
+        delay = _BASE_DELAY * (2 ** (attempt - 1))
+        logger.warning(
+            "Semantic Scholar %s; retry %d/%d after %.1fs",
+            reason,
+            attempt + 1,
+            _MAX_ATTEMPTS,
+            delay,
+        )
+        time.sleep(delay)
 
 
 def _normalise(raw: dict[str, Any]) -> dict[str, Any]:

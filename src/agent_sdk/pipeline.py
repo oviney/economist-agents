@@ -556,8 +556,7 @@ def _run_research_only(topic: str) -> None:
         print(
             "\nResearch aborted: providers failed.\n"
             f"  {exc}\n"
-            "  Likely causes: provider outage, missing/invalid "
-            "SERPER_API_KEY, or query rejected by provider (HTTP 4xx). "
+            "  Likely cause: an arXiv / Semantic Scholar outage or rate-limit. "
             "Retry in a few minutes or rephrase the topic.",
             file=sys.stderr,
         )
@@ -604,8 +603,8 @@ def _run_stage3_with_handshake(
         print(
             "\nPipeline aborted: research providers failed.\n"
             f"  {exc}\n"
-            "  Likely causes: provider outage, missing/invalid SERPER_API_KEY, "
-            "or query rejected by provider (HTTP 4xx). Retry in a few minutes "
+            "  Likely cause: an arXiv / Semantic Scholar outage or rate-limit. "
+            "Retry in a few minutes "
             "or rephrase the topic as a noun-phrase rather than a question.",
             file=sys.stderr,
         )
@@ -615,7 +614,7 @@ def _run_stage3_with_handshake(
             "\nPipeline aborted: search providers ran but returned zero sources.\n"
             f"  {exc}\n"
             "  Likely cause: topic too narrow, too recent, or phrased in a way "
-            "that matches nothing in arXiv/Google Scholar/Google Web. Try "
+            "that matches nothing in arXiv / Semantic Scholar. Try "
             "broadening it or rephrasing as a noun-phrase.",
             file=sys.stderr,
         )

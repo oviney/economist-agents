@@ -220,10 +220,6 @@ class TestRunResearchAgent:
                 return_value=None,
             ),
             patch(
-                "agents.research_agent.ResearchAgent._gather_web_research",
-                return_value=None,
-            ),
-            patch(
                 "scripts.citation_verifier.verify_citations", side_effect=lambda x: x
             ),
         ):
@@ -333,10 +329,6 @@ class TestRunResearchAgent:
             patch("agents.research_agent.review_agent_output") as mock_review,
             patch(
                 "agents.research_agent.ResearchAgent._gather_arxiv_research",
-                return_value=None,
-            ),
-            patch(
-                "agents.research_agent.ResearchAgent._gather_web_research",
                 return_value=None,
             ),
             patch(

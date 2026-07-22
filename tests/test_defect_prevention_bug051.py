@@ -15,7 +15,9 @@ _EMBED = "![Chart](/assets/charts/x.png)"
 
 
 def _check(body: str) -> str:
-    content = f"---\nlayout: post\ntitle: x\ndate: 2026-07-22\n---\n\n{body}\n\n{_EMBED}\n"
+    content = (
+        f"---\nlayout: post\ntitle: x\ndate: 2026-07-22\n---\n\n{body}\n\n{_EMBED}\n"
+    )
     return DefectPrevention()._check_chart_embedding(content, {"chart_data": True})
 
 

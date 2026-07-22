@@ -319,7 +319,9 @@ class ArxivSearcher:
             # inside "heroism" (BUG-049). Replacement is passed as a function so
             # the expansion text is treated literally (no backref surprises).
             pattern = rf"\b{re.escape(business_term.lower())}\b"
-            optimized = re.sub(pattern, lambda _m: academic_terms, optimized)
+            # Bind the expansion via default arg (not the loop var) — satisfies
+            # B023 and keeps the text literal (no backref interpretation).
+            optimized = re.sub(pattern, lambda _m, _r=academic_terms: _r, optimized)
 
         return optimized
 

@@ -98,6 +98,21 @@ Acceptance (the gate that moved here from B-009):
 
 Depends on: B-009 (clears the paid/false machinery first).
 
+### B-011 · Retire GitHub Actions CI; local `make quality` + pre-commit is the verification path
+
+Scoped in `docs/specs/B-011-retire-ci-local-verification.md`. Extends ADR-0014
+from generation to verification: make local tooling the source of truth, zero
+dependency on GitHub Actions (the repo is public so Actions is free, but the goal
+is independence). `main` is unprotected, so no CI is required to merge today.
+
+The real work is **parity, not deletion** — `make quality`/pre-commit are weaker
+than `ci.yml` (single Python vs 3.11+3.12 matrix; 40% coverage on `scripts` vs
+70% on `src`+`scripts` + `src/quality` 90%; no destructive-change guard; no
+bandit). Port those gates local first, *then* delete `ci.yml` +
+`quality-tests.yml` (+ `sync-copilot.yml`, the merge-noise bot). Open questions:
+fate of `docs.yml`/`copilot-setup-steps.yml`, whether to keep multi-version
+testing, and whether to record an ADR-0015. Not yet approved to build.
+
 ### B-008 · Single canonical slug across article file, chart PNG, and image-prompt sidecar
 
 Low-impact cleanup flagged in the B-006/B-007 code review. The finished article

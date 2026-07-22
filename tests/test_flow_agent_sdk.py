@@ -296,7 +296,19 @@ class TestQualityGate:
 
 
 class TestPublishArticle:
-    def test_publishes_and_indexes(self) -> None:
+    def test_publishes_and_indexes(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        # Isolate from any developer .env / ambient creds: this test asserts the
+        # no-credentials path, so BLOG_REPO_* / token must be absent regardless
+        # of the local environment (B-011: local verification must be hermetic).
+        for var in (
+            "BLOG_REPO_OWNER",
+            "BLOG_OWNER",
+            "BLOG_REPO_NAME",
+            "BLOG_REPO",
+            "BLOG_REPO_TOKEN",
+            "GITHUB_TOKEN",
+        ):
+            monkeypatch.delenv(var, raising=False)
         flow = EconomistContentFlow()
         flow._deduplicator = Mock()
         flow.state["selected_topic"] = {"topic": "Indexed Topic"}

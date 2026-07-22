@@ -101,8 +101,6 @@ jobs:
             --cov-report=term-missing \
             --cov-report=xml \
             --cov-fail-under=70
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
       - name: Enforce src/quality/ per-module coverage gate (#393)
         # The aggregate --cov-fail-under=70 above does not defend the

@@ -771,6 +771,51 @@
       "fixed_date": "2026-07-21T00:00:00",
       "fix_notes": "Fixed in #439: extract_business_insights() now emits papers_analyzed with the five fields _shared.py renders (title/url/authors/published/key_insight), authors joined to a string; the empty-papers branch also returns papers_analyzed: [].",
       "prevention_test_added": true
+    },
+    {
+      "id": "BUG-046",
+      "severity": "high",
+      "discovered_in": "development",
+      "discovered_date": "2026-07-21T00:00:00",
+      "description": "EconomistContentFlow.kickoff() is not keyless: Stage 1 topic discovery (flow.py:176 discover_topics -> create_llm_client) requires ANTHROPIC_API_KEY or OPENAI_API_KEY and raises ValueError '[LLM_CLIENT] No API key found' with no key set. So `python -m src.economist_agents.flow` cannot run keyless end-to-end, contradicting ADR-0013 / CLAUDE.md #3 and the assumption in the B-009 spec. The keyless generator is src.agent_sdk.pipeline (manual topic, no discovery); flow.py's discovery stage never moved to the subscription Agent SDK.",
+      "component": "economist_agents.flow.discover_topics / scripts.llm_client.create_llm_client",
+      "status": "open",
+      "github_issue": null,
+      "is_production_escape": false,
+      "root_cause": "integration_error",
+      "root_cause_notes": "Keyless migration (B-006/ADR-0013) moved writer/graphics/research to the subscription SDK but left topic discovery on the paid create_llm_client path.",
+      "discovered_by": "B-009 T1 fail-fast keyless run",
+      "prevention_test_added": false
+    },
+    {
+      "id": "BUG-047",
+      "severity": "high",
+      "discovered_in": "development",
+      "discovered_date": "2026-07-21T00:00:00",
+      "description": "Keyless writer (Stage 3) exhausts its cumulative budget across retries and produces no article. A live keyless run of src.agent_sdk.pipeline hit BudgetExceededError (cap=$0.2169, cost_at_abort=$0.3166) after ~9 min with output/posts/ empty. The cumulative-budget-across-attempts logic plus repeated writer regeneration (_WRITER_MAX_ATTEMPTS) burned the budget, implying the writer is looping on malformed output rather than the budget merely being too low. DIAGNOSTIC PENDING: rerun with a generous --writer-budget to distinguish under-budget vs malformed-output loop. Related to the preamble/code-fence recovery in the closed PR #441 (_extract_article) and BUG-044.",
+      "component": "agent_sdk.stage3_runner.run_stage3 / _collect_text",
+      "status": "open",
+      "github_issue": null,
+      "is_production_escape": false,
+      "root_cause": "code_logic",
+      "root_cause_notes": "Likely writer producing malformed output -> retry loop -> cumulative budget exhaustion. Confirm via generous-budget rerun; if it still fails, the writer output well-formed check / recovery (cf. PR #441 _extract_article) is the fix, not the budget.",
+      "discovered_by": "B-009 T1 fail-fast keyless run",
+      "prevention_test_added": false
+    },
+    {
+      "id": "BUG-048",
+      "severity": "medium",
+      "discovered_in": "development",
+      "discovered_date": "2026-07-21T00:00:00",
+      "description": "Async-generator cleanup bug masks BudgetExceededError. When _raise_if_budget_exceeded fires inside _collect_text (stage3_runner.py:381->335), a 'RuntimeError: aclose(): asynchronous generator is already running' is raised during handling of the BudgetExceededError, so the clean typed budget error is obscured by an async cleanup RuntimeError. The query() async generator is not closed cleanly on the early raise.",
+      "component": "agent_sdk.stage3_runner._collect_text",
+      "status": "open",
+      "github_issue": null,
+      "is_production_escape": false,
+      "root_cause": "code_logic",
+      "root_cause_notes": "Raising out of the `async for message in query(...)` loop without closing/awaiting the async generator triggers aclose() while it is still running. Needs structured cleanup (e.g. break + explicit aclose, or aclosing()).",
+      "discovered_by": "B-009 T1 fail-fast keyless run",
+      "prevention_test_added": false
     }
   ],
   "summary": {

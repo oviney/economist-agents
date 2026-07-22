@@ -118,7 +118,7 @@ When dispatching agents via the `Agent` tool (orchestrating the fleet), the brie
 
 ## Architecture
 
-- **LLM**: Claude (Anthropic) is the primary LLM. OPENAI_API_KEY only needed for DALL-E images.
+- **LLM**: Claude (Anthropic) via the Agent SDK on the Claude subscription. No DALL-E / `OPENAI_API_KEY` — image generation was retired (ADR-0014); hero images are human-supplied per constraint #4.
 - **Research**: Deterministic academic search via free, keyless providers only — arXiv + Semantic Scholar. No LLM and no pay-per-use APIs in the research path.
 - **Writing**: Claude via Anthropic Agent SDK (`src/agent_sdk/stage3_runner.py`).
 - **Quality gates**: Deterministic post-processing in `src/agent_sdk/stage4_runner.py`, then `scripts/publication_validator.py`.
@@ -158,11 +158,20 @@ See `skills/python-quality/SKILL.md` for complete standards.
 
 | Variable | Required | Purpose |
 |----------|----------|---------|
-| `ANTHROPIC_API_KEY` | Yes | Claude LLM for writing/editing agents (or an `ant auth login` profile) |
-| `OPENAI_API_KEY` | For images | DALL-E 3 featured image generation |
+| `BLOG_REPO_TOKEN` | To publish | Free GitHub token (push to `oviney/blog`) so the deploy step can open a PR. No AI key. |
 
-Research uses free, keyless providers (arXiv + Semantic Scholar) — no API key
-required. Pay-per-use search APIs (Serper/Google, Brave, Tavily) were removed.
+The keyless path uses **no paid AI keys**. Writing/graphics/vision run on the
+Claude subscription via the Agent SDK; research uses free keyless providers
+(arXiv + Semantic Scholar). There is **no `OPENAI_API_KEY`/DALL-E path** — hero
+images are human-supplied per constraint #4, and the DALL-E workflow was retired
+(ADR-0014 / B-009). Pay-per-use search APIs (Serper/Google, Brave, Tavily) were
+removed by #438.
+
+> Note: a legacy paid path still exists — `EconomistContentFlow` Stage 1 topic
+> discovery calls `create_llm_client`, which needs `ANTHROPIC_API_KEY`
+> (BUG-046). Making the full flow keyless is tracked in **B-010**; until then the
+> keyless generator is `python -m src.agent_sdk.pipeline` (manual topic). See
+> `docs/keyless-pipeline-runbook.md`.
 
 ## Key Skills
 

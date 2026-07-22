@@ -1,7 +1,13 @@
 # TODO: Retire paid GitHub Actions; keyless local run only (B-009)
 
 **Plan**: [`tasks/plan.md`](./plan.md) · **Spec**: [`docs/specs/B-009-retire-paid-github-actions.md`](../docs/specs/B-009-retire-paid-github-actions.md)
-**Status**: PLANNED — awaiting LGTM to build
+**Status**: ⚠️ RE-SPEC'D after T1 (2026-07-21). T1 failed the fail-fast gate:
+`flow.py` is not keyless (BUG-046), the keyless writer produces no article within
+budget (BUG-047), + an async bug (BUG-048). Work split into **B-009 Track A**
+(retire paid/broken/false machinery — the tasks below, minus the flow.py claims)
+and **B-010 Track B** (fix keyless generation; owns the live-run acceptance gate).
+The T1 task below is DONE (it ran and produced these findings). Task breakdown
+will be regenerated when a track is built.
 
 ## Tasks (dependency-ordered)
 

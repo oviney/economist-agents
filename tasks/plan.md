@@ -3,7 +3,21 @@
 **Spec**: `docs/specs/B-009-retire-paid-github-actions.md` (approved — go to plan)
 **ADR**: `docs/adr/0014-retire-paid-github-actions-generation.md` (Accepted, #449)
 **Branch**: _to create_ — `chore/b-009-retire-paid-gha`
-**Status**: T1 handed to owner (fail-fast gate). T2–T7 blocked until T1 passes.
+**Status**: ⚠️ T1 RAN and FAILED THE GATE (2026-07-21) → work re-spec'd into
+Track A (B-009) + Track B (B-010). This plan's T5/T6 assumed `flow.py` is the
+keyless command — it is not (BUG-046). See the spec's T1 re-spec banner and
+`BACKLOG.md` B-009/B-010. A fresh task breakdown will be generated when Track A
+or B is picked up to build; the tasks below are retained for history.
+
+**T1 outcome (fail-fast gate did its job):**
+- ✅ Keyless subscription generation *runs* (Stage 3 writer executed via the SDK,
+  no API key).
+- ❌ `EconomistContentFlow` is not keyless — Stage 1 discovery needs a paid key
+  (BUG-046).
+- ❌ Keyless writer exhausts budget across retries, produces no article (BUG-047).
+- 🐛 Async-cleanup RuntimeError masks the budget error (BUG-048).
+- 🔧 Env gaps found: no pip/venv/deps; `ensurepip` stripped → bootstrapped via
+  `get-pip.py`. Belongs in a runbook Setup section (B-010).
 
 ## Goal restated
 

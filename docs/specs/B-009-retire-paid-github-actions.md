@@ -5,6 +5,35 @@
 > #438/#440 (removed pay-per-use research) and #439 (hardened the free
 > replacements), all merged to `main`.
 
+## ⚠️ RE-SPEC after T1 (2026-07-21) — read first
+
+The fail-fast T1 run (a real keyless attempt) **invalidated this spec's core
+assumption** and split the work in two. Findings:
+
+1. **`EconomistContentFlow` is NOT keyless.** Stage 1 topic discovery
+   (`flow.py:176 → create_llm_client`) requires a paid key and raises
+   `[LLM_CLIENT] No API key found`. So `python -m src.economist_agents.flow`
+   **cannot** be the canonical keyless command. (→ **BUG-046**)
+2. **The keyless writer can't produce an article within budget.** A live keyless
+   `pipeline.py` run reached the Stage 3 writer on the subscription (proving
+   keyless generation *runs*) but exhausted its cumulative budget across retries
+   and emitted **no article** (`BudgetExceededError`, `output/posts/` empty).
+   (→ **BUG-047**)
+3. **Async-cleanup bug** masks the budget error with `RuntimeError: aclose():
+   asynchronous generator is already running`. (→ **BUG-048**)
+
+**Consequence — the work splits:**
+
+- **This item (B-009) = Track A:** retire the paid workflows + strip the
+  false/stale doc claims. It removes paid + broken + misleading machinery and
+  depends on *nothing* working. It does **not** assert a working keyless command.
+- **New item [B-010] = Track B:** fix keyless generation (BUG-046/047/048) so a
+  real keyless command generates an article and opens a blog PR. **The live-run
+  acceptance gate below moves to B-010.**
+
+The sections below are retained for history; where they conflict with this
+banner, the banner wins. Assumption #1 is **false** (see finding 1).
+
 ## Objective
 
 Make a keyless local/subscription run the **only** way articles are generated
@@ -15,19 +44,21 @@ keyless/subscription-only operation, yet four workflows still inject
 `content-pipeline.yml` cron has failed 8 consecutive runs (no live article since
 2026-04-27).
 
-**Success = zero paid-AI keys anywhere in `.github/workflows/`, and one
-documented keyless command that both generates an article and opens a PR on
-`oviney/blog`, proven by a real end-to-end run.**
+**Success (Track A / this item) = zero paid-AI keys anywhere in
+`.github/workflows/`, the paid + broken workflows retired, and the run docs no
+longer advertise Serper / a required `ANTHROPIC_API_KEY` / DALL-E.** The
+"documented keyless command that generates an article and opens a blog PR,
+proven by a real end-to-end run" moves to **B-010 (Track B)** — it cannot be met
+until the keyless generator is fixed (BUG-046/047/048).
 
 ## Assumptions (correct me before I plan)
 
-1. **The canonical keyless generate+publish command already exists** and needs
-   no new wiring: `python -m src.economist_agents.flow`. Its `main()` builds
-   `EconomistContentFlow()` with the default `image_mode="chart_only"` (keyless,
-   no DALL-E), and `kickoff()` runs `run_pipeline(research_mode="deterministic")`
-   — which post-#438 is keyless (arXiv + Semantic Scholar) — then calls
-   `_deploy_to_blog`, which opens the blog PR on the free `BLOG_REPO_TOKEN`.
-   → B-009 is therefore **delete + strip + doc-fix + verify**, not new code.
+1. ~~**The canonical keyless generate+publish command already exists**:
+   `python -m src.economist_agents.flow`.~~ **FALSE — disproven by T1** (see
+   banner). `flow.py` Stage 1 topic discovery calls `create_llm_client`, which
+   requires a paid key. The keyless generator is `src.agent_sdk.pipeline`
+   (manual topic, no discovery) — and even it hits BUG-047. Fixing this is
+   B-010, not B-009.
 2. **`docs/keyless-pipeline-runbook.md` documents the wrong command** for the
    full flow: `python -m src.agent_sdk.pipeline …` generates and validates but
    does **not** publish. The runbook should present `python -m

@@ -26,42 +26,70 @@ _(none)_
 
 ## Todo
 
-### B-009 · Retire paid-AI GitHub Actions; keyless local run is the only generation path
+### B-009 · Retire paid-AI GitHub Actions (Track A)
 
 Executes [ADR-0014](docs/adr/0014-retire-paid-github-actions-generation.md).
-Today four workflows inject paid-AI secrets, contradicting CLAUDE.md #5 and
-ADR-0013; the weekly `content-pipeline.yml` cron has also failed 8 runs straight
-(no live article since 2026-04-27). Make the keyless subscription run the only
-way articles are generated and published.
+Spec: `docs/specs/B-009-retire-paid-github-actions.md` (see the **T1 re-spec
+banner** — this item was split after the fail-fast run). Four workflows inject
+paid-AI secrets, contradicting CLAUDE.md #5 and ADR-0013; the weekly
+`content-pipeline.yml` cron has failed 8 runs straight (no live article since
+2026-04-27). This item **removes the paid + broken + misleading machinery**. It
+does *not* claim a working keyless command — that is B-010.
 
 Scope:
-- Delete `.github/workflows/content-pipeline.yml` (scheduled paid generation) and
-  `.github/workflows/regenerate-image.yml` (DALL-E — violates CLAUDE.md #1/#4).
-- Strip `OPENAI_API_KEY` / paid-AI secrets from `.github/workflows/ci.yml`
-  (tests mock APIs, so this should be inert — **verify a full CI run stays green
-  after removal**, don't assume).
-- Triage `.github/workflows/blog-quality-audit.yml`: strip paid keys, or retire
-  it if it cannot run without paid AI.
-- Reconcile entrypoints so "local run opens the blog PR" works from one keyless,
-  `chart_only` command. The documented command
-  (`python -m src.agent_sdk.pipeline … --research-mode claude_web`) generates +
-  validates but does **not** publish; `_deploy_to_blog` lives only in
-  `EconomistContentFlow.kickoff()` (`src/economist_agents/flow.py`). Publishing
-  uses the free `BLOG_REPO_TOKEN`, no AI key.
-- Promote `docs/keyless-pipeline-runbook.md` to canonical; point README /
-  CLAUDE.md at it. Correct CLAUDE.md's remaining paid-path contradiction — the
-  `OPENAI_API_KEY | For images | DALL-E 3` env-var row (conflicts with
-  constraint #4 and this ADR). Note: the Serper/`SERPER_API_KEY` references were
-  already removed by #438.
+- Delete `.github/workflows/content-pipeline.yml` (scheduled paid generation),
+  `.github/workflows/regenerate-image.yml` (DALL-E — violates CLAUDE.md #1/#4),
+  and `.github/workflows/remediation-sync.yml` (its cron triggers the deleted
+  content pipeline — would fail post-merge).
+- Strip `OPENAI_API_KEY` from `.github/workflows/ci.yml` (tests mock APIs, so
+  inert — **verify a green CI run**, don't assume).
+- `.github/workflows/blog-quality-audit.yml`: strip the vestigial
+  `OPENAI_API_KEY` **and remove its cron** (keep `workflow_dispatch`); its
+  weekly scan re-spams the blog via a `state=open`-only dedup bug.
+- Correct the false/stale run docs: CLAUDE.md's `OPENAI_API_KEY | DALL-E 3` env
+  row; README's Serper line, env table, and Usage block. Point README/CLAUDE.md
+  at the runbook. **Do not** assert `flow.py` is the keyless command (it isn't —
+  BUG-046). Where a canonical keyless command is needed, mark it "in repair
+  (B-010)" rather than document a command that produces no article.
 
 Acceptance:
-- No `.github/workflows/*.yml` references `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`,
-  or `SERPER_API_KEY`.
-- A single documented keyless command produces an article **and** opens a PR on
-  `oviney/blog`, verified by one real end-to-end run on the subscription.
+- `grep -rE "ANTHROPIC_API_KEY|OPENAI_API_KEY|SERPER_API_KEY" .github/workflows/`
+  → empty; no remaining workflow references a deleted one.
 - Remaining GitHub Actions (tests/lint/docs) pass with no paid secrets present.
+- No run doc advertises Serper, a required `ANTHROPIC_API_KEY`, or DALL-E; none
+  claims `flow.py` as a working keyless command.
 
-Out of scope: any unattended/scheduled replacement (see ADR-0014 "Revisit if").
+Out of scope: fixing keyless generation (→ B-010); any unattended/scheduled
+replacement (see ADR-0014 "Revisit if").
+
+### B-010 · Fix keyless generation so a local run produces an article + blog PR (Track B)
+
+Split out of B-009 by the T1 fail-fast run (2026-07-21). The keyless generator
+*runs* on the subscription but cannot yet produce a publishable article
+end-to-end. Delivers the working keyless generate+publish command that ADR-0014
+promises. Fixes three logged defects:
+
+- **BUG-046** — `EconomistContentFlow` topic discovery is not keyless
+  (`flow.py:176 → create_llm_client` needs a paid key). Either move discovery to
+  the subscription Agent SDK, or bless a `pipeline.py <topic>` + `deploy_to_blog`
+  two-step as the canonical keyless path.
+- **BUG-047** — the keyless writer exhausts its cumulative budget across retries
+  and emits no article. **First step: the budget-vs-loop diagnostic** (rerun
+  with a generous `--writer-budget`); if it still fails, fix the writer
+  well-formed/recovery path (cf. the closed PR #441 `_extract_article`, BUG-044).
+- **BUG-048** — async-generator cleanup bug (`aclose(): asynchronous generator
+  is already running`) masks `BudgetExceededError` in `_collect_text`.
+
+Acceptance (the gate that moved here from B-009):
+- One documented keyless command produces a publish-valid article + chart **and**
+  opens a PR on `oviney/blog`, verified by a real end-to-end run on the
+  subscription (env: `.venv` provisioned, `BLOG_REPO_*`, `claude` CLI auth).
+- `docs/keyless-pipeline-runbook.md` names that command as canonical, plus a
+  **Setup/Prerequisites** section (venv, `get-pip.py` since `ensurepip` is
+  stripped on this Debian python, `pip install -r requirements.txt`) — gaps T1
+  surfaced.
+
+Depends on: B-009 (clears the paid/false machinery first).
 
 ### B-008 · Single canonical slug across article file, chart PNG, and image-prompt sidecar
 

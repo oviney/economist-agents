@@ -816,6 +816,36 @@
       "root_cause_notes": "Raising out of the `async for message in query(...)` loop without closing/awaiting the async generator triggers aclose() while it is still running. Needs structured cleanup (e.g. break + explicit aclose, or aclosing()).",
       "discovered_by": "B-009 T1 fail-fast keyless run",
       "prevention_test_added": false
+    },
+    {
+      "id": "BUG-049",
+      "severity": "medium",
+      "discovered_in": "development",
+      "discovered_date": "2026-07-22T00:00:00",
+      "description": "arXiv search-term optimizer garbles words. _optimize_search_terms (scripts/arxiv_search.py:302) lowercases the query then substring-replaces mapping keys with no word boundaries, so 'AI'->'artificial intelligence OR machine learning' fires inside 'drain' -> 'dr artificial intelligence OR machine learning n'. Observed live: query 'why flaky tests quietly drain engineering budgets' became '...quietly drartificial intelligence OR machine learningn engineering budgets', producing junk arXiv queries that return nothing.",
+      "component": "scripts.arxiv_search._optimize_search_terms",
+      "status": "open",
+      "github_issue": null,
+      "is_production_escape": false,
+      "root_cause": "code_logic",
+      "root_cause_notes": "Naive str.replace() of term-mapping keys; needs word-boundary (\\b) matching.",
+      "discovered_by": "B-010 T1 validation run",
+      "prevention_test_added": false
+    },
+    {
+      "id": "BUG-050",
+      "severity": "high",
+      "discovered_in": "development",
+      "discovered_date": "2026-07-22T00:00:00",
+      "description": "Keyless deterministic research is unreliable and aborts the whole pipeline. The two free providers (arXiv, Semantic Scholar) rate-limit/err heavily (HTTP 429/503); when BOTH fail on a topic, deterministic research returns zero sources and the empty-research guard (#438) aborts the run (exit 2, 'Pipeline aborted: research failed', provider_failed={'arxiv':True,'semantic_scholar':True}). Observed live: a default-budget keyless run aborted before the writer. This is the primary blocker to reliable keyless article production \u2014 bigger than the writer bugs. Likely mitigation: default the keyless path to research_mode='claude_web' (ADR-0013, Claude's own WebSearch on the subscription \u2014 not the rate-limited academic APIs), which is exactly why claude_web was introduced.",
+      "component": "agent_sdk.pipeline research (deterministic) / empty-research guard",
+      "status": "open",
+      "github_issue": null,
+      "is_production_escape": false,
+      "root_cause": "integration_error",
+      "root_cause_notes": "Keyless research depends on free rate-limited APIs with an abort-on-empty guard. Decide the reliable keyless research mode (claude_web vs hardened deterministic) \u2014 affects B-010's canonical-command choice and the live-run acceptance gate.",
+      "discovered_by": "B-010 T1 validation run",
+      "prevention_test_added": false
     }
   ],
   "summary": {

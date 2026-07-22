@@ -1,8 +1,10 @@
 name: Blog Quality Audit
 
 on:
-  schedule:
-    - cron: '30 7 * * 1'  # Monday 07:30 UTC — before blog content-review at 08:00
+  # Manual-only (ADR-0014 / B-009). The weekly cron was removed: with no
+  # upstream producer it re-scanned a static back-catalogue and re-filed issues
+  # every Monday (existing_issue_title() dedupes on state=open only, so closed
+  # issues resurrected). Run on demand — use dry_run first.
   workflow_dispatch:
     inputs:
       dry_run:
@@ -28,8 +30,9 @@ jobs:
 
       - name: Run blog quality audit
         env:
+          # Free GitHub token only — the audit is heuristic (ArticleEvaluator),
+          # no paid AI. OPENAI_API_KEY was vestigial and has been removed.
           GH_TOKEN: ${{ secrets.BLOG_REPO_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           DRY_RUN: ${{ inputs.dry_run || 'false' }}
         run: python scripts/blog_quality_audit.py
 

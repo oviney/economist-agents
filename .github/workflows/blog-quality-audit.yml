@@ -31,7 +31,7 @@ jobs:
       - name: Run blog quality audit
         env:
           # Free GitHub token only — the audit is heuristic (ArticleEvaluator),
-          # no paid AI. OPENAI_API_KEY was vestigial and has been removed.
+          # no paid AI. The vestigial OpenAI key was removed (B-009).
           GH_TOKEN: ${{ secrets.BLOG_REPO_TOKEN }}
           DRY_RUN: ${{ inputs.dry_run || 'false' }}
         run: python scripts/blog_quality_audit.py

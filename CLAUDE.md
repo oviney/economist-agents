@@ -118,7 +118,7 @@ When dispatching agents via the `Agent` tool (orchestrating the fleet), the brie
 
 ## Architecture
 
-- **LLM**: Claude (Anthropic) is the primary LLM. OPENAI_API_KEY only needed for DALL-E images.
+- **LLM**: Claude (Anthropic) via the Agent SDK on the Claude subscription. No DALL-E / `OPENAI_API_KEY` — image generation was retired (ADR-0014); hero images are human-supplied per constraint #4.
 - **Research**: Deterministic academic search via free, keyless providers only — arXiv + Semantic Scholar. No LLM and no pay-per-use APIs in the research path.
 - **Writing**: Claude via Anthropic Agent SDK (`src/agent_sdk/stage3_runner.py`).
 - **Quality gates**: Deterministic post-processing in `src/agent_sdk/stage4_runner.py`, then `scripts/publication_validator.py`.

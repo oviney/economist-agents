@@ -80,6 +80,7 @@ nav:
     - ADR-0012 — Retire the AgentRegistry: adr/0012-retire-agent-registry.md
     - ADR-0013 — Keyless claude_web Research: adr/0013-keyless-claude-web-research.md
     - ADR-0014 — Retire Paid GitHub Actions Generation: adr/0014-retire-paid-github-actions-generation.md
+    - ADR-0015 — Local-First Verification: adr/0015-local-first-verification.md
 
   - Skills:
     - Workflow (addyosmani/agent-skills):

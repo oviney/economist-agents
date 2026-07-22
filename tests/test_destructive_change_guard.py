@@ -30,14 +30,36 @@ class TestConfiguration:
     def test_max_deletion_is_50_pct(self) -> None:
         assert MAX_DELETION_PCT == 50
 
-    def test_ci_workflow_is_critical(self) -> None:
-        assert ".github/workflows/ci.yml" in CRITICAL_FILES
+    def test_retired_ci_workflows_are_not_critical(self) -> None:
+        # GitHub Actions was retired (content-pipeline.yml in B-009, ci.yml in
+        # B-011); the guard protects core source, not CI config we intentionally
+        # removed, so these must NOT be in the protected list.
+        assert ".github/workflows/ci.yml" not in CRITICAL_FILES
+        assert ".github/workflows/content-pipeline.yml" not in CRITICAL_FILES
 
 
 class TestIntentionalRewriteBypass:
     def test_returns_empty_when_no_pr_context(self) -> None:
-        with patch.dict("os.environ", {"GITHUB_REF": "", "PR_NUMBER": ""}, clear=False):
+        with patch.dict(
+            "os.environ",
+            {"GITHUB_REF": "", "PR_NUMBER": "", "INTENTIONAL_REWRITE": ""},
+            clear=False,
+        ):
             assert get_intentional_rewrites() == set()
+
+    def test_local_allowlist_via_env_var(self) -> None:
+        # B-011: paywall-free local allowlist for `make ci-local` — comma/space
+        # separated, works with no PR context and no gh.
+        with patch.dict(
+            "os.environ",
+            {
+                "GITHUB_REF": "",
+                "PR_NUMBER": "",
+                "INTENTIONAL_REWRITE": "src/a.py, scripts/b.py",
+            },
+            clear=False,
+        ):
+            assert get_intentional_rewrites() == {"src/a.py", "scripts/b.py"}
 
     def test_parses_marker_lines_from_pr_body(self) -> None:
         body = (

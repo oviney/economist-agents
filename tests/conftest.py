@@ -6,6 +6,33 @@ from unittest.mock import Mock
 import pytest
 
 
+@pytest.fixture(autouse=True)
+def _hermetic_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Isolate every test from ambient credentials in a developer's `.env`.
+
+    A local `.env` with `BLOG_REPO_*` (as the keyless runbook uses) otherwise
+    leaks in: `_deploy_to_blog` would see credentials and attempt a real
+    `git clone` of the blog repo over the network — breaking no-credential
+    assertions and, in the kickoff path, hanging the suite. Paid AI keys are
+    cleared too so tests never accidentally hit a live provider. Tests that need
+    a value set it explicitly via `monkeypatch.setenv` (which wins over this).
+    B-011 / ADR-0015: local verification must be hermetic.
+    """
+    for var in (
+        "BLOG_REPO_OWNER",
+        "BLOG_OWNER",
+        "BLOG_REPO_NAME",
+        "BLOG_REPO",
+        "BLOG_REPO_TOKEN",
+        "GITHUB_TOKEN",
+        "GH_TOKEN",
+        "ANTHROPIC_API_KEY",
+        "OPENAI_API_KEY",
+        "SERPER_API_KEY",
+    ):
+        monkeypatch.delenv(var, raising=False)
+
+
 @pytest.fixture
 def temp_output_dir(tmp_path: Path) -> Path:
     """Create temporary output directory for tests.

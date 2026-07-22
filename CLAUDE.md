@@ -140,6 +140,11 @@ scripts/                  # Standalone scripts (publication_validator, citation_
 Type hints mandatory. Docstrings required. Use `orjson` not `json`.
 `logger` not `print()`. Mock APIs in tests. >80% coverage required.
 
+**Verification is local-first (ADR-0015).** There is no GitHub Actions CI and
+`main` is not branch-protected — run `make ci-local` before merging (ruff, mypy,
+tests + coverage 70% / `src/quality` 90%, bandit, destructive-change guard). You
+are the merge gate. Python is pinned to one version via `.python-version`.
+
 See `skills/python-quality/SKILL.md` for complete standards.
 
 ## Quality Gates (enforced deterministically)

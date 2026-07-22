@@ -1,8 +1,12 @@
 # ADR-0004: Python Version Constraint for CrewAI Compatibility
 
 **Date:** 2025-01-02
-**Status:** Accepted
+**Status:** Superseded by [ADR-0015](0015-local-first-verification.md)
 **Context:** Sprint 9 Story 1 - CrewAI Integration Validation
+
+> **Superseded (2026-07-22):** CrewAI was removed ([ADR-0006](0006-agent-framework-selection.md)),
+> so the compatibility constraint that motivated this ADR is moot. ADR-0015
+> retires the multi-version test matrix in favour of a single pinned version.
 
 > **Note (2026-04-05):** This constraint exists because of CrewAI. [ADR-0006](0006-agent-framework-selection.md) re-evaluates the framework choice; if a replacement framework is adopted, revisit this Python version constraint as part of that migration.
 

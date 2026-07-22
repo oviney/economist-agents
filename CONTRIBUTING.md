@@ -6,9 +6,9 @@ Thank you for your interest in contributing to the Economist-Agents project! Thi
 
 ### Prerequisites
 
-- **Python 3.13.x** (3.14+ untested)
+- **Python 3.12** (pinned in `.python-version`; single version per ADR-0015)
 - **Git** with pre-commit hooks enabled
-- **Virtual environment** (venv or conda)
+- **Virtual environment** (venv)
 
 ### Setup
 
@@ -16,13 +16,15 @@ Thank you for your interest in contributing to the Economist-Agents project! Thi
    ```bash
    git clone https://github.com/oviney/economist-agents.git
    cd economist-agents
-   python3.13 -m venv .venv
+   python3 -m venv .venv
+   # On stock Debian/Ubuntu ensurepip is stripped, so the venv has no pip —
+   # bootstrap it:
+   curl -sS https://bootstrap.pypa.io/get-pip.py | .venv/bin/python
    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
    ```
 
 2. **Install dependencies:**
    ```bash
-   pip install --upgrade pip
    pip install -r requirements.txt
    pip install -r requirements-dev.txt
    ```
@@ -33,19 +35,22 @@ Thank you for your interest in contributing to the Economist-Agents project! Thi
    pre-commit install --hook-type pre-push
    ```
 
-4. **Configure environment:**
+4. **Configure environment (keyless — no paid AI keys):**
    ```bash
-   cp .env.example .env
-   # Edit .env with your API keys:
-   # ANTHROPIC_API_KEY (required — primary LLM)
-   # SERPER_API_KEY (recommended — adds Google Web/Scholar; arXiv + Semantic Scholar work without it)
-   # OPENAI_API_KEY (optional — DALL-E image generation only)
+   # To publish generated articles, set a FREE GitHub token with push access to
+   # oviney/blog (Contents + Pull requests: write). No AI key is needed —
+   # writing/graphics/research run on the Claude subscription via the Agent SDK.
+   export BLOG_REPO_TOKEN=<your fine-grained PAT>
    ```
+   See `docs/keyless-pipeline-runbook.md` for the full keyless run.
 
-5. **Verify setup:**
+5. **Verify (before every merge — you are the gate):**
    ```bash
-   make quality  # Runs format, lint, type-check, and tests
+   make ci-local   # full pre-merge gate: ruff, mypy, tests+coverage (70% +
+                   # src/quality 90%), bandit, destructive-change guard.
    ```
+   There is no GitHub Actions CI and `main` is not branch-protected (ADR-0015):
+   `make ci-local` is the source of truth. `make quality` is the faster subset.
 
 ## ✏️ Generating an article — the image handshake (#403)
 

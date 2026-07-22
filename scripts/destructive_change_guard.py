@@ -30,8 +30,9 @@ CRITICAL_FILES = [
     "src/quality/agent_reviewer.py",
     "scripts/frontmatter_schema.py",
     "scripts/article_evaluator.py",
-    ".github/workflows/content-pipeline.yml",
-    ".github/workflows/ci.yml",
+    # NB: the CI workflow files were removed from this list when GitHub Actions
+    # was retired (content-pipeline.yml in B-009, ci.yml in B-011). The guard
+    # protects core source, not CI config we intentionally retired.
 ]
 
 # Maximum percentage of lines that can be deleted from a critical file
@@ -85,15 +86,24 @@ def get_file_line_count(base: str, filepath: str) -> int:
 
 
 def get_intentional_rewrites() -> set[str]:
-    """Read "Intentional rewrite: <path>" allowlist from the PR description.
+    """Read the "Intentional rewrite: <path>" allowlist.
 
-    On GitHub Actions the PR number is available via several env vars
-    (``GITHUB_REF`` is ``refs/pull/<n>/merge`` for pull-request events).
-    When the gh CLI is available, fetch the PR body and parse out any
-    ``Intentional rewrite: <path>`` lines. Returns an empty set when not
-    running in a PR context or when the gh call fails — in that case the
-    guard runs in its strict default mode.
+    Two sources, unioned:
+    - **Local** (``make ci-local`` / pre-commit): the ``INTENTIONAL_REWRITE``
+      env var, a comma- or whitespace-separated list of paths. This is the
+      paywall-free equivalent of the PR-description allowlist for a repo that
+      runs verification locally (B-011 / ADR-0015).
+    - **PR context** (legacy, if still on GitHub): parse ``Intentional
+      rewrite: <path>`` lines from the PR description via the gh CLI.
+
+    Returns an empty set (strict mode) when neither source yields anything.
     """
+    allowlist: set[str] = set()
+
+    # Local allowlist — works with no PR context and no gh.
+    local = os.environ.get("INTENTIONAL_REWRITE", "")
+    allowlist.update(p for p in re.split(r"[,\s]+", local.strip()) if p)
+
     pr_number: str | None = None
     ref = os.environ.get("GITHUB_REF", "")
     match = re.match(r"refs/pull/(\d+)/", ref)
@@ -102,7 +112,7 @@ def get_intentional_rewrites() -> set[str]:
     elif os.environ.get("PR_NUMBER"):
         pr_number = os.environ["PR_NUMBER"]
     if not pr_number:
-        return set()
+        return allowlist
 
     result = subprocess.run(
         ["gh", "pr", "view", pr_number, "--json", "body", "-q", ".body"],
@@ -110,12 +120,13 @@ def get_intentional_rewrites() -> set[str]:
         text=True,
     )
     if result.returncode != 0:
-        return set()
+        return allowlist
 
     body = result.stdout
-    return {
+    allowlist.update(
         m.group(1).strip() for m in re.finditer(r"Intentional rewrite:\s*(\S+)", body)
-    }
+    )
+    return allowlist
 
 
 def check_destructive_changes() -> list[str]:
@@ -135,7 +146,7 @@ def check_destructive_changes() -> list[str]:
         if filepath not in CRITICAL_FILES:
             continue
         if filepath in allowlist:
-            print(f"  ⏩ Allowed (intentional rewrite per PR body): {filepath}")
+            print(f"  ⏩ Allowed (intentional rewrite): {filepath}")
             continue
 
         deleted = stat["deleted"]

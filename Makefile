@@ -1,4 +1,4 @@
-.PHONY: install test lint format type-check quality clean help
+.PHONY: install test lint format type-check quality ci-local clean help
 
 # Default target
 help:
@@ -8,7 +8,8 @@ help:
 	@echo "  make lint         - Run ruff linter"
 	@echo "  make format       - Format code with ruff"
 	@echo "  make type-check   - Run mypy type checker"
-	@echo "  make quality      - Run all quality checks"
+	@echo "  make quality      - Run all quality checks (fast)"
+	@echo "  make ci-local     - Full pre-merge gate (replaces GitHub Actions CI)"
 	@echo "  make clean        - Remove cache files"
 
 install:
@@ -35,6 +36,25 @@ type-check:
 
 quality: format lint type-check test
 	@echo "✅ All quality checks passed!"
+
+# Full pre-merge gate — reproduces every check the retired GitHub Actions
+# `Quality Gates CI` (ci.yml) enforced, so verification is local-first and
+# paywall-free (ADR-0015). main is unprotected: run this before you merge.
+ci-local:
+	@echo "── ruff format ──"        && ruff format --check .
+	@echo "── ruff lint ──"          && ruff check .
+	@echo "── bare-name imports ──"  && python scripts/check_bare_name_imports.py
+	@echo "── mypy (advisory) ──"    && (mypy scripts/ || echo "⚠️  mypy advisory — known debt, non-blocking")
+	@echo "── tests + coverage ──"   && pytest tests/ \
+		--cov=src --cov=scripts \
+		--cov-report=term-missing \
+		--cov-fail-under=70
+	@echo "── src/quality per-module coverage ──" && coverage report --include='src/quality/*' --fail-under=90
+	@echo "── security scan (bandit) ──" && bandit -r scripts/ \
+		--exclude '*/.venv/*,*/__pycache__/*,scripts/archived' \
+		--severity-level medium -q
+	@echo "── destructive-change guard ──" && python scripts/destructive_change_guard.py
+	@echo "✅ ci-local passed — you are the merge gate (main is unprotected)."
 
 clean:
 	find . -type d -name __pycache__ -exec rm -rf {} +

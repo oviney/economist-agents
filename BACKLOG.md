@@ -100,6 +100,15 @@ Depends on: B-009 (clears the paid/false machinery first).
 
 ### B-011 · Retire GitHub Actions CI; local `make quality` + pre-commit is the verification path
 
+> **✅ DONE (2026-07-22).** `make ci-local` reproduces every gate ci.yml
+> enforced (ruff, mypy-advisory, tests+coverage 70% / src/quality 90%, bandit,
+> destructive guard) — verified green (2217 passed, 79.5% cov, src/quality 97%).
+> ci.yml / quality-tests.yml / sync-copilot.yml deleted; docs.yml +
+> copilot-setup-steps.yml kept. Python pinned to 3.12; ADR-0015 recorded;
+> ADR-0004 superseded. Fixed a full-suite hang (hermetic-env conftest fixture).
+> Follow-up (optional): wire coverage/guard/bandit into pre-commit as
+> non-optional (make ci-local is the enforced gate today).
+
 Scoped in `docs/specs/B-011-retire-ci-local-verification.md`. Extends ADR-0014
 from generation to verification: make local tooling the source of truth, zero
 dependency on GitHub Actions (the repo is public so Actions is free, but the goal

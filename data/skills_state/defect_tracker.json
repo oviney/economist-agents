@@ -798,7 +798,7 @@
       "github_issue": null,
       "is_production_escape": false,
       "root_cause": "code_logic",
-      "root_cause_notes": "Likely writer producing malformed output -> retry loop -> cumulative budget exhaustion. Confirm via generous-budget rerun; if it still fails, the writer output well-formed check / recovery (cf. PR #441 _extract_article) is the fix, not the budget.",
+      "root_cause_notes": "DIAGNOSED (generous --writer-budget 3.00 run): DUAL cause. (1) Under-budget \u2014 the run completed at $0.5907 total, but the defaults (run_pipeline writer 0.30 / CLI 0.60) are exhausted once the writer retries. (2) The writer emits conversational preamble on some attempts (e.g. 'The search tool is wired to arXiv... I'll write the article grounded in...'), failing the well-formed check (starts_with_dash=False) and forcing a retry that burns budget. Fix: port the closed PR #441 _extract_article preamble/fence recovery into the stage3 retry loop so preamble attempts recover in-place instead of retrying, AND raise the default writer budget for margin. NOTE: a generous-budget run DID produce a publish-valid article (publication_validator PASSED) \u2014 keyless generation works.",
       "discovered_by": "B-009 T1 fail-fast keyless run",
       "prevention_test_added": false
     },

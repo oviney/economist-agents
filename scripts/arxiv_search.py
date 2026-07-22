@@ -314,8 +314,12 @@ class ArxivSearcher:
 
         optimized = query.lower()
         for business_term, academic_terms in term_mapping.items():
-            if business_term.lower() in optimized:
-                optimized = optimized.replace(business_term.lower(), academic_terms)
+            # Word-boundary match so short keys don't fire inside other words —
+            # e.g. "AI" must not expand inside "drain"/"training", "ROI" not
+            # inside "heroism" (BUG-049). Replacement is passed as a function so
+            # the expansion text is treated literally (no backref surprises).
+            pattern = rf"\b{re.escape(business_term.lower())}\b"
+            optimized = re.sub(pattern, lambda _m: academic_terms, optimized)
 
         return optimized
 

@@ -1,20 +1,74 @@
-# TODO: Keyless subscription pipeline (B-006)
+# TODO: Retire paid GitHub Actions; keyless local run only (B-009)
 
-**Plan**: [`tasks/plan.md`](./plan.md) · **Spec**: [`docs/specs/B-006-keyless-subscription-pipeline.md`](../docs/specs/B-006-keyless-subscription-pipeline.md)
-**Status**: IMPLEMENTED — all tasks + both checkpoints complete (PR #447).
+**Plan**: [`tasks/plan.md`](./plan.md) · **Spec**: [`docs/specs/B-009-retire-paid-github-actions.md`](../docs/specs/B-009-retire-paid-github-actions.md)
+**Status**: PLANNED — awaiting LGTM to build
 
-## Todo (dependency-ordered)
+## Tasks (dependency-ordered)
 
-- [x] **T0** — Env: `claude-agent-sdk` imports; keyless smoke `query()` proven (install workaround: `--ignore-installed PyJWT`; `IS_SANDBOX=1` under root). Full requirements install fix → T6.
-- [x] **T1** — `src/agent_sdk/research/claude_web.py` → `build_claude_web_brief()` (WebSearch/WebFetch) + 3 tests green
-- [x] **T2** — Wired `research_mode="claude_web"` through `run_stage3` dispatch + `run_pipeline` type; routing + env-override tests green. (CLI `--research-mode`/`--image-mode` end-to-end flags deferred to the Checkpoint B live-run wiring.)
-- [x] **— CHECKPOINT A —** `run_pipeline(chart_only, claude_web)` with all keys unset → `publication_validator_passed=True`, 0 issues. Surfaced + fixed two pre-existing chart-embed bugs (BUG-038 `!`→`.` mangling of `![`; BUG-039 chart_only strip-before-embed ordering) with regression tests. Full suite: 2234 passed, no regressions.
-- [x] **T3** — Rerouted `refine_image_metadata` to `query()`+Read vision, dropped key gate; 7 vision tests rewritten; arch-check clean
-- [x] **T4** — `economist_agent._abort_if_keyless()` fail-loud message + 2 tests
-- [x] **T5** — ADR-0013 (keyless claude_web research); registered in mkdocs; adr-lint passes
-- [x] **T6** — `--research-mode`/`--image-mode` CLI + end-to-end chart_only path; runbook `docs/keyless-pipeline-runbook.md`; `BACKLOG.md` B-006
-- [x] **— CHECKPOINT B — PASSED (run 6)** ✅ Live keyless subscription run with ANTHROPIC/OPENAI/SERPER **all unset** produced a validator-passing 1092-word article (`output/posts/crying-wolf-flaky-tests-...md`), `publication_validator PASSED`, exit 0. Six real sourced stats + URLs, embedded chart. Took 6 runs, each peeling off one pre-existing gap against the real CLI (mocked tests never exercised it): BUG-038 (`!`→`.` on `![`), 039 (chart_only strip-order), 040 (fence body-delete), 041 (graphics turn-cap crash), 042 (missing chart title), 043 (bounded writer retry for non-determinism), + budget-cap headroom for multi-turn CLI calls. All fixed with regression tests.
+- [ ] **T1 — Prove the keyless path end-to-end** _(gate; run on current `main`)_
+  - Acceptance: `python -m src.economist_agents.flow` (env: `IS_SANDBOX=1`,
+    `BLOG_REPO_TOKEN`) generates a publish-valid article + chart (`chart_only`,
+    keyless deterministic research) **and** opens a PR on `oviney/blog`.
+  - Verify: blog-PR URL exists; article passes `publication_validator`.
+  - Files: none in this repo (produces a PR on `oviney/blog`).
+  - **Runner: OWNER** — Ouray runs it locally on the subscription, reports result + blog-PR URL.
+  - Depends: none. **Scope: S (externally gated).**
+  - ⛔ If this fails → STOP, do not start T2. Re-open the spec (a non-working
+    flow invalidates the core assumption).
 
-## Done
+- [ ] **T2 — Retire the scheduled paid-generation workflows**
+  - Acceptance: `content-pipeline.yml`, `regenerate-image.yml`, and
+    `remediation-sync.yml` all deleted (remediation-sync confirmed full retire —
+    it triggers the deleted content pipeline).
+  - Verify: `grep -rE "content-pipeline\.yml|regenerate-image\.yml" .github/workflows/`
+    → empty; `git rm` recorded.
+  - Files: 3 workflow files (delete).
+  - Depends: T1 (Checkpoint A). Scope: S.
 
-_(none yet)_
+- [ ] **T3 — Strip `OPENAI_API_KEY` from `ci.yml`**
+  - Acceptance: no paid-AI secret in `ci.yml`; test step runs keyless.
+  - Verify: a green CI run on the B-009 branch (tests mock APIs — proven, not assumed).
+  - Files: `.github/workflows/ci.yml`.
+  - Depends: T1. Scope: XS.
+
+- [ ] **T4 — Strip key + remove cron from `blog-quality-audit.yml`**
+  - Acceptance: no `OPENAI_API_KEY`; no `schedule:` block; `workflow_dispatch`
+    (with `dry_run`) retained.
+  - Verify: `grep -n "schedule\|OPENAI_API_KEY" .github/workflows/blog-quality-audit.yml`
+    → only unrelated matches / none.
+  - Files: `.github/workflows/blog-quality-audit.yml`.
+  - Depends: T1. Scope: XS.
+
+- [ ] **T5 — Fix runbook + CLAUDE.md**
+  - Acceptance: `docs/keyless-pipeline-runbook.md` names `python -m
+    src.economist_agents.flow` as the canonical keyless generate+publish command
+    (keeps the `pipeline` command as generate-only); CLAUDE.md's
+    `OPENAI_API_KEY | DALL-E 3` env row removed/corrected; both point at the runbook.
+  - Verify: runbook shows the flow command; `grep -n "DALL" CLAUDE.md` → none in
+    a "supported path" sense.
+  - Files: `docs/keyless-pipeline-runbook.md`, `CLAUDE.md`.
+  - Depends: T1 (documents the proven command). Scope: S.
+
+- [ ] **T6 — Full README run-doc correction**
+  - Acceptance: README no longer says "via Serper" (~L29), no env-table rows for
+    required `ANTHROPIC_API_KEY` / `SERPER_API_KEY` / `OPENAI_API_KEY`+DALL·E
+    (~L82-84, ~L175-176); the Usage block names the canonical `flow` command,
+    not the non-publishing `pipeline` + hero handshake (~L92-104); points at runbook.
+  - Verify: `grep -niE "serper|dall" README.md` → none; Usage shows the flow command.
+  - Files: `README.md`.
+  - Depends: T1. Scope: S (~20-30 lines).
+
+- [ ] **T7 — Open the B-009 PR and land**
+  - Acceptance: one PR bundling the spec, plan, workflow deletions/strips, and
+    doc fixes; description records the T1 blog-PR URL and both `grep` guards;
+    CI green; merged; B-009 marked Done in `BACKLOG.md`.
+  - Verify: all spec Success Criteria (1–6); PR checks green on the real commit.
+  - Files: `BACKLOG.md` (mark Done) + the PR itself.
+  - Depends: T2–T6. Scope: S.
+
+## Checkpoints
+
+- **A (after T1, BLOCKING):** keyless path proven; blog-PR URL captured, else stop.
+- **B (after T2–T4):** no paid keys, no dangling workflow refs, CI green.
+- **C (after T5–T6):** all run docs agree on the keyless `flow` command.
+- **D (after T7):** spec Success Criteria met; B-009 Done.

@@ -1,111 +1,95 @@
-# PLAN: Keyless subscription pipeline (B-006)
+# PLAN: Retire paid GitHub Actions; keyless local run only (B-009)
 
-**Spec**: `docs/specs/B-006-keyless-subscription-pipeline.md` (approved — go to plan)
-**Branch**: `claude/pipeline-status-check-mwptdh`
-**Status**: IMPLEMENTED — plan executed; keyless pipeline proven live (PR #447)
+**Spec**: `docs/specs/B-009-retire-paid-github-actions.md` (approved — go to plan)
+**ADR**: `docs/adr/0014-retire-paid-github-actions-generation.md` (Accepted, #449)
+**Branch**: _to create_ — `chore/b-009-retire-paid-gha`
+**Status**: T1 handed to owner (fail-fast gate). T2–T7 blocked until T1 passes.
 
 ## Goal restated
 
-One command, **all three keys unset**, produces a `publication_validator`-passing
-article using only the Claude subscription (Agent SDK). Auth + keyless WebSearch
-already proven in-session.
+Make a keyless local/subscription run the only way articles are generated and
+published, and remove every GitHub Actions workflow that requires a paid-AI key.
+Doc + workflow changes only — **no `src/`/`scripts/` code changes expected**.
 
-## Dependency graph
+## Architecture decisions
 
-```
-T0 env (install SDK + IS_SANDBOX)         ← unblocks all runtime verification
-      │
-      ▼
-T1 claude_web researcher  ──►  T2 wire research_mode through stage3+pipeline+CLI
-                                     │
-                                     ▼
-                              [CHECKPOINT A]  keyless article via mocked test
-                                     │
-      ┌──────────────────────────────┼───────────────────────────┐
-      ▼                              ▼                            ▼
-T3 vision→query() (D3)      T4 economist_agent fail-loud (D1)   T5 ADR (D4)
-      └──────────────────────────────┼───────────────────────────┘
-                                     ▼
-                              T6 runbook + BACKLOG + install fix
-                                     │
-                                     ▼
-                              [CHECKPOINT B]  live keyless run → validator exit 0
-```
+- **Fail-fast ordering.** The riskiest assumption is that the keyless command
+  actually produces an article end-to-end after 3 months of a dark pipeline.
+  That real run is *also* the spec's acceptance gate. So it goes **first**, on
+  current `main`, before we delete any paid automation. If it fails → STOP and
+  re-spec (per spec: a non-working flow is a new finding, not scope creep).
+- **Prove the exact documented command.** Task 1 runs
+  `python -m src.economist_agents.flow` — the same command Tasks 5–6 will
+  document as canonical — so the docs describe a verified path, not an assumed
+  one.
+- **`remediation-sync.yml` → retire, not patch.** It is a scheduled workflow
+  whose queue processor triggers the deleted `content-pipeline.yml`; stripping
+  only the trigger leaves a queue processor that can't act. Retiring it aligns
+  with ADR-0014's "no unattended scheduled generation."
+- **One PR, spec + plan included.** The approved spec and this plan land in the
+  same B-009 PR as the changes they govern.
 
-T1→T2 is the only hard chain. T3/T4/T5 are independent and parallelizable after
-Checkpoint A. Each task is a vertical slice (produces an observable result), each
-tested and committed per `incremental-implementation`.
+## Task list
 
-## Tasks
+### Phase 1 — Prove the keyless path (fail-fast gate)
 
-### T0 — Env: reliable keyless SDK install *(unblocker)*
-- Make `claude-agent-sdk` installable without the `sgmllib3k`/feedparser wheel
-  failure aborting the transaction (pin/isolate, or document a two-step install).
-- Document `IS_SANDBOX=1` requirement when running as root.
-- **AC**: `python -c "import claude_agent_sdk"` succeeds; keyless smoke `query()`
-  returns text. **Verify**: run `scratchpad/smoke.py` with keys unset.
+- [ ] **T1** — Real keyless end-to-end run
 
-### T1 — `claude_web` researcher
-- New `src/agent_sdk/research/claude_web.py`:
-  `async build_claude_web_brief(topic, max_budget_usd=None) -> tuple[str, float]`.
-- Uses `query()` with `allowed_tools=["WebSearch","WebFetch"]`, research-analyst
-  system prompt; returns a brief **string** matching `_format_brief` shape
-  (claims + source names + URLs) and the SDK cost.
-- **AC**: given a mocked `query()` transcript, returns a non-empty brief string
-  with sources; reads no `SERPER_API_KEY`; constructs no `anthropic` client.
-- **Verify**: `pytest tests/test_claude_web_research.py -q`.
+### Checkpoint A (BLOCKING)
+- [ ] T1 produced a publish-valid article + chart and opened a PR on
+      `oviney/blog`. Blog-PR URL captured. **If T1 failed, stop and re-spec —
+      do not proceed to deletions.**
 
-### T2 — Wire `research_mode="claude_web"` through the stack
-- `stage3_runner.run_stage3`: add `"claude_web"` to the allowed set
-  (lines 424–435) → dispatch to `build_claude_web_brief`.
-- `pipeline.run_pipeline`: accept/thread `research_mode="claude_web"`.
-- `pipeline.main`: add `--research-mode` choice `claude_web` (+ `--image-mode`).
-- **AC**: `run_pipeline(topic, image_mode="chart_only", research_mode="claude_web")`
-  with mocked `query()` and **all keys unset** returns
-  `publication_validator_passed=True`; asserts no Serper/anthropic client built.
-- **Verify**: `pytest tests/test_pipeline_keyless.py -q`.
+### Phase 2 — Retire paid workflows + fix couplings
 
-> **CHECKPOINT A** — keyless article generated in a deterministic (mocked) test;
-> prove zero paid-client construction. Stop, show green, get go for T3–T6.
+- [ ] **T2** — Delete `content-pipeline.yml`, `regenerate-image.yml`, retire `remediation-sync.yml`
+- [ ] **T3** — Strip `OPENAI_API_KEY` from `ci.yml`
+- [ ] **T4** — Strip key + remove cron from `blog-quality-audit.yml`
 
-### T3 — Vision refinement off the API key (D3)
-- `_shared.refine_image_metadata`: replace `anthropic.AsyncAnthropic` path with
-  `query()` vision (image passed to the SDK); drop the `ANTHROPIC_API_KEY` gate;
-  keep graceful fallback to writer drafts on any error.
-- **AC**: mocked `query()` → refined alt/caption; error → drafts. No
-  `ANTHROPIC_API_KEY` read. (Off critical path for `chart_only`; matters for hero.)
-- **Verify**: `pytest tests/test_vision_refine_keyless.py -q`.
+### Checkpoint B
+- [ ] `grep -rE "ANTHROPIC_API_KEY|OPENAI_API_KEY|SERPER_API_KEY" .github/workflows/` → empty
+- [ ] `grep -rE "content-pipeline\.yml|regenerate-image\.yml" .github/workflows/` → empty
+- [ ] A green CI run confirms the `ci.yml` key removal is inert (tests mock APIs)
 
-### T4 — `economist_agent.py` fail-loud (D1)
-- Deprecated path: on a keyless invocation, raise/exit with a clear
-  "use `python -m src.agent_sdk.pipeline --research-mode claude_web`" message
-  instead of a raw `KeyError`/`ValueError`.
-- **AC**: keyless run of the deprecated entry prints the guidance, exits non-zero.
-- **Verify**: `pytest tests/test_economist_agent_deprecation.py -q`.
+### Phase 3 — Make the run docs agree
 
-### T5 — ADR: LLM in the research path (keyless mode) (D4)
-- `docs/adr/00NN-llm-research-keyless-mode.md`: record the deliberate departure
-  from "no LLM in research"; scope it to `claude_web` mode only; note
-  non-determinism and that citation gates remain enforced.
-- **AC**: ADR passes the repo's adr-lint gate. **Verify**: adr-lint script green.
+- [ ] **T5** — Fix runbook + CLAUDE.md
+- [ ] **T6** — Full README run-doc correction
 
-### T6 — Runbook + backlog + install fix
-- Doc: keyless run recipe (env + command + the honest research caveat).
-- `BACKLOG.md`: add B-006, mark Done on merge.
-- **AC**: doc committed; `BACKLOG.md` updated.
+### Checkpoint C
+- [ ] Runbook names `python -m src.economist_agents.flow` as canonical
+- [ ] No run doc (README/CLAUDE.md/runbook) advertises Serper, a required
+      `ANTHROPIC_API_KEY`, or `OPENAI_API_KEY`/DALL-E
 
-> **CHECKPOINT B** — behavioural: `IS_SANDBOX=1 python -m src.agent_sdk.pipeline
-> --image-mode chart_only --research-mode claude_web` with **no keys** →
-> article on disk, `publication_validator.py` exit 0. This is the real proof;
-> subscription-billed, not CI. (I can run this here.)
+### Phase 4 — Land
 
-## Non-goals (scope discipline, per spec §8)
+- [ ] **T7** — Open the B-009 PR; record the T1 blog-PR URL; CI green; merge
 
-Not converging/deleting the two pipelines; not touching hero/DALL-E generation;
-not removing the Serper `deterministic` mode (only adding a keyless sibling).
+### Checkpoint D (Complete)
+- [ ] All spec Success Criteria (1–6) met; mark B-009 Done in BACKLOG.md
 
-## Test strategy summary
+## Risks and mitigations
 
-All new tests keyless + offline via **mocked `query()`** so CI needs no
-subscription. The one subscription-dependent step is Checkpoint B (human/live),
-explicitly out of CI. Existing suite must stay green.
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| Keyless flow doesn't actually run e2e (3 months dark) | High | T1 first, on `main`, before any deletion. Failure → stop + re-spec. |
+| T1 needs subscription auth + `BLOG_REPO_TOKEN` and opens a real blog PR | Med | Human-in-the-loop: owner runs T1 (or explicitly authorises it); it is an outward action on `oviney/blog`. |
+| Stripping `ci.yml` key breaks a test that reads it | Med | Verified by a green CI run (Checkpoint B), not assumed. Revert is one line. |
+| `remediation-sync.yml` retirement removes wanted queue logic | Low | It cannot function without the deleted content pipeline; retire is the honest state. Flag in PR for owner review. |
+| README correction drifts from CLAUDE.md/runbook wording | Low | T5 and T6 share one canonical command string; cross-check in Checkpoint C. |
+
+## Parallelization
+
+- T2 / T3 / T4 touch independent files — safe to do together within Phase 2.
+- T5 / T6 are independent docs — parallelizable, but must post-date T1 (they
+  document the command T1 proves).
+- T1 gates everything; T7 depends on all.
+
+## Open questions — RESOLVED
+
+- **T1 execution** → **owner runs it.** Ouray runs `python -m
+  src.economist_agents.flow` locally on the subscription and reports the result
+  + blog-PR URL. It is not run in the agent environment (subscription auth +
+  outward blog PR).
+- **`remediation-sync.yml`** → **retire entirely** (confirmed). It cannot
+  function without the deleted content pipeline.

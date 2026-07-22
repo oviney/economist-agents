@@ -147,15 +147,20 @@ class DefectPrevention:
                 "This prevents BUG-016 (charts generated but invisible)."
             )
 
-        # Secondary check: Chart should be referenced in text
-        chart_references = [
-            r"as the chart shows",
-            r"the chart reveals",
-            r"shown in the chart",
-            r"chart illustrates",
+        # Secondary check: Chart should be referenced in text. Match naturally —
+        # "chart" within a few words of a reference verb ("the chart below
+        # illustrates", "the chart above demonstrates"), or "as/in/shown in the
+        # chart". The old fixed-phrase list produced false positives on valid
+        # references with an intervening word (BUG-051).
+        chart_reference_patterns = [
+            r"\bchart\b(?:\s+\w+){0,3}\s+"
+            r"(?:show|shows|reveal|reveals|illustrat\w+|depict\w+|demonstrat\w+|"
+            r"highlight\w+|display\w+|underscore\w+|confirm\w+|make[a-z]*\s+clear)",
+            r"\b(?:as|in|from|per|shown\s+in)\s+the\s+chart\b",
         ]
         has_reference = any(
-            re.search(pattern, content, re.IGNORECASE) for pattern in chart_references
+            re.search(pattern, content, re.IGNORECASE)
+            for pattern in chart_reference_patterns
         )
 
         if not has_reference:

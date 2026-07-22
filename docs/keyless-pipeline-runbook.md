@@ -1,39 +1,63 @@
-# Runbook: Keyless pipeline on the Claude subscription (B-006)
+# Runbook: Keyless pipeline on the Claude subscription (B-006 / B-009 / B-010)
 
-Generate a publish-ready article with **no paid API keys** — no
+Generate **and publish** an article with **no paid API keys** — no
 `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, or `SERPER_API_KEY`. All LLM work
 (writer, graphics, research, vision) runs on your Claude subscription through
 the Agent SDK (`claude_agent_sdk.query()` → the authenticated `claude` CLI).
+Publishing opens a PR on the blog repo using a **free** GitHub token.
+
+This is the canonical, verified path (B-010 acceptance run: keyless generate +
+blog PR on 2026-07-21).
 
 ## One-time setup
 
+The pipeline has historically only run in GitHub Actions, so a local checkout
+needs provisioning. On a stock Debian/Ubuntu python, `ensurepip` is stripped, so
+`python3 -m venv` produces a venv without pip — bootstrap it with `get-pip.py`:
+
 ```bash
-# The Agent SDK is the runtime. If the full requirements install aborts on an
-# unrelated wheel (sgmllib3k / feedparser), install the SDK directly:
-pip install --ignore-installed PyJWT "claude-agent-sdk>=0.1.68,<1.0.0"
+python3 -m venv .venv                                   # .venv is gitignored
+curl -sS https://bootstrap.pypa.io/get-pip.py | .venv/bin/python   # ensurepip is stripped
+.venv/bin/pip install -r requirements.txt               # ~100 packages
 ```
 
-The `claude` CLI must be installed and logged in to your subscription
-(`claude` on PATH; credentials in `~/.claude/`). This session already is.
+The `claude` CLI must be installed and logged in to your subscription (`claude`
+on PATH; credentials in `~/.claude/`).
 
-## Run it
+## 1. Generate (keyless)
 
 ```bash
 # IS_SANDBOX=1 is required ONLY when running as root — the SDK otherwise refuses
 # --dangerously-skip-permissions. Drop it if you run as a normal user.
-IS_SANDBOX=1 python -m src.agent_sdk.pipeline "your topic here" \
+IS_SANDBOX=1 .venv/bin/python -m src.agent_sdk.pipeline "your topic here" \
     --image-mode chart_only \
     --research-mode claude_web
 ```
 
-- `--image-mode chart_only` — no DALL-E hero image; the data chart is the
-  visual. Runs end-to-end with no image handshake and writes the finished
-  article to `output/posts/<slug>.md`.
-- `--research-mode claude_web` — Claude does its own live web research via the
-  built-in `WebSearch`/`WebFetch` tools (no Serper). See ADR-0013.
+- `--research-mode claude_web` — **use this.** Claude does its own live web
+  research via built-in `WebSearch`/`WebFetch` (ADR-0013). The `deterministic`
+  mode (arXiv + Semantic Scholar) is heavily rate-limited from most environments
+  and frequently aborts the run with empty research (BUG-050); `claude_web`
+  avoids those APIs entirely and is the reliable keyless default.
+- `--image-mode chart_only` — no hero image; the data chart is the visual. Runs
+  end-to-end with no image handshake and writes `output/posts/<slug>.md`.
 
-Exit code `0` = the publication validator passed (article is publish-ready);
-`1` = validator found issues (printed to stderr); `2` = research failed.
+Exit `0` = publication validator passed (publish-ready); `1` = validator issues;
+`2` = research failed (retry, or you are on `deterministic` — switch to
+`claude_web`).
+
+## 2. Publish (keyless — free GitHub token, opens a PR you review)
+
+```bash
+BLOG_REPO_TOKEN=<free GitHub PAT with push to oviney/blog> \
+  .venv/bin/python -m scripts.deploy_to_blog --blog-owner oviney --blog-repo blog
+# add --dry-run first to validate without pushing.
+```
+
+This clones the blog repo, commits the latest `output/posts/*` article + chart
+on a `content/<slug>-<ts>` branch, and opens a PR on `oviney/blog`. **You review
+and merge that PR to go live** — the human publication gate is unchanged. The
+token needs only `Contents` + `Pull requests` write on `oviney/blog` — no AI key.
 
 ## What runs, and on what auth
 
@@ -52,8 +76,11 @@ Exit code `0` = the publication validator passed (article is publish-ready);
   Source quality depends on the model's search behaviour; the
   `citation_verifier` / `publication_validator` citation gates still apply.
 - **`chart_only` ships no hero image.** For a hero image, use the default
-  `--image-mode hero` handshake flow (which needs a human-supplied PNG, or
-  `OPENAI_API_KEY` for DALL-E in the legacy path).
+  `--image-mode hero` handshake flow and supply the PNG yourself (per CLAUDE.md
+  #4). There is no DALL-E path — image generation was retired (ADR-0014).
+- **Topic is manual.** `pipeline.py` takes the topic as an argument; there is no
+  keyless auto-discovery. `EconomistContentFlow`'s Stage-1 discovery still needs
+  `ANTHROPIC_API_KEY` (BUG-046), so this two-step is the keyless route.
 
 ## Deprecated path
 

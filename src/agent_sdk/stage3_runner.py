@@ -320,6 +320,38 @@ def _strip_duplicate_article(text: str) -> str:
     return text
 
 
+# Start of a genuine article: a ``---`` fence line immediately followed by a
+# known frontmatter key. Distinguishes real frontmatter from a stray ``---``
+# markdown rule the writer may drop in its preamble.
+_FRONTMATTER_START = re.compile(
+    r"(?m)^---[ \t]*\r?\n"
+    r"(?=(?:layout|title|date|author|categories|description|image)\s*:)"
+)
+
+
+def _extract_article(text: str) -> str:
+    """Recover the article from noisy writer output (BUG-047).
+
+    Handles three observed writer quirks, in order:
+    1. The whole article wrapped in a code fence (``_strip_enclosing_code_fence``).
+    2. Conversational preamble (and/or a stray ``---`` markdown rule) before the
+       real frontmatter — everything before the first genuine ``---\\n<key>:``
+       block is discarded, so a preambled draft passes the well-formed check on
+       the first attempt instead of forcing a budget-burning retry.
+    3. A dangling trailing code fence left once a between-preamble fence opener
+       is removed.
+
+    Prose with no frontmatter at all is returned (near) unchanged so the
+    downstream well-formed check still rejects it.
+    """
+    text = _strip_enclosing_code_fence(text)
+    match = _FRONTMATTER_START.search(text)
+    if match and match.start() > 0:
+        text = text[match.start() :]
+    text = re.sub(r"\r?\n[ \t]*```[a-zA-Z]*[ \t]*$", "", text.rstrip())
+    return text.rstrip() + "\n"
+
+
 def _raise_if_budget_exceeded(
     msg: ResultMessage, cost: float, max_budget_usd: float | None
 ) -> None:
@@ -370,6 +402,7 @@ async def _collect_text(
     )
     text_chunks: list[str] = []
     cost = 0.0
+    budget_msg: ResultMessage | None = None
     try:
         async for msg in query(prompt=prompt, options=options):
             if isinstance(msg, AssistantMessage):
@@ -378,9 +411,14 @@ async def _collect_text(
                         text_chunks.append(block.text)
             elif isinstance(msg, ResultMessage):
                 cost = float(msg.total_cost_usd or 0.0)
-                _raise_if_budget_exceeded(msg, cost, max_budget_usd)
-    except BudgetExceededError:
-        raise
+                if msg.subtype == "error_max_budget_usd":
+                    # Break out and raise AFTER the loop (below). Raising here,
+                    # mid-iteration, makes the async-for finalise the query()
+                    # generator while it is still running its subprocess pump —
+                    # 'aclose(): asynchronous generator is already running'
+                    # then masks the real BudgetExceededError (BUG-048).
+                    budget_msg = msg
+                    break
     except Exception as exc:  # noqa: BLE001
         # The subscription CLI raises (rather than returning a ResultMessage)
         # when it hits the turn cap. If the agent already emitted text, proceed
@@ -393,6 +431,11 @@ async def _collect_text(
             )
         else:
             raise
+
+    # Raise the budget error here — after the async generator has closed cleanly
+    # on ``break`` — so it surfaces as a typed BudgetExceededError (BUG-048).
+    if budget_msg is not None:
+        _raise_if_budget_exceeded(budget_msg, cost, max_budget_usd)
 
     pieces: list[str] = []
     for chunk in text_chunks:
@@ -548,9 +591,10 @@ async def run_stage3(
             max_turns=2 * search_session.max_calls + 2,
         )
         writer_cost += attempt_cost
-        candidate = _strip_duplicate_article(
-            _strip_enclosing_code_fence(raw_writer_output)
-        )
+        # _extract_article (BUG-047) unwraps a fence AND strips conversational
+        # preamble / stray rules before the frontmatter, so a preambled draft
+        # passes the well-formed check on this attempt instead of retrying.
+        candidate = _strip_duplicate_article(_extract_article(raw_writer_output))
         # Require opening ---, a closing --- on its own line, and a non-empty
         # body. re.DOTALL so the frontmatter block can contain newlines.
         _fm_match = re.match(r"^---\r?\n.*?\r?\n---\r?\n(.+)", candidate, re.DOTALL)

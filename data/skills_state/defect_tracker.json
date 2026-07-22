@@ -785,7 +785,8 @@
       "root_cause": "integration_error",
       "root_cause_notes": "Keyless migration (B-006/ADR-0013) moved writer/graphics/research to the subscription SDK but left topic discovery on the paid create_llm_client path.",
       "discovered_by": "B-009 T1 fail-fast keyless run",
-      "prevention_test_added": false
+      "prevention_test_added": false,
+      "fix_notes": "Resolved-by-workaround: the canonical keyless path is the two-step pipeline.py <topic> --research-mode claude_web (generate) + deploy_to_blog (publish), which skips flow.py's paid topic discovery. Making EconomistContentFlow discovery keyless remains a future enhancement, not required for keyless generate+publish."
     },
     {
       "id": "BUG-047",
@@ -794,13 +795,15 @@
       "discovered_date": "2026-07-21T00:00:00",
       "description": "Keyless writer (Stage 3) exhausts its cumulative budget across retries and produces no article. A live keyless run of src.agent_sdk.pipeline hit BudgetExceededError (cap=$0.2169, cost_at_abort=$0.3166) after ~9 min with output/posts/ empty. The cumulative-budget-across-attempts logic plus repeated writer regeneration (_WRITER_MAX_ATTEMPTS) burned the budget, implying the writer is looping on malformed output rather than the budget merely being too low. DIAGNOSTIC PENDING: rerun with a generous --writer-budget to distinguish under-budget vs malformed-output loop. Related to the preamble/code-fence recovery in the closed PR #441 (_extract_article) and BUG-044.",
       "component": "agent_sdk.stage3_runner.run_stage3 / _collect_text",
-      "status": "open",
+      "status": "fixed",
       "github_issue": null,
       "is_production_escape": false,
       "root_cause": "code_logic",
-      "root_cause_notes": "Likely writer producing malformed output -> retry loop -> cumulative budget exhaustion. Confirm via generous-budget rerun; if it still fails, the writer output well-formed check / recovery (cf. PR #441 _extract_article) is the fix, not the budget.",
+      "root_cause_notes": "DIAGNOSED (generous --writer-budget 3.00 run): DUAL cause. (1) Under-budget \u2014 the run completed at $0.5907 total, but the defaults (run_pipeline writer 0.30 / CLI 0.60) are exhausted once the writer retries. (2) The writer emits conversational preamble on some attempts (e.g. 'The search tool is wired to arXiv... I'll write the article grounded in...'), failing the well-formed check (starts_with_dash=False) and forcing a retry that burns budget. Fix: port the closed PR #441 _extract_article preamble/fence recovery into the stage3 retry loop so preamble attempts recover in-place instead of retrying, AND raise the default writer budget for margin. NOTE: a generous-budget run DID produce a publish-valid article (publication_validator PASSED) \u2014 keyless generation works.",
       "discovered_by": "B-009 T1 fail-fast keyless run",
-      "prevention_test_added": false
+      "prevention_test_added": true,
+      "fixed_date": "2026-07-22T00:00:00",
+      "fix_notes": "_extract_article preamble recovery wired into the Stage 3 retry loop; verified end-to-end by the B-010 claude_web acceptance run (clean completion, no malformed-retry budget burn)."
     },
     {
       "id": "BUG-048",
@@ -809,13 +812,49 @@
       "discovered_date": "2026-07-21T00:00:00",
       "description": "Async-generator cleanup bug masks BudgetExceededError. When _raise_if_budget_exceeded fires inside _collect_text (stage3_runner.py:381->335), a 'RuntimeError: aclose(): asynchronous generator is already running' is raised during handling of the BudgetExceededError, so the clean typed budget error is obscured by an async cleanup RuntimeError. The query() async generator is not closed cleanly on the early raise.",
       "component": "agent_sdk.stage3_runner._collect_text",
-      "status": "open",
+      "status": "fixed",
       "github_issue": null,
       "is_production_escape": false,
       "root_cause": "code_logic",
       "root_cause_notes": "Raising out of the `async for message in query(...)` loop without closing/awaiting the async generator triggers aclose() while it is still running. Needs structured cleanup (e.g. break + explicit aclose, or aclosing()).",
       "discovered_by": "B-009 T1 fail-fast keyless run",
-      "prevention_test_added": false
+      "prevention_test_added": true,
+      "fixed_date": "2026-07-22T00:00:00",
+      "fix_notes": "break-then-raise so BudgetExceededError surfaces cleanly; contract-tested (a mock cannot reproduce the real-SDK 'already running' RuntimeError, but the raise-mid-iteration that triggers it is removed)."
+    },
+    {
+      "id": "BUG-049",
+      "severity": "medium",
+      "discovered_in": "development",
+      "discovered_date": "2026-07-22T00:00:00",
+      "description": "arXiv search-term optimizer garbles words. _optimize_search_terms (scripts/arxiv_search.py:302) lowercases the query then substring-replaces mapping keys with no word boundaries, so 'AI'->'artificial intelligence OR machine learning' fires inside 'drain' -> 'dr artificial intelligence OR machine learning n'. Observed live: query 'why flaky tests quietly drain engineering budgets' became '...quietly drartificial intelligence OR machine learningn engineering budgets', producing junk arXiv queries that return nothing.",
+      "component": "scripts.arxiv_search._optimize_search_terms",
+      "status": "fixed",
+      "github_issue": null,
+      "is_production_escape": false,
+      "root_cause": "code_logic",
+      "root_cause_notes": "Naive str.replace() of term-mapping keys; needs word-boundary (\\b) matching.",
+      "discovered_by": "B-010 T1 validation run",
+      "prevention_test_added": true,
+      "fixed_date": "2026-07-22T00:00:00",
+      "fix_notes": "word-boundary re.sub in _optimize_search_terms; unit-tested (drain/heroism survive)."
+    },
+    {
+      "id": "BUG-050",
+      "severity": "high",
+      "discovered_in": "development",
+      "discovered_date": "2026-07-22T00:00:00",
+      "description": "Keyless deterministic research is unreliable and aborts the whole pipeline. The two free providers (arXiv, Semantic Scholar) rate-limit/err heavily (HTTP 429/503); when BOTH fail on a topic, deterministic research returns zero sources and the empty-research guard (#438) aborts the run (exit 2, 'Pipeline aborted: research failed', provider_failed={'arxiv':True,'semantic_scholar':True}). Observed live: a default-budget keyless run aborted before the writer. This is the primary blocker to reliable keyless article production \u2014 bigger than the writer bugs. Likely mitigation: default the keyless path to research_mode='claude_web' (ADR-0013, Claude's own WebSearch on the subscription \u2014 not the rate-limited academic APIs), which is exactly why claude_web was introduced.",
+      "component": "agent_sdk.pipeline research (deterministic) / empty-research guard",
+      "status": "fixed",
+      "github_issue": null,
+      "is_production_escape": false,
+      "root_cause": "integration_error",
+      "root_cause_notes": "Keyless research depends on free rate-limited APIs with an abort-on-empty guard. Decide the reliable keyless research mode (claude_web vs hardened deterministic) \u2014 affects B-010's canonical-command choice and the live-run acceptance gate.",
+      "discovered_by": "B-010 T1 validation run",
+      "prevention_test_added": false,
+      "fixed_date": "2026-07-22T00:00:00",
+      "fix_notes": "Mitigated by defaulting the keyless path to research_mode=claude_web (documented canonical in the runbook). Verified: claude_web produced a publish-valid article on the exact topic that aborted under deterministic. deterministic remains rate-limited; claude_web is the reliable keyless research mode."
     }
   ],
   "summary": {

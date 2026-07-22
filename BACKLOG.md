@@ -64,6 +64,13 @@ replacement (see ADR-0014 "Revisit if").
 
 ### B-010 · Fix keyless generation so a local run produces an article + blog PR (Track B)
 
+> **✅ ACCEPTANCE GATE MET (2026-07-21).** A keyless run
+> (`pipeline.py … --research-mode claude_web` → `deploy_to_blog`) produced a
+> publish-valid article and opened **oviney/blog PR #1156** — the first article
+> since 2026-04-27. Fixes BUG-047/048/049/050/051 (all now `fixed` in the
+> tracker). BUG-046 resolved-by-workaround (two-step skips paid discovery);
+> making `EconomistContentFlow` discovery keyless remains a future enhancement.
+
 Split out of B-009 by the T1 fail-fast run (2026-07-21). The keyless generator
 *runs* on the subscription but cannot yet produce a publishable article
 end-to-end. Delivers the working keyless generate+publish command that ADR-0014

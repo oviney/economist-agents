@@ -26,8 +26,10 @@ The pipeline runs in stages, orchestrated by `src/economist_agents/flow.py` over
    Economist Editor, Busy Reader, Performance Analyst) to pick what is worth writing.
 3. **Stage 3 — content generation** (`src/agent_sdk/stage3_runner.py`): research →
    write → charts → edit.
-   - **Research** is deterministic web search (arXiv + Google Scholar via Serper).
-     There is **no LLM in the research path**, so sources are reproducible.
+   - **Research** is deterministic academic search over free, keyless providers
+     (arXiv + Semantic Scholar). There is **no LLM in the research path**, so
+     sources are reproducible, and **no paid search API** (Serper/Google, Brave,
+     Tavily were removed by #438).
    - **Writer → Graphics → Editor** all run on Claude via the Anthropic Agent SDK.
    - A **stat audit** strips any sentence whose statistics are not present in the
      research brief.
@@ -77,21 +79,30 @@ cp .env.example .env               # then edit in your API keys
 
 ### Environment variables
 
+The keyless path uses **no paid AI keys** — writing/graphics run on the Claude
+subscription via the Agent SDK, research on free keyless providers.
+
 | Variable | Required | Purpose |
 |----------|----------|---------|
-| `ANTHROPIC_API_KEY` | **Yes** | Claude — the primary LLM for writing and editing |
-| `SERPER_API_KEY` | Recommended | Adds Google Web + Scholar to research (arXiv + Semantic Scholar work without it) |
-| `OPENAI_API_KEY` | For images only | DALL·E 3 featured-image generation |
+| `BLOG_REPO_TOKEN` | To publish | Free GitHub token with push to `oviney/blog`, so the deploy step can open a PR. No AI key. |
 | `OUTPUT_DIR` | No | Output directory for generated articles (default `output/`) |
 | `GOOGLE_APPLICATION_CREDENTIALS`, `GA4_PROPERTY_ID`, `GSC_PROPERTY_URL` | For analytics ETL | Google Analytics 4 / Search Console content-intelligence pipeline |
+
+> **No `SERPER_API_KEY`/`OPENAI_API_KEY`.** Serper and the other pay-per-use
+> search APIs were removed (#438); DALL·E image generation was retired
+> (ADR-0014 / B-009) — hero images are human-supplied per the handshake below.
+> A legacy paid path remains (`EconomistContentFlow` topic discovery needs
+> `ANTHROPIC_API_KEY` — BUG-046); making the full flow keyless is **B-010**.
 
 ---
 
 ## Usage
 
-Generating a real article is a **two-step image handshake**: Stage 3 writes the draft
-and chart and then pauses (exit code 10) so you can supply a featured image at zero API
-cost; `--resume` then runs Stage 4 and finalises the article.
+The keyless generator runs on the Claude subscription — **no paid AI key**. It
+takes a topic argument (there is no keyless auto-discovery yet — see B-010) and a
+**two-step image handshake**: Stage 3 writes the draft and chart and pauses (exit
+code 10) so you can supply a featured image at zero API cost; `--resume` then
+runs Stage 4 and finalises the article.
 
 ```bash
 # Step 1 — Stage 3: writes output/posts/<slug>.md + chart, prints the image prompt,
@@ -102,6 +113,13 @@ python3 -m src.agent_sdk.pipeline "<topic>"
 # (or --no-image for a chart-only post).
 python3 -m src.agent_sdk.pipeline --resume <slug>
 ```
+
+> This generates + validates but does **not** publish. Publishing (open a PR on
+> `oviney/blog` via the free `BLOG_REPO_TOKEN`) currently lives only in
+> `EconomistContentFlow`, whose topic-discovery is not yet keyless (BUG-046). A
+> single keyless generate→publish command is tracked in **B-010**. See
+> [`docs/keyless-pipeline-runbook.md`](docs/keyless-pipeline-runbook.md) for the
+> current keyless run + setup steps.
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full handshake (image drop path, exit
 codes, deploy step) and [`docs/FLOW_ARCHITECTURE.md`](docs/FLOW_ARCHITECTURE.md) for the
@@ -172,11 +190,13 @@ for why the GitHub-issues MCP was retired.
 
 ## Architecture notes
 
-- **LLM**: Claude (Anthropic) is the primary LLM. `OPENAI_API_KEY` is needed only for
-  DALL·E images.
+- **LLM**: Claude (Anthropic) via the Agent SDK on the Claude subscription — no
+  paid AI key on the keyless path. No DALL·E / `OPENAI_API_KEY` (image generation
+  retired, ADR-0014); hero images are human-supplied.
 - **Framework**: The Anthropic Agent SDK is the runtime. The earlier CrewAI runtime
   was removed in Phase 2 (see [ADR-0006](docs/adr/0006-agent-framework-selection.md)).
-- **Research**: Deterministic, LLM-free, and reproducible.
+- **Research**: Deterministic, LLM-free, and reproducible (arXiv + Semantic Scholar,
+  keyless).
 - **Quality**: Enforced in plain Python, not by an LLM judge.
 
 ---

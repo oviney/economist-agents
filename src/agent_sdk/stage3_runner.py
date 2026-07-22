@@ -402,6 +402,7 @@ async def _collect_text(
     )
     text_chunks: list[str] = []
     cost = 0.0
+    budget_msg: ResultMessage | None = None
     try:
         async for msg in query(prompt=prompt, options=options):
             if isinstance(msg, AssistantMessage):
@@ -410,9 +411,14 @@ async def _collect_text(
                         text_chunks.append(block.text)
             elif isinstance(msg, ResultMessage):
                 cost = float(msg.total_cost_usd or 0.0)
-                _raise_if_budget_exceeded(msg, cost, max_budget_usd)
-    except BudgetExceededError:
-        raise
+                if msg.subtype == "error_max_budget_usd":
+                    # Break out and raise AFTER the loop (below). Raising here,
+                    # mid-iteration, makes the async-for finalise the query()
+                    # generator while it is still running its subprocess pump —
+                    # 'aclose(): asynchronous generator is already running'
+                    # then masks the real BudgetExceededError (BUG-048).
+                    budget_msg = msg
+                    break
     except Exception as exc:  # noqa: BLE001
         # The subscription CLI raises (rather than returning a ResultMessage)
         # when it hits the turn cap. If the agent already emitted text, proceed
@@ -425,6 +431,11 @@ async def _collect_text(
             )
         else:
             raise
+
+    # Raise the budget error here — after the async generator has closed cleanly
+    # on ``break`` — so it surfaces as a typed BudgetExceededError (BUG-048).
+    if budget_msg is not None:
+        _raise_if_budget_exceeded(budget_msg, cost, max_budget_usd)
 
     pieces: list[str] = []
     for chunk in text_chunks:

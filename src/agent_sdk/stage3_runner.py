@@ -496,6 +496,7 @@ async def run_stage3(
     writer_model: str = DEFAULT_WRITER_MODEL,
     graphics_model: str = DEFAULT_GRAPHICS_MODEL,
     research_mode: str = "deterministic",
+    brief_override: str | None = None,
 ) -> Stage3Result:
     """Generate one article via the Agent SDK and return captured metrics.
 
@@ -527,20 +528,27 @@ async def run_stage3(
     # env overrides the argument. An unrecognised value fails closed to
     # deterministic (a typo must not silently disable the expensive deep path or
     # the keyless path) and is logged so operators can confirm.
-    resolved_research_mode = os.environ.get("RESEARCH_MODE", research_mode)
-    if resolved_research_mode not in ("deterministic", "deep", "claude_web"):
-        logger.warning(
-            "Unrecognised research mode %r; using deterministic",
-            resolved_research_mode,
-        )
-        resolved_research_mode = "deterministic"
-    logger.info("Research mode: %s", resolved_research_mode)
-    if resolved_research_mode == "deep":
-        research_brief, research_cost = await build_deep_research_brief(topic)
-    elif resolved_research_mode == "claude_web":
-        research_brief, research_cost = await build_claude_web_brief(topic)
+    if brief_override is not None:
+        # B-012: opt-in --brief — a pre-built deep-research brief (refuted claims
+        # already stripped by pipeline.load_brief_file) is used verbatim; the
+        # research step is skipped entirely (no cost).
+        research_brief, research_cost = brief_override, 0.0
+        logger.info("Research: using supplied --brief (%d chars)", len(research_brief))
     else:
-        research_brief, research_cost = build_research_brief(topic), 0.0
+        resolved_research_mode = os.environ.get("RESEARCH_MODE", research_mode)
+        if resolved_research_mode not in ("deterministic", "deep", "claude_web"):
+            logger.warning(
+                "Unrecognised research mode %r; using deterministic",
+                resolved_research_mode,
+            )
+            resolved_research_mode = "deterministic"
+        logger.info("Research mode: %s", resolved_research_mode)
+        if resolved_research_mode == "deep":
+            research_brief, research_cost = await build_deep_research_brief(topic)
+        elif resolved_research_mode == "claude_web":
+            research_brief, research_cost = await build_claude_web_brief(topic)
+        else:
+            research_brief, research_cost = build_research_brief(topic), 0.0
     logger.info("Research brief: %d chars", len(research_brief))
 
     style_context = _fetch_style_context(topic)

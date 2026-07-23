@@ -3034,6 +3034,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="1. Generate (keyless)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#opt-in-brief-for-flagship-posts-b-012" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Opt-in: --brief for flagship posts (B-012)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -3137,10 +3154,21 @@ on PATH; credentials in <code>~/.claude/</code>).</p>
 <p>Exit <code>0</code> = publication validator passed (publish-ready); <code>1</code> = validator issues;
 <code>2</code> = research failed (retry, or you are on <code>deterministic</code> — switch to
 <code>claude_web</code>).</p>
+<h3 id="opt-in-brief-for-flagship-posts-b-012">Opt-in: <code>--brief</code> for flagship posts (B-012)<a class="headerlink" href="#opt-in-brief-for-flagship-posts-b-012" title="Permanent link">&para;</a></h3>
+<p>For a cornerstone post where sourcing quality matters most, run the
+<code>deep-research</code> harness first to produce a verified, cited brief
+(<code>docs/research/&lt;slug&gt;.md</code>), then hand it to the writer:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">IS_SANDBOX</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">&quot;&lt;topic&gt;&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span>--image-mode<span class="w"> </span>chart_only<span class="w"> </span>--brief<span class="w"> </span>docs/research/&lt;slug&gt;.md
+</code></pre></div>
+<p><code>--brief</code> skips the research step and uses that file (refuted claims are
+stripped automatically). <strong>This is opt-in and heavy</strong> — one deep-research run is
+~2M tokens and can hit your session limit — so <code>claude_web</code> stays the everyday
+default; reserve <code>--brief</code> for the pieces that warrant it.</p>
 <h2 id="2-publish-keyless-free-github-token-opens-a-pr-you-review">2. Publish (keyless — free GitHub token, opens a PR you review)<a class="headerlink" href="#2-publish-keyless-free-github-token-opens-a-pr-you-review" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">BLOG_REPO_TOKEN</span><span class="o">=</span>&lt;free<span class="w"> </span>GitHub<span class="w"> </span>PAT<span class="w"> </span>with<span class="w"> </span>push<span class="w"> </span>to<span class="w"> </span>oviney/blog&gt;<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span>.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>scripts.deploy_to_blog<span class="w"> </span>--blog-owner<span class="w"> </span>oviney<span class="w"> </span>--blog-repo<span class="w"> </span>blog
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1"># add --dry-run first to validate without pushing.</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">BLOG_REPO_TOKEN</span><span class="o">=</span>&lt;free<span class="w"> </span>GitHub<span class="w"> </span>PAT<span class="w"> </span>with<span class="w"> </span>push<span class="w"> </span>to<span class="w"> </span>oviney/blog&gt;<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span>.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>scripts.deploy_to_blog<span class="w"> </span>--blog-owner<span class="w"> </span>oviney<span class="w"> </span>--blog-repo<span class="w"> </span>blog
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># add --dry-run first to validate without pushing.</span>
 </code></pre></div>
 <p>This clones the blog repo, commits the latest <code>output/posts/*</code> article + chart
 on a <code>content/&lt;slug&gt;-&lt;ts&gt;</code> branch, and opens a PR on <code>oviney/blog</code>. <strong>You review

@@ -61,11 +61,27 @@ the live branch, no PR, prints the obscure URL) + `scripts/promote_review.py` /
 `make publish SLUG=<slug>` (blocking validator gate). Tests:
 `test_deploy_review_mode.py`, `test_promote_review.py`; `post` path untouched.
 
-**Remaining (owner-gated, cross-repo/outward):** (1) the `oviney/blog` PR adding
-the `review` collection + `noindex` layout + `robots.txt` — **drafted ready to
-paste in `docs/specs/B-013-blog-side.md`**; (2) the **owner-run leak test** on
-the live blog (checklist in the same doc). Do NOT run `--mode review` against the
-live blog before (1)+(2). Kept in Todo until the leak test passes.
+**Blog side: PR OPEN → https://github.com/oviney/blog/pull/1157** (branch
+`feat/b-013-review-collection`). Adds the `review` collection + `noindex`/
+`sitemap:false` defaults + `_layouts/review.html` + `robots.txt` disallow.
+Verified against the real blog: `_layouts/default.html` *already* emits the
+robots meta from `page.noindex`, so this activates existing plumbing rather than
+adding new. YAML validated; 18/1/4 added lines, nothing existing touched.
+Reference copy of the change: `docs/specs/B-013-blog-side.md`.
+
+**NEXT (resume here):**
+1. Review + merge blog PR #1157.
+2. Run the **leak test** (the acceptance gate) — deploy ONE draft:
+   `python -m scripts.deploy_to_blog --mode review --article output/posts/<slug>.md
+   --blog-owner oviney --blog-repo blog --host www.viney.ca`
+   then check the 7 boxes in `docs/specs/B-013-blog-side.md` (homepage, /blog/,
+   archives, feed.xml, sitemap.xml, search, view-source `noindex`).
+3. If clean → `make publish SLUG=<slug>`, then move B-013 to Done.
+
+Note: canonical blog URL is **www.viney.ca** (not viney.ca) — pass `--host
+www.viney.ca` or set `BLOG_HOST`. Blog live branch is `main`. The `.env`
+`BLOG_REPO_TOKEN` failed auth on push (read-only/expired) — `gh auth token`
+works; worth refreshing the PAT.
 
 ## Done
 

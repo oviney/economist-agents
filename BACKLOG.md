@@ -26,15 +26,27 @@ _(none)_
 
 ## Todo
 
-### B-012 · deep-research-backed research briefs (candidate — gated on prototype)
+### B-012 · Opt-in `deep-brief` research mode (spec'd — prototype validated)
 
-Replace/augment the pipeline's research step with the `deep-research` harness
-(multi-source fan-out + adversarial claim verification + citations). Rationale:
-T1 showed keyless research is flaky — arXiv/Semantic Scholar 429-throttle and
-`claude_web` falls back to the model's own memory (BUG-050); a blog's credibility
-is its stats. **Gate:** the running prototype must produce a demonstrably
-better-sourced brief than `claude_web` on a real topic before we wire anything
-in. Triage: `docs/ideas/tooling-adoption.md`. Not yet spec'd.
+Wire the `deep-research` harness as an **opt-in** research path for flagship
+posts; `claude_web` stays the everyday default. **Prototype (2026-07-22) settled
+it:** dramatically better sourcing — 19 claims each surviving a 3-0 verification
+vote, and it *refuted the walked-back Accenture Copilot numbers* a single-pass
+researcher would ship — but one topic cost ~102 agents / ~2M tokens / ~15 min and
+**hit the session limit**. So: opt-in, not default. Spec:
+`docs/specs/B-012-deep-brief-research-mode.md`. Prototype output (a real verified
+brief) lives at `docs/research/ai-productivity-brief.md`.
+
+### B-014 · Chart redesign — fix graphics-stage correctness bug + dataviz styling (spec'd)
+
+The graphics stage produces charts that **misrepresent the data** — the
+flaky-tests chart mixed five percentages with a raw 150,000 count on one axis
+(headline 84% vanished; count mislabeled "150000 %"). Fix the graphics-agent spec
+(one axis / one measure / correct units / form-follows-job) + bring
+dataviz-validated colorblind-safe palettes + mark specs into `chart_renderer.py`
+(matplotlib PNG kept; **not** an SVG/interactive switch). Prototype before/after
+proved the defect and the fix; palettes already validated. Spec:
+`docs/specs/B-014-chart-redesign.md`.
 
 ### B-013 · Live unlisted draft review on GitHub Pages (candidate — gated on leak test)
 

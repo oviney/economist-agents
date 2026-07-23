@@ -48,7 +48,9 @@ def test_values_spanning_many_orders_of_magnitude_are_rejected() -> None:
     """B-014 Prove-It: a spec whose values span too many orders of magnitude for
     one linear axis must be rejected before render — not silently produce a chart
     where the small values are invisible."""
-    with pytest.raises(ChartRenderError, match="orders of magnitude|one .*axis|coherent"):
+    with pytest.raises(
+        ChartRenderError, match="orders of magnitude|one .*axis|coherent"
+    ):
         render_chart(_mixed_scale_spec(), Path("/tmp/should-not-be-written.png"))
 
 

@@ -46,17 +46,6 @@ researcher would ship — but one topic cost ~102 agents / ~2M tokens / ~15 min 
 `docs/specs/B-012-deep-brief-research-mode.md`. Prototype output (a real verified
 brief) lives at `docs/research/ai-productivity-brief.md`.
 
-### B-014 · Chart redesign — fix graphics-stage correctness bug + dataviz styling (spec'd)
-
-The graphics stage produces charts that **misrepresent the data** — the
-flaky-tests chart mixed five percentages with a raw 150,000 count on one axis
-(headline 84% vanished; count mislabeled "150000 %"). Fix the graphics-agent spec
-(one axis / one measure / correct units / form-follows-job) + bring
-dataviz-validated colorblind-safe palettes + mark specs into `chart_renderer.py`
-(matplotlib PNG kept; **not** an SVG/interactive switch). Prototype before/after
-proved the defect and the fix; palettes already validated. Spec:
-`docs/specs/B-014-chart-redesign.md`.
-
 ### B-013 · Live unlisted draft review on GitHub Pages (candidate — gated on leak test)
 
 Review generated drafts as the *rendered* post at an obscure, `noindex`, live
@@ -65,102 +54,6 @@ GitHub PR diff; promote to `_posts/` via `make publish`. One-pager:
 `docs/ideas/live-draft-review.md`. **Gate:** 10-minute leak test — deploy one
 draft and confirm the minimal-mistakes theme surfaces it in *none* of
 homepage/archives/feed/sitemap. Not yet spec'd.
-
-### B-009 · Retire paid-AI GitHub Actions (Track A)
-
-Executes [ADR-0014](docs/adr/0014-retire-paid-github-actions-generation.md).
-Spec: `docs/specs/B-009-retire-paid-github-actions.md` (see the **T1 re-spec
-banner** — this item was split after the fail-fast run). Four workflows inject
-paid-AI secrets, contradicting CLAUDE.md #5 and ADR-0013; the weekly
-`content-pipeline.yml` cron has failed 8 runs straight (no live article since
-2026-04-27). This item **removes the paid + broken + misleading machinery**. It
-does *not* claim a working keyless command — that is B-010.
-
-Scope:
-- Delete `.github/workflows/content-pipeline.yml` (scheduled paid generation),
-  `.github/workflows/regenerate-image.yml` (DALL-E — violates CLAUDE.md #1/#4),
-  and `.github/workflows/remediation-sync.yml` (its cron triggers the deleted
-  content pipeline — would fail post-merge).
-- Strip `OPENAI_API_KEY` from `.github/workflows/ci.yml` (tests mock APIs, so
-  inert — **verify a green CI run**, don't assume).
-- `.github/workflows/blog-quality-audit.yml`: strip the vestigial
-  `OPENAI_API_KEY` **and remove its cron** (keep `workflow_dispatch`); its
-  weekly scan re-spams the blog via a `state=open`-only dedup bug.
-- Correct the false/stale run docs: CLAUDE.md's `OPENAI_API_KEY | DALL-E 3` env
-  row; README's Serper line, env table, and Usage block. Point README/CLAUDE.md
-  at the runbook. **Do not** assert `flow.py` is the keyless command (it isn't —
-  BUG-046). Where a canonical keyless command is needed, mark it "in repair
-  (B-010)" rather than document a command that produces no article.
-
-Acceptance:
-- `grep -rE "ANTHROPIC_API_KEY|OPENAI_API_KEY|SERPER_API_KEY" .github/workflows/`
-  → empty; no remaining workflow references a deleted one.
-- Remaining GitHub Actions (tests/lint/docs) pass with no paid secrets present.
-- No run doc advertises Serper, a required `ANTHROPIC_API_KEY`, or DALL-E; none
-  claims `flow.py` as a working keyless command.
-
-Out of scope: fixing keyless generation (→ B-010); any unattended/scheduled
-replacement (see ADR-0014 "Revisit if").
-
-### B-010 · Fix keyless generation so a local run produces an article + blog PR (Track B)
-
-> **✅ ACCEPTANCE GATE MET (2026-07-21).** A keyless run
-> (`pipeline.py … --research-mode claude_web` → `deploy_to_blog`) produced a
-> publish-valid article and opened **oviney/blog PR #1156** — the first article
-> since 2026-04-27. Fixes BUG-047/048/049/050/051 (all now `fixed` in the
-> tracker). BUG-046 resolved-by-workaround (two-step skips paid discovery);
-> making `EconomistContentFlow` discovery keyless remains a future enhancement.
-
-Split out of B-009 by the T1 fail-fast run (2026-07-21). The keyless generator
-*runs* on the subscription but cannot yet produce a publishable article
-end-to-end. Delivers the working keyless generate+publish command that ADR-0014
-promises. Fixes three logged defects:
-
-- **BUG-046** — `EconomistContentFlow` topic discovery is not keyless
-  (`flow.py:176 → create_llm_client` needs a paid key). Either move discovery to
-  the subscription Agent SDK, or bless a `pipeline.py <topic>` + `deploy_to_blog`
-  two-step as the canonical keyless path.
-- **BUG-047** — the keyless writer exhausts its cumulative budget across retries
-  and emits no article. **First step: the budget-vs-loop diagnostic** (rerun
-  with a generous `--writer-budget`); if it still fails, fix the writer
-  well-formed/recovery path (cf. the closed PR #441 `_extract_article`, BUG-044).
-- **BUG-048** — async-generator cleanup bug (`aclose(): asynchronous generator
-  is already running`) masks `BudgetExceededError` in `_collect_text`.
-
-Acceptance (the gate that moved here from B-009):
-- One documented keyless command produces a publish-valid article + chart **and**
-  opens a PR on `oviney/blog`, verified by a real end-to-end run on the
-  subscription (env: `.venv` provisioned, `BLOG_REPO_*`, `claude` CLI auth).
-- `docs/keyless-pipeline-runbook.md` names that command as canonical, plus a
-  **Setup/Prerequisites** section (venv, `get-pip.py` since `ensurepip` is
-  stripped on this Debian python, `pip install -r requirements.txt`) — gaps T1
-  surfaced.
-
-Depends on: B-009 (clears the paid/false machinery first).
-
-### B-011 · Retire GitHub Actions CI; local `make quality` + pre-commit is the verification path
-
-> **✅ DONE (2026-07-22).** `make ci-local` reproduces every gate ci.yml
-> enforced (ruff, mypy-advisory, tests+coverage 70% / src/quality 90%, bandit,
-> destructive guard) — verified green (2217 passed, 79.5% cov, src/quality 97%).
-> ci.yml / quality-tests.yml / sync-copilot.yml deleted; docs.yml +
-> copilot-setup-steps.yml kept. Python pinned to 3.12; ADR-0015 recorded;
-> ADR-0004 superseded. Fixed a full-suite hang (hermetic-env conftest fixture).
-> Follow-up (optional): wire coverage/guard/bandit into pre-commit as
-> non-optional (make ci-local is the enforced gate today).
-
-Scoped in `docs/specs/B-011-retire-ci-local-verification.md`. Extends ADR-0014
-from generation to verification: make local tooling the source of truth, zero
-dependency on GitHub Actions (the repo is public so Actions is free, but the goal
-is independence). `main` is unprotected, so no CI is required to merge today.
-
-The real work is **parity, not deletion** — `make quality`/pre-commit are weaker
-than `ci.yml` (single Python vs 3.11+3.12 matrix; 40% coverage on `scripts` vs
-70% on `src`+`scripts` + `src/quality` 90%; no destructive-change guard; no
-bandit). Port those gates local first, *then* delete `ci.yml` +
-`quality-tests.yml` (+ `sync-copilot.yml`, the merge-noise bot). Open questions:
-fate of `docs.yml`/`copilot-setup-steps.yml`, whether to keep multi-version
-testing, and whether to record an ADR-0015. Not yet approved to build.
 
 ## Done
 
@@ -175,6 +68,49 @@ rendered PNG on disk. Now the article file, chart PNG, `![Chart]` embed, and the
 `<slug>.image_prompt.md` sidecar always share one slug. Regression test
 (`tests/test_canonical_slug.py`) asserts they agree for a `chart_only` article.
 PR #456; `make ci-local` green (2224 passed, cov 79.49% / `src/quality` 97%).
+
+### B-014 · Chart redesign — graphics-stage correctness fix + dataviz styling — 2026-07-22
+
+The graphics stage produced charts that **misrepresented the data** (the
+flaky-tests chart mixed five percentages with a raw 150,000 count on one axis;
+headline 84% vanished, count mislabeled "150000 %"). Baked one-axis/one-measure/
+correct-units rules into the graphics-agent prompt (`_shared.py`) and added a
+mixed-unit guard to `chart_renderer.py` (`_MAX_VALUE_SPAN = 1000`, rejects specs
+whose max/min-nonzero ratio exceeds 1000× — Prove-It regression). Swapped in a
+dataviz-validated colorblind-safe navy (`#0f5f92`). Matplotlib PNG kept — **not**
+an SVG/interactive switch. PR #454. Spec: `docs/specs/B-014-chart-redesign.md`.
+
+### B-011 · Retire GitHub Actions CI; local `make ci-local` is the verification source of truth — 2026-07-22
+
+`make ci-local` reproduces every gate ci.yml enforced (ruff, mypy-advisory,
+tests + coverage 70% / `src/quality` 90%, bandit, destructive guard) — verified
+green. ci.yml / quality-tests.yml / sync-copilot.yml deleted; docs.yml +
+copilot-setup-steps.yml kept. Python pinned to 3.12; ADR-0015 recorded, ADR-0004
+superseded. Fixed a full-suite hang (hermetic-env conftest fixture that clears
+`BLOG_REPO_*`/`*_API_KEY` so tests never do a real blog clone). `main` is
+unprotected — the operator running `make ci-local` is the merge gate. PR #452.
+Spec: `docs/specs/B-011-retire-ci-local-verification.md`.
+
+### B-010 · Keyless generation produces an article + blog PR again (Track B) — 2026-07-21
+
+A keyless run (`pipeline.py … --research-mode claude_web` → `deploy_to_blog`)
+produced a publish-valid article and opened **oviney/blog PR #1156** — the first
+live article since 2026-04-27 (pipeline had been dark ~3 months). Fixes
+BUG-047/048/049/050/051. BUG-046 resolved-by-workaround: the two-step
+`pipeline.py <topic>` + `deploy_to_blog` is the blessed keyless path (skips the
+paid `EconomistContentFlow` discovery); making discovery itself keyless remains a
+future enhancement. Runbook updated with the canonical command + Setup/Prereqs.
+PR #451.
+
+### B-009 · Retire paid-AI GitHub Actions (Track A) — 2026-07-21
+
+Executes ADR-0014. Deleted `content-pipeline.yml` (scheduled paid generation),
+`regenerate-image.yml` (DALL-E — violates CLAUDE.md #1/#4), and
+`remediation-sync.yml`; stripped `OPENAI_API_KEY` from `ci.yml`; stripped the key
++ removed the cron from `blog-quality-audit.yml` (kept `workflow_dispatch`).
+Corrected the false/stale run docs (README/CLAUDE.md Serper + DALL-E claims). No
+workflow injects a paid-AI secret and none references a deleted workflow. PR #450.
+Spec: `docs/specs/B-009-retire-paid-github-actions.md`.
 
 ### B-006 · Keyless subscription pipeline (claude_web research + chart-embed fixes) — 2026-07-14
 

@@ -1,9 +1,25 @@
 # Spec: B-013 · Live unlisted draft review on GitHub Pages
 
-> Status: **DRAFT — awaiting owner LGTM before planning.**
+> Status: **LOCAL HALF BUILT (2026-07-23); blog-repo half + leak test owner-gated.**
 > Builds on the idea one-pager `docs/ideas/live-draft-review.md` and the keyless
 > deploy path (`scripts/deploy_to_blog.py`, B-010). Executes the "review the
 > rendered post, not a PR diff" direction.
+>
+> **Built & `make ci-local`-green (this repo, no outward action):**
+> `deploy_to_blog --mode review` (`deploy_review()` — writes `_review/<slug>-<token>.md`,
+> `layout: review`, commits to the live branch, **no PR**, prints the obscure URL);
+> `scripts/promote_review.py` + `make publish SLUG=<slug>` (flips layout back,
+> injects date, blocking publication-validator gate, removes the draft, pushes).
+> Tests: `tests/test_deploy_review_mode.py`, `tests/test_promote_review.py`.
+> The `post` path is untouched (separate function) — regression-tested.
+>
+> **Still owner-gated (outward / cross-repo — NOT done here):**
+> (1) the `oviney/blog` PR adding the `review` collection + `noindex` layout +
+> `robots.txt`; (2) the live leak test (Success Criterion 2). Until (1) ships,
+> `--mode review` pushes a draft that renders with the default layout — the
+> obscurity holds only once the blog-side collection excludes it from
+> feed/sitemap/listings. **Do not run `--mode review` against the live blog
+> before the blog-side PR + leak test.**
 
 ## Assumptions I'm making (correct these before I plan)
 

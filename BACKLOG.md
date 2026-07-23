@@ -26,6 +26,25 @@ _(none)_
 
 ## Todo
 
+### B-012 · deep-research-backed research briefs (candidate — gated on prototype)
+
+Replace/augment the pipeline's research step with the `deep-research` harness
+(multi-source fan-out + adversarial claim verification + citations). Rationale:
+T1 showed keyless research is flaky — arXiv/Semantic Scholar 429-throttle and
+`claude_web` falls back to the model's own memory (BUG-050); a blog's credibility
+is its stats. **Gate:** the running prototype must produce a demonstrably
+better-sourced brief than `claude_web` on a real topic before we wire anything
+in. Triage: `docs/ideas/tooling-adoption.md`. Not yet spec'd.
+
+### B-013 · Live unlisted draft review on GitHub Pages (candidate — gated on leak test)
+
+Review generated drafts as the *rendered* post at an obscure, `noindex`, live
+`/review/<slug>-<token>/` URL (real theme, reviewable from a phone) instead of a
+GitHub PR diff; promote to `_posts/` via `make publish`. One-pager:
+`docs/ideas/live-draft-review.md`. **Gate:** 10-minute leak test — deploy one
+draft and confirm the minimal-mistakes theme surfaces it in *none* of
+homepage/archives/feed/sitemap. Not yet spec'd.
+
 ### B-009 · Retire paid-AI GitHub Actions (Track A)
 
 Executes [ADR-0014](docs/adr/0014-retire-paid-github-actions-generation.md).

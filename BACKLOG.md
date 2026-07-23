@@ -53,7 +53,18 @@ Review generated drafts as the *rendered* post at an obscure, `noindex`, live
 GitHub PR diff; promote to `_posts/` via `make publish`. One-pager:
 `docs/ideas/live-draft-review.md`. **Gate:** 10-minute leak test — deploy one
 draft and confirm the minimal-mistakes theme surfaces it in *none* of
-homepage/archives/feed/sitemap. Not yet spec'd.
+homepage/archives/feed/sitemap. Spec: `docs/specs/B-013-live-draft-review.md`.
+
+**Local half BUILT (2026-07-23), `make ci-local` green:** `deploy_to_blog
+--mode review` (writes `_review/<slug>-<token>.md`, `layout: review`, commits to
+the live branch, no PR, prints the obscure URL) + `scripts/promote_review.py` /
+`make publish SLUG=<slug>` (blocking validator gate). Tests:
+`test_deploy_review_mode.py`, `test_promote_review.py`; `post` path untouched.
+
+**Remaining (owner-gated, cross-repo/outward):** (1) the `oviney/blog` PR adding
+the `review` collection + `noindex` layout + `robots.txt`; (2) the **owner-run
+leak test** on the live blog. Do NOT run `--mode review` against the live blog
+before (1)+(2). Kept in Todo until the leak test passes.
 
 ## Done
 

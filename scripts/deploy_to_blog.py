@@ -29,6 +29,7 @@ import argparse
 import logging
 import os
 import re
+import secrets
 import shutil
 import subprocess
 import sys
@@ -49,13 +50,15 @@ class DeployError(RuntimeError):
 
 @dataclass
 class DeployResult:
-    """Structured outcome of a deploy() call."""
+    """Structured outcome of a deploy() / deploy_review() call."""
 
     status: str  # "published" | "up_to_date" | "validation_failed" | "dry_run"
+    #             | "review_published"  (deploy_review)
     branch: str
     article_name: str
     validation_report: str
     pushed: bool
+    url: str | None = None  # set by deploy_review() — the obscure review URL
 
 
 # ---------------------------------------------------------------------------
@@ -375,6 +378,140 @@ def deploy(
 
 
 # ---------------------------------------------------------------------------
+# Review mode (B-013) — unlisted live draft, no PR
+# ---------------------------------------------------------------------------
+
+
+def _to_review_content(content: str) -> str:
+    """Transform a generated post into an unlisted ``review`` draft.
+
+    Swaps the ``layout: post`` front-matter for ``layout: review`` (the blog's
+    ``review`` layout injects ``<meta name="robots" content="noindex,nofollow">``)
+    and rewrites in-repo ``output/charts/`` asset paths to the deployed
+    ``/assets/charts/`` location, mirroring :func:`deploy`.
+    """
+    content = re.sub(
+        r"^layout:.*$", "layout: review", content, count=1, flags=re.MULTILINE
+    )
+    return content.replace("output/charts/", "/assets/charts/")
+
+
+def deploy_review(
+    article_path: Path,
+    blog_owner: str,
+    blog_repo: str,
+    token: str,
+    *,
+    live_branch: str = "main",
+    host: str = "viney.ca",
+    dry_run: bool = False,
+) -> DeployResult:
+    """Deploy *article_path* as an **unlisted** live draft for owner review.
+
+    Unlike :func:`deploy`, this writes to the blog's ``_review/`` collection at
+    an obscure ``<slug>-<token>`` name, commits **directly to the live branch**,
+    and opens **no PR**.  The owner reviews the fully-rendered post at the
+    returned URL; the ``review`` collection is excluded from the site's nav,
+    feed, and sitemap and carries ``noindex`` (B-013 leak-test gate). Promote an
+    approved draft to ``_posts/`` with ``scripts.promote_review`` (``make
+    publish``).
+
+    This is a separate function from :func:`deploy` on purpose: the ``post``
+    path serves the live keyless pipeline (B-010) and must stay byte-for-byte
+    unchanged.
+    """
+    if not article_path.exists():
+        raise DeployError(f"Article not found: {article_path}")
+    if not blog_owner or not blog_repo:
+        raise DeployError("blog_owner and blog_repo are required")
+    if not token:
+        raise DeployError("GitHub token is required")
+
+    full_repo = f"{blog_owner}/{blog_repo}"
+    # Strip any leading deploy-date prefix so the review permalink is a clean
+    # slug (the ``review`` collection permalink is /review/:name/).
+    slug = re.sub(r"^\d{4}-\d{2}-\d{2}-", "", article_path.stem)
+    token_suffix = secrets.token_hex(4)  # 8 hex chars of obscurity
+    review_name = f"{slug}-{token_suffix}.md"
+    charts_dir = Path("output/charts")
+
+    run_command('git config --global user.name "Economist Agent Bot"')
+    run_command(
+        'git config --global user.email "github-actions[bot]@users.noreply.github.com"'
+    )
+
+    blog_dir = Path("temp_blog_repo")
+    if blog_dir.exists():
+        shutil.rmtree(blog_dir)
+
+    logger.info("Cloning %s …", full_repo)
+    run_command(
+        f"git clone https://x-access-token:{token}@github.com/{full_repo}.git {blog_dir}"
+    )
+    # Commit straight onto the live branch — no feature branch, no PR.
+    run_command(f"git checkout {live_branch}", cwd=blog_dir)
+
+    review_dir = blog_dir / "_review"
+    assets_dir = blog_dir / "assets" / "charts"
+    review_dir.mkdir(parents=True, exist_ok=True)
+    assets_dir.mkdir(parents=True, exist_ok=True)
+
+    content = _to_review_content(article_path.read_text())
+    (review_dir / review_name).write_text(content)
+    logger.info("Wrote unlisted draft: _review/%s", review_name)
+
+    # Copy referenced chart PNGs (fallback to <slug>.png) so the rendered draft
+    # isn't a broken <img>.
+    chart_refs = sorted(set(re.findall(r"/assets/charts/([^)\s]+\.png)", content)))
+    chart_files = [charts_dir / Path(ref).name for ref in chart_refs]
+    if not chart_files:
+        fallback_chart = charts_dir / f"{slug}.png"
+        if fallback_chart.exists():
+            chart_files.append(fallback_chart)
+    for chart_file in chart_files:
+        if not chart_file.exists():
+            raise DeployError(f"Chart asset not found: {chart_file}")
+        shutil.copy2(chart_file, assets_dir / chart_file.name)
+
+    url = f"https://{host}/review/{slug}-{token_suffix}/"
+
+    if dry_run:
+        shutil.rmtree(blog_dir, ignore_errors=True)
+        return DeployResult(
+            status="dry_run",
+            branch=live_branch,
+            article_name=review_name,
+            validation_report="",
+            pushed=False,
+            url=url,
+        )
+
+    run_command("git add _review assets/charts", cwd=blog_dir)
+    commit_msg = f"review: unlisted draft {review_name}"
+    run_command(f'git commit -m "{commit_msg}"', cwd=blog_dir)
+    # Double-commit protocol (BUG-025): pre-commit hooks may reformat staged
+    # files, leaving the tree dirty; re-stage and amend so the loop terminates.
+    if run_command("git status --porcelain", cwd=blog_dir):
+        run_command("git add -u", cwd=blog_dir)
+        run_command("git commit --amend --no-edit", cwd=blog_dir)
+
+    logger.info("Pushing unlisted draft to %s…", live_branch)
+    run_command(f"git push origin {live_branch}", cwd=blog_dir)
+
+    shutil.rmtree(blog_dir, ignore_errors=True)
+    logger.info("Review draft live (unlisted, noindex): %s", url)
+
+    return DeployResult(
+        status="review_published",
+        branch=live_branch,
+        article_name=review_name,
+        validation_report="",
+        pushed=True,
+        url=url,
+    )
+
+
+# ---------------------------------------------------------------------------
 # CLI wrapper
 # ---------------------------------------------------------------------------
 
@@ -409,6 +546,23 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--dry-run",
         action="store_true",
         help="Prepare and validate but skip push/PR creation",
+    )
+    parser.add_argument(
+        "--mode",
+        choices=("post", "review"),
+        default="post",
+        help="'post' (default): open a PR into _posts/. 'review' (B-013): write "
+        "an unlisted noindex draft to _review/ on the live branch, no PR.",
+    )
+    parser.add_argument(
+        "--live-branch",
+        default=os.getenv("BLOG_LIVE_BRANCH", "main"),
+        help="Live branch to commit review drafts to (default: $BLOG_LIVE_BRANCH or 'main').",
+    )
+    parser.add_argument(
+        "--host",
+        default=os.getenv("BLOG_HOST", "viney.ca"),
+        help="Blog host for the printed review URL (default: $BLOG_HOST or 'viney.ca').",
     )
     return parser.parse_args(argv)
 
@@ -445,13 +599,24 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     try:
-        result = deploy(
-            article_path=article,
-            blog_owner=blog_owner,
-            blog_repo=blog_repo,
-            token=args.token,
-            dry_run=args.dry_run,
-        )
+        if args.mode == "review":
+            result = deploy_review(
+                article_path=article,
+                blog_owner=blog_owner,
+                blog_repo=blog_repo,
+                token=args.token,
+                live_branch=args.live_branch,
+                host=args.host,
+                dry_run=args.dry_run,
+            )
+        else:
+            result = deploy(
+                article_path=article,
+                blog_owner=blog_owner,
+                blog_repo=blog_repo,
+                token=args.token,
+                dry_run=args.dry_run,
+            )
     except DeployError as exc:
         logger.error("Deploy failed: %s", exc)
         return 1
@@ -459,6 +624,8 @@ def main(argv: list[str] | None = None) -> int:
     if result.status == "validation_failed":
         return 1
 
+    if result.url:
+        logger.info("Review URL: %s", result.url)
     logger.info("Deploy finished: status=%s branch=%s", result.status, result.branch)
     return 0
 

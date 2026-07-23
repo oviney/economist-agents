@@ -62,9 +62,10 @@ the live branch, no PR, prints the obscure URL) + `scripts/promote_review.py` /
 `test_deploy_review_mode.py`, `test_promote_review.py`; `post` path untouched.
 
 **Remaining (owner-gated, cross-repo/outward):** (1) the `oviney/blog` PR adding
-the `review` collection + `noindex` layout + `robots.txt`; (2) the **owner-run
-leak test** on the live blog. Do NOT run `--mode review` against the live blog
-before (1)+(2). Kept in Todo until the leak test passes.
+the `review` collection + `noindex` layout + `robots.txt` — **drafted ready to
+paste in `docs/specs/B-013-blog-side.md`**; (2) the **owner-run leak test** on
+the live blog (checklist in the same doc). Do NOT run `--mode review` against the
+live blog before (1)+(2). Kept in Todo until the leak test passes.
 
 ## Done
 

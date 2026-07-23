@@ -635,6 +635,10 @@ async def run_stage3(
         "JSON object with keys: title, subtitle, data (list of "
         "{metric, value, unit, color}), colors (navy/burgundy hex map), "
         "dimensions (width/height). No commentary, no markdown fences.\n\n"
+        "One axis, one measure: every data item must be the same kind of measure "
+        "on the same scale (all percentages, OR all counts — never mixed), within "
+        "~1 order of magnitude, with correct units. Pick the single measure that "
+        "best carries the article's argument.\n\n"
         f"Article excerpt:\n{article[:2500]}"
     )
     graphics_text, graphics_cost = await _collect_text(

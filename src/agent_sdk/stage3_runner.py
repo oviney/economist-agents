@@ -50,6 +50,7 @@ from src.agent_sdk._shared import (
     GRAPHICS_AGENT_PROMPT,
     BudgetExceededError,
     build_research_brief,
+    canonical_slug,
 )
 from src.agent_sdk._shared import (
     audit_article_stats as _audit_article_stats,
@@ -225,7 +226,6 @@ class Stage3Result:
     image_prompt: str = ""  # #403 slice 3: the prompt text itself
 
 
-_IMAGE_FIELD_PATTERN = re.compile(r"^image:\s*[^\n]*?/([^/\s]+)\.png", re.MULTILINE)
 _TITLE_FIELD_PATTERN = re.compile(r'^title:\s*["\']?(.*?)["\']?\s*$', re.MULTILINE)
 _IMAGE_ALT_PATTERN = re.compile(r'^image_alt:\s*["\']?(.*?)["\']?\s*$', re.MULTILINE)
 _IMAGE_CAPTION_PATTERN = re.compile(
@@ -247,19 +247,11 @@ def _extract_frontmatter_field(article: str, pattern: re.Pattern[str]) -> str:
 
 
 def _slug_for_chart(article: str, topic: str) -> str:
-    """Derive the slug to use when naming the chart PNG.
-
-    Preferred source is the article's frontmatter ``image:`` line, since
-    that's what the deploy script and the in-article chart reference both
-    point at. Falls back to a kebab-cased topic when the writer omitted
-    the image field (slice 2 makes that optional). Slice 3 will replace
-    this with a single canonical slug derivation."""
-    match = _IMAGE_FIELD_PATTERN.search(article)
-    if match:
-        return match.group(1)
-    # Conservative kebab-case: lowercase, ASCII alnum + hyphens only.
-    safe = re.sub(r"[^a-z0-9]+", "-", topic.lower()).strip("-")
-    return safe or "untitled"
+    """Slug for the chart PNG + image-prompt sidecar — the single canonical slug
+    (B-008), shared with the article file and the in-article chart embed so they
+    can never point at different filenames. Derived from the article title,
+    falling back to the topic."""
+    return canonical_slug(article, topic)
 
 
 _INLINE_HEADING_PATTERN = re.compile(r"[ \t]+(##+ +[A-Z][^\n]*)")

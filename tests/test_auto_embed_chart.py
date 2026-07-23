@@ -12,12 +12,14 @@ from src.agent_sdk._shared import _auto_embed_chart
 _BODY = "Some analysis. As the chart shows, things rose.\n\n## References\n\n1. X\n"
 
 
-def test_embeds_chart_from_hero_image_slug() -> None:
+def test_embeds_chart_from_canonical_title_slug() -> None:
+    # B-008: the embed uses the canonical title slug (matching the chart PNG and
+    # the article filename), NOT the hero image field.
     article = (
         "---\ntitle: My Piece\nimage: /assets/images/rlhf-trends.png\n---\n\n" + _BODY
     )
     out = _auto_embed_chart(article)
-    assert "![Chart](/assets/charts/rlhf-trends.png)" in out
+    assert "![Chart](/assets/charts/my-piece.png)" in out
 
 
 def test_embeds_chart_from_title_when_image_frontmatter_stripped() -> None:

@@ -24,6 +24,7 @@ from src.agent_sdk._shared import (
     SearchProvidersEmptyError,
     SearchProvidersFailedError,
     _auto_embed_chart,
+    canonical_slug,
 )
 from src.agent_sdk.image_gate import ImageGateError, check_hero_image
 from src.agent_sdk.stage3_runner import (
@@ -512,11 +513,9 @@ def main() -> None:
 
 
 def _slug_from_article(article: str, fallback: str) -> str:
-    """Derive a filename slug from the article's title frontmatter (or topic)."""
-    match = re.search(r'^title:\s*["\']?(.+?)["\']?\s*$', article, re.MULTILINE)
-    source = match.group(1) if match else fallback
-    slug = re.sub(r"[^a-z0-9]+", "-", source.lower()).strip("-")
-    return slug or "article"
+    """Filename slug for the article — the single canonical slug (B-008), shared
+    with the chart PNG, chart embed, and image-prompt sidecar."""
+    return canonical_slug(article, fallback)
 
 
 def _run_end_to_end(

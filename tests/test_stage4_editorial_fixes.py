@@ -186,7 +186,7 @@ class TestChartAutoEmbed:
 
     def test_chart_inserted_before_references(self) -> None:
         article = (
-            "---\nimage: /assets/images/my-slug.png\n---\n"
+            "---\ntitle: My Slug\nimage: /assets/images/my-slug.png\n---\n"
             "Article body.\n\n## References\n\n1. Source"
         )
         result = _apply_editorial_fixes(article)
@@ -195,7 +195,7 @@ class TestChartAutoEmbed:
 
     def test_chart_not_doubled_if_present(self) -> None:
         article = (
-            "---\nimage: /assets/images/my-slug.png\n---\n"
+            "---\ntitle: My Slug\nimage: /assets/images/my-slug.png\n---\n"
             "Body.\n\n![Chart](/assets/charts/my-slug.png)\n\n## References\n"
         )
         result = _apply_editorial_fixes(article)
@@ -215,7 +215,7 @@ class TestChartAutoEmbed:
 
     def test_chart_appended_if_no_references_section(self) -> None:
         article = (
-            "---\nimage: /assets/images/my-slug.png\n---\n"
+            "---\ntitle: My Slug\nimage: /assets/images/my-slug.png\n---\n"
             "Article body with no references."
         )
         result = _apply_editorial_fixes(article)

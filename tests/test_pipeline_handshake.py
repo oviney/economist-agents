@@ -30,7 +30,7 @@ def _fake_stage3(
     return Stage3Result(
         topic="test topic",
         article=(
-            "---\nlayout: post\ntitle: T\n"
+            "---\nlayout: post\ntitle: Test Slug\n"
             "image: /assets/images/test-slug.png\n"
             "image_alt: alt\nimage_caption: cap\n---\n\nBody.\n"
         ),

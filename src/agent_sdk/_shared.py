@@ -428,25 +428,32 @@ def _truncate_description(frontmatter: str, max_chars: int = 160) -> str:
     return frontmatter.replace(match.group(0), f"{prefix}{quote}{truncated}{quote}")
 
 
+def canonical_slug(article: str, fallback: str) -> str:
+    """The single slug shared by the article file, the chart PNG, the chart
+    embed, and the image-prompt sidecar (B-008).
+
+    Derived from the article's ``title`` frontmatter — the article's identity —
+    falling back to a kebab-cased ``fallback`` (the topic) when no title is
+    present. Using one derivation everywhere prevents a chart embed from pointing
+    at a PNG named from a different source (which broke in ``chart_only`` runs
+    where the hero ``image:`` field is empty).
+    """
+    match = re.search(r'^title:\s*["\']?(.+?)["\']?\s*$', article, re.MULTILINE)
+    source = match.group(1) if match else fallback
+    slug = re.sub(r"[^a-z0-9]+", "-", source.lower()).strip("-")
+    return slug or "article"
+
+
 def _auto_embed_chart(article: str) -> str:
     """Insert a chart embed before References if one is missing."""
     if "![" in article and "/assets/charts/" in article:
         return article
 
-    slug_match = re.search(r"image:\s*/assets/images/([^.\s]+)", article)
-    if slug_match:
-        slug = slug_match.group(1)
-    else:
-        # chart_only mode strips the hero ``image:`` frontmatter, so derive the
-        # slug from the title instead — otherwise the chart can never be
-        # embedded and the article fails the mandatory-chart validator.
-        title_match = re.search(r"title:\s*[\"']?(.+?)[\"']?\s*\n", article)
-        if not title_match:
-            return article
-        slug = (
-            re.sub(r"[^a-z0-9]+", "-", title_match.group(1).lower()).strip("-")
-            or "untitled"
-        )
+    if not re.search(r"^title:", article, re.MULTILINE):
+        # No title to derive a slug from — cannot name the chart; leave as-is
+        # (the mandatory-chart validator will flag it).
+        return article
+    slug = canonical_slug(article, "untitled")
 
     chart_embed = f"\n![Chart](/assets/charts/{slug}.png)\n"
 

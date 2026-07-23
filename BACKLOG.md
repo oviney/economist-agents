@@ -162,18 +162,19 @@ bandit). Port those gates local first, *then* delete `ci.yml` +
 fate of `docs.yml`/`copilot-setup-steps.yml`, whether to keep multi-version
 testing, and whether to record an ADR-0015. Not yet approved to build.
 
-### B-008 · Single canonical slug across article file, chart PNG, and image-prompt sidecar
-
-Low-impact cleanup flagged in the B-006/B-007 code review. The finished article
-file is named via `_slug_from_article` (from `title:`) while the chart PNG and
-the `output/posts/<slug>.image_prompt.md` sidecar are named via `_slug_for_chart`
-(from the `image:` field / topic). In `chart_only` runs these can diverge, so
-`foo.md` may sit beside `bar.image_prompt.md`. No functional break (both files
-exist; the prompt is also embedded inline), but a single shared slug derivation
-would remove the confusion. Also aligns with the validator's title-based
-canonical slug.
-
 ## Done
+
+### B-008 · Single canonical slug across article file, chart PNG, and image-prompt sidecar — 2026-07-23
+
+Adds `canonical_slug(article, fallback)` in `_shared.py` — one title-based slug
+(topic fallback) that `_auto_embed_chart`, `_slug_for_chart` (stage3), and
+`_slug_from_article` (pipeline) all delegate to. Turned out to be more than
+cosmetic: in `chart_only` mode the hero `image:` frontmatter is stripped, so the
+old `image:`-derived slug could embed the chart at a slug that didn't match the
+rendered PNG on disk. Now the article file, chart PNG, `![Chart]` embed, and the
+`<slug>.image_prompt.md` sidecar always share one slug. Regression test
+(`tests/test_canonical_slug.py`) asserts they agree for a `chart_only` article.
+PR #456; `make ci-local` green (2224 passed, cov 79.49% / `src/quality` 97%).
 
 ### B-006 · Keyless subscription pipeline (claude_web research + chart-embed fixes) — 2026-07-14
 

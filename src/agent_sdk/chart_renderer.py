@@ -41,8 +41,12 @@ from typing import Any
 # every module import. Push that cost to render-time so tests that don't
 # render don't pay it.
 
-# Economist palette (matches scripts/generate_chart.py).
-_NAVY = "#17648d"
+# Economist palette. Navy + burgundy are the two categorical series colors; the
+# pair is validated colorblind-safe via the dataviz skill's validate_palette.js
+# (light, surface #f1f0e9: all checks PASS, worst-adjacent CVD ΔE 13.4). The
+# previous navy #17648d failed the chroma floor (0.097 < 0.1 — read gray), so it
+# was nudged to #0f5f92 (B-014).
+_NAVY = "#0f5f92"
 _RED = "#e3120b"
 _BURGUNDY = "#843844"
 _BG_COLOR = "#f1f0e9"

@@ -26,6 +26,37 @@ _(none)_
 
 ## Todo
 
+### B-012 · Opt-in `deep-brief` research mode (spec'd — prototype validated)
+
+Wire the `deep-research` harness as an **opt-in** research path for flagship
+posts; `claude_web` stays the everyday default. **Prototype (2026-07-22) settled
+it:** dramatically better sourcing — 19 claims each surviving a 3-0 verification
+vote, and it *refuted the walked-back Accenture Copilot numbers* a single-pass
+researcher would ship — but one topic cost ~102 agents / ~2M tokens / ~15 min and
+**hit the session limit**. So: opt-in, not default. Spec:
+`docs/specs/B-012-deep-brief-research-mode.md`. Prototype output (a real verified
+brief) lives at `docs/research/ai-productivity-brief.md`.
+
+### B-014 · Chart redesign — fix graphics-stage correctness bug + dataviz styling (spec'd)
+
+The graphics stage produces charts that **misrepresent the data** — the
+flaky-tests chart mixed five percentages with a raw 150,000 count on one axis
+(headline 84% vanished; count mislabeled "150000 %"). Fix the graphics-agent spec
+(one axis / one measure / correct units / form-follows-job) + bring
+dataviz-validated colorblind-safe palettes + mark specs into `chart_renderer.py`
+(matplotlib PNG kept; **not** an SVG/interactive switch). Prototype before/after
+proved the defect and the fix; palettes already validated. Spec:
+`docs/specs/B-014-chart-redesign.md`.
+
+### B-013 · Live unlisted draft review on GitHub Pages (candidate — gated on leak test)
+
+Review generated drafts as the *rendered* post at an obscure, `noindex`, live
+`/review/<slug>-<token>/` URL (real theme, reviewable from a phone) instead of a
+GitHub PR diff; promote to `_posts/` via `make publish`. One-pager:
+`docs/ideas/live-draft-review.md`. **Gate:** 10-minute leak test — deploy one
+draft and confirm the minimal-mistakes theme surfaces it in *none* of
+homepage/archives/feed/sitemap. Not yet spec'd.
+
 ### B-009 · Retire paid-AI GitHub Actions (Track A)
 
 Executes [ADR-0014](docs/adr/0014-retire-paid-github-actions-generation.md).

@@ -26,6 +26,39 @@ def _valid_spec() -> dict:
     }
 
 
+def _mixed_scale_spec() -> dict:
+    """The exact flaky-tests failure (B-014): five percentages plus a raw
+    150,000 count on one linear axis — the count (mislabelled '%') swallowed the
+    scale and the headline 84% collapsed to an invisible sliver."""
+    return {
+        "title": "The Invisible Payroll Tax",
+        "subtitle": "Cost of flaky tests, selected industrial studies",
+        "data": [
+            {"metric": "Google CI signal skewed", "value": 84, "unit": "%"},
+            {"metric": "Jira frontend build failures", "value": 21, "unit": "%"},
+            {"metric": "Total productive dev time", "value": 2.5, "unit": "%"},
+            {"metric": "Dev time repairing", "value": 1.3, "unit": "%"},
+            {"metric": "Dev time investigating", "value": 1.1, "unit": "%"},
+            {"metric": "Atlassian dev-hours/yr", "value": 150000, "unit": "%"},
+        ],
+    }
+
+
+def test_values_spanning_many_orders_of_magnitude_are_rejected() -> None:
+    """B-014 Prove-It: a spec whose values span too many orders of magnitude for
+    one linear axis must be rejected before render — not silently produce a chart
+    where the small values are invisible."""
+    with pytest.raises(ChartRenderError, match="orders of magnitude|one .*axis|coherent"):
+        render_chart(_mixed_scale_spec(), Path("/tmp/should-not-be-written.png"))
+
+
+def test_normal_scale_spec_still_renders(tmp_path: Path) -> None:
+    """Guard rail: a spec whose values are within a sane range is unaffected."""
+    out = tmp_path / "ok.png"
+    render_chart(_valid_spec(), out)  # values 0..1 — well within span
+    assert out.exists()
+
+
 def _png_dimensions(path: Path) -> tuple[int, int]:
     """Read width, height from a PNG header without depending on Pillow.
 

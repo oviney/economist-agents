@@ -71,8 +71,15 @@ def _resolve_color(name: str | None) -> str:
     return _NAMED_COLORS.get(name.lower(), _NAVY)
 
 
+# Max allowed ratio between the largest and smallest non-zero data value. ~3
+# orders of magnitude — generous enough to never reject a realistic chart, tight
+# enough to catch a raw count mixed in with percentages (B-014).
+_MAX_VALUE_SPAN = 1000
+
+
 def _validate_spec(spec: Any) -> None:
-    """Reject any spec that would crash matplotlib partway through render."""
+    """Reject any spec that would crash matplotlib partway through render, or
+    that would render a misleading chart (values spanning too many magnitudes)."""
     if not isinstance(spec, dict):
         raise ChartRenderError(f"spec must be a dict, got {type(spec).__name__}")
     title = spec.get("title")
@@ -91,6 +98,19 @@ def _validate_spec(spec: Any) -> None:
             raise ChartRenderError(
                 f"spec.data[{i}].value must be numeric, got {type(value).__name__}"
             )
+
+    # Reject values spanning too many orders of magnitude for one linear axis:
+    # the small bars collapse to invisible slivers (B-014 — a 150,000 count next
+    # to percentages 0–84 hid the headline finding). Fix the spec (one coherent
+    # measure), don't render a misleading chart. Zero values are excluded from
+    # the ratio; the guard only fires with ≥2 non-zero magnitudes.
+    magnitudes = [abs(item["value"]) for item in data if item["value"]]
+    if len(magnitudes) >= 2 and max(magnitudes) / min(magnitudes) > _MAX_VALUE_SPAN:
+        raise ChartRenderError(
+            f"spec.data values span too many orders of magnitude "
+            f"({max(magnitudes):g} vs {min(magnitudes):g}) for one linear axis — "
+            f"pick one coherent measure (see dataviz: one axis, one measure)"
+        )
 
 
 def render_chart(spec: dict, output_path: Path) -> Path:

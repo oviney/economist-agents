@@ -46,6 +46,22 @@ Exit `0` = publication validator passed (publish-ready); `1` = validator issues;
 `2` = research failed (retry, or you are on `deterministic` — switch to
 `claude_web`).
 
+### Opt-in: `--brief` for flagship posts (B-012)
+
+For a cornerstone post where sourcing quality matters most, run the
+`deep-research` harness first to produce a verified, cited brief
+(`docs/research/<slug>.md`), then hand it to the writer:
+
+```bash
+IS_SANDBOX=1 python -m src.agent_sdk.pipeline "<topic>" \
+    --image-mode chart_only --brief docs/research/<slug>.md
+```
+
+`--brief` skips the research step and uses that file (refuted claims are
+stripped automatically). **This is opt-in and heavy** — one deep-research run is
+~2M tokens and can hit your session limit — so `claude_web` stays the everyday
+default; reserve `--brief` for the pieces that warrant it.
+
 ## 2. Publish (keyless — free GitHub token, opens a PR you review)
 
 ```bash

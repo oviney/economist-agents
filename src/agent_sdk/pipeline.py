@@ -96,6 +96,20 @@ class PipelineResult:
     article_chars: int
 
 
+def load_brief_file(path: str | Path) -> str:
+    """Load an opt-in deep-research brief for the writer, EXCLUDING refuted claims.
+
+    B-012: a deep-research brief (``docs/research/<slug>.md``) carries a
+    ``## Refuted / unverified`` section listing claims the adversarial check
+    killed. Those must never reach the writer, so this drops that section (from
+    its heading to the next top-level ``##`` heading or EOF); the verified claims
+    and sources pass through unchanged.
+    """
+    text = Path(path).read_text()
+    text = re.sub(r"(?ms)^##\s+Refuted\b.*?(?=^##\s|\Z)", "", text)
+    return text.strip() + "\n"
+
+
 async def run_pipeline(
     topic: str,
     writer_budget_usd: float | None = 0.30,
@@ -104,6 +118,7 @@ async def run_pipeline(
     graphics_model: str = DEFAULT_GRAPHICS_MODEL,
     image_mode: Literal["chart_only", "hero"] = "hero",
     research_mode: Literal["deterministic", "deep", "claude_web"] = "deterministic",
+    brief_override: str | None = None,
 ) -> PipelineResult:
     """Generate one article through the Agent SDK pipeline.
 
@@ -123,6 +138,7 @@ async def run_pipeline(
         writer_model=writer_model,
         graphics_model=graphics_model,
         research_mode=research_mode,
+        brief_override=brief_override,
     )
     article_for_stage4 = stage3.article
     if image_mode == "chart_only":
@@ -408,6 +424,17 @@ def main() -> None:
         ),
     )
     parser.add_argument(
+        "--brief",
+        default=None,
+        metavar="PATH",
+        help=(
+            "Opt-in (B-012): use a pre-built deep-research brief file "
+            "(docs/research/<slug>.md) as the writer's research instead of "
+            "running --research-mode. Refuted claims are stripped. For flagship "
+            "posts — the deep-research harness is heavy; claude_web is the default."
+        ),
+    )
+    parser.add_argument(
         "--image-mode",
         choices=("hero", "chart_only"),
         default="hero",
@@ -464,6 +491,7 @@ def main() -> None:
             writer_model=args.writer_model,
             graphics_model=args.graphics_model,
             research_mode=args.research_mode,
+            brief_override=load_brief_file(args.brief) if args.brief else None,
         )
         return
 
@@ -500,6 +528,7 @@ def _run_end_to_end(
     graphics_model: str,
     research_mode: str,
     image_mode: str = "chart_only",
+    brief_override: str | None = None,
 ) -> None:
     """Run the full pipeline end-to-end (no handshake) and write the finished
     article. With ``--research-mode claude_web`` this is fully keyless — Stage 3
@@ -519,6 +548,7 @@ def _run_end_to_end(
                 graphics_model=graphics_model,
                 image_mode=image_mode,
                 research_mode=research_mode,
+                brief_override=brief_override,
             )
         )
     except (SearchProvidersFailedError, SearchProvidersEmptyError) as exc:

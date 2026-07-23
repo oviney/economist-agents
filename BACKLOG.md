@@ -26,7 +26,16 @@ _(none)_
 
 ## Todo
 
-### B-012 · Opt-in `deep-brief` research mode (spec'd — prototype validated)
+### B-012 · Opt-in `deep-brief` research mode (BUILT — live acceptance run pending)
+
+> **✅ CODE DONE.** `--brief <file>` wired end-to-end (`pipeline.load_brief_file`
+> strips refuted claims → `run_pipeline`/`run_stage3` `brief_override` skips the
+> research step); documented opt-in/heavy in the runbook; `claude_web` stays
+> default. Tested (`tests/test_deep_brief.py`) + `make ci-local` green. The one
+> remaining acceptance criterion — a real deep-research → article run — is a
+> token-heavy owner-run step (deep-research ~2M tokens), left opt-in by design.
+
+
 
 Wire the `deep-research` harness as an **opt-in** research path for flagship
 posts; `claude_web` stays the everyday default. **Prototype (2026-07-22) settled

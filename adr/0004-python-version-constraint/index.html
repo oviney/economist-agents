@@ -1518,6 +1518,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../0015-local-first-verification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0015 — Local-First Verification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3730,9 +3758,12 @@
 
 <h1 id="adr-0004-python-version-constraint-for-crewai-compatibility">ADR-0004: Python Version Constraint for CrewAI Compatibility<a class="headerlink" href="#adr-0004-python-version-constraint-for-crewai-compatibility" title="Permanent link">&para;</a></h1>
 <p><strong>Date:</strong> 2025-01-02
-<strong>Status:</strong> Accepted
+<strong>Status:</strong> Superseded by <a href="../0015-local-first-verification/">ADR-0015</a>
 <strong>Context:</strong> Sprint 9 Story 1 - CrewAI Integration Validation</p>
 <blockquote>
+<p><strong>Superseded (2026-07-22):</strong> CrewAI was removed (<a href="../0006-agent-framework-selection/">ADR-0006</a>),
+so the compatibility constraint that motivated this ADR is moot. ADR-0015
+retires the multi-version test matrix in favour of a single pinned version.</p>
 <p><strong>Note (2026-04-05):</strong> This constraint exists because of CrewAI. <a href="../0006-agent-framework-selection/">ADR-0006</a> re-evaluates the framework choice; if a replacement framework is adopted, revisit this Python version constraint as part of that migration.</p>
 </blockquote>
 <h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>

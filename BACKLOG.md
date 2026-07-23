@@ -53,7 +53,11 @@ Review generated drafts as the *rendered* post at an obscure, `noindex`, live
 GitHub PR diff; promote to `_posts/` via `make publish`. One-pager:
 `docs/ideas/live-draft-review.md`. **Gate:** 10-minute leak test — deploy one
 draft and confirm the minimal-mistakes theme surfaces it in *none* of
-homepage/archives/feed/sitemap. Not yet spec'd.
+homepage/archives/feed/sitemap. **Spec'd (2026-07-23):**
+`docs/specs/B-013-live-draft-review.md` — awaiting owner LGTM before planning.
+Note it's a **cross-repo** feature (Jekyll `review` collection + `noindex` layout
+live in `oviney/blog`; `deploy_to_blog --mode review` + `make publish` live here)
+and the acceptance gate is an **owner-run outward leak test** on the live blog.
 
 ## Done
 

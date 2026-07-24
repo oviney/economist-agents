@@ -26,6 +26,32 @@ _(none)_
 
 ## Todo
 
+### B-016 · Claude-generated visuals: hero image + all post figures (BUG-053)
+
+Owner wants Claude's own visualization to produce the **hero image** and **all
+charts/images** a post needs — today the pipeline only draws one data chart
+(matplotlib) and emits a hero-image *prompt* for a human. **BLOCKED ON AN OWNER
+DECISION:** this reverses CLAUDE.md constraint #4 (NON-NEGOTIABLE — no pipeline
+hero-image generation, "not even procedural/PIL"), which exists to honour #1 (no
+keyed image services). Keyless-compatible interpretations to choose among:
+(i) extend keyless code-drawn charts to multiple figures per post; (ii) a
+Claude-authored **SVG/code hero illustration** (keyless, but currently banned by
+#4); (iii) true raster AI hero art (needs a keyed/paid image model → blocked by
+#1/#2). Owner amends #4 + picks scope, then spec it. See BUG-053.
+
+### B-017 · Economist-writing enforcement misses AI-slop tells (BUG-054)
+
+The generated flaky-tests article passes every deterministic economist-writing
+gate (named companies, ≤4 headings, colon-twist title, no lists) yet still reads
+like AI slop. Stage-4 only strips a fixed hedging/closing set; it does not catch:
+em-dash rhythm, the repeated "not X but Y" scaffold, meta-commentary on its own
+argument ("The argument here is…", "The numbers…make this case almost without
+assistance"), unfalsifiable superlatives ("No other category…"), and purple/mixed
+metaphors (dripping-tap→flooding-basement→plumber; "the engineer's nervous
+system"). Spec a fix: extend the banlist/heuristics and/or add an
+economist-writing judge pass, with regression fixtures from the cited tells. See
+BUG-054 for the full evidence list.
+
 ### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
 
 Discovered 2026-07-23 opening the B-013 blog PR (#1157). The **target blog repo

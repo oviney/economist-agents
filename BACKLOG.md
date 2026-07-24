@@ -26,6 +26,20 @@ _(none)_
 
 ## Todo
 
+### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
+
+Discovered 2026-07-23 opening the B-013 blog PR (#1157). The **target blog repo
+is itself agent-governed** with its own skills framework, scoped `agent:*`
+labels, protected files, and a required-check branch-protection gate — and
+economist-agents is an external agent from its point of view. Full findings:
+`docs/blog-integration-constraints.md`. Impact beyond B-013: our everyday
+`deploy_to_blog` article PRs must pass the blog's `build`, `Security Audit`,
+`check-agent-scope`, Content Validation, Visual Regression, and Playwright gates,
+and clear its 1-review requirement (author can't self-approve). Decide + document
+the canonical way our PRs pass `check-agent-scope` — likely label them
+`agent:editorial-chief` and keep article PRs `_posts/`-only (nothing else) — and
+whether the deploy step should carry that label. Not yet spec'd; capture-only.
+
 ### B-012 · Opt-in `deep-brief` research mode (BUILT — live acceptance run pending)
 
 > **✅ CODE DONE.** `--brief <file>` wired end-to-end (`pipeline.load_brief_file`

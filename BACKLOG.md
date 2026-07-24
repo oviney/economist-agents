@@ -39,19 +39,6 @@ Claude-authored **SVG/code hero illustration** (keyless, but currently banned by
 #4); (iii) true raster AI hero art (needs a keyed/paid image model → blocked by
 #1/#2). Owner amends #4 + picks scope, then spec it. See BUG-053.
 
-### B-017 · Economist-writing enforcement misses AI-slop tells (BUG-054)
-
-The generated flaky-tests article passes every deterministic economist-writing
-gate (named companies, ≤4 headings, colon-twist title, no lists) yet still reads
-like AI slop. Stage-4 only strips a fixed hedging/closing set; it does not catch:
-em-dash rhythm, the repeated "not X but Y" scaffold, meta-commentary on its own
-argument ("The argument here is…", "The numbers…make this case almost without
-assistance"), unfalsifiable superlatives ("No other category…"), and purple/mixed
-metaphors (dripping-tap→flooding-basement→plumber; "the engineer's nervous
-system"). Spec a fix: extend the banlist/heuristics and/or add an
-economist-writing judge pass, with regression fixtures from the cited tells. See
-BUG-054 for the full evidence list.
-
 ### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
 
 Discovered 2026-07-23 opening the B-013 blog PR (#1157). The **target blog repo
@@ -131,6 +118,29 @@ Blog governance findings that bit us here → `docs/blog-integration-constraints
 + BACKLOG **B-015**.
 
 ## Done
+
+### B-017 · Flag the AI-slop tells that pass every deterministic gate (BUG-054) — 2026-07-24
+
+The flaky-tests article passed every economist-writing gate yet still read like
+AI slop. Four countable detectors now run inside Stage 4 on
+`publication_validator.py` (which already surfaces its issues to the reviewer):
+`em_dash_density`, `antithesis_scaffold` (the "not X but Y" pile-up),
+`meta_commentary`, `unfalsifiable_superlative`. Two design rules: they **flag,
+never rewrite** (deleting one arm of a "not X but Y" mid-paragraph is worse slop
+— rewriting stays human-in-the-loop, like the hero image), and they emit
+**HIGH/MEDIUM, never CRITICAL** (inform the reviewer; don't quarantine a
+publishable draft). Body-only — frontmatter, References, and fenced code blocks
+exempt. **Verified on the real BUG-054 article:** all four fire (em-dash
+1.15/para HIGH, antithesis ×3, 4 meta-commentary hits, 1 superlative) and its
+only CRITICAL is a pre-existing `date_mismatch`. Scope is honest: 4 of 5 cited
+tells are countable; the **purple/mixed-metaphor tell is semantic and was not
+faked** — it stays human-review's job, with an opt-in keyless judge parked in the
+spec (the CrewAI Stage-4 LLM reviewer was removed for 50% parse failure; not
+reintroduced into the default path). 14 tests
+(`tests/test_publication_validator_ai_slop.py`) incl. a clean control that must
+stay unflagged. Spec: `docs/specs/B-017-ai-slop-enforcement.md`.
+**Thresholds are first guesses** (em-dash 0.8/para HIGH, antithesis ≥4 HIGH /
+≥2 MEDIUM) — tune on the next few real articles.
 
 ### B-008 · Single canonical slug across article file, chart PNG, and image-prompt sidecar — 2026-07-23
 

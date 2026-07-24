@@ -75,27 +75,34 @@ the live branch, no PR, prints the obscure URL) + `scripts/promote_review.py` /
 `make publish SLUG=<slug>` (blocking validator gate). Tests:
 `test_deploy_review_mode.py`, `test_promote_review.py`; `post` path untouched.
 
-**Blog side: PR OPEN → https://github.com/oviney/blog/pull/1157** (branch
-`feat/b-013-review-collection`). Adds the `review` collection + `noindex`/
-`sitemap:false` defaults + `_layouts/review.html` + `robots.txt` disallow.
-Verified against the real blog: `_layouts/default.html` *already* emits the
-robots meta from `page.noindex`, so this activates existing plumbing rather than
-adding new. YAML validated; 18/1/4 added lines, nothing existing touched.
-Reference copy of the change: `docs/specs/B-013-blog-side.md`.
+**Blog side — MOSTLY DONE, one fix PR pending merge:**
+- **PR #1157 MERGED** (2026-07-24) — `review` collection + `noindex`/`sitemap:false`
+  defaults + `_layouts/review.html` + `robots.txt` disallow now on blog `main`.
+- **Leak test RUN (2026-07-24), 6/7 pass** — deployed one unlisted draft
+  (`…-1530b611`). Draft is absent from homepage, /blog/, feed.xml, sitemap.xml,
+  and search.json, and robots.txt disallows /review/ ⇒ **the hide works.** The one
+  failure: the draft rendered **bare** (no `<head>`, no theme, no `noindex` meta).
+- **Root cause:** this blog **disabled `remote_theme`** and uses local layouts —
+  there is **no `single` layout**. `review.html` extended `single`, so it didn't
+  chain to `default.html` (where `noindex` lives). Real posts use `layout: post`.
+- **Fix: PR #1159 OPEN → https://github.com/oviney/blog/pull/1159** — one word,
+  `review.html` now `layout: post`. `review.html` is NOT a protected file, so it
+  should clear `check-agent-scope`.
 
 **NEXT (resume here):**
-1. Review + merge blog PR #1157.
-2. Run the **leak test** (the acceptance gate) — deploy ONE draft:
-   `python -m scripts.deploy_to_blog --mode review --article output/posts/<slug>.md
-   --blog-owner oviney --blog-repo blog --host www.viney.ca`
-   then check the 7 boxes in `docs/specs/B-013-blog-side.md` (homepage, /blog/,
-   archives, feed.xml, sitemap.xml, search, view-source `noindex`).
-3. If clean → `make publish SLUG=<slug>`, then move B-013 to Done.
+1. **Merge blog PR #1159** (owner web-UI: "Merge without waiting for requirements
+   (bypass rules)" → "Bypass rules and merge (squash)" → Confirm — same flow used
+   for #1157; `gh pr merge` is classifier-blocked for the agent).
+2. After Pages rebuilds, re-run the leak-test verify on the SAME draft URL
+   (`…-1530b611`) — expect the `noindex` meta present ⇒ **7/7**.
+3. Then `make publish SLUG=<slug>` on an approved draft, and move B-013 to Done.
+   (A bare-rendered test draft `…-1530b611` is currently live/unlisted; it
+   re-renders correctly once #1159 merges, or delete `_review/…-1530b611.md`.)
 
-Note: canonical blog URL is **www.viney.ca** (not viney.ca) — pass `--host
-www.viney.ca` or set `BLOG_HOST`. Blog live branch is `main`. The `.env`
-`BLOG_REPO_TOKEN` failed auth on push (read-only/expired) — `gh auth token`
-works; worth refreshing the PAT.
+Note: canonical blog URL is **www.viney.ca**; live branch **main**; `.env`
+`BLOG_REPO_TOKEN` failed push auth (`gh auth token` works — refresh the PAT).
+Blog governance findings that bit us here → `docs/blog-integration-constraints.md`
++ BACKLOG **B-015**.
 
 ## Done
 

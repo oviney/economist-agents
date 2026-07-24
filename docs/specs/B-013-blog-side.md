@@ -48,19 +48,26 @@ defaults:
 
 ## 2. `_layouts/review.html` — reuse post styling, inject `noindex`
 
+> **CORRECTED 2026-07-24 after the live leak test.** This blog **disabled
+> `remote_theme`** and uses **local** layouts (`default.html`, `post.html`,
+> `page.html`) — there is **no `single` layout**. Extend **`post`** (what real
+> posts use), which chains to `default.html`, whose `<head>` already emits the
+> `noindex` meta from `page.noindex` (line 17). The earlier `layout: single`
+> rendered the draft **bare** (no head, no theme, no noindex). No
+> `_includes/head/custom.html` is needed — the `noindex` plumbing already exists.
+
 ```html
 ---
-layout: single
+layout: post
 ---
 {{ content }}
 ```
 
-…and add the robots tag via minimal-mistakes' supported head hook,
-`_includes/head/custom.html` (create it if absent):
+The `noindex` comes from the collection default (`noindex: true` in `_config.yml`,
+§1) flowing to `_layouts/default.html`'s existing:
 
 ```liquid
-{% if page.collection == "review" %}
-<meta name="robots" content="noindex,nofollow">
+{%- if page.noindex -%}<meta name="robots" content="noindex, nofollow">{%- endif -%}
 {% endif %}
 ```
 

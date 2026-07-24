@@ -260,6 +260,12 @@ class PublicationValidator:
         # Check 20: Internal-link integrity
         self._check_internal_links(article_content)
 
+        # Checks 21-24: AI-slop tells (B-017 / BUG-054) — flag-only, never CRITICAL
+        self._check_em_dash_density(article_content)
+        self._check_antithesis_scaffold(article_content)
+        self._check_meta_commentary(article_content)
+        self._check_superlatives(article_content)
+
         # Determine if valid (no CRITICAL issues)
         critical_issues = [i for i in self.issues if i["severity"] == "CRITICAL"]
         is_valid = len(critical_issues) == 0
@@ -383,6 +389,156 @@ class PublicationValidator:
                         )
         except Exception:
             pass  # Title check is non-critical if YAML parsing fails
+
+    # ── AI-slop detectors (B-017 / BUG-054) ────────────────────────────────
+    # These four checks catch structural tells that pass every other gate yet
+    # still read as AI slop. They REPORT (never rewrite — deleting one arm of a
+    # "not X but Y" mid-paragraph produces worse prose) and emit HIGH/MEDIUM,
+    # never CRITICAL: they inform the human reviewer, they don't quarantine an
+    # otherwise-publishable draft. Thresholds are first guesses to tune on real
+    # articles. See docs/specs/B-017-ai-slop-enforcement.md.
+
+    # Curated phrases the writer uses to narrate its own argument — never
+    # desirable. Any hit is HIGH.
+    _META_COMMENTARY_PATTERNS = [
+        r"the argument here",
+        r"makes? (?:this|the) case",
+        r"the numbers,? once examined",
+        r"as this (?:article|piece) (?:argues|shows|demonstrates)",
+        r"what follows (?:is|makes)",
+        r"it is worth restating",
+        r"almost without assistance",
+    ]
+
+    # Absolute, unfalsifiable claims. MEDIUM each, HIGH at >= 2.
+    _SUPERLATIVE_PATTERNS = [
+        r"\bno other\b",
+        r"\b(?:the )?most \w+ (?:category|form|kind|type|example)\b",
+        r"\bnever before\b",
+        r"\bunlike any\b",
+        r"\bnothing (?:else )?(?:comes close|compares)\b",
+    ]
+
+    def _slop_scan_text(self, content: str) -> str:
+        """Body prose only: frontmatter, the References section, and fenced
+        code blocks removed, so slop checks never fire on YAML, citation
+        titles, or code (BUG-054)."""
+        body = content
+        if body.startswith("---"):
+            parts = body.split("---", 2)
+            if len(parts) >= 3:
+                body = parts[2]
+        for pattern in (
+            r"\n## References\b",
+            r"\n## Sources\b",
+            r"\n## Bibliography\b",
+        ):
+            match = re.search(pattern, body, re.IGNORECASE)
+            if match:
+                body = body[: match.start()]
+                break
+        # Drop fenced code blocks.
+        body = re.sub(r"```.*?```", "", body, flags=re.DOTALL)
+        return body
+
+    @staticmethod
+    def _paragraph_count(text: str) -> int:
+        return max(1, len([p for p in re.split(r"\n\s*\n", text) if p.strip()]))
+
+    def _check_em_dash_density(self, content: str) -> None:
+        """Flag em-dash used as the default connective (BUG-054 tell #1)."""
+        body = self._slop_scan_text(content)
+        count = body.count("—")  # em-dash
+        if count == 0:
+            return
+        ratio = count / self._paragraph_count(body)
+        if ratio > 0.8:
+            severity = "HIGH"
+        elif ratio > 0.5:
+            severity = "MEDIUM"
+        else:
+            return
+        self.issues.append(
+            {
+                "check": "em_dash_density",
+                "severity": severity,
+                "message": (
+                    f"Em-dash rhythm: {count} em-dashes across "
+                    f"{self._paragraph_count(body)} paragraphs "
+                    f"({ratio:.2f}/para) reads as AI cadence"
+                ),
+                "details": "The em-dash has become the default connective.",
+                "fix": "Recast most em-dashes as full stops, commas, or colons by hand.",
+            },
+        )
+
+    def _check_antithesis_scaffold(self, content: str) -> None:
+        """Flag the repeated ``not X but Y`` antithesis (BUG-054 tell #2)."""
+        body = self._slop_scan_text(content)
+        pattern = re.compile(
+            r"\bnot\s+(?:merely|simply|just|only\s+)?[\w-]+[^.]{0,40}?\bbut\b",
+            re.IGNORECASE,
+        )
+        hits = pattern.findall(body)
+        n = len(hits)
+        if n >= 4:
+            severity = "HIGH"
+        elif n >= 2:
+            severity = "MEDIUM"
+        else:
+            return
+        self.issues.append(
+            {
+                "check": "antithesis_scaffold",
+                "severity": severity,
+                "message": f'The "not X but Y" antithesis scaffold appears {n} times',
+                "details": "A single antithesis is fine; a pile-up is an AI tell.",
+                "fix": "Rewrite most as direct assertions of what the thing IS.",
+            },
+        )
+
+    def _check_meta_commentary(self, content: str) -> None:
+        """Flag the article narrating its own argument (BUG-054 tell #3)."""
+        body = self._slop_scan_text(content)
+        found = []
+        for pattern in self._META_COMMENTARY_PATTERNS:
+            for match in re.finditer(pattern, body, re.IGNORECASE):
+                start = max(0, match.start() - 30)
+                end = min(len(body), match.end() + 30)
+                found.append(f'"{match.group()}" in: ...{body[start:end].strip()}...')
+        if not found:
+            return
+        self.issues.append(
+            {
+                "check": "meta_commentary",
+                "severity": "HIGH",
+                "message": f"Meta-commentary on the article's own argument ({len(found)})",
+                "details": "\n".join(found),
+                "fix": "Delete the narration; let the evidence carry the point.",
+            },
+        )
+
+    def _check_superlatives(self, content: str) -> None:
+        """Flag unfalsifiable absolute superlatives (BUG-054 tell #4)."""
+        body = self._slop_scan_text(content)
+        found = []
+        for pattern in self._SUPERLATIVE_PATTERNS:
+            for match in re.finditer(pattern, body, re.IGNORECASE):
+                start = max(0, match.start() - 30)
+                end = min(len(body), match.end() + 30)
+                found.append(f'"{match.group()}" in: ...{body[start:end].strip()}...')
+        if not found:
+            return
+        severity = "HIGH" if len(found) >= 2 else "MEDIUM"
+        self.issues.append(
+            {
+                "check": "unfalsifiable_superlative",
+                "severity": severity,
+                "message": f"Unfalsifiable superlative claim(s) ({len(found)})",
+                "details": "\n".join(found),
+                "fix": "Replace absolutes with a specific, verifiable comparison.",
+            },
+        )
 
     def _check_placeholders(self, content: str):
         """Check for placeholder text that should never be published"""

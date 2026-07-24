@@ -855,6 +855,40 @@
       "prevention_test_added": false,
       "fixed_date": "2026-07-22T00:00:00",
       "fix_notes": "Mitigated by defaulting the keyless path to research_mode=claude_web (documented canonical in the runbook). Verified: claude_web produced a publish-valid article on the exact topic that aborted under deterministic. deterministic remains rate-limited; claude_web is the reliable keyless research mode."
+    },
+    {
+      "id": "BUG-051",
+      "severity": "medium",
+      "discovered_in": "production",
+      "discovered_date": "2026-07-24T00:00:00",
+      "description": "B-013 review drafts rendered BARE on the live blog \u2014 no <head>, no theme, no noindex meta \u2014 defeating both the 'review the post in the real theme' goal and the noindex acceptance criterion. Caught by the live leak test after merging oviney/blog PR #1157 (the other 6/7 checks passed: draft absent from homepage/blog/feed.xml/sitemap.xml/search + robots.txt disallows /review/).",
+      "component": "oviney/blog _layouts/review.html (B-013 blog-side)",
+      "status": "fixed",
+      "github_issue": "oviney/blog#1159",
+      "is_production_escape": true,
+      "root_cause": "integration_error",
+      "root_cause_notes": "review.html extended `layout: single`, assuming the remote minimal-mistakes theme. This blog has remote_theme COMMENTED OUT and uses local layouts (default/page/post) \u2014 there is no `single` layout, so the parent layout silently did not apply and the draft rendered as bare markdown-to-HTML. Real posts use `layout: post` -> `default.html`, whose <head> emits the page.noindex robots meta. Assumption about the target repo's theme was not verified before shipping.",
+      "discovered_by": "leak-test (deploy_review --mode review + read-only feed/sitemap/homepage/noindex checks)",
+      "prevention_test_added": "Acceptance leak-test checklist in docs/specs/B-013-blog-side.md is the regression gate; run it on any change to the review collection/layout before calling B-013 done.",
+      "fixed_date": "2026-07-24T00:00:00",
+      "fix_notes": "oviney/blog PR #1159: _layouts/review.html now `layout: post` (chains to default.html where noindex lives). Awaiting owner admin-bypass merge; re-verify leak test = 7/7 after Pages rebuild."
+    },
+    {
+      "id": "BUG-052",
+      "severity": "low",
+      "discovered_in": "development",
+      "discovered_date": "2026-07-24T00:00:00",
+      "description": "scripts.deploy_to_blog.deploy_review defaults --host to 'viney.ca', but the blog's canonical URL is 'www.viney.ca' (per oviney/blog _config.yml `url`). A review deploy without an explicit --host prints/returns a review URL on the apex domain that redirects or 404s depending on DNS.",
+      "component": "scripts/deploy_to_blog.py deploy_review (host default)",
+      "status": "fixed",
+      "github_issue": "",
+      "is_production_escape": false,
+      "root_cause": "requirements_gap",
+      "root_cause_notes": "Host default was guessed as 'viney.ca' during B-013 build before the real _config `url` (www.viney.ca) was read.",
+      "discovered_by": "leak-test (URL returned by deploy_review)",
+      "prevention_test_added": "tests/test_deploy_review_mode.py::TestDeployReview::test_default_host_is_canonical_www",
+      "fixed_date": "2026-07-24T00:00:00",
+      "fix_notes": "deploy_review host default + CLI --host default changed to 'www.viney.ca'; regression test asserts the default review URL uses www."
     }
   ],
   "summary": {
@@ -895,7 +929,7 @@
     "avg_time_to_detect_days": 4.1,
     "avg_time_to_resolve_days": 2.0,
     "avg_critical_ttd_days": 3.7,
-    "last_updated": "2026-01-05T02:07:42.265320",
+    "last_updated": "2026-07-24T00:00:00",
     "total": 21
   }
 }

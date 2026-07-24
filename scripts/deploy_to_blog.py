@@ -403,7 +403,7 @@ def deploy_review(
     token: str,
     *,
     live_branch: str = "main",
-    host: str = "viney.ca",
+    host: str = "www.viney.ca",
     dry_run: bool = False,
 ) -> DeployResult:
     """Deploy *article_path* as an **unlisted** live draft for owner review.
@@ -561,8 +561,8 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument(
         "--host",
-        default=os.getenv("BLOG_HOST", "viney.ca"),
-        help="Blog host for the printed review URL (default: $BLOG_HOST or 'viney.ca').",
+        default=os.getenv("BLOG_HOST", "www.viney.ca"),
+        help="Blog host for the printed review URL (default: $BLOG_HOST or 'www.viney.ca').",
     )
     return parser.parse_args(argv)
 

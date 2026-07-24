@@ -127,6 +127,24 @@ class TestDeployReview:
             "review mode must not open a PR"
         )
 
+    def test_default_host_is_canonical_www(self, article_file: Path) -> None:
+        # BUG-052: the blog's canonical URL is www.viney.ca; deploy_review must
+        # default there so the printed review URL doesn't 404/redirect on the apex.
+        def fake_run_command(cmd: str, cwd=None) -> str:
+            if cmd.startswith("git clone"):
+                self._prepare_clone()
+            return ""
+
+        with patch.object(dtb, "run_command", side_effect=fake_run_command):
+            result = dtb.deploy_review(
+                article_path=article_file,
+                blog_owner="test-owner",
+                blog_repo="test-blog",
+                token="t",
+            )  # no host= → exercises the default
+        assert result.url is not None
+        assert result.url.startswith("https://www.viney.ca/review/"), result.url
+
     def test_missing_chart_asset_raises(self, article_file: Path) -> None:
         # Remove the fallback chart so the referenced asset is absent.
         (Path("output/charts/my-draft.png")).unlink()

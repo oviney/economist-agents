@@ -319,3 +319,46 @@ class TestDescriptionTruncation:
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "--tb=short"])
+
+
+# ---------------------------------------------------------------------------
+# BUG-055: never emit `image: ""` — Liquid treats an empty string as TRUTHY
+# ---------------------------------------------------------------------------
+
+
+class TestEmptyImageFrontmatterNeverEmitted:
+    """An empty ``image: ""`` breaks the blog's REQUIRED ``build`` check.
+
+    ``_layouts/post.html`` guards the hero with ``{% if page.image %}``, but in
+    Liquid only ``nil``/``false`` are falsy — an empty string passes the guard,
+    so ``responsive-image.html`` renders an ``<img>`` with no usable ``src`` and
+    html-proofer fails: "image has no src or srcset attribute". Our own
+    validator treats absent and empty identically (chart-only mode), so the key
+    must simply be OMITTED when there is no hero.
+    """
+
+    def test_chart_only_article_omits_image_key(self) -> None:
+        article = (
+            "---\n"
+            "layout: post\n"
+            'title: "A Specific Descriptive Title"\n'
+            "---\n\n"
+            "Body paragraph with enough text to look like prose.\n"
+        )
+        out = _apply_editorial_fixes(article, current_date="2026-07-24")
+        assert 'image: ""' not in out, (
+            'empty image: breaks the blog build (Liquid treats "" as truthy)'
+        )
+        assert "image: ''" not in out
+
+    def test_existing_real_image_is_preserved(self) -> None:
+        article = (
+            "---\n"
+            "layout: post\n"
+            'title: "A Specific Descriptive Title"\n'
+            "image: /assets/images/real-hero.png\n"
+            "---\n\n"
+            "Body paragraph.\n"
+        )
+        out = _apply_editorial_fixes(article, current_date="2026-07-24")
+        assert "/assets/images/real-hero.png" in out

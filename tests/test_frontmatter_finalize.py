@@ -53,12 +53,17 @@ class TestReconstructsMissingFrontmatter:
         result = _apply_editorial_fixes(f"# Real Title\n\n{_LONG_BODY}", _TODAY)
         assert "Testing quality engineering matters." in result
 
-    def test_image_is_empty_not_default_svg(self) -> None:
-        # A blog-default.svg (or missing-file) hero is itself a CRITICAL; the
-        # reconstruction must stamp an EMPTY image (chart-only), which passes.
+    def test_image_key_omitted_entirely_not_stamped_empty(self) -> None:
+        # BUG-055: reconstruction must OMIT `image:` for a chart-only article,
+        # not stamp `image: ""`. A blog-default.svg (or missing-file) hero is a
+        # CRITICAL, and an EMPTY value is worse than an absent one — Liquid
+        # treats "" as truthy, so it satisfies the blog's `{% if page.image %}`
+        # hero guard and renders an <img> with no src, failing the blog's
+        # required build check via html-proofer.
         result = _apply_editorial_fixes(f"# Real Title\n\n{_LONG_BODY}", _TODAY)
         assert "blog-default.svg" not in result
-        assert _frontmatter_of(result).get("image", "") in ("", None)
+        assert 'image: ""' not in result
+        assert "image" not in _frontmatter_of(result)
 
 
 class TestLeadingWhitespace:

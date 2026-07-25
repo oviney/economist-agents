@@ -436,7 +436,7 @@
         "Added LENGTH as first MANDATORY rule in writer prompt",
         "Documented gate vs target in prompt (gate=700, target=800-1000)"
       ],
-      "fix_notes": "Aligned word-count gates across codebase to 700 (matches publication_validator.py and skills/economist-writing/SKILL.md sweet-spot floor). Updated agent_reviewer.py, editorial_judge.py, skill_synthesizer.py from 800\u2192700. Strengthened stage3_crew.py writer prompt with explicit LENGTH rule (700-1200 words, target 800-1000) in MANDATORY block."
+      "fix_notes": "Aligned word-count gates across codebase to 700 (matches publication_validator.py and skills/economist-writing/SKILL.md sweet-spot floor). Updated agent_reviewer.py, editorial_judge.py, skill_synthesizer.py from 800→700. Strengthened stage3_crew.py writer prompt with explicit LENGTH rule (700-1200 words, target 800-1000) in MANDATORY block."
     },
     {
       "id": "BUG-030",
@@ -502,7 +502,7 @@
       "status": "fixed",
       "fixed_date": "2026-04-26T16:56:33.701701",
       "fix_commit": "2cf28a4",
-      "fix_notes": "Allow `_client` injection to bypass the availability guard \u2014 caller is supplying whatever interface chroma would provide.",
+      "fix_notes": "Allow `_client` injection to bypass the availability guard — caller is supplying whatever interface chroma would provide.",
       "root_cause": "code_logic",
       "root_cause_notes": "Availability guard checked before honouring injection.",
       "is_production_escape": false,
@@ -531,7 +531,7 @@
         "new_validation"
       ],
       "prevention_actions": [
-        "Add a regression test asserting the dashboard's sprint-trends section renders with non-empty content when sprint_history.json contains \u22652 sprints.",
+        "Add a regression test asserting the dashboard's sprint-trends section renders with non-empty content when sprint_history.json contains ≥2 sprints.",
         "Grep audit: any future state-file relocation must update all readers in one commit."
       ]
     },
@@ -540,20 +540,20 @@
       "severity": "high",
       "discovered_in": "test_failure",
       "discovered_date": "2026-04-26T16:56:33.701701",
-      "description": "scripts/defect_tracker.py reads from legacy `skills/defect_tracker.json` instead of `data/skills_state/defect_tracker.json` \u2014 same migration miss as BUG-034",
+      "description": "scripts/defect_tracker.py reads from legacy `skills/defect_tracker.json` instead of `data/skills_state/defect_tracker.json` — same migration miss as BUG-034",
       "component": "defect_tracker",
       "status": "fixed",
       "fixed_date": "2026-04-26T16:56:33.701701",
       "fix_commit": "2cf28a4",
       "fix_notes": "Path updated to data/skills_state/.",
       "root_cause": "integration_error",
-      "root_cause_notes": "Same migration as BUG-034 \u2014 three readers missed when state files moved.",
+      "root_cause_notes": "Same migration as BUG-034 — three readers missed when state files moved.",
       "is_production_escape": true,
       "prevention_strategy": [
         "new_validation"
       ],
       "prevention_actions": [
-        "See BUG-034 \u2014 same prevention applies."
+        "See BUG-034 — same prevention applies."
       ]
     },
     {
@@ -561,20 +561,20 @@
       "severity": "high",
       "discovered_in": "test_failure",
       "discovered_date": "2026-04-26T16:56:33.701701",
-      "description": "scripts/agent_metrics.py reads from legacy `skills/agent_metrics.json` instead of `data/skills_state/agent_metrics.json` \u2014 same migration miss as BUG-034/035",
+      "description": "scripts/agent_metrics.py reads from legacy `skills/agent_metrics.json` instead of `data/skills_state/agent_metrics.json` — same migration miss as BUG-034/035",
       "component": "agent_metrics",
       "status": "fixed",
       "fixed_date": "2026-04-26T16:56:33.701701",
       "fix_commit": "2cf28a4",
       "fix_notes": "Path updated to data/skills_state/.",
       "root_cause": "integration_error",
-      "root_cause_notes": "Same migration as BUG-034 \u2014 three readers missed when state files moved.",
+      "root_cause_notes": "Same migration as BUG-034 — three readers missed when state files moved.",
       "is_production_escape": true,
       "prevention_strategy": [
         "new_validation"
       ],
       "prevention_actions": [
-        "See BUG-034 \u2014 same prevention applies."
+        "See BUG-034 — same prevention applies."
       ]
     },
     {
@@ -608,16 +608,16 @@
           "patch_frontmatter_extensible": "_patch_frontmatter (flow.py ~line 413) uses regex string injection. Straightforward to extend. Existing tests in TestPatchFrontmatter (test_flow_agent_sdk.py lines 339-357) cover the pattern.",
           "anthropic_mock_pattern": "conftest.py has mock_anthropic_client fixture (lines 26-38). Claude vision calls use the same query() async generator path. Mockable via patch of src.agent_sdk.stage3_runner.query.",
           "gaps_identified": [
-            "_FakePipelineResult (test_flow_agent_sdk.py lines 28-45) has no image_alt or image_caption fields \u2014 must be extended.",
+            "_FakePipelineResult (test_flow_agent_sdk.py lines 28-45) has no image_alt or image_caption fields — must be extended.",
             "No test currently validates stage3 output through publication_validator image metadata CRITICAL gates end-to-end."
           ],
           "critical_blocker": "Writer prompt (stage3_runner.py lines 253-256) MUST be updated first to require both fields. Vision refinement and frontmatter injection have nothing to refine until the writer emits these fields.",
           "recommended_test_plan": {
-            "test_writer_emits_fields": "tests/test_flow_agent_sdk.py \u2014 new TestWriterFrontmatter class",
-            "test_vision_refinement": "tests/test_flow_agent_sdk.py \u2014 new TestVisionRefinement class, patch query()",
-            "test_integration": "tests/test_flow_agent_sdk.py \u2014 extend TestQualityGate: mock pipeline \u2192 validator passes image gates",
-            "test_patch_frontmatter": "tests/test_flow_agent_sdk.py \u2014 extend TestPatchFrontmatter",
-            "sequence": "TDD: RED (write failing tests) \u2192 update prompt \u2192 GREEN \u2192 add vision step \u2192 REFACTOR"
+            "test_writer_emits_fields": "tests/test_flow_agent_sdk.py — new TestWriterFrontmatter class",
+            "test_vision_refinement": "tests/test_flow_agent_sdk.py — new TestVisionRefinement class, patch query()",
+            "test_integration": "tests/test_flow_agent_sdk.py — extend TestQualityGate: mock pipeline → validator passes image gates",
+            "test_patch_frontmatter": "tests/test_flow_agent_sdk.py — extend TestPatchFrontmatter",
+            "sequence": "TDD: RED (write failing tests) → update prompt → GREEN → add vision step → REFACTOR"
           }
         }
       },
@@ -799,7 +799,7 @@
       "github_issue": null,
       "is_production_escape": false,
       "root_cause": "code_logic",
-      "root_cause_notes": "DIAGNOSED (generous --writer-budget 3.00 run): DUAL cause. (1) Under-budget \u2014 the run completed at $0.5907 total, but the defaults (run_pipeline writer 0.30 / CLI 0.60) are exhausted once the writer retries. (2) The writer emits conversational preamble on some attempts (e.g. 'The search tool is wired to arXiv... I'll write the article grounded in...'), failing the well-formed check (starts_with_dash=False) and forcing a retry that burns budget. Fix: port the closed PR #441 _extract_article preamble/fence recovery into the stage3 retry loop so preamble attempts recover in-place instead of retrying, AND raise the default writer budget for margin. NOTE: a generous-budget run DID produce a publish-valid article (publication_validator PASSED) \u2014 keyless generation works.",
+      "root_cause_notes": "DIAGNOSED (generous --writer-budget 3.00 run): DUAL cause. (1) Under-budget — the run completed at $0.5907 total, but the defaults (run_pipeline writer 0.30 / CLI 0.60) are exhausted once the writer retries. (2) The writer emits conversational preamble on some attempts (e.g. 'The search tool is wired to arXiv... I'll write the article grounded in...'), failing the well-formed check (starts_with_dash=False) and forcing a retry that burns budget. Fix: port the closed PR #441 _extract_article preamble/fence recovery into the stage3 retry loop so preamble attempts recover in-place instead of retrying, AND raise the default writer budget for margin. NOTE: a generous-budget run DID produce a publish-valid article (publication_validator PASSED) — keyless generation works.",
       "discovered_by": "B-009 T1 fail-fast keyless run",
       "prevention_test_added": true,
       "fixed_date": "2026-07-22T00:00:00",
@@ -844,13 +844,13 @@
       "severity": "high",
       "discovered_in": "development",
       "discovered_date": "2026-07-22T00:00:00",
-      "description": "Keyless deterministic research is unreliable and aborts the whole pipeline. The two free providers (arXiv, Semantic Scholar) rate-limit/err heavily (HTTP 429/503); when BOTH fail on a topic, deterministic research returns zero sources and the empty-research guard (#438) aborts the run (exit 2, 'Pipeline aborted: research failed', provider_failed={'arxiv':True,'semantic_scholar':True}). Observed live: a default-budget keyless run aborted before the writer. This is the primary blocker to reliable keyless article production \u2014 bigger than the writer bugs. Likely mitigation: default the keyless path to research_mode='claude_web' (ADR-0013, Claude's own WebSearch on the subscription \u2014 not the rate-limited academic APIs), which is exactly why claude_web was introduced.",
+      "description": "Keyless deterministic research is unreliable and aborts the whole pipeline. The two free providers (arXiv, Semantic Scholar) rate-limit/err heavily (HTTP 429/503); when BOTH fail on a topic, deterministic research returns zero sources and the empty-research guard (#438) aborts the run (exit 2, 'Pipeline aborted: research failed', provider_failed={'arxiv':True,'semantic_scholar':True}). Observed live: a default-budget keyless run aborted before the writer. This is the primary blocker to reliable keyless article production — bigger than the writer bugs. Likely mitigation: default the keyless path to research_mode='claude_web' (ADR-0013, Claude's own WebSearch on the subscription — not the rate-limited academic APIs), which is exactly why claude_web was introduced.",
       "component": "agent_sdk.pipeline research (deterministic) / empty-research guard",
       "status": "fixed",
       "github_issue": null,
       "is_production_escape": false,
       "root_cause": "integration_error",
-      "root_cause_notes": "Keyless research depends on free rate-limited APIs with an abort-on-empty guard. Decide the reliable keyless research mode (claude_web vs hardened deterministic) \u2014 affects B-010's canonical-command choice and the live-run acceptance gate.",
+      "root_cause_notes": "Keyless research depends on free rate-limited APIs with an abort-on-empty guard. Decide the reliable keyless research mode (claude_web vs hardened deterministic) — affects B-010's canonical-command choice and the live-run acceptance gate.",
       "discovered_by": "B-010 T1 validation run",
       "prevention_test_added": false,
       "fixed_date": "2026-07-22T00:00:00",
@@ -861,13 +861,13 @@
       "severity": "medium",
       "discovered_in": "production",
       "discovered_date": "2026-07-24T00:00:00",
-      "description": "B-013 review drafts rendered BARE on the live blog \u2014 no <head>, no theme, no noindex meta \u2014 defeating both the 'review the post in the real theme' goal and the noindex acceptance criterion. Caught by the live leak test after merging oviney/blog PR #1157 (the other 6/7 checks passed: draft absent from homepage/blog/feed.xml/sitemap.xml/search + robots.txt disallows /review/).",
+      "description": "B-013 review drafts rendered BARE on the live blog — no <head>, no theme, no noindex meta — defeating both the 'review the post in the real theme' goal and the noindex acceptance criterion. Caught by the live leak test after merging oviney/blog PR #1157 (the other 6/7 checks passed: draft absent from homepage/blog/feed.xml/sitemap.xml/search + robots.txt disallows /review/).",
       "component": "oviney/blog _layouts/review.html (B-013 blog-side)",
       "status": "fixed",
       "github_issue": "oviney/blog#1159",
       "is_production_escape": true,
       "root_cause": "integration_error",
-      "root_cause_notes": "review.html extended `layout: single`, assuming the remote minimal-mistakes theme. This blog has remote_theme COMMENTED OUT and uses local layouts (default/page/post) \u2014 there is no `single` layout, so the parent layout silently did not apply and the draft rendered as bare markdown-to-HTML. Real posts use `layout: post` -> `default.html`, whose <head> emits the page.noindex robots meta. Assumption about the target repo's theme was not verified before shipping.",
+      "root_cause_notes": "review.html extended `layout: single`, assuming the remote minimal-mistakes theme. This blog has remote_theme COMMENTED OUT and uses local layouts (default/page/post) — there is no `single` layout, so the parent layout silently did not apply and the draft rendered as bare markdown-to-HTML. Real posts use `layout: post` -> `default.html`, whose <head> emits the page.noindex robots meta. Assumption about the target repo's theme was not verified before shipping.",
       "discovered_by": "leak-test (deploy_review --mode review + read-only feed/sitemap/homepage/noindex checks)",
       "prevention_test_added": "Acceptance leak-test checklist in docs/specs/B-013-blog-side.md is the regression gate; run it on any change to the review collection/layout before calling B-013 done.",
       "fixed_date": "2026-07-24T00:00:00",
@@ -889,6 +889,55 @@
       "prevention_test_added": "tests/test_deploy_review_mode.py::TestDeployReview::test_default_host_is_canonical_www",
       "fixed_date": "2026-07-24T00:00:00",
       "fix_notes": "deploy_review host default + CLI --host default changed to 'www.viney.ca'; regression test asserts the default review URL uses www."
+    },
+    {
+      "id": "BUG-053",
+      "severity": "medium",
+      "discovered_in": "development",
+      "discovered_date": "2026-07-24T00:00:00",
+      "description": "OWNER-REPORTED (visual). The owner wants Claude's own visualization capability to produce the HERO IMAGE and ALL charts/images a post requires. Today the pipeline only (a) draws a single data chart via chart_renderer.py (matplotlib) and (b) emits a hero-image PROMPT sidecar for a human to render elsewhere. Desired: end-to-end Claude-generated visuals so a post ships with its hero + any supporting figures without a manual image step.",
+      "component": "src/agent_sdk (graphics stage) + image_prompt_synth + deploy hero-image handoff",
+      "status": "open",
+      "github_issue": "",
+      "is_production_escape": false,
+      "root_cause": "requirements_gap",
+      "root_cause_notes": "CONSTRAINT CONFLICT — must be resolved by the owner before any fix. CLAUDE.md constraint #4 (NON-NEGOTIABLE) currently forbids pipeline hero-image generation of ANY kind — not DALL-E/Gemini (needs a keyed service, violates constraint #1), and explicitly 'not procedural/PIL image generation either'; the hero is human-supplied from a prompt. So this request REVERSES documented policy. Feasible keyless interpretations to consider: (i) charts — already allowed & keyless (code-drawn), extend coverage to multiple figures per post; (ii) hero as a CODE/SVG-drawn editorial illustration authored by Claude (keyless, but currently banned by #4's 'no procedural' clause); (iii) true raster AI hero art — needs an image model = a keyed/paid service = blocked by constraints #1/#2 unless the owner adds one. NEXT STEP: owner decides whether to amend constraint #4 and which interpretation is in scope, then spec it (spec-driven-development).",
+      "discovered_by": "owner report",
+      "prevention_test_added": "",
+      "fixed_date": "",
+      "fix_notes": ""
+    },
+    {
+      "id": "BUG-054",
+      "severity": "high",
+      "discovered_in": "production",
+      "discovered_date": "2026-07-24T00:00:00",
+      "description": "OWNER-REPORTED (prose). The generated flaky-tests article ('Green Light, Red Ledger…') reads like AI slop despite passing the deterministic economist-writing gates. It CLEARS the mechanical checks (named companies: Atlassian/Google/Microsoft/CloudBees; <=4 headings; colon-twist title; data-dense; no lists) yet still exhibits AI tells the current Stage-4 banned-phrase list does not catch.",
+      "component": "src/agent_sdk._shared (Stage 4 polish / banned-phrase list) + skills/economist-writing enforcement",
+      "status": "resolved",
+      "github_issue": "",
+      "is_production_escape": true,
+      "root_cause": "validation_gap",
+      "root_cause_notes": "Concrete AI-slop tells found on review against skills/economist-writing (none are in the current deterministic banlist): (1) EM-DASH rhythm — em-dashes used as the default connective, often 1-2 per paragraph. (2) META-COMMENTARY on its own argument: 'The argument here is blunter than most engineering post-mortems allow'; 'The numbers, once examined, make this case almost without assistance'; 'The most interesting question is not whether flaky tests are expensive… it is why'. (3) 'NOT X BUT Y' antithesis scaffold repeated ~6x: 'not cutting corners—she is making a…decision', 'not a nuisance …but a quantifiable payroll cost', 'not defective code but tests', 'not merely expensive but epistemically impossible'. (4) UNFALSIFIABLE SUPERLATIVES / overreach: 'No other category of engineering waste operates so openly and at such scale with so little executive scrutiny.' (5) PURPLE / MIXED-METAPHOR pile-up: dripping tap -> flooding basement -> 'the plumber charges considerably more than the pipe was worth'; 'offloaded from the pipeline to the engineer's nervous system'; 'the engineer is hunting a ghost'; 'auto-retry is an anaesthetic, not a cure'. (6) FAUX-SPECIFIC cuteness: 'a test decided to behave differently on a Tuesday'. These pass because Stage 4 only strips a fixed hedging/closing set; the rhythmic + rhetorical AI tells are unlisted.",
+      "discovered_by": "owner report + economist-writing skill review",
+      "prevention_test_added": "",
+      "fixed_date": "",
+      "fix_notes": "Candidate fixes (spec first): extend the deterministic banlist / add heuristics for em-dash density, 'not X but Y' frequency, meta-commentary stems ('the argument here', 'the numbers…make this case'), and superlative overreach; and/or add an economist-writing Stage-4 judge pass that flags these. Add regression fixtures built from the tells above.",
+      "resolution": "B-017: four flag-only detectors (em_dash_density, antithesis_scaffold, meta_commentary, unfalsifiable_superlative) added to publication_validator.py; HIGH/MEDIUM never CRITICAL. Verified on the real article. Metaphor tell (#5) is semantic - parked, not faked. Spec: docs/specs/B-017-ai-slop-enforcement.md",
+      "resolved_date": "2026-07-24"
+    },
+    {
+      "id": "BUG-055",
+      "severity": "HIGH",
+      "status": "resolved",
+      "reported_date": "2026-07-24",
+      "resolved_date": "2026-07-24",
+      "title": "Empty image: \"\" frontmatter fails the blog's required build check (html-proofer)",
+      "description": "Stage 4 stamped image: \"\" into every article (_shared._DEFAULT_IMAGE). Our validator reads empty and absent identically (chart-only mode) so it passed locally, but Jekyll does not: in Liquid only nil/false are falsy, so \"\" satisfies the blog post layout guard {% if page.image %}, responsive-image.html renders an <img> with no usable src, and html-proofer fails with \"image has no src or srcset attribute\". This fails oviney/blog REQUIRED build check.",
+      "evidence": "oviney/blog PR #1159 build FAIL (run 30086689055): html-proofer 1 failure at _site/review/green-light-red-ledger-...-1530b611/index.html:166 \"image has no src or srcset attribute\". Draft frontmatter line 8 is image: \"\". PR #1157 build PASSED because review.html then extended a nonexistent layout and rendered bare (no img tag emitted).",
+      "root_cause": "_shared._DEFAULT_IMAGE = \"\" injected whenever finalize ran without a hero. The stale comment claimed the frontmatter schema requires the key present; schema_validator requires only layout/title/date/categories.",
+      "resolution": "Removed the injection and strip any empty image: line (_EMPTY_IMAGE_LINE) so chart-only articles OMIT the key. Regression: TestEmptyImageFrontmatterNeverEmitted in tests/test_stage4_editorial_fixes.py. Hero images stay human-supplied (constraint #4).",
+      "impact": "Blocked the main publishing path, not just B-013 review drafts: every generated article PR would fail the blog required build check once it carried image: \"\"."
     }
   ],
   "summary": {

@@ -41,17 +41,19 @@ Claude-authored **SVG/code hero illustration** (keyless, but currently banned by
 
 ### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
 
-Discovered 2026-07-23 opening the B-013 blog PR (#1157). The **target blog repo
-is itself agent-governed** with its own skills framework, scoped `agent:*`
-labels, protected files, and a required-check branch-protection gate — and
-economist-agents is an external agent from its point of view. Full findings:
-`docs/blog-integration-constraints.md`. Impact beyond B-013: our everyday
-`deploy_to_blog` article PRs must pass the blog's `build`, `Security Audit`,
-`check-agent-scope`, Content Validation, Visual Regression, and Playwright gates,
-and clear its 1-review requirement (author can't self-approve). Decide + document
-the canonical way our PRs pass `check-agent-scope` — likely label them
-`agent:editorial-chief` and keep article PRs `_posts/`-only (nothing else) — and
-whether the deploy step should carry that label. Not yet spec'd; capture-only.
+**`check-agent-scope` half RESOLVED 2026-07-24** (see Done). Remaining, and
+**not yet spec'd**: our PRs must also pass the blog's *other* required checks —
+`build`, `🔒 Security Audit`, `📝 Content Validation`, `🖼️ Visual Regression`,
+`validate-editorial`, Accessibility/Lighthouse, and Playwright shards 1–3 — none
+of which we have ever observed passing on a generated-article PR (PR #1157 was a
+config/layout change, not an article, and its Visual Regression failures looked
+like **pre-existing baseline drift** on pages we never touched). Until one real
+article PR is watched end-to-end we don't know whether a generated post trips
+Content Validation or the editorial validator. Do that on the next article
+deploy and record the results here. Also unavoidable: the **1-review
+requirement** — the token user is the owner and GitHub forbids self-approval, so
+every PR needs the owner's web-UI bypass. Full findings:
+`docs/blog-integration-constraints.md`.
 
 ### B-012 · Opt-in `deep-brief` research mode (BUILT — live acceptance run pending)
 
@@ -118,6 +120,61 @@ Blog governance findings that bit us here → `docs/blog-integration-constraints
 + BACKLOG **B-015**.
 
 ## Done
+
+### B-018 · `image: ""` broke the blog's required `build` check (BUG-055) — 2026-07-24
+
+**Found by reading CI on the open B-013 PR rather than trusting the local gate.**
+Stage 4 stamped `image: ""` into every article. Our validator reads empty and
+absent identically ("no hero", chart-only) so it passed `make ci-local` — but
+**Jekyll does not**: in Liquid only `nil`/`false` are falsy, so `""` satisfies the
+blog's `{% if page.image %}` hero guard, `responsive-image.html` emits an `<img>`
+with no usable `src`, and html-proofer fails the blog's **required `build`
+check** with "image has no src or srcset attribute". Evidence: blog PR #1159
+`build` FAIL, html-proofer at
+`_site/review/…-1530b611/index.html:166`. (#1157's build passed only because
+`review.html` then extended a nonexistent layout and rendered bare, emitting no
+`<img>` at all — the bare-render bug was masking this one.)
+**Impact was NOT limited to review drafts:** every generated article PR would
+have failed the same required check.
+
+**Root cause was two in-repo contracts disagreeing.** `frontmatter_schema.py`
+`REQUIRED_FIELDS` (Story #117) required `image`, which is *why* Stage 4 stamped an
+empty value — but #403 slice 2 had since made the hero **optional** ("Path A:
+chart-only"), and `publication_validator._check_image_contract` treats an absent
+`image:` as valid. Fix reconciles them: `image` is no longer a required field,
+Stage 4 omits the key instead of stamping it, and any empty `image:` line the
+writer emits is stripped (`_EMPTY_IMAGE_LINE` in `_shared.py`). Hero images stay
+human-supplied (constraint #4) — no image generation added.
+Regressions: `TestEmptyImageFrontmatterNeverEmitted`
+(`tests/test_stage4_editorial_fixes.py`) and
+`test_image_key_omitted_entirely_not_stamped_empty`
+(`tests/test_frontmatter_finalize.py`, rewritten — it previously *asserted* the
+buggy empty-stamp behaviour). See BUG-055.
+
+**Still to do before B-013 can close:** the stale test draft
+`_review/…-1530b611.md` already on blog `main` still carries `image: ""`, so blog
+PR #1159's `build` will keep failing until that file is deleted. Delete it (it is
+a throwaway bare-render test artifact), then merge #1159, then redeploy a fresh
+draft — which now omits the key — and re-run the leak test for 7/7.
+
+### B-015a · Article PRs are governance-safe by construction; agent-label plan reversed — 2026-07-24
+
+Read `oviney/blog`'s `scripts/check-pr-scope.sh` instead of inferring from its
+docs, and the answer **reversed B-015's stated plan.** Rule 4 (agent scope) is
+**opt-in by label**: an unlabelled PR is treated as a *human PR* and skips the
+check entirely. Adding `agent:editorial-chief` would therefore only **add**
+restrictions (it activates the forbidden-zone pattern including `^scripts/`,
+`^tests/`, `^_layouts/`). **Decision: keep `deploy_to_blog` PRs unlabelled** —
+less work and less risk than labelling. Rules 1–3 (protected files, >15 files,
+governance surfaces) apply regardless and our article PRs pass all three.
+To make that hold **by construction rather than by luck**, `deploy()` now stages
+`git add _posts assets` instead of `git add .` (an unscoped add sweeps in
+anything else dirty in the clone, which could trip Rule 1/2);
+`deploy_review()` already did this. Regression: `TestGovernanceSafeStaging`
+(2 tests) in `tests/test_deploy_to_blog.py`. Findings table:
+`docs/blog-integration-constraints.md`. The **other** required checks (build,
+Security Audit, Content Validation, Visual Regression, Playwright) remain
+unverified on a real article PR — still open under B-015.
 
 ### B-017 · Flag the AI-slop tells that pass every deterministic gate (BUG-054) — 2026-07-24
 

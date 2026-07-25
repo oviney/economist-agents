@@ -20,14 +20,23 @@ from typing import Any
 
 import yaml
 
-# Required frontmatter fields and their validation rules
+# Required frontmatter fields and their validation rules.
+#
+# ``image`` is deliberately NOT required (BUG-055). Story #117 originally
+# required it, but #403 slice 2 made the hero optional ("Path A": an article may
+# ship chart-only), and ``publication_validator._check_image_contract`` treats an
+# absent ``image:`` as valid. Requiring the key here forced Stage 4 to stamp
+# ``image: ""``, and an EMPTY value is worse than an absent one: in Liquid only
+# ``nil``/``false`` are falsy, so ``""`` satisfies the blog's
+# ``{% if page.image %}`` hero guard, renders an ``<img>`` with no ``src``, and
+# fails the blog's required ``build`` check via html-proofer. When a hero exists,
+# the ``image_*`` companion rules below still apply.
 REQUIRED_FIELDS = [
     "layout",
     "title",
     "date",
     "author",
     "categories",
-    "image",
     "description",
 ]
 

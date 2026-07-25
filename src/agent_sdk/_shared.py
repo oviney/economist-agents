@@ -509,13 +509,19 @@ def _enforce_heading_limit(article: str, max_headings: int = 4) -> str:
     return frontmatter + body
 
 
-#: Value stamped into ``image:`` when an article reaches finalize with no hero
-#: at all. Deliberately EMPTY (chart-only mode), NOT a ``blog-default.svg``
-#: placeholder: the publication validator treats ``blog-default.svg`` as a
-#: CRITICAL ``default_image_fallback`` and a real path as a missing-file
-#: CRITICAL, whereas an empty value is read as "no hero" and passes. The
-#: frontmatter schema only requires the key to be present, which this satisfies.
-_DEFAULT_IMAGE = ""
+#: Matches an ``image:`` frontmatter line whose value is empty or an empty
+#: quoted string.
+#:
+#: BUG-055: a chart-only article must OMIT ``image:`` entirely rather than stamp
+#: ``image: ""``. Our validator reads empty and absent identically ("no hero",
+#: chart-only mode), but **Jekyll does not**: in Liquid only ``nil`` and
+#: ``false`` are falsy, so an empty string satisfies the blog's
+#: ``{% if page.image %}`` hero guard, ``responsive-image.html`` renders an
+#: ``<img>`` with no usable ``src``, and html-proofer fails the blog's REQUIRED
+#: ``build`` check with "image has no src or srcset attribute". The frontmatter
+#: schema requires only layout/title/date/categories, so dropping the key is
+#: safe. Hero images stay human-supplied per CLAUDE.md constraint #4.
+_EMPTY_IMAGE_LINE = re.compile(r"^image:\s*(?:\"\"|''|)\s*$\n?", re.MULTILINE)
 
 
 def _yaml_safe(value: str, max_chars: int = 120) -> str:
@@ -626,8 +632,10 @@ def apply_editorial_fixes(article: str, current_date: str | None = None) -> str:
                 fm = fm.rstrip() + '\ncategories: ["Quality Engineering"]\n'
             if current_date and "date:" not in fm:
                 fm = fm.rstrip() + f"\ndate: {current_date}\n"
-            if current_date and "image:" not in fm:
-                fm = fm.rstrip() + f'\nimage: "{_DEFAULT_IMAGE}"\n'
+            # No `image:` injection: a chart-only article omits the key rather
+            # than stamping an empty value that breaks the blog build (BUG-055).
+            # Strip an empty one the writer may have emitted.
+            fm = _EMPTY_IMAGE_LINE.sub("", fm)
             if current_date and "description:" not in fm:
                 fm = fm.rstrip() + f'\ndescription: "{_derive_description(parts[2])}"\n'
             fm = _normalize_category_casing(fm)

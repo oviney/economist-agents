@@ -88,51 +88,55 @@ researcher would ship — but one topic cost ~102 agents / ~2M tokens / ~15 min 
 `docs/specs/B-012-deep-brief-research-mode.md`. Prototype output (a real verified
 brief) lives at `docs/research/ai-productivity-brief.md`.
 
-### B-013 · Live unlisted draft review on GitHub Pages (candidate — gated on leak test)
-
-Review generated drafts as the *rendered* post at an obscure, `noindex`, live
-`/review/<slug>-<token>/` URL (real theme, reviewable from a phone) instead of a
-GitHub PR diff; promote to `_posts/` via `make publish`. One-pager:
-`docs/ideas/live-draft-review.md`. **Gate:** 10-minute leak test — deploy one
-draft and confirm the minimal-mistakes theme surfaces it in *none* of
-homepage/archives/feed/sitemap. Spec: `docs/specs/B-013-live-draft-review.md`.
-
-**Local half BUILT (2026-07-23), `make ci-local` green:** `deploy_to_blog
---mode review` (writes `_review/<slug>-<token>.md`, `layout: review`, commits to
-the live branch, no PR, prints the obscure URL) + `scripts/promote_review.py` /
-`make publish SLUG=<slug>` (blocking validator gate). Tests:
-`test_deploy_review_mode.py`, `test_promote_review.py`; `post` path untouched.
-
-**Blog side — MOSTLY DONE, one fix PR pending merge:**
-- **PR #1157 MERGED** (2026-07-24) — `review` collection + `noindex`/`sitemap:false`
-  defaults + `_layouts/review.html` + `robots.txt` disallow now on blog `main`.
-- **Leak test RUN (2026-07-24), 6/7 pass** — deployed one unlisted draft
-  (`…-1530b611`). Draft is absent from homepage, /blog/, feed.xml, sitemap.xml,
-  and search.json, and robots.txt disallows /review/ ⇒ **the hide works.** The one
-  failure: the draft rendered **bare** (no `<head>`, no theme, no `noindex` meta).
-- **Root cause:** this blog **disabled `remote_theme`** and uses local layouts —
-  there is **no `single` layout**. `review.html` extended `single`, so it didn't
-  chain to `default.html` (where `noindex` lives). Real posts use `layout: post`.
-- **Fix: PR #1159 OPEN → https://github.com/oviney/blog/pull/1159** — one word,
-  `review.html` now `layout: post`. `review.html` is NOT a protected file, so it
-  should clear `check-agent-scope`.
-
-**NEXT (resume here):**
-1. **Merge blog PR #1159** (owner web-UI: "Merge without waiting for requirements
-   (bypass rules)" → "Bypass rules and merge (squash)" → Confirm — same flow used
-   for #1157; `gh pr merge` is classifier-blocked for the agent).
-2. After Pages rebuilds, re-run the leak-test verify on the SAME draft URL
-   (`…-1530b611`) — expect the `noindex` meta present ⇒ **7/7**.
-3. Then `make publish SLUG=<slug>` on an approved draft, and move B-013 to Done.
-   (A bare-rendered test draft `…-1530b611` is currently live/unlisted; it
-   re-renders correctly once #1159 merges, or delete `_review/…-1530b611.md`.)
-
-Note: canonical blog URL is **www.viney.ca**; live branch **main**; `.env`
-`BLOG_REPO_TOKEN` failed push auth (`gh auth token` works — refresh the PAT).
-Blog governance findings that bit us here → `docs/blog-integration-constraints.md`
-+ BACKLOG **B-015**.
-
 ## Done
+
+### B-013 · Live unlisted draft review on GitHub Pages — 2026-07-25 · **LEAK TEST 10/10**
+
+Review a generated draft as the *rendered* post at an obscure, `noindex`, live
+`/review/<slug>-<token>/` URL (real theme, readable on a phone) instead of a
+GitHub PR diff; promote to `_posts/` with `make publish SLUG=<slug>`.
+Spec: `docs/specs/B-013-live-draft-review.md`; one-pager
+`docs/ideas/live-draft-review.md`; blog-side runbook
+`docs/specs/B-013-blog-side.md`.
+
+**Local half:** `deploy_to_blog --mode review` (writes
+`_review/<slug>-<token>.md`, rewrites `layout: review` + chart paths, commits
+straight to the live branch, opens **no PR**, prints the obscure URL) +
+`scripts/promote_review.py` / `make publish` (blocking validator gate). The
+default `post` path is untouched — a separate function guarantees it. Tests:
+`test_deploy_review_mode.py`, `test_promote_review.py`.
+
+**Blog side (PRs #1157 + #1159, both merged):** `review` collection with
+`output: true`, `permalink: /review/:name/`, and defaults `noindex: true` /
+`sitemap: false`; `_layouts/review.html`; `robots.txt` disallows `/review/`.
+
+**ACCEPTANCE — leak test 10/10 on draft `…-a7014d4d`** (`www.viney.ca`,
+re-runnable via `scripts/leak_test_review_draft.sh <slug-with-token>`):
+reachable at its obscure URL, renders through the real theme, carries
+`<meta name="robots" content="noindex, nofollow">`, no src-less `<img>`, and is
+**absent from `/`, `/blog/`, `feed.xml`, `sitemap.xml`, and `search.json`** with
+`robots.txt` disallowing the path.
+
+**Two bugs had to be fixed to get there, and the first was masking the second:**
+1. **BUG-051** — `review.html` extended `single`, a layout that does not exist
+   (this blog has `remote_theme` **commented out** and uses local layouts:
+   `default`/`page`/`post`). The draft rendered **bare** — no `<head>`, no theme,
+   and critically no `noindex`. Fixed in #1159: extend `post`, which chains to
+   `default.html` where the `noindex` meta lives. That was the 6/7 failure.
+2. **BUG-055** — with the layout fixed, the draft finally rendered the hero
+   guard, exposing `image: ""` → html-proofer → blog `build` FAIL. See B-018.
+   The bare render had been hiding it by emitting no `<img>` at all.
+
+**Operational notes:** canonical host is **www.viney.ca** (apex redirects — the
+`--host` default was BUG-052); live branch is **main**; `.env`'s
+`BLOG_REPO_TOKEN` fails push auth, `gh auth token` works (**refresh that PAT**).
+Blog governance constraints → `docs/blog-integration-constraints.md` + **B-015**.
+
+**Draft `…-a7014d4d` is live and unlisted** — review it, then
+`make publish SLUG=green-light-red-ledger-flaky-tests-are-engineering-s-costliest-invisible-tax`
+to promote, or delete `_review/…-a7014d4d.md` to discard. Note it still carries
+the **B-017 prose tells** (that article is BUG-054's evidence) and has **no hero
+image** (constraint #4 — human-supplied).
 
 ### B-018 · `image: ""` broke the blog's required `build` check (BUG-055) — 2026-07-24
 

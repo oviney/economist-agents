@@ -205,3 +205,58 @@ class TestInvariants:
             "unfalsifiable_superlative",
         }
         assert not [i for i in issues if i.get("check") in new_checks]
+
+
+# ---------------------------------------------------------------------------
+# BUG-055 guard: `image:` present-but-empty must be CRITICAL, not silently OK
+# ---------------------------------------------------------------------------
+
+
+class TestEmptyImageIsCritical:
+    """An empty ``image:`` is worse than an absent one and must never deploy.
+
+    Stage 4 now omits the key, but an article generated before that fix (or a
+    writer that emits the key itself) can still carry ``image: ""`` — and it
+    silently breaks the blog's REQUIRED ``build`` check, because Liquid treats
+    ``""`` as truthy, satisfies ``{% if page.image %}``, and renders an ``<img>``
+    with no ``src`` for html-proofer to reject. This is the deterministic local
+    gate that BUG-055 lacked: it escaped to the blog's CI instead.
+    """
+
+    def _issues(self, image_line: str) -> list[dict[str, str]]:
+        article = _article(_CLEAN_BODY).replace(
+            "image: /assets/images/test-article.png", image_line
+        )
+        validator = PublicationValidator(
+            expected_date="2026-04-03", require_image_file=False
+        )
+        return validator.validate(article)[1]
+
+    def test_empty_quoted_image_is_critical(self) -> None:
+        hits = _by_check(self._issues('image: ""'), "empty_image_value")
+        assert hits, 'image: "" must be flagged'
+        assert hits[0]["severity"] == "CRITICAL"
+
+    def test_bare_empty_image_is_critical(self) -> None:
+        hits = _by_check(self._issues("image:"), "empty_image_value")
+        assert hits and hits[0]["severity"] == "CRITICAL"
+
+    def test_absent_image_key_is_fine(self) -> None:
+        # Chart-only (#403 Path A): omitting the key entirely is the correct form.
+        article = "\n".join(
+            line
+            for line in _article(_CLEAN_BODY).splitlines()
+            if not line.startswith("image")
+        )
+        validator = PublicationValidator(
+            expected_date="2026-04-03", require_image_file=False
+        )
+        is_valid, issues = validator.validate(article)
+        assert not _by_check(issues, "empty_image_value")
+        assert is_valid, [i for i in issues if i["severity"] == "CRITICAL"]
+
+    def test_real_image_path_is_fine(self) -> None:
+        hits = _by_check(
+            self._issues("image: /assets/images/test-article.png"), "empty_image_value"
+        )
+        assert not hits

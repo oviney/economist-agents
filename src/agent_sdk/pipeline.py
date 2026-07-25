@@ -20,6 +20,7 @@ from typing import Literal
 
 import orjson
 
+from scripts.claim_provenance import check_claim_provenance
 from scripts.source_integrity import check_reference_integrity, summarise
 from src.agent_sdk._shared import (
     SearchProvidersEmptyError,
@@ -134,6 +135,20 @@ def _log_source_findings(findings: list) -> None:
         )
 
 
+def _log_claim_findings(findings: list) -> None:
+    """Report figure-provenance findings (B-021)."""
+    for finding in findings:
+        if finding.verdict == "FAIL":
+            logger.error("Claim provenance FAIL: %s", finding.message)
+    failures = sum(1 for f in findings if f.verdict == "FAIL")
+    if failures:
+        logger.error(
+            "%d figure(s) do not match the research brief in unit or subject. "
+            "Do not publish without human review.",
+            failures,
+        )
+
+
 def load_brief_file(path: str | Path) -> str:
     """Load an opt-in deep-research brief for the writer, EXCLUDING refuted claims.
 
@@ -210,6 +225,13 @@ async def run_pipeline(
     source_findings = check_reference_integrity(final_article)
     _log_source_findings(source_findings)
 
+    # B-021: every figure must keep the unit and the subject its source gave
+    # it. The stat audit only asks whether the number is *in* the brief.
+    claim_findings = check_claim_provenance(
+        final_article, getattr(stage3, "research_brief", "")
+    )
+    _log_claim_findings(claim_findings)
+
     result = PipelineResult(
         topic=topic,
         article=final_article,
@@ -236,6 +258,15 @@ async def run_pipeline(
                 "message": f.message,
             }
             for f in source_findings
+        ]
+        + [
+            {
+                "check": f.check,
+                "verdict": f.verdict,
+                "reference": f.number,
+                "message": f.message,
+            }
+            for f in claim_findings
         ],
     )
     wall_seconds = result.stage3_seconds + result.stage4_seconds

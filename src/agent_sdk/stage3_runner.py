@@ -224,6 +224,10 @@ class Stage3Result:
     prompt_path: Path | None = None  # #403 slice 3: image-prompt artefact
     slug: str = ""  # #403 slice 3: canonical slug for downstream resume
     image_prompt: str = ""  # #403 slice 3: the prompt text itself
+    # B-021: the brief itself, not just its length. Keeping only
+    # research_brief_chars was the architectural root cause of BUG-059 —
+    # downstream stages had no way to check a figure against its source.
+    research_brief: str = ""
 
 
 _TITLE_FIELD_PATTERN = re.compile(r'^title:\s*["\']?(.*?)["\']?\s*$', re.MULTILINE)
@@ -699,6 +703,7 @@ async def run_stage3(
         graphics_model=graphics_model,
         wall_seconds=elapsed,
         research_brief_chars=len(research_brief),
+        research_brief=research_brief,
         article_chars=len(article),
         stat_audit_removed=max(stat_audit_removed, 0),
         writer_search_calls=search_session.calls_made,

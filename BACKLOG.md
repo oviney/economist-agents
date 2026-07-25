@@ -121,6 +121,27 @@ Blog governance findings that bit us here → `docs/blog-integration-constraints
 
 ## Done
 
+### B-018 · `image: ""` broke the blog's required `build` check (BUG-055) — 2026-07-24
+
+**Found by reading CI on the open B-013 PR rather than trusting the local gate.**
+Stage 4 stamped `image: ""` into every article. Our validator reads empty and
+absent identically ("no hero", chart-only) so it passed `make ci-local` — but
+**Jekyll does not**: in Liquid only `nil`/`false` are falsy, so `""` satisfies the
+blog's `{% if page.image %}` hero guard, `responsive-image.html` emits an `<img>`
+with no usable `src`, and html-proofer fails the blog's **required `build`
+check** with "image has no src or srcset attribute". Evidence: blog PR #1159
+`build` FAIL, html-proofer at
+`_site/review/…-1530b611/index.html:166`. (#1157's build passed only because
+`review.html` then extended a nonexistent layout and rendered bare, emitting no
+`<img>` at all — the bare-render bug was masking this one.)
+**Impact was NOT limited to review drafts:** every generated article PR would
+have failed the same required check. Fix: omit the key entirely and strip any
+empty `image:` line (`_EMPTY_IMAGE_LINE` in `_shared.py`); the stale comment
+claiming the schema needs the key was wrong — `schema_validator` requires only
+`layout/title/date/categories`. Hero images stay human-supplied (constraint #4).
+Regression: `TestEmptyImageFrontmatterNeverEmitted`
+(`tests/test_stage4_editorial_fixes.py`). See BUG-055.
+
 ### B-015a · Article PRs are governance-safe by construction; agent-label plan reversed — 2026-07-24
 
 Read `oviney/blog`'s `scripts/check-pr-scope.sh` instead of inferring from its

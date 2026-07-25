@@ -41,19 +41,32 @@ Claude-authored **SVG/code hero illustration** (keyless, but currently banned by
 
 ### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
 
-**`check-agent-scope` half RESOLVED 2026-07-24** (see Done). Remaining, and
-**not yet spec'd**: our PRs must also pass the blog's *other* required checks —
-`build`, `🔒 Security Audit`, `📝 Content Validation`, `🖼️ Visual Regression`,
-`validate-editorial`, Accessibility/Lighthouse, and Playwright shards 1–3 — none
-of which we have ever observed passing on a generated-article PR (PR #1157 was a
-config/layout change, not an article, and its Visual Regression failures looked
-like **pre-existing baseline drift** on pages we never touched). Until one real
-article PR is watched end-to-end we don't know whether a generated post trips
-Content Validation or the editorial validator. Do that on the next article
-deploy and record the results here. Also unavoidable: the **1-review
-requirement** — the token user is the owner and GitHub forbids self-approval, so
-every PR needs the owner's web-UI bypass. Full findings:
+**`check-agent-scope` RESOLVED 2026-07-24** (see B-015a in Done). **Gate matrix
+now measured** on blog PR #1159 (run 30135701462/30135701497):
+
+| Check | Result | Note |
+|---|---|---|
+| `build` | **pass** | only after the BUG-055 empty-`image:` fix (B-018) |
+| `check-agent-scope` | **pass** | unlabelled ⇒ Rule 4 skipped (B-015a) |
+| `📝 Content Validation` | **pass** | |
+| `validate-editorial` | **pass** | |
+| Playwright shards 1–3 | **pass** | |
+| `🎯 Accessibility, Visual & Lighthouse` | **pass** | |
+| `📊 Quality Report` | **pass** | |
+| `🔒 Security Audit` | **fail** | **pre-existing, blog-side**: npm CVEs in the blog's deps (`body-parser` high). Not content-related |
+| `🖼️ Visual Regression` | **fail** | **pre-existing, blog-side**: stale committed baselines on `about`/`blog-index`/`homepage` (expected 3274px, got 3501px). Same 3 pages failed on #1157 |
+
+**So every check we can influence passes.** The two failures are blog-repo
+maintenance debt, and both are *required* checks — meaning **every**
+economist-agents PR needs an owner bypass until the blog bumps its npm deps and
+refreshes its visual baselines. Worth two issues in `oviney/blog` (not here).
+Also unavoidable regardless: the **1-review requirement** — the token user is the
+owner and GitHub forbids self-approval. Full findings:
 `docs/blog-integration-constraints.md`.
+
+**Still unmeasured:** these results come from a layout/content-delete PR, not a
+real generated article. Confirm Content Validation + validate-editorial still pass
+on the next actual article deploy.
 
 ### B-012 · Opt-in `deep-brief` research mode (BUILT — live acceptance run pending)
 

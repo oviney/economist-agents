@@ -13,13 +13,14 @@ import logging
 import re
 import sys
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal
 
 import orjson
 
+from scripts.source_integrity import check_reference_integrity, summarise
 from src.agent_sdk._shared import (
     SearchProvidersEmptyError,
     SearchProvidersFailedError,
@@ -95,6 +96,42 @@ class PipelineResult:
     stage3_seconds: float
     stage4_seconds: float
     article_chars: int
+    # B-020: one dict per reference-integrity finding. UNRESOLVED entries
+    # mean the check could not run — they are not passes.
+    source_findings: list[dict[str, str]] = field(default_factory=list)
+
+
+def _log_source_findings(findings: list) -> None:
+    """Report reference-integrity findings, keeping UNRESOLVED distinct from PASS.
+
+    A run where every reference is UNRESOLVED must never read as a clean run —
+    that is precisely how a fail-open verifier produces a green signal from a
+    check that never happened.
+    """
+    if not findings:
+        return
+    counts = summarise(findings)
+    logger.info(
+        "Reference integrity: %d pass, %d FAIL, %d unresolved",
+        counts["pass"],
+        counts["fail"],
+        counts["unresolved"],
+    )
+    for finding in findings:
+        if finding.verdict == "FAIL":
+            logger.error("Reference integrity FAIL: %s", finding.message)
+    if counts["fail"]:
+        logger.error(
+            "%d reference(s) do not match their source. Do not publish without "
+            "human review.",
+            counts["fail"],
+        )
+    elif counts["unresolved"] and not counts["pass"]:
+        logger.warning(
+            "No reference could be resolved (%d unresolved) — citations are "
+            "UNVERIFIED, not verified.",
+            counts["unresolved"],
+        )
 
 
 def load_brief_file(path: str | Path) -> str:
@@ -164,6 +201,15 @@ async def run_pipeline(
     # A no-op unless frontmatter names a real hero.
     final_article = _strip_hero_prompt_comment(final_article)
 
+    # B-020: resolve every reference and compare its printed metadata against
+    # the document actually at that URL. The article that shipped cited two
+    # references that do not exist as printed (BUG-058) and passed every gate,
+    # because the evidence check counts references and never resolves one.
+    # UNRESOLVED is logged distinctly from PASS: a check that could not run is
+    # not a check that passed.
+    source_findings = check_reference_integrity(final_article)
+    _log_source_findings(source_findings)
+
     result = PipelineResult(
         topic=topic,
         article=final_article,
@@ -182,6 +228,15 @@ async def run_pipeline(
         stage3_seconds=stage3.wall_seconds,
         stage4_seconds=stage4.wall_seconds,
         article_chars=len(final_article),
+        source_findings=[
+            {
+                "check": f.check,
+                "verdict": f.verdict,
+                "reference": str(f.reference_index),
+                "message": f.message,
+            }
+            for f in source_findings
+        ],
     )
     wall_seconds = result.stage3_seconds + result.stage4_seconds
     try:

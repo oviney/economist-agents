@@ -32,6 +32,13 @@ def _hermetic_env(monkeypatch: pytest.MonkeyPatch) -> None:
     ):
         monkeypatch.delenv(var, raising=False)
 
+    # B-020: the source-integrity gate resolves reference URLs over the network
+    # in production. Local verification must stay hermetic, so force its offline
+    # path — every reference then reports UNRESOLVED, which is a truthful
+    # "not checked" rather than a false pass. Tests that exercise the gate
+    # inject their own fetch_fn and are unaffected.
+    monkeypatch.setenv("ECON_AGENTS_OFFLINE", "1")
+
 
 @pytest.fixture
 def temp_output_dir(tmp_path: Path) -> Path:

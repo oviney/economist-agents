@@ -20,6 +20,7 @@ from typing import Literal
 
 import orjson
 
+from scripts.chart_provenance import check_chart_provenance
 from scripts.claim_provenance import check_claim_provenance
 from scripts.source_integrity import check_reference_integrity, summarise
 from src.agent_sdk._shared import (
@@ -232,6 +233,15 @@ async def run_pipeline(
     )
     _log_claim_findings(claim_findings)
 
+    # B-023: a plotted number is a claim. The chart that shipped asserted the
+    # article's strongest false claim more baldly than the prose did.
+    chart_findings = check_chart_provenance(
+        stage3.chart_data or {}, getattr(stage3, "research_brief", "")
+    )
+    for finding in chart_findings:
+        if finding.verdict == "FAIL":
+            logger.error("Chart provenance FAIL: %s", finding.message)
+
     result = PipelineResult(
         topic=topic,
         article=final_article,
@@ -267,6 +277,15 @@ async def run_pipeline(
                 "message": f.message,
             }
             for f in claim_findings
+        ]
+        + [
+            {
+                "check": f.check,
+                "verdict": f.verdict,
+                "reference": f.metric,
+                "message": f.message,
+            }
+            for f in chart_findings
         ],
     )
     wall_seconds = result.stage3_seconds + result.stage4_seconds

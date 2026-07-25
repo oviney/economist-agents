@@ -7,7 +7,7 @@ frontmatter schema before reaching the quality gate.
 
 import pytest
 
-from scripts.frontmatter_schema import FrontmatterSchema
+from scripts.frontmatter_schema import REQUIRED_FIELDS, FrontmatterSchema
 
 # ═══════════════════════════════════════════════════════════════════════════
 # Fixtures
@@ -47,10 +47,10 @@ class TestRequiredFields:
         assert result.is_valid
         assert len(result.errors) == 0
 
-    @pytest.mark.parametrize(
-        "missing_field",
-        ["layout", "title", "date", "categories", "image", "description"],
-    )
+    # Derived from REQUIRED_FIELDS rather than hardcoded, so the parametrisation
+    # can never drift from the schema it is testing (BUG-055: this list still
+    # asserted `image` was required after the hero became optional).
+    @pytest.mark.parametrize("missing_field", REQUIRED_FIELDS)
     def test_each_required_field_enforced(
         self,
         schema: FrontmatterSchema,
@@ -61,6 +61,18 @@ class TestRequiredFields:
         result = schema.validate(fm)
         assert not result.is_valid
         assert any(missing_field in e for e in result.errors)
+
+    def test_image_is_optional(self, schema: FrontmatterSchema) -> None:
+        # BUG-055: the hero is optional (#403 "Path A" chart-only). `image` must
+        # NOT be required, because requiring it forced Stage 4 to stamp
+        # `image: ""` — and an empty value is truthy in Liquid, so it satisfies
+        # the blog's hero guard, renders an <img> with no src, and fails the
+        # blog's required build check via html-proofer.
+        fm = {**VALID_FRONTMATTER}
+        fm.pop("image", None)
+        result = schema.validate(fm)
+        assert result.is_valid, result.errors
+        assert "image" not in REQUIRED_FIELDS
 
 
 # ═══════════════════════════════════════════════════════════════════════════

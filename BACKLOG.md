@@ -135,12 +135,27 @@ check** with "image has no src or srcset attribute". Evidence: blog PR #1159
 `review.html` then extended a nonexistent layout and rendered bare, emitting no
 `<img>` at all — the bare-render bug was masking this one.)
 **Impact was NOT limited to review drafts:** every generated article PR would
-have failed the same required check. Fix: omit the key entirely and strip any
-empty `image:` line (`_EMPTY_IMAGE_LINE` in `_shared.py`); the stale comment
-claiming the schema needs the key was wrong — `schema_validator` requires only
-`layout/title/date/categories`. Hero images stay human-supplied (constraint #4).
-Regression: `TestEmptyImageFrontmatterNeverEmitted`
-(`tests/test_stage4_editorial_fixes.py`). See BUG-055.
+have failed the same required check.
+
+**Root cause was two in-repo contracts disagreeing.** `frontmatter_schema.py`
+`REQUIRED_FIELDS` (Story #117) required `image`, which is *why* Stage 4 stamped an
+empty value — but #403 slice 2 had since made the hero **optional** ("Path A:
+chart-only"), and `publication_validator._check_image_contract` treats an absent
+`image:` as valid. Fix reconciles them: `image` is no longer a required field,
+Stage 4 omits the key instead of stamping it, and any empty `image:` line the
+writer emits is stripped (`_EMPTY_IMAGE_LINE` in `_shared.py`). Hero images stay
+human-supplied (constraint #4) — no image generation added.
+Regressions: `TestEmptyImageFrontmatterNeverEmitted`
+(`tests/test_stage4_editorial_fixes.py`) and
+`test_image_key_omitted_entirely_not_stamped_empty`
+(`tests/test_frontmatter_finalize.py`, rewritten — it previously *asserted* the
+buggy empty-stamp behaviour). See BUG-055.
+
+**Still to do before B-013 can close:** the stale test draft
+`_review/…-1530b611.md` already on blog `main` still carries `image: ""`, so blog
+PR #1159's `build` will keep failing until that file is deleted. Delete it (it is
+a throwaway bare-render test artifact), then merge #1159, then redeploy a fresh
+draft — which now omits the key — and re-run the leak test for 7/7.
 
 ### B-015a · Article PRs are governance-safe by construction; agent-label plan reversed — 2026-07-24
 

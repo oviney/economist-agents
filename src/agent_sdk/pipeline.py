@@ -159,6 +159,10 @@ async def run_pipeline(
     image_prompt = getattr(stage3, "image_prompt", "")
     if image_mode == "chart_only" and image_prompt:
         final_article = _inject_hero_prompt_comment(final_article, image_prompt)
+    # BUG-062 safety net: whatever route the article took, it must not leave
+    # here carrying "generate an image" scaffolding for an image it already has.
+    # A no-op unless frontmatter names a real hero.
+    final_article = _strip_hero_prompt_comment(final_article)
 
     result = PipelineResult(
         topic=topic,
@@ -295,6 +299,45 @@ def _load_state(slug: str) -> dict:
 _FRONTMATTER_IMAGE_LINE = re.compile(r"^image(?:_alt|_caption)?:[^\n]*\n", re.MULTILINE)
 
 
+_HERO_PROMPT_COMMENT = re.compile(
+    r"<!--\s*HERO IMAGE\b.*?-->\n*",
+    re.DOTALL,
+)
+
+_FRONTMATTER_REAL_IMAGE = re.compile(
+    r"^image:[ \t]*(?!\s*$)(?!\"\"\s*$)(?!''\s*$)\S[^\n]*$",
+    re.MULTILINE,
+)
+
+
+def _has_real_hero(article: str) -> bool:
+    """True when frontmatter carries a non-empty ``image:`` value.
+
+    ``image: ""`` does not count — BUG-055 established that an empty value is
+    not a hero (Liquid treats it as truthy, html-proofer does not).
+    """
+    if not article.startswith("---"):
+        return False
+    parts = article.split("---", 2)
+    if len(parts) < 3:
+        return False
+    return bool(_FRONTMATTER_REAL_IMAGE.search(parts[1]))
+
+
+def _strip_hero_prompt_comment(article: str) -> str:
+    """Remove the hero-prompt scaffolding comment once a real hero exists.
+
+    BUG-062: the placeholder is injected for chart-only posts so the reviewer
+    knows to draw the hero. When a hero later arrives (B-016 generates one), the
+    placeholder became stale scaffolding that shipped verbatim in the published
+    post, prompt text and all. Strip it only when ``image:`` resolves to a real
+    asset — a chart-only post still needs its placeholder.
+    """
+    if not _has_real_hero(article):
+        return article
+    return _HERO_PROMPT_COMMENT.sub("", article)
+
+
 def _inject_hero_prompt_comment(article: str, image_prompt: str) -> str:
     """Insert the hero-image prompt as a review-visible HTML comment at the top
     of the body (CLAUDE.md Operating Constraint #4).
@@ -303,7 +346,13 @@ def _inject_hero_prompt_comment(article: str, image_prompt: str) -> str:
     this prompt at PR-review time and replaces the comment with the image. The
     comment is invisible in the rendered post but shows in the PR diff and the
     raw markdown, right where the hero belongs.
+
+    No-op when the article already has a real hero (BUG-062): emitting a
+    "generate an image" placeholder for an image that already exists is how the
+    scaffolding leaked into publication.
     """
+    if _has_real_hero(article):
+        return article
     # Neutralise any "-->" in the prompt so it cannot terminate the HTML comment
     # early and leak prompt text into the rendered post.
     safe_prompt = image_prompt.strip().replace("-->", "--​>")
@@ -743,7 +792,10 @@ def _run_resume(slug: str, *, no_image: bool) -> None:
     elapsed = time.perf_counter() - start
 
     # Write back the polished article (Stage 4 may auto-fix British spelling etc.)
-    article_path.write_text(stage4.article)
+    # BUG-062: the resume path is where a hero actually arrives, so it is the
+    # path that stranded the "generate an image" placeholder in the published
+    # post. Strip it here too — a no-op when the article ships chart-only.
+    article_path.write_text(_strip_hero_prompt_comment(stage4.article))
 
     s3_metrics = state.get("metrics", {})
     total_cost = s3_metrics.get("writer_cost_usd", 0.0) + s3_metrics.get(

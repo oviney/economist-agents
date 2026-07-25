@@ -18,16 +18,27 @@ one of these, and never re-litigate them.
    (`claude_agent_sdk` / the authenticated `claude` CLI). The default runtime is
    keyless: writing/graphics/vision via `query()`, research via
    `research_mode="claude_web"` (Claude's own WebSearch), never Serper.
-4. **The pipeline does NOT generate the hero image — it generates a PROMPT.**
-   The hero workflow is human-in-the-loop at PR-review time:
-   (a) the pipeline writes a hero-image *prompt* (`image_prompt_synth.py` →
-   `compose_prompt`), surfaces it in the post (inline placeholder comment) and
-   as the `output/posts/<slug>.image_prompt.md` sidecar so it is visible when
-   reviewing the post in the PR; (b) the owner takes that prompt, generates the
-   image themselves, and drops it in. Do **not** add image generation of any
-   kind — not DALL-E/Gemini/Midjourney (violates #1), and not procedural/PIL
-   image generation either. The only pipeline-drawn raster is the **data chart**
-   (`chart_renderer.py`, matplotlib), which is not an illustration.
+4. **Visuals are drawn as CODE, never generated as pixels.** *(AMENDED
+   2026-07-25 by the owner — B-016. The previous rule banned all pipeline
+   illustration and required a human-supplied hero; the owner now wants Claude's
+   own visualisation to produce the hero and any figures a post needs.)*
+   - **Allowed:** Claude authors the hero as **SVG** (hand-written geometry,
+     `output/posts/images/<slug>-hero.svg`), and charts via `chart_renderer.py`
+     (matplotlib). Both are keyless — they run on the subscription, so #1–#3
+     still hold. Prefer SVG for heroes: the blog's `responsive-image.html` does
+     `replace: '.png', '.webp'`, so a `.png` hero demands a `.webp` sibling
+     while an `.svg` takes the plain `<img>` branch and needs none.
+   - **Still forbidden:** any *raster/pixel* image model — DALL-E, Gemini/Imagen,
+     Midjourney, Stable Diffusion (all violate #1/#2), and procedural/PIL
+     pixel-pushing. Claude has no keyless raster image model here; if a task
+     needs photographic art, say it cannot be done keyless.
+   - The hero **prompt** (`image_prompt_synth.py` → `compose_prompt`) is still
+     written to the `output/posts/<slug>.image_prompt.md` sidecar. It is now the
+     *brief Claude draws from*, and remains available if the owner wants to
+     supply art by hand instead.
+   - **Always look at the rendered result** before shipping (headless Chrome
+     screenshot for SVG, read the PNG for charts). Composition bugs and z-order
+     mistakes are invisible in source.
 5. **No github.com-only workflows for running the pipeline.** It must run
    locally / in the session on the subscription.
 

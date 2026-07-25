@@ -245,6 +245,10 @@ def deploy(
         logger.info("Copying chart: %s → %s", chart_file, target_chart)
         shutil.copy2(chart_file, target_chart)
 
+    # Hero referenced by the frontmatter (B-016) — an SVG hero lives at a
+    # ``<slug>-hero.svg`` name the slug-guess below never matches.
+    _copy_hero_asset(target_article.read_text(), images_dir)
+
     # Copy featured PNG + generate WebP — the blog's responsive-image
     # include emits a <source srcset="…webp">, so the .webp must exist
     # or htmlproofer fails the deploy.
@@ -389,6 +393,62 @@ def deploy(
 # ---------------------------------------------------------------------------
 
 
+def _hero_asset_ref(content: str) -> str | None:
+    """Filename of the hero the frontmatter ``image:`` points at, else ``None``.
+
+    Frontmatter-driven rather than ``<slug>.png``-guessed, because the hero is a
+    Claude-authored **SVG** named ``<slug>-hero.svg`` (B-016) and a slug guess
+    silently skipped it, shipping a broken ``<img>``. An empty value is not a
+    reference (BUG-055).
+    """
+    if not content.startswith("---"):
+        return None
+    parts = content.split("---", 2)
+    if len(parts) < 2:
+        return None
+    match = re.search(
+        r"^image:[ \t]*[\"']?([^\"'\s]+)[\"']?[ \t]*$", parts[1], re.MULTILINE
+    )
+    if not match:
+        return None
+    return Path(match.group(1)).name or None
+
+
+def _copy_hero_asset(content: str, images_dir: Path) -> None:
+    """Copy the frontmatter-referenced hero into the blog clone (B-016).
+
+    A ``.png`` hero also gets a ``.webp`` sibling because the blog's
+    ``responsive-image.html`` does ``replace: '.png', '.webp'`` and emits a
+    ``<source srcset>`` html-proofer then requires. An ``.svg`` hero takes the
+    plain ``<img>`` branch, so it needs no webp — which is why authoring the
+    hero as SVG is both keyless and the lower-friction path.
+    """
+    name = _hero_asset_ref(content)
+    if not name:
+        return
+    source = Path("output") / "posts" / "images" / name
+    if not source.exists():
+        raise DeployError(
+            f"Hero asset not found: {source} (frontmatter image: references it)"
+        )
+    images_dir.mkdir(parents=True, exist_ok=True)
+    target = images_dir / name
+    shutil.copy2(source, target)
+    logger.info("Copied hero: %s → %s", source, target)
+
+    if target.suffix.lower() != ".png":
+        return
+    try:
+        from PIL import Image  # type: ignore
+
+        Image.open(target).save(str(target.with_suffix(".webp")), "WEBP", quality=85)
+        logger.info("Generated webp for PNG hero: %s", target.with_suffix(".webp"))
+    except ImportError:
+        logger.warning(
+            "Pillow unavailable — no webp for PNG hero (htmlproofer may fail)"
+        )
+
+
 def _to_review_content(content: str) -> str:
     """Transform a generated post into an unlisted ``review`` draft.
 
@@ -480,6 +540,10 @@ def deploy_review(
             raise DeployError(f"Chart asset not found: {chart_file}")
         shutil.copy2(chart_file, assets_dir / chart_file.name)
 
+    # Ship the hero too (B-016) — a review draft is meant to be reviewed as the
+    # finished post, so it must render the illustration, not a broken <img>.
+    _copy_hero_asset(content, blog_dir / "assets" / "images")
+
     url = f"https://{host}/review/{slug}-{token_suffix}/"
 
     if dry_run:
@@ -493,7 +557,7 @@ def deploy_review(
             url=url,
         )
 
-    run_command("git add _review assets/charts", cwd=blog_dir)
+    run_command("git add _review assets/charts assets/images", cwd=blog_dir)
     commit_msg = f"review: unlisted draft {review_name}"
     run_command(f'git commit -m "{commit_msg}"', cwd=blog_dir)
     # Double-commit protocol (BUG-025): pre-commit hooks may reformat staged

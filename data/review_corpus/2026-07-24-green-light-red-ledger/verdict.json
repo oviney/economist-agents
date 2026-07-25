@@ -1,0 +1,76 @@
+{
+  "article_slug": "green-light-red-ledger-flaky-tests-invisible-tax",
+  "article_published": "2026-07-24",
+  "review_run": "2026-07-25",
+  "reviewer": "blog-post-review v1.0 (external, human-initiated, custom rubric)",
+  "verdict": "BLOCK",
+  "weighted_score": 41.0,
+  "max_score": 100,
+  "gates": {
+    "G1": "fail",
+    "G2": "fail",
+    "G3": "fail",
+    "G4": "fail",
+    "G5": "not_assessed_gate_misspecified"
+  },
+  "dimensions": {
+    "evidence": 2,
+    "falsifiability": 1,
+    "thesis": 2,
+    "actionability": 2,
+    "voice": 3,
+    "craft": 3
+  },
+  "blocking_findings": [
+    "G2: ICST 2024 source concluded in favour of auto-retry; post argues against it citing that source",
+    "G2/G4: 45% async-wait root cause attributed to arXiv 2504.16777, which reports networking and external dependencies and explicitly disputes the async finding",
+    "G3: rerun cost given as $0.02; source states 0.02 cents; ratio understated 100x",
+    "G4: reference 1 author 'Parry, J.' fabricated; actual authors Leinen et al.",
+    "G4: reference 5 title fabricated",
+    "G4: 'one in five emergency Slack notifications' inference invented",
+    "G2: Google 'involve a flaky test' rendered as 'caused by'; 2016 figure undated in body",
+    "G2: Atlassian 'as much as 21%, in the past' rendered as flat present-tense",
+    "G1: Microsoft 25-43% figure sourced to vendor blog, primary source not cited, UNVERIFIED",
+    "G1: 6,600 developer-hours is a derivation on an undisclosed 1,760-hour work year"
+  ],
+  "sources_checked": 5,
+  "sources_resolved": 5,
+  "reviewer_confidence_pct": 93,
+
+  "independent_verification": {
+    "performed": "2026-07-25",
+    "method": "each load-bearing claim re-checked against the primary source before any correction was applied",
+    "confirmed": [
+      "ref 5 real title is 'Systemic Flakiness: An Empirical Analysis of Co-Occurring Flaky Test Failures' (Parry, Kapfhammer, Hilton, McMinn)",
+      "ref 1 real authors are Leinen, Elsner, Pretschner, Stahlbauer, Sailer, Juergens",
+      "source states 0.02 cents, not $0.02",
+      "ICST 2024 authors recommend shifting effort toward automatic reruns",
+      "Micco 2016 says transitions 'involve' a flaky test; 1.5% base rate exists and was omitted",
+      "arXiv 2504.16777 names networking and external-dependency instability, disputes async-as-leading-cause"
+    ],
+    "reviewer_errors_found": [
+      "the review's proposed replacement text says '22 Java projects'; the paper's dataset is reported as 24 Java projects. The project count was omitted from the correction rather than asserted."
+    ],
+    "findings_the_review_missed": [
+      "the chart's 'Google: genuine defects 16%' and 'Jira Frontend: genuine defects 79%' series were derived by subtracting the flaky share from 100 and appear in no source; the 16% also collides with an unrelated real figure (share of Google tests carrying flakiness). Chart removed.",
+      "the hero-image prompt HTML comment (<!-- HERO IMAGE ... -->) shipped verbatim in the published post body despite a real SVG hero being set in frontmatter"
+    ]
+  },
+
+  "disposition": {
+    "action": "corrected in place with a published Correction section and last_modified_at revision date",
+    "blog_commit": "b1eb5fd",
+    "rationale": "the article was already live; a silent edit of six factual errors would repeat the trust failure the article is about",
+    "defects_filed": ["BUG-058", "BUG-059", "BUG-060", "BUG-061", "BUG-062"],
+    "backlog_filed": ["B-020", "B-021", "B-022", "B-023"]
+  },
+
+  "rubric_calibration": {
+    "gate": "G5",
+    "issue": "G5 fired on em dashes. The reviewer inferred that rule from the owner's personal writing preference and flagged it as probably wrong for this publication rather than silently changing the rubric mid-run.",
+    "decision": "Demote G5 from a blocking gate to a craft-level style note. The blog's house style targets The Economist, which uses em dashes freely; the published article uses them throughout and the corrected version keeps them.",
+    "note": "Recorded so a future review run does not re-fire this gate as blocking."
+  },
+
+  "why_this_file_exists": "This is the first labelled evaluation case for the pipeline. Every deterministic gate passed on an article containing six factual errors and two fabricated citations, because every gate measures conformance and none measures truth. The findings above are the seed regression corpus for the citation-integrity and claim-provenance gates (B-020, B-021)."
+}

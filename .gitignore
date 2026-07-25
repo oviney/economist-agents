@@ -42,6 +42,11 @@ logs/agent_sdk_costs.jsonl
 data/*
 # Track orchestrator audit-trail (starts as empty [])
 !data/orchestrator_state.json
+# Track the article review corpus — labelled evaluation fixtures for the
+# citation-integrity and claim-provenance gates (B-020/B-021). These are the
+# regression inputs, not runtime state, so they belong in version control.
+!data/review_corpus/
+!data/review_corpus/**
 
 # OS
 .DS_Store

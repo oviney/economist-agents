@@ -26,6 +26,78 @@ _(none)_
 
 ## Todo
 
+> **Priority note (2026-07-25).** B-020 → B-023 outrank B-019. B-019 describes
+> failures that are caught *loudly, at a gate, before publication* — which is the
+> cheap and safe kind. B-020–B-023 describe a failure that passed **every**
+> deterministic gate and reached readers: the first published article carried six
+> factual errors and two fabricated citations (BUG-058 → BUG-062, corrected in
+> `oviney/blog` b1eb5fd). The backlog had been ordered by what breaks the build
+> rather than by what breaks the reader. Fix that ordering first.
+>
+> Root cause shared by B-020/B-021: **the research brief stores values stripped of
+> provenance**, and Stage 3 re-associates them late. Author bleed, unit loss,
+> number-to-claim mismatch and stance inversion are four symptoms of that one
+> architectural choice.
+>
+> Evidence corpus: `data/review_corpus/2026-07-24-green-light-red-ledger/`.
+
+### B-020 · Citation-integrity gate — resolve every reference and match its metadata
+
+**Highest-priority pipeline item.** Fixes BUG-058. For each entry in the
+References section: fetch the URL, extract the real title and author list, and
+assert they match what the article emitted. Fail the article if they do not.
+
+- Deterministic, keyless, no LLM — satisfies constraints #1–#3.
+- Would have caught both fabrications mechanically: a title that does not exist
+  at the cited URL, and an author lifted from a different reference.
+- Regression fixtures already exist in `data/review_corpus/`: reference 1
+  (`Parry, J. et al.` → Leinen et al.) and reference 5 (invented title).
+- Note the existing evidence check *counts* references; it has never *resolved*
+  one. Counting is not verification.
+
+### B-021 · Claim provenance — every statistic carries its source sentence and unit
+
+Fixes BUG-059. A number in the research brief must carry (a) a pointer to the
+exact source sentence it came from and (b) an explicit unit. Stage 4 asserts the
+pointer resolves and that the unit survives into the prose.
+
+- Catches the `0.02 cents → $0.02` class (unit dropped in transit).
+- Catches the `45% of projects → 45% of root causes` class (number re-scoped to a
+  claim it does not support).
+- **The existing stat audit is not a substitute and never was.** It asserts
+  `stat ∈ research_brief`. It has never asserted that the brief entry is true,
+  correctly scoped, or correctly united — so it passed a fabricated headline
+  statistic while working exactly as specified. This is a spec defect to correct,
+  not a bug to patch.
+
+### B-022 · Source-stance check — does the source support the sentence citing it?
+
+Fixes BUG-060. For each citation, classify whether the source's own conclusion
+**supports**, **contradicts**, or **does not bear on** the sentence that cites it.
+Flag contradictions before publication.
+
+- Keyless via `query()` on the subscription (constraint #3).
+- The published article argued auto-retry is "an anaesthetic" while citing a paper
+  whose authors concluded the opposite and shifted toward automatic reruns. No
+  deterministic gate can catch this; it needs a stage that reads conclusions
+  rather than mining numbers.
+- Depends on B-020 (a resolved citation is a precondition for reading its stance).
+
+### B-023 · Chart data provenance — no derived series without a declared source
+
+Fixes BUG-061. A chart series must point at a source figure. A series computed
+from another series must be explicitly declared as derived and justified.
+
+- The published chart plotted "genuine defects" shares of 16% and 79%, both
+  produced by subtracting the flaky share from 100. Neither appears in any source,
+  and the 16% collided with an unrelated real Google figure, making an invented
+  number look corroborated.
+- Also covers **BUG-062** (hero-prompt comment leaking into the published body):
+  strip the `<!-- HERO IMAGE` placeholder whenever `image:` resolves to a real
+  asset, with a regression test asserting none survives finalisation.
+- Constraint #4 already says *always look at the rendered result*. That is what
+  found this defect; the prose review missed it. Make it a gate, not a habit.
+
 ### B-019 · Align generated front matter with the blog's post contract (NEXT ARTICLE WILL FAIL WITHOUT THIS)
 
 **Highest-priority pipeline item.** Publishing the first real article failed the

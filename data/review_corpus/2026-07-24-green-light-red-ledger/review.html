@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Review: Green Light, Red Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EEF0F2;--card:#FFFFFF;--ink:#16191C;--slate:#4A5560;
+    --rule:#C3C9CE;--hair:#DDE1E4;--fail:#A4262C;--pass:#1F6F63;--warn:#8A6114;
+    --disp:"IBM Plex Sans Condensed",system-ui,sans-serif;
+    --body:"IBM Plex Sans",system-ui,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
+  .wrap{max-width:960px;margin:0 auto;padding:44px 28px 96px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--slate)}
+  h1{font-family:var(--disp);font-weight:700;font-size:clamp(27px,5vw,40px);line-height:1.03;letter-spacing:-.015em;margin:10px 0 6px}
+  .sub{color:var(--slate);margin:0 0 30px;font-size:14.5px}
+  .sub a{color:var(--slate)}
+
+  /* 1. verdict */
+  .verdictbar{border:2px solid var(--fail);background:var(--card);margin-bottom:8px}
+  .vtop{display:flex;align-items:stretch;border-bottom:2px solid var(--fail)}
+  .vstamp{background:var(--fail);color:#fff;font-family:var(--disp);font-weight:700;
+    font-size:clamp(30px,6vw,46px);letter-spacing:.02em;padding:16px 26px;line-height:1;
+    display:flex;align-items:center}
+  .vscore{padding:14px 22px;display:flex;flex-direction:column;justify-content:center}
+  .vscore .n{font-family:var(--mono);font-weight:600;font-size:30px;line-height:1}
+  .vscore .n span{font-size:15px;color:var(--slate);font-weight:400}
+  .vscore .l{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-top:4px}
+  .vwhy{padding:14px 22px;border-left:1px solid var(--hair);flex:1;display:flex;align-items:center;font-size:14px;color:var(--slate)}
+  .gaterow{display:grid;grid-template-columns:repeat(5,1fr)}
+  .gcell{padding:12px 14px;border-right:1px solid var(--hair)}
+  .gcell:last-child{border-right:0}
+  .gcell .gid{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--slate)}
+  .gcell .gv{font-family:var(--disp);font-weight:700;font-size:16px;margin-top:3px}
+  .gcell .gn{font-size:11.5px;color:var(--slate);line-height:1.35;margin-top:2px}
+  .f{color:var(--fail)} .p{color:var(--pass)} .q{color:var(--warn)}
+  .conf{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--slate);margin:0 0 40px}
+
+  h2{font-family:var(--disp);font-weight:700;font-size:13px;letter-spacing:.13em;text-transform:uppercase;
+    color:var(--slate);margin:0 0 4px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+  h2 em{font-style:normal;color:var(--fail);font-family:var(--mono);font-size:11px;letter-spacing:.06em}
+  section{margin-bottom:44px}
+  .snote{color:var(--slate);font-size:14px;margin:12px 0 18px;max-width:70ch}
+
+  /* findings */
+  .find{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--fail);
+    padding:16px 18px;margin-bottom:14px}
+  .find.warn{border-left-color:var(--warn)}
+  .fhead{display:flex;justify-content:space-between;gap:14px;align-items:baseline;flex-wrap:wrap;margin-bottom:9px}
+  .ftitle{font-family:var(--disp);font-weight:700;font-size:17px;line-height:1.2}
+  .fmeta{font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--slate);white-space:nowrap}
+  blockquote{margin:0 0 10px;padding:9px 13px;background:var(--paper);border-left:2px solid var(--rule);
+    font-size:14px;font-style:italic;color:#33393F}
+  blockquote.src{border-left-color:var(--pass);font-style:normal}
+  blockquote b{font-style:normal;font-family:var(--mono);font-size:10px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--slate);display:block;margin-bottom:4px}
+  .find p{margin:0 0 9px;font-size:14.5px}
+  .find p:last-child{margin:0}
+  .calc{font-family:var(--mono);font-size:13px;background:var(--ink);color:#E8EAEC;padding:12px 14px;
+    margin:0 0 10px;overflow-x:auto;line-height:1.65}
+  .calc i{color:#9AA4AD;font-style:normal}
+
+  /* dimension table */
+  table{width:100%;border-collapse:collapse;font-size:14px;background:var(--card)}
+  th{text-align:left;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--slate);padding:9px 12px;border-bottom:2px solid var(--ink);background:var(--paper)}
+  td{padding:11px 12px;border-bottom:1px solid var(--hair);vertical-align:top}
+  td.sc,td.wc{font-family:var(--mono);font-weight:600;text-align:center;white-space:nowrap;width:56px}
+  td.dn{font-family:var(--disp);font-weight:600;font-size:15px;white-space:nowrap}
+  tr.tot td{border-bottom:0;border-top:2px solid var(--ink);font-family:var(--mono);font-weight:600;background:var(--paper)}
+
+  /* objection */
+  .obj{background:var(--ink);color:#E8EAEC;padding:22px 24px}
+  .obj h3{font-family:var(--disp);font-weight:700;font-size:20px;margin:0 0 12px;color:#fff;line-height:1.2}
+  .obj p{margin:0 0 12px;font-size:14.5px}
+  .obj p:last-child{margin:0}
+  .obj blockquote{background:#22262A;border-left-color:var(--warn);color:#D6DADE}
+  .obj blockquote b{color:#9AA4AD}
+
+  /* fixes */
+  ol.fixes{list-style:none;counter-reset:fx;padding:0;margin:0}
+  ol.fixes>li{counter-increment:fx;background:var(--card);border:1px solid var(--rule);
+    padding:16px 18px 16px 54px;position:relative;margin-bottom:12px}
+  ol.fixes>li::before{content:counter(fx);position:absolute;left:0;top:0;bottom:0;width:38px;
+    background:var(--ink);color:#fff;font-family:var(--mono);font-weight:600;font-size:15px;
+    display:flex;align-items:flex-start;justify-content:center;padding-top:16px}
+  .repl{border-left:3px solid var(--pass);background:#F4F7F6;padding:11px 14px;font-size:14.5px;margin:8px 0 0}
+  .repl b{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--pass);display:block;margin-bottom:5px}
+
+  ul.works{list-style:none;padding:0;margin:0}
+  ul.works li{padding:8px 0 8px 18px;position:relative;border-bottom:1px solid var(--hair);font-size:14.5px}
+  ul.works li:last-child{border-bottom:0}
+  ul.works li::before{content:"";position:absolute;left:0;top:17px;width:7px;height:2px;background:var(--pass)}
+
+  pre.json{font-family:var(--mono);font-size:12.5px;background:var(--ink);color:#E8EAEC;
+    padding:18px;overflow-x:auto;line-height:1.7;margin:0}
+  footer{margin-top:52px;padding-top:16px;border-top:2px solid var(--ink);
+    font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--slate);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+  @media (max-width:820px){
+    .vtop{flex-wrap:wrap}.vwhy{border-left:0;border-top:1px solid var(--hair);flex:1 0 100%}
+    .gaterow{grid-template-columns:1fr 1fr}
+    .gcell{border-bottom:1px solid var(--hair)}
+    td.dn{white-space:normal}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<p class="eyebrow">blog-post-review v1.0 &nbsp;/&nbsp; run 25 Jul 2026</p>
+<h1>Green Light, Red Ledger: Flaky Tests Are Engineering's Costliest Invisible Tax</h1>
+<p class="sub">Published 24 Jul 2026 on viney.ca &nbsp;&middot;&nbsp; 5 cited sources, all 5 resolved and read against the text</p>
+
+<!-- 1 -->
+<section>
+  <h2>1. Verdict</h2>
+  <div class="verdictbar" style="margin-top:16px">
+    <div class="vtop">
+      <div class="vstamp">BLOCK</div>
+      <div class="vscore">
+        <div class="n">41<span>/100</span></div>
+        <div class="l">weighted</div>
+      </div>
+      <div class="vwhy">Four gates fail. Two citations are fabricated, one cost figure is wrong by a factor of 100, and the post's central normative claim is contradicted by its own primary source.</div>
+    </div>
+    <div class="gaterow">
+      <div class="gcell"><div class="gid">G1</div><div class="gv f">FAIL</div><div class="gn">One load-bearing figure has no primary source; one is derived on a hidden assumption</div></div>
+      <div class="gcell"><div class="gid">G2</div><div class="gv f">FAIL</div><div class="gn">Four claims overstate or invert what their source says</div></div>
+      <div class="gcell"><div class="gid">G3</div><div class="gv f">FAIL</div><div class="gn">Dollars-for-cents unit error; ratio understated 100x</div></div>
+      <div class="gcell"><div class="gid">G4</div><div class="gv f">FAIL</div><div class="gn">Invented author, invented paper title, invented inference</div></div>
+      <div class="gcell"><div class="gid">G5</div><div class="gv q">N/A</div><div class="gn">Gate likely mis-specified for the blog. See fix 8</div></div>
+    </div>
+  </div>
+  <p class="conf">REVIEWER CONFIDENCE 93% &nbsp;&middot;&nbsp; findings below carry individual confidence values</p>
+</section>
+
+<!-- 2 -->
+<section>
+  <h2>2. Gate findings <em>ordered by severity</em></h2>
+  <p class="snote">Every source was fetched and read. Quotes marked SOURCE are from the cited document.</p>
+
+  <div class="find">
+    <div class="fhead">
+      <div class="ftitle">The primary source concluded the opposite of the post's thesis</div>
+      <div class="fmeta">G2 &nbsp;&middot;&nbsp; 97%</div>
+    </div>
+    <blockquote><b>Post</b>The trouble is that auto-retry is an anaesthetic, not a cure; it masks the systemic rot while the cost accumulates elsewhere.</blockquote>
+    <blockquote class="src"><b>Source: Leinen et al., ICST 2024 abstract</b>Contrary to most other studies, we find the cost for rerunning tests to be negligible and inexpensive... The insights gained from our case study have led to the decision to shift effort from investigation and repair to automatically rerunning tests.</blockquote>
+    <p>The post borrows this paper's cost figures to argue that auto-retry is a false economy. The authors ran that exact comparison and moved <em>toward</em> automatic reruns because of it. The post does not mention this, and a reader who follows the citation will find the paper arguing against the paragraph that cites it.</p>
+    <p>This is the most damaging finding in the review, and it is not a nitpick about emphasis. It is the difference between a post that has read its sources and one that has mined them for numbers.</p>
+  </div>
+
+  <div class="find">
+    <div class="fhead">
+      <div class="ftitle">The 45% asynchronous-wait claim is attributed to a paper that argues against it</div>
+      <div class="fmeta">G2 / G4 &nbsp;&middot;&nbsp; 96%</div>
+    </div>
+    <blockquote><b>Post</b>More usefully, nearly half of all flakiness, 45%, traces to a single root cause: asynchronous wait errors.</blockquote>
+    <blockquote class="src"><b>Source: arXiv 2504.16777, RQ3 and Discussion</b>The main causes are networking issues and instabilities in external dependencies... In contrast, previous studies that categorized the causes of individual flaky tests generally rated asynchronous operations and concurrency as the leading causes. By overlooking systemic flakiness, these studies may have unintentionally presented a skewed distribution of flaky test causes.</blockquote>
+    <p>The paper's root-cause table contains six categories: Networking (25), External Dependency (14), Filesystem Pollution (5), Timeout (4), Unknown (2), System Clock (1). Asynchronous wait is not among them. The paper's explicit contribution is to challenge the async-is-dominant finding that the post attributes to it.</p>
+    <p>The 45% appears to be misappropriated from a different sentence in the same paper: 10 of 22 projects, 45%, contained at least one cluster. That is a proportion of projects, not of root causes. This is the diagnostic pattern of a pipeline pattern-matching a number to a claim rather than reading the finding.</p>
+    <p>Consequence: the post's only actionable recommendation, a sprint on async test hygiene, rests entirely on this figure.</p>
+  </div>
+
+  <div class="find">
+    <div class="fhead">
+      <div class="ftitle">Dollars given where the source says cents</div>
+      <div class="fmeta">G3 &nbsp;&middot;&nbsp; 98%</div>
+    </div>
+    <blockquote><b>Post</b>manual investigation of a flaky pipeline failure costs $5.67 in developer time, versus $0.02 for an automatic rerun, a 280-fold gap.</blockquote>
+    <blockquote class="src"><b>Source: Leinen et al., ICST 2024 abstract</b>Automatically rerunning a test costs 0.02~cents, while not rerunning and thus letting the pipeline fail results in a manual investigation costing $5.67 in our context.</blockquote>
+    <div class="calc">post      $5.67 / $0.02      = 283.5      <i>stated as "280-fold"</i>
+source    $5.67 / $0.0002    = 28,350     <i>0.02 cents = $0.0002</i>
+error                          100x       <i>understated</i></div>
+    <p>The tilde in the source is LaTeX spacing, so the unit is unambiguous. The post's arithmetic is internally consistent and its rounding is honest; the inputs are wrong. Note the direction: this error works <em>against</em> the post's own argument, which is why nothing in the prose flags it as implausible. Unit errors that flatter the thesis get caught by instinct. This one would not have been.</p>
+  </div>
+
+  <div class="find">
+    <div class="fhead">
+      <div class="ftitle">Two fabricated bibliographic details</div>
+      <div class="fmeta">G4 &nbsp;&middot;&nbsp; 99%</div>
+    </div>
+    <p><b>Reference 1</b> credits the ICST 2024 paper to "Parry, J. et al." The actual authors are Fabian Leinen, Daniel Elsner, Alexander Pretschner, Andreas Stahlbauer, Michael Sailer and Elmar Juergens (TU Munich and CQSE). Owain Parry, initial O, is the first author of <em>reference 5</em>. The pipeline appears to have taken an author from one source and attached it to another, then guessed the initial.</p>
+    <p><b>Reference 5</b> gives the title as "Empirical Study of Flaky Test Co-Failure Groups in 22 Java Projects." The paper at that URL is titled "Systemic Flakiness: An Empirical Analysis of Co-Occurring Flaky Test Failures." The listed title is a plausible-sounding invention.</p>
+    <p><b>In-text</b>: "meaning one in five emergency Slack notifications is, strictly speaking, a lie." Nothing in the Atlassian source concerns notifications, and 21% of master build failures does not convert to 21% of notifications without a stated mapping. This is invented detail wearing the costume of arithmetic.</p>
+  </div>
+
+  <div class="find">
+    <div class="fhead">
+      <div class="ftitle">Google's "involve" hardened into "caused by", and a 2016 figure presented as current</div>
+      <div class="fmeta">G2 &nbsp;&middot;&nbsp; 95%</div>
+    </div>
+    <blockquote><b>Post</b>84% of test-suite transitions from passing to failing are caused by flaky tests rather than genuine code defects... An alert system that cries wolf 84% of the time is not an alert system; it is ambient noise.</blockquote>
+    <blockquote class="src"><b>Source: Micco, Google Testing Blog, 27 May 2016</b>What we find in practice is that about 84% of the transitions we observe from pass to fail involve a flaky test... It is quite common to ignore legitimate failures in flaky tests due to the high number of false-positives.</blockquote>
+    <p>Involving a flaky test is not the same as being caused by one instead of a real defect, and Micco's very next point is that real failures get wrongly dismissed inside that 84%. The post reads the number as "84% of red builds are false alarms," then escalates to crying wolf. The source supports neither step.</p>
+    <p>Two further omissions cut the same way. The post drops Google's headline rate, about 1.5% of test runs producing a flaky result, which is the denominator that makes 84% interpretable. And the source is ten years old, cited in a July 2026 article with no date given in the body. The 16% figure is reported accurately, and the post deserves credit for going to Micco rather than repeating Atlassian's garbled second-hand version of it.</p>
+  </div>
+
+  <div class="find">
+    <div class="fhead">
+      <div class="ftitle">Atlassian's historical upper bound presented as a current central value</div>
+      <div class="fmeta">G2 &nbsp;&middot;&nbsp; 94%</div>
+    </div>
+    <blockquote><b>Post</b>In the Jira Frontend repository, 21% of all master build failures are caused not by defective code but by tests that disagree with themselves.</blockquote>
+    <blockquote class="src"><b>Source: Atlassian Engineering, 8 Dec 2025</b>Test flakiness has been a significant contributor to build reliability issues in the past, responsible for as much as 21% of master build failures in the Jira Frontend repository.</blockquote>
+    <p>"As much as, in the past" becomes a flat present-tense "21% of all." The 150,000-hour figure checks out against the source, though the source attributes those hours to reruns and says "over 150,000" where the post says "an estimated 150,000."</p>
+    <p>The larger problem is what the source is. It is a case study of Atlassian building Flakinator and reporting results: 22,000 builds recovered and 7,000 unique flaky tests identified in one quarter, across twelve products, using retry-based detection and automated quarantine. The post cites this document as evidence that leaders have "tacitly agreed to keep paying," while the document is an account of a leader who stopped.</p>
+  </div>
+
+  <div class="find warn">
+    <div class="fhead">
+      <div class="ftitle">Two figures that cannot be checked as published</div>
+      <div class="fmeta">G1 &nbsp;&middot;&nbsp; 88%</div>
+    </div>
+    <p><b>The Microsoft 25 to 43% reproduction rate</b> is sourced to a CloudBees blog post, which is tier 4 under the rubric and cannot carry a load-bearing quantitative claim. A citable primary source almost certainly exists (Lam et al., "Root Causing Flaky Tests in a Large-Scale Industrial Setting," ISSTA 2019). Marked UNVERIFIED rather than false: the figure may well be right, but the post has not shown that it is.</p>
+    <p><b>The 6,600 developer-hours figure</b> does not appear in the cited abstract and is presented as a study finding ("Across the study period, that amounted to"). It is a derivation, and it depends on an assumption the post never states:</p>
+    <div class="calc">6,600 h / 0.025          = 264,000 h total productive time
+264,000 / (30 dev x 5 yr) = 1,760 h per developer-year   <i>assumed, not stated</i>
+at 2,080 h/yr the same 2.5% yields 7,800 h
+3.75 developer-years      = 0.025 x 30 x 5              <i>unit-invariant, and correct</i></div>
+    <p>The developer-years figure is sound. The hours figure is an artefact of an undisclosed work-year, and the post's closing paragraph rests its emotional weight on it: "those 6,600 developer-hours quietly ticking away." Use the invariant number in the conclusion, not the assumption-dependent one.</p>
+  </div>
+</section>
+
+<!-- 3 -->
+<section>
+  <h2>3. Dimension scores</h2>
+  <table>
+    <thead><tr><th>Dimension</th><th style="text-align:center">Score</th><th style="text-align:center">Contrib</th><th>Justification</th></tr></thead>
+    <tbody>
+      <tr><td class="dn">Evidence</td><td class="sc f">2/5</td><td class="wc">10.0</td>
+        <td>The source <em>selection</em> is strong: two research papers and two first-party engineering blogs, which would score 4. The source <em>handling</em> scores 1. No sample sizes or study limits appear in the text, no age caveat on a 2016 figure, and Google's 1.5% base rate is omitted where it would have deflated the drama.</td></tr>
+      <tr><td class="dn">Falsifiability</td><td class="sc f">1/5</td><td class="wc">4.0</td>
+        <td>No counter-case, no stated conditions for being wrong, no confidence on any contested claim. The strongest objection was sitting in the abstract of source 1 and was passed over. "No other category of engineering waste operates so openly... with so little executive scrutiny" is an unfalsifiable superlative offered without evidence.</td></tr>
+      <tr><td class="dn">Thesis</td><td class="sc f">2/5</td><td class="wc">6.0</td>
+        <td>"Flaky tests are expensive and under-measured" is received wisdom for this audience. The one genuinely fresh idea, systemic clustering enabling concentrated fixes, gets a single paragraph and rests on the misattributed 45%. Structure is a list of four statistics, not a developing argument: delete the signal-to-noise section and the case stands unchanged.</td></tr>
+      <tr><td class="dn">Actionability</td><td class="sc f">2/5</td><td class="wc">6.0</td>
+        <td>One concrete recommendation, a focused sprint on async hygiene, built on a fabricated figure and asserted to "halve the noise" with nothing behind the estimate. No owner role, no measurement, no way to tell in six weeks whether it worked.</td></tr>
+      <tr><td class="dn">Voice</td><td class="sc q">3/5</td><td class="wc">9.0</td>
+        <td>Quantitative by default, vendor-neutral, controlled register. The problem is that the voice is carrying more confidence than the evidence earns, which is the specific failure mode a skeptic brand cannot afford: it reads authoritative precisely where it is wrong. The closing metaphor also runs three beats past its welcome.</td></tr>
+      <tr><td class="dn">Craft</td><td class="sc q">3/5</td><td class="wc">6.0</td>
+        <td>Prose quality is clearly above pipeline baseline. Tells present: negation-elevation stacked on rule-of-three in the opening ("not a nuisance... but a quantifiable payroll cost, a signal-to-noise crisis, and a structural defect"), and "The news is not uniformly grim" as a section pivot. Title fidelity fails: a red ledger promises a ledger, and the post never builds one.</td></tr>
+      <tr class="tot"><td>WEIGHTED TOTAL</td><td class="sc">&mdash;</td><td class="wc">41.0</td><td>REWORK band on score alone. BLOCK on gates.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 4 -->
+<section>
+  <h2>4. The strongest objection</h2>
+  <div class="obj">
+    <h3>Every primary source in this post uses the strategy the post calls an anaesthetic.</h3>
+    <p>The post's normative claim is that auto-retry masks rot and that leaders keep paying because retrying "makes the dashboard green, the standup short, and the quarterly metrics tidy." The three organisations it cites all evaluated that trade and came down the other way, with data:</p>
+    <blockquote><b>Leinen et al., ICST 2024</b>The insights gained from our case study have led to the decision to shift effort from investigation and repair to automatically rerunning tests.</blockquote>
+    <p><b>Atlassian</b> built retry-based detection with automated quarantine, reports 81% detection for some products, and recovered 22,000 builds in a quarter. <b>Google</b>, in the same post the 84% comes from, lists rerunning and automatic quarantine as its own mitigations.</p>
+    <p>The steelmanned counter-argument: at 0.02 cents per rerun against $5.67 per investigation, retry is not an anaesthetic, it is correct triage. Engineering time is the scarce input, and spending it on a defect class where Microsoft reportedly could not reproduce failures in most cases even after 500 runs is the actual waste. Quarantine loses signal, but signal you cannot act on has no value to lose.</p>
+    <p>The post has no answer to this because it never acknowledges the position exists. That is the gap to close, and closing it is also the opportunity: the honest version of this argument is not "retry is a cop-out" but "retry is right and the industry still has no accepted way to bound it." Bounded quarantine, a stated ceiling above which the quarantine has become the test strategy, is a genuinely publishable thesis and nobody has written it well. It would also give the piece the falsifiable claim it currently lacks.</p>
+  </div>
+</section>
+
+<!-- 5 -->
+<section>
+  <h2>5. Fixes, ranked by score impact</h2>
+  <ol class="fixes">
+    <li>
+      <p><b>Reference 5 and the async paragraph.</b> Delete the 45% claim. It is not in the source and the source argues against it. Replace the paragraph's opening:</p>
+      <div class="repl"><b>Replacement text</b>A 2025 analysis of 810 flaky tests across 22 Java projects found that 75% fail as part of a cluster, with a mean cluster size of 13.5 tests spanning 2.9 test classes. The authors identified intermittent networking issues and instabilities in external dependencies as the predominant causes, and argued that earlier studies naming asynchronous operations as the leading cause may have been skewed by treating flaky failures as isolated events. The clustering is the actionable finding: root causes are shared, so one fix can retire a dozen tests.</div>
+      <p style="margin-top:9px">Also correct the title to "Systemic Flakiness: An Empirical Analysis of Co-Occurring Flaky Test Failures," authors Parry, Hilton, Kapfhammer and McMinn, and drop the inference that clustering proves failures are "not random." The paper's own construct-validity note concedes random chance as a possible contributor.</p>
+    </li>
+    <li>
+      <p><b>The auto-retry argument.</b> Add the counter-case before the conclusion, or the post is refuted by its own footnotes.</p>
+      <div class="repl"><b>Insert before the closing paragraph</b>It is worth being honest about where this argument is weakest. The Munich team that produced the $5.67 figure drew the opposite conclusion from it: finding reruns negligibly cheap, they shifted effort away from investigation and toward automatic retries. Atlassian and Google both do the same. On unit cost alone they are right, and a defence of retry has to be answered rather than dismissed. The answer is not that retry is wrong but that it is unbounded. A team that retries without a stated ceiling has no way to notice when the quarantine has quietly become the test strategy. My own line would be 3% of the suite; above that, the retries are the problem.</div>
+    </li>
+    <li>
+      <p><b>Reference 1.</b> Replace "Parry, J. et al." with the actual authors.</p>
+      <div class="repl"><b>Replacement text</b>Leinen, F., Elsner, D., Pretschner, A., Stahlbauer, A., Sailer, M., and Juergens, E. "Cost of Flaky Tests in Continuous Integration: An Industrial Case Study." ICST 2024, pp. 329 to 340.</div>
+    </li>
+    <li>
+      <p><b>The cost ratio.</b> Fix the unit. The corrected number is far more striking than the one printed.</p>
+      <div class="repl"><b>Replacement text</b>manual investigation of a flaky pipeline failure costs $5.67 in developer time, against 0.02 cents for an automatic rerun. The gap is not a rounding difference; it is roughly four orders of magnitude.</div>
+    </li>
+    <li>
+      <p><b>The Google paragraph.</b> Restore the source's hedge, the date, and the base rate.</p>
+      <div class="repl"><b>Replacement text</b>Writing in 2016, Google's John Micco reported that about 84% of observed transitions from pass to fail involved a flaky test, against an underlying rate of roughly 1.5% of all test runs returning a flaky result. Involvement is not the same as causation, and Micco was explicit that the corrosive part runs both ways: real failures get dismissed as flakes because the false-positive rate is high enough to make dismissal rational. That figure is now a decade old and Google has not published an update, which is itself worth noting.</div>
+      <p style="margin-top:9px">Then cut "cries wolf 84% of the time." It does not survive the corrected reading.</p>
+    </li>
+    <li>
+      <p><b>The Atlassian paragraph.</b> Keep the hedge, and cut the Slack sentence entirely: it is invented.</p>
+      <div class="repl"><b>Replacement text</b>Atlassian reports that flaky tests have accounted for as much as 21% of master build failures in the Jira Frontend repository, and that reruns in the Jira backend repository waste over 150,000 hours of developer time a year. Both figures come from a 2025 engineering post describing how Atlassian built tooling to fix the problem, which is a useful corrective to the idea that nobody is trying.</div>
+    </li>
+    <li>
+      <p><b>Title fidelity.</b> The piece promises a ledger and delivers four unreconciled figures from four organisations at four different scales: one repository, one 30-developer project, one company-wide corpus, 22 open-source projects. Either build the ledger, normalising to cost per developer per year so the numbers can sit in one column, or retitle. The 3.75 developer-years figure is the one to lead with in the conclusion, since it holds regardless of the assumed work year, unlike the 6,600 hours.</p>
+    </li>
+    <li>
+      <p><b>Rubric calibration, for you rather than the post.</b> G5 fired on em dashes, which this post uses heavily. I inferred that rule from your own writing preference, and it is probably wrong for the blog: the house style targets The Economist, which uses em dashes freely. Recommend demoting G5 from a blocking gate to a craft-level style note, or scoping it to a house style sheet you define separately. I have left the gate in place pending your call rather than quietly changing the rubric mid-review.</p>
+    </li>
+  </ol>
+</section>
+
+<!-- 6 -->
+<section>
+  <h2>6. What is working</h2>
+  <ul class="works">
+    <li><b>Source selection.</b> Two research papers and two first-party engineering posts is a genuinely good evidence base. The failures here are all in handling, which is a fixable pipeline problem, not a sourcing one.</li>
+    <li><b>It went to Micco directly.</b> The Atlassian post garbles Google's finding as "16% of test failures were flaky." The article has the correct version, 16% of tests carrying some flakiness. Something in the pipeline preferred the primary source over the convenient one.</li>
+    <li><b>The opening.</b> Framing the dismissive engineer as making a statistically well-informed decision is the sharpest idea in the piece, and it is the seed of the better argument in section 4.</li>
+    <li><b>Honest rounding.</b> 283.5 was reported as 280-fold, rounding against the thesis rather than toward it. The inputs were wrong but the intellectual habit was right.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Machine-readable verdict</h2>
+<pre class="json">{
+  "verdict": "BLOCK",
+  "weighted_score": 41.0,
+  "gates": {
+    "G1": "fail", "G2": "fail", "G3": "fail", "G4": "fail",
+    "G5": "not_assessed_gate_misspecified"
+  },
+  "dimensions": {
+    "evidence": 2, "falsifiability": 1, "thesis": 2,
+    "actionability": 2, "voice": 3, "craft": 3
+  },
+  "blocking_findings": [
+    "G2: ICST 2024 source concluded in favour of auto-retry; post argues against it citing that source",
+    "G2/G4: 45% async-wait root cause attributed to arXiv 2504.16777, which reports networking and external dependencies and explicitly disputes the async finding",
+    "G3: rerun cost given as $0.02; source states 0.02 cents; ratio understated 100x",
+    "G4: reference 1 author 'Parry, J.' fabricated; actual authors Leinen et al.",
+    "G4: reference 5 title fabricated",
+    "G4: 'one in five emergency Slack notifications' inference invented",
+    "G2: Google 'involve a flaky test' rendered as 'caused by'; 2016 figure undated in body",
+    "G2: Atlassian 'as much as 21%, in the past' rendered as flat present-tense",
+    "G1: Microsoft 25-43% figure sourced to vendor blog, primary source not cited, UNVERIFIED",
+    "G1: 6,600 developer-hours is a derivation on an undisclosed 1,760-hour work year"
+  ],
+  "sources_checked": 5,
+  "sources_resolved": 5,
+  "reviewer_confidence_pct": 93
+}</pre>
+</section>
+
+<footer>
+  <span>blog-post-review v1.0 &nbsp;&middot;&nbsp; 41/100 &nbsp;&middot;&nbsp; BLOCK</span>
+  <span>All 5 cited sources fetched and read against the text</span>
+</footer>
+
+</div>
+</body>
+</html>

@@ -99,6 +99,58 @@ GitHub forbids self-approval, so every economist-agents PR shows
 That is a property of the blog's branch protection, not something we can fix
 here.
 
+## The post front-matter contract (measured 2026-07-25 by publishing a real article)
+
+**This is the section to read before touching generated front matter.** Publishing
+the first real article failed the blog's `validate-editorial` job **four separate
+times**, each on a rule our own `publication_validator` does not have. Our
+contract had only ever been written against *our* validator.
+
+`validate-editorial` runs **two** scripts — both must pass:
+
+### 1. `scripts/validate-posts.sh`
+
+| Rule | Requirement |
+|---|---|
+| Required fields | `layout`, `title`, `date`, `author`, `categories`, **`image`** |
+| **`tags`** | **≥ 2**, inline bracket form `tags: [a, b]`, **all lowercase-hyphen** (any uppercase = hard error). Block-style YAML is *not detected* and reads as missing |
+| `image` | must resolve to a real file under `assets/images/` |
+
+### 2. `scripts/validate-post-quality.sh` (ERROR = blocks, WARNING = advisory)
+
+| Rule | Requirement |
+|---|---|
+| **`subtitle`** | **required**; ≤ 60 words hard, ≤ 40 soft |
+| `categories` | each item must be one of exactly **"Quality Engineering", "Software Engineering", "Test Automation", "Security"** — and the parser splits on `", "`, so items **must be quoted**. An unquoted inline list is read as ONE category and fails |
+| **slug** | filename minus the `YYYY-MM-DD-` prefix, **≤ 60 chars hard** (≥ 55 warns). See the blog's `docs/URL_SLUG_POLICY.md` |
+| `image` | set, not `blog-default.svg`, file must exist |
+| `image_alt` / `image_caption` | both required, must be reader-facing, not generic |
+| `image_caption` | ≤ ~40 chars (**warning** — it renders as `figcaption.image-credit`) |
+| `description` | present, ≤ 160 chars |
+| `author` | must be exactly `Ouray Viney` |
+| body | no heading markers inside paragraph text |
+| advisory only | `## References` with ≥ 3 items, ≥ 800 words, ≥ 3 H2s, a data chart |
+
+### What the generator still does NOT emit (next article will fail)
+
+- **`subtitle`** — never emitted
+- **quoted** category items — we emit `[Quality Engineering, Test Automation]`
+- **slug ≤ 60** — ours derive from the full title (the flaky-tests slug was **76**).
+  Careful: this collides with **B-008**'s single-canonical-slug invariant, where one
+  slug feeds the article filename, chart PNG, chart embed, and prompt sidecar.
+
+Only `tags` was fixed generator-side (BUG-057). **Verify any change by running the
+blog's own scripts**, not by reading them:
+
+```bash
+bash scripts/validate-posts.sh
+bash scripts/validate-post-quality.sh --all   # exit 2 = warnings only, that's a pass
+```
+
+> **No redirects.** The blog has **no `jekyll-redirect-from`** and `_config.yml` is
+> an unbypassable protected file, so **renaming a published post 404s the old URL**
+> with no way to redirect. Get the slug right before publishing.
+
 ## The blog's own skills framework — `.github/skills/`
 
 oviney/blog carries a full local mirror of the agent-skills lifecycle plus

@@ -26,6 +26,37 @@ _(none)_
 
 ## Todo
 
+### B-019 · Align generated front matter with the blog's post contract (NEXT ARTICLE WILL FAIL WITHOUT THIS)
+
+**Highest-priority pipeline item.** Publishing the first real article failed the
+blog's `validate-editorial` job **four times**, each on a rule our own validator
+does not have. Full measured contract:
+`docs/blog-integration-constraints.md` → "The post front-matter contract".
+Only `tags` was fixed generator-side (BUG-057). Still unemitted:
+
+1. **`subtitle`** — required front matter (≤60 words hard, ≤40 soft). Not emitted
+   at all. Needs a Stage-3/Stage-4 source (derive from the description, or have the
+   writer produce it as a distinct field).
+2. **Quoted category items** — the blog's parser splits on `", "`, so our unquoted
+   `[Quality Engineering, Test Automation]` reads as ONE invalid category. One-line
+   fix in the frontmatter emitter, but needs a test asserting the quoted form.
+3. **Slug ≤ 60 chars** — ours derive from the full title; the flaky-tests slug was
+   **76**. **This is the careful one:** it collides with **B-008**'s
+   single-canonical-slug invariant, where one slug feeds the article filename, the
+   chart PNG, the chart embed, and the `.image_prompt.md` sidecar. A naive truncation
+   desynchronises them and reintroduces the class of bug B-008 closed. Needs a spec:
+   shorten at a word boundary, keep one derivation, and cover every consumer.
+4. Advisory but worth doing: `image_caption` ≤ ~40 chars (renders as
+   `figcaption.image-credit`).
+
+**No redirects exist** (no `jekyll-redirect-from`; `_config.yml` is protected), so a
+too-long slug cannot be fixed after publish without 404ing the live URL — the
+flaky-tests post had to be renamed. Get it right pre-publish.
+
+**Verify against the blog's own scripts, never by reading them:**
+`bash scripts/validate-posts.sh` and
+`bash scripts/validate-post-quality.sh --all` (exit 2 = warnings only = pass).
+
 ### B-016b · Generate the hero SVG automatically in Stage 3 (follow-on)
 
 **B-016a shipped the mechanism** (see Done) but the hero SVG for the flaky-tests

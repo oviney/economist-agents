@@ -242,6 +242,9 @@ class PublicationValidator:
         # Check 14: Image contract validation
         self._check_image_contract(article_content)
 
+        # Check 14b: empty image: value (BUG-055 — breaks the blog build)
+        self._check_empty_image_value(article_content)
+
         # Check 15: Heading structure validation
         self._check_heading_structure(article_content)
 
@@ -537,6 +540,42 @@ class PublicationValidator:
                 "message": f"Unfalsifiable superlative claim(s) ({len(found)})",
                 "details": "\n".join(found),
                 "fix": "Replace absolutes with a specific, verifiable comparison.",
+            },
+        )
+
+    def _check_empty_image_value(self, content: str) -> None:
+        """``image:`` present but empty is CRITICAL (BUG-055).
+
+        An absent ``image:`` is valid (chart-only, #403 "Path A"). An EMPTY one is
+        not: in Liquid only ``nil``/``false`` are falsy, so ``""`` satisfies the
+        blog's ``{% if page.image %}`` hero guard, ``responsive-image.html``
+        renders an ``<img>`` with no ``src``, and html-proofer fails the blog's
+        REQUIRED ``build`` check. Stage 4 omits the key, but an article generated
+        before that fix — or a writer that emits the key itself — can still carry
+        it, and the failure surfaces only in the blog's CI. This is the local gate
+        that BUG-055 lacked.
+        """
+        if not content.startswith("---"):
+            return
+        parts = content.split("---", 2)
+        if len(parts) < 2:
+            return
+        if not re.search(r"^image:[ \t]*(?:\"\"|''|)[ \t]*$", parts[1], re.MULTILINE):
+            return
+        self.issues.append(
+            {
+                "check": "empty_image_value",
+                "severity": "CRITICAL",
+                "message": "Frontmatter has an empty image: value",
+                "details": (
+                    "An empty image: is truthy in Liquid, so the blog renders a "
+                    "hero <img> with no src and html-proofer fails the required "
+                    "build check."
+                ),
+                "fix": (
+                    "Remove the image: line entirely to ship chart-only, or point "
+                    "it at a real hero PNG."
+                ),
             },
         )
 

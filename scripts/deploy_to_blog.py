@@ -302,7 +302,14 @@ def deploy(
     # leaving the working tree dirty after commit.  Re-stage and amend
     # so the loop terminates and the commit reflects formatted content.
     logger.info("Committing changes…")
-    run_command("git add .", cwd=blog_dir)
+    # Stage only the content paths this deploy writes. The blog gates every PR
+    # with ``scripts/check-pr-scope.sh``: Rule 1 fails on protected files
+    # (``_config.yml``, ``Gemfile``, ``.github/CODEOWNERS``, …), Rule 2 on >15
+    # files, Rule 3 on ``.github/skills|instructions/``. An unscoped
+    # ``git add .`` would stage whatever else happens to be dirty in the clone,
+    # so "an article PR touches only _posts/ + assets/" must hold by
+    # construction, not by luck (B-015). Mirrors ``deploy_review()``.
+    run_command("git add _posts assets", cwd=blog_dir)
 
     commit_msg = f"content: Add generated article {article_name}"
     try:

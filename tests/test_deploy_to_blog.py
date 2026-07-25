@@ -560,3 +560,81 @@ def test_find_latest_article_falls_back_to_output_posts(
     article.write_text(_make_article())
 
     assert dtb.find_latest_article() == Path("output/posts/newest.md")
+
+
+# ---------------------------------------------------------------------------
+# B-015: the PR footprint must stay inside the blog's governance-safe zone
+# ---------------------------------------------------------------------------
+
+
+class TestGovernanceSafeStaging:
+    """``oviney/blog`` gates every PR with ``scripts/check-pr-scope.sh``, whose
+    Rule 1 fails any PR touching a protected file (``_config.yml``, ``Gemfile``,
+    ``.github/CODEOWNERS``, …) and Rule 3 any PR touching
+    ``.github/skills|instructions/``. An unscoped ``git add .`` stages whatever
+    happens to be dirty in the clone, so the guarantee "an article PR touches
+    only ``_posts/`` + ``assets/``" would hold by luck rather than by
+    construction. Stage the content paths explicitly — the same discipline
+    ``deploy_review()`` already applies (B-013).
+    """
+
+    @pytest.fixture
+    def article_file(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+        monkeypatch.chdir(tmp_path)
+        p = tmp_path / "2026-01-15-governance-article.md"
+        p.write_text(_make_article(date="2026-01-15"))
+        return p
+
+    def _setup_clone(self) -> Path:
+        blog = Path("temp_blog_repo")
+        blog.mkdir(exist_ok=True)
+        (blog / "_posts").mkdir(exist_ok=True)
+        (blog / "assets" / "charts").mkdir(parents=True, exist_ok=True)
+        (blog / "assets" / "images").mkdir(parents=True, exist_ok=True)
+        return blog
+
+    def _run(self, article_file: Path) -> list[str]:
+        commands: list[str] = []
+
+        def fake_run_command(cmd: str, cwd=None) -> str:
+            commands.append(cmd)
+            if cmd.startswith("git clone"):
+                self._setup_clone()
+            return ""
+
+        with (
+            patch.object(dtb, "run_command", side_effect=fake_run_command),
+            patch(
+                "scripts.deploy_to_blog.validate_file",
+                return_value=(True, "ok"),
+            ),
+        ):
+            dtb.deploy(
+                article_path=article_file,
+                blog_owner="o",
+                blog_repo="r",
+                token="t",
+            )
+        return commands
+
+    def test_staging_is_scoped_to_content_paths(self, article_file: Path) -> None:
+        commands = self._run(article_file)
+        adds = [c for c in commands if c.startswith("git add")]
+        assert adds, "expected the deploy to stage something"
+        # An unscoped `git add .` sweeps in anything dirty in the clone, which
+        # can trip the blog's protected-file / scope-explosion rules.
+        assert not any(c.strip() == "git add ." for c in adds), (
+            f"unscoped 'git add .' would stage out-of-scope files; got {adds}"
+        )
+
+    def test_staged_paths_are_only_posts_and_assets(self, article_file: Path) -> None:
+        commands = self._run(article_file)
+        initial_add = next(
+            c for c in commands if c.startswith("git add") and c != "git add -u"
+        )
+        targets = initial_add.removeprefix("git add").split()
+        assert targets, "expected explicit paths, not a bare add"
+        for target in targets:
+            assert target in {"_posts", "assets"}, (
+                f"'{target}' is outside the governance-safe zone (_posts, assets)"
+            )

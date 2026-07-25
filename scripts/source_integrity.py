@@ -271,6 +271,31 @@ def _resolved_surnames(authors: list[str]) -> set[str]:
 # ---------------------------------------------------------------------------
 
 
+def fetch_references(
+    references: list[Reference],
+    *,
+    fetch_fn: FetchFn | None = None,
+) -> dict[int, str]:
+    """Fetch each reference's page, keyed by reference index.
+
+    Exposed so the stance check (B-022) can read what a source actually says
+    without fetching it a second time. A reference that could not be fetched is
+    simply absent from the mapping — callers must treat absence as UNRESOLVED,
+    never as a pass.
+    """
+    fetch = fetch_fn or _default_fetch
+    pages: dict[int, str] = {}
+    for ref in references:
+        try:
+            page = fetch(ref.url)
+        except Exception as exc:  # noqa: BLE001 - any failure is UNRESOLVED
+            logger.warning("Fetch raised for %s: %s", ref.url, exc)
+            page = None
+        if page is not None:
+            pages[ref.index] = page
+    return pages
+
+
 def check_reference_integrity(
     article: str,
     *,
@@ -282,20 +307,16 @@ def check_reference_integrity(
     could not be fetched, or whose page carries no usable metadata, yields
     ``UNRESOLVED`` — never ``PASS``.
     """
-    fetch = fetch_fn or _default_fetch
     references = parse_references(article)
     if not references:
         return []
 
+    pages = fetch_references(references, fetch_fn=fetch_fn)
     resolved: dict[int, ResolvedDoc] = {}
     findings: list[Finding] = []
 
     for ref in references:
-        try:
-            page = fetch(ref.url)
-        except Exception as exc:  # noqa: BLE001 - any failure is UNRESOLVED
-            logger.warning("Fetch raised for %s: %s", ref.url, exc)
-            page = None
+        page = pages.get(ref.index)
 
         if page is None:
             findings.append(

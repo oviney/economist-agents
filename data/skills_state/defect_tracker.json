@@ -942,67 +942,77 @@
     {
       "id": "BUG-058",
       "severity": "CRITICAL",
-      "status": "open",
+      "status": "gated",
       "reported_date": "2026-07-25",
       "title": "Citation metadata fabricated and cross-contaminated between sources",
       "description": "In the first published article, reference 1 was credited to 'Parry, J. et al.' when its actual authors are Leinen, Elsner, Pretschner, Stahlbauer, Sailer and Juergens. 'Parry' is the first author of reference 5. Reference 5 in turn carried an invented title, 'Empirical Study of Flaky Test Co-Failure Groups in 22 Java Projects', instead of its real title 'Systemic Flakiness: An Empirical Analysis of Co-Occurring Flaky Test Failures'. Author identity migrated from one reference to another and a title was synthesised to look plausible.",
       "evidence": "data/review_corpus/2026-07-24-green-light-red-ledger/ (review.html, verdict.json). Both fabrications independently confirmed against the primary sources before correction.",
       "root_cause": "Citation records are not bound to their source at extraction time. Author, title and URL are re-associated downstream, so a name harvested from one source can be attached to another. No gate resolves a reference URL and compares its real metadata against the emitted reference line.",
-      "resolution": "Open. Fix is B-020 (citation-integrity gate: fetch each reference URL, extract title and authors, assert they match the reference line). Keyless and deterministic.",
+      "resolution": "Detected before publication by B-020. scripts/source_integrity.py resolves every reference and compares printed title/authors against the document at that URL; reference_author_bleed names the reference a stray surname actually belongs to. Wired into run_pipeline. 20 regression tests, corpus case as fixture.",
       "impact": "Published fabricated bibliographic detail under a real byline. Passed every deterministic gate: the evidence check counts references, it never resolves them.",
-      "is_production_escape": true
+      "is_production_escape": true,
+      "gated_date": "2026-07-25",
+      "residual_risk": "The gate flags; it does not prevent generation. An article can still be written with this defect \u2014 it can no longer reach publication unnoticed."
     },
     {
       "id": "BUG-059",
       "severity": "CRITICAL",
-      "status": "open",
+      "status": "gated",
       "reported_date": "2026-07-25",
       "title": "Statistics bound to the wrong claim and stripped of units in the research brief",
       "description": "Two distinct manifestations of one root cause. (1) The article claimed '45% of flakiness traces to asynchronous wait errors', citing a paper that reports no such figure; 45% appears in that paper as the share of PROJECTS containing at least one cluster. A proportion of projects became a proportion of root causes. (2) The source states an automatic rerun costs '0.02 cents'; the article rendered it '$0.02', a 100x error that propagated into a stated '280-fold gap' where the true ratio is roughly four orders of magnitude.",
       "evidence": "data/review_corpus/2026-07-24-green-light-red-ledger/verdict.json. Both confirmed against the primary sources.",
       "root_cause": "The research brief stores numeric VALUES stripped of their provenance, their unit and the sentence that produced them. Stage 3 re-associates a bare number with whatever claim it is writing. The existing stat audit asserts stat IN research_brief; it has never asserted that the brief entry is true, correctly scoped, or correctly united. This is a specification defect, not an implementation bug: the gate is doing exactly what it was specified to do.",
-      "resolution": "Open. Fix is B-021 (every statistic carries a pointer to the exact source sentence plus an explicit unit; Stage 4 asserts the pointer resolves and the unit survives).",
+      "resolution": "Detected before publication by B-021. scripts/claim_provenance.py checks unit preservation, number scope and unsourced figures. Root cause fixed at source: Stage3Result kept only research_brief_chars and discarded the brief, so no downstream stage could check a figure against it; research_brief is now carried through. 13 regression tests.",
       "impact": "Published a fabricated headline statistic that carried the article's only actionable recommendation, and a cost ratio wrong by 100x. The unit error ran AGAINST the article's own argument, so no prose instinct flagged it.",
-      "is_production_escape": true
+      "is_production_escape": true,
+      "gated_date": "2026-07-25",
+      "residual_risk": "The gate flags; it does not prevent generation. An article can still be written with this defect \u2014 it can no longer reach publication unnoticed."
     },
     {
       "id": "BUG-060",
       "severity": "HIGH",
-      "status": "open",
+      "status": "gated",
       "reported_date": "2026-07-25",
       "title": "Article thesis directly contradicted by its own primary source",
       "description": "The article used the ICST 2024 cost figures to argue that auto-retry is 'an anaesthetic, not a cure'. The authors of that paper ran exactly that comparison and concluded the opposite, recommending that effort shift TOWARD automatic reruns. Atlassian and Google, the other two cited organisations, also adopted retry-based strategies. A reader following any citation would find it arguing against the paragraph citing it.",
       "evidence": "data/review_corpus/2026-07-24-green-light-red-ledger/review.html section 4. Confirmed against the primary source.",
       "root_cause": "No stage compares the STANCE of a source against the use the article makes of it. Sources are mined for extractable numbers; their conclusions are never read. Nothing in the pipeline can detect citing a paper in support of the position it refutes.",
-      "resolution": "Open. Fix is B-022 (adversarial source-conflict review stage, keyless via query(): for each citation, does the source's own conclusion support, contradict or not bear on the sentence citing it).",
+      "resolution": "Detected before publication by B-022. scripts/source_stance.py classifies each source as SUPPORTS / CONTRADICTS / DOES_NOT_BEAR_ON via query() on the subscription, reusing pages already fetched for B-020. 13 regression tests.",
       "impact": "The most damaging single finding. It is the difference between an article that has read its sources and one that has mined them for numbers.",
-      "is_production_escape": true
+      "is_production_escape": true,
+      "gated_date": "2026-07-25",
+      "residual_risk": "The gate flags; it does not prevent generation. An article can still be written with this defect \u2014 it can no longer reach publication unnoticed."
     },
     {
       "id": "BUG-061",
       "severity": "HIGH",
-      "status": "open",
+      "status": "gated",
       "reported_date": "2026-07-25",
       "title": "Chart series fabricated by arithmetic derivation from an unrelated figure",
       "description": "The published chart plotted 'Google: genuine defects 16%' and 'Jira Frontend: genuine defects 79%'. Neither figure appears in either source; both were produced by subtracting the flaky-test share from 100. The 16% additionally collided with a real but unrelated Google figure (the share of tests carrying some flakiness), which made an invented number look corroborated. The chart title, 'A Red Build Is Probably Lying', asserted the causal reading the sources do not support.",
       "evidence": "assets/charts/green-light-red-ledger-flaky-tests-engineering-budget.png in oviney/blog before removal in commit b1eb5fd. Not caught by the external prose review either; found by reading the rendered PNG.",
       "root_cause": "Chart data has no provenance requirement. A series may be computed from another series and rendered without any assertion that the derived quantity is stated by a source or is even meaningful. 100 minus a flaky-involvement rate is not a defect rate.",
-      "resolution": "Open. Fix is B-023 (no chart series without a source pointer; derived series must be explicitly declared and justified).",
+      "resolution": "Detected before publication by B-023. scripts/chart_provenance.py rejects plotted values absent from the brief and undeclared complements (100 - other series). Fires even when the value is present in the brief, because the invented 16% collided with a real unrelated figure. 8 regression tests.",
       "impact": "The visual asserted the article's strongest false claim more baldly than the prose did, and was publicly reachable at a stable asset URL. Chart removed rather than rebuilt: inventing a replacement dataset under time pressure is the failure mode being fixed.",
-      "is_production_escape": true
+      "is_production_escape": true,
+      "gated_date": "2026-07-25",
+      "residual_risk": "The gate flags; it does not prevent generation. An article can still be written with this defect \u2014 it can no longer reach publication unnoticed."
     },
     {
       "id": "BUG-062",
       "severity": "MEDIUM",
-      "status": "open",
+      "status": "gated",
       "reported_date": "2026-07-25",
       "title": "Hero-image prompt comment leaked verbatim into the published post body",
       "description": "The published markdown carried the full '<!-- HERO IMAGE - generate an image from the prompt below... -->' scaffolding block, including the raw generation prompt, palette and aspect-ratio instructions, even though frontmatter already pointed at a real generated SVG hero. The placeholder is emitted unconditionally and is never stripped once a hero exists.",
       "evidence": "_posts/2026-07-24-green-light-red-ledger-flaky-tests-invisible-tax.md lines 15-26 as published; removed in oviney/blog commit b1eb5fd.",
       "root_cause": "B-016 added SVG hero generation but the placeholder comment emitter was left in place; the two paths are unaware of each other. Invisible to readers, so no gate and no human review flagged it.",
-      "resolution": "Open. Strip the placeholder whenever image: resolves to a real asset; regression test asserting no '<!-- HERO IMAGE' survives finalisation.",
+      "resolution": "Detected before publication by B-023. _inject_hero_prompt_comment is a no-op when a real hero exists; _strip_hero_prompt_comment wired into both finalisation paths. 7 regression tests.",
       "impact": "Pipeline internals shipped in published content. Cosmetic in this instance, but it is the same class as any prompt or scaffolding leak.",
-      "is_production_escape": true
+      "is_production_escape": true,
+      "gated_date": "2026-07-25",
+      "residual_risk": "The gate flags; it does not prevent generation. An article can still be written with this defect \u2014 it can no longer reach publication unnoticed."
     }
   ],
   "summary": {

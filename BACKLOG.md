@@ -26,77 +26,19 @@ _(none)_
 
 ## Todo
 
-> **Priority note (2026-07-25).** B-020 → B-023 outrank B-019. B-019 describes
-> failures that are caught *loudly, at a gate, before publication* — which is the
-> cheap and safe kind. B-020–B-023 describe a failure that passed **every**
-> deterministic gate and reached readers: the first published article carried six
-> factual errors and two fabricated citations (BUG-058 → BUG-062, corrected in
-> `oviney/blog` b1eb5fd). The backlog had been ordered by what breaks the build
-> rather than by what breaks the reader. Fix that ordering first.
+> **Priority note (2026-07-25, updated).** B-020 → B-023 are **done** — the four
+> source-integrity gates are built, tested and wired into `run_pipeline`. B-019
+> is now the top Todo item again.
 >
-> Root cause shared by B-020/B-021: **the research brief stores values stripped of
-> provenance**, and Stage 3 re-associates them late. Author bleed, unit loss,
-> number-to-claim mismatch and stance inversion are four symptoms of that one
-> architectural choice.
+> Why they jumped the queue: B-019 describes failures caught *loudly, at a gate,
+> before publication* — the cheap and safe kind. B-020–B-023 described a failure
+> that passed **every** deterministic gate and reached readers. The backlog had
+> been ordered by what breaks the build rather than by what breaks the reader.
 >
-> Evidence corpus: `data/review_corpus/2026-07-24-green-light-red-ledger/`.
-
-### B-020 · Citation-integrity gate — resolve every reference and match its metadata
-
-**Highest-priority pipeline item.** Fixes BUG-058. For each entry in the
-References section: fetch the URL, extract the real title and author list, and
-assert they match what the article emitted. Fail the article if they do not.
-
-- Deterministic, keyless, no LLM — satisfies constraints #1–#3.
-- Would have caught both fabrications mechanically: a title that does not exist
-  at the cited URL, and an author lifted from a different reference.
-- Regression fixtures already exist in `data/review_corpus/`: reference 1
-  (`Parry, J. et al.` → Leinen et al.) and reference 5 (invented title).
-- Note the existing evidence check *counts* references; it has never *resolved*
-  one. Counting is not verification.
-
-### B-021 · Claim provenance — every statistic carries its source sentence and unit
-
-Fixes BUG-059. A number in the research brief must carry (a) a pointer to the
-exact source sentence it came from and (b) an explicit unit. Stage 4 asserts the
-pointer resolves and that the unit survives into the prose.
-
-- Catches the `0.02 cents → $0.02` class (unit dropped in transit).
-- Catches the `45% of projects → 45% of root causes` class (number re-scoped to a
-  claim it does not support).
-- **The existing stat audit is not a substitute and never was.** It asserts
-  `stat ∈ research_brief`. It has never asserted that the brief entry is true,
-  correctly scoped, or correctly united — so it passed a fabricated headline
-  statistic while working exactly as specified. This is a spec defect to correct,
-  not a bug to patch.
-
-### B-022 · Source-stance check — does the source support the sentence citing it?
-
-Fixes BUG-060. For each citation, classify whether the source's own conclusion
-**supports**, **contradicts**, or **does not bear on** the sentence that cites it.
-Flag contradictions before publication.
-
-- Keyless via `query()` on the subscription (constraint #3).
-- The published article argued auto-retry is "an anaesthetic" while citing a paper
-  whose authors concluded the opposite and shifted toward automatic reruns. No
-  deterministic gate can catch this; it needs a stage that reads conclusions
-  rather than mining numbers.
-- Depends on B-020 (a resolved citation is a precondition for reading its stance).
-
-### B-023 · Chart data provenance — no derived series without a declared source
-
-Fixes BUG-061. A chart series must point at a source figure. A series computed
-from another series must be explicitly declared as derived and justified.
-
-- The published chart plotted "genuine defects" shares of 16% and 79%, both
-  produced by subtracting the flaky share from 100. Neither appears in any source,
-  and the 16% collided with an unrelated real Google figure, making an invented
-  number look corroborated.
-- Also covers **BUG-062** (hero-prompt comment leaking into the published body):
-  strip the `<!-- HERO IMAGE` placeholder whenever `image:` resolves to a real
-  asset, with a regression test asserting none survives finalisation.
-- Constraint #4 already says *always look at the rendered result*. That is what
-  found this defect; the prose review missed it. Make it a gate, not a habit.
+> **What is closed and what is not.** The gates *detect*; they do not *prevent*.
+> An article can still be written with a fabricated citation — it can no longer
+> reach publication unnoticed. Defects BUG-058→062 are marked `gated`, not
+> `fixed`, for exactly that reason.
 
 ### B-019 · Align generated front matter with the blog's post contract (NEXT ARTICLE WILL FAIL WITHOUT THIS)
 
@@ -202,6 +144,48 @@ researcher would ship — but one topic cost ~102 agents / ~2M tokens / ~15 min 
 brief) lives at `docs/research/ai-productivity-brief.md`.
 
 ## Done
+
+### B-020 → B-023 · Source-integrity gates — 2026-07-25
+
+The first published article passed every deterministic gate carrying six factual
+errors and two fabricated citations. Four gates now close that class. Spec:
+`docs/specs/B-020-source-integrity-gates.md`. Corpus: `data/review_corpus/`.
+
+| Item | Module | Catches |
+|------|--------|---------|
+| B-020 | `scripts/source_integrity.py` | references that do not exist as printed; a surname that belongs to a *different* reference (BUG-058) |
+| B-021 | `scripts/claim_provenance.py` | a figure that changed unit (`0.02 cents` → `$0.02`) or subject (45% of projects → 45% of root causes) (BUG-059) |
+| B-022 | `scripts/source_stance.py` | a source cited in support of the position it refutes (BUG-060) |
+| B-023 | `scripts/chart_provenance.py` | plotted values absent from the brief, and undeclared complements (BUG-061); hero-prompt scaffolding leaks (BUG-062) |
+
+**The finding that reframed the work.** `scripts/citation_verifier.py` already
+existed, with tests. It did not help for three reasons, and all three shaped the
+design:
+
+1. It is imported only by `agents/research_agent.py` — the legacy paid path. The
+   keyless pipeline never called it. The published article went through a path
+   with *zero* citation verification.
+2. It verifies whether a *statistic* appears in the source text. It never checks
+   whether the *reference* is real. Both fabrications were reference-metadata
+   errors, invisible to it.
+3. It fails open: `if page_text is None: continue`. Since arXiv 403s datacentre
+   fetches, a wired-in version would have passed the fabrications by default.
+
+So every gate here treats **UNRESOLVED as a first-class verdict**, never folded
+into PASS. A green signal from a check that never ran is worse than no check.
+
+**Root cause fixed at source.** `Stage3Result` kept `research_brief_chars` — the
+*length* of the brief — and discarded the brief itself. Downstream stages had no
+way to check a figure against its source. `research_brief` is now carried
+through; that one field is what made B-021 and B-023 possible.
+
+Hermeticity: `ECON_AGENTS_OFFLINE`, set by the existing conftest fixture
+(B-011 / ADR-0015), forces the offline path so the suite never reaches the
+network — and offline yields UNRESOLVED, never PASS.
+
+Verified: 61 new tests; 2260 passed / 4 failed (the same 4 that fail on a clean
+tree, confirmed by stashing); ruff clean.
+
 
 ### 🎉 FIRST ARTICLE PUBLISHED END-TO-END — 2026-07-25
 

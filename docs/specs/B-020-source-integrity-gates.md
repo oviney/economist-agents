@@ -1,6 +1,14 @@
 # B-020 → B-023 · Source-integrity gates
 
-**Status:** spec
+**Status:** implemented (2026-07-25) — B-020, B-021, B-022, B-023 all shipped
+and wired into `run_pipeline`. 61 regression tests.
+
+> **Correction to this spec.** It claimed cross-reference contamination was
+> "detectable offline". It is not. Deciding that a surname printed on reference
+> *i* belongs to reference *j* requires *i*'s resolved metadata to know the name
+> is stray. The check was therefore implemented post-resolution. It is stronger
+> than planned — it names the reference the surname migrated from — but it is
+> not free, and the spec was wrong to say it was.
 **Date:** 2026-07-25
 **Defects:** BUG-058, BUG-059, BUG-060, BUG-061, BUG-062
 **Evidence:** `data/review_corpus/2026-07-24-green-light-red-ledger/`

@@ -22,7 +22,13 @@ import orjson
 
 from scripts.chart_provenance import check_chart_provenance
 from scripts.claim_provenance import check_claim_provenance
-from scripts.source_integrity import check_reference_integrity, summarise
+from scripts.source_integrity import (
+    check_reference_integrity,
+    fetch_references,
+    parse_references,
+    summarise,
+)
+from scripts.source_stance import Citation, check_source_stance
 from src.agent_sdk._shared import (
     SearchProvidersEmptyError,
     SearchProvidersFailedError,
@@ -150,6 +156,44 @@ def _log_claim_findings(findings: list) -> None:
         )
 
 
+_STANCE_SOURCE_CHARS = 6000
+_STANCE_CLAIM_CHARS = 4000
+
+
+def _check_stances(article: str) -> list:
+    """Ask whether each cited source supports the article that cites it (B-022).
+
+    Reuses the pages already fetched for B-020 rather than fetching twice. A
+    reference that could not be read is skipped here and already reported
+    UNRESOLVED by the reference-integrity gate, so silence is never mistaken
+    for a pass.
+    """
+    references = parse_references(article)
+    if not references:
+        return []
+    pages = fetch_references(references)
+    if not pages:
+        logger.warning(
+            "No source could be read — stance of %d citation(s) is UNVERIFIED.",
+            len(references),
+        )
+        return []
+
+    body = article.split("---", 2)[-1][:_STANCE_CLAIM_CHARS]
+    citations = [
+        Citation(
+            index=ref.index,
+            title=ref.title,
+            url=ref.url,
+            claim=body,
+            source_text=pages[ref.index][:_STANCE_SOURCE_CHARS],
+        )
+        for ref in references
+        if ref.index in pages
+    ]
+    return check_source_stance(citations)
+
+
 def load_brief_file(path: str | Path) -> str:
     """Load an opt-in deep-research brief for the writer, EXCLUDING refuted claims.
 
@@ -242,6 +286,15 @@ async def run_pipeline(
         if finding.verdict == "FAIL":
             logger.error("Chart provenance FAIL: %s", finding.message)
 
+    # B-022: the only gate here that needs the model. Every figure in the
+    # paragraph that shipped was transcribed correctly; the paper it cited had
+    # concluded the opposite. Number-matching cannot see that — you have to read
+    # what the source concluded.
+    stance_findings = _check_stances(final_article)
+    for finding in stance_findings:
+        if finding.verdict == "FAIL":
+            logger.error("Source stance FAIL: %s", finding.message)
+
     result = PipelineResult(
         topic=topic,
         article=final_article,
@@ -286,6 +339,15 @@ async def run_pipeline(
                 "message": f.message,
             }
             for f in chart_findings
+        ]
+        + [
+            {
+                "check": f.check,
+                "verdict": f.verdict,
+                "reference": str(f.reference_index),
+                "message": f.message,
+            }
+            for f in stance_findings
         ],
     )
     wall_seconds = result.stage3_seconds + result.stage4_seconds

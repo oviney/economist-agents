@@ -3059,6 +3059,56 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#the-post-front-matter-contract-measured-2026-07-25-by-publishing-a-real-article" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The post front-matter contract (measured 2026-07-25 by publishing a real article)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The post front-matter contract (measured 2026-07-25 by publishing a real article)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-scriptsvalidate-postssh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. scripts/validate-posts.sh
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-scriptsvalidate-post-qualitysh-error-blocks-warning-advisory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. scripts/validate-post-quality.sh (ERROR = blocks, WARNING = advisory)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-the-generator-still-does-not-emit-next-article-will-fail" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What the generator still does NOT emit (next article will fail)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#the-blogs-own-skills-framework-githubskills" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3211,6 +3261,104 @@ GitHub forbids self-approval, so every economist-agents PR shows
 <code>REVIEW_REQUIRED</code> and needs the owner's web-UI bypass (or a second reviewer).
 That is a property of the blog's branch protection, not something we can fix
 here.</p>
+<h2 id="the-post-front-matter-contract-measured-2026-07-25-by-publishing-a-real-article">The post front-matter contract (measured 2026-07-25 by publishing a real article)<a class="headerlink" href="#the-post-front-matter-contract-measured-2026-07-25-by-publishing-a-real-article" title="Permanent link">&para;</a></h2>
+<p><strong>This is the section to read before touching generated front matter.</strong> Publishing
+the first real article failed the blog's <code>validate-editorial</code> job <strong>four separate
+times</strong>, each on a rule our own <code>publication_validator</code> does not have. Our
+contract had only ever been written against <em>our</em> validator.</p>
+<p><code>validate-editorial</code> runs <strong>two</strong> scripts — both must pass:</p>
+<h3 id="1-scriptsvalidate-postssh">1. <code>scripts/validate-posts.sh</code><a class="headerlink" href="#1-scriptsvalidate-postssh" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Required fields</td>
+<td><code>layout</code>, <code>title</code>, <code>date</code>, <code>author</code>, <code>categories</code>, <strong><code>image</code></strong></td>
+</tr>
+<tr>
+<td><strong><code>tags</code></strong></td>
+<td><strong>≥ 2</strong>, inline bracket form <code>tags: [a, b]</code>, <strong>all lowercase-hyphen</strong> (any uppercase = hard error). Block-style YAML is <em>not detected</em> and reads as missing</td>
+</tr>
+<tr>
+<td><code>image</code></td>
+<td>must resolve to a real file under <code>assets/images/</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-scriptsvalidate-post-qualitysh-error-blocks-warning-advisory">2. <code>scripts/validate-post-quality.sh</code> (ERROR = blocks, WARNING = advisory)<a class="headerlink" href="#2-scriptsvalidate-post-qualitysh-error-blocks-warning-advisory" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>subtitle</code></strong></td>
+<td><strong>required</strong>; ≤ 60 words hard, ≤ 40 soft</td>
+</tr>
+<tr>
+<td><code>categories</code></td>
+<td>each item must be one of exactly <strong>"Quality Engineering", "Software Engineering", "Test Automation", "Security"</strong> — and the parser splits on <code>", "</code>, so items <strong>must be quoted</strong>. An unquoted inline list is read as ONE category and fails</td>
+</tr>
+<tr>
+<td><strong>slug</strong></td>
+<td>filename minus the <code>YYYY-MM-DD-</code> prefix, <strong>≤ 60 chars hard</strong> (≥ 55 warns). See the blog's <code>docs/URL_SLUG_POLICY.md</code></td>
+</tr>
+<tr>
+<td><code>image</code></td>
+<td>set, not <code>blog-default.svg</code>, file must exist</td>
+</tr>
+<tr>
+<td><code>image_alt</code> / <code>image_caption</code></td>
+<td>both required, must be reader-facing, not generic</td>
+</tr>
+<tr>
+<td><code>image_caption</code></td>
+<td>≤ ~40 chars (<strong>warning</strong> — it renders as <code>figcaption.image-credit</code>)</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>present, ≤ 160 chars</td>
+</tr>
+<tr>
+<td><code>author</code></td>
+<td>must be exactly <code>Ouray Viney</code></td>
+</tr>
+<tr>
+<td>body</td>
+<td>no heading markers inside paragraph text</td>
+</tr>
+<tr>
+<td>advisory only</td>
+<td><code>## References</code> with ≥ 3 items, ≥ 800 words, ≥ 3 H2s, a data chart</td>
+</tr>
+</tbody>
+</table>
+<h3 id="what-the-generator-still-does-not-emit-next-article-will-fail">What the generator still does NOT emit (next article will fail)<a class="headerlink" href="#what-the-generator-still-does-not-emit-next-article-will-fail" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong><code>subtitle</code></strong> — never emitted</li>
+<li><strong>quoted</strong> category items — we emit <code>[Quality Engineering, Test Automation]</code></li>
+<li><strong>slug ≤ 60</strong> — ours derive from the full title (the flaky-tests slug was <strong>76</strong>).
+  Careful: this collides with <strong>B-008</strong>'s single-canonical-slug invariant, where one
+  slug feeds the article filename, chart PNG, chart embed, and prompt sidecar.</li>
+</ul>
+<p>Only <code>tags</code> was fixed generator-side (BUG-057). <strong>Verify any change by running the
+blog's own scripts</strong>, not by reading them:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>bash<span class="w"> </span>scripts/validate-posts.sh
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>bash<span class="w"> </span>scripts/validate-post-quality.sh<span class="w"> </span>--all<span class="w">   </span><span class="c1"># exit 2 = warnings only, that&#39;s a pass</span>
+</code></pre></div>
+<blockquote>
+<p><strong>No redirects.</strong> The blog has <strong>no <code>jekyll-redirect-from</code></strong> and <code>_config.yml</code> is
+an unbypassable protected file, so <strong>renaming a published post 404s the old URL</strong>
+with no way to redirect. Get the slug right before publishing.</p>
+</blockquote>
 <h2 id="the-blogs-own-skills-framework-githubskills">The blog's own skills framework — <code>.github/skills/</code><a class="headerlink" href="#the-blogs-own-skills-framework-githubskills" title="Permanent link">&para;</a></h2>
 <p>oviney/blog carries a full local mirror of the agent-skills lifecycle plus
 blog-specific skills: <code>jekyll-development</code>, <code>jekyll-qa</code>, <code>economist-theme</code>,

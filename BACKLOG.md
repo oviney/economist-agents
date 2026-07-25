@@ -26,18 +26,17 @@ _(none)_
 
 ## Todo
 
-### B-016 · Claude-generated visuals: hero image + all post figures (BUG-053)
+### B-016b · Generate the hero SVG automatically in Stage 3 (follow-on)
 
-Owner wants Claude's own visualization to produce the **hero image** and **all
-charts/images** a post needs — today the pipeline only draws one data chart
-(matplotlib) and emits a hero-image *prompt* for a human. **BLOCKED ON AN OWNER
-DECISION:** this reverses CLAUDE.md constraint #4 (NON-NEGOTIABLE — no pipeline
-hero-image generation, "not even procedural/PIL"), which exists to honour #1 (no
-keyed image services). Keyless-compatible interpretations to choose among:
-(i) extend keyless code-drawn charts to multiple figures per post; (ii) a
-Claude-authored **SVG/code hero illustration** (keyless, but currently banned by
-#4); (iii) true raster AI hero art (needs a keyed/paid image model → blocked by
-#1/#2). Owner amends #4 + picks scope, then spec it. See BUG-053.
+**B-016a shipped the mechanism** (see Done) but the hero SVG for the flaky-tests
+article was **hand-authored by Claude in-session**, not produced by the pipeline.
+To make this repeatable, Stage 3 needs a graphics step that asks Claude to author
+`output/posts/images/<slug>-hero.svg` from the existing `compose_prompt` brief,
+plus a deterministic gate (well-formed XML, `viewBox`, `<title>`/`<desc>`
+present, no `<text>` glyphs, no external `href`, size ceiling) and a
+render-and-look check. Also unresolved: **multiple figures per post** — the
+owner's ask included "any charts or images the post requires", and today the
+pipeline still draws exactly one chart. Not yet spec'd.
 
 ### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
 
@@ -89,6 +88,45 @@ researcher would ship — but one topic cost ~102 agents / ~2M tokens / ~15 min 
 brief) lives at `docs/research/ai-productivity-brief.md`.
 
 ## Done
+
+### B-016a · Claude-authored hero illustrations ship end-to-end; constraint #4 amended — 2026-07-25
+
+Owner amended **constraint #4** (was NON-NEGOTIABLE, recorded in CLAUDE.md rather
+than changed silently). New line: **visuals are drawn as CODE, never generated as
+pixels.** Allowed — Claude hand-authors the hero as **SVG** + charts via
+`chart_renderer.py`, both keyless on the subscription (#1–#3 unchanged).
+Forbidden — any raster/pixel model (DALL-E, Imagen, Midjourney, SD) and
+procedural/PIL. Claude has **no keyless raster model**, so photographic art still
+cannot be done keyless; the hero-prompt sidecar is retained as the brief Claude
+draws from and as the manual-supply escape hatch.
+
+**Hero shipping had never been wired** — `deploy()` copied only
+`output/posts/images/<slug>.png` (an SVG hero was silently skipped → broken
+`<img>`), and `deploy_review()` copied **no hero at all**, so a review draft could
+never show the illustration it exists to review. Now frontmatter-driven:
+`_hero_asset_ref()` + `_copy_hero_asset()`, wired into both paths,
+`assets/images` staged. The **webp asymmetry is load-bearing**: the blog's
+`responsive-image.html` does `replace: '.png','.webp'` and emits a
+`<source srcset>` html-proofer demands, so a PNG hero needs the sibling and an SVG
+hero takes the plain `<img>` branch and needs none — SVG is both the keyless path
+and the lower-friction one. Tests: `tests/test_deploy_hero_asset.py` (8).
+
+**Verified live** on draft `…-f40e8d27`: `hero.svg` serves 200 `image/svg+xml`,
+renders in-theme with its figcaption, leak test still 10/10.
+
+**Also fixed the article's chart, which was unshippable.** Five of six bars were
+**invisible** (percentages 84/21/2.5/1.3/1.1 sharing one axis with a raw 150,000
+count) and that count was labelled **"150000 %"** — a stale artifact from *before*
+B-014's mixed-unit guard. Confirmed the guard now rejects that exact spec, then
+rebuilt the chart on one coherent measure (share of failing builds caused by flaky
+tests vs genuine defects: Google 84/16, Jira Frontend 21/79) — which is what the
+prose actually promises the chart shows.
+
+**Standing rule added to CLAUDE.md #4: look at the rendered result before
+shipping.** Five iterations were needed, and a screenshot caught a z-order bug
+where the drain painted over the coin pile — invisible in source.
+
+Follow-on (pipeline automation + multi-figure posts) → **B-016b**.
 
 ### B-013 · Live unlisted draft review on GitHub Pages — 2026-07-25 · **LEAK TEST 10/10**
 

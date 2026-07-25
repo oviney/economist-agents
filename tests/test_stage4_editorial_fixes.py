@@ -163,7 +163,13 @@ class TestCategoryNormalization:
         article = '---\ncategories: ["quality-engineering"]\n---\nBody'
         result = _apply_editorial_fixes(article)
         assert "Quality Engineering" in result
-        assert "quality-engineering" not in result
+        # Scoped to the categories line: the derived `tags:` line is *required*
+        # to be lowercase-hyphen (BUG-057), so a document-wide assertion here
+        # would forbid a correct tag value.
+        categories_line = next(
+            ln for ln in result.split("\n") if ln.startswith("categories:")
+        )
+        assert "quality-engineering" not in categories_line
 
     def test_lowercase_spaces_to_title_case(self) -> None:
         article = '---\ncategories: ["software engineering"]\n---\nBody'
@@ -362,3 +368,66 @@ class TestEmptyImageFrontmatterNeverEmitted:
         )
         out = _apply_editorial_fixes(article, current_date="2026-07-24")
         assert "/assets/images/real-hero.png" in out
+
+
+# ---------------------------------------------------------------------------
+# BUG-057: the blog requires >=2 lowercase-hyphen tags in inline bracket format
+# ---------------------------------------------------------------------------
+
+
+class TestTagsAlwaysEmitted:
+    """``oviney/blog``'s ``scripts/validate-posts.sh`` requires a ``tags`` field
+    with **>= 2** tags, inline bracket format, **all lowercase-hyphen**. The
+    pipeline never emitted one, so the first real article published failed the
+    blog's ``validate-editorial`` gate. Derive tags from ``categories`` so every
+    article satisfies the contract by construction.
+    """
+
+    def test_tags_derived_from_categories(self) -> None:
+        article = (
+            "---\nlayout: post\n"
+            'title: "A Specific Descriptive Title"\n'
+            "categories: [Quality Engineering, Test Automation]\n"
+            "---\n\nBody.\n"
+        )
+        out = _apply_editorial_fixes(article, current_date="2026-07-25")
+        assert "tags: [quality-engineering, test-automation]" in out
+
+    def test_tags_are_lowercase_hyphen_only(self) -> None:
+        article = (
+            "---\nlayout: post\n"
+            'title: "A Specific Descriptive Title"\n'
+            'categories: ["Software Engineering", "Security"]\n'
+            "---\n\nBody.\n"
+        )
+        out = _apply_editorial_fixes(article, current_date="2026-07-25")
+        tags_line = next(ln for ln in out.split("\n") if ln.startswith("tags:"))
+        value = tags_line.split(":", 1)[1].strip().strip("[]")
+        assert value == value.lower(), f"tags must be lowercase: {tags_line}"
+        assert not any(c.isupper() for c in value)
+        assert len([t for t in value.split(",") if t.strip()]) >= 2
+
+    def test_at_least_two_tags_even_from_one_category(self) -> None:
+        article = (
+            "---\nlayout: post\n"
+            'title: "A Specific Descriptive Title"\n'
+            'categories: ["Quality Engineering"]\n'
+            "---\n\nBody.\n"
+        )
+        out = _apply_editorial_fixes(article, current_date="2026-07-25")
+        tags_line = next(ln for ln in out.split("\n") if ln.startswith("tags:"))
+        value = tags_line.split(":", 1)[1].strip().strip("[]")
+        count = len([t for t in value.split(",") if t.strip()])
+        assert count >= 2, f"blog requires >=2 tags, got {count}: {tags_line}"
+
+    def test_existing_tags_preserved(self) -> None:
+        article = (
+            "---\nlayout: post\n"
+            'title: "A Specific Descriptive Title"\n'
+            'categories: ["Quality Engineering"]\n'
+            "tags: [flaky-tests, continuous-integration]\n"
+            "---\n\nBody.\n"
+        )
+        out = _apply_editorial_fixes(article, current_date="2026-07-25")
+        assert "tags: [flaky-tests, continuous-integration]" in out
+        assert out.count("tags:") == 1

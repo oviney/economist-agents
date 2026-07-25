@@ -391,6 +391,36 @@ _CATEGORY_NORMALIZATION: dict[str, str] = {
 }
 
 
+#: Fallback tags so the >= 2 floor holds even for a single-category article.
+_FALLBACK_TAGS: tuple[str, ...] = ("software-quality", "engineering")
+
+
+def _derive_tags(frontmatter: str) -> str:
+    """Inline-bracket ``tags:`` line satisfying the blog's post contract (BUG-057).
+
+    ``oviney/blog``'s ``scripts/validate-posts.sh`` requires **>= 2** tags, in
+    inline bracket form, **all lowercase-hyphen** (an uppercase character is a
+    hard error). The pipeline never emitted the field, so the first real article
+    published failed the blog's ``validate-editorial`` gate. Derive them from
+    ``categories`` — already the article's own topic labels — kebab-cased, topped
+    up from ``_FALLBACK_TAGS`` when a single category would leave us under the
+    floor.
+    """
+    match = re.search(r"^categories:\s*(.+)$", frontmatter, re.MULTILINE)
+    raw = match.group(1) if match else ""
+    tags: list[str] = []
+    for part in raw.strip().strip("[]").split(","):
+        slug = re.sub(r"[^a-z0-9]+", "-", part.strip().strip("\"'").lower()).strip("-")
+        if slug and slug not in tags:
+            tags.append(slug)
+    for fallback in _FALLBACK_TAGS:
+        if len(tags) >= 2:
+            break
+        if fallback not in tags:
+            tags.append(fallback)
+    return f"tags: [{', '.join(tags)}]"
+
+
 def _normalize_category_casing(frontmatter: str) -> str:
     """Normalize category values to the blog's title-case contract."""
     lines = frontmatter.split("\n")
@@ -630,6 +660,10 @@ def apply_editorial_fixes(article: str, current_date: str | None = None) -> str:
                 fm = fm.rstrip() + f'\nauthor: "{BLOG_AUTHOR}"\n'
             if "categories:" not in fm:
                 fm = fm.rstrip() + '\ncategories: ["Quality Engineering"]\n'
+            # The blog requires >=2 lowercase-hyphen tags (BUG-057). Derive them
+            # after categories are guaranteed so there is always a source.
+            if not re.search(r"^tags:", fm, re.MULTILINE):
+                fm = fm.rstrip() + "\n" + _derive_tags(fm) + "\n"
             if current_date and "date:" not in fm:
                 fm = fm.rstrip() + f"\ndate: {current_date}\n"
             # No `image:` injection: a chart-only article omits the key rather

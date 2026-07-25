@@ -63,9 +63,20 @@ Also unavoidable regardless: the **1-review requirement** — the token user is 
 owner and GitHub forbids self-approval. Full findings:
 `docs/blog-integration-constraints.md`.
 
-**Still unmeasured:** these results come from a layout/content-delete PR, not a
-real generated article. Confirm Content Validation + validate-editorial still pass
-on the next actual article deploy.
+**MEASURED ON A REAL ARTICLE 2026-07-25 — and it failed.** Publishing the
+flaky-tests post tripped `validate-editorial`: the blog's
+`scripts/validate-posts.sh` requires a **`tags`** field (≥2, inline
+`[foo, bar]`, **all lowercase-hyphen**) and the pipeline had never emitted one, so
+*every* article would have failed. Fixed generator-side (`_derive_tags`, BUG-057)
+and verified by running the blog's own script → `PASSED`. Lesson: the gate matrix
+above was measured on a *layout* PR; only a real article exercises the gates that
+govern articles.
+
+**Open item from the same script:** `validate-posts.sh` also requires **`image:`**,
+so a **chart-only** article — which omits `image:` per BUG-055 — would fail this
+gate. Currently **masked** because B-016 always draws a hero. Decide the intended
+behaviour: always author a hero (then chart-only never happens), or give
+chart-only posts a default illustration. Not yet spec'd.
 
 ### B-012 · Opt-in `deep-brief` research mode (BUILT — live acceptance run pending)
 
@@ -88,6 +99,23 @@ researcher would ship — but one topic cost ~102 agents / ~2M tokens / ~15 min 
 brief) lives at `docs/research/ai-productivity-brief.md`.
 
 ## Done
+
+### 🎉 FIRST ARTICLE PUBLISHED END-TO-END — 2026-07-25
+
+**https://www.viney.ca/2026/07/24/green-light-red-ledger-flaky-tests-are-engineering-s-costliest-invisible-tax/**
+
+The keyless pipeline's first article to travel the whole path: generate → review
+as a live unlisted draft (B-013) → owner approval → `make publish` → live post,
+with a **Claude-authored SVG hero** (B-016a) and a **corrected chart** (BUG-056).
+The B-017 slop detectors printed as **advisory notes** in the publish report and
+correctly did not block. Owner accepted the prose as-is.
+
+Three defects had to be fixed *because* of this run, each invisible to
+`make ci-local`: **BUG-055** (empty `image:` broke the blog build), **BUG-056**
+(chart with 5 invisible bars and a `150000 %` label), **BUG-057** (`tags:` never
+emitted → failed the blog's `validate-editorial`). Standing lesson recorded in
+CLAUDE.md #4 and B-015: **a green local gate says nothing about what the blog
+accepts, and only a real article exercises the gates that govern articles.**
 
 ### B-016a · Claude-authored hero illustrations ship end-to-end; constraint #4 amended — 2026-07-25
 

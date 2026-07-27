@@ -18,8 +18,14 @@ naming the specific failure.
 
 from __future__ import annotations
 
+import logging
 import re
+import shutil
+import subprocess
+from pathlib import Path
 from xml.etree import ElementTree
+
+logger = logging.getLogger(__name__)
 
 #: The blog's hero slot is 16:9, and so is the shipped hero (1600x900).
 _TARGET_RATIO = 16 / 9
@@ -165,3 +171,80 @@ def check_hero_svg(source: str) -> None:
             f"hero SVG has only {primitives} drawing primitives; expected at least "
             f"{_MIN_PRIMITIVES} (a near-empty canvas is a failed drawing)"
         )
+
+
+#: Chrome is the only rasteriser available here — there is no rsvg-convert or
+#: cairosvg in this environment, and adding one would be a new dependency for a
+#: capability we already have.
+_CHROME_BINARIES = ("google-chrome", "chromium", "chromium-browser")
+_RENDER_TIMEOUT_S = 60
+
+#: Matches the gate's 16:9 contract and the shipped hero's intrinsic size.
+_RENDER_WIDTH = 1600
+_RENDER_HEIGHT = 900
+
+
+def render_to_png(svg_path: Path, png_path: Path) -> Path | None:
+    """Rasterise ``svg_path`` so the composition can be *looked at*.
+
+    The structural gate cannot see composition, and Operating Constraint #4
+    requires looking at the rendered result before shipping — so something has to
+    produce a raster. This is that step; the vision critique and the operator both
+    read its output.
+
+    Returns ``None`` on every failure rather than raising. Rendering exists to
+    *enable* a quality check, so its absence must degrade to "no critique
+    available", never to a failed article (spec failure policy, row 2: a vision
+    malfunction must not affect the exit code).
+    """
+    binary = next((b for b in _CHROME_BINARIES if shutil.which(b)), None)
+    if binary is None:
+        logger.warning(
+            "No Chrome/Chromium binary found (%s) — skipping hero render, so the "
+            "vision critique will be skipped too",
+            ", ".join(_CHROME_BINARIES),
+        )
+        return None
+
+    png_path.parent.mkdir(parents=True, exist_ok=True)
+    argv = [
+        binary,
+        "--headless",
+        "--disable-gpu",
+        # No profile, no network, no extensions: this renders a local file and
+        # must not become a browsing session.
+        "--no-sandbox",
+        "--hide-scrollbars",
+        f"--screenshot={png_path}",
+        f"--window-size={_RENDER_WIDTH},{_RENDER_HEIGHT}",
+        f"file://{svg_path.resolve()}",
+    ]
+
+    try:
+        result = subprocess.run(  # noqa: S603 - fixed argv, no shell, local file
+            argv,
+            capture_output=True,
+            text=True,
+            timeout=_RENDER_TIMEOUT_S,
+            check=False,
+        )
+    except (subprocess.TimeoutExpired, OSError) as exc:
+        logger.warning("Hero render failed (%s) — skipping vision critique", exc)
+        return None
+
+    if result.returncode != 0:
+        logger.warning(
+            "Hero render exited %s — skipping vision critique. stderr: %s",
+            result.returncode,
+            (result.stderr or "").strip()[:400],
+        )
+        return None
+    if not png_path.is_file():
+        # Chrome can exit 0 having written nothing; without this the vision step
+        # would be handed a path that does not exist.
+        logger.warning(
+            "Hero render exited 0 but wrote no file at %s — skipping vision critique",
+            png_path,
+        )
+        return None
+    return png_path

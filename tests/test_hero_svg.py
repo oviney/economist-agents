@@ -12,9 +12,13 @@ checks what a computer can check reliably.
 
 from __future__ import annotations
 
+import subprocess
+from pathlib import Path
+
 import pytest
 
-from src.agent_sdk.hero_svg import HeroSvgError, check_hero_svg
+from src.agent_sdk import hero_svg
+from src.agent_sdk.hero_svg import HeroSvgError, check_hero_svg, render_to_png
 
 
 def _svg(body: str = "", **attrs: str) -> str:
@@ -43,8 +47,6 @@ class TestTheKnownGoodHeroPasses:
     """If the gate rejects the hero we actually shipped, the gate is wrong."""
 
     def test_the_shipped_hero_passes(self) -> None:
-        from pathlib import Path
-
         shipped = next(Path("output/posts/images").glob("*-hero.svg"), None)
         if shipped is None:
             pytest.skip("no shipped hero available in this checkout")
@@ -220,3 +222,96 @@ class TestErrorQuality:
         # Actionable like ChartRenderError: says what is wrong and the numbers.
         assert "aspect ratio" in str(exc.value)
         assert "1.0" in str(exc.value) or "900" in str(exc.value)
+
+
+class TestRenderToPng:
+    """Rasterise so Claude and the operator can *look* — the structural gate
+    cannot see composition, and constraint #4 requires looking at the render.
+
+    No test spawns Chrome: BUG-058 is the cautionary case for tests that reach
+    outside the process.
+    """
+
+    def test_invokes_chrome_headless_with_the_right_geometry(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        svg = tmp_path / "h.svg"
+        svg.write_text(_svg())
+        png = tmp_path / "h.png"
+        calls: list[list[str]] = []
+
+        def fake_run(argv, **kwargs):  # type: ignore[no-untyped-def]
+            calls.append(argv)
+            png.write_bytes(b"\x89PNG\r\n\x1a\n" + b"0" * 100)
+            return subprocess.CompletedProcess(argv, 0, "", "")
+
+        monkeypatch.setattr(hero_svg.subprocess, "run", fake_run)
+        monkeypatch.setattr(
+            hero_svg.shutil, "which", lambda _: "/usr/bin/google-chrome"
+        )
+
+        assert render_to_png(svg, png) == png
+        argv = calls[0]
+        assert "--headless" in argv
+        assert any(a.startswith("--screenshot=") for a in argv)
+        assert any("1600,900" in a for a in argv)
+        assert argv[-1].startswith("file://")
+
+    def test_missing_chrome_degrades_to_none_rather_than_raising(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        # A vision *malfunction* must never affect the pipeline (spec failure
+        # policy, row 2). No Chrome means no critique, not a failed article.
+        svg = tmp_path / "h.svg"
+        svg.write_text(_svg())
+        monkeypatch.setattr(hero_svg.shutil, "which", lambda _: None)
+        assert render_to_png(svg, tmp_path / "h.png") is None
+
+    def test_chrome_failure_degrades_to_none(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        svg = tmp_path / "h.svg"
+        svg.write_text(_svg())
+        monkeypatch.setattr(
+            hero_svg.shutil, "which", lambda _: "/usr/bin/google-chrome"
+        )
+        monkeypatch.setattr(
+            hero_svg.subprocess,
+            "run",
+            lambda *a, **k: subprocess.CompletedProcess(
+                a[0] if a else [], 1, "", "boom"
+            ),
+        )
+        assert render_to_png(svg, tmp_path / "h.png") is None
+
+    def test_timeout_degrades_to_none(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        svg = tmp_path / "h.svg"
+        svg.write_text(_svg())
+        monkeypatch.setattr(
+            hero_svg.shutil, "which", lambda _: "/usr/bin/google-chrome"
+        )
+
+        def raise_timeout(*a, **k):  # type: ignore[no-untyped-def]
+            raise subprocess.TimeoutExpired(cmd="chrome", timeout=30)
+
+        monkeypatch.setattr(hero_svg.subprocess, "run", raise_timeout)
+        assert render_to_png(svg, tmp_path / "h.png") is None
+
+    def test_a_silent_no_output_run_degrades_to_none(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        # Chrome exits 0 but writes nothing — the failure mode that would
+        # otherwise hand a nonexistent path to the vision step.
+        svg = tmp_path / "h.svg"
+        svg.write_text(_svg())
+        monkeypatch.setattr(
+            hero_svg.shutil, "which", lambda _: "/usr/bin/google-chrome"
+        )
+        monkeypatch.setattr(
+            hero_svg.subprocess,
+            "run",
+            lambda *a, **k: subprocess.CompletedProcess([], 0, "", ""),
+        )
+        assert render_to_png(svg, tmp_path / "h.png") is None

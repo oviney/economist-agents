@@ -1,6 +1,6 @@
 # Spec: B-016b — Stage 3 draws the hero SVG automatically
 
-**Status:** Draft, awaiting owner LGTM
+**Status:** Draft — failure policy decided 2026-07-27; awaiting owner LGTM to build
 **Backlog:** B-016b (blocker)
 **Depends on:** B-016a (mechanism), B-019 (`_link_hero_asset`, front-matter contract)
 **Blocks:** every future article
@@ -98,9 +98,10 @@ being runnable unattended.
    pattern, and answers a *specific* checklist rather than "is this good": is any
    subject occluded by a later-painted shape; is there a large empty region; do any
    two subjects overlap ambiguously; is the focal subject off-canvas or clipped.
-5. On a reported defect, regenerate with the critique appended — **max 2 retries**,
-   then keep the best attempt and log the unresolved critique.
-6. The **existing** publish approval stays the human backstop.
+5. On a reported defect, regenerate with the critique appended — **max 2 retries**.
+6. If the critique is still unresolved after retries, **write and link the hero,
+   then exit non-zero with the critique printed** (see Failure policy below).
+7. The **existing** publish approval stays the human backstop.
 
 **Why this one:** constraint #4 already says *"Always look at the rendered result
 before shipping."* That is a standing rule, so the question is only *who looks*.
@@ -112,11 +113,49 @@ to degrade gracefully.
 **Honest limits, stated rather than buried:**
 - Claude critiquing its own output is weaker than a fresh reviewer. It will catch
   z-order and dead space; it will not reliably catch *taste*.
-- Vision must **never block the pipeline**. Following
-  `refine_image_metadata`'s precedent: on any vision failure, log and keep the
-  structurally-valid SVG. A hero that exists beats a pipeline that halts.
-- The unresolved-critique log line is the honest signal to the operator that this
-  hero deserves a look.
+- A vision **malfunction** must never block the pipeline; a vision **verdict**
+  may. These are different things and an earlier draft of this spec conflated
+  them — see Failure policy.
+
+## Failure policy
+
+Three distinct outcomes, deliberately not collapsed into one rule:
+
+| Outcome | Behaviour | Exit |
+|---|---|---|
+| **Structural gate fails** | Hero not written. Log the specific rule. `image:` stays absent | non-zero |
+| **Vision malfunctions** — SDK raises, no text, non-JSON, Chrome missing, image >4 MB | **Degrade**: keep the structurally-valid hero, link it, log a warning. Follow `refine_image_metadata`'s precedent exactly | **zero** |
+| **Vision reports an unresolved defect** after 2 retries | **Write and link the hero**, print the critique to stderr | non-zero |
+
+The third row is the resolved open question, and it is deliberately the same
+shape as the convention already in `pipeline._run_end_to_end`:
+
+```python
+if result.publication_validator_passed:
+    sys.exit(0)
+print("❌ Publication validator found issues:", file=sys.stderr)
+for issue in result.publication_validator_issues:
+    print(f"  [{issue['severity']}] {issue['check']}: {issue['message']}", ...)
+sys.exit(1)
+```
+
+Artifacts on disk, issues enumerated, non-zero exit, operator decides. An
+unresolved hero critique is the same class of problem, so it gets the same
+treatment rather than a new one.
+
+Why not the two alternatives considered:
+
+- **Ship with a loud warning.** A warning is only as good as its reader. It
+  scrolls past in pipeline output, and what it guards is a permanent public
+  image. "Loud" is not a mechanism.
+- **Leave `image:` absent so the blog gate stops it.** The operator would then
+  see the blog report **"hero image not set"** — a *false* diagnosis. The hero
+  exists; Claude thinks it looks wrong. That message sends you to the wrong
+  place. Diagnostics must name the real fault.
+
+Non-zero on a cosmetic issue blocks the *unattended* path, which is the right
+default for something permanent, public, and unredirectable. The operator can
+always look and publish anyway — the hero and article are both on disk.
 
 ## Design
 
@@ -162,11 +201,11 @@ brief → compose_prompt(...)        # exists, constraints fixed
 hero  → author SVG → check_hero_svg → render_to_png → critique loop
 ```
 
-Failure policy, matching the existing asymmetry: a **chart** render failure is
-fatal (a missing chart leaves a broken body embed); a **hero** failure is
-**non-fatal** — log it, leave the asset absent, let `_link_hero_asset` omit
-`image:` and the blog gate reject it. That is a clear, diagnosable failure rather
-than a corrupt article.
+Stage 3 itself never raises for a hero problem — it returns the hero path (or
+none) plus any unresolved critique, and the **CLI** decides the exit code, exactly
+as it already does for publication-validator issues. That keeps `run_pipeline`
+usable as a library and the exit-code policy in one place. Full behaviour in
+Failure policy above.
 
 ## Testing strategy
 
@@ -178,7 +217,8 @@ network call or invoke Chrome — BUG-058 is the cautionary case.
 | Unit | `check_hero_svg` — one test per gate rule, both directions. Fixtures are literal SVG strings, including a real reduction of the shipped hero as the known-good case |
 | Unit | `render_to_png` — Chrome invocation is mocked; assert argv shape and that a missing binary degrades rather than raises |
 | Unit | Critique loop — mocked SDK returns "defect found" then "clean"; assert it retries once, caps at 2, and returns the best attempt on persistent failure |
-| Unit | Vision failure degrades — SDK raises → structurally-valid SVG is kept, warning logged, no exception escapes |
+| Unit | Vision **malfunction** degrades — SDK raises / returns non-JSON / Chrome missing → hero kept and linked, warning logged, no exception escapes, exit code unaffected |
+| Unit | Vision **verdict** fails the run — unresolved critique after 2 retries → hero still written and linked, critique on stderr, CLI exits non-zero |
 | Integration | Stage 3 with a stubbed author step yields a hero at the canonical slug path, and `_link_hero_asset` picks it up |
 | Acceptance | `scripts/acceptance_blog_frontmatter.sh` — **0 errors** on a pipeline-generated article with no hand-drawn asset |
 | Manual, required once | Generate a real hero and **look at the PNG** before declaring done (constraint #4) |
@@ -196,8 +236,9 @@ google-chrome --headless --screenshot=out.png --window-size=1600,900 file://<svg
 
 - **Always:** derive the hero path from `canonical_slug`; look at the render before
   shipping; degrade gracefully on vision failure.
-- **Ask first:** raising the retry cap above 2; making a hero failure fatal;
-  touching `image_gate.py` (it is on the resume/handshake path).
+- **Ask first:** raising the retry cap above 2; making a vision *malfunction*
+  affect the exit code (it must not — only a verdict may); touching
+  `image_gate.py` (it is on the resume/handshake path).
 - **Never:** a raster image model, a new API key, or a paid service (constraints
   #1–#3); `<text>` in the hero; an external `href` in shipped markup; a test that
   reaches the network or spawns Chrome.
@@ -209,15 +250,15 @@ google-chrome --headless --screenshot=out.png --window-size=1600,900 file://<svg
 2. `check_hero_svg` rejects each of the nine rule violations with a message naming
    the specific failure.
 3. The critique loop provably retries on a reported defect and caps at 2.
-4. A vision or Chrome failure never raises out of Stage 3.
+4. The three failure outcomes are distinguishable and tested: a vision
+   **malfunction** never raises and never changes the exit code; a vision
+   **verdict** of unresolved-defect writes and links the hero *and* exits
+   non-zero with the critique on stderr; a structural failure writes no hero.
 5. `make ci-local` green; coverage does not drop.
 6. I have looked at a real generated hero PNG and reported what I saw.
 
-## Open question
+## Open questions
 
-**One.** When the critique loop exhausts its retries and Claude still reports a
-composition defect, should the pipeline (a) ship the best attempt with a loud
-warning — my recommendation, consistent with "vision never blocks" — or (b) treat
-it like a failed hero and leave `image:` absent, forcing the blog gate to stop the
-article? (b) is safer for what reaches the public but converts a cosmetic problem
-into a hard stop on an otherwise good article.
+**None.** The failure-policy question is resolved above (2026-07-27, owner
+decision): write and link the hero, exit non-zero with the critique, matching the
+existing publication-validator convention.

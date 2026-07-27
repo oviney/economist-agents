@@ -36,6 +36,34 @@ sys.path.insert(0, str(scripts_dir))
 
 from scripts import economist_agent as ea  # noqa: E402
 
+
+@pytest.fixture(autouse=True)
+def _stub_research_providers(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Stub the two network paths inside ``ResearchAgent.research`` (BUG-058).
+
+    The docstring above claims this module "mocks all LLM API calls", but it only
+    ever patched the LLM boundary. ``ResearchAgent.research`` also calls
+    ``_gather_arxiv_research`` (live arXiv HTTP) and ``verify_citations`` (fetches
+    every citation URL). Six tests here made real requests, taking **10m24s** for
+    this file — and rising, because arXiv returns HTTP 429 under repeated runs.
+
+    The ``_no_network`` guard in conftest already makes those calls *fail* fast,
+    but the production code retries with backoff before degrading, so the sleeps
+    remained. Stubbing at the source removes them: this file runs in ~1s.
+    """
+    import agents.research_agent as research_agent
+
+    monkeypatch.setattr(
+        research_agent.ResearchAgent,
+        "_gather_arxiv_research",
+        lambda self, topic: None,
+    )
+    monkeypatch.setattr(
+        "scripts.citation_verifier.verify_citations",
+        lambda data, *args, **kwargs: data,
+    )
+
+
 # ============================================================================
 # FIXTURES
 # ============================================================================

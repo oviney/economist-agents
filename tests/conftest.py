@@ -5,6 +5,41 @@ from unittest.mock import Mock
 
 import pytest
 
+from tests import _netguard as netguard
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    """Register the network opt-out marker (BUG-058)."""
+    config.addinivalue_line(
+        "markers",
+        "allow_network: permit real outbound sockets in this test (must be justified)",
+    )
+
+
+@pytest.fixture(autouse=True)
+def _no_network(
+    request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Block real outbound sockets so no test can depend on a third party (BUG-058).
+
+    ``tests/test_economist_agent.py`` patched the LLM boundary but not the arXiv
+    provider or the citation verifier, so six tests made live HTTP calls. That
+    file alone took **10m24s**, and because arXiv answers with HTTP 429 under
+    repeated runs the cost is *unbounded and nondeterministic* — the gate got
+    slower the more it was used, and failed outright offline.
+
+    `make ci-local` is the only merge gate (ADR-0015), so its runtime must not be
+    set by someone else's rate limiter. Loopback is still allowed (local servers
+    and IPC are legitimate); opt out deliberately with
+    ``@pytest.mark.allow_network``.
+
+    Sibling of :func:`_hermetic_env` — same "local verification is hermetic"
+    contract, one layer lower.
+    """
+    if request.node.get_closest_marker("allow_network"):
+        return
+    netguard.install(monkeypatch)
+
 
 @pytest.fixture(autouse=True)
 def _hermetic_env(monkeypatch: pytest.MonkeyPatch) -> None:

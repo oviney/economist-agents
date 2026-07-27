@@ -26,40 +26,23 @@ _(none)_
 
 ## Todo
 
-### B-019 · Align generated front matter with the blog's post contract (NEXT ARTICLE WILL FAIL WITHOUT THIS)
+### B-016b · Generate the hero SVG automatically in Stage 3 — **NOW A BLOCKER**
 
-**Highest-priority pipeline item.** Publishing the first real article failed the
-blog's `validate-editorial` job **four times**, each on a rule our own validator
-does not have. Full measured contract:
-`docs/blog-integration-constraints.md` → "The post front-matter contract".
-Only `tags` was fixed generator-side (BUG-057). Still unemitted:
+**Promoted from follow-on to blocker on 2026-07-26.** B-019 measured the blog's
+gate with `scripts/acceptance_blog_frontmatter.sh` and found that **`image:` is
+required by both blog scripts** and must resolve to a real file
+(`validate-post-quality.sh` check 1: "hero image not set"). There is therefore
+**no publishable chart-only article** — `--image-mode chart_only`, whose premise
+is "ships without a hero", now produces something the blog rejects.
 
-1. **`subtitle`** — required front matter (≤60 words hard, ≤40 soft). Not emitted
-   at all. Needs a Stage-3/Stage-4 source (derive from the description, or have the
-   writer produce it as a distinct field).
-2. **Quoted category items** — the blog's parser splits on `", "`, so our unquoted
-   `[Quality Engineering, Test Automation]` reads as ONE invalid category. One-line
-   fix in the frontmatter emitter, but needs a test asserting the quoted form.
-3. **Slug ≤ 60 chars** — ours derive from the full title; the flaky-tests slug was
-   **76**. **This is the careful one:** it collides with **B-008**'s
-   single-canonical-slug invariant, where one slug feeds the article filename, the
-   chart PNG, the chart embed, and the `.image_prompt.md` sidecar. A naive truncation
-   desynchronises them and reintroduces the class of bug B-008 closed. Needs a spec:
-   shorten at a word boundary, keep one derivation, and cover every consumer.
-4. Advisory but worth doing: `image_caption` ≤ ~40 chars (renders as
-   `figcaption.image-credit`).
+This also resolves the B-015 open question in the opposite direction from the one
+assumed: the fix is not to relax `image:`, it is that every article needs a hero.
 
-**No redirects exist** (no `jekyll-redirect-from`; `_config.yml` is protected), so a
-too-long slug cannot be fixed after publish without 404ing the live URL — the
-flaky-tests post had to be renamed. Get it right pre-publish.
+B-019 already ships the *linking* half — `_link_hero_asset` (`pipeline.py`) points
+`image:` at `output/posts/images/<slug>-hero.{svg,png}` when it exists, preferring
+SVG, and leaves the key absent when it does not. What remains:
 
-**Verify against the blog's own scripts, never by reading them:**
-`bash scripts/validate-posts.sh` and
-`bash scripts/validate-post-quality.sh --all` (exit 2 = warnings only = pass).
-
-### B-016b · Generate the hero SVG automatically in Stage 3 (follow-on)
-
-**B-016a shipped the mechanism** (see Done) but the hero SVG for the flaky-tests
+The hero SVG for the flaky-tests
 article was **hand-authored by Claude in-session**, not produced by the pipeline.
 To make this repeatable, Stage 3 needs a graphics step that asks Claude to author
 `output/posts/images/<slug>-hero.svg` from the existing `compose_prompt` brief,
@@ -103,11 +86,11 @@ and verified by running the blog's own script → `PASSED`. Lesson: the gate mat
 above was measured on a *layout* PR; only a real article exercises the gates that
 govern articles.
 
-**Open item from the same script:** `validate-posts.sh` also requires **`image:`**,
-so a **chart-only** article — which omits `image:` per BUG-055 — would fail this
-gate. Currently **masked** because B-016 always draws a hero. Decide the intended
-behaviour: always author a hero (then chart-only never happens), or give
-chart-only posts a default illustration. Not yet spec'd.
+**RESOLVED 2026-07-26 (B-019).** Measured with
+`scripts/acceptance_blog_frontmatter.sh`: **both** blog scripts require `image:`,
+and `validate-post-quality.sh` check 1 errors with "hero image not set". So the
+answer is the first option — **always author a hero**; chart-only is simply not a
+publishable mode. Tracked as a blocker in **B-016b**.
 
 ### B-012 · Opt-in `deep-brief` research mode (BUILT — live acceptance run pending)
 
@@ -130,6 +113,42 @@ researcher would ship — but one topic cost ~102 agents / ~2M tokens / ~15 min 
 brief) lives at `docs/research/ai-productivity-brief.md`.
 
 ## Done
+
+### B-019 · Generated front matter now clears the blog's gate — 2026-07-26
+
+Spec: `docs/specs/B-019-frontmatter-contract-alignment.md`. Closed the four
+generator-side gaps that made every future article fail the blog's
+`validate-editorial` job, and built the acceptance oracle that proves it.
+
+- **Slug ≤50 chars** through `canonical_slug()` — the single B-008 seam, so the
+  filename, chart PNG, chart embed, and prompt sidecar all move together. Drops
+  stop-words, strips possessives, trims **whole trailing words** (never mid-word,
+  which is the failure `URL_SLUG_POLICY.md` exists to prevent). The real 76-char
+  flaky-tests title now yields 46. A writer-proposed `slug:` is honoured when it
+  matches the blog's shape; the derivation is the guarantee.
+- **`categories`** rewritten to the blog's exact form — inline, double-quoted,
+  values validated against the blog's four, off-list dropped, block-style YAML
+  converted. Tags now derive *after* canonicalisation so an off-list value cannot
+  leak into them.
+- **`subtitle`** backfilled from the description (≤40 words) when the writer omits
+  it, and requested distinctly in the Stage-3 prompt.
+- **Placeholder `image:`** stripped — the prompt used to ask for a literal
+  `/assets/images/SLUG.png`, which can never resolve. The prompt no longer asks
+  for an image path at all.
+- **Guardrail:** the pipeline now prints `slug: <value> (N chars, <source>)` at
+  generation time. The URL is permanent — no `jekyll-redirect-from` — so it should
+  be reviewable in one line, not inferred from an output path.
+- **`scripts/acceptance_blog_frontmatter.sh`** — runs a pipeline-finalized article
+  through the blog's two real validators in a real clone. **This is the oracle**;
+  `make ci-local` was green through all four of the original gate failures.
+
+Verified: acceptance **0 errors** against the blog's own scripts; `make ci-local`
+green; 38 new tests.
+
+**Found while verifying:** `image:` is mandatory on the blog, so there is no
+publishable chart-only article. B-016b promoted to blocker; B-015's open item
+resolved. See `docs/blog-integration-constraints.md`.
+
 
 ### 🎉 FIRST ARTICLE PUBLISHED END-TO-END — 2026-07-25
 

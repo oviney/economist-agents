@@ -22,7 +22,8 @@ def test_slug_comes_from_title_not_image_field() -> None:
         "image: /assets/images/three-people-and-a-fleet.png\n"
         "---\n\nBody."
     )
-    assert _slug_for_chart(article, "Some topic") == "the-real-headline"
+    # "The" is dropped as a stop word per the blog's slug policy (B-019).
+    assert _slug_for_chart(article, "Some topic") == "real-headline"
 
 
 def test_slug_falls_back_to_kebab_topic_when_no_title() -> None:
@@ -34,7 +35,7 @@ def test_slug_falls_back_to_kebab_topic_when_no_title() -> None:
 
 
 def test_slug_strips_leading_and_trailing_hyphens() -> None:
-    assert _slug_for_chart("---\nlayout: post\n---\n\n", "—An idea—") == "an-idea"
+    assert _slug_for_chart("---\nlayout: post\n---\n\n", "—An idea—") == "idea"
 
 
 def test_slug_handles_topic_with_only_non_alnum() -> None:

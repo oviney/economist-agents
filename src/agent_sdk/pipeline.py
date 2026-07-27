@@ -25,6 +25,7 @@ from src.agent_sdk._shared import (
     SearchProvidersFailedError,
     _auto_embed_chart,
     canonical_slug,
+    describe_slug,
 )
 from src.agent_sdk.image_gate import ImageGateError, check_hero_image
 from src.agent_sdk.stage3_runner import (
@@ -54,6 +55,8 @@ EXIT_IMAGE_GATE_FAILED = 11
 # #403 slice 3: slug-keyed canonical artefacts. logs/spike/* stays as
 # telemetry only (gitignored at the project level for the spike dir).
 POSTS_DIR = Path("output/posts")
+#: Where Claude's hand-drawn hero SVGs land (CLAUDE.md Operating Constraint #4).
+HERO_IMAGES_DIR = POSTS_DIR / "images"
 STATE_DIR = Path("output/state")
 IMAGE_DROP_DIR = Path("output/posts/images")
 
@@ -159,6 +162,13 @@ async def run_pipeline(
     image_prompt = getattr(stage3, "image_prompt", "")
     if image_mode == "chart_only" and image_prompt:
         final_article = _inject_hero_prompt_comment(final_article, image_prompt)
+
+    # The blog requires a resolvable `image:` (B-019), so link the hero asset if
+    # one has been drawn for this slug. No asset -> the key stays absent and the
+    # blog will reject the article; drawing it automatically is B-016b.
+    final_article = _link_hero_asset(
+        final_article, canonical_slug(final_article, topic)
+    )
 
     result = PipelineResult(
         topic=topic,
@@ -518,6 +528,47 @@ def _slug_from_article(article: str, fallback: str) -> str:
     return canonical_slug(article, fallback)
 
 
+#: Constraint #4 prefers SVG: the blog's ``responsive-image.html`` rewrites
+#: ``.png`` to ``.webp``, so a PNG hero needs a ``.webp`` sibling while an SVG
+#: takes the plain ``<img>`` branch. Order = preference.
+_HERO_SUFFIXES = (".svg", ".png")
+
+_IMAGE_LINE = re.compile(r"^image:.*$\n?", re.MULTILINE)
+
+
+def _link_hero_asset(
+    article: str, slug: str, *, images_dir: Path = HERO_IMAGES_DIR
+) -> str:
+    """Point ``image:`` at the article's hero asset, if one has been drawn.
+
+    The blog **requires** ``image:`` — measured 2026-07-26 with
+    ``scripts/acceptance_blog_frontmatter.sh``, both ``validate-posts.sh`` and
+    ``validate-post-quality.sh`` error with "hero image not set", and the path
+    must resolve to a real file. So there is **no publishable chart-only
+    article** (this closes the B-015 open question).
+
+    This function only *links* an asset that already exists at
+    ``<images_dir>/<slug>-hero.{svg,png}``. Generating it is B-016b. When no
+    asset exists the key is left absent rather than pointed at a missing file:
+    absent is a clean gate failure, a broken path breaks the Jekyll build
+    (BUG-055).
+    """
+    if not article.startswith("---"):
+        return article
+    for suffix in _HERO_SUFFIXES:
+        if (images_dir / f"{slug}-hero{suffix}").is_file():
+            break
+    else:
+        return article
+
+    parts = article.split("---", 2)
+    if len(parts) < 3:
+        return article
+    fm = _IMAGE_LINE.sub("", parts[1]).rstrip()
+    fm += f"\nimage: /assets/images/{slug}-hero{suffix}\n"
+    return "---" + fm + "---" + parts[2]
+
+
 def _run_end_to_end(
     topic: str,
     *,
@@ -563,6 +614,11 @@ def _run_end_to_end(
         f"\nStage 3+4 complete: ${result.total_cost_usd:.4f}, "
         f"{result.article_chars} chars → {article_path}"
     )
+    # The slug becomes a permanent URL — oviney/blog has no jekyll-redirect-from
+    # and _config.yml is a protected file, so renaming a published post 404s the
+    # original. Surface it explicitly for review rather than burying it in the
+    # output path (B-019).
+    print(f"  {describe_slug(result.article, topic)}")
     if result.publication_validator_passed:
         print("✅ Publication validator PASSED — article is publish-ready.")
         sys.exit(0)

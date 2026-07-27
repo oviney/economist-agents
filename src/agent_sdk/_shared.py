@@ -421,20 +421,80 @@ def _derive_tags(frontmatter: str) -> str:
     return f"tags: [{', '.join(tags)}]"
 
 
+#: The only category values ``oviney/blog``'s validate-post-quality.sh accepts.
+#: Anything else is a hard error there, so an off-list value is dropped rather
+#: than guessed at.
+_DEFAULT_CATEGORY = "Quality Engineering"
+
+_BLOCK_LIST_ITEM = re.compile(r"^\s*-\s+(.+?)\s*$")
+
+
+#: The blog hard-fails a subtitle over 60 words and warns over 40; target the
+#: soft cap so a generated article lands clean rather than merely passing.
+_SUBTITLE_MAX_WORDS = 40
+
+
+def _derive_subtitle(frontmatter: str, body: str) -> str:
+    """A ``subtitle`` value for an article whose writer omitted the field.
+
+    ``oviney/blog`` requires ``subtitle`` — its absence is a hard ERROR, so a
+    missing one must never be allowed to block an otherwise publishable article
+    (the same reasoning as the description/tags guarantees above). Prefers the
+    ``description``, which is already a one-line editorial summary, and falls
+    back to the body's opening sentence.
+
+    This duplicates the description on the rendered page. That is deliberate and
+    is the *fallback*: the writer is prompted for a distinct subtitle, and a mild
+    repetition is a far better failure mode than a rejected deploy.
+    """
+    match = re.search(r'^description:\s*(["\']?)(.+?)\1\s*$', frontmatter, re.MULTILINE)
+    source = match.group(2) if match else _derive_description(body)
+    words = source.replace('"', "").split()
+    if len(words) > _SUBTITLE_MAX_WORDS:
+        source = " ".join(words[:_SUBTITLE_MAX_WORDS])
+    return source.strip().rstrip(".,;:")
+
+
 def _normalize_category_casing(frontmatter: str) -> str:
-    """Normalize category values to the blog's title-case contract."""
+    """Rewrite ``categories:`` into the blog's exact expected form (B-019).
+
+    ``oviney/blog``'s ``validate-post-quality.sh`` parses the line by splitting
+    on ``", "``, so the value must be an **inline, double-quoted** list —
+    ``categories: ["Quality Engineering", "Test Automation"]``. An unquoted list
+    reads as a single invalid category and hard-fails the gate; a block-style
+    YAML list is not detected at all.
+
+    Values are mapped through :data:`_CATEGORY_NORMALIZATION`; anything outside
+    the blog's four accepted values is dropped, falling back to
+    :data:`_DEFAULT_CATEGORY` when nothing survives.
+    """
     lines = frontmatter.split("\n")
     for i, line in enumerate(lines):
-        if line.strip().startswith("categories:"):
-            for raw_value, canonical in _CATEGORY_NORMALIZATION.items():
-                lines[i] = re.sub(
-                    re.escape(raw_value),
-                    canonical,
-                    lines[i],
-                    flags=re.IGNORECASE,
-                )
-            break
-    return "\n".join(lines)
+        if not line.strip().startswith("categories:"):
+            continue
+
+        raw = line.split(":", 1)[1].strip()
+        end = i + 1
+        if not raw:
+            # Block-style list: consume the "- item" lines that follow.
+            items = []
+            while end < len(lines) and (m := _BLOCK_LIST_ITEM.match(lines[end])):
+                items.append(m.group(1))
+                end += 1
+        else:
+            items = raw.strip("[]").split(",")
+
+        canonical: list[str] = []
+        for item in items:
+            value = _CATEGORY_NORMALIZATION.get(item.strip().strip("\"'").lower())
+            if value and value not in canonical:
+                canonical.append(value)
+        if not canonical:
+            canonical = [_DEFAULT_CATEGORY]
+
+        quoted = ", ".join(f'"{value}"' for value in canonical)
+        return "\n".join(lines[:i] + [f"categories: [{quoted}]"] + lines[end:])
+    return frontmatter
 
 
 def _truncate_description(frontmatter: str, max_chars: int = 160) -> str:
@@ -458,20 +518,125 @@ def _truncate_description(frontmatter: str, max_chars: int = 160) -> str:
     return frontmatter.replace(match.group(0), f"{prefix}{quote}{truncated}{quote}")
 
 
+#: Stop words dropped from a derived slug. Deliberately a short closed list —
+#: the blog's policy says omit filler "where the slug still reads clearly", so
+#: this covers articles/conjunctions/prepositions and nothing content-bearing.
+_SLUG_STOP_WORDS: frozenset[str] = frozenset(
+    [
+        "the",
+        "a",
+        "an",
+        "and",
+        "or",
+        "of",
+        "to",
+        "in",
+        "on",
+        "for",
+        "is",
+        "are",
+        "was",
+        "were",
+        "be",
+        "that",
+        "this",
+        "with",
+        "as",
+        "at",
+        "by",
+        "from",
+        "it",
+        "its",
+        "but",
+        "not",
+    ]
+)
+
+#: The blog targets <=50 chars, warns from 55, and hard-fails over 60
+#: (``oviney/blog`` ``docs/URL_SLUG_POLICY.md``). Deriving to the *target* keeps
+#: us clear of the warning band too.
+_SLUG_TARGET_CHARS = 50
+
+#: A writer-proposed ``slug:`` is accepted only in the exact shape the blog
+#: wants: lowercase alphanumerics, single hyphens, no leading/trailing hyphen.
+_VALID_SLUG_FIELD = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+_SLUG_FIELD_PATTERN = re.compile(r'^slug:\s*["\']?(.+?)["\']?\s*$', re.MULTILINE)
+
+#: ``Engineering's`` must slugify to ``engineering``, not ``engineering-s``.
+_POSSESSIVE = re.compile(r"['’]s\b")
+
+
+def _shorten_to_slug(source: str) -> str:
+    """Kebab-case ``source`` and shorten it to the blog's slug policy.
+
+    Complete words only — the policy exists because an upstream tool once cut
+    slugs mid-word (``…-and-sustai``), and those URLs are permanently indexed.
+    So we drop whole trailing words rather than characters.
+    """
+    text = _POSSESSIVE.sub("", source)
+    words = [
+        w
+        for w in re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-").split("-")
+        if w and w not in _SLUG_STOP_WORDS
+    ]
+    while words and len("-".join(words)) > _SLUG_TARGET_CHARS:
+        words.pop()
+    if words:
+        return "-".join(words)
+    # A title of nothing but stop words: keep them rather than return nothing,
+    # still bounded by the target.
+    bare = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+    return bare[:_SLUG_TARGET_CHARS].rstrip("-")
+
+
 def canonical_slug(article: str, fallback: str) -> str:
     """The single slug shared by the article file, the chart PNG, the chart
     embed, and the image-prompt sidecar (B-008).
 
-    Derived from the article's ``title`` frontmatter — the article's identity —
-    falling back to a kebab-cased ``fallback`` (the topic) when no title is
-    present. Using one derivation everywhere prevents a chart embed from pointing
-    at a PNG named from a different source (which broke in ``chart_only`` runs
-    where the hero ``image:`` field is empty).
+    Sources, in order:
+
+    1. An explicit ``slug:`` frontmatter field, when it already matches the
+       blog's shape and length. The writer proposes it (B-019) because a
+       mechanically-shortened title tends to end on a dangling word, and the URL
+       is permanent — ``oviney/blog`` has no ``jekyll-redirect-from``.
+    2. The article's ``title``, shortened per the blog's slug policy.
+    3. A kebab-cased ``fallback`` (the topic) when there is no title.
+
+    Using one derivation everywhere prevents a chart embed from pointing at a
+    PNG named from a different source (which broke in ``chart_only`` runs where
+    the hero ``image:`` field is empty), and means the B-019 shortening moves
+    every consumer together rather than desynchronising them.
     """
+    field = _SLUG_FIELD_PATTERN.search(article)
+    if field:
+        proposed = field.group(1).strip()
+        if _VALID_SLUG_FIELD.match(proposed) and len(proposed) <= 60:
+            return proposed
+
     match = re.search(r'^title:\s*["\']?(.+?)["\']?\s*$', article, re.MULTILINE)
     source = match.group(1) if match else fallback
-    slug = re.sub(r"[^a-z0-9]+", "-", source.lower()).strip("-")
-    return slug or "article"
+    return _shorten_to_slug(source) or "article"
+
+
+def describe_slug(article: str, fallback: str) -> str:
+    """One-line, reviewable summary of the slug the article will publish under.
+
+    The URL is permanent (no ``jekyll-redirect-from`` on the blog), so the
+    operator needs to see it *before* publishing rather than infer it from an
+    output filename.
+    """
+    slug = canonical_slug(article, fallback)
+    field = _SLUG_FIELD_PATTERN.search(article)
+    proposed = field.group(1).strip() if field else ""
+    if proposed and proposed == slug:
+        source = "writer-supplied"
+    elif proposed:
+        source = "derived from title (writer's slug rejected)"
+    elif re.search(r"^title:", article, re.MULTILINE):
+        source = "derived from title"
+    else:
+        source = "derived from topic"
+    return f"slug: {slug}  ({len(slug)} chars, {source})"
 
 
 def _auto_embed_chart(article: str) -> str:
@@ -552,6 +717,16 @@ def _enforce_heading_limit(article: str, max_headings: int = 4) -> str:
 #: schema requires only layout/title/date/categories, so dropping the key is
 #: safe. Hero images stay human-supplied per CLAUDE.md constraint #4.
 _EMPTY_IMAGE_LINE = re.compile(r"^image:\s*(?:\"\"|''|)\s*$\n?", re.MULTILINE)
+
+#: An ``image:`` value the writer never filled in. The Stage-3 prompt used to ask
+#: for a literal ``/assets/images/SLUG.png`` — the writer cannot know the slug, so
+#: the path could never resolve and hard-failed the blog's gate (B-019).
+_PLACEHOLDER_IMAGE_LINE = re.compile(
+    r"^image:[ \t]*[\"']?[^\n\"']*"
+    r"(?:\bSLUG\b|<[^>\n]+>|\bYOUR[-_]|\bPLACEHOLDER\b|\bTODO\b)"
+    r"[^\n\"']*[\"']?[ \t]*$\n?",
+    re.MULTILINE,
+)
 
 
 def _yaml_safe(value: str, max_chars: int = 120) -> str:
@@ -659,7 +834,11 @@ def apply_editorial_fixes(article: str, current_date: str | None = None) -> str:
 
                 fm = fm.rstrip() + f'\nauthor: "{BLOG_AUTHOR}"\n'
             if "categories:" not in fm:
-                fm = fm.rstrip() + '\ncategories: ["Quality Engineering"]\n'
+                fm = fm.rstrip() + f'\ncategories: ["{_DEFAULT_CATEGORY}"]\n'
+            # Canonicalise categories BEFORE deriving tags: tags are kebab-cased
+            # categories, so a block-style or off-list value would otherwise leak
+            # into the tags (or leave only the fallbacks). B-019.
+            fm = _normalize_category_casing(fm)
             # The blog requires >=2 lowercase-hyphen tags (BUG-057). Derive them
             # after categories are guaranteed so there is always a source.
             if not re.search(r"^tags:", fm, re.MULTILINE):
@@ -668,11 +847,18 @@ def apply_editorial_fixes(article: str, current_date: str | None = None) -> str:
                 fm = fm.rstrip() + f"\ndate: {current_date}\n"
             # No `image:` injection: a chart-only article omits the key rather
             # than stamping an empty value that breaks the blog build (BUG-055).
-            # Strip an empty one the writer may have emitted.
+            # Strip an empty one the writer may have emitted — and likewise a
+            # placeholder path, which cannot resolve and fails the blog's gate
+            # (B-019). Absent is safe; broken is not.
             fm = _EMPTY_IMAGE_LINE.sub("", fm)
+            fm = _PLACEHOLDER_IMAGE_LINE.sub("", fm)
             if current_date and "description:" not in fm:
                 fm = fm.rstrip() + f'\ndescription: "{_derive_description(parts[2])}"\n'
-            fm = _normalize_category_casing(fm)
+            # ``subtitle`` is required by the blog and was never emitted (B-019).
+            # Derived after description so there is always a source; the writer
+            # is asked for a distinct one, this only guarantees the gate passes.
+            if current_date and not re.search(r"^subtitle:", fm, re.MULTILINE):
+                fm = fm.rstrip() + f'\nsubtitle: "{_derive_subtitle(fm, parts[2])}"\n'
             fm = _truncate_description(fm)
             text = "---" + fm + "---" + parts[2]
 

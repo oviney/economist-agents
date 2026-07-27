@@ -131,16 +131,49 @@ contract had only ever been written against *our* validator.
 | body | no heading markers inside paragraph text |
 | advisory only | `## References` with ≥ 3 items, ≥ 800 words, ≥ 3 H2s, a data chart |
 
-### What the generator still does NOT emit (next article will fail)
+### CLOSED 2026-07-26 by B-019 — the generator now satisfies this contract
 
-- **`subtitle`** — never emitted
-- **quoted** category items — we emit `[Quality Engineering, Test Automation]`
-- **slug ≤ 60** — ours derive from the full title (the flaky-tests slug was **76**).
-  Careful: this collides with **B-008**'s single-canonical-slug invariant, where one
-  slug feeds the article filename, chart PNG, chart embed, and prompt sidecar.
+`subtitle`, quoted/validated `categories`, the ≤50-char slug, and the placeholder
+`image:` are all handled generator-side. Verified by **running the blog's own two
+scripts against a pipeline-finalized article**: 0 errors.
 
-Only `tags` was fixed generator-side (BUG-057). **Verify any change by running the
-blog's own scripts**, not by reading them:
+Reproduce it — this is the acceptance oracle, not `make ci-local`:
+
+```bash
+scripts/acceptance_blog_frontmatter.sh <path-to-a-blog-clone>
+```
+
+The slug now derives through `canonical_slug()` (the one B-008 seam), which drops
+stop-words and trims whole trailing words to ≤50 chars — never mid-word, which is
+the failure `URL_SLUG_POLICY.md` exists to prevent. The real 76-char flaky-tests
+title now yields 46 chars. Because there is one derivation, the filename, chart
+PNG, chart embed, and prompt sidecar all move together.
+
+### A hero image is MANDATORY — there is no publishable chart-only article
+
+**Measured 2026-07-26, and it contradicts a long-standing assumption in this repo.**
+Both blog scripts require `image:`:
+
+- `validate-posts.sh` lists `image` in its required-field loop and requires the path
+  to resolve to a real file under `assets/images/`
+- `validate-post-quality.sh` check 1 errors with `hero image not set`, and also
+  rejects `blog-default.svg`
+
+So `--image-mode chart_only`, whose entire premise is "ships without a hero", now
+produces an article the blog **will reject**. That resolves the B-015 open question
+in the opposite direction from the one assumed: the fix is not to relax `image:`,
+it is that every article needs a hero. **B-016b (generate the hero SVG in Stage 3)
+is therefore a blocker for the next article, not an enhancement.**
+
+Two details worth keeping:
+
+- The stub-size check (≥100×100) shells out to Pillow, which cannot open an SVG —
+  the exception is swallowed, so an **SVG hero skips the dimension check** entirely.
+- `_link_hero_asset` (`pipeline.py`) links `output/posts/images/<slug>-hero.{svg,png}`
+  when it exists and leaves the key **absent** when it does not. Absent is a clean
+  gate failure; a broken path breaks the Jekyll build (BUG-055).
+
+**Verify any change by running the blog's own scripts**, not by reading them:
 
 ```bash
 bash scripts/validate-posts.sh

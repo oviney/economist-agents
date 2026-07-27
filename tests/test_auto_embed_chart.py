@@ -26,7 +26,8 @@ def test_embeds_chart_from_title_when_image_frontmatter_stripped() -> None:
     """chart_only mode strips ``image:`` — the slug must fall back to the title."""
     article = '---\ntitle: "RLHF for Language Models"\n---\n\n' + _BODY
     out = _auto_embed_chart(article)
-    assert "![Chart](/assets/charts/rlhf-for-language-models.png)" in out
+    # "for" is dropped as a stop word per the blog's slug policy (B-019).
+    assert "![Chart](/assets/charts/rlhf-language-models.png)" in out
     # embedded before the References section
     assert out.index("![Chart]") < out.index("## References")
 

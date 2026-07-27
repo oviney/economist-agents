@@ -181,7 +181,8 @@ def test_checkpoint_a_keyless_chart_only_passes_validator(
 
 def test_slug_from_article_uses_title() -> None:
     art = '---\nlayout: post\ntitle: "The Quiet Reinvention of QA"\n---\n\nBody.\n'
-    assert _slug_from_article(art, "fallback topic") == "the-quiet-reinvention-of-qa"
+    # "The" and "of" are dropped as stop words per the blog's slug policy (B-019).
+    assert _slug_from_article(art, "fallback topic") == "quiet-reinvention-qa"
 
 
 def test_slug_from_article_falls_back_to_topic() -> None:
@@ -233,5 +234,6 @@ def test_end_to_end_cli_writes_article_and_exits_zero(
             research_mode="claude_web",
         )
     assert exc.value.code == 0
-    written = (tmp_path / "output" / "posts" / "a-good-title.md").read_text()
+    # "A" is dropped as a stop word per the blog's slug policy (B-019).
+    written = (tmp_path / "output" / "posts" / "good-title.md").read_text()
     assert "A Good Title" in written

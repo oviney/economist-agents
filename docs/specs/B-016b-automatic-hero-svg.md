@@ -1,6 +1,7 @@
 # Spec: B-016b — Stage 3 draws the hero SVG automatically
 
-**Status:** Draft — failure policy decided 2026-07-27; awaiting owner LGTM to build
+**Status:** BUILT 2026-07-27. Verified end to end. See *Measured reality* below —
+three spec assumptions were wrong and are corrected there.
 **Backlog:** B-016b (blocker)
 **Depends on:** B-016a (mechanism), B-019 (`_link_hero_asset`, front-matter contract)
 **Blocks:** every future article
@@ -262,3 +263,53 @@ google-chrome --headless --screenshot=out.png --window-size=1600,900 file://<svg
 **None.** The failure-policy question is resolved above (2026-07-27, owner
 decision): write and link the hero, exit non-zero with the critique, matching the
 existing publication-validator convention.
+
+
+## Measured reality (added 2026-07-27, after building)
+
+Everything below replaces guesses in the sections above. Numbers come from
+instrumenting the SDK message stream and from three real generation runs.
+
+### One hero draw
+
+| | |
+|---|---|
+| Wall clock | **454s** measured; some draws exceed **600s** |
+| Of which thinking, before any SVG appears | **~440s** |
+| Output | one `TextBlock`, ~3,700–5,000 chars |
+| Cost | **$0.4534** per draw |
+| Full loop (1 timeout + 2 draws + 2 critiques) | **1236.7s, $0.6649** |
+
+### Three spec assumptions that were wrong
+
+1. **`max_turns=1` is unusable.** Thinking consumes turns, so a one-turn cap dies
+   with `Reached maximum number of turns (1)` *before any text arrives*. Now 4.
+2. **A 240s timeout and a $0.40 budget were both below the real cost.** Each would
+   have killed a working call on its own. Now 600s and $0.75.
+3. **The critique does not converge.** It found genuine defects on *every* attempt
+   across three runs, so the spec's 2 redraws cost ~16 minutes and bought nothing.
+   Cut to 1.
+
+### What actually determines quality
+
+Not the rules — a **worked example**. With the rulebook alone the output passed all
+nine structural rules and was still clipart (dot-eyed cartoon figure, a "shadow"
+reading as a beige wedge, no editorial idea). Adding a condensed extract of the
+shipped hero to the system prompt — full-bleed background, few large forms,
+silhouettes not faces, separation strokes on overlaps — moved it to usable in one
+change, with no other difference.
+
+### The critique's real character
+
+It is a good **reporter** and an unreliable **judge**, which is why the failure
+policy's "never a gate" stance was right:
+
+- True positives, precisely described: a queue stack clipped at the top and right
+  edges; a figure's stool legs clipped at the bottom.
+- False positive: it called deliberate negative space ("the bottom ~30% is bare
+  floor") a defect.
+
+### Cost per article, for planning
+
+~20 minutes and ~$0.66 for a hero, on top of the writer and graphics stages. That
+is the honest figure to weigh against hand-authoring one.

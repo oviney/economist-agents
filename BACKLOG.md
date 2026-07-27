@@ -26,32 +26,6 @@ _(none)_
 
 ## Todo
 
-### B-016b · Generate the hero SVG automatically in Stage 3 — **NOW A BLOCKER**
-
-**Promoted from follow-on to blocker on 2026-07-26.** B-019 measured the blog's
-gate with `scripts/acceptance_blog_frontmatter.sh` and found that **`image:` is
-required by both blog scripts** and must resolve to a real file
-(`validate-post-quality.sh` check 1: "hero image not set"). There is therefore
-**no publishable chart-only article** — `--image-mode chart_only`, whose premise
-is "ships without a hero", now produces something the blog rejects.
-
-This also resolves the B-015 open question in the opposite direction from the one
-assumed: the fix is not to relax `image:`, it is that every article needs a hero.
-
-B-019 already ships the *linking* half — `_link_hero_asset` (`pipeline.py`) points
-`image:` at `output/posts/images/<slug>-hero.{svg,png}` when it exists, preferring
-SVG, and leaves the key absent when it does not. What remains:
-
-The hero SVG for the flaky-tests
-article was **hand-authored by Claude in-session**, not produced by the pipeline.
-To make this repeatable, Stage 3 needs a graphics step that asks Claude to author
-`output/posts/images/<slug>-hero.svg` from the existing `compose_prompt` brief,
-plus a deterministic gate (well-formed XML, `viewBox`, `<title>`/`<desc>`
-present, no `<text>` glyphs, no external `href`, size ceiling) and a
-render-and-look check. Also unresolved: **multiple figures per post** — the
-owner's ask included "any charts or images the post requires", and today the
-pipeline still draws exactly one chart. Not yet spec'd.
-
 ### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
 
 **`check-agent-scope` RESOLVED 2026-07-24** (see B-015a in Done). **Gate matrix
@@ -113,6 +87,48 @@ researcher would ship — but one topic cost ~102 agents / ~2M tokens / ~15 min 
 brief) lives at `docs/research/ai-productivity-brief.md`.
 
 ## Done
+
+### B-016b · Stage 3 draws the hero SVG automatically — 2026-07-27
+
+Spec: `docs/specs/B-016b-automatic-hero-svg.md` (owner LGTM). **Verified end to
+end: Claude drew a usable hero from the article's own `image_alt` brief with no
+human input.** The blocker is cleared — the pipeline can now produce an article
+with a resolvable `image:`, which both blog validators require.
+
+Shipped: `hero_svg.py` (9-rule structural gate + headless-Chrome render),
+`hero_author.py` (draw loop + vision critique), Stage 3 integration, and the CLI
+exit policy from the spec's three-row failure table.
+
+**What actually determines quality: a worked example, not rules.** With the
+rulebook alone the output passed all nine structural rules and was still clipart —
+dot-eyed cartoon figure, a "shadow" reading as a beige wedge, no editorial idea.
+Adding a condensed extract of the shipped hero to the system prompt (full-bleed
+background, few large forms, silhouettes not faces, separation strokes on overlaps)
+moved it to usable in one change with nothing else different.
+
+**Three spec assumptions were wrong, each independently fatal.** Measured by
+instrumenting the SDK message stream: a draw is ~440s of thinking, then one
+~3,700-char TextBlock at 454s, costing $0.4534.
+- `max_turns=1` → thinking consumes turns, so it died with "Reached maximum number
+  of turns (1)" before any text arrived. Now 4.
+- 240s timeout → below the 454s floor; some draws exceed 600s. Now 600s.
+- $0.40 budget → below the actual $0.4534. Now $0.75.
+
+**The critique is a good reporter and an unreliable judge.** It correctly caught a
+queue stack clipped at the top and right edges, and a figure's stool legs clipped at
+the bottom — but it also called deliberate negative space a defect, and it never
+converged (real defects on every attempt across three runs). So retries went from
+the spec's 2 to 1, and it stays a reporter, never a gate.
+
+**Cost per article: ~20 min, ~$0.66** for the hero, on top of writer + graphics.
+That is the honest figure to weigh against hand-authoring one.
+
+Also found and filed **BUG-059**: `_collect_text` bounds cost but not wall clock, so
+any Stage 3 call — writer and graphics included — can stall the pipeline with no
+diagnostic. The hero's own calls are bounded here as a local mitigation.
+
+Still open: **multiple figures per post**, deliberately out of scope (see spec).
+
 
 ### B-019 · Generated front matter now clears the blog's gate — 2026-07-26
 

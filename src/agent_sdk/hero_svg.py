@@ -27,6 +27,11 @@ from xml.etree import ElementTree
 
 logger = logging.getLogger(__name__)
 
+#: Where Claude's hand-drawn heroes land (Operating Constraint #4). Defined here,
+#: the lowest-level hero module, so stage3_runner and pipeline share one
+#: definition without importing each other.
+HERO_IMAGES_DIR = Path("output/posts/images")
+
 #: The blog's hero slot is 16:9, and so is the shipped hero (1600x900).
 _TARGET_RATIO = 16 / 9
 _RATIO_TOLERANCE = 0.02

@@ -12,7 +12,8 @@ from src.agent_sdk.image_prompt_synth import (
 
 def test_contains_all_hard_constraints() -> None:
     out = compose_prompt(title="X", image_alt="A scene description")
-    assert "Aspect ratio: 1792x1024" in out
+    # 16:9, matching the hero gate and the shipped hero (B-016b).
+    assert "Aspect ratio: 1600x900" in out
     assert "Economist red #E3120B" in out
     assert "no text, no words, no captions" in out
     assert "bold, high-contrast" in out

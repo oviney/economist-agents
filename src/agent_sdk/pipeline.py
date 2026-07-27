@@ -27,6 +27,7 @@ from src.agent_sdk._shared import (
     canonical_slug,
     describe_slug,
 )
+from src.agent_sdk.hero_svg import HERO_IMAGES_DIR
 from src.agent_sdk.image_gate import ImageGateError, check_hero_image
 from src.agent_sdk.stage3_runner import (
     DEFAULT_GRAPHICS_MODEL,
@@ -55,8 +56,6 @@ EXIT_IMAGE_GATE_FAILED = 11
 # #403 slice 3: slug-keyed canonical artefacts. logs/spike/* stays as
 # telemetry only (gitignored at the project level for the spike dir).
 POSTS_DIR = Path("output/posts")
-#: Where Claude's hand-drawn hero SVGs land (CLAUDE.md Operating Constraint #4).
-HERO_IMAGES_DIR = POSTS_DIR / "images"
 STATE_DIR = Path("output/state")
 IMAGE_DROP_DIR = Path("output/posts/images")
 
@@ -98,6 +97,8 @@ class PipelineResult:
     stage3_seconds: float
     stage4_seconds: float
     article_chars: int
+    hero_critique: str = ""
+    hero_error: str = ""
 
 
 def load_brief_file(path: str | Path) -> str:
@@ -188,6 +189,10 @@ async def run_pipeline(
         stage3_seconds=stage3.wall_seconds,
         stage4_seconds=stage4.wall_seconds,
         article_chars=len(final_article),
+        # getattr: test doubles stand in for Stage3Result, same reason as
+        # image_prompt above.
+        hero_critique=getattr(stage3, "hero_critique", ""),
+        hero_error=getattr(stage3, "hero_error", ""),
     )
     wall_seconds = result.stage3_seconds + result.stage4_seconds
     try:
@@ -619,15 +624,38 @@ def _run_end_to_end(
     # original. Surface it explicitly for review rather than burying it in the
     # output path (B-019).
     print(f"  {describe_slug(result.article, topic)}")
-    if result.publication_validator_passed:
-        print("✅ Publication validator PASSED — article is publish-ready.")
-        sys.exit(0)
-    print("❌ Publication validator found issues:", file=sys.stderr)
-    for issue in result.publication_validator_issues:
+
+    # B-016b failure policy. The hero is a separate axis from the validator: the
+    # blog requires a resolvable image:, and an unresolved composition critique
+    # must not ship on a permanent public page just because a warning was logged.
+    hero_failed = bool(result.hero_critique or result.hero_error)
+    if result.hero_error:
+        print(f"❌ No hero drawn: {result.hero_error}", file=sys.stderr)
         print(
-            f"  [{issue.get('severity')}] {issue.get('check')}: {issue.get('message')}",
+            "   The blog requires a resolvable image: — it will reject this "
+            "article until a hero exists.",
             file=sys.stderr,
         )
+    if result.hero_critique:
+        print(
+            "❌ Hero composition still defective after redraws "
+            "(the SVG is on disk — look at it, then redraw or accept):",
+            file=sys.stderr,
+        )
+        for line in result.hero_critique.splitlines():
+            print(f"  {line}", file=sys.stderr)
+
+    if result.publication_validator_passed and not hero_failed:
+        print("✅ Publication validator PASSED — article is publish-ready.")
+        sys.exit(0)
+    if not result.publication_validator_passed:
+        print("❌ Publication validator found issues:", file=sys.stderr)
+        for issue in result.publication_validator_issues:
+            print(
+                f"  [{issue.get('severity')}] {issue.get('check')}: "
+                f"{issue.get('message')}",
+                file=sys.stderr,
+            )
     sys.exit(1)
 
 

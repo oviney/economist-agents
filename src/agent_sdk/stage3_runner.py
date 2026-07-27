@@ -56,6 +56,7 @@ from src.agent_sdk._shared import (
     audit_article_stats as _audit_article_stats,
 )
 from src.agent_sdk.chart_renderer import render_chart
+from src.agent_sdk.hero_svg import HERO_IMAGES_DIR
 from src.agent_sdk.image_prompt_synth import PromptSynthError, compose_prompt
 from src.agent_sdk.research.claude_web import build_claude_web_brief
 from src.agent_sdk.research.deep_research import build_deep_research_brief
@@ -233,6 +234,11 @@ class Stage3Result:
     prompt_path: Path | None = None  # #403 slice 3: image-prompt artefact
     slug: str = ""  # #403 slice 3: canonical slug for downstream resume
     image_prompt: str = ""  # #403 slice 3: the prompt text itself
+    hero_path: Path | None = None  # B-016b: Claude-drawn hero SVG
+    hero_critique: str = (
+        ""  # B-016b: unresolved composition defects (CLI exits non-zero)
+    )
+    hero_error: str = ""  # B-016b: why no hero exists (empty when hero_path is set)
 
 
 _TITLE_FIELD_PATTERN = re.compile(r'^title:\s*["\']?(.*?)["\']?\s*$', re.MULTILINE)
@@ -694,6 +700,34 @@ async def run_stage3(
     except PromptSynthError as exc:
         logger.warning("Image prompt synthesis skipped (%s)", exc)
 
+    # B-016b: Claude draws the hero from that same brief. The blog REQUIRES a
+    # resolvable `image:` (both its validators error without one), so an article
+    # with no hero is unpublishable — but a hero problem must never corrupt or
+    # abort an otherwise good article. So this never raises: the outcome is
+    # reported on Stage3Result and the CLI owns the exit code.
+    hero_path: Path | None = None
+    hero_critique = ""
+    hero_error = ""
+    if image_prompt:
+        # Imported at call time: hero_author needs _collect_text from this module,
+        # so a module-level import here would be a cycle.
+        from src.agent_sdk.hero_author import author_hero_svg
+
+        hero = author_hero_svg(
+            brief=image_prompt,
+            slug=slug,
+            images_dir=HERO_IMAGES_DIR,
+            model=graphics_model,
+        )
+        hero_path, hero_critique, hero_error = hero.path, hero.critique, hero.error
+        if hero_path:
+            logger.info("Drew hero: %s", hero_path)
+        else:
+            logger.warning("No hero drawn (%s)", hero_error or "unknown reason")
+    else:
+        hero_error = "no image_alt in frontmatter, so there was no brief to draw from"
+        logger.warning("Skipping hero: %s", hero_error)
+
     elapsed = time.perf_counter() - start
 
     return Stage3Result(
@@ -715,6 +749,9 @@ async def run_stage3(
         prompt_path=prompt_path,
         slug=slug,
         image_prompt=image_prompt,
+        hero_path=hero_path,
+        hero_critique=hero_critique,
+        hero_error=hero_error,
     )
 
 

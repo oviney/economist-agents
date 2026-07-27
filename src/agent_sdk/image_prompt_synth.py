@@ -28,12 +28,20 @@ from __future__ import annotations
 # Hard constraints that every prompt must end with. Kept as a module
 # constant so tests can assert their presence and so the operator can
 # eyeball them when reviewing the artefact.
+# Corrected 2026-07-27 (B-016b). These were written for DALL-E: the aspect ratio
+# was 1792x1024 because that was a DALL-E size option. There is no raster image
+# model on the keyless path any more — Claude draws the hero as SVG (Operating
+# Constraint #4) — so the ratio now matches the hero gate's 16:9 contract and the
+# hero that actually shipped. Deliberately medium-neutral: this brief says WHAT to
+# draw, and the SVG author step adds the technical how (see hero_svg).
 _HARD_CONSTRAINTS: tuple[str, ...] = (
     "Palette: Economist red #E3120B, deep navy, off-white, one accent",
-    "Aspect ratio: 1792x1024 (landscape hero)",
+    "Aspect ratio: 1600x900 (16:9 landscape hero)",
     "Constraints: no text, no words, no captions, no logos in the image itself",
     "Style: bold, high-contrast graphic editorial illustration "
     "(not painterly, not photorealistic)",
+    "Composition: fill the frame — no large empty regions, and nothing "
+    "important clipped by the edges",
 )
 
 # Cap on inputs we drop into the prompt. Generous enough to keep the

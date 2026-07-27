@@ -345,3 +345,63 @@ class TestCliExitPolicy:
         result = self._result(hero_critique="- dead space")
         self._run(tmp_path, monkeypatch, result)
         assert list((tmp_path / "output" / "posts").glob("*.md"))
+
+
+class TestDrawTimeoutIsBounded:
+    """BUG-059: _collect_text has no timeout, so an unbounded hero call hung the
+    pipeline for 15 minutes with no output. A stalled draw must be a retryable
+    attempt, never a hang."""
+
+    def test_a_timeout_is_retried_with_a_simpler_instruction(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, _no_render: None
+    ) -> None:
+        calls = {"n": 0}
+        prompts: list[str] = []
+
+        async def stall_then_draw(
+            prompt: str, *a: object, **k: object
+        ) -> tuple[str, float]:
+            prompts.append(prompt)
+            calls["n"] += 1
+            if calls["n"] == 1:
+                raise TimeoutError
+            return _GOOD_SVG, 0.0
+
+        monkeypatch.setattr(hero_author, "_collect_text", stall_then_draw)
+        result = hero_author.author_hero_svg(
+            brief=_BRIEF, slug="s", images_dir=tmp_path
+        )
+        assert result.path is not None, "a timeout must not lose the hero entirely"
+        # The retry has to ask for something cheaper, or it just stalls again.
+        assert "simpler" in prompts[1]
+
+    def test_repeated_timeouts_give_up_with_a_diagnostic(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, _no_render: None
+    ) -> None:
+        async def always_stall(*a: object, **k: object) -> tuple[str, float]:
+            raise TimeoutError
+
+        monkeypatch.setattr(hero_author, "_collect_text", always_stall)
+        result = hero_author.author_hero_svg(
+            brief=_BRIEF, slug="s", images_dir=tmp_path
+        )
+        assert result.path is None
+        # Names the real fault so the operator is not left guessing.
+        assert "exceeded" in result.error and "s" in result.error
+
+    def test_the_draw_call_is_actually_wrapped_in_a_timeout(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, _no_render: None
+    ) -> None:
+        # Guards the fix itself: if the wait_for is ever removed, a stalled SDK
+        # call would hang the pipeline again and this test would hang with it.
+        seen: dict[str, object] = {}
+
+        async def capture(coro, timeout=None):  # type: ignore[no-untyped-def]
+            seen["timeout"] = timeout
+            coro.close()
+            return _GOOD_SVG, 0.0
+
+        monkeypatch.setattr(hero_author.asyncio, "wait_for", capture)
+        monkeypatch.setattr(hero_author, "_collect_text", _Recorder([_GOOD_SVG]))
+        hero_author.author_hero_svg(brief=_BRIEF, slug="s", images_dir=tmp_path)
+        assert seen["timeout"] == hero_author._DRAW_TIMEOUT_S

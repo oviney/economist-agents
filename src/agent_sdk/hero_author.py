@@ -46,6 +46,18 @@ _MAX_STRUCTURAL_ATTEMPTS = 3
 #: caps this at 2 deliberately: past that, a human should look.
 _MAX_CRITIQUE_RETRIES = 2
 
+#: Wall-clock ceilings. ``_collect_text`` has no timeout of its own, so without
+#: these a stalled SDK call blocks the pipeline forever — which is exactly what
+#: happened on the first real run (15 minutes, no output, no log line). A hero is
+#: never worth hanging an article for, so a timeout is just a failed attempt.
+_DRAW_TIMEOUT_S = 240
+_CRITIQUE_TIMEOUT_S = 120
+
+#: Cost ceilings, mirroring how the writer and graphics agents are bounded. An
+#: unbounded drawing loop could otherwise spend without limit.
+_DRAW_BUDGET_USD = 0.40
+_CRITIQUE_BUDGET_USD = 0.10
+
 _SVG_BLOCK = re.compile(r"<svg\b.*?</svg\s*>", re.DOTALL | re.IGNORECASE)
 _JSON_BLOCK = re.compile(r"\{.*\}", re.DOTALL)
 
@@ -62,8 +74,10 @@ Hard requirements (a validator rejects the file otherwise):
   drawn anywhere in the artwork.
 - No <image>, no <script>, no on* event attributes, no external references. The
   file must be entirely self-contained geometry.
-- At least 12 drawing primitives; the reference hero uses 66.
-- Under 100 KB.
+- Between 20 and 45 drawing primitives. Build the picture from a modest number
+  of large, confident shapes rather than many tiny ones.
+- Keep the whole file under about 6 KB. A long file is a sign of fussy detail,
+  not of quality.
 
 Craft requirements:
 - Bold, high-contrast, flat graphic shapes. Not painterly, not photorealistic,
@@ -139,7 +153,17 @@ def _parse_verdict(text: str) -> list[str]:
 
 
 async def _draw(prompt: str, model: str) -> tuple[str, float]:
-    return await _collect_text(prompt, HERO_SYSTEM_PROMPT, model=model, max_turns=2)
+    """One bounded drawing call. Raises on timeout so the caller can retry."""
+    return await asyncio.wait_for(
+        _collect_text(
+            prompt,
+            HERO_SYSTEM_PROMPT,
+            model=model,
+            max_turns=1,
+            max_budget_usd=_DRAW_BUDGET_USD,
+        ),
+        timeout=_DRAW_TIMEOUT_S,
+    )
 
 
 async def _author(brief: str, slug: str, images_dir: Path, model: str) -> HeroResult:
@@ -166,6 +190,20 @@ async def _author(brief: str, slug: str, images_dir: Path, model: str) -> HeroRe
                 )
             try:
                 text, call_cost = await _draw(prompt, model)
+            except TimeoutError:
+                # Retryable: a stalled generation is not a reason to give up, but
+                # it must not hang. Shrink the ask on the way round.
+                last_error = (
+                    f"generation exceeded {_DRAW_TIMEOUT_S}s — return a simpler "
+                    "drawing with fewer, larger shapes"
+                )
+                logger.warning(
+                    "Hero attempt %s/%s timed out after %ss",
+                    attempt + 1,
+                    _MAX_STRUCTURAL_ATTEMPTS,
+                    _DRAW_TIMEOUT_S,
+                )
+                continue
             except Exception as exc:  # noqa: BLE001 - degrade, never crash Stage 3
                 logger.warning("Hero authoring call failed: %s", exc)
                 return HeroResult(path=None, error=str(exc), cost_usd=cost)
@@ -218,13 +256,17 @@ async def _critique(svg_path: Path, png_path: Path, model: str) -> list[str]:
     if rendered is None:
         return []
     try:
-        text, _ = await _collect_text(
-            "Use the Read tool to look at this rendered illustration and report "
-            f"composition faults: {rendered}",
-            _CRITIQUE_SYSTEM_PROMPT,
-            model=model,
-            allowed_tools=["Read"],
-            max_turns=3,
+        text, _ = await asyncio.wait_for(
+            _collect_text(
+                "Use the Read tool to look at this rendered illustration and report "
+                f"composition faults: {rendered}",
+                _CRITIQUE_SYSTEM_PROMPT,
+                model=model,
+                allowed_tools=["Read"],
+                max_turns=3,
+                max_budget_usd=_CRITIQUE_BUDGET_USD,
+            ),
+            timeout=_CRITIQUE_TIMEOUT_S,
         )
     except Exception as exc:  # noqa: BLE001 - a malfunction must not cost the hero
         logger.warning("Hero critique failed (%s) — proceeding without it", exc)

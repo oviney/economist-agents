@@ -38,30 +38,65 @@ from src.agent_sdk.stage3_runner import _collect_text
 
 logger = logging.getLogger(__name__)
 
-#: Structural rejections are deterministic and cheap to fix, so allow a couple of
-#: corrections before giving up.
-_MAX_STRUCTURAL_ATTEMPTS = 3
+#: Structural rejections are deterministic and cheap to fix — but a draw is NOT
+#: cheap (measured: ~454s and $0.45 each), so keep the worst case bounded.
+_MAX_STRUCTURAL_ATTEMPTS = 2
 
-#: Composition redraws cost a full generation plus a vision call each. The spec
-#: caps this at 2 deliberately: past that, a human should look.
-_MAX_CRITIQUE_RETRIES = 2
+#: Measured: the critique does NOT converge. Across three real attempts it found
+#: genuine defects every time (dead space, clipped edges), so each redraw cost
+#: ~8 minutes and bought nothing. Reduced from the spec's 2 to 1 — one correction
+#: is worth trying; a second is just spend. See the spec's failure policy: the
+#: critique's real value is the report, not the loop.
+_MAX_CRITIQUE_RETRIES = 1
 
-#: Wall-clock ceilings. ``_collect_text`` has no timeout of its own, so without
-#: these a stalled SDK call blocks the pipeline forever — which is exactly what
-#: happened on the first real run (15 minutes, no output, no log line). A hero is
-#: never worth hanging an article for, so a timeout is just a failed attempt.
-_DRAW_TIMEOUT_S = 240
-_CRITIQUE_TIMEOUT_S = 120
+#: Wall-clock ceilings. ``_collect_text`` has no timeout of its own (BUG-059), so
+#: without these a stalled SDK call blocks the pipeline forever.
+#:
+#: These numbers are MEASURED, not guessed. Instrumenting the message stream for
+#: one hero draw: 440s of SystemMessage/ThinkingBlock traffic, then a single
+#: 3,725-char TextBlock at 454s, cost $0.4534. Drawing a composed scene in SVG is
+#: genuinely a large reasoning task. The first three values I picked (max_turns=1,
+#: 240s, $0.40) were each independently fatal.
+_DRAW_TIMEOUT_S = 600
+_CRITIQUE_TIMEOUT_S = 180
 
-#: Cost ceilings, mirroring how the writer and graphics agents are bounded. An
-#: unbounded drawing loop could otherwise spend without limit.
-_DRAW_BUDGET_USD = 0.40
-_CRITIQUE_BUDGET_USD = 0.10
+#: Thinking consumes turns, so a one-turn cap fails with "Reached maximum number
+#: of turns (1)" before any text arrives. Measured working value: 3.
+_DRAW_MAX_TURNS = 4
+
+#: Cost ceilings, mirroring how the writer and graphics agents are bounded. Set
+#: above the measured $0.4534 with headroom rather than at it.
+_DRAW_BUDGET_USD = 0.75
+_CRITIQUE_BUDGET_USD = 0.15
 
 _SVG_BLOCK = re.compile(r"<svg\b.*?</svg\s*>", re.DOTALL | re.IGNORECASE)
 _JSON_BLOCK = re.compile(r"\{.*\}", re.DOTALL)
 
-HERO_SYSTEM_PROMPT = """You draw editorial hero illustrations as hand-authored SVG.
+#: A worked example beats a rulebook. Measured: with rules alone the model
+#: produces clipart-grade output (crude figure, dead space, clipped edges) that
+#: passes every structural rule. This condensed extract of the hero that shipped
+#: with the first article demonstrates the techniques that actually matter —
+#: full-bleed background, a rotated group, separation strokes on overlapping
+#: shapes, and silhouette figures built from few large forms.
+_EXEMPLAR = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <title>A green build drains the engineering budget</title>
+  <desc>An engineer presses a green tick while a severed pipeline pours coins into a drain.</desc>
+  <rect width="1600" height="900" fill="#f3efe4"/>
+  <g transform="rotate(13.6 800 450)">
+    <rect x="-200" y="300" width="1400" height="90" fill="#17557f"/>
+    <rect x="-200" y="300" width="1400" height="18" fill="#0f3a5f"/>
+  </g>
+  <polygon points="900,760 1500,760 1560,900 840,900" fill="#111111"/>
+  <ellipse cx="1180" cy="762" rx="120" ry="26" fill="#0b2b46"/>
+  <ellipse cx="1150" cy="700" rx="34" ry="14" fill="#e3120b" stroke="#f3efe4" stroke-width="3"/>
+  <ellipse cx="1205" cy="672" rx="34" ry="14" fill="#c10f09" stroke="#f3efe4" stroke-width="3"/>
+  <circle cx="620" cy="560" r="86" fill="#1c8f4a" stroke="#f3efe4" stroke-width="6"/>
+  <path d="M580 560 l30 32 l58 -66" stroke="#f3efe4" stroke-width="16" fill="none"/>
+  <path d="M300 470 q40 -110 96 -110 q56 0 60 110 z" fill="#111111"/>
+  <rect x="318" y="470" width="80" height="210" rx="18" fill="#111111"/>
+</svg>"""
+
+HERO_SYSTEM_PROMPT = f"""You draw editorial hero illustrations as hand-authored SVG.
 
 You are not describing an image for another tool to generate — you are writing the
 SVG source yourself, shape by shape, in the manner of an Economist graphic.
@@ -88,6 +123,14 @@ Craft requirements:
 - Give overlapping subjects a thin background-coloured stroke so they read as
   separate objects rather than a merged silhouette.
 - Nothing important may be clipped by the canvas edge.
+
+Study this extract from a hero that shipped, and imitate its technique — few
+large forms, a full-bleed background, silhouettes rather than cartoon faces,
+separation strokes where shapes overlap, and one clear editorial idea:
+
+{_EXEMPLAR}
+
+Do not copy its subject. Draw the requested subject with that same economy.
 
 Output the SVG source and nothing else. No prose, no markdown fences."""
 
@@ -159,7 +202,7 @@ async def _draw(prompt: str, model: str) -> tuple[str, float]:
             prompt,
             HERO_SYSTEM_PROMPT,
             model=model,
-            max_turns=1,
+            max_turns=_DRAW_MAX_TURNS,
             max_budget_usd=_DRAW_BUDGET_USD,
         ),
         timeout=_DRAW_TIMEOUT_S,
@@ -236,12 +279,16 @@ async def _author(brief: str, slug: str, images_dir: Path, model: str) -> HeroRe
             return HeroResult(path=svg_path, cost_usd=cost)
 
         carry_forward = "\n".join(f"- {d}" for d in defects)
-        logger.warning(
-            "Hero composition defects (redraw %s/%s):\n%s",
-            redraw + 1,
-            _MAX_CRITIQUE_RETRIES,
-            carry_forward,
+        # `redraw` is 0-based and the last pass has no redraw left, so report
+        # what will actually happen rather than a bare counter ("redraw 2/1"
+        # was the confusing output this replaces).
+        remaining = _MAX_CRITIQUE_RETRIES - redraw
+        outcome = (
+            f"redrawing ({remaining} attempt(s) left)"
+            if remaining > 0
+            else "no redraws left — reporting"
         )
+        logger.warning("Hero composition defects, %s:\n%s", outcome, carry_forward)
 
     # Retries exhausted. Keep the hero — it is structurally valid and on disk —
     # and hand the critique back so the CLI can exit non-zero. Shipping silently

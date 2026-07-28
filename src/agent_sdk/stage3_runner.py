@@ -111,6 +111,17 @@ DEFAULT_GRAPHICS_MODEL = _validated_model("GRAPHICS_MODEL", "claude-sonnet-4-6")
 # Bounded writer regeneration on malformed output (non-deterministic drafts).
 _WRITER_MAX_ATTEMPTS = 3
 
+#: Measured cost of ONE Sonnet writer attempt including its tool turns (~$0.42 on
+#: the B-020 acceptance runs), rounded up for headroom.
+_WRITER_ATTEMPT_COST_USD = 0.45
+
+#: The writer budget is cumulative across attempts, so the default must be able to
+#: pay for every attempt the retry policy promises — otherwise a malformed first
+#: draft (a normal, handled condition) starves the retry and aborts the run after
+#: real money is spent (BUG-061). Derived, never hand-picked, so the two cannot
+#: drift apart again.
+DEFAULT_WRITER_BUDGET_USD = _WRITER_ATTEMPT_COST_USD * _WRITER_MAX_ATTEMPTS
+
 WRITER_SYSTEM_PROMPT = """You are an Economist-style Writer renowned for sharp, witty prose with British flair.
 Every article must satisfy the 10 rules below before submission. Do not read files. Write primarily
 from the brief. You MAY call the `search_for_source` tool sparingly (at most 3 times per article)
@@ -562,7 +573,7 @@ async def _graphics_with_retry(
 
 async def run_stage3(
     topic: str,
-    writer_budget_usd: float | None = 0.30,
+    writer_budget_usd: float | None = DEFAULT_WRITER_BUDGET_USD,
     graphics_budget_usd: float | None = 0.10,
     writer_model: str = DEFAULT_WRITER_MODEL,
     graphics_model: str = DEFAULT_GRAPHICS_MODEL,
@@ -575,9 +586,10 @@ async def run_stage3(
 
     Args:
         topic: Article topic.
-        writer_budget_usd: Hard cap for the writer call. Default 0.30
-            (~3× headroom over observed Sonnet 4.6 runs ~$0.11). Bump
-            to 0.60 for Opus runs.
+        writer_budget_usd: Hard cap on TOTAL writer cost across all attempts.
+            Defaults to ``DEFAULT_WRITER_BUDGET_USD`` — one measured attempt
+            (~$0.45) × ``_WRITER_MAX_ATTEMPTS`` — so the retry policy is always
+            funded (BUG-061). ``None`` disables the cap.
         graphics_budget_usd: Hard cap for the graphics call. Default
             0.10 (~3× headroom over ~$0.03).
         writer_model: Model id for the Writer call. Default Sonnet 4.6
@@ -658,6 +670,23 @@ async def run_stage3(
             if writer_budget_usd is None
             else max(0.0, writer_budget_usd - writer_cost)
         )
+        # Never dispatch a retry the budget cannot pay for (BUG-061). The SDK
+        # would abort it anyway, but generically — the operator needs the
+        # arithmetic and the name of the knob, not "budget exceeded".
+        if (
+            attempt > 1
+            and remaining_budget is not None
+            and remaining_budget < _WRITER_ATTEMPT_COST_USD
+        ):
+            raise BudgetExceededError(
+                f"Writer attempt {attempt} of {_WRITER_MAX_ATTEMPTS} needs "
+                f"~${_WRITER_ATTEMPT_COST_USD:.2f} but only "
+                f"${remaining_budget:.2f} is left of --writer-budget "
+                f"${writer_budget_usd:.2f} (spent ${writer_cost:.2f}). Raise "
+                f"--writer-budget to at least "
+                f"${DEFAULT_WRITER_BUDGET_USD:.2f} to fund every attempt.",
+                budget_usd=writer_budget_usd,
+            )
         raw_writer_output, attempt_cost = await _collect_text(
             writer_prompt,
             WRITER_SYSTEM_PROMPT,

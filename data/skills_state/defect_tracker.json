@@ -1014,7 +1014,7 @@
     {
       "id": "BUG-061",
       "severity": "HIGH",
-      "status": "open",
+      "status": "resolved",
       "reported_date": "2026-07-27",
       "title": "Default --writer-budget $0.60 cannot absorb a single writer retry, so the default invocation aborts",
       "description": "The writer budget is consumed ACROSS retry attempts, not per attempt: each attempt is given the remaining balance. One Sonnet writer attempt costs ~$0.42, so a first attempt that produces malformed output (a normal, handled condition with _WRITER_MAX_ATTEMPTS=3) leaves too little for the second, which then aborts the whole pipeline with BudgetExceededError.",
@@ -1022,7 +1022,12 @@
       "root_cause": "The default was never validated against a real retry. Its own help text claims it is 'sized for Sonnet with retries + tool turns', but at ~$0.42 per attempt three attempts need ~$1.26 and even two need ~$0.85.",
       "impact": "The DEFAULT invocation fails whenever the writer's first attempt is malformed — which happened on the very first real end-to-end run. Wastes ~14 minutes and the cost of the attempts, and produces no article. The retry mechanism that exists to add resilience instead guarantees failure.",
       "proposed_fix": "Raise the default to ~$1.60 (3 attempts x $0.42 plus headroom) and correct the help text with the measured per-attempt cost. Consider giving each attempt its own cap rather than sharing one balance, so a wasted attempt cannot starve the retry it exists to enable. Verify by running with the default and forcing a retry.",
-      "workaround": "Pass --writer-budget 1.60 explicitly."
+      "workaround": "Pass --writer-budget 1.60 explicitly.",
+      "fixed_date": "2026-07-28T00:00:00",
+      "resolved_date": "2026-07-28",
+      "prevention_test_added": "tests/test_writer_budget_funds_retry.py",
+      "fix_notes": "The cumulative cap was correct; the DEFAULT was incoherent with _WRITER_MAX_ATTEMPTS. Default now derives from _WRITER_ATTEMPT_COST_USD (0.45, measured) x _WRITER_MAX_ATTEMPTS, shared by run_stage3/run_pipeline/--writer-budget. An unfundable retry is refused BEFORE dispatch with an error naming the flag and the arithmetic, instead of the SDK generic abort.",
+      "verification": "4 regression tests + full suite 2386 passed (2026-07-28)"
     },
     {
       "id": "BUG-062",

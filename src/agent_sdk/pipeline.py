@@ -31,6 +31,7 @@ from src.agent_sdk.hero_svg import HERO_IMAGES_DIR
 from src.agent_sdk.image_gate import ImageGateError, check_hero_image
 from src.agent_sdk.stage3_runner import (
     DEFAULT_GRAPHICS_MODEL,
+    DEFAULT_WRITER_BUDGET_USD,
     DEFAULT_WRITER_MODEL,
     Stage3Result,
     run_stage3,
@@ -150,7 +151,7 @@ def _maybe_inject_hero_prompt(
 
 async def run_pipeline(
     topic: str,
-    writer_budget_usd: float | None = 0.30,
+    writer_budget_usd: float | None = DEFAULT_WRITER_BUDGET_USD,
     graphics_budget_usd: float | None = 0.10,
     writer_model: str = DEFAULT_WRITER_MODEL,
     graphics_model: str = DEFAULT_GRAPHICS_MODEL,
@@ -424,11 +425,13 @@ def main() -> None:
     parser.add_argument(
         "--writer-budget",
         type=float,
-        default=0.60,
+        default=DEFAULT_WRITER_BUDGET_USD,
         help=(
-            "Hard cap on writer cost in USD (default 0.60). This is a runaway "
-            "guard, not billing — the subscription path is not metered per token; "
-            "sized for Sonnet with retries + tool turns."
+            f"Hard cap on TOTAL writer cost in USD across all attempts (default "
+            f"{DEFAULT_WRITER_BUDGET_USD:.2f}). This is a runaway guard, not "
+            "billing — the subscription path is not metered per token. The "
+            "default is one measured Sonnet attempt x the retry limit, so a "
+            "malformed first draft can still be regenerated (BUG-061)."
         ),
     )
     parser.add_argument(

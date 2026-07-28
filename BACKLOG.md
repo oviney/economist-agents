@@ -26,32 +26,6 @@ _(none)_
 
 ## Todo
 
-### B-020 · Full acceptance run: generate article + hero end to end (NEXT ACTION)
-
-Everything is built; this is the run that proves it. B-016b's success criterion 1
-and the last thing between here and article two.
-
-```bash
-IS_SANDBOX=1 python -m src.agent_sdk.pipeline "<topic>" \
-  --research-mode claude_web --image-mode hero
-scripts/acceptance_blog_frontmatter.sh <path-to-a-blog-clone>   # expect 0 errors
-```
-
-Expect it to take a while and cost real money: the hero alone is **~20 min and
-~$0.66** on top of writer + graphics (measured — see B-016b in Done). Budget one
-sitting for it.
-
-What to check, beyond exit code 0:
-1. `scripts/acceptance_blog_frontmatter.sh` reports **0 errors** using the
-   generated article and its generated hero (not the stand-in).
-2. **Look at the hero PNG.** Operating Constraint #4. The critique reports defects
-   but is not a gate, and it produces false positives (it called deliberate
-   negative space a defect), so the render still needs eyes before publishing.
-3. The printed `slug: <value> (N chars, <source>)` line is a sane permanent URL —
-   there are no redirects on the blog, so this is the last cheap moment to fix it.
-4. A non-zero exit with a hero critique is EXPECTED, not a failure: the hero is on
-   disk, and the call is whether to accept it, redraw, or hand-author.
-
 ### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
 
 **`check-agent-scope` RESOLVED 2026-07-24** (see B-015a in Done). **Gate matrix
@@ -113,6 +87,52 @@ researcher would ship — but one topic cost ~102 agents / ~2M tokens / ~15 min 
 brief) lives at `docs/research/ai-productivity-brief.md`.
 
 ## Done
+
+### B-020 · Full end-to-end acceptance PASSED — 2026-07-27
+
+**A fully generated article cleared the blog's own validators with 0 errors** —
+front matter, chart, and a Claude-drawn hero, nothing hand-touched. This is
+B-016b's success criterion 1 and the last gate before article two.
+
+```
+validate-posts:        PASSED — all posts valid
+validate-post-quality: ✅ code-review-queue-throughput-tax.md   Errors: 0
+ACCEPTANCE PASSED — generated front matter clears the blog's gate.
+```
+
+Reproduce with `scripts/acceptance_blog_frontmatter.sh <blog-clone> <article.md>`.
+
+**It took five runs, and each one exposed a different real defect that no test
+could have caught.** That is the headline finding, worth more than any single fix:
+
+| Run | Died at | Defect |
+|---|---|---|
+| 1 | writer budget | **BUG-061** — retries share one budget, so a malformed first attempt starves the retry meant to recover from it |
+| 2 | hero step | `asyncio.run()` inside a running loop; all 20 hero tests called it synchronously |
+| 3 | chart render | **BUG-063** — graphics had no retry while the writer has three |
+| 4 | acceptance gate | `chart_only` stripped `image_alt`/`image_caption` and injected a "generate an image" comment, both premised on there being no hero |
+| 5 | acceptance gate | `image_alt` rejected as prompt text |
+
+Also caught in passing: **BUG-062 (CRITICAL)** — wiring the hero into Stage 3 made
+`make ci-local` issue real LLM calls, because `hero_author` holds its own
+`_collect_text` reference. The gate went from timing out at 900s to 119s once
+`netguard` blocked the SDK chokepoint.
+
+**The nicest fix:** `image_alt` now comes from the hero SVG's own `<desc>`. The
+writer's alt is a drawing *brief* ("An Economist-style editorial illustration
+of…") which the blog rejects as prompt text; the `<desc>` describes what was
+actually drawn, so it is both more accurate and clean of prompt vocabulary.
+
+**Measured cost of one article:** ~$0.97–$1.35 and ~35 minutes, including the
+hero (~20 min, ~$0.66) and the graphics retries — which fired on **2 of 3
+attempts** in the passing run.
+
+**Hero quality, looked at (Constraint #4):** usable, not excellent. The editorial
+idea lands — a small figure dwarfed by a towering queue, burndown flatlining below
+— but the top card is clipped, the chart line runs off the right edge, and the
+figure is crude. The vision critique reported all three correctly, which is the
+design working: gate passes, critique reports, human decides.
+
 
 ### B-016b · Stage 3 draws the hero SVG automatically — 2026-07-27
 

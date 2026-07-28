@@ -279,3 +279,128 @@ class TestHeroAssetIsLinked:
         assert _link_hero_asset("no frontmatter", "my-slug", images_dir=images) == (
             "no frontmatter"
         )
+
+
+class TestHeroMetadataSurvivesWhenAHeroExists:
+    """chart_only was built on 'this article ships without a hero', which B-016b
+    made false. It stripped image_alt/image_caption and injected a 'generate an
+    image from this prompt' comment — so the blog rejected the article for
+    'missing image_alt' even though a hero had been drawn (B-020 run 4)."""
+
+    @staticmethod
+    def _article() -> str:
+        return (
+            '---\nlayout: post\ntitle: "T"\n'
+            'image_alt: "A developer waiting beside a queue of review cards"\n'
+            'image_caption: "Waiting is the work nobody bills"\n'
+            "---\n\n## Body\n\nText. As the chart shows, it costs.\n\n"
+            "## References\n\n1. A\n2. B\n3. C\n"
+        )
+
+    def test_alt_and_caption_are_kept_when_a_hero_was_drawn(self) -> None:
+        from src.agent_sdk.pipeline import _prepare_for_stage4
+
+        out = _prepare_for_stage4(
+            self._article(), image_mode="chart_only", hero_drawn=True
+        )
+        assert "image_alt:" in out
+        assert "image_caption:" in out
+
+    def test_alt_and_caption_are_stripped_when_no_hero_exists(self) -> None:
+        # Unchanged behaviour for the genuinely-heroless case.
+        from src.agent_sdk.pipeline import _prepare_for_stage4
+
+        out = _prepare_for_stage4(
+            self._article(), image_mode="chart_only", hero_drawn=False
+        )
+        assert "image_alt:" not in out
+
+    def test_the_hero_prompt_comment_is_not_injected_when_a_hero_exists(self) -> None:
+        from src.agent_sdk.pipeline import _maybe_inject_hero_prompt
+
+        out = _maybe_inject_hero_prompt(
+            "---\nlayout: post\n---\n\nBody.\n",
+            image_mode="chart_only",
+            image_prompt="draw something",
+            hero_drawn=True,
+        )
+        assert "HERO IMAGE" not in out
+
+    def test_the_hero_prompt_comment_is_still_injected_without_a_hero(self) -> None:
+        from src.agent_sdk.pipeline import _maybe_inject_hero_prompt
+
+        out = _maybe_inject_hero_prompt(
+            "---\nlayout: post\n---\n\nBody.\n",
+            image_mode="chart_only",
+            image_prompt="draw something",
+            hero_drawn=False,
+        )
+        assert "HERO IMAGE" in out
+
+
+class TestAltTextComesFromTheDrawing:
+    """The writer's image_alt is a drawing BRIEF ("An Economist-style editorial
+    illustration of...") and the blog rejects that as prompt text, not alt text.
+    The hero SVG's own <desc> describes what was actually drawn, which is what a
+    screen reader needs. Found by B-020 run 5."""
+
+    @staticmethod
+    def _hero(desc: str) -> str:
+        return (
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">'
+            f"<title>T</title><desc>{desc}</desc></svg>"
+        )
+
+    def test_alt_is_replaced_with_the_heros_description(self, tmp_path: Path) -> None:
+        from src.agent_sdk.pipeline import _link_hero_asset
+
+        images = tmp_path / "images"
+        images.mkdir()
+        desc = "A developer reaches toward a towering stack of amber review cards."
+        (images / "s-hero.svg").write_text(self._hero(desc))
+        article = (
+            '---\nlayout: post\ntitle: "T"\n'
+            'image_alt: "An Economist-style editorial illustration of a developer"\n'
+            "---\n\nBody.\n"
+        )
+        out = _link_hero_asset(article, "s", images_dir=images)
+        assert f'image_alt: "{desc}"' in out
+        assert "editorial illustration" not in out
+
+    def test_a_hero_without_a_desc_leaves_the_existing_alt_alone(
+        self, tmp_path: Path
+    ) -> None:
+        from src.agent_sdk.pipeline import _link_hero_asset
+
+        images = tmp_path / "images"
+        images.mkdir()
+        (images / "s-hero.svg").write_text(
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">'
+            "<title>T</title></svg>"
+        )
+        article = '---\nlayout: post\ntitle: "T"\nimage_alt: "kept"\n---\n\nBody.\n'
+        assert 'image_alt: "kept"' in _link_hero_asset(article, "s", images_dir=images)
+
+    def test_alt_is_added_when_the_writer_omitted_it(self, tmp_path: Path) -> None:
+        from src.agent_sdk.pipeline import _link_hero_asset
+
+        images = tmp_path / "images"
+        images.mkdir()
+        (images / "s-hero.svg").write_text(self._hero("A quiet queue of cards."))
+        out = _link_hero_asset(
+            '---\nlayout: post\ntitle: "T"\n---\n\nBody.\n', "s", images_dir=images
+        )
+        assert 'image_alt: "A quiet queue of cards."' in out
+
+    def test_a_desc_with_quotes_cannot_break_the_yaml(self, tmp_path: Path) -> None:
+        from src.agent_sdk.pipeline import _link_hero_asset
+
+        images = tmp_path / "images"
+        images.mkdir()
+        (images / "s-hero.svg").write_text(self._hero('A "quoted" phrase inside.'))
+        out = _link_hero_asset(
+            '---\nlayout: post\ntitle: "T"\n---\n\nBody.\n', "s", images_dir=images
+        )
+        import yaml
+
+        yaml.safe_load(out.split("---", 2)[1])  # must parse

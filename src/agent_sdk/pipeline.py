@@ -115,6 +115,39 @@ def load_brief_file(path: str | Path) -> str:
     return text.strip() + "\n"
 
 
+def _prepare_for_stage4(article: str, *, image_mode: str, hero_drawn: bool) -> str:
+    """Embed the chart and, when appropriate, strip hero metadata.
+
+    ``chart_only`` was built on the premise that the article ships WITHOUT a hero,
+    so it stripped ``image_alt``/``image_caption`` along with ``image:``. B-016b
+    made that premise false, and the blog requires both fields — so a drawn hero
+    produced an article rejected for "missing image_alt" (B-020 run 4). Strip only
+    when there really is no hero.
+    """
+    if image_mode != "chart_only":
+        return article
+    # Embed the chart while the hero-image slug is still present (the chart path
+    # is derived from it), THEN strip — stripping first would leave
+    # _auto_embed_chart with no slug and fail the required-chart check (BUG-040).
+    article = _auto_embed_chart(article)
+    if hero_drawn:
+        return article
+    return _strip_image_frontmatter(article)
+
+
+def _maybe_inject_hero_prompt(
+    article: str, *, image_mode: str, image_prompt: str, hero_drawn: bool
+) -> str:
+    """Surface the hero-image prompt for a reviewer — only if no hero was drawn.
+
+    Injecting it alongside a hero that already exists tells the reviewer to
+    hand-make art the pipeline just produced.
+    """
+    if image_mode == "chart_only" and image_prompt and not hero_drawn:
+        return _inject_hero_prompt_comment(article, image_prompt)
+    return article
+
+
 async def run_pipeline(
     topic: str,
     writer_budget_usd: float | None = 0.30,
@@ -145,24 +178,21 @@ async def run_pipeline(
         research_mode=research_mode,
         brief_override=brief_override,
     )
-    article_for_stage4 = stage3.article
-    if image_mode == "chart_only":
-        # Embed the chart while the hero-image slug is still present (the chart
-        # path is derived from it), THEN strip the hero metadata — mirroring
-        # _run_resume. Stripping first would leave _auto_embed_chart with no slug
-        # and the article would fail the validator's required-chart check
-        # (BUG-040).
-        article_for_stage4 = _auto_embed_chart(stage3.article)
-        article_for_stage4 = _strip_image_frontmatter(article_for_stage4)
+    hero_drawn = bool(getattr(stage3, "hero_path", None))
+    article_for_stage4 = _prepare_for_stage4(
+        stage3.article, image_mode=image_mode, hero_drawn=hero_drawn
+    )
     stage4 = run_stage4(article_for_stage4, stage3.chart_data)
 
     # Surface the hero-image prompt inline (chart-only ships without a hero; the
     # reviewer generates the image from this prompt at PR-review time — CLAUDE.md
     # Operating Constraint #4). Injected AFTER Stage 4 so validation is unchanged.
-    final_article = stage4.article
-    image_prompt = getattr(stage3, "image_prompt", "")
-    if image_mode == "chart_only" and image_prompt:
-        final_article = _inject_hero_prompt_comment(final_article, image_prompt)
+    final_article = _maybe_inject_hero_prompt(
+        stage4.article,
+        image_mode=image_mode,
+        image_prompt=getattr(stage3, "image_prompt", ""),
+        hero_drawn=hero_drawn,
+    )
 
     # The blog requires a resolvable `image:` (B-019), so link the hero asset if
     # one has been drawn for this slug. No asset -> the key stays absent and the
@@ -571,7 +601,33 @@ def _link_hero_asset(
         return article
     fm = _IMAGE_LINE.sub("", parts[1]).rstrip()
     fm += f"\nimage: /assets/images/{slug}-hero{suffix}\n"
+
+    # The hero's own <desc> is real alt text: it describes what was DRAWN. The
+    # writer's image_alt is a drawing brief ("An Economist-style editorial
+    # illustration of...") and the blog rejects that as prompt text rather than
+    # accessible alt text (B-020 run 5).
+    desc = _hero_description(images_dir / f"{slug}-hero{suffix}")
+    if desc:
+        fm = _IMAGE_ALT_LINE.sub("", fm).rstrip()
+        fm += f'\nimage_alt: "{desc}"\n'
     return "---" + fm + "---" + parts[2]
+
+
+_HERO_DESC = re.compile(r"<desc[^>]*>(.*?)</desc>", re.DOTALL | re.IGNORECASE)
+_IMAGE_ALT_LINE = re.compile(r"^image_alt:.*$\n?", re.MULTILINE)
+
+
+def _hero_description(path: Path) -> str:
+    """The hero's ``<desc>``, cleaned for use as YAML-safe alt text."""
+    try:
+        match = _HERO_DESC.search(path.read_text())
+    except OSError:
+        return ""
+    if not match:
+        return ""
+    # Collapse whitespace and drop double quotes so the value cannot break the
+    # front matter it is written into.
+    return " ".join(match.group(1).split()).replace('"', "").strip()
 
 
 def _run_end_to_end(

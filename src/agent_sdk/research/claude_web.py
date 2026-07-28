@@ -18,6 +18,7 @@ and is non-deterministic. The downstream ``citation_verifier`` /
 
 from __future__ import annotations
 
+import asyncio
 import logging
 
 from claude_agent_sdk import (
@@ -31,6 +32,11 @@ from claude_agent_sdk import (
 logger = logging.getLogger(__name__)
 
 RESEARCH_MODEL = "claude-sonnet-4-6"
+
+#: Wall-clock bound for the whole web-research leg (BUG-059). Generous because
+#: this is a 40-turn search/fetch loop and the costliest leg of Stage 3
+#: (~$0.53-0.65 measured); it is a hang detector, not a schedule.
+DEFAULT_WEB_RESEARCH_TIMEOUT_S = 900.0
 # Turns for the search→fetch→reason loop. Web research fans out across several
 # queries + fetches, so this needs real headroom or the SDK hits the cap and the
 # brief soft-degrades to empty (BUG-042). Bounded to avoid runaway.
@@ -71,6 +77,7 @@ def _format_brief(topic: str, body: str) -> str:
 async def build_claude_web_brief(
     topic: str,
     max_budget_usd: float | None = None,
+    timeout_s: float | None = None,
 ) -> tuple[str, float]:
     """Research ``topic`` with Claude's own web tools; return ``(brief, cost)``.
 
@@ -82,10 +89,14 @@ async def build_claude_web_brief(
     Args:
         topic: The article topic to research.
         max_budget_usd: Optional cumulative SDK budget ceiling for this call.
+        timeout_s: Wall-clock bound (BUG-059); defaults to
+            ``DEFAULT_WEB_RESEARCH_TIMEOUT_S``. A stall degrades exactly like any
+            other SDK failure — an empty brief — rather than hanging Stage 3.
 
     Returns:
         ``(brief, cost_usd)`` — the brief string and SDK-reported cost.
     """
+    bound = DEFAULT_WEB_RESEARCH_TIMEOUT_S if timeout_s is None else timeout_s
     options = ClaudeAgentOptions(
         system_prompt=_SYSTEM_PROMPT,
         model=RESEARCH_MODEL,
@@ -105,13 +116,21 @@ async def build_claude_web_brief(
     text_parts: list[str] = []
     cost = 0.0
     try:
-        async for message in query(prompt=prompt, options=options):
-            if isinstance(message, AssistantMessage):
-                for block in message.content:
-                    if isinstance(block, TextBlock):
-                        text_parts.append(block.text)
-            elif isinstance(message, ResultMessage):
-                cost = float(message.total_cost_usd or 0.0)
+        async with asyncio.timeout(bound):
+            async for message in query(prompt=prompt, options=options):
+                if isinstance(message, AssistantMessage):
+                    for block in message.content:
+                        if isinstance(block, TextBlock):
+                            text_parts.append(block.text)
+                elif isinstance(message, ResultMessage):
+                    cost = float(message.total_cost_usd or 0.0)
+    except TimeoutError:
+        # BUG-059: research is the longest multi-turn leg, so it is the most
+        # likely to stall. Same soft degrade as any other SDK failure below.
+        logger.warning(
+            "claude_web research exceeded its %gs bound — returning empty brief",
+            bound,
+        )
     except Exception as exc:  # noqa: BLE001 — soft-degrade, never crash Stage 3
         logger.warning("claude_web research failed (%s) — returning empty brief", exc)
 

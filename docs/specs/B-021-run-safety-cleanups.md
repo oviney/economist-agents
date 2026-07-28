@@ -56,12 +56,30 @@ and removes the only runaway guard on the writer.
 SDK `query()` generator with no `asyncio` timeout. `max_budget_usd` stops
 spending, not waiting.
 
-**Change:** wrap the collection in `asyncio.timeout` with a per-call
-`timeout_s` parameter, defaulted per call site from measured reality — the hero
-draw is the long pole at 440–600s and must not be given the writer's bound. On
-expiry, raise a typed error naming which call timed out and its bound, so the
-retry loops (writer, graphics) can treat it as one more malformed-output-class
-failure rather than a crash.
+**Change:** wrap the collection in `asyncio.timeout` with a `timeout_s`
+parameter and a module default, raising a typed `ModelCallTimeoutError` tagged
+with a `label` that names the call (`"writer (attempt 2/3)"`).
+
+**Amended during implementation (2026-07-28), two points:**
+
+1. **Scope widened to every unbounded collector, not just `_collect_text`.** The
+   defect was logged against `_collect_text`, but `research/_llm.py` and
+   `research/claude_web.py` each `async for` over `query()` with no bound too —
+   and research is the *longest and costliest* leg (~$0.53–0.65, a 40-turn
+   search/fetch loop). Fixing only the one named collector would have left the
+   identical hole in the likeliest place to hit it. The hero path needed nothing:
+   `hero_author` already wraps `_collect_text` in its own `asyncio.wait_for`.
+2. **A timeout fails fast; it is NOT fed to the retry loops** as this spec
+   originally proposed. Retrying a stall would mean 3 × 15 min of waiting before
+   the operator learns anything, which is the defect wearing a different hat.
+   Research is the one exception: it already soft-degrades to an empty brief on
+   any SDK failure, and a stall is treated identically.
+
+**Bounds, from measurement, not taste** (`logs/agent_sdk_costs.jsonl` +
+B-016b timings): one Stage 3 call 900s, one research orchestration call 300s,
+the web-research leg 900s. Longest single call ever observed is a 440–600s hero
+draw; whole Stage 3 runs land at 406–1500s across many calls. These are hang
+detectors sitting above anything legitimate — not schedules.
 
 **Not doing:** a global pipeline timeout. It cannot say *what* hung, which is the
 whole point.

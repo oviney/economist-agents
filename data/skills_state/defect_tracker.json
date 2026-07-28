@@ -989,7 +989,7 @@
     {
       "id": "BUG-059",
       "severity": "HIGH",
-      "status": "open",
+      "status": "resolved",
       "reported_date": "2026-07-27",
       "title": "_collect_text has no wall-clock timeout, so any Stage 3 LLM call can hang the pipeline indefinitely",
       "description": "src/agent_sdk/stage3_runner.py::_collect_text awaits the Agent SDK query() generator with no asyncio timeout. max_budget_usd bounds COST but not TIME, and a stalled or very long generation blocks forever with no output.",
@@ -997,7 +997,12 @@
       "root_cause": "Missing timeout. The writer and graphics agents are bounded on cost (max_budget_usd) but not on wall clock, so the same exposure exists for every Stage 3 call, not just the hero.",
       "impact": "A hung provider call stalls the whole pipeline with no diagnostic. The operator sees no output and cannot tell a slow run from a dead one. Affects the writer and graphics agents too.",
       "proposed_fix": "Give _collect_text an explicit timeout_s parameter with a sane default and wrap the query() iteration in asyncio.wait_for, raising a typed AgentCallTimeout that callers can treat as a retryable attempt failure. B-016b already bounds its OWN calls (240s draw / 120s critique) as a local mitigation; this generalises it.",
-      "workaround": "B-016b's hero calls are individually bounded; other callers are not."
+      "workaround": "B-016b's hero calls are individually bounded; other callers are not.",
+      "fixed_date": "2026-07-28T00:00:00",
+      "resolved_date": "2026-07-28",
+      "prevention_test_added": "tests/test_model_call_timeouts.py",
+      "fix_notes": "Every SDK collector now runs under asyncio.timeout and converts expiry into a typed ModelCallTimeoutError labelled with the call (\"writer (attempt 2/3)\"). Scope widened past the logged component: research/_llm.py and research/claude_web.py had the identical unbounded async-for, and research is the longest leg. Bounds from measured data: 900s per Stage 3 call, 300s per research orchestration call, 900s for the web-research leg. A timeout fails fast rather than being retried; research keeps its existing soft degrade to an empty brief. hero_author already bounded itself at 600s and was left alone.",
+      "verification": "7 regression tests + full suite 2393 passed (2026-07-28)"
     },
     {
       "id": "BUG-060",

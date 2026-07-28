@@ -49,6 +49,7 @@ from src.agent_sdk._shared import (
 from src.agent_sdk._shared import (
     GRAPHICS_AGENT_PROMPT,
     BudgetExceededError,
+    ModelCallTimeoutError,
     build_research_brief,
     canonical_slug,
 )
@@ -114,6 +115,13 @@ _WRITER_MAX_ATTEMPTS = 3
 #: Measured cost of ONE Sonnet writer attempt including its tool turns (~$0.42 on
 #: the B-020 acceptance runs), rounded up for headroom.
 _WRITER_ATTEMPT_COST_USD = 0.45
+
+#: Wall-clock backstop for ONE model call (BUG-059). Not a target — a bound on
+#: "this has hung". The longest single call ever measured is a hero draw at
+#: 440-600s (hero_author bounds itself tighter at 600s); whole-Stage-3 runs land
+#: at 406-1500s across many calls. 900s therefore sits above anything legitimate
+#: and turns an infinite stall into a failure the operator can read.
+DEFAULT_CALL_TIMEOUT_S = 900.0
 
 #: The writer budget is cumulative across attempts, so the default must be able to
 #: pay for every attempt the retry policy promises — otherwise a malformed first
@@ -396,6 +404,8 @@ async def _collect_text(
     mcp_servers: dict[str, Any] | None = None,
     allowed_tools: list[str] | None = None,
     max_turns: int = 1,
+    timeout_s: float | None = None,
+    label: str = "stage 3",
 ) -> tuple[str, float]:
     """Run an Agent SDK query and return ``(text, cost_usd)``.
 
@@ -407,7 +417,15 @@ async def _collect_text(
     By default no tools are exposed and the query runs in a single turn. Pass
     ``mcp_servers``/``allowed_tools`` with ``max_turns > 1`` to enable a tool-use
     loop (e.g. the writer's on-demand source search, #389).
+
+    The call is bounded in wall clock as well as cost (BUG-059): ``timeout_s``
+    falls back to ``DEFAULT_CALL_TIMEOUT_S`` and expiry raises
+    :class:`ModelCallTimeoutError` tagged with ``label``. There is deliberately
+    no way to opt out — an unbounded call is the defect. A caller that needs a
+    tighter bound passes a smaller ``timeout_s`` (``hero_author`` bounds its own
+    draw at 600s, well inside the default backstop).
     """
+    bound = DEFAULT_CALL_TIMEOUT_S if timeout_s is None else timeout_s
     options = ClaudeAgentOptions(
         system_prompt=system_prompt,
         model=model,
@@ -422,21 +440,28 @@ async def _collect_text(
     cost = 0.0
     budget_msg: ResultMessage | None = None
     try:
-        async for msg in query(prompt=prompt, options=options):
-            if isinstance(msg, AssistantMessage):
-                for block in msg.content:
-                    if isinstance(block, TextBlock):
-                        text_chunks.append(block.text)
-            elif isinstance(msg, ResultMessage):
-                cost = float(msg.total_cost_usd or 0.0)
-                if msg.subtype == "error_max_budget_usd":
-                    # Break out and raise AFTER the loop (below). Raising here,
-                    # mid-iteration, makes the async-for finalise the query()
-                    # generator while it is still running its subprocess pump —
-                    # 'aclose(): asynchronous generator is already running'
-                    # then masks the real BudgetExceededError (BUG-048).
-                    budget_msg = msg
-                    break
+        async with asyncio.timeout(bound):
+            async for msg in query(prompt=prompt, options=options):
+                if isinstance(msg, AssistantMessage):
+                    for block in msg.content:
+                        if isinstance(block, TextBlock):
+                            text_chunks.append(block.text)
+                elif isinstance(msg, ResultMessage):
+                    cost = float(msg.total_cost_usd or 0.0)
+                    if msg.subtype == "error_max_budget_usd":
+                        # Break out and raise AFTER the loop (below). Raising
+                        # here, mid-iteration, makes the async-for finalise the
+                        # query() generator while it is still running its
+                        # subprocess pump — 'aclose(): asynchronous generator is
+                        # already running' then masks the real
+                        # BudgetExceededError (BUG-048).
+                        budget_msg = msg
+                        break
+    except TimeoutError as exc:
+        # BUG-059: the call stalled. Nothing was returned, so there is nothing
+        # to salvage — fail loudly and name the call rather than waiting forever.
+        logger.error("%s model call timed out after %gs", label, bound)
+        raise ModelCallTimeoutError(label, bound) from exc
     except Exception as exc:  # noqa: BLE001
         # The subscription CLI raises (rather than returning a ResultMessage)
         # when it hits the turn cap. If the agent already emitted text, proceed
@@ -545,6 +570,7 @@ async def _graphics_with_retry(
             # Turn headroom: the subscription CLI can need >1 turn for the JSON
             # (BUG-042). Kept small — no tools are exposed for graphics.
             max_turns=4,
+            label=f"graphics (attempt {attempt}/{_GRAPHICS_MAX_ATTEMPTS})",
         )
         cost += call_cost
         chart_data = _ensure_chart_title(_parse_chart_json(text), article, topic)
@@ -697,6 +723,7 @@ async def run_stage3(
             # Each search costs 2 turns (the tool_use, then consuming the
             # tool_result); plus the initial draft and 1 turn of headroom.
             max_turns=2 * search_session.max_calls + 2,
+            label=f"writer (attempt {attempt}/{_WRITER_MAX_ATTEMPTS})",
         )
         writer_cost += attempt_cost
         # _extract_article (BUG-047) unwraps a fence AND strips conversational

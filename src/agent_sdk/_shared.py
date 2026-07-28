@@ -47,6 +47,28 @@ class SearchProvidersEmptyError(EmptyResearchBriefError):
     """
 
 
+class ModelCallTimeoutError(RuntimeError):
+    """Raised when a model call exceeds its wall-clock bound (BUG-059).
+
+    ``max_budget_usd`` bounds what a call may SPEND; it says nothing about how
+    long it may WAIT. An Agent SDK ``query()`` that stalls therefore blocked
+    Stage 3 indefinitely, with no output and no way to distinguish a slow call
+    from a dead one. Every collector now runs under a bound and converts the
+    expiry into this typed error, which names the call so a log line is
+    actionable rather than "the pipeline is stuck".
+    """
+
+    def __init__(self, label: str, timeout_s: float) -> None:
+        self.label = label
+        self.timeout_s = timeout_s
+        super().__init__(
+            f"{label} model call exceeded its {timeout_s:g}s wall-clock bound. "
+            "The call produced no result and was abandoned; nothing was "
+            "committed. Retry, or raise the bound if this call is legitimately "
+            "this slow."
+        )
+
+
 class BudgetExceededError(RuntimeError):
     """Raised when an Agent SDK call hits its ``max_budget_usd`` cap.
 

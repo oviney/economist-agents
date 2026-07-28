@@ -11,22 +11,21 @@ to test, and one fewer framework dependency.
 Stages:
     1. discover_topics — topic scout + dedup gate
     2. editorial_review — 6-persona weighted board vote
-    3. generate_content — Agent SDK Stage 3 (Writer + Graphics); hero image
-       only when ``image_mode="hero"`` (see Image policy below)
+    3. generate_content — Agent SDK Stage 3 (Writer + Graphics + hero SVG)
     4. quality_gate — frontmatter schema + Agent SDK Stage 4 + validator
     5a. publish — index + persist
     5b. revise — one retry with feedback, then quarantine
 
-Image policy (#410):
-    The CLI (``python -m src.agent_sdk.pipeline``) implements the #403
-    human handshake — it pauses after Stage 3 (exit code 10) for a
-    human-dropped hero image and resumes via ``--resume``. This Python
-    API does NOT pause; instead ``EconomistContentFlow(image_mode=...)``
-    chooses the policy up front:
-    - ``"chart_only"`` (default): ship on the chart alone; no paid image
-      API; Stage 4 validates without a hero so a missing hero never
-      forces a revision.
-    - ``"hero"``: explicit opt-in to generate a DALL-E hero after Stage 3.
+Image policy:
+    The CLI (``python -m src.agent_sdk.pipeline``) has ONE path since B-021 —
+    Stage 3 draws the hero SVG itself (B-016b), so nothing pauses for a
+    human-supplied image and the #403 handshake (exit 10 / ``--resume``) is gone.
+    ``EconomistContentFlow(image_mode=...)`` now only chooses what this flow does
+    AFTER the pipeline returns:
+    - ``"chart_only"`` (default): take the pipeline's output as-is. Keyless.
+    - ``"hero"``: legacy DALL-E featured-image step. Needs ``OPENAI_API_KEY``,
+      so it violates Operating Constraints #1-#4 and is dead in practice —
+      removal tracked as B-022.
 
 Usage:
     from src.economist_agents.flow import EconomistContentFlow
@@ -83,14 +82,14 @@ class EconomistContentFlow:
     ) -> None:
         """Construct the flow.
 
-        ``image_mode`` is the Python-API image policy (#410). Unlike the CLI
-        handshake (``python -m src.agent_sdk.pipeline``, which pauses for a
-        human-dropped hero image), the flow does not pause:
-        - ``"chart_only"`` (default): ship the article on its chart alone. No
-          paid image API is called, and Stage 4 is told to validate without a
-          hero image so a missing hero never routes a valid draft to revision.
-        - ``"hero"``: explicit opt-in to generate a DALL-E hero image after
-          Stage 3 (requires ``OPENAI_API_KEY``).
+        ``image_mode`` selects what happens to the hero image AFTER the Agent SDK
+        pipeline returns. It no longer changes the pipeline itself: B-021 left
+        ``run_pipeline`` with a single path, and Stage 3 draws its own hero SVG
+        (B-016b).
+        - ``"chart_only"`` (default): take the pipeline's output as-is. Keyless.
+        - ``"hero"``: legacy opt-in to the retired DALL-E featured-image step,
+          which needs ``OPENAI_API_KEY`` and so violates Operating Constraints
+          #1-#4. Dead in practice; removal is tracked as B-022.
         """
         if image_mode not in {"chart_only", "hero"}:
             raise ValueError(
@@ -273,7 +272,7 @@ class EconomistContentFlow:
         logger.info("   Topic: %s", topic)
 
         try:
-            result = asyncio.run(run_pipeline(topic, image_mode=self.image_mode))
+            result = asyncio.run(run_pipeline(topic))
         except MalformedArticleError as exc:
             logger.warning(
                 "Writer returned malformed output — routing to revision: %s", exc
@@ -632,9 +631,7 @@ class EconomistContentFlow:
             # Must carry the flow's image policy: a chart_only flow that runs
             # revision in the default "hero" mode would re-introduce the #403
             # missing-image-file false rejection (no DALL-E runs on this path).
-            result = asyncio.run(
-                run_pipeline(enhanced_topic, image_mode=self.image_mode)
-            )
+            result = asyncio.run(run_pipeline(enhanced_topic))
         except BudgetExceededError as exc:
             # Budget caps don't get fixed by retrying — abort cleanly.
             logger.error("Agent SDK budget exceeded on revision — aborting: %s", exc)

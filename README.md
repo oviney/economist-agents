@@ -90,7 +90,7 @@ subscription via the Agent SDK, research on free keyless providers.
 
 > **No `SERPER_API_KEY`/`OPENAI_API_KEY`.** Serper and the other pay-per-use
 > search APIs were removed (#438); DALL·E image generation was retired
-> (ADR-0014 / B-009) — hero images are human-supplied per the handshake below.
+> (ADR-0014 / B-009) — Claude draws the hero itself, as SVG (B-016b).
 > A legacy paid path remains (`EconomistContentFlow` topic discovery needs
 > `ANTHROPIC_API_KEY` — BUG-046); making the full flow keyless is **B-010**.
 
@@ -99,20 +99,21 @@ subscription via the Agent SDK, research on free keyless providers.
 ## Usage
 
 The keyless generator runs on the Claude subscription — **no paid AI key**. It
-takes a topic argument (there is no keyless auto-discovery yet — see B-010) and a
-**two-step image handshake**: Stage 3 writes the draft and chart and pauses (exit
-code 10) so you can supply a featured image at zero API cost; `--resume` then
-runs Stage 4 and finalises the article.
+takes a topic argument (there is no keyless auto-discovery yet — see B-010) and
+runs **end to end in one command**: Stage 3 researches, writes, charts, and draws
+the hero SVG; Stage 4 polishes and validates.
 
 ```bash
-# Step 1 — Stage 3: writes output/posts/<slug>.md + chart, prints the image prompt,
-# drop path, and resume command, then exits 10.
-python3 -m src.agent_sdk.pipeline "<topic>"
-
-# Step 2 — Stage 4: finalise after dropping the hero image
-# (or --no-image for a chart-only post).
-python3 -m src.agent_sdk.pipeline --resume <slug>
+# Writes output/posts/<slug>.md + chart + hero SVG, then validates. Exits 0 when
+# the article is publish-ready.
+python3 -m src.agent_sdk.pipeline "<topic>" --research-mode claude_web
 ```
+
+> There used to be a two-step image handshake here — Stage 3 paused on exit 10
+> for a human-supplied hero and `--resume` finished the job. B-016b made Claude
+> draw the hero itself, so B-021 removed the pause, `--image-mode`, `--resume`,
+> and `--no-image`. To supply art by hand, overwrite the drawn SVG at
+> `output/posts/images/<slug>-hero.svg` and re-run.
 
 > This generates + validates but does **not** publish. Publishing (open a PR on
 > `oviney/blog` via the free `BLOG_REPO_TOKEN`) currently lives only in
@@ -121,9 +122,9 @@ python3 -m src.agent_sdk.pipeline --resume <slug>
 > [`docs/keyless-pipeline-runbook.md`](docs/keyless-pipeline-runbook.md) for the
 > current keyless run + setup steps.
 
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full handshake (image drop path, exit
-codes, deploy step) and [`docs/FLOW_ARCHITECTURE.md`](docs/FLOW_ARCHITECTURE.md) for the
-orchestration design.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the run + deploy steps and exit codes,
+and [`docs/FLOW_ARCHITECTURE.md`](docs/FLOW_ARCHITECTURE.md) for the orchestration
+design.
 
 ---
 

@@ -264,22 +264,21 @@ class EconomistContentFlow(Flow):
 
 ---
 
-## Image policy: CLI handshake vs. Python API (#410)
+## Image policy
 
-The featured-image step differs by entry point:
+Stage 3 draws the hero itself, as SVG, on the Claude subscription (B-016b). Both
+entry points get the same visual: a drawn hero plus the matplotlib chart.
 
-- **CLI** (`python -m src.agent_sdk.pipeline`) implements the #403 human
-  handshake: after Stage 3 it persists slug-keyed state, writes a prompt
-  artefact, and exits with **code 10** to pause for a human-dropped hero image;
-  `--resume <slug>` validates the dropped PNG and continues to Stage 4.
-- **Python API** (`EconomistContentFlow`) does **not** pause. The policy is
-  chosen at construction via `image_mode`:
-  - `"chart_only"` (default) — ships on the chart alone. No paid image API is
-    called, and `run_pipeline(..., image_mode="chart_only")` strips the hero
-    frontmatter before Stage 4 so a not-yet-generated hero never routes a valid
-    draft to revision.
-  - `"hero"` — explicit opt-in to a DALL-E hero image after Stage 3 (requires
-    `OPENAI_API_KEY`).
+- **CLI** (`python -m src.agent_sdk.pipeline`) has **one path** since B-021. It
+  runs Stage 3 → Stage 4 and exits 0 when the article is publish-ready. The #403
+  human handshake — exit code 10, slug-keyed resume state, `--resume`, the PNG
+  gate — was removed once Claude drew its own hero; there was nothing left to
+  pause for. To supply art by hand, overwrite the drawn SVG and re-run.
+- **Python API** (`EconomistContentFlow`) no longer forwards an image policy to
+  `run_pipeline`. Its `image_mode` now only selects what the *flow* does after
+  the pipeline returns: `"chart_only"` (default) takes the output as-is, while
+  `"hero"` is the legacy DALL-E step that needs `OPENAI_API_KEY` and therefore
+  violates Operating Constraints #1–#4. Removing it is **B-022**.
 
 ---
 

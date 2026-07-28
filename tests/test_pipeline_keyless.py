@@ -169,7 +169,6 @@ def test_checkpoint_a_keyless_chart_only_passes_validator(
     result = asyncio.run(
         run_pipeline(
             "topic",
-            image_mode="chart_only",
             research_mode="claude_web",
         )
     )
@@ -192,7 +191,7 @@ def test_slug_from_article_falls_back_to_topic() -> None:
 def test_end_to_end_cli_writes_article_and_exits_zero(
     tmp_path: Path, monkeypatch
 ) -> None:
-    """The chart_only end-to-end CLI path writes the article and exits 0 when the
+    """The end-to-end CLI path writes the article and exits 0 when the
     validator passes, using run_pipeline with the selected research mode."""
     monkeypatch.chdir(tmp_path)
     _unset_all_keys(monkeypatch)
@@ -200,7 +199,7 @@ def test_end_to_end_cli_writes_article_and_exits_zero(
     from src.agent_sdk.pipeline import PipelineResult
 
     async def fake_run_pipeline(topic, **kwargs):
-        assert kwargs["image_mode"] == "chart_only"
+        assert "image_mode" not in kwargs  # B-021: one path, no modes
         assert kwargs["research_mode"] == "claude_web"
         return PipelineResult(
             topic=topic,

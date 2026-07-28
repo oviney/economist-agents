@@ -15,14 +15,11 @@ them (no un-awaited-coroutine warnings).
 
 from __future__ import annotations
 
-import asyncio
 from dataclasses import dataclass
-from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-import src.agent_sdk.pipeline as pipeline
 from scripts.publication_validator import PublicationValidator
 from src.agent_sdk.pipeline import _strip_image_frontmatter
 from src.economist_agents.flow import EconomistContentFlow
@@ -87,7 +84,7 @@ def test_chart_only_skips_dalle_and_ships_imageless(
 
     draft = flow.generate_content({"topic": "AI testing"})
 
-    assert mock_run_pipeline.await_args.kwargs.get("image_mode") == "chart_only"
+    assert "image_mode" not in mock_run_pipeline.await_args.kwargs
     mock_image.assert_not_called()
     # image-less, NOT the blog-default.svg fallback (which deploy rejects)
     assert draft["featured_image"] == ""
@@ -112,7 +109,7 @@ def test_hero_mode_calls_dalle(
 
     draft = flow.generate_content({"topic": "AI coding"})
 
-    assert mock_run_pipeline.await_args.kwargs.get("image_mode") == "hero"
+    assert "image_mode" not in mock_run_pipeline.await_args.kwargs
     mock_image.assert_called_once()
     assert draft["featured_image"].endswith(".png")
 
@@ -186,61 +183,5 @@ def test_revision_carries_chart_only_image_mode(
 
     flow.request_revision()
 
-    assert mock_run_pipeline.await_args.kwargs.get("image_mode") == "chart_only"
+    assert "image_mode" not in mock_run_pipeline.await_args.kwargs
     mock_image.assert_not_called()
-
-
-# ── run_pipeline image_mode seam ──────────────────────────────────────────
-
-
-def _run_pipeline_capturing_stage4(image_mode: str) -> str:
-    """Run run_pipeline with stage3/stage4 mocked; return the article Stage 4 saw."""
-    stage3 = SimpleNamespace(
-        article=_ARTICLE,
-        chart_data={"title": "C"},
-        total_cost_usd=0.05,
-        writer_cost_usd=0.04,
-        graphics_cost_usd=0.01,
-        research_cost_usd=0.0,
-        writer_model="m",
-        graphics_model="m",
-        wall_seconds=1.0,
-    )
-    stage4 = SimpleNamespace(
-        article=_ARTICLE,
-        editorial_score=88,
-        gates_passed=5,
-        publication_ready=True,
-        publication_validator_passed=True,
-        publication_validator_issues=[],
-        wall_seconds=0.01,
-    )
-    seen: dict = {}
-
-    def _fake_stage4(article: str, chart_data: dict):
-        seen["article"] = article
-        return stage4
-
-    async def _fake_stage3(*a, **k):
-        return stage3
-
-    with (
-        patch.object(pipeline, "run_stage3", _fake_stage3),
-        patch.object(pipeline, "run_stage4", _fake_stage4),
-        patch.object(pipeline, "_append_cost_log", lambda *a, **k: None),
-    ):
-        asyncio.run(pipeline.run_pipeline("topic", image_mode=image_mode))
-    return seen["article"]
-
-
-def test_run_pipeline_chart_only_strips_hero_before_stage4() -> None:
-    seen = _run_pipeline_capturing_stage4("chart_only")
-    assert "image:" not in seen
-    assert "image_alt:" not in seen
-    assert "image_caption:" not in seen
-    assert "Body." in seen  # body preserved
-
-
-def test_run_pipeline_hero_keeps_image_before_stage4() -> None:
-    seen = _run_pipeline_capturing_stage4("hero")
-    assert "image: /assets/images/t.png" in seen

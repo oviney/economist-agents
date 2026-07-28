@@ -1007,14 +1007,19 @@
     {
       "id": "BUG-060",
       "severity": "LOW",
-      "status": "open",
+      "status": "resolved",
       "reported_date": "2026-07-27",
       "title": "image_gate.py is DALL-E-era PNG-only and is dead code on the keyless hero path",
       "description": "src/agent_sdk/image_gate.py checks PNG magic bytes, 1792x1024 +/-5%, and a 50 KB floor. Heroes are now SVG (Operating Constraint #4), so none of those checks can apply. B-016b added hero_svg.check_hero_svg instead of contorting it.",
       "evidence": "Noted while building B-016b; image_gate is still imported by pipeline for the --resume handshake path.",
       "root_cause": "Left behind by the DALL-E retirement (ADR-0014 / B-009). The handshake path that uses it predates SVG heroes.",
       "impact": "Misleading rather than broken: a reader of the code may believe hero images are gated on PNG dimensions. Also constrains the --resume handshake to PNG drops.",
-      "proposed_fix": "Decide the fate of the --resume image handshake now that Stage 3 draws the hero. If the handshake stays, teach it check_hero_svg for .svg drops; if it goes, delete image_gate.py with it. Spec-worthy, not a patch — it is on a user-facing path."
+      "proposed_fix": "Decide the fate of the --resume image handshake now that Stage 3 draws the hero. If the handshake stays, teach it check_hero_svg for .svg drops; if it goes, delete image_gate.py with it. Spec-worthy, not a patch — it is on a user-facing path.",
+      "fixed_date": "2026-07-28T00:00:00",
+      "resolved_date": "2026-07-28",
+      "prevention_test_added": "tests/test_single_pipeline_path.py",
+      "fix_notes": "Resolved by deletion (owner call, B-021 slice 3). image_gate.py was only reachable from the --resume handshake, which existed to receive raster art that Operating Constraint #4 forbids and B-016b made unnecessary. Removed the module, --image-mode/--resume/--no-image, the handshake + state machinery, and exit codes 10/11 (retired, not reused). One path remains.",
+      "verification": "9 regression tests + full suite 2377 passed, make ci-local green (2026-07-28)"
     },
     {
       "id": "BUG-061",

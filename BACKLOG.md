@@ -26,6 +26,18 @@ _(none)_
 
 ## Todo
 
+### B-022 · Remove the DALL-E featured-image branch from `EconomistContentFlow`
+
+Spun out of B-021. `EconomistContentFlow(image_mode="hero")` still runs the
+retired DALL-E step (`generate_featured_image`, warns about `OPENAI_API_KEY`,
+falls back to `blog-default.svg`) — which Operating Constraints #1–#4 forbid and
+ADR-0014 retired. B-021 stopped the flow forwarding `image_mode` to
+`run_pipeline`, so the branch no longer changes what the pipeline produces; it is
+dead weight on a legacy surface. Deliberately left out of B-021 to keep that
+diff scoped to the CLI. Removing it means deleting the branch, the
+`generate_featured_image` adapter wiring, `image_mode` itself, and
+`tests/test_flow_image_mode.py`'s hero cases.
+
 ### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
 
 **`check-agent-scope` RESOLVED 2026-07-24** (see B-015a in Done). **Gate matrix
@@ -87,6 +99,43 @@ researcher would ship — but one topic cost ~102 agents / ~2M tokens / ~15 min 
 brief) lives at `docs/research/ai-productivity-brief.md`.
 
 ## Done
+
+### B-021 · The next run cannot abort, hang, or default to a dead mode — 2026-07-28
+
+B-020 proved the pipeline works but deferred three defects it exposed, all of
+which cost a real ~$1 / ~35-min run to hit. Spec:
+`docs/specs/B-021-run-safety-cleanups.md`.
+
+- **BUG-061 (writer budget) — FIXED.** `_WRITER_MAX_ATTEMPTS=3` with a $0.60
+  cumulative default and a measured ~$0.42 per attempt funded exactly ONE
+  attempt, so a malformed first draft — a *handled* condition — aborted the run
+  with the SDK's generic budget error. The cumulative cap stays (it is the only
+  runaway guard); the default is now **derived** from
+  `_WRITER_ATTEMPT_COST_USD × _WRITER_MAX_ATTEMPTS` so the two cannot drift, and
+  an unfundable retry is refused before dispatch with the arithmetic and the flag
+  name in the message.
+- **BUG-059 (no wall clock) — FIXED, wider than logged.** Every SDK collector now
+  runs under `asyncio.timeout` and raises a typed `ModelCallTimeoutError` naming
+  the call. The bug named `_collect_text`, but `research/_llm.py` and
+  `research/claude_web.py` had the identical unbounded `async for` — and research
+  is the longest, costliest leg, so it is where a stall is likeliest. Bounds are
+  measured, not guessed: 900s per Stage 3 call, 300s per research orchestration
+  call, 900s for the web-research leg. `hero_author` already bounded itself.
+- **BUG-060 + `--image-mode` — RESOLVED BY DELETION** (owner call, 2026-07-28).
+  `hero` was the DEFAULT and was dead: it ran the retired handshake, told the
+  operator to paste a prompt into chat.openai.com, and exited 10 without reaching
+  Stage 4. `chart_only` was the only working mode and, since B-016b, ships a
+  Claude-drawn hero — so its name lied too. Removed `--image-mode`, `--resume`,
+  `--no-image`, `image_gate.py`, the handshake/resume/state machinery, and exit
+  codes 10/11 (**retired, not reused**). One path remains. Hand-supplied art now
+  means overwriting `output/posts/images/<slug>-hero.svg` and re-running.
+
+**Also found, logged not fixed:** **BUG-064** — `_graphics_with_retry` hands every
+attempt the FULL `graphics_budget_usd` instead of the remaining balance, so 3
+attempts can spend 3× the stated cap (the mirror image of BUG-061). **B-022** —
+the flow's DALL-E branch, now provably dead.
+
+Suite 2377 green, `make ci-local` green.
 
 ### B-020 · Full end-to-end acceptance PASSED — 2026-07-27
 

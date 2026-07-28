@@ -30,7 +30,6 @@ on PATH; credentials in `~/.claude/`).
 # IS_SANDBOX=1 is required ONLY when running as root — the SDK otherwise refuses
 # --dangerously-skip-permissions. Drop it if you run as a normal user.
 IS_SANDBOX=1 .venv/bin/python -m src.agent_sdk.pipeline "your topic here" \
-    --image-mode chart_only \
     --research-mode claude_web
 ```
 
@@ -39,8 +38,9 @@ IS_SANDBOX=1 .venv/bin/python -m src.agent_sdk.pipeline "your topic here" \
   mode (arXiv + Semantic Scholar) is heavily rate-limited from most environments
   and frequently aborts the run with empty research (BUG-050); `claude_web`
   avoids those APIs entirely and is the reliable keyless default.
-- `--image-mode chart_only` — no hero image; the data chart is the visual. Runs
-  end-to-end with no image handshake and writes `output/posts/<slug>.md`.
+- There are no image modes any more (B-021). The run goes end to end: Stage 3
+  draws the hero SVG itself (B-016b) alongside the chart, and writes
+  `output/posts/<slug>.md`.
 
 Exit `0` = publication validator passed (publish-ready); `1` = validator issues;
 `2` = research failed (retry, or you are on `deterministic` — switch to
@@ -54,7 +54,7 @@ For a cornerstone post where sourcing quality matters most, run the
 
 ```bash
 IS_SANDBOX=1 python -m src.agent_sdk.pipeline "<topic>" \
-    --image-mode chart_only --brief docs/research/<slug>.md
+    --brief docs/research/<slug>.md
 ```
 
 `--brief` skips the research step and uses that file (refuted claims are
@@ -91,12 +91,13 @@ token needs only `Contents` + `Pull requests` write on `oviney/blog` — no AI k
   path — a deliberate, opt-in departure from the LLM-free default (ADR-0013).
   Source quality depends on the model's search behaviour; the
   `citation_verifier` / `publication_validator` citation gates still apply.
-- **`chart_only` ships no hero image.** For a hero image, use the default
-  `--image-mode hero` handshake flow and supply the PNG yourself (per CLAUDE.md
-  #4). There is no DALL-E path — image generation was retired (ADR-0014).
+- **The hero is Claude-drawn SVG, never raster.** There is no DALL-E path —
+  image generation was retired (ADR-0014) and CLAUDE.md #4 forbids pixel models.
+  To supply art by hand, overwrite `output/posts/images/<slug>-hero.svg` (the
+  `.image_prompt.md` sidecar is the brief) and re-run.
 - **Topic is manual.** `pipeline.py` takes the topic as an argument; there is no
   keyless auto-discovery. `EconomistContentFlow`'s Stage-1 discovery still needs
-  `ANTHROPIC_API_KEY` (BUG-046), so this two-step is the keyless route.
+  `ANTHROPIC_API_KEY` (BUG-046), so this single command is the keyless route.
 
 ## Deprecated path
 

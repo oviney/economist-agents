@@ -300,9 +300,7 @@ class TestHeroMetadataSurvivesWhenAHeroExists:
     def test_alt_and_caption_are_kept_when_a_hero_was_drawn(self) -> None:
         from src.agent_sdk.pipeline import _prepare_for_stage4
 
-        out = _prepare_for_stage4(
-            self._article(), image_mode="chart_only", hero_drawn=True
-        )
+        out = _prepare_for_stage4(self._article(), hero_drawn=True)
         assert "image_alt:" in out
         assert "image_caption:" in out
 
@@ -310,9 +308,7 @@ class TestHeroMetadataSurvivesWhenAHeroExists:
         # Unchanged behaviour for the genuinely-heroless case.
         from src.agent_sdk.pipeline import _prepare_for_stage4
 
-        out = _prepare_for_stage4(
-            self._article(), image_mode="chart_only", hero_drawn=False
-        )
+        out = _prepare_for_stage4(self._article(), hero_drawn=False)
         assert "image_alt:" not in out
 
     def test_the_hero_prompt_comment_is_not_injected_when_a_hero_exists(self) -> None:
@@ -320,7 +316,6 @@ class TestHeroMetadataSurvivesWhenAHeroExists:
 
         out = _maybe_inject_hero_prompt(
             "---\nlayout: post\n---\n\nBody.\n",
-            image_mode="chart_only",
             image_prompt="draw something",
             hero_drawn=True,
         )
@@ -331,7 +326,6 @@ class TestHeroMetadataSurvivesWhenAHeroExists:
 
         out = _maybe_inject_hero_prompt(
             "---\nlayout: post\n---\n\nBody.\n",
-            image_mode="chart_only",
             image_prompt="draw something",
             hero_drawn=False,
         )

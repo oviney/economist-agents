@@ -26,6 +26,32 @@ _(none)_
 
 ## Todo
 
+### B-020 · Full acceptance run: generate article + hero end to end (NEXT ACTION)
+
+Everything is built; this is the run that proves it. B-016b's success criterion 1
+and the last thing between here and article two.
+
+```bash
+IS_SANDBOX=1 python -m src.agent_sdk.pipeline "<topic>" \
+  --research-mode claude_web --image-mode hero
+scripts/acceptance_blog_frontmatter.sh <path-to-a-blog-clone>   # expect 0 errors
+```
+
+Expect it to take a while and cost real money: the hero alone is **~20 min and
+~$0.66** on top of writer + graphics (measured — see B-016b in Done). Budget one
+sitting for it.
+
+What to check, beyond exit code 0:
+1. `scripts/acceptance_blog_frontmatter.sh` reports **0 errors** using the
+   generated article and its generated hero (not the stand-in).
+2. **Look at the hero PNG.** Operating Constraint #4. The critique reports defects
+   but is not a gate, and it produces false positives (it called deliberate
+   negative space a defect), so the render still needs eyes before publishing.
+3. The printed `slug: <value> (N chars, <source>)` line is a sane permanent URL —
+   there are no redirects on the blog, so this is the last cheap moment to fix it.
+4. A non-zero exit with a hero critique is EXPECTED, not a failure: the hero is on
+   disk, and the call is whether to accept it, redraw, or hand-author.
+
 ### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
 
 **`check-agent-scope` RESOLVED 2026-07-24** (see B-015a in Done). **Gate matrix

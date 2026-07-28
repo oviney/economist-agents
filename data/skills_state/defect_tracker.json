@@ -1060,6 +1060,22 @@
       "proposed_fix": "Give the graphics call the same bounded retry the writer has, feeding the ChartRenderError message back so the agent can correct the spec. Reuse the writer's attempt-loop shape rather than inventing a second one.",
       "resolved_date": "2026-07-27",
       "resolution": "_graphics_with_retry in stage3_runner gives the graphics agent 3 bounded attempts, feeding ChartRenderError's own message back so it knows what to correct. Chart failures stay fatal, but 'fatal' now means 'no valid spec in 3 tries' rather than 'the first try was malformed'. Made async deliberately — a sync helper called from the async run_stage3 would have repeated the asyncio.run-inside-a-loop bug fixed the same day. Regression: tests/test_graphics_retry.py (3 tests). One existing test (test_run_stage3_fails_when_chart_render_fails) supplied only two mock replies so the retry hit StopIteration; its fixture was fixed, not its assertion."
+    },
+    {
+      "id": "BUG-064",
+      "severity": "MEDIUM",
+      "status": "open",
+      "discovered_date": "2026-07-28T00:00:00",
+      "description": "_graphics_with_retry passes the FULL graphics_budget_usd to every attempt rather than the remaining balance, so _GRAPHICS_MAX_ATTEMPTS=3 can spend up to 3x the cap the operator set. The writer loop decrements correctly (see BUG-061); graphics is the mirror-image inconsistency. Not a run-aborter — it silently overspends instead of under-funding. Measured graphics cost has already reached $0.41 against a $0.40 cap on one B-020 run (logs/agent_sdk_costs.jsonl 2026-07-28T01:22).",
+      "component": "src/agent_sdk/stage3_runner.py::_graphics_with_retry",
+      "github_issue": "",
+      "is_production_escape": false,
+      "root_cause": "code_logic",
+      "root_cause_notes": "The graphics retry loop (BUG-063) was added after the writer loop and did not copy its cumulative-budget accounting.",
+      "discovered_by": "code reading during the BUG-061 fix (B-021 slice 1)",
+      "prevention_test_added": "",
+      "fixed_date": "",
+      "fix_notes": ""
     }
   ],
   "summary": {

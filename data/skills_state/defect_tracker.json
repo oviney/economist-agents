@@ -863,7 +863,7 @@
       "discovered_date": "2026-07-24T00:00:00",
       "description": "B-013 review drafts rendered BARE on the live blog — no <head>, no theme, no noindex meta — defeating both the 'review the post in the real theme' goal and the noindex acceptance criterion. Caught by the live leak test after merging oviney/blog PR #1157 (the other 6/7 checks passed: draft absent from homepage/blog/feed.xml/sitemap.xml/search + robots.txt disallows /review/).",
       "component": "oviney/blog _layouts/review.html (B-013 blog-side)",
-      "status": "fixed",
+      "status": "resolved",
       "github_issue": "oviney/blog#1159",
       "is_production_escape": true,
       "root_cause": "integration_error",
@@ -871,7 +871,9 @@
       "discovered_by": "leak-test (deploy_review --mode review + read-only feed/sitemap/homepage/noindex checks)",
       "prevention_test_added": "Acceptance leak-test checklist in docs/specs/B-013-blog-side.md is the regression gate; run it on any change to the review collection/layout before calling B-013 done.",
       "fixed_date": "2026-07-24T00:00:00",
-      "fix_notes": "oviney/blog PR #1159: _layouts/review.html now `layout: post` (chains to default.html where noindex lives). Awaiting owner admin-bypass merge; re-verify leak test = 7/7 after Pages rebuild."
+      "fix_notes": "oviney/blog PR #1159: _layouts/review.html now `layout: post` (chains to default.html where noindex lives). Awaiting owner admin-bypass merge; re-verify leak test = 7/7 after Pages rebuild.",
+      "resolved_date": "2026-07-25",
+      "verification": "B-013 leak test 10/10 on draft ...-a7014d4d (2026-07-25)"
     },
     {
       "id": "BUG-052",
@@ -880,7 +882,7 @@
       "discovered_date": "2026-07-24T00:00:00",
       "description": "scripts.deploy_to_blog.deploy_review defaults --host to 'viney.ca', but the blog's canonical URL is 'www.viney.ca' (per oviney/blog _config.yml `url`). A review deploy without an explicit --host prints/returns a review URL on the apex domain that redirects or 404s depending on DNS.",
       "component": "scripts/deploy_to_blog.py deploy_review (host default)",
-      "status": "fixed",
+      "status": "resolved",
       "github_issue": "",
       "is_production_escape": false,
       "root_cause": "requirements_gap",
@@ -888,7 +890,9 @@
       "discovered_by": "leak-test (URL returned by deploy_review)",
       "prevention_test_added": "tests/test_deploy_review_mode.py::TestDeployReview::test_default_host_is_canonical_www",
       "fixed_date": "2026-07-24T00:00:00",
-      "fix_notes": "deploy_review host default + CLI --host default changed to 'www.viney.ca'; regression test asserts the default review URL uses www."
+      "fix_notes": "deploy_review host default + CLI --host default changed to 'www.viney.ca'; regression test asserts the default review URL uses www.",
+      "resolved_date": "2026-07-25",
+      "verification": "B-013 leak test 10/10 on draft ...-a7014d4d (2026-07-25)"
     },
     {
       "id": "BUG-053",
@@ -897,7 +901,7 @@
       "discovered_date": "2026-07-24T00:00:00",
       "description": "OWNER-REPORTED (visual). The owner wants Claude's own visualization capability to produce the HERO IMAGE and ALL charts/images a post requires. Today the pipeline only (a) draws a single data chart via chart_renderer.py (matplotlib) and (b) emits a hero-image PROMPT sidecar for a human to render elsewhere. Desired: end-to-end Claude-generated visuals so a post ships with its hero + any supporting figures without a manual image step.",
       "component": "src/agent_sdk (graphics stage) + image_prompt_synth + deploy hero-image handoff",
-      "status": "open",
+      "status": "resolved",
       "github_issue": "",
       "is_production_escape": false,
       "root_cause": "requirements_gap",
@@ -905,7 +909,9 @@
       "discovered_by": "owner report",
       "prevention_test_added": "",
       "fixed_date": "",
-      "fix_notes": ""
+      "fix_notes": "",
+      "resolved_date": "2026-07-25",
+      "resolution": "B-016a: constraint #4 amended to allow code-drawn visuals (SVG hero + matplotlib charts); raster/pixel models still forbidden. Hero copying wired into deploy() and deploy_review() (was never wired). Verified live on draft ...-f40e8d27."
     },
     {
       "id": "BUG-054",
@@ -937,7 +943,113 @@
       "evidence": "oviney/blog PR #1159 build FAIL (run 30086689055): html-proofer 1 failure at _site/review/green-light-red-ledger-...-1530b611/index.html:166 \"image has no src or srcset attribute\". Draft frontmatter line 8 is image: \"\". PR #1157 build PASSED because review.html then extended a nonexistent layout and rendered bare (no img tag emitted).",
       "root_cause": "_shared._DEFAULT_IMAGE = \"\" injected whenever finalize ran without a hero. The stale comment claimed the frontmatter schema requires the key present; schema_validator requires only layout/title/date/categories.",
       "resolution": "Removed the injection and strip any empty image: line (_EMPTY_IMAGE_LINE) so chart-only articles OMIT the key. Regression: TestEmptyImageFrontmatterNeverEmitted in tests/test_stage4_editorial_fixes.py. Hero images stay human-supplied (constraint #4).",
-      "impact": "Blocked the main publishing path, not just B-013 review drafts: every generated article PR would fail the blog required build check once it carried image: \"\"."
+      "impact": "Blocked the main publishing path, not just B-013 review drafts: every generated article PR would fail the blog required build check once it carried image: \"\".",
+      "verification": "Fresh draft ...-a7014d4d deployed with NO image: key; blog build passes; leak test 10/10 incl. no src-less <img>. Local CRITICAL empty_image_value guard added."
+    },
+    {
+      "id": "BUG-056",
+      "severity": "HIGH",
+      "status": "resolved",
+      "reported_date": "2026-07-25",
+      "resolved_date": "2026-07-25",
+      "title": "Flaky-tests article shipped a broken chart: 5 of 6 bars invisible, raw count labelled as %",
+      "description": "The chart embedded in the flaky-tests article plotted percentages (84, 21, 2.5, 1.3, 1.1) on the same linear axis as a raw count of 150000 developer-hours. The count dwarfed everything so all five percentage bars rendered as zero-width, and the count was labelled \"150000 %\" - a unit that is flatly wrong.",
+      "root_cause": "Stale artifact: the PNG was rendered 2026-07-21, before B-014 added the mixed-unit guard (_MAX_VALUE_SPAN) on 2026-07-22. Nothing re-rendered or re-validated the existing chart afterwards.",
+      "resolution": "Confirmed the B-014 guard now rejects the original spec (150000 vs 1.1). Re-rendered on one coherent measure: share of failing builds caused by flaky tests vs genuine defects (Google 84/16, Jira Frontend 21/79), matching what the prose promises the chart shows.",
+      "impact": "Would have published a chart conveying no information and stating a false unit. Charts predating B-014 are not automatically re-validated - a gap worth watching on older articles."
+    },
+    {
+      "id": "BUG-057",
+      "severity": "HIGH",
+      "status": "resolved",
+      "reported_date": "2026-07-25",
+      "resolved_date": "2026-07-25",
+      "title": "Pipeline never emitted tags: every published article fails the blog validate-editorial gate",
+      "description": "oviney/blog scripts/validate-posts.sh requires a tags field with at least 2 tags in inline bracket format, all lowercase-hyphen; an uppercase character is a hard error. The pipeline never emitted tags at all, so the first real generated article to reach _posts failed validate-editorial on blog main.",
+      "evidence": "Test Jekyll Build run 30138114457 on oviney/blog main: green-light-red-ledger... missing required front-matter field: tags. validate-posts: FAILED.",
+      "root_cause": "Our frontmatter contract (_shared.apply_editorial_fixes + frontmatter_schema) was written against our OWN validator, which never required tags. The blog gate was never exercised on a real generated article: B-015 measured the gate matrix on a layout PR, not on an article.",
+      "resolution": "_derive_tags kebab-cases the categories into a tags line, topped up from _FALLBACK_TAGS so the 2-tag floor holds for a single-category article. Verified by running the blog OWN scripts/validate-posts.sh: PASSED. Live post hotfixed separately. Regression: TestTagsAlwaysEmitted, 4 tests.",
+      "impact": "Blocked publication of every article at the blog gate. Also surfaced that validate-posts.sh requires image: too, so a chart-only article that omits image: per BUG-055 would ALSO fail this gate. Currently masked because B-016 always draws a hero. Tracked in B-015."
+    },
+    {
+      "id": "BUG-058",
+      "severity": "HIGH",
+      "status": "resolved",
+      "reported_date": "2026-07-26",
+      "title": "Six tests in test_economist_agent.py made live arXiv/citation HTTP calls; the merge gate's runtime was set by a third party's rate limiter",
+      "description": "TestRunResearchAgent and TestIntegration patched agents.research_agent.call_llm but not the TWO other network paths inside ResearchAgent.research: _gather_arxiv_research (live arXiv HTTP) and scripts.citation_verifier.verify_citations (fetches every citation URL).",
+      "evidence": "pytest --durations on the file: 34 passed in 624.53s (10m24s), with six tests accounting for 620s (127.75/127.24/122.40/97.14/96.21/50.21). Log shows 'arXiv transient error (HTTP 429 ...); retry 2/3 after 1.5s'. Reproduced on a clean tree via git stash, so it predates B-019.",
+      "root_cause": "Incomplete mocking at the wrong boundary. The tests were written against the LLM seam; the arXiv provider and citation verifier are reached deeper inside ResearchAgent.research and were never stubbed. Because the production code catches network errors and retries with backoff, the tests still PASSED — the defect was invisible except as duration, which is why it survived so long.",
+      "impact": "Severity raised MEDIUM -> HIGH on measurement. Cost is not a fixed ~2 min as first assessed: arXiv rate-limits under repeated runs, so the gate got slower the more it was used and was unbounded. make ci-local is the only merge gate (ADR-0015); it also failed offline and depended on arXiv availability.",
+      "proposed_fix": "Patch ResearchAgent._gather_arxiv_research in the TestRunResearchAgent fixture to return an empty insights dict. Add a suite-wide guard test that fails if any test opens a socket.",
+      "resolved_date": "2026-07-26",
+      "resolution": "Two layers. (1) tests/_netguard.py + an autouse _no_network fixture block all non-loopback sockets, so no test can reach a third party; opt out with @pytest.mark.allow_network. Loopback still works for local servers/IPC. (2) An autouse fixture in test_economist_agent.py stubs both paths at source, removing the retry backoff the guard alone left behind. The exception lives in tests/_netguard.py, not conftest.py, so it has one module identity (conftest is imported as top-level 'conftest', so 'from tests.conftest import ...' yields a different class and pytest.raises silently fails to match). Regression: tests/test_no_network_guard.py, 6 tests.",
+      "measured_result": "test_economist_agent.py: 624.53s -> 3.71s (168x)."
+    },
+    {
+      "id": "BUG-059",
+      "severity": "HIGH",
+      "status": "open",
+      "reported_date": "2026-07-27",
+      "title": "_collect_text has no wall-clock timeout, so any Stage 3 LLM call can hang the pipeline indefinitely",
+      "description": "src/agent_sdk/stage3_runner.py::_collect_text awaits the Agent SDK query() generator with no asyncio timeout. max_budget_usd bounds COST but not TIME, and a stalled or very long generation blocks forever with no output.",
+      "evidence": "Found building B-016b: the first real hero generation ran 15 minutes and produced no SVG and no log line beyond CLI startup (exit 124 from the outer `timeout`). Bisected with probes: a trivial prompt returns in 4.7s and a small SVG ask in 19.3s, but a composed-scene drawing request had not returned at 205s. Nothing in _collect_text would ever have stopped it.",
+      "root_cause": "Missing timeout. The writer and graphics agents are bounded on cost (max_budget_usd) but not on wall clock, so the same exposure exists for every Stage 3 call, not just the hero.",
+      "impact": "A hung provider call stalls the whole pipeline with no diagnostic. The operator sees no output and cannot tell a slow run from a dead one. Affects the writer and graphics agents too.",
+      "proposed_fix": "Give _collect_text an explicit timeout_s parameter with a sane default and wrap the query() iteration in asyncio.wait_for, raising a typed AgentCallTimeout that callers can treat as a retryable attempt failure. B-016b already bounds its OWN calls (240s draw / 120s critique) as a local mitigation; this generalises it.",
+      "workaround": "B-016b's hero calls are individually bounded; other callers are not."
+    },
+    {
+      "id": "BUG-060",
+      "severity": "LOW",
+      "status": "open",
+      "reported_date": "2026-07-27",
+      "title": "image_gate.py is DALL-E-era PNG-only and is dead code on the keyless hero path",
+      "description": "src/agent_sdk/image_gate.py checks PNG magic bytes, 1792x1024 +/-5%, and a 50 KB floor. Heroes are now SVG (Operating Constraint #4), so none of those checks can apply. B-016b added hero_svg.check_hero_svg instead of contorting it.",
+      "evidence": "Noted while building B-016b; image_gate is still imported by pipeline for the --resume handshake path.",
+      "root_cause": "Left behind by the DALL-E retirement (ADR-0014 / B-009). The handshake path that uses it predates SVG heroes.",
+      "impact": "Misleading rather than broken: a reader of the code may believe hero images are gated on PNG dimensions. Also constrains the --resume handshake to PNG drops.",
+      "proposed_fix": "Decide the fate of the --resume image handshake now that Stage 3 draws the hero. If the handshake stays, teach it check_hero_svg for .svg drops; if it goes, delete image_gate.py with it. Spec-worthy, not a patch — it is on a user-facing path."
+    },
+    {
+      "id": "BUG-061",
+      "severity": "HIGH",
+      "status": "open",
+      "reported_date": "2026-07-27",
+      "title": "Default --writer-budget $0.60 cannot absorb a single writer retry, so the default invocation aborts",
+      "description": "The writer budget is consumed ACROSS retry attempts, not per attempt: each attempt is given the remaining balance. One Sonnet writer attempt costs ~$0.42, so a first attempt that produces malformed output (a normal, handled condition with _WRITER_MAX_ATTEMPTS=3) leaves too little for the second, which then aborts the whole pipeline with BudgetExceededError.",
+      "evidence": "B-020 acceptance run, 2026-07-27, default budgets: 'Writer attempt 1/3 produced malformed output (starts_with_dash=True, body_empty=True); retrying' then 'BudgetExceededError: cap=$0.3352, cost_at_abort=$0.4216'. $0.3352 is $0.60 minus the ~$0.26 the malformed attempt already spent. Pipeline exited 1 after ~14 min with no article.",
+      "root_cause": "The default was never validated against a real retry. Its own help text claims it is 'sized for Sonnet with retries + tool turns', but at ~$0.42 per attempt three attempts need ~$1.26 and even two need ~$0.85.",
+      "impact": "The DEFAULT invocation fails whenever the writer's first attempt is malformed — which happened on the very first real end-to-end run. Wastes ~14 minutes and the cost of the attempts, and produces no article. The retry mechanism that exists to add resilience instead guarantees failure.",
+      "proposed_fix": "Raise the default to ~$1.60 (3 attempts x $0.42 plus headroom) and correct the help text with the measured per-attempt cost. Consider giving each attempt its own cap rather than sharing one balance, so a wasted attempt cannot starve the retry it exists to enable. Verify by running with the default and forcing a retry.",
+      "workaround": "Pass --writer-budget 1.60 explicitly."
+    },
+    {
+      "id": "BUG-062",
+      "severity": "CRITICAL",
+      "status": "resolved",
+      "reported_date": "2026-07-27",
+      "resolved_date": "2026-07-27",
+      "title": "Wiring the hero into Stage 3 made `make ci-local` issue real LLM calls; the gate began timing out",
+      "description": "hero_author holds its OWN reference to _collect_text. The ~10 test files that patch stage3_runner._collect_text therefore did not cover the hero step, which called the real Agent SDK during the test suite.",
+      "evidence": "output/posts/test.image_prompt.md and output/posts/images/test-hero.svg appeared in the repo during a gate run, containing REAL generated content built from a test fixture's frontmatter ('Subject: alt', 'Editorial framing: cap'). Decisive measurement: the gate timed out at 900s (EXIT=124) before the guard and ran in 119.05s with 2371 passed after it.",
+      "root_cause": "Introduced by me in B-016b. The BUG-058 socket guard cannot see these calls: claude_agent_sdk.query spawns a subprocess CLI, so no in-process socket opens.",
+      "impact": "Every make ci-local made live subscription calls (~$0.45 and ~450s each) and wrote generated artefacts into output/. The gate became unusable — it timed out — which would have pushed people to skip it, the exact failure that let BUG-055..057 reach main.",
+      "resolution": "netguard.install_model_guard patches stage3_runner.query — the single chokepoint every model call funnels through — as an autouse fixture with the @pytest.mark.allow_network opt-out. Tests that legitimately exercise _collect_text internals patch it themselves and their patch wins. Regression: 3 tests in test_no_network_guard.py, one specifically covering the separate-reference trap. Zero existing tests broke, confirming none were relying on the real SDK."
+    },
+    {
+      "id": "BUG-063",
+      "severity": "HIGH",
+      "status": "resolved",
+      "reported_date": "2026-07-27",
+      "title": "The graphics agent has no retry, so one malformed chart spec kills the pipeline after the writer has already succeeded",
+      "description": "run_stage3 calls the graphics agent once and passes the result straight to render_chart, whose failures are fatal by design (a missing chart leaves a broken body embed). The writer gets _WRITER_MAX_ATTEMPTS=3 for exactly the same class of malformed-LLM-output problem; graphics gets one attempt.",
+      "evidence": "B-020 acceptance run 3, 2026-07-27: 'ChartRenderError: spec.data is required and must be a non-empty list' aborted the run after the writer had already produced a full article. Prior run showed the writer's own malformed-output retry firing, so malformed output from these agents is routine, not exceptional.",
+      "root_cause": "Resilience is unevenly distributed across stages that are equally prone to malformed LLM output. BUG-042 already established that the graphics call can need extra turns for its JSON, so the fragility was known for turns but not for content.",
+      "impact": "Wastes the entire writer stage (~$0.85 and several minutes) on a graphics failure that a retry would likely absorb. Blocks B-020 acceptance.",
+      "proposed_fix": "Give the graphics call the same bounded retry the writer has, feeding the ChartRenderError message back so the agent can correct the spec. Reuse the writer's attempt-loop shape rather than inventing a second one.",
+      "resolved_date": "2026-07-27",
+      "resolution": "_graphics_with_retry in stage3_runner gives the graphics agent 3 bounded attempts, feeding ChartRenderError's own message back so it knows what to correct. Chart failures stay fatal, but 'fatal' now means 'no valid spec in 3 tries' rather than 'the first try was malformed'. Made async deliberately — a sync helper called from the async run_stage3 would have repeated the asyncio.run-inside-a-loop bug fixed the same day. Regression: tests/test_graphics_retry.py (3 tests). One existing test (test_run_stage3_fails_when_chart_render_fails) supplied only two mock replies so the retry hit StopIteration; its fixture was fixed, not its assertion."
     }
   ],
   "summary": {

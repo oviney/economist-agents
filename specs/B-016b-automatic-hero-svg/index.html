@@ -3230,6 +3230,78 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#measured-reality-added-2026-07-27-after-building" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Measured reality (added 2026-07-27, after building)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Measured reality (added 2026-07-27, after building)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#one-hero-draw" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        One hero draw
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#three-spec-assumptions-that-were-wrong" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Three spec assumptions that were wrong
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-actually-determines-quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What actually determines quality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-critiques-real-character" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The critique's real character
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cost-per-article-for-planning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cost per article, for planning
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3251,7 +3323,8 @@
 
 
 <h1 id="spec-b-016b-stage-3-draws-the-hero-svg-automatically">Spec: B-016b — Stage 3 draws the hero SVG automatically<a class="headerlink" href="#spec-b-016b-stage-3-draws-the-hero-svg-automatically" title="Permanent link">&para;</a></h1>
-<p><strong>Status:</strong> Draft — failure policy decided 2026-07-27; awaiting owner LGTM to build
+<p><strong>Status:</strong> BUILT 2026-07-27. Verified end to end. See <em>Measured reality</em> below —
+three spec assumptions were wrong and are corrected there.
 <strong>Backlog:</strong> B-016b (blocker)
 <strong>Depends on:</strong> B-016a (mechanism), B-019 (<code>_link_hero_asset</code>, front-matter contract)
 <strong>Blocks:</strong> every future article</p>
@@ -3602,6 +3675,69 @@ network call or invoke Chrome — BUG-058 is the cautionary case.</p>
 <p><strong>None.</strong> The failure-policy question is resolved above (2026-07-27, owner
 decision): write and link the hero, exit non-zero with the critique, matching the
 existing publication-validator convention.</p>
+<h2 id="measured-reality-added-2026-07-27-after-building">Measured reality (added 2026-07-27, after building)<a class="headerlink" href="#measured-reality-added-2026-07-27-after-building" title="Permanent link">&para;</a></h2>
+<p>Everything below replaces guesses in the sections above. Numbers come from
+instrumenting the SDK message stream and from three real generation runs.</p>
+<h3 id="one-hero-draw">One hero draw<a class="headerlink" href="#one-hero-draw" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Wall clock</td>
+<td><strong>454s</strong> measured; some draws exceed <strong>600s</strong></td>
+</tr>
+<tr>
+<td>Of which thinking, before any SVG appears</td>
+<td><strong>~440s</strong></td>
+</tr>
+<tr>
+<td>Output</td>
+<td>one <code>TextBlock</code>, ~3,700–5,000 chars</td>
+</tr>
+<tr>
+<td>Cost</td>
+<td><strong>$0.4534</strong> per draw</td>
+</tr>
+<tr>
+<td>Full loop (1 timeout + 2 draws + 2 critiques)</td>
+<td><strong>1236.7s, $0.6649</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="three-spec-assumptions-that-were-wrong">Three spec assumptions that were wrong<a class="headerlink" href="#three-spec-assumptions-that-were-wrong" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong><code>max_turns=1</code> is unusable.</strong> Thinking consumes turns, so a one-turn cap dies
+   with <code>Reached maximum number of turns (1)</code> <em>before any text arrives</em>. Now 4.</li>
+<li><strong>A 240s timeout and a $0.40 budget were both below the real cost.</strong> Each would
+   have killed a working call on its own. Now 600s and $0.75.</li>
+<li><strong>The critique does not converge.</strong> It found genuine defects on <em>every</em> attempt
+   across three runs, so the spec's 2 redraws cost ~16 minutes and bought nothing.
+   Cut to 1.</li>
+</ol>
+<h3 id="what-actually-determines-quality">What actually determines quality<a class="headerlink" href="#what-actually-determines-quality" title="Permanent link">&para;</a></h3>
+<p>Not the rules — a <strong>worked example</strong>. With the rulebook alone the output passed all
+nine structural rules and was still clipart (dot-eyed cartoon figure, a "shadow"
+reading as a beige wedge, no editorial idea). Adding a condensed extract of the
+shipped hero to the system prompt — full-bleed background, few large forms,
+silhouettes not faces, separation strokes on overlaps — moved it to usable in one
+change, with no other difference.</p>
+<h3 id="the-critiques-real-character">The critique's real character<a class="headerlink" href="#the-critiques-real-character" title="Permanent link">&para;</a></h3>
+<p>It is a good <strong>reporter</strong> and an unreliable <strong>judge</strong>, which is why the failure
+policy's "never a gate" stance was right:</p>
+<ul>
+<li>True positives, precisely described: a queue stack clipped at the top and right
+  edges; a figure's stool legs clipped at the bottom.</li>
+<li>False positive: it called deliberate negative space ("the bottom ~30% is bare
+  floor") a defect.</li>
+</ul>
+<h3 id="cost-per-article-for-planning">Cost per article, for planning<a class="headerlink" href="#cost-per-article-for-planning" title="Permanent link">&para;</a></h3>
+<p>~20 minutes and ~$0.66 for a hero, on top of the writer and graphics stages. That
+is the honest figure to weigh against hand-authoring one.</p>
 
 
 

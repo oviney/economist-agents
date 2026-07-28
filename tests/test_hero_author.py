@@ -405,3 +405,36 @@ class TestDrawTimeoutIsBounded:
         monkeypatch.setattr(hero_author, "_collect_text", _Recorder([_GOOD_SVG]))
         hero_author.author_hero_svg(brief=_BRIEF, slug="s", images_dir=tmp_path)
         assert seen["timeout"] == hero_author._DRAW_TIMEOUT_S
+
+
+class TestCallableFromAnEventLoop:
+    """Stage 3 is async, so the hero entry point is called from inside a running
+    loop. Every other test here calls it synchronously, which is why they all
+    passed while the real pipeline raised 'asyncio.run() cannot be called from a
+    running event loop' and silently produced no hero.
+    """
+
+    def test_the_async_entry_point_works_inside_a_running_loop(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, _no_render: None
+    ) -> None:
+        import asyncio
+
+        monkeypatch.setattr(hero_author, "_collect_text", _Recorder([_GOOD_SVG]))
+
+        async def as_stage3_does() -> hero_author.HeroResult:
+            return await hero_author.author_hero_svg_async(
+                brief=_BRIEF, slug="s", images_dir=tmp_path
+            )
+
+        result = asyncio.run(as_stage3_does())
+        assert result.path is not None, result.error
+        assert "event loop" not in result.error
+
+    def test_the_sync_wrapper_still_works_outside_a_loop(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, _no_render: None
+    ) -> None:
+        monkeypatch.setattr(hero_author, "_collect_text", _Recorder([_GOOD_SVG]))
+        result = hero_author.author_hero_svg(
+            brief=_BRIEF, slug="s", images_dir=tmp_path
+        )
+        assert result.path is not None

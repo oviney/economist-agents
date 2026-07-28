@@ -711,9 +711,11 @@ async def run_stage3(
     if image_prompt:
         # Imported at call time: hero_author needs _collect_text from this module,
         # so a module-level import here would be a cycle.
-        from src.agent_sdk.hero_author import author_hero_svg
+        from src.agent_sdk.hero_author import author_hero_svg_async
 
-        hero = author_hero_svg(
+        # Async entry point: run_stage3 is already inside an event loop, so the
+        # sync wrapper would raise and silently lose the hero.
+        hero = await author_hero_svg_async(
             brief=image_prompt,
             slug=slug,
             images_dir=HERO_IMAGES_DIR,

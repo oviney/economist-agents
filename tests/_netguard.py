@@ -57,3 +57,35 @@ def install(monkeypatch: Any) -> None:
 
     monkeypatch.setattr(socket.socket, "connect", guarded_connect)
     monkeypatch.setattr(socket.socket, "connect_ex", guarded_connect_ex)
+
+
+class LiveModelCallInTestError(RuntimeError):
+    """A test reached the real Agent SDK instead of a stub."""
+
+
+def install_model_guard(monkeypatch: Any) -> None:
+    """Block live Agent SDK calls from tests.
+
+    The socket guard cannot see these: ``claude_agent_sdk.query`` spawns a
+    subprocess CLI, so no in-process socket is opened. Found the hard way — the
+    B-016b hero step holds its OWN reference to ``_collect_text``, so the ~10
+    test files that patch ``stage3_runner._collect_text`` did not cover it, and
+    ``make ci-local`` began making real model calls and writing generated SVGs
+    into ``output/``.
+
+    ``stage3_runner.query`` is the single chokepoint: every model call in the
+    pipeline funnels through ``_collect_text``, which uses it. Tests that
+    legitimately exercise ``_collect_text`` internals patch it themselves, and
+    their patch is applied after this one, so it wins.
+    """
+    import src.agent_sdk.stage3_runner as stage3_runner
+
+    def blocked(*args: Any, **kwargs: Any) -> Any:
+        raise LiveModelCallInTestError(
+            "Test reached the real Agent SDK. Patch the boundary you are "
+            "exercising (e.g. stage3_runner._collect_text, or "
+            "hero_author._collect_text — they are SEPARATE references), or mark "
+            "the test @pytest.mark.allow_network with a justification."
+        )
+
+    monkeypatch.setattr(stage3_runner, "query", blocked)

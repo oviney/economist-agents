@@ -39,6 +39,7 @@ def _no_network(
     if request.node.get_closest_marker("allow_network"):
         return
     netguard.install(monkeypatch)
+    netguard.install_model_guard(monkeypatch)
 
 
 @pytest.fixture(autouse=True)

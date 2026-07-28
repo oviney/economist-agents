@@ -321,7 +321,7 @@ async def _critique(svg_path: Path, png_path: Path, model: str) -> list[str]:
     return _parse_verdict(text)
 
 
-def author_hero_svg(
+async def author_hero_svg_async(
     *,
     brief: str,
     slug: str,
@@ -330,15 +330,37 @@ def author_hero_svg(
 ) -> HeroResult:
     """Author ``<slug>-hero.svg`` in ``images_dir`` and critique its render.
 
+    This is the entry point Stage 3 uses, because ``run_stage3`` is already
+    inside an event loop — calling the sync wrapper from there raises
+    "asyncio.run() cannot be called from a running event loop" and silently
+    produces no hero.
+
     Never raises. Stage 3 must not fail because of a hero, so every failure is
-    reported in the returned :class:`HeroResult` and the CLI decides the exit code.
+    reported in the returned :class:`HeroResult` and the CLI decides the exit
+    code.
     """
     from src.agent_sdk.stage3_runner import DEFAULT_GRAPHICS_MODEL
 
     try:
-        return asyncio.run(
-            _author(brief, slug, images_dir, model or DEFAULT_GRAPHICS_MODEL)
-        )
+        return await _author(brief, slug, images_dir, model or DEFAULT_GRAPHICS_MODEL)
     except Exception as exc:  # noqa: BLE001 - last-resort guard
         logger.warning("Hero authoring aborted: %s", exc)
         return HeroResult(path=None, error=str(exc))
+
+
+def author_hero_svg(
+    *,
+    brief: str,
+    slug: str,
+    images_dir: Path,
+    model: str | None = None,
+) -> HeroResult:
+    """Synchronous wrapper for callers that are NOT already in an event loop.
+
+    Stage 3 must use :func:`author_hero_svg_async` instead.
+    """
+    return asyncio.run(
+        author_hero_svg_async(
+            brief=brief, slug=slug, images_dir=images_dir, model=model
+        )
+    )

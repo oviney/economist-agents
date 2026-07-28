@@ -17,7 +17,7 @@ import socket
 
 import pytest
 
-from tests._netguard import NetworkAccessInTestError
+from tests._netguard import LiveModelCallInTestError, NetworkAccessInTestError
 
 # A documentation IP (RFC 5737 TEST-NET-1). Never routable, so even if the guard
 # were removed this test cannot silently start making real connections.
@@ -75,3 +75,33 @@ class TestOptOut:
 
     def test_the_guard_is_installed_without_the_marker(self) -> None:
         assert socket.socket.connect.__name__ == "guarded_connect"
+
+
+class TestLiveModelCallsAreBlocked:
+    """The socket guard cannot see Agent SDK calls — they spawn a subprocess CLI,
+    not an in-process socket. B-016b's hero step held its own reference to
+    _collect_text, so tests patching stage3_runner._collect_text did not cover
+    it and `make ci-local` started making real model calls."""
+
+    def test_the_sdk_query_chokepoint_is_blocked(self) -> None:
+        import src.agent_sdk.stage3_runner as stage3_runner
+
+        with pytest.raises(LiveModelCallInTestError, match="real Agent SDK"):
+            stage3_runner.query(prompt="hello", options=None)
+
+    def test_collect_text_cannot_reach_the_model(self) -> None:
+        import asyncio
+
+        import src.agent_sdk.stage3_runner as stage3_runner
+
+        with pytest.raises(LiveModelCallInTestError):
+            asyncio.run(stage3_runner._collect_text("hi", "sys"))
+
+    def test_the_hero_path_cannot_reach_the_model_either(self, tmp_path) -> None:  # type: ignore[no-untyped-def]
+        # The specific gap that caused this: hero_author._collect_text is a
+        # DIFFERENT reference from stage3_runner._collect_text.
+        from src.agent_sdk.hero_author import author_hero_svg
+
+        result = author_hero_svg(brief="draw", slug="s", images_dir=tmp_path)
+        assert result.path is None
+        assert "real Agent SDK" in result.error

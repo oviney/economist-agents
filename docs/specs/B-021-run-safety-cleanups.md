@@ -1,6 +1,6 @@
 # Spec: B-021 · The next real run must not abort, hang, or default to a dead mode
 
-Status: DRAFT — awaiting LGTM
+Status: **DONE 2026-07-28** — all three slices landed, `make ci-local` green
 Date: 2026-07-28
 Depends on: B-020 (acceptance passed 2026-07-27)
 
@@ -151,8 +151,26 @@ its bug id:
    operator to use a third-party image tool.
 4. `make ci-local` green; BUG-059/060/061 marked resolved with verification notes.
 
-## Open Questions
+## Resolved Questions
 
-- **Q1 (slice 3):** fork (a) delete vs (b) repair-and-rename. Recommendation (a).
-- **Q2:** the per-attempt cost estimate driving slice 1's default — measured
-  ~$0.42 for Sonnet. Confirm before it becomes a constant.
+- **Q1 (slice 3): ANSWERED 2026-07-28 — (a) delete.** Owner call. The handshake's
+  only consumer was a workflow the constraints forbid. Hand-supplied art survives
+  as "overwrite `output/posts/images/<slug>-hero.svg` and re-run"; the prompt
+  sidecar is still written as the brief.
+- **Q2: `_WRITER_ATTEMPT_COST_USD = 0.45`** — measured ~$0.42 per Sonnet attempt
+  on the B-020 runs, rounded up for headroom. `DEFAULT_WRITER_BUDGET_USD` is that
+  × `_WRITER_MAX_ATTEMPTS` = **$1.35**, replacing the hand-picked $0.60.
+
+## Outcome
+
+All four success criteria met. Suite 2377 green; `make ci-local` green; verified
+at runtime (`--writer-budget` default reads 1.35, removed flags rejected).
+Net **-773 lines**. BUG-059/060/061 marked resolved with verification notes.
+
+**Spun out, deliberately not done here:**
+- **BUG-064** — `_graphics_with_retry` hands every attempt the FULL budget rather
+  than the remaining balance, so 3 attempts can spend 3× the stated cap. Found
+  while fixing BUG-061; it is the mirror image of it. Silent overspend, not a run
+  aborter, so it did not belong in a slice about run safety.
+- **B-022** — `EconomistContentFlow`'s DALL-E branch, now provably dead. Kept out
+  to hold slice 3's diff to the CLI surface the owner approved.

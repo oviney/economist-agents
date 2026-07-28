@@ -118,10 +118,14 @@ def test_run_stage3_fails_when_chart_render_fails(
     # Empty data list — chart_renderer rejects this with ChartRenderError.
     chart_json = '{"title": "T", "data": []}'
 
-    call_results = iter([(article_text, 0.0), (chart_json, 0.0)])
+    # The graphics agent now retries a spec the renderer rejects (BUG-063), so
+    # supply the bad JSON for every attempt. The behaviour under test is
+    # unchanged: exhausting the retries must still block the article.
+    calls = {"n": 0}
 
     async def fake_collect(*args, **kwargs):
-        return next(call_results)
+        calls["n"] += 1
+        return (article_text, 0.0) if calls["n"] == 1 else (chart_json, 0.0)
 
     monkeypatch.setattr("src.agent_sdk.stage3_runner._collect_text", fake_collect)
     monkeypatch.setattr(

@@ -55,7 +55,7 @@ from src.agent_sdk._shared import (
 from src.agent_sdk._shared import (
     audit_article_stats as _audit_article_stats,
 )
-from src.agent_sdk.chart_renderer import render_chart
+from src.agent_sdk.chart_renderer import ChartRenderError, render_chart
 from src.agent_sdk.hero_svg import HERO_IMAGES_DIR
 from src.agent_sdk.image_prompt_synth import PromptSynthError, compose_prompt
 from src.agent_sdk.research.claude_web import build_claude_web_brief
@@ -496,6 +496,70 @@ def _ensure_chart_title(chart_data: dict, article: str, topic: str) -> dict:
     return {**chart_data, "title": derived}
 
 
+#: The graphics agent is as prone to malformed output as the writer, which gets
+#: _WRITER_MAX_ATTEMPTS. It had none, so one bad JSON spec killed the pipeline
+#: AFTER the writer had already succeeded and cost ~$0.85 (BUG-063, found by the
+#: B-020 acceptance run).
+_GRAPHICS_MAX_ATTEMPTS = 3
+
+
+async def _graphics_with_retry(
+    collect: Any,
+    graphics_prompt: str,
+    graphics_model: str,
+    graphics_budget_usd: float | None,
+    article: str,
+    topic: str,
+    chart_path: Path,
+) -> tuple[dict, float, int]:
+    """Generate a chart spec and render it, retrying a spec the renderer rejects.
+
+    Chart failures stay fatal — a missing chart leaves a broken body embed — but
+    "fatal" should mean "the agent could not produce a valid spec in N tries",
+    not "the first try was malformed".
+
+    Returns ``(chart_data, cost, attempts)``. Raises the last
+    :class:`ChartRenderError` when every attempt fails.
+    """
+    cost = 0.0
+    last_error: ChartRenderError | None = None
+    prompt = graphics_prompt
+
+    for attempt in range(1, _GRAPHICS_MAX_ATTEMPTS + 1):
+        text, call_cost = await collect(
+            prompt,
+            GRAPHICS_AGENT_PROMPT,
+            model=graphics_model,
+            max_budget_usd=graphics_budget_usd,
+            # Turn headroom: the subscription CLI can need >1 turn for the JSON
+            # (BUG-042). Kept small — no tools are exposed for graphics.
+            max_turns=4,
+        )
+        cost += call_cost
+        chart_data = _ensure_chart_title(_parse_chart_json(text), article, topic)
+        try:
+            render_chart(chart_data, chart_path)
+        except ChartRenderError as exc:
+            last_error = exc
+            logger.warning(
+                "Graphics attempt %s/%s produced an unrenderable spec: %s; retrying",
+                attempt,
+                _GRAPHICS_MAX_ATTEMPTS,
+                exc,
+            )
+            # Feed the renderer's own message back — without it the agent has no
+            # idea what to change and simply repeats itself.
+            prompt = (
+                f"{graphics_prompt}\n\nYour previous chart JSON was rejected by "
+                f"the renderer: {exc}\nReturn corrected JSON only."
+            )
+            continue
+        return chart_data, cost, attempt
+
+    assert last_error is not None
+    raise last_error
+
+
 async def run_stage3(
     topic: str,
     writer_budget_usd: float | None = 0.30,
@@ -656,22 +720,22 @@ async def run_stage3(
         "best carries the article's argument.\n\n"
         f"Article excerpt:\n{article[:2500]}"
     )
-    graphics_text, graphics_cost = await _collect_text(
-        graphics_prompt,
-        GRAPHICS_AGENT_PROMPT,
-        model=graphics_model,
-        max_budget_usd=graphics_budget_usd,
-        # Turn headroom: the subscription CLI can need >1 turn for the JSON
-        # (BUG-042). Kept small — no tools are exposed for graphics.
-        max_turns=4,
-    )
-    chart_data = _ensure_chart_title(_parse_chart_json(graphics_text), article, topic)
-
-    # #403 slice 1: render the chart spec to a real PNG. Render failures
-    # are fatal because a missing chart would leave a broken body embed.
+    # #403 slice 1: render the chart spec to a real PNG. Render failures stay
+    # fatal (a missing chart leaves a broken body embed) but are now retried
+    # first — one malformed spec used to kill the run after the writer had
+    # already succeeded (BUG-063).
     slug = _slug_for_chart(article, topic)
-    chart_path = render_chart(chart_data, Path("output/charts") / f"{slug}.png")
-    logger.info("Rendered chart: %s", chart_path)
+    chart_path = Path("output/charts") / f"{slug}.png"
+    chart_data, graphics_cost, graphics_attempts = await _graphics_with_retry(
+        _collect_text,
+        graphics_prompt,
+        graphics_model,
+        graphics_budget_usd,
+        article,
+        topic,
+        chart_path,
+    )
+    logger.info("Rendered chart: %s (attempt %s)", chart_path, graphics_attempts)
 
     # #403 slice 3: synthesise the ChatGPT-handoff prompt and persist it
     # as a sibling artefact. The prompt is built from the article's own

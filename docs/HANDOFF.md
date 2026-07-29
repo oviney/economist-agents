@@ -36,6 +36,24 @@ token is still a credential under Operating Constraint #1.
 
 **Do not delete that branch before B-023 is answered.** It is the only copy.
 
+**First action on the Mac — stop relying on it being the only copy.** Push it, so
+the decision is no longer racing against a disk failure or a cleanup command:
+
+```bash
+cd ~/code/economist-agents
+git push origin backup/integration-test-20260728
+```
+
+One judgement call before running it: `oviney/economist-agents` is **public**, and
+the branch carries auth-resolution work (`docs/specs/anthropic-auth-token-resolution.md`,
+`tests/test_anthropic_auth_resolution.py`). Skim those two files for a real token
+or key first — the commits looked like resolution *logic* rather than secrets, but
+that was read from commit metadata on another machine, not verified against the
+file contents. If anything sensitive is in there, push to a private remote instead.
+
+Once pushed, B-023 can be decided whenever, and this section becomes a normal
+backlog item rather than a single-point-of-failure.
+
 ## Nothing else is waiting on the owner
 
 `oviney/blog#1168` merged 2026-07-29. Verified against the file on `oviney/blog`

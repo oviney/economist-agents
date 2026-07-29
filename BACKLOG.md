@@ -26,6 +26,34 @@ _(none)_
 
 ## Todo
 
+### B-023 · Decide the fate of `llm_client.py`'s Anthropic auth path
+
+Surfaced 2026-07-28 while reconciling `backup/integration-test-20260728`, a
+Mac-only branch that was never pushed. Almost everything on it had already
+landed on `main` by other routes (the paid-search-API removal, BUG-047's
+code-fence recovery, the arXiv `papers_analyzed` fix). Two things had not:
+
+1. **The model bump — TAKEN.** Cherry-picked as `3988dad`; `llm_client.py` was
+   still defaulting to the deprecated `claude-sonnet-4-20250514`.
+2. **The auth work — NOT TAKEN, needs a decision.** The branch taught
+   `_create_anthropic_client` to honour an `ant` OAuth profile /
+   `ANTHROPIC_AUTH_TOKEN` instead of requiring `ANTHROPIC_API_KEY`
+   (`tests/test_anthropic_auth_resolution.py`,
+   `docs/specs/anthropic-auth-token-resolution.md` — both absent from `main`).
+
+**The decision:** `create_llm_client` is the **legacy paid path** — Stage 1
+topic discovery needs `ANTHROPIC_API_KEY` (BUG-046), and **B-010 exists to
+retire it**. So the auth work either (a) makes a keyless-ish route work on a
+path we intend to delete, or (b) is genuinely useful if that path survives.
+There is also a constraint question: Operating Constraint #1 forbids new API
+keys, and an `ANTHROPIC_AUTH_TOKEN` is still a credential — arguably in the
+spirit of #3 (the Claude subscription) rather than against it, but that is a
+call for the owner, not an inference.
+
+**Answer B-010's scope first**, then either port the branch's auth commit
+(`73e73c0`) or delete `backup/integration-test-20260728`. Do not delete the
+branch before this is answered — it is the only copy.
+
 ### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
 
 **`check-agent-scope` RESOLVED 2026-07-24** (see B-015a in Done). **Gate matrix

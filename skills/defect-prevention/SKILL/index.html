@@ -2302,6 +2302,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#the-defects-tests-cannot-find-gaps-in-what-is-checked-at-all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The defects tests cannot find: gaps in what is checked at all
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#red-flags" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3374,6 +3385,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#the-defects-tests-cannot-find-gaps-in-what-is-checked-at-all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The defects tests cannot find: gaps in what is checked at all
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#red-flags" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3524,8 +3546,38 @@
 </tr>
 </tbody>
 </table>
+<h2 id="the-defects-tests-cannot-find-gaps-in-what-is-checked-at-all">The defects tests cannot find: gaps in what is checked at all<a class="headerlink" href="#the-defects-tests-cannot-find-gaps-in-what-is-checked-at-all" title="Permanent link">&para;</a></h2>
+<p>A prevention rule guards a pattern <em>inside</em> the thing being checked. It cannot
+guard something the check never sees. Two of the four defects closed on
+2026-07-28 were of that second kind, and <strong>neither was found by a failing test —
+both were found by reading code adjacent to an unrelated fix:</strong></p>
+<ul>
+<li><strong>BUG-064</strong> — <code>_graphics_with_retry</code> handed every attempt the FULL budget
+  instead of the remaining balance, so three retries could spend 3× the operator's
+  cap. Found while fixing <strong>BUG-061</strong>, its exact mirror image in the <em>writer</em> loop.
+  Every test passed throughout: the suite asserted the retry <em>policy</em>, never the
+  budget <em>arithmetic</em>, and nothing compared the two loops to each other.</li>
+<li><strong>BUG-065</strong> — the hero-prompt comment reached a published post. The validator
+  has a check built for exactly this ("placeholder text that should never be
+  published") and it could not fire, because the comment is injected <em>after</em>
+  Stage 4 by design. The artefact the validator blessed was not the artefact that
+  shipped (ADR-0017).</li>
+</ul>
+<p><strong>The generalisable habit:</strong> when you fix a defect, read the <em>sibling</em> — the other
+retry loop, the other entry point, the other deploy path. Both of these bugs were
+one function away from a fix that was already being made. And when a gate exists
+for a class of problem that still escaped, ask whether the gate can <em>see</em> the
+thing at all before adding a pattern to it — a rule that can never fire is worse
+than no rule, because it reads like protection.</p>
+<p>Neither of these belongs in <code>check_all()</code>. They are recorded here because the
+lesson is about <em>where to look</em>, not about a pattern to match.</p>
 <h2 id="red-flags">Red Flags<a class="headerlink" href="#red-flags" title="Permanent link">&para;</a></h2>
 <ul>
+<li><strong>A gate that cannot see what it is meant to guard</strong> — e.g. a check that runs
+  before the content it validates is injected. Verify the ordering, not just the
+  pattern.</li>
+<li><strong>A fix applied to one of two mirrored code paths</strong> — retry loops, deploy entry
+  points, <code>deploy()</code>/<code>deploy_review()</code>. Fix the sibling or log why not.</li>
 <li>Prevention rule uses LLM calls instead of deterministic checks</li>
 <li>Rule added to <code>check_all()</code> but no corresponding test written</li>
 <li>Pattern logged but no prevention rule created within the same sprint</li>

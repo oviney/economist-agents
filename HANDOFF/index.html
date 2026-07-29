@@ -3224,6 +3224,19 @@ is an <code>ant</code> OAuth / <code>ANTHROPIC_AUTH_TOKEN</code> resolution path
 <code>create_llm_client</code> is the legacy paid path <strong>B-010 exists to retire</strong> — and a
 token is still a credential under Operating Constraint #1.</p>
 <p><strong>Do not delete that branch before B-023 is answered.</strong> It is the only copy.</p>
+<p><strong>First action on the Mac — stop relying on it being the only copy.</strong> Push it, so
+the decision is no longer racing against a disk failure or a cleanup command:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">cd</span><span class="w"> </span>~/code/economist-agents
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>backup/integration-test-20260728
+</code></pre></div>
+<p>One judgement call before running it: <code>oviney/economist-agents</code> is <strong>public</strong>, and
+the branch carries auth-resolution work (<code>docs/specs/anthropic-auth-token-resolution.md</code>,
+<code>tests/test_anthropic_auth_resolution.py</code>). Skim those two files for a real token
+or key first — the commits looked like resolution <em>logic</em> rather than secrets, but
+that was read from commit metadata on another machine, not verified against the
+file contents. If anything sensitive is in there, push to a private remote instead.</p>
+<p>Once pushed, B-023 can be decided whenever, and this section becomes a normal
+backlog item rather than a single-point-of-failure.</p>
 <h2 id="nothing-else-is-waiting-on-the-owner">Nothing else is waiting on the owner<a class="headerlink" href="#nothing-else-is-waiting-on-the-owner" title="Permanent link">&para;</a></h2>
 <p><code>oviney/blog#1168</code> merged 2026-07-29. Verified against the file on <code>oviney/blog</code>
 <code>main</code> — 0 of 4 slop detectors fire, the hero-prompt comment is gone, 860 words,
@@ -3238,7 +3251,7 @@ the blog bumps its deps and refreshes its baselines — see B-015.</p>
 <p>There is no blocker. Two generated drafts from the B-020 runs are sitting in
 <code>output/posts/</code> on the "code review queue" topic — regenerate rather than reuse
 them, since they predate today's fixes.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">IS_SANDBOX</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">&quot;&lt;topic&gt;&quot;</span><span class="w"> </span>--research-mode<span class="w"> </span>claude_web
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">IS_SANDBOX</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">&quot;&lt;topic&gt;&quot;</span><span class="w"> </span>--research-mode<span class="w"> </span>claude_web
 </code></pre></div>
 <p>Budget ~$1 and ~35 minutes. Then <code>deploy_to_blog</code> opens the PR.</p>
 <h2 id="things-that-will-bite-a-fresh-session">Things that will bite a fresh session<a class="headerlink" href="#things-that-will-bite-a-fresh-session" title="Permanent link">&para;</a></h2>

@@ -274,11 +274,13 @@ entry points get the same visual: a drawn hero plus the matplotlib chart.
   human handshake — exit code 10, slug-keyed resume state, `--resume`, the PNG
   gate — was removed once Claude drew its own hero; there was nothing left to
   pause for. To supply art by hand, overwrite the drawn SVG and re-run.
-- **Python API** (`EconomistContentFlow`) no longer forwards an image policy to
-  `run_pipeline`. Its `image_mode` now only selects what the *flow* does after
-  the pipeline returns: `"chart_only"` (default) takes the output as-is, while
-  `"hero"` is the legacy DALL-E step that needs `OPENAI_API_KEY` and therefore
-  violates Operating Constraints #1–#4. Removing it is **B-022**.
+- **Python API** (`EconomistContentFlow`) takes **no image policy** since B-022.
+  It takes the pipeline's output as-is and ships the draft image-less, letting
+  the hero ride in the article frontmatter. The old `image_mode="hero"` branch
+  called DALL-E, needed `OPENAI_API_KEY`, and degraded to `blog-default.svg` —
+  which the deploy path rejects as `default_image_fallback`, so its failure mode
+  produced an unpublishable article. Constraints #1–#4 forbade it and ADR-0014
+  had retired it.
 
 ---
 

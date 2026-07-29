@@ -17,15 +17,13 @@ Stages:
     5b. revise — one retry with feedback, then quarantine
 
 Image policy:
-    The CLI (``python -m src.agent_sdk.pipeline``) has ONE path since B-021 —
-    Stage 3 draws the hero SVG itself (B-016b), so nothing pauses for a
-    human-supplied image and the #403 handshake (exit 10 / ``--resume``) is gone.
-    ``EconomistContentFlow(image_mode=...)`` now only chooses what this flow does
-    AFTER the pipeline returns:
-    - ``"chart_only"`` (default): take the pipeline's output as-is. Keyless.
-    - ``"hero"``: legacy DALL-E featured-image step. Needs ``OPENAI_API_KEY``,
-      so it violates Operating Constraints #1-#4 and is dead in practice —
-      removal tracked as B-022.
+    There is no policy to choose. Stage 3 draws the hero SVG itself (B-016b) and
+    the CLI (``python -m src.agent_sdk.pipeline``) has had ONE path since B-021 —
+    nothing pauses for a human-supplied image, and the #403 handshake
+    (exit 10 / ``--resume``) is gone. B-022 then removed this flow's
+    ``image_mode`` and its DALL-E branch, which needed ``OPENAI_API_KEY`` and
+    fell back to ``blog-default.svg`` — a CRITICAL deploy-time rejection.
+    Keyless throughout, per Operating Constraints #1-#4.
 
 Usage:
     from src.economist_agents.flow import EconomistContentFlow
@@ -43,23 +41,20 @@ import pathlib
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any
 
 import orjson
-import yaml as _yaml
 
 from scripts.article_evaluator import ArticleEvaluator
 from scripts.frontmatter_schema import FrontmatterSchema
 from src.agent_sdk._shared import (
     BudgetExceededError,
     EmptyResearchBriefError,
-    refine_image_metadata,
 )
 from src.agent_sdk.pipeline import run_pipeline
 from src.agent_sdk.stage3_runner import MalformedArticleError
 from src.economist_agents.adapters import (
     create_llm_client,
-    generate_featured_image,
     run_editorial_board,
     scout_topics,
 )
@@ -77,25 +72,17 @@ PIPELINE_RESULT_PATH = Path(
 class EconomistContentFlow:
     """Sequential orchestrator for the end-to-end content pipeline."""
 
-    def __init__(
-        self, image_mode: Literal["chart_only", "hero"] = "chart_only"
-    ) -> None:
+    def __init__(self) -> None:
         """Construct the flow.
 
-        ``image_mode`` selects what happens to the hero image AFTER the Agent SDK
-        pipeline returns. It no longer changes the pipeline itself: B-021 left
-        ``run_pipeline`` with a single path, and Stage 3 draws its own hero SVG
-        (B-016b).
-        - ``"chart_only"`` (default): take the pipeline's output as-is. Keyless.
-        - ``"hero"``: legacy opt-in to the retired DALL-E featured-image step,
-          which needs ``OPENAI_API_KEY`` and so violates Operating Constraints
-          #1-#4. Dead in practice; removal is tracked as B-022.
+        There is no image policy to choose any more (B-022). Stage 3 draws the
+        hero SVG itself (B-016b) and ``run_pipeline`` has a single path (B-021),
+        so the flow takes the pipeline's output as-is. The old
+        ``image_mode="hero"`` branch called DALL-E, needed ``OPENAI_API_KEY``,
+        and fell back to ``blog-default.svg`` — which the deploy path rejects as
+        ``default_image_fallback``. It violated Operating Constraints #1-#4 and
+        ADR-0014 had already retired it.
         """
-        if image_mode not in {"chart_only", "hero"}:
-            raise ValueError(
-                f"image_mode must be 'chart_only' or 'hero', got {image_mode!r}"
-            )
-        self.image_mode = image_mode
         self._deduplicator = TopicDeduplicator()
         self.state: dict[str, Any] = {}
 
@@ -325,87 +312,20 @@ class EconomistContentFlow:
             result.gates_passed,
         )
 
-        if self.image_mode == "chart_only":
-            # Ship on the chart alone. No paid image API, no vision refine.
-            # run_pipeline already stripped the hero frontmatter before Stage 4,
-            # so a missing hero never forces a revision. featured_image is left
-            # EMPTY (not blog-default.svg): _patch_frontmatter's
-            # `if featured_image:` guard then leaves the article image-less,
-            # which the publication validator accepts ("no image → pass"). The
-            # default-image fallback would instead be a CRITICAL deploy-time
-            # rejection (publication_validator default_image_fallback).
-            logger.info("   🖼️  image_mode=chart_only — skipping hero image generation")
-            return {
-                "article": article,
-                "chart_data": result.chart_data,
-                "featured_image": "",
-                "featured_image_local": "",
-                "image_alt": "",
-                "image_caption": "",
-                "stage4_already_run": True,
-                "publication_validator_passed": result.publication_validator_passed,
-                "publication_validator_issues": result.publication_validator_issues,
-                "editorial_score": result.editorial_score,
-                "gates_passed": result.gates_passed,
-            }
-
-        # ── hero mode (explicit opt-in): generate a DALL-E featured image ──
-        # Slug for the DALL-E filename
-        slug = topic.lower()
-        for ch in " :?!,.'\"()":
-            slug = slug.replace(ch, "-")
-        slug = slug.strip("-")[:60]
-
-        output_dir = Path("output/images")
-        output_dir.mkdir(parents=True, exist_ok=True)
-        image_path = str(output_dir / f"{slug}.png")
-
-        if not os.environ.get("OPENAI_API_KEY"):
-            logger.warning(
-                "   ⚠️  OPENAI_API_KEY not set — DALL-E image generation requires it "
-                "even when Claude is the primary LLM",
-            )
-
-        logger.info("🎨 Generating featured image...")
-        featured_image = "/assets/images/blog-default.svg"
-        try:
-            generated = generate_featured_image(
-                topic=topic,
-                article_summary=article[:200],
-                output_path=image_path,
-            )
-            if generated:
-                featured_image = f"/assets/images/{slug}.png"
-                logger.info("   ✅ Featured image: %s", image_path)
-            else:
-                logger.info("   ℹ️  Using default image")
-        except Exception as exc:
-            logger.warning("   ℹ️  Image generation failed (%s), using default", exc)
-
-        # Extract image_alt / image_caption drafts emitted by the writer
-        _image_alt, _image_caption = "", ""
-        if article.startswith("---"):
-            _parts = article.split("---", 2)
-            if len(_parts) >= 2:
-                try:
-                    _fm = _yaml.safe_load(_parts[1]) or {}
-                    _image_alt = _fm.get("image_alt", "") or ""
-                    _image_caption = _fm.get("image_caption", "") or ""
-                except Exception:
-                    pass
-
-        # Ground image metadata with Claude vision (async; falls back on failure)
-        _refined = asyncio.run(
-            refine_image_metadata(image_path, _image_alt, _image_caption)
-        )
-
+        # Stage 3 draws the hero itself (B-016b) and run_pipeline strips the hero
+        # frontmatter when it did not, so a missing hero never forces a revision.
+        # featured_image is left EMPTY (not blog-default.svg): _patch_frontmatter's
+        # `if featured_image:` guard then leaves the article image-less, which the
+        # publication validator accepts ("no image → pass"). The default-image
+        # fallback would instead be a CRITICAL deploy-time rejection
+        # (publication_validator default_image_fallback).
         return {
             "article": article,
             "chart_data": result.chart_data,
-            "featured_image": featured_image,
-            "featured_image_local": image_path,
-            "image_alt": _refined["image_alt"],
-            "image_caption": _refined["image_caption"],
+            "featured_image": "",
+            "featured_image_local": "",
+            "image_alt": "",
+            "image_caption": "",
             "stage4_already_run": True,
             "publication_validator_passed": result.publication_validator_passed,
             "publication_validator_issues": result.publication_validator_issues,

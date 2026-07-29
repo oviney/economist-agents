@@ -165,15 +165,12 @@ class TestEditorialReview:
 
 
 class TestGenerateContent:
-    @patch("src.economist_agents.flow.generate_featured_image", return_value=False)
     @patch("src.economist_agents.flow.run_pipeline", new_callable=AsyncMock)
     def test_calls_pipeline_and_returns_article(
         self,
         mock_run_pipeline: AsyncMock,
-        mock_image: Mock,
     ) -> None:
-        # chart_only (default) makes a single asyncio.run(run_pipeline(...)) call;
-        # refine_image_metadata is not invoked.
+        # One path (B-021/B-022): a single asyncio.run(run_pipeline(...)) call.
         mock_run_pipeline.return_value = _passing_pipeline_result()
         flow = EconomistContentFlow()
 
@@ -187,54 +184,8 @@ class TestGenerateContent:
         assert result["publication_validator_passed"] is True
         assert result["editorial_score"] == 88
         assert result["gates_passed"] == 5
-        # default flow is chart_only (#410): ships image-less, no DALL-E
+        # Ships image-less; the hero rides in the article frontmatter (B-016b).
         assert result["featured_image"] == ""
-
-    @patch("src.economist_agents.flow.refine_image_metadata", new_callable=AsyncMock)
-    @patch("src.economist_agents.flow.generate_featured_image", return_value=True)
-    @patch("src.economist_agents.flow.run_pipeline", new_callable=AsyncMock)
-    def test_uses_dalle_image_when_generated(
-        self,
-        mock_run_pipeline: AsyncMock,
-        mock_image: Mock,
-        mock_refine: AsyncMock,
-    ) -> None:
-        mock_run_pipeline.return_value = _passing_pipeline_result()
-        mock_refine.return_value = {
-            "image_alt": "alt text",
-            "image_caption": "caption text",
-        }
-        flow = EconomistContentFlow(image_mode="hero")
-
-        result = flow.generate_content({"topic": "AI Coding Assistants"})
-
-        assert result["featured_image"] == "/assets/images/ai-coding-assistants.png"
-
-    @patch("src.economist_agents.flow.refine_image_metadata", new_callable=AsyncMock)
-    @patch("src.economist_agents.flow.generate_featured_image", return_value=False)
-    @patch("src.economist_agents.flow.run_pipeline", new_callable=AsyncMock)
-    def test_hero_mode_awaits_refine_image_metadata(
-        self,
-        mock_run_pipeline: AsyncMock,
-        mock_image: Mock,
-        mock_refine: AsyncMock,
-    ) -> None:
-        """In hero mode the flow must await refine_image_metadata exactly once, with
-        the generated image path. (Replaces the old asyncio.run-introspection test
-        that asserted call_count/iscoroutine on the seam we've removed.)"""
-        mock_run_pipeline.return_value = _passing_pipeline_result()
-        mock_refine.return_value = {
-            "image_alt": "editorial alt",
-            "image_caption": "editorial caption",
-        }
-        flow = EconomistContentFlow(image_mode="hero")
-
-        flow.generate_content({"topic": "AI Testing"})
-
-        mock_refine.assert_awaited_once()
-        # First positional arg is the DALL-E image path (output/images/<slug>.png).
-        image_path = mock_refine.await_args.args[0]
-        assert image_path.endswith("ai-testing.png")
 
 
 # ─── stage 4 routing ────────────────────────────────────────────────────
@@ -858,7 +809,6 @@ class TestKickoffResultFile:
         flow.kickoff()
         return result_path
 
-    @patch("src.economist_agents.flow.generate_featured_image", return_value=False)
     @patch("src.economist_agents.flow.run_pipeline", new_callable=AsyncMock)
     @patch("src.economist_agents.flow.run_editorial_board")
     @patch("src.economist_agents.flow.scout_topics")
@@ -869,7 +819,6 @@ class TestKickoffResultFile:
         mock_scout: Mock,
         mock_board: Mock,
         mock_run_pipeline: AsyncMock,
-        mock_image: Mock,
         tmp_path,
         monkeypatch,
     ) -> None:
@@ -889,7 +838,6 @@ class TestKickoffResultFile:
         assert "gates_passed" in data
         assert "status" in data
 
-    @patch("src.economist_agents.flow.generate_featured_image", return_value=False)
     @patch("src.economist_agents.flow.run_pipeline", new_callable=AsyncMock)
     @patch("src.economist_agents.flow.run_editorial_board")
     @patch("src.economist_agents.flow.scout_topics")
@@ -900,7 +848,6 @@ class TestKickoffResultFile:
         mock_scout: Mock,
         mock_board: Mock,
         mock_run_pipeline: AsyncMock,
-        mock_image: Mock,
         tmp_path,
         monkeypatch,
     ) -> None:
@@ -919,7 +866,6 @@ class TestKickoffResultFile:
         assert data["gates_passed"] == 5
         assert data["status"] == "published"
 
-    @patch("src.economist_agents.flow.generate_featured_image", return_value=False)
     @patch("src.economist_agents.flow.run_pipeline", new_callable=AsyncMock)
     @patch("src.economist_agents.flow.run_editorial_board")
     @patch("src.economist_agents.flow.scout_topics")
@@ -930,7 +876,6 @@ class TestKickoffResultFile:
         mock_scout: Mock,
         mock_board: Mock,
         mock_run_pipeline: AsyncMock,
-        mock_image: Mock,
         tmp_path,
         monkeypatch,
     ) -> None:
@@ -977,7 +922,6 @@ class TestKickoffResultFile:
         assert "editorial_score" in data
         assert "gates_passed" in data
 
-    @patch("src.economist_agents.flow.generate_featured_image", return_value=False)
     @patch("src.economist_agents.flow.run_pipeline", new_callable=AsyncMock)
     @patch("src.economist_agents.flow.run_editorial_board")
     @patch("src.economist_agents.flow.scout_topics")
@@ -988,7 +932,6 @@ class TestKickoffResultFile:
         mock_scout: Mock,
         mock_board: Mock,
         mock_run_pipeline: AsyncMock,
-        mock_image: Mock,
         tmp_path,
         monkeypatch,
     ) -> None:

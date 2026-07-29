@@ -182,11 +182,34 @@ def check_hero_svg(source: str) -> None:
 #: cairosvg in this environment, and adding one would be a new dependency for a
 #: capability we already have.
 _CHROME_BINARIES = ("google-chrome", "chromium", "chromium-browser")
+
+#: macOS ships Chrome as an app bundle, so it is never on ``PATH`` under any of
+#: the names above and ``shutil.which()`` alone can never find it (BUG-068). The
+#: failure was silent — no raster, therefore no vision critique, therefore
+#: Constraint #4 unenforceable on the platform the owner runs.
+_CHROME_APP_PATHS = (
+    Path("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"),
+    Path("/Applications/Chromium.app/Contents/MacOS/Chromium"),
+)
 _RENDER_TIMEOUT_S = 60
 
 #: Matches the gate's 16:9 contract and the shipped hero's intrinsic size.
 _RENDER_WIDTH = 1600
 _RENDER_HEIGHT = 900
+
+
+def _find_chrome() -> str | None:
+    """Locate a Chrome/Chromium executable, or ``None`` if none is installed.
+
+    ``PATH`` is searched first: a binary the operator put there is a deliberate
+    choice and should outrank a system-default app bundle. Bundle paths are the
+    fallback that makes macOS work at all (BUG-068).
+    """
+    for name in _CHROME_BINARIES:
+        found = shutil.which(name)
+        if found:
+            return found
+    return next((str(p) for p in _CHROME_APP_PATHS if p.exists()), None)
 
 
 def render_to_png(svg_path: Path, png_path: Path) -> Path | None:
@@ -202,12 +225,14 @@ def render_to_png(svg_path: Path, png_path: Path) -> Path | None:
     available", never to a failed article (spec failure policy, row 2: a vision
     malfunction must not affect the exit code).
     """
-    binary = next((b for b in _CHROME_BINARIES if shutil.which(b)), None)
+    binary = _find_chrome()
     if binary is None:
         logger.warning(
-            "No Chrome/Chromium binary found (%s) — skipping hero render, so the "
-            "vision critique will be skipped too",
+            "No Chrome/Chromium binary found (searched PATH for %s, and %s) — "
+            "skipping hero render, so the vision critique will be skipped too and "
+            "NOBODY WILL HAVE LOOKED AT THE HERO (Constraint #4)",
             ", ".join(_CHROME_BINARIES),
+            ", ".join(str(p) for p in _CHROME_APP_PATHS),
         )
         return None
 

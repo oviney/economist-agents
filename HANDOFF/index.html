@@ -10,13 +10,9 @@
       
       
       
-        <link rel="canonical" href="https://oviney.github.io/economist-agents/FLOW_ARCHITECTURE/">
+        <link rel="canonical" href="https://oviney.github.io/economist-agents/HANDOFF/">
       
       
-        <link rel="prev" href="../agent-registry-spec/">
-      
-      
-        <link rel="next" href="../AUTONOMOUS_ORCHESTRATION_STRATEGY/">
       
       
         
@@ -27,7 +23,7 @@
     
     
       
-        <title>Flow Architecture - Economist Agents</title>
+        <title>Hand-off — 2026-07-28 - Economist Agents</title>
       
     
     
@@ -78,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#economist-content-flow-architecture" class="md-skip">
+        <a href="#hand-off-2026-07-28" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +108,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Flow Architecture
+              Hand-off — 2026-07-28
             
           </span>
         </div>
@@ -261,12 +257,10 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../agent-registry-spec/" class="md-tabs__link">
           
   
@@ -492,31 +486,28 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   
@@ -534,7 +525,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -577,37 +568,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Flow Architecture
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../FLOW_ARCHITECTURE/" class="md-nav__link">
         
   
   
@@ -623,381 +587,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Overview
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#architecture-diagram" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Architecture Diagram
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#flow-stages" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Flow Stages
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Flow Stages">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-discover_topics-start" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. discover_topics() - @start
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-editorial_review-listendiscover_topics" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. editorial_review() - @listen(discover_topics)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-generate_content-listeneditorial_review" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. generate_content() - @listen(editorial_review)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-quality_gate-routergenerate_content" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. quality_gate() - @router(generate_content)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5a-publish_article-listenpublish" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5a. publish_article() - @listen("publish")
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5b-request_revision-listenrevision" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5b. request_revision() - @listen("revision")
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#key-design-decisions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Key Design Decisions
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Key Design Decisions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-deterministic-progression" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Deterministic Progression
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-on-demand-crew-initialization" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. On-Demand Crew Initialization
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-quality-gate-threshold" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Quality Gate Threshold
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-state-management" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. State Management
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#flow-usage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Flow Usage
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Flow Usage">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#basic-execution" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Basic Execution
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#cli-execution" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CLI Execution
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#integration-with-existing-code" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Integration with Existing Code
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#testing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Testing
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Testing">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#integration-tests" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Integration Tests
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#migration-from-workflow_sequence" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Migration from WORKFLOW_SEQUENCE
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Migration from WORKFLOW_SEQUENCE">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#old-pattern-scriptssm_agentpy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Old Pattern (scripts/sm_agent.py)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#new-pattern-flow-based" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        New Pattern (Flow-Based)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#performance" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Performance
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#future-enhancements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Future Enhancements
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Future Enhancements">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#sprint-14-scope" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Sprint 14 Scope
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#post-sprint-14" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Post-Sprint 14
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#references" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        References
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#image-policy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Image policy
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -3426,10 +3015,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
+  <a href="#state" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Overview
+        State
       
     </span>
   </a>
@@ -3437,10 +3026,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#architecture-diagram" class="md-nav__link">
+  <a href="#what-landed-today" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Architecture Diagram
+        What landed today
       
     </span>
   </a>
@@ -3448,271 +3037,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#flow-stages" class="md-nav__link">
+  <a href="#the-one-thing-waiting-on-you" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Flow Stages
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Flow Stages">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-discover_topics-start" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. discover_topics() - @start
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-editorial_review-listendiscover_topics" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. editorial_review() - @listen(discover_topics)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-generate_content-listeneditorial_review" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. generate_content() - @listen(editorial_review)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-quality_gate-routergenerate_content" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. quality_gate() - @router(generate_content)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5a-publish_article-listenpublish" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5a. publish_article() - @listen("publish")
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5b-request_revision-listenrevision" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5b. request_revision() - @listen("revision")
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#key-design-decisions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Key Design Decisions
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Key Design Decisions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-deterministic-progression" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Deterministic Progression
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-on-demand-crew-initialization" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. On-Demand Crew Initialization
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-quality-gate-threshold" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Quality Gate Threshold
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-state-management" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. State Management
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#flow-usage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Flow Usage
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Flow Usage">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#basic-execution" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Basic Execution
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#cli-execution" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CLI Execution
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#integration-with-existing-code" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Integration with Existing Code
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#testing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Testing
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Testing">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#integration-tests" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Integration Tests
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#migration-from-workflow_sequence" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Migration from WORKFLOW_SEQUENCE
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Migration from WORKFLOW_SEQUENCE">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#old-pattern-scriptssm_agentpy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Old Pattern (scripts/sm_agent.py)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#new-pattern-flow-based" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        New Pattern (Flow-Based)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#performance" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Performance
+        The one thing waiting on you
       
     </span>
   </a>
@@ -3720,49 +3048,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#future-enhancements" class="md-nav__link">
+  <a href="#next-up-article-two" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Future Enhancements
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Future Enhancements">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#sprint-14-scope" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Sprint 14 Scope
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#post-sprint-14" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Post-Sprint 14
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#references" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        References
+        Next up: article two
       
     </span>
   </a>
@@ -3770,10 +3059,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#image-policy" class="md-nav__link">
+  <a href="#things-that-will-bite-a-fresh-session" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Image policy
+        Things that will bite a fresh session
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#not-done-on-purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Not done, on purpose
       
     </span>
   </a>
@@ -3800,255 +3100,81 @@
   
 
 
-<h1 id="economist-content-flow-architecture">Economist Content Flow Architecture<a class="headerlink" href="#economist-content-flow-architecture" title="Permanent link">&para;</a></h1>
-<p><strong>Version</strong>: 2.0.0<br />
-<strong>Date</strong>: January 7, 2026<br />
-<strong>Status</strong>: Production (STORY-005 Complete)</p>
-<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>Production-grade content generation using CrewAI Flows for deterministic state-machine orchestration. Implements João Moura's Production ROI principles.</p>
-<h2 id="architecture-diagram">Architecture Diagram<a class="headerlink" href="#architecture-diagram" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌─────────────────────────────────────────────────────────────────┐
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│                    ECONOMIST CONTENT FLOW                        │
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│                   (Deterministic Orchestration)                  │
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>└─────────────────────────────────────────────────────────────────┘
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    @start                  @listen                 @listen
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>┌──────────────┐      ┌──────────────┐      ┌──────────────┐
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   discover   │─────&gt;│  editorial   │─────&gt;│  generate    │
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│   _topics()  │      │   _review()  │      │  _content()  │
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>└──────────────┘      └──────────────┘      └──────────────┘
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>                                                      │
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>                                                      ▼
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>                                               @router
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>                                          ┌──────────────┐
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>                                          │   quality    │
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>                                          │   _gate()    │
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>                                          └──────┬───────┘
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>                                                 │
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>                                    ┌────────────┴────────────┐
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>                                    ▼                         ▼
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>                           @listen(&quot;publish&quot;)      @listen(&quot;revision&quot;)
-<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>                         ┌──────────────┐        ┌──────────────┐
-<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>                         │   publish    │        │   request    │
-<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>                         │  _article()  │        │  _revision() │
-<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>                         └──────────────┘        └──────────────┘
-<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>                            (Terminal)               (Terminal)
+<h1 id="hand-off-2026-07-28">Hand-off — 2026-07-28<a class="headerlink" href="#hand-off-2026-07-28" title="Permanent link">&para;</a></h1>
+<p>Written for a fresh session on a different machine. <code>BACKLOG.md</code> stays the source
+of record; this file is the "where were we" note that a new session should read
+first, then delete or overwrite when it goes stale.</p>
+<h2 id="state">State<a class="headerlink" href="#state" title="Permanent link">&para;</a></h2>
+<p><code>main</code> is green and pushed. <code>make ci-local</code> passes (2380 tests, 8 skipped).
+There are <strong>no open defects and no blockers.</strong></p>
+<p>The pipeline generated a publishable article end to end in B-020, and everything
+since has been closing the traps that run exposed.</p>
+<h2 id="what-landed-today">What landed today<a class="headerlink" href="#what-landed-today" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>What it was</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>B-021</strong></td>
+<td>Three deferred B-020 defects. Writer budget couldn't fund its own retry (BUG-061); no call had a wall-clock bound (BUG-059); <code>--image-mode hero</code> was the default and was dead (BUG-060) — the whole human-image handshake was deleted, <strong>−773 lines</strong>.</td>
+</tr>
+<tr>
+<td><strong>B-022</strong></td>
+<td>The flow's DALL-E branch, provably dead after B-021, removed.</td>
+</tr>
+<tr>
+<td><strong>BUG-064</strong></td>
+<td>Graphics retries could spend 3× the stated cap.</td>
+</tr>
+<tr>
+<td><strong>BUG-065</strong></td>
+<td>Production escape — the hero-prompt comment reached the live blog. Now gated at the deploy boundary.</td>
+</tr>
+<tr>
+<td><code>oviney/blog#1168</code></td>
+<td>Prose-only edit clearing all four B-017 slop tells from the published flaky-tests post. <strong>Open, needs your admin-bypass merge.</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-one-thing-waiting-on-you">The one thing waiting on you<a class="headerlink" href="#the-one-thing-waiting-on-you" title="Permanent link">&para;</a></h2>
+<p><strong><code>oviney/blog#1168</code></strong> — it cannot merge itself. <code>🔒 Security Audit</code> and
+<code>🖼️ Visual Regression</code> fail blog-side for pre-existing reasons (npm CVEs; stale
+visual baselines), both are required checks, and GitHub forbids self-approval.
+Same bypass every article PR needs.</p>
+<h2 id="next-up-article-two">Next up: article two<a class="headerlink" href="#next-up-article-two" title="Permanent link">&para;</a></h2>
+<p>There is no blocker. Two generated drafts from the B-020 runs are sitting in
+<code>output/posts/</code> on the "code review queue" topic — regenerate rather than reuse
+them, since they predate today's fixes.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">IS_SANDBOX</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">&quot;&lt;topic&gt;&quot;</span><span class="w"> </span>--research-mode<span class="w"> </span>claude_web
 </code></pre></div>
-<h2 id="flow-stages">Flow Stages<a class="headerlink" href="#flow-stages" title="Permanent link">&para;</a></h2>
-<h3 id="1-discover_topics-start">1. discover_topics() - <code>@start</code><a class="headerlink" href="#1-discover_topics-start" title="Permanent link">&para;</a></h3>
-<p><strong>Type</strong>: Entry Point<br />
-<strong>Returns</strong>: <code>{"topics": [...], "timestamp": str}</code></p>
-<p>Generates topic candidates via Topic Scout (currently stubbed with mock data).</p>
-<p><strong>Future Integration</strong>: Stage1Crew (Topic Scout Agent)</p>
-<h3 id="2-editorial_review-listendiscover_topics">2. editorial_review() - <code>@listen(discover_topics)</code><a class="headerlink" href="#2-editorial_review-listendiscover_topics" title="Permanent link">&para;</a></h3>
-<p><strong>Type</strong>: Sequential Listener<br />
-<strong>Input</strong>: Topics from discover_topics()<br />
-<strong>Returns</strong>: <code>{"selected_topic": str, "score": float, "hook": str, "thesis": str}</code></p>
-<p>Selects winning topic via editorial board voting (currently selects top-scored topic).</p>
-<p><strong>Future Integration</strong>: Stage2Crew (Editorial Board Persona Agents)</p>
-<h3 id="3-generate_content-listeneditorial_review">3. generate_content() - <code>@listen(editorial_review)</code><a class="headerlink" href="#3-generate_content-listeneditorial_review" title="Permanent link">&para;</a></h3>
-<p><strong>Type</strong>: Sequential Listener<br />
-<strong>Input</strong>: Selected topic from editorial_review()<br />
-<strong>Returns</strong>: <code>{"article": str, "chart_path": str | None, "word_count": int, "metadata": dict}</code></p>
-<p>Executes <strong>Stage3Crew</strong> workflow:
-- ResearchAgent: Gather data with source attribution
-- WriterAgent: Draft article with British spelling
-- GraphicsAgent: Generate Economist-style charts</p>
-<h3 id="4-quality_gate-routergenerate_content">4. quality_gate() - <code>@router(generate_content)</code><a class="headerlink" href="#4-quality_gate-routergenerate_content" title="Permanent link">&para;</a></h3>
-<p><strong>Type</strong>: Conditional Router<br />
-<strong>Input</strong>: Article draft from generate_content()<br />
-<strong>Returns</strong>: <code>"publish" | "revision"</code> (routing decision)</p>
-<p>Executes <strong>Stage4Crew</strong> workflow:
-- EditorAgent: 5-gate editorial review
-- Routing Logic: <code>score &gt;= 8</code> → publish, <code>score &lt; 8</code> → revision</p>
-<h3 id="5a-publish_article-listenpublish">5a. publish_article() - <code>@listen("publish")</code><a class="headerlink" href="#5a-publish_article-listenpublish" title="Permanent link">&para;</a></h3>
-<p><strong>Type</strong>: Terminal (Publish Path)<br />
-<strong>Returns</strong>: <code>{"status": "published", "quality_score": float, "gates_passed": int}</code></p>
-<p>Finalizes article for publication (currently returns metadata).</p>
-<p><strong>Future Integration</strong>: Stage5Crew (DevOps Publishing Automation)</p>
-<h3 id="5b-request_revision-listenrevision">5b. request_revision() - <code>@listen("revision")</code><a class="headerlink" href="#5b-request_revision-listenrevision" title="Permanent link">&para;</a></h3>
-<p><strong>Type</strong>: Terminal (Revision Path)<br />
-<strong>Returns</strong>: <code>{"status": "needs_revision", "quality_score": float, "gates_failed": int}</code></p>
-<p>Flags article for rework (currently returns feedback).</p>
-<p><strong>Future Integration</strong>: Revision loop (Writer re-attempt with Editor feedback)</p>
-<h2 id="key-design-decisions">Key Design Decisions<a class="headerlink" href="#key-design-decisions" title="Permanent link">&para;</a></h2>
-<h3 id="1-deterministic-progression">1. <strong>Deterministic Progression</strong><a class="headerlink" href="#1-deterministic-progression" title="Permanent link">&para;</a></h3>
+<p>Budget ~$1 and ~35 minutes. Then <code>deploy_to_blog</code> opens the PR.</p>
+<h2 id="things-that-will-bite-a-fresh-session">Things that will bite a fresh session<a class="headerlink" href="#things-that-will-bite-a-fresh-session" title="Permanent link">&para;</a></h2>
 <ul>
-<li>No autonomous agent routing</li>
-<li>State transitions via <code>@start/@listen/@router</code> decorators</li>
-<li>Zero-agency state machine (predictable behavior)</li>
+<li><strong>A green <code>make ci-local</code> says nothing about what the blog accepts.</strong> Four
+  consecutive defects were green locally and rejected by the blog. The oracle is
+  running the blog's own scripts against a clone: <code>scripts/validate-posts.sh</code> and
+  <code>scripts/validate-post-quality.sh</code>. Measured contract:
+  <code>docs/blog-integration-constraints.md</code>.</li>
+<li><strong>The blog repo is <code>oviney/blog</code>.</strong> <code>scripts/deploy_to_blog.py</code> still shows
+  <code>viney-blog</code> in its usage docstring — that is the example, not the repo.</li>
+<li><strong><code>image:</code> is required and there are no redirects.</strong> A published slug is
+  permanent; get it right before publishing.</li>
+<li><strong>System python has no pip</strong> — work in <code>.venv</code>. <code>make ci-local</code> needs
+  <code>.venv/bin</code> on <code>PATH</code> or <code>ruff</code> is not found.</li>
+<li><strong>Exit codes 10 and 11 are retired, not reused.</strong> Old notes still mention them.</li>
 </ul>
-<h3 id="2-on-demand-crew-initialization">2. <strong>On-Demand Crew Initialization</strong><a class="headerlink" href="#2-on-demand-crew-initialization" title="Permanent link">&para;</a></h3>
+<h2 id="not-done-on-purpose">Not done, on purpose<a class="headerlink" href="#not-done-on-purpose" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Stage3Crew requires <code>topic</code> parameter</li>
-<li>Initialized in <code>generate_content()</code> with selected topic</li>
-<li>Stage4Crew initialized in <code>__init__()</code> (no parameters)</li>
+<li><strong>B-012</strong> — deep-research mode is built; only a live acceptance run remains
+  (~2M tokens). Parked as an owner cost decision, not a defect.</li>
+<li><strong><code>_check_placeholders</code> still cannot catch the hero-prompt comment.</strong> That is
+  correct — the comment does not exist when the validator runs. The deploy gate
+  is the fix. Do not "helpfully" add a pattern there; it would be dead code.</li>
 </ul>
-<h3 id="3-quality-gate-threshold">3. <strong>Quality Gate Threshold</strong><a class="headerlink" href="#3-quality-gate-threshold" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Publish: <code>quality_score &gt;= 8.0/10</code></li>
-<li>Revision: <code>quality_score &lt; 8.0/10</code></li>
-<li>Threshold aligned with Editor Agent 80% pass rate target</li>
-</ul>
-<h3 id="4-state-management">4. <strong>State Management</strong><a class="headerlink" href="#4-state-management" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Flow.state stores: <code>quality_result</code>, <code>decision</code></li>
-<li>Accessible across all stages</li>
-<li>Terminal stages read from state for final output</li>
-</ul>
-<h2 id="flow-usage">Flow Usage<a class="headerlink" href="#flow-usage" title="Permanent link">&para;</a></h2>
-<h3 id="basic-execution">Basic Execution<a class="headerlink" href="#basic-execution" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">src.economist_agents.flow</span><span class="w"> </span><span class="kn">import</span> <span class="n">EconomistContentFlow</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1"># Initialize flow</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">flow</span> <span class="o">=</span> <span class="n">EconomistContentFlow</span><span class="p">()</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="c1"># Execute full pipeline</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">result</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">kickoff</span><span class="p">()</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="c1"># Check result</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="k">if</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;published&#39;</span><span class="p">:</span>
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ Article published (quality: </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;quality_score&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/10)&quot;</span><span class="p">)</span>
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;⚠️ Revision required (</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;gates_failed&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> gates failed)&quot;</span><span class="p">)</span>
-</code></pre></div>
-<h3 id="cli-execution">CLI Execution<a class="headerlink" href="#cli-execution" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>python3<span class="w"> </span>src/economist_agents/flow.py
-</code></pre></div>
-<h3 id="integration-with-existing-code">Integration with Existing Code<a class="headerlink" href="#integration-with-existing-code" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Replace WORKFLOW_SEQUENCE usage</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># OLD: scripts/sm_agent.py TaskQueueManager.assign_to_agent()</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># NEW: Flow-based orchestration</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">src.economist_agents.flow</span><span class="w"> </span><span class="kn">import</span> <span class="n">EconomistContentFlow</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="k">def</span><span class="w"> </span><span class="nf">process_backlog_story</span><span class="p">(</span><span class="n">story</span><span class="p">):</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">flow</span> <span class="o">=</span> <span class="n">EconomistContentFlow</span><span class="p">()</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">kickoff</span><span class="p">()</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="k">return</span> <span class="n">result</span>
-</code></pre></div>
-<h2 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">&para;</a></h2>
-<h3 id="integration-tests">Integration Tests<a class="headerlink" href="#integration-tests" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>pytest<span class="w"> </span>tests/test_economist_flow.py<span class="w"> </span>-v
-</code></pre></div>
-<p><strong>Test Coverage</strong> (9 tests):
-1. Flow initialization and state management
-2. discover_topics() returns structured data
-3. editorial_review() selects top-scored topic
-4. Stage3Crew integration via generate_content()
-5. Stage4Crew routing (publish path, score ≥8)
-6. Stage4Crew routing (revision path, score &lt;8)
-7. publish_article() returns publication metadata
-8. request_revision() returns revision metadata
-9. Flow decorators properly registered</p>
-<p><strong>All Tests Passing</strong>: ✅ 9/9 (100%)</p>
-<h2 id="migration-from-workflow_sequence">Migration from WORKFLOW_SEQUENCE<a class="headerlink" href="#migration-from-workflow_sequence" title="Permanent link">&para;</a></h2>
-<h3 id="old-pattern-scriptssm_agentpy">Old Pattern (scripts/sm_agent.py)<a class="headerlink" href="#old-pattern-scriptssm_agentpy" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Hardcoded routing dict</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">WORKFLOW_SEQUENCE</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="s2">&quot;research&quot;</span><span class="p">:</span> <span class="s2">&quot;writer_agent&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="s2">&quot;writing&quot;</span><span class="p">:</span> <span class="s2">&quot;editor_agent&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="s2">&quot;editing&quot;</span><span class="p">:</span> <span class="s2">&quot;graphics_agent&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="s2">&quot;graphics&quot;</span><span class="p">:</span> <span class="s2">&quot;qe_agent&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">}</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="c1"># Manual agent assignment</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="k">def</span><span class="w"> </span><span class="nf">assign_to_agent</span><span class="p">(</span><span class="n">task</span><span class="p">):</span>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    <span class="n">phase</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;phase&quot;</span><span class="p">)</span>
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    <span class="k">return</span> <span class="n">WORKFLOW_SEQUENCE</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span>
-</code></pre></div>
-<h3 id="new-pattern-flow-based">New Pattern (Flow-Based)<a class="headerlink" href="#new-pattern-flow-based" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Deterministic state machine</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">EconomistContentFlow</span><span class="p">(</span><span class="n">Flow</span><span class="p">):</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="nd">@start</span><span class="p">()</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">discover_topics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="nd">@listen</span><span class="p">(</span><span class="n">discover_topics</span><span class="p">)</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">editorial_review</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topics</span><span class="p">):</span> <span class="o">...</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    <span class="nd">@listen</span><span class="p">(</span><span class="n">editorial_review</span><span class="p">)</span>
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selected_topic</span><span class="p">):</span> <span class="o">...</span>
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>    <span class="nd">@router</span><span class="p">(</span><span class="n">generate_content</span><span class="p">)</span>
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">quality_gate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">article_draft</span><span class="p">):</span> <span class="o">...</span>
-</code></pre></div>
-<p><strong>Benefits</strong>:
-- ✅ Type-safe transitions (Python decorators)
-- ✅ State management built-in (Flow.state)
-- ✅ Testing isolation (mock individual stages)
-- ✅ Scalable (add stages without modifying dict)</p>
-<h2 id="performance">Performance<a class="headerlink" href="#performance" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Flow Overhead</strong>: &lt;100ms (decorator processing)</li>
-<li><strong>Memory Usage</strong>: ~200MB (Flow state + crews)</li>
-<li><strong>Latency</strong>: No regression from WORKFLOW_SEQUENCE pattern</li>
-</ul>
-<h2 id="future-enhancements">Future Enhancements<a class="headerlink" href="#future-enhancements" title="Permanent link">&para;</a></h2>
-<h3 id="sprint-14-scope">Sprint 14 Scope<a class="headerlink" href="#sprint-14-scope" title="Permanent link">&para;</a></h3>
-<ol>
-<li><strong>STORY-006</strong>: Style Memory RAG</li>
-<li>Integrate ChromaDB vector store</li>
-<li>Gold Standard article retrieval</li>
-<li>
-<p>Editor Agent <code>style_memory_tool</code></p>
-</li>
-<li>
-<p><strong>STORY-007</strong>: ROI Telemetry</p>
-</li>
-<li>Token cost tracking</li>
-<li>Human-hour equivalents</li>
-<li><code>logs/execution_roi.json</code> logging</li>
-</ol>
-<h3 id="post-sprint-14">Post-Sprint 14<a class="headerlink" href="#post-sprint-14" title="Permanent link">&para;</a></h3>
-<ol>
-<li><strong>Stage1/Stage2 Integration</strong></li>
-<li>Replace mock topics with real Topic Scout</li>
-<li>
-<p>Integrate Editorial Board persona voting</p>
-</li>
-<li>
-<p><strong>Revision Loop</strong></p>
-</li>
-<li>Writer re-attempt with Editor feedback</li>
-<li>
-<p>Multi-iteration quality refinement</p>
-</li>
-<li>
-<p><strong>Stage5 DevOps</strong></p>
-</li>
-<li>Automated publishing to blog repo</li>
-<li>CI/CD integration</li>
-</ol>
-<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>CrewAI Flows Documentation</strong>: <a href="https://docs.crewai.com/concepts/flows">https://docs.crewai.com/concepts/flows</a></li>
-<li><strong>João Moura's Production ROI</strong>: <a href="../EPIC_PRODUCTION_AGENTIC_EVOLUTION/">Epic EPIC-001 Documentation</a></li>
-<li><strong>STORY-005 Implementation</strong>: <a href="../SPRINT.md">Sprint 14 Story 005</a></li>
-<li><strong>Flow Source Code</strong>: <a href="../src/economist_agents/flow.py">src/economist_agents/flow.py</a></li>
-<li><strong>Integration Tests</strong>: <a href="../tests/test_economist_flow.py">tests/test_economist_flow.py</a></li>
-</ul>
-<hr />
-<h2 id="image-policy">Image policy<a class="headerlink" href="#image-policy" title="Permanent link">&para;</a></h2>
-<p>Stage 3 draws the hero itself, as SVG, on the Claude subscription (B-016b). Both
-entry points get the same visual: a drawn hero plus the matplotlib chart.</p>
-<ul>
-<li><strong>CLI</strong> (<code>python -m src.agent_sdk.pipeline</code>) has <strong>one path</strong> since B-021. It
-  runs Stage 3 → Stage 4 and exits 0 when the article is publish-ready. The #403
-  human handshake — exit code 10, slug-keyed resume state, <code>--resume</code>, the PNG
-  gate — was removed once Claude drew its own hero; there was nothing left to
-  pause for. To supply art by hand, overwrite the drawn SVG and re-run.</li>
-<li><strong>Python API</strong> (<code>EconomistContentFlow</code>) takes <strong>no image policy</strong> since B-022.
-  It takes the pipeline's output as-is and ships the draft image-less, letting
-  the hero ride in the article frontmatter. The old <code>image_mode="hero"</code> branch
-  called DALL-E, needed <code>OPENAI_API_KEY</code>, and degraded to <code>blog-default.svg</code> —
-  which the deploy path rejects as <code>default_image_fallback</code>, so its failure mode
-  produced an unpublishable article. Constraints #1–#4 forbade it and ADR-0014
-  had retired it.</li>
-</ul>
-<hr />
-<p><strong>Status</strong>: ✅ Production-Ready (Sprint 14 Story 005 Complete)<br />
-<strong>Test Coverage</strong>: 100% (9/9 integration tests passing)<br />
-<strong>Documentation</strong>: Complete (architecture, usage, migration guide)</p>
 
 
 

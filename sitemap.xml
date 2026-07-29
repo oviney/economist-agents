@@ -565,6 +565,14 @@
          <lastmod>2026-07-29</lastmod>
     </url>
     <url>
+         <loc>https://oviney.github.io/economist-agents/adr/0016-single-pipeline-path/</loc>
+         <lastmod>2026-07-29</lastmod>
+    </url>
+    <url>
+         <loc>https://oviney.github.io/economist-agents/adr/0017-gate-publishable-content-at-deploy/</loc>
+         <lastmod>2026-07-29</lastmod>
+    </url>
+    <url>
          <loc>https://oviney.github.io/economist-agents/adr/TEMPLATE/</loc>
          <lastmod>2026-07-29</lastmod>
     </url>

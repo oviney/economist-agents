@@ -1161,6 +1161,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0016-single-pipeline-path/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0016 — One Pipeline Path
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0017-gate-publishable-content-at-deploy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0017 — Gate Publishable Content at Deploy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3025,6 +3081,17 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#2026-07-28-run-safety-close-out-one-pipeline-path-bounded-calls-funded-retries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-07-28: Run-safety close-out — one pipeline path, bounded calls, funded retries
+      
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#2026-04-26-agent-fleet-phase-2-crewai-removed-anthropic-agent-sdk-shipped-pr-315" class="md-nav__link">
@@ -6065,6 +6132,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#2026-07-28-run-safety-close-out-one-pipeline-path-bounded-calls-funded-retries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-07-28: Run-safety close-out — one pipeline path, bounded calls, funded retries
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#2026-04-26-agent-fleet-phase-2-crewai-removed-anthropic-agent-sdk-shipped-pr-315" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -9081,6 +9159,51 @@
 
 
 <h1 id="economist-agents-development-log">Economist Agents - Development Log<a class="headerlink" href="#economist-agents-development-log" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>Where the record lives.</strong> This log runs to 2026-04-26 and then stops. It is
+not that nothing shipped — the keyless overhaul, the first published article,
+and the B-0xx series all landed between May and July 2026. <code>BACKLOG.md</code> (Done
+section) became the source of record in that period and remains so; ADRs cover
+the decisions. Read those first. This file is kept for the pre-May history and
+for entries, like the one below, that span more than a single backlog item.</p>
+</blockquote>
+<h2 id="2026-07-28-run-safety-close-out-one-pipeline-path-bounded-calls-funded-retries">2026-07-28: Run-safety close-out — one pipeline path, bounded calls, funded retries<a class="headerlink" href="#2026-07-28-run-safety-close-out-one-pipeline-path-bounded-calls-funded-retries" title="Permanent link">&para;</a></h2>
+<p>Clears every open defect. Specs: <code>docs/specs/B-021-run-safety-cleanups.md</code>.
+Decisions: <a href="../adr/0016-single-pipeline-path/">ADR-0016</a>,
+<a href="../adr/0017-gate-publishable-content-at-deploy/">ADR-0017</a>.</p>
+<p><strong>What shipped:</strong>
+- <strong>B-021</strong> — the three defects B-020's acceptance run exposed and deferred:
+  - <strong>BUG-061</strong> the writer budget could not fund its own retry policy.
+    <code>_WRITER_MAX_ATTEMPTS=3</code> against a $0.60 cumulative default and a measured
+    ~$0.42/attempt paid for exactly one attempt, so a malformed first draft — a
+    <em>handled</em> condition — aborted the run after real spend. The default is now
+    <strong>derived</strong> (<code>_WRITER_ATTEMPT_COST_USD × _WRITER_MAX_ATTEMPTS</code> = $1.35) so
+    the two cannot drift, and an unfundable retry is refused before dispatch.
+  - <strong>BUG-059</strong> cost was bounded, wall clock was not. Every SDK collector now
+    runs under <code>asyncio.timeout</code> → typed <code>ModelCallTimeoutError</code> naming the call.
+    Scope came out wider than logged: <code>research/_llm.py</code> and
+    <code>research/claude_web.py</code> had the same unbounded <code>async for</code>, and research is
+    the longest, costliest leg. Bounds are measured, not guessed.
+  - <strong>BUG-060 + <code>--image-mode</code></strong> — the handshake deleted (ADR-0016), <strong>−773 lines</strong>.
+- <strong>B-022</strong> — <code>EconomistContentFlow</code>'s DALL-E branch removed; it was provably
+  dead once B-021 stopped the flow forwarding <code>image_mode</code> to <code>run_pipeline</code>.
+- <strong>BUG-064</strong> — graphics retries handed every attempt the <em>full</em> budget instead
+  of the remaining balance, so three tries could spend 3× the stated cap. The
+  mirror image of BUG-061, which is why it never aborted a run and sat unnoticed.
+- <strong>BUG-065</strong> — production escape: the <code>&lt;!-- HERO IMAGE …</code> reviewer comment
+  shipped into a published post. Gated at the deploy boundary (ADR-0017); removed
+  from the live article in <code>oviney/blog#1168</code>.
+- <strong>Live post cleanup</strong> — all four B-017 slop detectors were still firing on the
+  published flaky-tests article (advisory at publish, never acted on). Prose-only
+  edit; the blog's own validators report 0 errors, 0 warnings.
+- Stale <code>claude-sonnet-4-20250514</code> default in <code>scripts/llm_client.py</code> bumped to
+  <code>claude-sonnet-4-6</code>, cherry-picked from an unpushed Mac-only branch during
+  reconciliation. The auth half of that branch is deferred as <strong>B-023</strong>.</p>
+<p><strong>Suite:</strong> 2,381 passing / 8 skips. <code>make ci-local</code> green.</p>
+<p><strong>Worth carrying forward:</strong> two of these were found by <em>reading code next to a
+fix</em>, not by a failing test — BUG-064 while fixing BUG-061, and BUG-065 while
+regenerating a slop report against the live post. Neither had a test that could
+have caught it, because both were gaps in what was being checked at all.</p>
 <h2 id="2026-04-26-agent-fleet-phase-2-crewai-removed-anthropic-agent-sdk-shipped-pr-315">2026-04-26: Agent Fleet Phase 2 — CrewAI removed, Anthropic Agent SDK shipped (PR #315)<a class="headerlink" href="#2026-04-26-agent-fleet-phase-2-crewai-removed-anthropic-agent-sdk-shipped-pr-315" title="Permanent link">&para;</a></h2>
 <p>ADR-0006 Phase 2 complete. Closes epic #308 plus skills-polish backlog (#293, #294) and #314.</p>
 <p><strong>What shipped:</strong>

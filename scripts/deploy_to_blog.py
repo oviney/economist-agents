@@ -125,6 +125,23 @@ def run_command(cmd: str, cwd: Path | None = None) -> str:
 # ---------------------------------------------------------------------------
 
 
+def _dated_post_name(source_name: str, deploy_date: str) -> str:
+    """Return the ``_posts`` filename for ``source_name``, stamped with the date.
+
+    Jekyll derives a post's date and URL from its filename — ``_config.yml`` sets
+    ``permalink: /:year/:month/:day/:title/`` — so an undated file in ``_posts`` is
+    not a publishable post.
+
+    BUG-069: this used to be a bare ``re.sub`` of an existing ``YYYY-MM-DD-``
+    prefix, which *replaced* a date but never *added* one. That held while the
+    pipeline emitted dated filenames; B-006/B-008 moved generation to a canonical
+    slug at ``output/posts/<slug>.md`` and the substitution quietly became a no-op.
+    Strip-then-prefix handles both shapes, so the date cannot go missing again.
+    """
+    stripped = re.sub(r"^\d{4}-\d{2}-\d{2}-", "", source_name)
+    return f"{deploy_date}-{stripped}"
+
+
 def find_latest_article() -> Path:
     """Find the most recent generated article.
 
@@ -251,7 +268,7 @@ def deploy(
     # Rename article file to today's deploy date and inject the same
     # date into the YAML front matter.
     deploy_date = datetime.now().strftime("%Y-%m-%d")
-    article_name = re.sub(r"^\d{4}-\d{2}-\d{2}-", f"{deploy_date}-", article_path.name)
+    article_name = _dated_post_name(article_path.name, deploy_date)
     target_article = posts_dir / article_name
 
     logger.info("Copying article: %s → %s", article_path, target_article)

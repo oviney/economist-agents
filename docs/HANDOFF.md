@@ -20,14 +20,20 @@ since has been closing the traps that run exposed.
 | **B-022** | The flow's DALL-E branch, provably dead after B-021, removed. |
 | **BUG-064** | Graphics retries could spend 3× the stated cap. |
 | **BUG-065** | Production escape — the hero-prompt comment reached the live blog. Now gated at the deploy boundary. |
-| `oviney/blog#1168` | Prose-only edit clearing all four B-017 slop tells from the published flaky-tests post. **Open, needs your admin-bypass merge.** |
+| `oviney/blog#1168` | Prose-only edit clearing all four B-017 slop tells from the published flaky-tests post. **Merged** (`b3a29e5`, 2026-07-29). |
 
-## The one thing waiting on you
+## Nothing is waiting on the owner
 
-**`oviney/blog#1168`** — it cannot merge itself. `🔒 Security Audit` and
-`🖼️ Visual Regression` fail blog-side for pre-existing reasons (npm CVEs; stale
-visual baselines), both are required checks, and GitHub forbids self-approval.
-Same bypass every article PR needs.
+`oviney/blog#1168` merged 2026-07-29. Verified against the file on `oviney/blog`
+`main` — 0 of 4 slop detectors fire, the hero-prompt comment is gone, 860 words,
+2 em-dashes. (Checked the repo contents rather than the rendered page, so the
+result is not subject to a Pages rebuild lag.)
+
+Note for next time: that PR still needed an admin bypass to merge. `🔒 Security
+Audit` and `🖼️ Visual Regression` fail blog-side for pre-existing reasons (npm
+CVEs; stale visual baselines on about/blog-index/homepage), both are required
+checks, and GitHub forbids self-approval. **Every** article PR hits this until
+the blog bumps its deps and refreshes its baselines — see B-015.
 
 ## Next up: article two
 

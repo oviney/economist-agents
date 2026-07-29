@@ -79,3 +79,6 @@ github-pages-*.png
 
 home.png
 home-*.png
+
+# Transient clone created by scripts/deploy_to_blog.py (and its tests)
+temp_blog_repo/

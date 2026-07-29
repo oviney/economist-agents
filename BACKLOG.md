@@ -26,18 +26,6 @@ _(none)_
 
 ## Todo
 
-### B-022 · Remove the DALL-E featured-image branch from `EconomistContentFlow`
-
-Spun out of B-021. `EconomistContentFlow(image_mode="hero")` still runs the
-retired DALL-E step (`generate_featured_image`, warns about `OPENAI_API_KEY`,
-falls back to `blog-default.svg`) — which Operating Constraints #1–#4 forbid and
-ADR-0014 retired. B-021 stopped the flow forwarding `image_mode` to
-`run_pipeline`, so the branch no longer changes what the pipeline produces; it is
-dead weight on a legacy surface. Deliberately left out of B-021 to keep that
-diff scoped to the CLI. Removing it means deleting the branch, the
-`generate_featured_image` adapter wiring, `image_mode` itself, and
-`tests/test_flow_image_mode.py`'s hero cases.
-
 ### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
 
 **`check-agent-scope` RESOLVED 2026-07-24** (see B-015a in Done). **Gate matrix
@@ -99,6 +87,35 @@ researcher would ship — but one topic cost ~102 agents / ~2M tokens / ~15 min 
 brief) lives at `docs/research/ai-productivity-brief.md`.
 
 ## Done
+
+### B-022 · The DALL-E branch is gone from `EconomistContentFlow` — 2026-07-28
+
+`image_mode="hero"` called `generate_featured_image`, warned that
+`OPENAI_API_KEY` was unset, and fell back to `blog-default.svg` — which the
+deploy path rejects as `default_image_fallback`. Its graceful degradation
+degraded into an unpublishable article. Constraints #1–#4 forbid it; ADR-0014 had
+already retired DALL-E. B-021 had stopped it changing what the pipeline produces,
+leaving `image_mode` with one live value and one dead one, so the argument went
+too. `test_flow_image_mode.py` → `test_flow_image_contract.py`: no mode left to
+test, but the contract that branch existed to satisfy still needs pinning —
+including the control proving `blog-default.svg` is rejected, which is why this
+was a removal and not a repair.
+
+### Close-out defects — 2026-07-28
+
+- **BUG-064 · graphics retries could spend 3× the cap.** `_GRAPHICS_MAX_ATTEMPTS`
+  handed every attempt the FULL `graphics_budget_usd` instead of the remaining
+  balance. The mirror image of BUG-061 — silent *overspend* rather than
+  under-funding — which is why it never aborted a run and sat unnoticed until
+  BUG-061 sent me reading the neighbouring loop.
+- **BUG-065 · production escape: the hero-prompt comment reached the blog.** The
+  `<!-- HERO IMAGE … -->` block published live and sat in the page source. Gated
+  at the **deploy boundary**, not in `publication_validator`: the comment is
+  injected *after* Stage 4 by design, so the validator cannot see it, and it is
+  legitimate in the local artifact — illegitimate only on the blog. Guards both
+  `deploy()` and `deploy_review()` (a review deploy is a live URL too) and fires
+  before any clone. Rejects rather than strips: stripping would hide that no hero
+  was drawn. Removed from the live post in `oviney/blog#1168`.
 
 ### B-021 · The next run cannot abort, hang, or default to a dead mode — 2026-07-28
 

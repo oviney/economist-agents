@@ -984,10 +984,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#image-policy-cli-handshake-vs-python-api-410" class="md-nav__link">
+  <a href="#image-policy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Image policy: CLI handshake vs. Python API (#410)
+        Image policy
       
     </span>
   </a>
@@ -3770,10 +3770,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#image-policy-cli-handshake-vs-python-api-410" class="md-nav__link">
+  <a href="#image-policy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Image policy: CLI handshake vs. Python API (#410)
+        Image policy
       
     </span>
   </a>
@@ -4028,21 +4028,20 @@
 <li><strong>Integration Tests</strong>: <a href="../tests/test_economist_flow.py">tests/test_economist_flow.py</a></li>
 </ul>
 <hr />
-<h2 id="image-policy-cli-handshake-vs-python-api-410">Image policy: CLI handshake vs. Python API (#410)<a class="headerlink" href="#image-policy-cli-handshake-vs-python-api-410" title="Permanent link">&para;</a></h2>
-<p>The featured-image step differs by entry point:</p>
+<h2 id="image-policy">Image policy<a class="headerlink" href="#image-policy" title="Permanent link">&para;</a></h2>
+<p>Stage 3 draws the hero itself, as SVG, on the Claude subscription (B-016b). Both
+entry points get the same visual: a drawn hero plus the matplotlib chart.</p>
 <ul>
-<li><strong>CLI</strong> (<code>python -m src.agent_sdk.pipeline</code>) implements the #403 human
-  handshake: after Stage 3 it persists slug-keyed state, writes a prompt
-  artefact, and exits with <strong>code 10</strong> to pause for a human-dropped hero image;
-  <code>--resume &lt;slug&gt;</code> validates the dropped PNG and continues to Stage 4.</li>
-<li><strong>Python API</strong> (<code>EconomistContentFlow</code>) does <strong>not</strong> pause. The policy is
-  chosen at construction via <code>image_mode</code>:</li>
-<li><code>"chart_only"</code> (default) — ships on the chart alone. No paid image API is
-    called, and <code>run_pipeline(..., image_mode="chart_only")</code> strips the hero
-    frontmatter before Stage 4 so a not-yet-generated hero never routes a valid
-    draft to revision.</li>
-<li><code>"hero"</code> — explicit opt-in to a DALL-E hero image after Stage 3 (requires
-    <code>OPENAI_API_KEY</code>).</li>
+<li><strong>CLI</strong> (<code>python -m src.agent_sdk.pipeline</code>) has <strong>one path</strong> since B-021. It
+  runs Stage 3 → Stage 4 and exits 0 when the article is publish-ready. The #403
+  human handshake — exit code 10, slug-keyed resume state, <code>--resume</code>, the PNG
+  gate — was removed once Claude drew its own hero; there was nothing left to
+  pause for. To supply art by hand, overwrite the drawn SVG and re-run.</li>
+<li><strong>Python API</strong> (<code>EconomistContentFlow</code>) no longer forwards an image policy to
+  <code>run_pipeline</code>. Its <code>image_mode</code> now only selects what the <em>flow</em> does after
+  the pipeline returns: <code>"chart_only"</code> (default) takes the output as-is, while
+  <code>"hero"</code> is the legacy DALL-E step that needs <code>OPENAI_API_KEY</code> and therefore
+  violates Operating Constraints #1–#4. Removing it is <strong>B-022</strong>.</li>
 </ul>
 <hr />
 <p><strong>Status</strong>: ✅ Production-Ready (Sprint 14 Story 005 Complete)<br />

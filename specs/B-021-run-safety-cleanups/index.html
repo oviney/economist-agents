@@ -10,7 +10,7 @@
       
       
       
-        <link rel="canonical" href="https://oviney.github.io/economist-agents/keyless-pipeline-runbook/">
+        <link rel="canonical" href="https://oviney.github.io/economist-agents/specs/B-021-run-safety-cleanups/">
       
       
       
@@ -18,19 +18,19 @@
         
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
-        <title>Runbook: Keyless pipeline on the Claude subscription (B-006 / B-009 / B-010) - Economist Agents</title>
+        <title>Spec: B-021 · The next real run must not abort, hang, or default to a dead mode - Economist Agents</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -49,7 +49,7 @@
       
     
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#runbook-keyless-pipeline-on-the-claude-subscription-b-006-b-009-b-010" class="md-skip">
+        <a href="#spec-b-021-the-next-real-run-must-not-abort-hang-or-default-to-a-dead-mode" class="md-skip">
           Skip to content
         </a>
       
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="Economist Agents" class="md-header__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+    <a href="../.." title="Economist Agents" class="md-header__button md-logo" aria-label="Economist Agents" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -108,7 +108,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Runbook: Keyless pipeline on the Claude subscription (B-006 / B-009 / B-010)
+              Spec: B-021 · The next real run must not abort, hang, or default to a dead mode
             
           </span>
         </div>
@@ -221,7 +221,7 @@
   
   
     <li class="md-tabs__item">
-      <a href=".." class="md-tabs__link">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -240,7 +240,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../getting-started/" class="md-tabs__link">
+      <a href="../../getting-started/" class="md-tabs__link">
         
   
   
@@ -261,7 +261,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../agent-registry-spec/" class="md-tabs__link">
+        <a href="../../agent-registry-spec/" class="md-tabs__link">
           
   
   
@@ -281,7 +281,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../adr/0001-extract-agent-definitions-to-yaml/" class="md-tabs__link">
+        <a href="../../adr/0001-extract-agent-definitions-to-yaml/" class="md-tabs__link">
           
   
   
@@ -308,7 +308,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../skills/using-agent-skills/SKILL/" class="md-tabs__link">
+        <a href="../../skills/using-agent-skills/SKILL/" class="md-tabs__link">
           
   
   
@@ -331,7 +331,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../guides/WORKFLOW_GUIDE/" class="md-tabs__link">
+        <a href="../../guides/WORKFLOW_GUIDE/" class="md-tabs__link">
           
   
   
@@ -351,7 +351,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../AGENT_PROMPT_PATTERNS/" class="md-tabs__link">
+        <a href="../../AGENT_PROMPT_PATTERNS/" class="md-tabs__link">
           
   
   
@@ -371,7 +371,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../AGENT_VELOCITY_ANALYSIS/" class="md-tabs__link">
+        <a href="../../AGENT_VELOCITY_ANALYSIS/" class="md-tabs__link">
           
   
   
@@ -405,7 +405,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="Economist Agents" class="md-nav__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+    <a href="../.." title="Economist Agents" class="md-nav__button md-logo" aria-label="Economist Agents" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -435,7 +435,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -462,7 +462,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../getting-started/" class="md-nav__link">
+      <a href="../../getting-started/" class="md-nav__link">
         
   
   
@@ -543,7 +543,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../agent-registry-spec/" class="md-nav__link">
+      <a href="../../agent-registry-spec/" class="md-nav__link">
         
   
   
@@ -571,7 +571,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../FLOW_ARCHITECTURE/" class="md-nav__link">
+      <a href="../../FLOW_ARCHITECTURE/" class="md-nav__link">
         
   
   
@@ -599,7 +599,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../AUTONOMOUS_ORCHESTRATION_STRATEGY/" class="md-nav__link">
+      <a href="../../AUTONOMOUS_ORCHESTRATION_STRATEGY/" class="md-nav__link">
         
   
   
@@ -627,7 +627,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ARCHITECTURE_PATTERNS/" class="md-nav__link">
+      <a href="../../ARCHITECTURE_PATTERNS/" class="md-nav__link">
         
   
   
@@ -655,7 +655,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ARCHITECTURE_REVIEW_PROCESS/" class="md-nav__link">
+      <a href="../../ARCHITECTURE_REVIEW_PROCESS/" class="md-nav__link">
         
   
   
@@ -744,7 +744,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0001-extract-agent-definitions-to-yaml/" class="md-nav__link">
+      <a href="../../adr/0001-extract-agent-definitions-to-yaml/" class="md-nav__link">
         
   
   
@@ -772,7 +772,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0002-agent-registry-pattern/" class="md-nav__link">
+      <a href="../../adr/0002-agent-registry-pattern/" class="md-nav__link">
         
   
   
@@ -800,7 +800,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0003-phased-crewai-migration/" class="md-nav__link">
+      <a href="../../adr/0003-phased-crewai-migration/" class="md-nav__link">
         
   
   
@@ -828,7 +828,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0004-python-version-constraint/" class="md-nav__link">
+      <a href="../../adr/0004-python-version-constraint/" class="md-nav__link">
         
   
   
@@ -856,7 +856,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0005-agile-discipline-enforcement/" class="md-nav__link">
+      <a href="../../adr/0005-agile-discipline-enforcement/" class="md-nav__link">
         
   
   
@@ -884,7 +884,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0006-agent-framework-selection/" class="md-nav__link">
+      <a href="../../adr/0006-agent-framework-selection/" class="md-nav__link">
         
   
   
@@ -912,7 +912,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0007-content-intelligence-engine/" class="md-nav__link">
+      <a href="../../adr/0007-content-intelligence-engine/" class="md-nav__link">
         
   
   
@@ -940,7 +940,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0008-agent-skill-governance/" class="md-nav__link">
+      <a href="../../adr/0008-agent-skill-governance/" class="md-nav__link">
         
   
   
@@ -968,7 +968,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0009-architecture-audit-rubric/" class="md-nav__link">
+      <a href="../../adr/0009-architecture-audit-rubric/" class="md-nav__link">
         
   
   
@@ -996,7 +996,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0010-scripts-to-src-migration/" class="md-nav__link">
+      <a href="../../adr/0010-scripts-to-src-migration/" class="md-nav__link">
         
   
   
@@ -1024,7 +1024,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0011-opt-in-recursive-deep-research/" class="md-nav__link">
+      <a href="../../adr/0011-opt-in-recursive-deep-research/" class="md-nav__link">
         
   
   
@@ -1052,7 +1052,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0012-retire-agent-registry/" class="md-nav__link">
+      <a href="../../adr/0012-retire-agent-registry/" class="md-nav__link">
         
   
   
@@ -1080,7 +1080,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0013-keyless-claude-web-research/" class="md-nav__link">
+      <a href="../../adr/0013-keyless-claude-web-research/" class="md-nav__link">
         
   
   
@@ -1108,7 +1108,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0014-retire-paid-github-actions-generation/" class="md-nav__link">
+      <a href="../../adr/0014-retire-paid-github-actions-generation/" class="md-nav__link">
         
   
   
@@ -1136,7 +1136,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0015-local-first-verification/" class="md-nav__link">
+      <a href="../../adr/0015-local-first-verification/" class="md-nav__link">
         
   
   
@@ -1279,7 +1279,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/using-agent-skills/SKILL/" class="md-nav__link">
+      <a href="../../skills/using-agent-skills/SKILL/" class="md-nav__link">
         
   
   
@@ -1307,7 +1307,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/idea-refine/SKILL/" class="md-nav__link">
+      <a href="../../skills/idea-refine/SKILL/" class="md-nav__link">
         
   
   
@@ -1335,7 +1335,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/spec-driven-development/SKILL/" class="md-nav__link">
+      <a href="../../skills/spec-driven-development/SKILL/" class="md-nav__link">
         
   
   
@@ -1363,7 +1363,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/planning-and-task-breakdown/SKILL/" class="md-nav__link">
+      <a href="../../skills/planning-and-task-breakdown/SKILL/" class="md-nav__link">
         
   
   
@@ -1391,7 +1391,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/context-engineering/SKILL/" class="md-nav__link">
+      <a href="../../skills/context-engineering/SKILL/" class="md-nav__link">
         
   
   
@@ -1419,7 +1419,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/source-driven-development/SKILL/" class="md-nav__link">
+      <a href="../../skills/source-driven-development/SKILL/" class="md-nav__link">
         
   
   
@@ -1447,7 +1447,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/incremental-implementation/SKILL/" class="md-nav__link">
+      <a href="../../skills/incremental-implementation/SKILL/" class="md-nav__link">
         
   
   
@@ -1475,7 +1475,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/test-driven-development/SKILL/" class="md-nav__link">
+      <a href="../../skills/test-driven-development/SKILL/" class="md-nav__link">
         
   
   
@@ -1503,7 +1503,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/browser-testing-with-devtools/SKILL/" class="md-nav__link">
+      <a href="../../skills/browser-testing-with-devtools/SKILL/" class="md-nav__link">
         
   
   
@@ -1531,7 +1531,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/debugging-and-error-recovery/SKILL/" class="md-nav__link">
+      <a href="../../skills/debugging-and-error-recovery/SKILL/" class="md-nav__link">
         
   
   
@@ -1559,7 +1559,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/code-review-and-quality/SKILL/" class="md-nav__link">
+      <a href="../../skills/code-review-and-quality/SKILL/" class="md-nav__link">
         
   
   
@@ -1587,7 +1587,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/code-simplification/SKILL/" class="md-nav__link">
+      <a href="../../skills/code-simplification/SKILL/" class="md-nav__link">
         
   
   
@@ -1615,7 +1615,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/security-and-hardening/SKILL/" class="md-nav__link">
+      <a href="../../skills/security-and-hardening/SKILL/" class="md-nav__link">
         
   
   
@@ -1643,7 +1643,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/performance-optimization/SKILL/" class="md-nav__link">
+      <a href="../../skills/performance-optimization/SKILL/" class="md-nav__link">
         
   
   
@@ -1671,7 +1671,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/frontend-ui-engineering/SKILL/" class="md-nav__link">
+      <a href="../../skills/frontend-ui-engineering/SKILL/" class="md-nav__link">
         
   
   
@@ -1699,7 +1699,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/api-and-interface-design/SKILL/" class="md-nav__link">
+      <a href="../../skills/api-and-interface-design/SKILL/" class="md-nav__link">
         
   
   
@@ -1727,7 +1727,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/git-workflow-and-versioning/SKILL/" class="md-nav__link">
+      <a href="../../skills/git-workflow-and-versioning/SKILL/" class="md-nav__link">
         
   
   
@@ -1755,7 +1755,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/ci-cd-and-automation/SKILL/" class="md-nav__link">
+      <a href="../../skills/ci-cd-and-automation/SKILL/" class="md-nav__link">
         
   
   
@@ -1783,7 +1783,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/documentation-and-adrs/SKILL/" class="md-nav__link">
+      <a href="../../skills/documentation-and-adrs/SKILL/" class="md-nav__link">
         
   
   
@@ -1811,7 +1811,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/deprecation-and-migration/SKILL/" class="md-nav__link">
+      <a href="../../skills/deprecation-and-migration/SKILL/" class="md-nav__link">
         
   
   
@@ -1839,7 +1839,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/shipping-and-launch/SKILL/" class="md-nav__link">
+      <a href="../../skills/shipping-and-launch/SKILL/" class="md-nav__link">
         
   
   
@@ -1929,7 +1929,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/adr-governance/SKILL/" class="md-nav__link">
+      <a href="../../skills/adr-governance/SKILL/" class="md-nav__link">
         
   
   
@@ -1957,7 +1957,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/agent-delegation/SKILL/" class="md-nav__link">
+      <a href="../../skills/agent-delegation/SKILL/" class="md-nav__link">
         
   
   
@@ -1985,7 +1985,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/agent-traceability/SKILL/" class="md-nav__link">
+      <a href="../../skills/agent-traceability/SKILL/" class="md-nav__link">
         
   
   
@@ -2013,7 +2013,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/architecture-patterns/SKILL/" class="md-nav__link">
+      <a href="../../skills/architecture-patterns/SKILL/" class="md-nav__link">
         
   
   
@@ -2041,7 +2041,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/article-evaluation/SKILL/" class="md-nav__link">
+      <a href="../../skills/article-evaluation/SKILL/" class="md-nav__link">
         
   
   
@@ -2069,7 +2069,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/defect-prevention/SKILL/" class="md-nav__link">
+      <a href="../../skills/defect-prevention/SKILL/" class="md-nav__link">
         
   
   
@@ -2097,7 +2097,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/devops/SKILL/" class="md-nav__link">
+      <a href="../../skills/devops/SKILL/" class="md-nav__link">
         
   
   
@@ -2125,7 +2125,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/economist-writing/SKILL/" class="md-nav__link">
+      <a href="../../skills/economist-writing/SKILL/" class="md-nav__link">
         
   
   
@@ -2153,7 +2153,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/editorial-illustration/SKILL/" class="md-nav__link">
+      <a href="../../skills/editorial-illustration/SKILL/" class="md-nav__link">
         
   
   
@@ -2181,7 +2181,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/mcp-development/SKILL/" class="md-nav__link">
+      <a href="../../skills/mcp-development/SKILL/" class="md-nav__link">
         
   
   
@@ -2209,7 +2209,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/observability/SKILL/" class="md-nav__link">
+      <a href="../../skills/observability/SKILL/" class="md-nav__link">
         
   
   
@@ -2237,7 +2237,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/python-quality/SKILL/" class="md-nav__link">
+      <a href="../../skills/python-quality/SKILL/" class="md-nav__link">
         
   
   
@@ -2265,7 +2265,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/quality-gates/SKILL/" class="md-nav__link">
+      <a href="../../skills/quality-gates/SKILL/" class="md-nav__link">
         
   
   
@@ -2293,7 +2293,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/research-sourcing/SKILL/" class="md-nav__link">
+      <a href="../../skills/research-sourcing/SKILL/" class="md-nav__link">
         
   
   
@@ -2321,7 +2321,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/testing/SKILL/" class="md-nav__link">
+      <a href="../../skills/testing/SKILL/" class="md-nav__link">
         
   
   
@@ -2349,7 +2349,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/visual-qa/SKILL/" class="md-nav__link">
+      <a href="../../skills/visual-qa/SKILL/" class="md-nav__link">
         
   
   
@@ -2446,7 +2446,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/WORKFLOW_GUIDE/" class="md-nav__link">
+      <a href="../../guides/WORKFLOW_GUIDE/" class="md-nav__link">
         
   
   
@@ -2474,7 +2474,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/BLOG_DEPLOYMENT/" class="md-nav__link">
+      <a href="../../guides/BLOG_DEPLOYMENT/" class="md-nav__link">
         
   
   
@@ -2502,7 +2502,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/COPILOT_SYNC/" class="md-nav__link">
+      <a href="../../guides/COPILOT_SYNC/" class="md-nav__link">
         
   
   
@@ -2530,7 +2530,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/CI_MONITORING_GUIDE/" class="md-nav__link">
+      <a href="../../guides/CI_MONITORING_GUIDE/" class="md-nav__link">
         
   
   
@@ -2558,7 +2558,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/PYTHON_VERSION_TROUBLESHOOTING/" class="md-nav__link">
+      <a href="../../guides/PYTHON_VERSION_TROUBLESHOOTING/" class="md-nav__link">
         
   
   
@@ -2586,7 +2586,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/IMPLEMENTATION_ROADMAP/" class="md-nav__link">
+      <a href="../../guides/IMPLEMENTATION_ROADMAP/" class="md-nav__link">
         
   
   
@@ -2614,7 +2614,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/VALIDATION_QUICK_REF/" class="md-nav__link">
+      <a href="../../guides/VALIDATION_QUICK_REF/" class="md-nav__link">
         
   
   
@@ -2703,7 +2703,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../AGENT_PROMPT_PATTERNS/" class="md-nav__link">
+      <a href="../../AGENT_PROMPT_PATTERNS/" class="md-nav__link">
         
   
   
@@ -2731,7 +2731,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../AGENT_QUALITY_GATES/" class="md-nav__link">
+      <a href="../../AGENT_QUALITY_GATES/" class="md-nav__link">
         
   
   
@@ -2759,7 +2759,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../DEFINITION_OF_DONE/" class="md-nav__link">
+      <a href="../../DEFINITION_OF_DONE/" class="md-nav__link">
         
   
   
@@ -2787,7 +2787,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../DEFECT_PREVENTION/" class="md-nav__link">
+      <a href="../../DEFECT_PREVENTION/" class="md-nav__link">
         
   
   
@@ -2815,7 +2815,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../CHART_DESIGN_SPEC/" class="md-nav__link">
+      <a href="../../CHART_DESIGN_SPEC/" class="md-nav__link">
         
   
   
@@ -2904,7 +2904,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../AGENT_VELOCITY_ANALYSIS/" class="md-nav__link">
+      <a href="../../AGENT_VELOCITY_ANALYSIS/" class="md-nav__link">
         
   
   
@@ -2932,7 +2932,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../SPRINT_DISCIPLINE_GUIDE/" class="md-nav__link">
+      <a href="../../SPRINT_DISCIPLINE_GUIDE/" class="md-nav__link">
         
   
   
@@ -2960,7 +2960,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../CHANGELOG/" class="md-nav__link">
+      <a href="../../CHANGELOG/" class="md-nav__link">
         
   
   
@@ -3015,10 +3015,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#one-time-setup" class="md-nav__link">
+  <a href="#objective" class="md-nav__link">
     <span class="md-ellipsis">
       
-        One-time setup
+        Objective
       
     </span>
   </a>
@@ -3026,22 +3026,44 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#1-generate-keyless" class="md-nav__link">
+  <a href="#scope" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Generate (keyless)
+        Scope
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="1. Generate (keyless)">
+    <nav class="md-nav" aria-label="Scope">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#opt-in-brief-for-flagship-posts-b-012" class="md-nav__link">
+  <a href="#slice-1-bug-061-the-retry-policy-must-be-funded" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Opt-in: --brief for flagship posts (B-012)
+        Slice 1 — BUG-061: the retry policy must be funded
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#slice-2-bug-059-every-stage-3-model-call-gets-a-wall-clock-bound" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Slice 2 — BUG-059: every Stage 3 model call gets a wall-clock bound
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#slice-3-bug-060-image-mode-one-decision-not-two-patches" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Slice 3 — BUG-060 + --image-mode: one decision, not two patches
       
     </span>
   </a>
@@ -3054,10 +3076,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-publish-keyless-free-github-token-opens-a-pr-you-review" class="md-nav__link">
+  <a href="#commands" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Publish (keyless — free GitHub token, opens a PR you review)
+        Commands
       
     </span>
   </a>
@@ -3065,10 +3087,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-runs-and-on-what-auth" class="md-nav__link">
+  <a href="#testing-strategy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What runs, and on what auth
+        Testing Strategy
       
     </span>
   </a>
@@ -3076,10 +3098,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#honest-limitations" class="md-nav__link">
+  <a href="#boundaries" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Honest limitations
+        Boundaries
       
     </span>
   </a>
@@ -3087,10 +3109,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#deprecated-path" class="md-nav__link">
+  <a href="#success-criteria" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Deprecated path
+        Success Criteria
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resolved-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resolved Questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#outcome" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Outcome
       
     </span>
   </a>
@@ -3117,117 +3161,176 @@
   
 
 
-<h1 id="runbook-keyless-pipeline-on-the-claude-subscription-b-006-b-009-b-010">Runbook: Keyless pipeline on the Claude subscription (B-006 / B-009 / B-010)<a class="headerlink" href="#runbook-keyless-pipeline-on-the-claude-subscription-b-006-b-009-b-010" title="Permanent link">&para;</a></h1>
-<p>Generate <strong>and publish</strong> an article with <strong>no paid API keys</strong> — no
-<code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, or <code>SERPER_API_KEY</code>. All LLM work
-(writer, graphics, research, vision) runs on your Claude subscription through
-the Agent SDK (<code>claude_agent_sdk.query()</code> → the authenticated <code>claude</code> CLI).
-Publishing opens a PR on the blog repo using a <strong>free</strong> GitHub token.</p>
-<p>This is the canonical, verified path (B-010 acceptance run: keyless generate +
-blog PR on 2026-07-21).</p>
-<h2 id="one-time-setup">One-time setup<a class="headerlink" href="#one-time-setup" title="Permanent link">&para;</a></h2>
-<p>The pipeline has historically only run in GitHub Actions, so a local checkout
-needs provisioning. On a stock Debian/Ubuntu python, <code>ensurepip</code> is stripped, so
-<code>python3 -m venv</code> produces a venv without pip — bootstrap it with <code>get-pip.py</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv<span class="w">                                   </span><span class="c1"># .venv is gitignored</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>curl<span class="w"> </span>-sS<span class="w"> </span>https://bootstrap.pypa.io/get-pip.py<span class="w"> </span><span class="p">|</span><span class="w"> </span>.venv/bin/python<span class="w">   </span><span class="c1"># ensurepip is stripped</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>.venv/bin/pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt<span class="w">               </span><span class="c1"># ~100 packages</span>
-</code></pre></div>
-<p>The <code>claude</code> CLI must be installed and logged in to your subscription (<code>claude</code>
-on PATH; credentials in <code>~/.claude/</code>).</p>
-<h2 id="1-generate-keyless">1. Generate (keyless)<a class="headerlink" href="#1-generate-keyless" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># IS_SANDBOX=1 is required ONLY when running as root — the SDK otherwise refuses</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c1"># --dangerously-skip-permissions. Drop it if you run as a normal user.</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nv">IS_SANDBOX</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">&quot;your topic here&quot;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span>--research-mode<span class="w"> </span>claude_web
-</code></pre></div>
-<ul>
-<li><code>--research-mode claude_web</code> — <strong>use this.</strong> Claude does its own live web
-  research via built-in <code>WebSearch</code>/<code>WebFetch</code> (ADR-0013). The <code>deterministic</code>
-  mode (arXiv + Semantic Scholar) is heavily rate-limited from most environments
-  and frequently aborts the run with empty research (BUG-050); <code>claude_web</code>
-  avoids those APIs entirely and is the reliable keyless default.</li>
-<li>There are no image modes any more (B-021). The run goes end to end: Stage 3
-  draws the hero SVG itself (B-016b) alongside the chart, and writes
-  <code>output/posts/&lt;slug&gt;.md</code>.</li>
-</ul>
-<p>Exit <code>0</code> = publication validator passed (publish-ready); <code>1</code> = validator issues;
-<code>2</code> = research failed (retry, or you are on <code>deterministic</code> — switch to
-<code>claude_web</code>).</p>
-<h3 id="opt-in-brief-for-flagship-posts-b-012">Opt-in: <code>--brief</code> for flagship posts (B-012)<a class="headerlink" href="#opt-in-brief-for-flagship-posts-b-012" title="Permanent link">&para;</a></h3>
-<p>For a cornerstone post where sourcing quality matters most, run the
-<code>deep-research</code> harness first to produce a verified, cited brief
-(<code>docs/research/&lt;slug&gt;.md</code>), then hand it to the writer:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">IS_SANDBOX</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">&quot;&lt;topic&gt;&quot;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span>--brief<span class="w"> </span>docs/research/&lt;slug&gt;.md
-</code></pre></div>
-<p><code>--brief</code> skips the research step and uses that file (refuted claims are
-stripped automatically). <strong>This is opt-in and heavy</strong> — one deep-research run is
-~2M tokens and can hit your session limit — so <code>claude_web</code> stays the everyday
-default; reserve <code>--brief</code> for the pieces that warrant it.</p>
-<h2 id="2-publish-keyless-free-github-token-opens-a-pr-you-review">2. Publish (keyless — free GitHub token, opens a PR you review)<a class="headerlink" href="#2-publish-keyless-free-github-token-opens-a-pr-you-review" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">BLOG_REPO_TOKEN</span><span class="o">=</span>&lt;free<span class="w"> </span>GitHub<span class="w"> </span>PAT<span class="w"> </span>with<span class="w"> </span>push<span class="w"> </span>to<span class="w"> </span>oviney/blog&gt;<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span>.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>scripts.deploy_to_blog<span class="w"> </span>--blog-owner<span class="w"> </span>oviney<span class="w"> </span>--blog-repo<span class="w"> </span>blog
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># add --dry-run first to validate without pushing.</span>
-</code></pre></div>
-<p>This clones the blog repo, commits the latest <code>output/posts/*</code> article + chart
-on a <code>content/&lt;slug&gt;-&lt;ts&gt;</code> branch, and opens a PR on <code>oviney/blog</code>. <strong>You review
-and merge that PR to go live</strong> — the human publication gate is unchanged. The
-token needs only <code>Contents</code> + <code>Pull requests</code> write on <code>oviney/blog</code> — no AI key.</p>
-<h2 id="what-runs-and-on-what-auth">What runs, and on what auth<a class="headerlink" href="#what-runs-and-on-what-auth" title="Permanent link">&para;</a></h2>
+<h1 id="spec-b-021-the-next-real-run-must-not-abort-hang-or-default-to-a-dead-mode">Spec: B-021 · The next real run must not abort, hang, or default to a dead mode<a class="headerlink" href="#spec-b-021-the-next-real-run-must-not-abort-hang-or-default-to-a-dead-mode" title="Permanent link">&para;</a></h1>
+<p>Status: <strong>DONE 2026-07-28</strong> — all three slices landed, <code>make ci-local</code> green
+Date: 2026-07-28
+Depends on: B-020 (acceptance passed 2026-07-27)</p>
+<h2 id="objective">Objective<a class="headerlink" href="#objective" title="Permanent link">&para;</a></h2>
+<p>B-020 proved the pipeline can produce a publishable article end to end. It took
+<strong>five runs</strong>, and three of the defects it exposed were deferred rather than
+fixed. All three are latent traps on the <em>next</em> run, which costs ~$1 and ~35
+minutes each:</p>
 <table>
 <thead>
 <tr>
-<th>Stage</th>
-<th>Mechanism</th>
-<th>Key needed</th>
+<th>Defect</th>
+<th>Severity</th>
+<th>What it does to a real run</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Research</td>
-<td><code>claude_web</code> → <code>query()</code> + WebSearch/WebFetch</td>
-<td>none (subscription)</td>
+<td><strong>BUG-061</strong></td>
+<td>HIGH</td>
+<td>The writer's cumulative budget cannot fund a retry. One malformed first draft — a normal, <em>handled</em> condition — aborts the whole run with <code>BudgetExceededError</code> after money is already spent.</td>
 </tr>
 <tr>
-<td>Writer + Graphics</td>
-<td>Stage 3 <code>query()</code></td>
-<td>none (subscription)</td>
+<td><strong>BUG-059</strong></td>
+<td>HIGH</td>
+<td><code>_collect_text</code> bounds <strong>cost</strong> but not <strong>wall clock</strong>. Any Stage 3 call (writer, graphics, hero) can stall silently and forever. Hero draws already run 440–600s, so "slow" and "hung" are indistinguishable today.</td>
 </tr>
 <tr>
-<td>Hero image</td>
-<td>skipped in <code>chart_only</code></td>
-<td>none</td>
-</tr>
-<tr>
-<td>Vision alt/caption</td>
-<td>not invoked in <code>chart_only</code> (hero only)</td>
-<td>none (subscription)</td>
-</tr>
-<tr>
-<td>Quality gates + validator</td>
-<td>deterministic Python</td>
-<td>none</td>
+<td><strong>BUG-060</strong> + <code>--image-mode</code></td>
+<td>LOW / HIGH-UX</td>
+<td><code>--image-mode hero</code> is the <strong>default</strong> and is dead: it takes the retired DALL·E-era handshake, prints "paste this prompt into chat.openai.com", and exits 10. <code>chart_only</code> is the only mode that runs end to end — and since B-016b it ships a Claude-drawn hero, so its name lies too. <code>image_gate.check_hero_image</code> is PNG-only and only reachable from that dead path.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="honest-limitations">Honest limitations<a class="headerlink" href="#honest-limitations" title="Permanent link">&para;</a></h2>
+<p><strong>Success looks like:</strong> a fresh operator running the documented command gets an
+article or a <em>clear, actionable</em> failure — never a silent stall, never an abort
+caused by our own retry policy, never a default flag value that cannot work.</p>
+<h2 id="scope">Scope<a class="headerlink" href="#scope" title="Permanent link">&para;</a></h2>
+<p>Three independent slices, ordered by how early they break a run. Slices 1 and 2
+are bounded bug fixes with one correct answer. Slice 3 carries a real decision
+and is specced with its fork explicit.</p>
+<h3 id="slice-1-bug-061-the-retry-policy-must-be-funded">Slice 1 — BUG-061: the retry policy must be funded<a class="headerlink" href="#slice-1-bug-061-the-retry-policy-must-be-funded" title="Permanent link">&para;</a></h3>
+<p><strong>Root cause (confirmed in code).</strong> <code>stage3_runner.run_stage3</code> gives each writer
+attempt <code>writer_budget_usd - writer_cost</code> (stage3_runner.py:656-660). That
+cumulative cap is <em>correct</em> — it is the runaway guard, and it must stay. The
+defect is that the <strong>default is incoherent with <code>_WRITER_MAX_ATTEMPTS = 3</code></strong>:
+CLI default <code>--writer-budget 0.60</code> (pipeline.py:427) against a measured ~$0.42
+per Sonnet attempt funds <strong>one</strong> attempt, so attempt 2 starts with ~$0.18 and
+dies. The failure is also mute about the cause: the operator sees a budget error,
+not "your budget cannot afford the retry you configured".</p>
+<p><strong>Change:</strong>
+1. Derive the default from the policy instead of a hand-picked number: one
+   documented per-attempt estimate × <code>_WRITER_MAX_ATTEMPTS</code>, as a named constant
+   so the two can never drift apart again.
+2. Before spending on an attempt, if the remaining budget is below one attempt's
+   floor, raise a <code>BudgetExceededError</code> that names the flag and the arithmetic
+   ("attempt 2 of 3 needs ~$0.42, $0.18 left of --writer-budget $0.60") rather
+   than half-running an attempt and reporting the SDK's generic abort.</p>
+<p><strong>Not doing:</strong> making the budget per-attempt. That silently permits 3× overspend
+and removes the only runaway guard on the writer.</p>
+<h3 id="slice-2-bug-059-every-stage-3-model-call-gets-a-wall-clock-bound">Slice 2 — BUG-059: every Stage 3 model call gets a wall-clock bound<a class="headerlink" href="#slice-2-bug-059-every-stage-3-model-call-gets-a-wall-clock-bound" title="Permanent link">&para;</a></h3>
+<p><strong>Root cause.</strong> <code>_collect_text</code> (stage3_runner.py:380-455) <code>async for</code>s the Agent
+SDK <code>query()</code> generator with no <code>asyncio</code> timeout. <code>max_budget_usd</code> stops
+spending, not waiting.</p>
+<p><strong>Change:</strong> wrap the collection in <code>asyncio.timeout</code> with a <code>timeout_s</code>
+parameter and a module default, raising a typed <code>ModelCallTimeoutError</code> tagged
+with a <code>label</code> that names the call (<code>"writer (attempt 2/3)"</code>).</p>
+<p><strong>Amended during implementation (2026-07-28), two points:</strong></p>
+<ol>
+<li><strong>Scope widened to every unbounded collector, not just <code>_collect_text</code>.</strong> The
+   defect was logged against <code>_collect_text</code>, but <code>research/_llm.py</code> and
+   <code>research/claude_web.py</code> each <code>async for</code> over <code>query()</code> with no bound too —
+   and research is the <em>longest and costliest</em> leg (~$0.53–0.65, a 40-turn
+   search/fetch loop). Fixing only the one named collector would have left the
+   identical hole in the likeliest place to hit it. The hero path needed nothing:
+   <code>hero_author</code> already wraps <code>_collect_text</code> in its own <code>asyncio.wait_for</code>.</li>
+<li><strong>A timeout fails fast; it is NOT fed to the retry loops</strong> as this spec
+   originally proposed. Retrying a stall would mean 3 × 15 min of waiting before
+   the operator learns anything, which is the defect wearing a different hat.
+   Research is the one exception: it already soft-degrades to an empty brief on
+   any SDK failure, and a stall is treated identically.</li>
+</ol>
+<p><strong>Bounds, from measurement, not taste</strong> (<code>logs/agent_sdk_costs.jsonl</code> +
+B-016b timings): one Stage 3 call 900s, one research orchestration call 300s,
+the web-research leg 900s. Longest single call ever observed is a 440–600s hero
+draw; whole Stage 3 runs land at 406–1500s across many calls. These are hang
+detectors sitting above anything legitimate — not schedules.</p>
+<p><strong>Not doing:</strong> a global pipeline timeout. It cannot say <em>what</em> hung, which is the
+whole point.</p>
+<h3 id="slice-3-bug-060-image-mode-one-decision-not-two-patches">Slice 3 — BUG-060 + <code>--image-mode</code>: one decision, not two patches<a class="headerlink" href="#slice-3-bug-060-image-mode-one-decision-not-two-patches" title="Permanent link">&para;</a></h3>
+<p><strong>Root cause.</strong> The handshake path predates B-016b. Stage 3 now draws its own
+hero SVG, so the pause-for-human-art step, the PNG gate, and both exit codes
+(<code>EXIT_HANDSHAKE_PENDING</code>, <code>EXIT_IMAGE_GATE_FAILED</code>) exist to receive art from a
+raster image model that Operating Constraint #4 forbids.</p>
+<p><strong>The fork — needs an owner call:</strong></p>
 <ul>
-<li><strong><code>claude_web</code> research is non-deterministic</strong> and puts an LLM in the research
-  path — a deliberate, opt-in departure from the LLM-free default (ADR-0013).
-  Source quality depends on the model's search behaviour; the
-  <code>citation_verifier</code> / <code>publication_validator</code> citation gates still apply.</li>
-<li><strong>The hero is Claude-drawn SVG, never raster.</strong> There is no DALL-E path —
-  image generation was retired (ADR-0014) and CLAUDE.md #4 forbids pixel models.
-  To supply art by hand, overwrite <code>output/posts/images/&lt;slug&gt;-hero.svg</code> (the
-  <code>.image_prompt.md</code> sidecar is the brief) and re-run.</li>
-<li><strong>Topic is manual.</strong> <code>pipeline.py</code> takes the topic as an argument; there is no
-  keyless auto-discovery. <code>EconomistContentFlow</code>'s Stage-1 discovery still needs
-  <code>ANTHROPIC_API_KEY</code> (BUG-046), so this single command is the keyless route.</li>
+<li><strong>(a) Delete the handshake path.</strong> Remove <code>--image-mode</code>, <code>--resume</code>,
+  <code>--no-image</code>, <code>image_gate.py</code>, both exit codes; the end-to-end path becomes the
+  only path. Simplest, and matches what actually works. <strong>Cost:</strong> removes the
+  documented route for the owner to supply hero art by hand (Constraint #4 keeps
+  the prompt sidecar "available if the owner wants to supply art by hand"). The
+  sidecar would still be written; hand-supply would mean editing frontmatter.</li>
+<li><strong>(b) Repair and rename.</strong> Keep <code>--resume</code> as the hand-supply route, make the
+  gate format-aware instead of PNG-only (BUG-060), rename the modes truthfully
+  (the working one is not "chart_only"; the broken one is not "hero"). <strong>Cost:</strong>
+  keeps a second path alive that has never been exercised since B-016b.</li>
 </ul>
-<h2 id="deprecated-path">Deprecated path<a class="headerlink" href="#deprecated-path" title="Permanent link">&para;</a></h2>
-<p><code>scripts/economist_agent.py</code> still requires a paid key and will exit with a
-pointer here if run keyless. Use <code>python -m src.agent_sdk.pipeline</code> instead.</p>
+<p><strong>Recommendation: (a).</strong> The handshake's only consumer was a workflow the
+constraints now forbid, its operator instructions point at ChatGPT, and a route
+that is never run is a route that is never right. Hand-supply survives as
+"overwrite the drawn SVG and re-run Stage 4".</p>
+<p>Either way the default mode must be the one that runs end to end.</p>
+<h2 id="commands">Commands<a class="headerlink" href="#commands" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Test:   .venv/bin/python -m pytest tests/ -q
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Gate:   make ci-local          # ruff, mypy, tests + coverage, bandit — the merge gate (ADR-0015)
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Run:    IS_SANDBOX=1 python -m src.agent_sdk.pipeline &quot;&lt;topic&gt;&quot; --research-mode claude_web
+</code></pre></div>
+<h2 id="testing-strategy">Testing Strategy<a class="headerlink" href="#testing-strategy" title="Permanent link">&para;</a></h2>
+<p>pytest, <code>tests/</code>, mocked model calls only — <strong>no test may reach a third party</strong>
+(BUG-058, BUG-062). Each slice lands RED-first with a regression test named for
+its bug id:</p>
+<ul>
+<li>Slice 1: a writer whose first attempt is malformed and whose second succeeds
+  must complete under the default budget. A budget genuinely too small must fail
+  with the actionable message, not the SDK's generic abort.</li>
+<li>Slice 2: a <code>_collect_text</code> whose generator never yields must raise the typed
+  timeout inside the bound, not hang. Assert with a fake clock / tiny bound —
+  never a real sleep.</li>
+<li>Slice 3: the default <code>--image-mode</code> (or its replacement) must reach Stage 4
+  without exiting 10.</li>
+</ul>
+<h2 id="boundaries">Boundaries<a class="headerlink" href="#boundaries" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Always:</strong> <code>make ci-local</code> green before merge; one slice per commit; update
+  <code>defect_tracker.json</code> status + <code>BACKLOG.md</code> as each lands.</li>
+<li><strong>Ask first:</strong> slice 3's fork (above). Any change to the cumulative-budget
+  semantics rather than its default.</li>
+<li><strong>Never:</strong> add a key or paid service (Constraints #1–#3); let a test reach a
+  real model; delete <code>--resume</code> before the fork is answered.</li>
+</ul>
+<h2 id="success-criteria">Success Criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Under default flags, a writer run whose first attempt is malformed completes.</li>
+<li>A stalled model call fails with a typed, named timeout inside its bound.</li>
+<li>The default <code>--image-mode</code> runs end to end; no reachable code instructs the
+   operator to use a third-party image tool.</li>
+<li><code>make ci-local</code> green; BUG-059/060/061 marked resolved with verification notes.</li>
+</ol>
+<h2 id="resolved-questions">Resolved Questions<a class="headerlink" href="#resolved-questions" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Q1 (slice 3): ANSWERED 2026-07-28 — (a) delete.</strong> Owner call. The handshake's
+  only consumer was a workflow the constraints forbid. Hand-supplied art survives
+  as "overwrite <code>output/posts/images/&lt;slug&gt;-hero.svg</code> and re-run"; the prompt
+  sidecar is still written as the brief.</li>
+<li><strong>Q2: <code>_WRITER_ATTEMPT_COST_USD = 0.45</code></strong> — measured ~$0.42 per Sonnet attempt
+  on the B-020 runs, rounded up for headroom. <code>DEFAULT_WRITER_BUDGET_USD</code> is that
+  × <code>_WRITER_MAX_ATTEMPTS</code> = <strong>$1.35</strong>, replacing the hand-picked $0.60.</li>
+</ul>
+<h2 id="outcome">Outcome<a class="headerlink" href="#outcome" title="Permanent link">&para;</a></h2>
+<p>All four success criteria met. Suite 2377 green; <code>make ci-local</code> green; verified
+at runtime (<code>--writer-budget</code> default reads 1.35, removed flags rejected).
+Net <strong>-773 lines</strong>. BUG-059/060/061 marked resolved with verification notes.</p>
+<p><strong>Spun out, deliberately not done here:</strong>
+- <strong>BUG-064</strong> — <code>_graphics_with_retry</code> hands every attempt the FULL budget rather
+  than the remaining balance, so 3 attempts can spend 3× the stated cap. Found
+  while fixing BUG-061; it is the mirror image of it. Silent overspend, not a run
+  aborter, so it did not belong in a slice about run safety.
+- <strong>B-022</strong> — <code>EconomistContentFlow</code>'s DALL-E branch, now provably dead. Kept out
+  to hold slice 3's diff to the CLI surface the owner approved.</p>
 
 
 
@@ -3283,10 +3386,10 @@ pointer here if run keyless. Use <code>python -m src.agent_sdk.pipeline</code> i
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

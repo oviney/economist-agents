@@ -63,6 +63,9 @@ from src.agent_sdk.research.claude_web import (
     brief_has_findings,
     build_claude_web_brief,
 )
+from src.agent_sdk.research.deep_research import (
+    brief_has_findings as deep_brief_has_findings,
+)
 from src.agent_sdk.research.deep_research import build_deep_research_brief
 from src.agent_sdk.tools.research_tools import SourceFetchSession, build_search_tool
 
@@ -183,6 +186,31 @@ FORMATTING:
 - Do not emit the article more than once; output exactly one article per response"""
 
 
+def _fallback_to_deterministic(
+    topic: str, failed_mode: str, spent_usd: float
+) -> tuple[str, float, bool]:
+    """Supply the brief from the keyless providers after ``failed_mode`` found nothing.
+
+    One place for the downgrade policy and its message, shared by every mode that
+    can come back empty (B-024, B-026). ``spent_usd`` is carried forward rather
+    than reset: the failed leg's spend is real, and a run report that dropped it
+    would understate what the article cost.
+
+    Raises:
+        EmptyResearchBriefError: propagated from ``build_research_brief`` when the
+            deterministic providers find nothing either — the abort underneath the
+            fallback.
+    """
+    logger.warning(
+        "%s research produced no findings — falling back to the keyless "
+        "deterministic providers (arXiv + Semantic Scholar). This article will be "
+        "sourced differently from a %s-researched one (B-024)",
+        failed_mode,
+        failed_mode,
+    )
+    return build_research_brief(topic), spent_usd, True
+
+
 async def _acquire_research_brief(
     topic: str,
     research_mode: str,
@@ -231,22 +259,16 @@ async def _acquire_research_brief(
 
     if resolved_research_mode == "deep":
         brief, cost = await build_deep_research_brief(topic)
-        return brief, cost, False
+        if deep_brief_has_findings(brief, topic):
+            return brief, cost, False
+        return _fallback_to_deterministic(topic, "deep", cost)
     if resolved_research_mode != "claude_web":
         return build_research_brief(topic), 0.0, False
 
     brief, cost = await build_claude_web_brief(topic)
     if brief_has_findings(brief, topic):
         return brief, cost, False
-
-    # The costly leg produced nothing. Its spend is still real and is carried
-    # forward so the run report does not understate what the article cost.
-    logger.warning(
-        "claude_web research produced no findings — falling back to the keyless "
-        "deterministic providers (arXiv + Semantic Scholar). This article will be "
-        "sourced differently from a web-researched one (B-024)",
-    )
-    return build_research_brief(topic), cost, True
+    return _fallback_to_deterministic(topic, "claude_web", cost)
 
 
 def _build_writer_prompt(topic: str, research_brief: str, style_section: str) -> str:

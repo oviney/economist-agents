@@ -45,6 +45,28 @@ _RESEARCH_BRIEF_GUARDRAILS = (
 )
 
 
+#: Emitted for a subquestion that returned nothing. Named so the formatter and the
+#: findings predicate below cannot drift apart (B-026).
+_NO_EVIDENCE_LINE = "- No evidence found."
+
+
+def brief_has_findings(brief: str, topic: str) -> bool:
+    """True when ``brief`` carries at least one real sourced passage.
+
+    A deep brief can be evidence-free two ways, and only checking the first is the
+    hole B-026 closed: it can carry nothing at all (string-equal to a freshly
+    formatted empty brief), or it can answer every subquestion with
+    ``- No evidence found.`` The second is *not* string-equal to the first while
+    carrying exactly as much evidence, so equality alone is insufficient.
+    """
+    if brief.strip() == _format_brief(topic, []).strip():
+        return False
+    return any(
+        line.strip().startswith("- ") and line.strip() != _NO_EVIDENCE_LINE
+        for line in brief.splitlines()
+    )
+
+
 def _format_brief(topic: str, findings: list[dict[str, Any]]) -> str:
     """Render findings as a research brief (same string contract as the
     deterministic ``build_research_brief``: the anti-fabrication guardrail
@@ -56,7 +78,7 @@ def _format_brief(topic: str, findings: list[dict[str, Any]]) -> str:
         heading = finding.get("subquestion", "")
         if not passages:
             lines.append(f"## {heading}")
-            lines.append("- No evidence found.")
+            lines.append(_NO_EVIDENCE_LINE)
             lines.append("")
             continue
         lines.append(f"## {heading}")

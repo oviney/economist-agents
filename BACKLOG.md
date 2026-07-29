@@ -26,6 +26,65 @@ _(none)_
 
 ## Todo
 
+> **Opened 2026-07-29 from the article-two run.** **B-025** was withdrawn the same
+> day (see below) and **B-026** landed the same day (see Done); ids are never
+> reused, so both numbers stay spent. **B-027** remains open.
+
+### ~~B-025~~ · WITHDRAWN 2026-07-29 — the defect record was never at risk
+
+Opened on the claim that `.gitignore`'s `data/*` left
+`data/skills_state/defect_tracker.json` untracked, so BUG-066/067/068 existed only
+on one laptop. **The claim was false and the item is void.**
+
+`git ls-files` shows the tracker has been tracked all along, and tracked files are
+unaffected by `.gitignore`. `git cat-file -p HEAD:…` confirms all three defects are
+committed in `8e34ef5`, all `resolved`.
+
+The mistake: `git add` printed *"The following paths are ignored… data/skills_state"*
+— a hint about the **directory** pattern — and that was read as the add having
+failed. It had not; the already-tracked file was staged regardless and went into
+the commit. A hint was mistaken for an error, and a whole backlog item was built
+on it before anyone checked `git ls-files`.
+
+Recorded rather than deleted because it is the second instance in one session of
+asserting a defect from a surface reading instead of measuring — the first being
+the hero "clipping" that a four-line pixel check disproved. That pattern is the
+actual finding here, and **B-027** is its concrete remedy.
+
+### B-027 · A hero's framing must be measured, not eyeballed
+
+During the article-two review the hero was reported as having a clipped top card.
+It did not. The claim came from looking at a thumbnail; a four-line pixel check of
+the rendered PNG's border rows disproved it. The wrong call cost a $0.49 redraw
+that fixed nothing.
+
+Constraint #4 says "always look at the rendered result", and the failure mode this
+exposed is that *looking* is not measuring. The nine structural rules check
+viewBox presence, numerics, aspect ratio, element counts and text bans — **none
+checks whether drawn content reaches the frame edge.** Real clipping has happened
+before: B-020 recorded a clipped queue stack and a chart line running off the
+right edge.
+
+**Design decision:** measure the **rendered PNG's border pixels**, not the SVG
+geometry. A true SVG bounding box needs transform composition and path-data
+parsing, which is both hard and prone to false failures on valid heroes. Border
+sampling is exact, needs no geometry, and is the check that actually worked.
+
+**Report, never gate** — per B-016b's standing rule that composition findings
+inform the reviewer and do not quarantine an article. A full-bleed background
+legitimately touches all four edges, so edge contact alone is not a defect; the
+signal is a *foreground* shape meeting an edge.
+
+**Acceptance criteria:**
+- [ ] Given a hero whose foreground element crosses an edge, the run reports it
+- [ ] A full-bleed background does **not** trigger it (the control case)
+- [ ] It never changes the exit code or blocks publication
+- [ ] Skipped cleanly when no render exists, rather than erroring
+
+**Verify:** new tests with synthetic PNGs; `make ci-local`.
+**Files:** `src/agent_sdk/hero_svg.py` (or a sibling), `src/agent_sdk/hero_author.py`, tests.
+**Scope:** S–M.
+
 ### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
 
 **`check-agent-scope` RESOLVED 2026-07-24** (see B-015a in Done). **Gate matrix
@@ -87,6 +146,30 @@ researcher would ship — but one topic cost ~102 agents / ~2M tokens / ~15 min 
 brief) lives at `docs/research/ai-productivity-brief.md`.
 
 ## Done
+
+### B-026 · B-024 criterion 3 now holds for every research mode — 2026-07-29
+
+B-024 shipped the research-failure policy for `claude_web` and `deterministic` but
+left `deep` unguarded, which meant its own criterion 3 ("on any
+`--research-mode`") was not true. `build_deep_research_brief` has its own
+duplicated `_RESEARCH_BRIEF_GUARDRAILS` and its own
+`_format_brief(topic, findings)`, so `_acquire_research_brief` returned whatever it
+produced with no emptiness check — the exact hole BUG-067 was. The deferral was
+honest (B-012 leaves `deep` unexercised, so a guard there would be untested code)
+and a unit test removed the objection.
+
+**Writing the guard found a case the `claude_web` predicate would have missed.** A
+deep brief whose *every* subquestion answers `- No evidence found.` carries no
+evidence at all, yet is not string-equal to a freshly formatted empty brief — so
+the equality check that suffices for `claude_web` returns "has findings" for it.
+`deep_research.brief_has_findings` therefore checks both: string-equality with the
+empty brief, **and** whether any bullet is something other than the no-evidence
+line. `_NO_EVIDENCE_LINE` is now a named constant so the formatter and the
+predicate cannot drift apart.
+
+Also collapsed the duplicated downgrade block into `_fallback_to_deterministic()`,
+so the policy and its warning live in one place for every mode that can come back
+empty. 8 tests in `tests/test_research_failure_fallback.py`; `make ci-local` green.
 
 ### B-022 · The DALL-E branch is gone from `EconomistContentFlow` — 2026-07-28
 

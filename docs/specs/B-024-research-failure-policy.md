@@ -96,7 +96,12 @@ downgraded article is never mistaken for a web-researched one.
 2. A `claude_web` failure with *no* usable sources from any provider raises
    `EmptyResearchBriefError` and produces **no** article file.
 3. `run_stage3` never dispatches the writer with a findings-free brief, on any
-   `--research-mode`.
+   `--research-mode`. **MET in full 2026-07-29.** Shipped first for `claude_web`
+   (`deterministic` already raised); `deep` was initially deferred as an untested
+   path and closed by **B-026** the same day, which also caught a case the
+   `claude_web` predicate would have missed — a brief whose every subquestion
+   answered `- No evidence found.` is evidence-free without being string-equal to
+   an empty brief.
 4. The existing deterministic-path behaviour is unchanged
    (`tests/test_empty_research_guard.py` still green).
 5. `make ci-local` green.

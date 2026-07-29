@@ -21,8 +21,22 @@ since has been closing the traps that run exposed.
 | **BUG-064** | Graphics retries could spend 3× the stated cap. |
 | **BUG-065** | Production escape — the hero-prompt comment reached the live blog. Now gated at the deploy boundary. |
 | `oviney/blog#1168` | Prose-only edit clearing all four B-017 slop tells from the published flaky-tests post. **Merged** (`b3a29e5`, 2026-07-29). |
+| **Model default** | `scripts/llm_client.py` was defaulting to the deprecated `claude-sonnet-4-20250514`; bumped to `claude-sonnet-4-6` (`3988dad`). |
+| **ADR-0016 / 0017** | The two decisions worth a written rationale: deleting the handshake, and gating publishable content at the deploy boundary. |
 
-## Nothing is waiting on the owner
+## One open decision: B-023
+
+`backup/integration-test-20260728` is a **Mac-only branch that was never pushed
+anywhere** — reconciled 2026-07-28. Almost all of it had already reached `main`
+by other routes; the model bump above was cherry-picked out of it. What remains
+is an `ant` OAuth / `ANTHROPIC_AUTH_TOKEN` resolution path for
+`scripts/llm_client.py`, and it needs an owner call because
+`create_llm_client` is the legacy paid path **B-010 exists to retire** — and a
+token is still a credential under Operating Constraint #1.
+
+**Do not delete that branch before B-023 is answered.** It is the only copy.
+
+## Nothing else is waiting on the owner
 
 `oviney/blog#1168` merged 2026-07-29. Verified against the file on `oviney/blog`
 `main` — 0 of 4 slop detectors fire, the hero-prompt comment is gone, 860 words,

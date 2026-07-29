@@ -1081,6 +1081,22 @@
       "prevention_test_added": "",
       "fixed_date": "",
       "fix_notes": ""
+    },
+    {
+      "id": "BUG-065",
+      "severity": "MEDIUM",
+      "status": "open",
+      "discovered_date": "2026-07-28T00:00:00",
+      "description": "PRODUCTION ESCAPE. The <!-- HERO IMAGE - generate an image from the prompt below, then replace this whole comment with it --> block shipped into the published flaky-tests post and is still in the live page source (invisible in the render, but pipeline instructions on a public page). Two compounding causes: (1) pipeline._maybe_inject_hero_prompt injects the comment AFTER run_stage4, deliberately - 'Injected AFTER Stage 4 so validation is unchanged' - so the publication validator structurally CANNOT see it; (2) even if it could, _check_placeholders only matches TODO|FIXME|XXX|REPLACE_ME|YOUR_*, so a natural-language 'replace this whole comment' instruction is not placeholder text by its definition. The gate that exists for exactly this class of problem has a hole the pipeline drives through.",
+      "component": "src/agent_sdk/pipeline.py::_maybe_inject_hero_prompt + scripts/publication_validator.py::_check_placeholders",
+      "github_issue": "oviney/blog#1168",
+      "is_production_escape": true,
+      "root_cause": "validation_gap",
+      "root_cause_notes": "Injecting unpublishable content after the last gate that could reject it. The injection is correct in intent (the reviewer needs the brief when no hero was drawn); what is missing is any gate between injection and publish. Note B-016b/B-021 narrowed the blast radius - the comment is only injected when no hero is drawn, and Stage 3 now nearly always draws one - but the deploy path still cannot reject it.",
+      "discovered_by": "manual review of the live post while regenerating the B-017 slop list",
+      "prevention_test_added": "",
+      "fixed_date": "",
+      "fix_notes": ""
     }
   ],
   "summary": {

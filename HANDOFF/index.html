@@ -3037,10 +3037,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-one-thing-waiting-on-you" class="md-nav__link">
+  <a href="#nothing-is-waiting-on-the-owner" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The one thing waiting on you
+        Nothing is waiting on the owner
       
     </span>
   </a>
@@ -3136,15 +3136,20 @@ since has been closing the traps that run exposed.</p>
 </tr>
 <tr>
 <td><code>oviney/blog#1168</code></td>
-<td>Prose-only edit clearing all four B-017 slop tells from the published flaky-tests post. <strong>Open, needs your admin-bypass merge.</strong></td>
+<td>Prose-only edit clearing all four B-017 slop tells from the published flaky-tests post. <strong>Merged</strong> (<code>b3a29e5</code>, 2026-07-29).</td>
 </tr>
 </tbody>
 </table>
-<h2 id="the-one-thing-waiting-on-you">The one thing waiting on you<a class="headerlink" href="#the-one-thing-waiting-on-you" title="Permanent link">&para;</a></h2>
-<p><strong><code>oviney/blog#1168</code></strong> — it cannot merge itself. <code>🔒 Security Audit</code> and
-<code>🖼️ Visual Regression</code> fail blog-side for pre-existing reasons (npm CVEs; stale
-visual baselines), both are required checks, and GitHub forbids self-approval.
-Same bypass every article PR needs.</p>
+<h2 id="nothing-is-waiting-on-the-owner">Nothing is waiting on the owner<a class="headerlink" href="#nothing-is-waiting-on-the-owner" title="Permanent link">&para;</a></h2>
+<p><code>oviney/blog#1168</code> merged 2026-07-29. Verified against the file on <code>oviney/blog</code>
+<code>main</code> — 0 of 4 slop detectors fire, the hero-prompt comment is gone, 860 words,
+2 em-dashes. (Checked the repo contents rather than the rendered page, so the
+result is not subject to a Pages rebuild lag.)</p>
+<p>Note for next time: that PR still needed an admin bypass to merge. <code>🔒 Security
+Audit</code> and <code>🖼️ Visual Regression</code> fail blog-side for pre-existing reasons (npm
+CVEs; stale visual baselines on about/blog-index/homepage), both are required
+checks, and GitHub forbids self-approval. <strong>Every</strong> article PR hits this until
+the blog bumps its deps and refreshes its baselines — see B-015.</p>
 <h2 id="next-up-article-two">Next up: article two<a class="headerlink" href="#next-up-article-two" title="Permanent link">&para;</a></h2>
 <p>There is no blocker. Two generated drafts from the B-020 runs are sitting in
 <code>output/posts/</code> on the "code review queue" topic — regenerate rather than reuse

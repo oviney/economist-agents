@@ -48,6 +48,40 @@ class DeployError(RuntimeError):
     """Raised when a deploy step fails (clone, push, validation, …)."""
 
 
+#: Prefix of the reviewer-facing block ``_maybe_inject_hero_prompt`` adds when
+#: Stage 3 drew no hero. Matching the prefix, not the whole block, keeps this
+#: robust to the prompt text changing.
+_HERO_PROMPT_MARKER = "<!-- HERO IMAGE"
+
+
+def _reject_unrendered_hero_prompt(article_path: Path) -> None:
+    """Refuse to publish an article still carrying the hero-prompt comment.
+
+    BUG-065 (production escape): the block shipped into a published post and sat
+    in the live page source. It is invisible in the render, but it is pipeline
+    instructions on a public page.
+
+    This cannot live in ``publication_validator``: the comment is injected AFTER
+    ``run_stage4`` on purpose ("so validation is unchanged"), so the validator
+    never sees it. Deploy is the real boundary — the last point before anything
+    becomes public — so the gate belongs here.
+
+    It **rejects** rather than strips. The comment is only ever present because
+    no hero was drawn; silently deleting it would hide that, and the blog
+    requires a resolvable ``image:`` anyway (B-019). A loud refusal naming the
+    fix is the useful behaviour.
+    """
+    if _HERO_PROMPT_MARKER not in article_path.read_text():
+        return
+    raise DeployError(
+        f"{article_path.name} still contains the hero-image prompt comment "
+        f"({_HERO_PROMPT_MARKER}…). That block is a brief for a human reviewer "
+        "and must never be published — it leaked into a live post once already "
+        "(BUG-065). Draw or supply the hero, replace the whole comment with the "
+        "image reference, then deploy again."
+    )
+
+
 @dataclass
 class DeployResult:
     """Structured outcome of a deploy() / deploy_review() call."""
@@ -172,6 +206,9 @@ def deploy(
     """
     if not article_path.exists():
         raise DeployError(f"Article not found: {article_path}")
+    # BUG-065: check the local file BEFORE any clone/push work, so a rejected
+    # article costs nothing and the error is about the article, not about git.
+    _reject_unrendered_hero_prompt(article_path)
     if not blog_owner or not blog_repo:
         raise DeployError("blog_owner and blog_repo are required")
     if not token:
@@ -489,6 +526,9 @@ def deploy_review(
     """
     if not article_path.exists():
         raise DeployError(f"Article not found: {article_path}")
+    # BUG-065: check the local file BEFORE any clone/push work, so a rejected
+    # article costs nothing and the error is about the article, not about git.
+    _reject_unrendered_hero_prompt(article_path)
     if not blog_owner or not blog_repo:
         raise DeployError("blog_owner and blog_repo are required")
     if not token:

@@ -1069,7 +1069,7 @@
     {
       "id": "BUG-064",
       "severity": "MEDIUM",
-      "status": "open",
+      "status": "resolved",
       "discovered_date": "2026-07-28T00:00:00",
       "description": "_graphics_with_retry passes the FULL graphics_budget_usd to every attempt rather than the remaining balance, so _GRAPHICS_MAX_ATTEMPTS=3 can spend up to 3x the cap the operator set. The writer loop decrements correctly (see BUG-061); graphics is the mirror-image inconsistency. Not a run-aborter — it silently overspends instead of under-funding. Measured graphics cost has already reached $0.41 against a $0.40 cap on one B-020 run (logs/agent_sdk_costs.jsonl 2026-07-28T01:22).",
       "component": "src/agent_sdk/stage3_runner.py::_graphics_with_retry",
@@ -1078,14 +1078,16 @@
       "root_cause": "code_logic",
       "root_cause_notes": "The graphics retry loop (BUG-063) was added after the writer loop and did not copy its cumulative-budget accounting.",
       "discovered_by": "code reading during the BUG-061 fix (B-021 slice 1)",
-      "prevention_test_added": "",
-      "fixed_date": "",
-      "fix_notes": ""
+      "prevention_test_added": "tests/test_graphics_budget_is_cumulative.py",
+      "fixed_date": "2026-07-28T00:00:00",
+      "fix_notes": "_graphics_with_retry now hands each attempt graphics_budget_usd minus what earlier attempts spent, matching the writer loop. None (unbounded) stays unbounded rather than collapsing to 0.0.",
+      "resolved_date": "2026-07-28",
+      "verification": "3 regression tests + make ci-local green, 2380 passed (2026-07-28)"
     },
     {
       "id": "BUG-065",
       "severity": "MEDIUM",
-      "status": "open",
+      "status": "resolved",
       "discovered_date": "2026-07-28T00:00:00",
       "description": "PRODUCTION ESCAPE. The <!-- HERO IMAGE - generate an image from the prompt below, then replace this whole comment with it --> block shipped into the published flaky-tests post and is still in the live page source (invisible in the render, but pipeline instructions on a public page). Two compounding causes: (1) pipeline._maybe_inject_hero_prompt injects the comment AFTER run_stage4, deliberately - 'Injected AFTER Stage 4 so validation is unchanged' - so the publication validator structurally CANNOT see it; (2) even if it could, _check_placeholders only matches TODO|FIXME|XXX|REPLACE_ME|YOUR_*, so a natural-language 'replace this whole comment' instruction is not placeholder text by its definition. The gate that exists for exactly this class of problem has a hole the pipeline drives through.",
       "component": "src/agent_sdk/pipeline.py::_maybe_inject_hero_prompt + scripts/publication_validator.py::_check_placeholders",
@@ -1094,9 +1096,11 @@
       "root_cause": "validation_gap",
       "root_cause_notes": "Injecting unpublishable content after the last gate that could reject it. The injection is correct in intent (the reviewer needs the brief when no hero was drawn); what is missing is any gate between injection and publish. Note B-016b/B-021 narrowed the blast radius - the comment is only injected when no hero is drawn, and Stage 3 now nearly always draws one - but the deploy path still cannot reject it.",
       "discovered_by": "manual review of the live post while regenerating the B-017 slop list",
-      "prevention_test_added": "",
-      "fixed_date": "",
-      "fix_notes": ""
+      "prevention_test_added": "tests/test_deploy_rejects_hero_prompt_comment.py",
+      "fixed_date": "2026-07-28T00:00:00",
+      "fix_notes": "Gated at the DEPLOY boundary, not in publication_validator: the comment is injected after run_stage4 by design, so the validator cannot see it, and it is legitimate in the local artifact — only illegitimate on the blog. _reject_unrendered_hero_prompt guards BOTH deploy() and deploy_review() (a review deploy is a live URL too) and fires before any clone/push, so a rejected article costs nothing. Rejects rather than strips: stripping would hide that no hero was drawn. Removed from the live post in oviney/blog#1168.",
+      "resolved_date": "2026-07-28",
+      "verification": "4 regression tests + make ci-local green (2026-07-28)"
     }
   ],
   "summary": {

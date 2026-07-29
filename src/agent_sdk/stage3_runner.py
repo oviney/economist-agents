@@ -562,11 +562,19 @@ async def _graphics_with_retry(
     prompt = graphics_prompt
 
     for attempt in range(1, _GRAPHICS_MAX_ATTEMPTS + 1):
+        # BUG-064: the cap is on the STAGE, not on one attempt. Hand each attempt
+        # the remaining balance — as the writer loop does — or three retries can
+        # spend three times the number the operator set.
+        remaining_budget = (
+            None
+            if graphics_budget_usd is None
+            else max(0.0, graphics_budget_usd - cost)
+        )
         text, call_cost = await collect(
             prompt,
             GRAPHICS_AGENT_PROMPT,
             model=graphics_model,
-            max_budget_usd=graphics_budget_usd,
+            max_budget_usd=remaining_budget,
             # Turn headroom: the subscription CLI can need >1 turn for the JSON
             # (BUG-042). Kept small — no tools are exposed for graphics.
             max_turns=4,

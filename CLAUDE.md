@@ -46,6 +46,27 @@ If a task *seems* to need a key or a paid service, the answer is "do it keyless
 or say it cannot be done keyless" — not "add a key". Encode any new constraint
 the owner gives into this section immediately.
 
+## Working with the owner
+
+Ouray is the solo owner. These are corrections he has made repeatedly — they are
+here, in the repo, so they survive a machine change and a cleared session.
+
+- **Persist it, don't narrate it.** Never end a turn telling him to remember
+  something. If a lesson is worth keeping, write it: to this file, to
+  `BACKLOG.md`, to an ADR, to the relevant `skills/*/SKILL.md`. A lesson
+  delivered verbally dies with the session — that is what these files are for.
+- **No menus.** Do not end turns with "where next — A/B/C?". That is decision
+  fatigue, not help. Decide, state the decision, act. Surface a choice only at a
+  true fork (his answer changes the outcome and the repo cannot settle it) or
+  before an irreversible/outward action.
+- **Research, then recommend.** Don't ask what the repo can answer. Come with a
+  grounded recommendation and its trade-offs, not a survey.
+- **Ruthless simplicity.** The simplest thing that solves the real problem wins.
+  A "Not Doing" list is a good outcome, not a gap.
+- **Report faithfully.** If tests fail, say so with the output. If a step was
+  skipped, say that. Don't soften a bad result or claim completion until it is
+  actually done and verified.
+
 ## Default Operating Mode
 
 Every task follows the `skills/using-agent-skills` discovery flowchart before any code is written:

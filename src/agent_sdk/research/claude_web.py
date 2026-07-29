@@ -74,6 +74,15 @@ def _format_brief(topic: str, body: str) -> str:
     return "\n".join(lines)
 
 
+def brief_has_findings(brief: str, topic: str) -> bool:
+    """True when ``brief`` carries sourced findings, not just its guardrail header.
+
+    Compares against a freshly formatted empty brief rather than pattern-matching
+    the header, so this cannot drift out of step with ``_format_brief``.
+    """
+    return brief.strip() != _format_brief(topic, "").strip()
+
+
 async def build_claude_web_brief(
     topic: str,
     max_budget_usd: float | None = None,

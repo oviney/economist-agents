@@ -22,6 +22,7 @@ import logging
 import re
 import shutil
 import subprocess
+from collections import Counter
 from pathlib import Path
 from xml.etree import ElementTree
 
@@ -196,6 +197,106 @@ _RENDER_TIMEOUT_S = 60
 #: Matches the gate's 16:9 contract and the shipped hero's intrinsic size.
 _RENDER_WIDTH = 1600
 _RENDER_HEIGHT = 900
+
+
+#: Below this share of an edge, a run is anti-aliasing or a deliberate accent
+#: touching the frame, not a shape running out of it.
+_EDGE_MIN_COVERAGE = 0.02
+#: Per-channel tolerance, so anti-aliased boundaries do not read as new colours.
+_EDGE_COLOUR_TOLERANCE = 16
+
+
+def report_edge_contact(png_path: Path) -> list[str]:
+    """Measure where rendered content meets the frame edge.
+
+    This is a **measurement, not a verdict**, and the distinction is the whole
+    point. B-027 exists because a hero was reported clipped on the strength of a
+    glance at a thumbnail, and a border-pixel check proved it was not. Constraint
+    #4 says look at the rendered result; this supplies numbers so that looking does
+    not have to mean guessing.
+
+    Taken on the raster, not the SVG — a true SVG bounding box needs transform
+    composition and path-data parsing, which is both hard and prone to false
+    failures on valid geometry.
+
+    Full-bleed content is excluded structurally rather than by threshold: a border
+    pixel counts only when the perpendicular line through it is *not* uniform. A
+    band spanning the full width is deliberate, and a coverage threshold alone
+    cannot recognise that, because such a band necessarily puts a partial run on
+    both vertical edges.
+
+    **Known limitation, deliberately not "fixed".** A shape that intentionally
+    bleeds off one side — a desk, a wall, a table edge, all common and correct —
+    is geometrically identical to a shape accidentally clipped. The shipped hero
+    has exactly that: a desk rect from x=0 that stops at x=680. Telling those apart
+    requires intent, which pixels do not carry. So this reports *what is true*
+    (content meets this edge, by this much) and leaves the judgement to a human.
+    Do not add heuristics to suppress the "false positives"; they are not false,
+    they are unadjudicated.
+
+    Returns a list of human-readable measurements, empty when nothing meets an edge
+    without crossing. Never raises: this informs the reviewer and must not be the
+    reason a run fails (B-016b failure policy, row 2).
+    """
+    try:
+        from PIL import Image
+
+        with Image.open(png_path) as handle:
+            image = handle.convert("RGB")
+            width, height = image.size
+            pixels = image.load()
+    except Exception as exc:  # noqa: BLE001 — a reporter must never break a run
+        logger.debug("edge-contact check skipped for %s (%s)", png_path, exc)
+        return []
+
+    if width < 2 or height < 2:
+        return []
+
+    def _close(a: tuple[int, ...], b: tuple[int, ...]) -> bool:
+        return all(
+            abs(c - d) <= _EDGE_COLOUR_TOLERANCE for c, d in zip(a, b, strict=True)
+        )
+
+    row_spans: dict[int, bool] = {}
+    col_spans: dict[int, bool] = {}
+
+    def _row_crosses(y: int) -> bool:
+        """True when row ``y`` is one colour all the way across — a full-bleed band."""
+        if y not in row_spans:
+            first = pixels[0, y]
+            row_spans[y] = all(_close(pixels[x, y], first) for x in range(width))
+        return row_spans[y]
+
+    def _col_crosses(x: int) -> bool:
+        """True when column ``x`` is one colour top to bottom."""
+        if x not in col_spans:
+            first = pixels[x, 0]
+            col_spans[x] = all(_close(pixels[x, y], first) for y in range(height))
+        return col_spans[x]
+
+    edges: dict[str, tuple[list[tuple[int, int, int]], object]] = {
+        "top": ([pixels[x, 0] for x in range(width)], _col_crosses),
+        "bottom": ([pixels[x, height - 1] for x in range(width)], _col_crosses),
+        "left": ([pixels[0, y] for y in range(height)], _row_crosses),
+        "right": ([pixels[width - 1, y] for y in range(height)], _row_crosses),
+    }
+
+    findings: list[str] = []
+    for name, (line, crosses) in edges.items():
+        dominant = Counter(line).most_common(1)[0][0]
+        clipped = sum(
+            1
+            for index, colour in enumerate(line)
+            if not _close(colour, dominant) and not crosses(index)  # type: ignore[operator]
+        )
+        coverage = clipped / len(line)
+        if coverage >= _EDGE_MIN_COVERAGE:
+            findings.append(
+                f"Content meets the {name} edge across {coverage:.0%} of it without "
+                "crossing the frame. Deliberate bleed-off and accidental clipping "
+                "look identical here — look at the render before judging."
+            )
+    return findings
 
 
 def _find_chrome() -> str | None:

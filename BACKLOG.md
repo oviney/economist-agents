@@ -51,40 +51,6 @@ asserting a defect from a surface reading instead of measuring — the first bei
 the hero "clipping" that a four-line pixel check disproved. That pattern is the
 actual finding here, and **B-027** is its concrete remedy.
 
-### B-027 · A hero's framing must be measured, not eyeballed
-
-During the article-two review the hero was reported as having a clipped top card.
-It did not. The claim came from looking at a thumbnail; a four-line pixel check of
-the rendered PNG's border rows disproved it. The wrong call cost a $0.49 redraw
-that fixed nothing.
-
-Constraint #4 says "always look at the rendered result", and the failure mode this
-exposed is that *looking* is not measuring. The nine structural rules check
-viewBox presence, numerics, aspect ratio, element counts and text bans — **none
-checks whether drawn content reaches the frame edge.** Real clipping has happened
-before: B-020 recorded a clipped queue stack and a chart line running off the
-right edge.
-
-**Design decision:** measure the **rendered PNG's border pixels**, not the SVG
-geometry. A true SVG bounding box needs transform composition and path-data
-parsing, which is both hard and prone to false failures on valid heroes. Border
-sampling is exact, needs no geometry, and is the check that actually worked.
-
-**Report, never gate** — per B-016b's standing rule that composition findings
-inform the reviewer and do not quarantine an article. A full-bleed background
-legitimately touches all four edges, so edge contact alone is not a defect; the
-signal is a *foreground* shape meeting an edge.
-
-**Acceptance criteria:**
-- [ ] Given a hero whose foreground element crosses an edge, the run reports it
-- [ ] A full-bleed background does **not** trigger it (the control case)
-- [ ] It never changes the exit code or blocks publication
-- [ ] Skipped cleanly when no render exists, rather than erroring
-
-**Verify:** new tests with synthetic PNGs; `make ci-local`.
-**Files:** `src/agent_sdk/hero_svg.py` (or a sibling), `src/agent_sdk/hero_author.py`, tests.
-**Scope:** S–M.
-
 ### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
 
 **`check-agent-scope` RESOLVED 2026-07-24** (see B-015a in Done). **Gate matrix
@@ -146,6 +112,43 @@ researcher would ship — but one topic cost ~102 agents / ~2M tokens / ~15 min 
 brief) lives at `docs/research/ai-productivity-brief.md`.
 
 ## Done
+
+### B-027 · Hero framing is measured — but it cannot be adjudicated — 2026-07-29
+
+**Scoped as a clipping detector; shipped as a measurement, because the detector is
+not achievable.** That negative result is the finding worth keeping.
+
+The trigger: a hero was reported as having a clipped top card. It did not. The
+claim came from glancing at a thumbnail, and a four-line border-pixel check
+disproved it — at the cost of a $0.49 redraw that fixed nothing. The nine
+structural rules check viewBox, aspect ratio, element counts and text bans; none
+measured framing. Real clipping *has* happened (B-020: a clipped queue stack, a
+chart line off the right edge), so the gap was real.
+
+`report_edge_contact()` measures the rendered PNG rather than the SVG — a true SVG
+bounding box needs transform composition and path-data parsing, which is hard and
+prone to false failures on valid geometry.
+
+**Two design corrections, both found by testing rather than reasoning:**
+
+1. *Coverage thresholds do not work.* The first implementation flagged a full-bleed
+   floor band, because a band spanning the full width necessarily puts a partial
+   run on **both** vertical edges. Full-bleed is now excluded structurally: a
+   border pixel counts only when the perpendicular line through it is not uniform.
+2. *Intent is invisible.* Run against the real heroes, the check fires on both —
+   and correctly so. The shipped hero has a desk rect from `x=0` stopping at
+   `x=680`: it bleeds off one side deliberately, and that is **geometrically
+   identical** to a shape accidentally clipped. No pixel test can separate them.
+
+So it reports what is true ("content meets the left edge across 10% of it without
+crossing the frame") and leaves the verdict to a human. It is **not** folded into
+`defects`, so it never drives a redraw or the exit code — letting unadjudicated
+observations spend money is the mistake that started this item.
+`TestEdgeContactIsAMeasurementNotAVerdict` pins the limitation so nobody later
+suppresses the "false positives"; they are not false, they are unjudged.
+
+9 tests in `tests/test_hero_edge_contact.py`, including the full-bleed control that
+the first implementation failed. Wired into `hero_author._author` at INFO.
 
 ### B-026 · B-024 criterion 3 now holds for every research mode — 2026-07-29
 

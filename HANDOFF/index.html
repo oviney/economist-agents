@@ -3093,10 +3093,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#nothing-is-waiting-on-the-owner" class="md-nav__link">
+  <a href="#one-open-decision-b-023" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Nothing is waiting on the owner
+        One open decision: B-023
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nothing-else-is-waiting-on-the-owner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nothing else is waiting on the owner
       
     </span>
   </a>
@@ -3194,9 +3205,26 @@ since has been closing the traps that run exposed.</p>
 <td><code>oviney/blog#1168</code></td>
 <td>Prose-only edit clearing all four B-017 slop tells from the published flaky-tests post. <strong>Merged</strong> (<code>b3a29e5</code>, 2026-07-29).</td>
 </tr>
+<tr>
+<td><strong>Model default</strong></td>
+<td><code>scripts/llm_client.py</code> was defaulting to the deprecated <code>claude-sonnet-4-20250514</code>; bumped to <code>claude-sonnet-4-6</code> (<code>3988dad</code>).</td>
+</tr>
+<tr>
+<td><strong>ADR-0016 / 0017</strong></td>
+<td>The two decisions worth a written rationale: deleting the handshake, and gating publishable content at the deploy boundary.</td>
+</tr>
 </tbody>
 </table>
-<h2 id="nothing-is-waiting-on-the-owner">Nothing is waiting on the owner<a class="headerlink" href="#nothing-is-waiting-on-the-owner" title="Permanent link">&para;</a></h2>
+<h2 id="one-open-decision-b-023">One open decision: B-023<a class="headerlink" href="#one-open-decision-b-023" title="Permanent link">&para;</a></h2>
+<p><code>backup/integration-test-20260728</code> is a <strong>Mac-only branch that was never pushed
+anywhere</strong> — reconciled 2026-07-28. Almost all of it had already reached <code>main</code>
+by other routes; the model bump above was cherry-picked out of it. What remains
+is an <code>ant</code> OAuth / <code>ANTHROPIC_AUTH_TOKEN</code> resolution path for
+<code>scripts/llm_client.py</code>, and it needs an owner call because
+<code>create_llm_client</code> is the legacy paid path <strong>B-010 exists to retire</strong> — and a
+token is still a credential under Operating Constraint #1.</p>
+<p><strong>Do not delete that branch before B-023 is answered.</strong> It is the only copy.</p>
+<h2 id="nothing-else-is-waiting-on-the-owner">Nothing else is waiting on the owner<a class="headerlink" href="#nothing-else-is-waiting-on-the-owner" title="Permanent link">&para;</a></h2>
 <p><code>oviney/blog#1168</code> merged 2026-07-29. Verified against the file on <code>oviney/blog</code>
 <code>main</code> — 0 of 4 slop detectors fire, the hero-prompt comment is gone, 860 words,
 2 em-dashes. (Checked the repo contents rather than the rendered page, so the

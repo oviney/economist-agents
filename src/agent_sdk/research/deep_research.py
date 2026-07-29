@@ -61,10 +61,14 @@ def brief_has_findings(brief: str, topic: str) -> bool:
     """
     if brief.strip() == _format_brief(topic, []).strip():
         return False
-    return any(
-        line.strip().startswith("- ") and line.strip() != _NO_EVIDENCE_LINE
-        for line in brief.splitlines()
-    )
+    # Only *bulleted* briefs can be judged bullet-by-bullet. Requiring a
+    # non-no-evidence bullet outright would call any unbulleted brief empty, which
+    # regressed two integration tests whose stub brief is plain prose — bullets are
+    # how ``_format_brief`` happens to render, not what "has findings" means.
+    bullets = [
+        line.strip() for line in brief.splitlines() if line.strip().startswith("- ")
+    ]
+    return not (bullets and all(bullet == _NO_EVIDENCE_LINE for bullet in bullets))
 
 
 def _format_brief(topic: str, findings: list[dict[str, Any]]) -> str:

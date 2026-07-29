@@ -229,6 +229,38 @@ class TestDeepResearchFallback:
         assert downgraded is False
         assert called == [], "deterministic providers must not run on the happy path"
 
+    def test_unbulleted_deep_brief_with_content_counts_as_having_findings(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A brief carrying prose but no bullets has findings.
+
+        Caught by the pre-existing integration suite, not by this file: the first
+        predicate required a non-no-evidence *bullet*, which called any unbulleted
+        brief empty and triggered a spurious fallback. Bullets are how
+        ``_format_brief`` happens to render, not what "has findings" means.
+        """
+        import src.agent_sdk.stage3_runner as s3
+
+        called: list[str] = []
+        monkeypatch.setattr(
+            s3,
+            "build_deep_research_brief",
+            _async_return(("# Deep brief\n\nsourced passage", 0.5)),
+        )
+        monkeypatch.setattr(
+            s3,
+            "build_research_brief",
+            lambda topic: called.append(topic) or DETERMINISTIC_BRIEF,
+        )
+
+        brief, _cost, downgraded = asyncio.run(
+            _acquire_research_brief(TOPIC, "deep", None)
+        )
+
+        assert brief == "# Deep brief\n\nsourced passage"
+        assert downgraded is False
+        assert called == []
+
     def test_no_findings_anywhere_on_the_deep_path_raises(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:

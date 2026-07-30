@@ -17,6 +17,14 @@ Both are policies expressed as guides, and a guide is skippable. Expressed as a
 would be disabled within a day — the noise-overload failure mode that makes teams stop
 watching their own static analysis. So the guard denies *introducing* a key (assignment,
 export, install) and allows reading, grepping, and documenting one.
+
+**Known false positive, observed 2026-07-29.** This guard blocked the first attempt to open
+the PR that introduced it: the PR body was passed through a shell heredoc and quoted a
+literal key assignment while *describing* the guard. A regex cannot distinguish prose inside
+a heredoc from a command. Left unfixed deliberately — heredoc-aware parsing is fragile, the
+case is rare, and the workaround (write long text to a file rather than inlining it in a
+shell command) is better practice anyway. Recorded here because a guard's failure modes
+should be documented where the guard lives, not discovered twice.
 """
 
 from __future__ import annotations

@@ -367,6 +367,103 @@ already retired the workflow.
 **Files:** `.mcp.json`, `.claude/settings.local.json`, `tests/test_harness_config.py`.
 **Scope:** XS — smallest diff in the set, and it deletes a live contradiction.
 
+### B-035 · Close the three harness decisions B-030…B-034 deliberately left open
+
+**Opened 2026-07-30.** B-030…B-034 shipped with three questions routed to the owner
+rather than guessed at. All three were then **measured** (2026-07-30) and each has one
+recommended path. This item is the execution.
+
+#### Task 1 — the `Stop` gate should run scoped tests, not just lint (S)
+
+| Measurement | Value |
+|---|---|
+| Full suite | ~100s |
+| One matching test file | **3.4s** (6.2s wall) |
+| `scripts/` modules with a matching `tests/test_<name>.py` | **40 of 48 (83%)** |
+
+The objection was cost, and the measurement removes it: don't run the suite, run the
+*matching* files. Lint regulates maintainability only; a red test is the correctness
+signal, which the podcast calls the most important and least solved feedback loop. The
+one-block-per-session bound already caps the downside.
+
+- [ ] Changed `scripts/X.py` maps to `tests/test_X.py`; only matching files run
+- [ ] 60s cap; on timeout or no match, fall back to lint-only (never block on a timeout)
+- [ ] Lint stays the always-on part — tests are additive, not a replacement
+- [ ] A test asserts the fallback path does not block
+
+**Files:** `scripts/hooks/session_gate.py`, `tests/test_harness_hooks.py`. **Scope:** S.
+
+#### Task 2 — mypy needs a baseline, not a weaker guide (S)
+
+| Measurement | Value |
+|---|---|
+| `scripts/*.py` mypy-clean under `--follow-imports=silent` | 36 of 48 |
+| Would block a commit **merely by being touched** | **12 (25%)** |
+
+As shipped, one commit in four touching `scripts/` is blocked by errors it did not
+introduce — including `publication_validator.py`, `editorial_board.py` and, pointedly,
+`destructive_change_guard.py`. That is the noise-overload failure mode that gets a gate
+reverted to `manual`, which is how mypy went inert in the first place.
+
+**Do not delete "Type hints mandatory" from `CLAUDE.md`.** Record the 12 known-dirty files
+as a baseline and block only on errors outside it. B-032 already built this exact
+mechanism for complexity (`docs/harness-overrides.md`); mypy should reuse it rather than
+invent a second answer to the same question. One mechanism, two sensors — and with a
+baseline the guide becomes *true* for all new code instead of aspirational.
+
+- [ ] Baseline records the 12 files, with the error count each is grandfathered at
+- [ ] A **new** error in a baselined file still blocks (baseline is per-file count, not a mute)
+- [ ] Baseline shrinks only — a test fails if a file's grandfathered count grows
+- [ ] `CLAUDE.md` keeps "Type hints mandatory"; the baseline is what makes it honest
+
+**Files:** `.pre-commit-config.yaml`, `docs/harness-overrides.md` (or a sibling),
+`tests/test_harness_config.py`. **Scope:** S.
+
+#### Task 3 — cut ~5,300 of 8,031 guide lines without losing one instruction (M)
+
+The reference-count hypothesis from the audit was **wrong** — every skill is referenced ≥3
+times via the mkdocs nav, so it discriminates nothing. Two stronger signals replaced it.
+
+**(a) The local skills are duplicates of a repo that loads from elsewhere.**
+
+| Finding | Lines |
+|---|---|
+| Byte-identical to upstream `addyosmani/agent-skills` | 15 skills, **4,488** |
+| Diverged by 2–4 lines only (trivial) | 4 skills, ~1,120 |
+| Genuinely diverged — `using-agent-skills`, the Skill Routing Contract | 32 of 174 lines |
+| Local-only domain skills (economist-writing, python-quality, …) | 17 skills — **keep all** |
+
+Decisive: **every skill invoked during the 2026-07-29 session loaded from
+`/Users/ouray.viney/code/agent-skills/skills/`, not from `economist-agents/skills/`** (each
+invocation prints its base directory). The repo's own skills are not in the invocable skill
+list at all — `CLAUDE.md` reaches them as file paths. Those 4,488 lines are not a guide the
+agent reads; they are a stale copy of one it reads from somewhere else.
+
+**(b) `.github/copilot-instructions.md` is not a 2,601-line guide — it is a generator bug.**
+`scripts/sync_copilot_context.py` **appends** its "Learned Anti-Patterns" section instead of
+replacing it. There are now **20 of them** (16 distinct, most 85 lines); 2,267 of 2,601
+lines sit below the first heading.
+
+- [ ] `sync_copilot_context.py` replaces rather than appends; file regenerated
+      (**do this regardless of the rest — it is a bug fix, not a decision**)
+- [ ] The 19 vendored upstream skill copies deleted; `using-agent-skills` kept for its
+      32 lines of local routing contract
+- [ ] `CLAUDE.md` Key Skills section points at the plugin, not at deleted paths
+- [ ] mkdocs nav entries for the deleted skills removed
+- [ ] All 17 domain skills untouched
+- [ ] `make ci-local` green; `validate_skills.py` still passes on what remains
+
+**Net: 8,031 → ~2,700 lines with zero instructions lost**, because everything deleted
+duplicates something that loads from elsewhere.
+
+**Open question that gates (b) only:** the public docs site currently republishes those 19
+upstream skills. If republishing addyosmani's skills under `oviney`'s docs was deliberate,
+that changes Task 3(a) — it does not change 3(b) or Tasks 1–2.
+
+**Files:** `scripts/sync_copilot_context.py`, `.github/copilot-instructions.md`, 19
+`skills/*/` directories, `CLAUDE.md`, `mkdocs.yml`. **Scope:** M, owner-gated on the docs
+site question.
+
 ---
 
 ### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates

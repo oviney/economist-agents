@@ -1,8 +1,14 @@
-# Agent state — ignore runtime data but commit slash commands and agent personas
+# Agent state — ignore runtime data but commit slash commands, agent personas,
+# and the harness hook wiring (B-030: hooks are team policy, not personal config —
+# .claude/settings.local.json stays ignored)
 .claude/*
 !.claude/commands/
 !.claude/agents/
+!.claude/settings.json
 .gemini/
+
+# Harness sensor history (B-030) — per-session snapshots, runtime data
+logs/sensor_history.jsonl
 
 # Python
 __pycache__/

@@ -30,6 +30,11 @@ _(none)_
 > day (see below); **B-026** and **B-027** landed the same day (see Done). Ids are
 > never reused, so all three numbers stay spent. **B-028** and **B-029** are open,
 > both from the RCA on the skipped review stage.
+>
+> **Opened 2026-07-29 from the harness audit.** **B-030 … B-034** come from auditing
+> this repo against SE Radio 730 (harness engineering). They generalise B-028 and
+> B-029: a guide the default ignores, and a sensor that cannot fail. See the
+> "Harness engineering" section below.
 
 ### B-028 · The unreviewed publish path must stop being the default
 
@@ -134,6 +139,235 @@ it still passes, then confirm it fails against a deliberately undated copy.
 **Risk if left:** this is the gate the project trusts most, and it has now been
 shown to give a false green on a publish-blocking defect. Every future article
 inherits that.
+
+---
+
+## Harness engineering (B-030 … B-034) — opened 2026-07-29
+
+> **Source:** an audit of this repo against *SE Radio 730 — Birgitta Boeckeler on
+> Harness Engineering for AI Agents*. Full findings in
+> `docs/reviews/harness-engineering-assessment-2026-07-29.md`; spec in
+> `docs/specs/harness-engineering.md`.
+>
+> **The finding in one line.** This repo is **guide-maximal and
+> sensor-disconnected**: 8,031 lines of `SKILL.md` plus a strong sensor inventory
+> (ruff, mypy, pytest, bandit, four custom guards) with **zero hooks** wiring them
+> together — so every sensor fires at the owner's gate rather than the agent's, and
+> the owner performs triage an agent could have done mid-session.
+>
+> Boeckeler's framework splits harness work into **guides** (feed-forward: markdown,
+> codemods) and **sensors** (feedback: static analysis, tests — "that starts another
+> little loop where the agent tries to self-correct and then asks the sensor again").
+> Her warnings land squarely on **B-028** (*"a guide the default ignores"*) and
+> **B-029** (*"if my pipeline is always green… I would get suspicious"*) — those two
+> items are this episode's central failures, already self-diagnosed. B-030…B-034
+> generalise the fix.
+>
+> **Implementation order: B-034 → B-031 → B-032 → B-030 → B-033.** B-030 is the
+> highest-leverage item but not the first: 034 and 031 shrink the surface, 032
+> supplies the sensor 030 calls, and 033's value depends on 030's session recording.
+>
+> **Status 2026-07-29: all five BUILT on `fix/article-two-run-defects`, `make ci-local`
+> green** (2515 passed, 9 skipped, coverage 80.38%, `src/quality` 97%, bandit clean).
+> They stay in Todo until merged — per this file's convention, "done" means merged to
+> `main` via reviewed PR, and the owner is the merge gate (ADR-0015). Three decisions
+> are flagged for the owner in the spec's Open Questions: whether the `Stop` gate should
+> also run tests, whether mypy's per-commit enforcement is the right trade, and which
+> unmeasured guides to cut.
+
+### B-030 · Sensors must fire in the agent's loop, not only at the owner's gate
+
+**The gap.** There is no project `.claude/settings.json` at all;
+`.claude/settings.local.json` holds 122 permission entries and **no `hooks` key**. The
+only hooks anywhere are two user-level `terminal-notifier` calls. Every computational
+sensor is bound to `pre-commit`, `pre-push`, or `make ci-local`. An agent can therefore
+write 200 lines of Python and end its turn with the tree red and no signal having reached
+it; the owner discovers this later, with the agent's context already stale.
+
+**The fix — five hook wirings** in a committed `.claude/settings.json`:
+
+| Event | Matcher | Behaviour |
+|---|---|---|
+| `PostToolUse` | `Edit\|Write` | On `*.py`: format + autofix the touched file, then feed anything remaining (plus complexity findings from B-032) back as `additionalContext`. |
+| `PreToolUse` | `Bash` | **Deny** forbidden-key introduction and `deploy_to_blog` without `--mode review`. |
+| `PreToolUse` | `Write\|Edit` | Same deny set on the file-write path. |
+| `Stop` | — | Red tracked-Python tree → `decision: "block"` **once per session**, violations as the reason. |
+| `SessionStart` | — | Inject the five non-negotiable constraints, branch, and open `B-` items. |
+
+**Why the `PreToolUse` denies matter more than they look.** `CLAUDE.md` constraint #1 —
+**"NO new API keys. Ever."** — is the most emphatic sentence in the repo and has *zero*
+computational backing (grepped: neither `destructive_change_guard.py` nor
+`pre_commit_arch_check.py` mentions `OPENAI_API_KEY`). B-028 is the same shape: the review
+stage is prose, and the tool's default ignores it. **A policy expressed as a guide is
+skippable; expressed as a deny it is not.** This item does not touch
+`deploy_to_blog.py`'s default — that stays B-028's call — it makes the policy hold from
+the harness side either way.
+
+**Acceptance criteria:**
+- [x] `.claude/settings.json` is committed; `jq -e` resolves every hook command
+- [x] Each hook returns a valid payload and exit 0 for its documented stdin
+- [x] A forbidden-key `Bash` command is denied; `git status` is not
+- [x] `deploy_to_blog --mode post` is denied; `--mode review` is not
+- [x] `session_gate` blocks on first call, **does not block** on the second with the same
+      `session_id` (an unbounded blocking `Stop` hook is a session trap — this is the
+      guardrail, not a nicety)
+- [x] Malformed stdin → exit 0, empty payload, for **every** hook (a broken sensor must
+      degrade to no sensor, never to a blocked developer)
+- [x] `logs/sensor_history.jsonl` gains a snapshot line per edit; gitignored
+
+**Side benefit — revives dead code.** `scripts/agent_trace_logger.py` is a complete,
+schema-versioned, secret-redacting trace logger whose **only importer is its own test**.
+It becomes the snapshot writer, closing the observability gap Boeckeler describes ("how
+did the number of analysis violations evolve?").
+
+**Files:** `.claude/settings.json`, `scripts/hooks/*`, `.gitignore`,
+`tests/test_harness_hooks.py`. **Scope:** M.
+
+### B-031 · Four sensors cannot currently fail
+
+**The gap.** A green run proves nothing, because four gates are structurally incapable of
+going red:
+
+| Sensor | Why it is inert |
+|---|---|
+| mypy | `stages: [manual]`, `strict = False`, `check_untyped_defs = False`, **and** `ci-local` wraps it in `\|\| echo "advisory"` — while `CLAUDE.md` says "Type hints mandatory" |
+| coverage (pre-push) | `stages: [manual]` → never runs; and `make test` says 40 while `ci-local` says 70 |
+| badge validation | `entry: bash -c '... \|\| true'` — cannot fail, by construction, on a hook whose stated purpose is preventing BUG-023 |
+| `validate-skills` | registered **twice** under the same `id`, second copy has `always_run: false` duplicated as a YAML key |
+
+**The fix.** mypy becomes a real per-commit hook on the files being committed (repo-wide
+mypy stays advisory — 611 known errors is a separate project, and the `ci-local` comment
+now says so instead of implying debt-free). One coverage number, in one place. `|| true`
+deleted. Duplicate registration deleted.
+
+**Acceptance criteria:**
+- [x] No pre-commit hook entry contains `|| true` — asserted by test
+- [x] No hook `id` appears twice — asserted by test
+- [x] `make test` and `make ci-local` declare the **same** `--cov-fail-under`
+- [x] `pre-commit run --all-files` fails when a checked condition actually fails
+
+**Cross-reference, not scope.** **B-029** is the same class of defect — an oracle that
+renames its input and so cannot fail — but it lives in the blog deploy path and B-029 owns
+its fix. Both items are instances of one rule: *a sensor that cannot fire is worse than no
+sensor, because it manufactures confidence.*
+
+**Files:** `.pre-commit-config.yaml`, `Makefile`, `tests/test_harness_config.py`.
+**Scope:** S.
+
+### B-032 · Nothing regulates complexity — the characteristic AI-code failure mode
+
+**The gap.** `ruff.toml` selects `E, W, F, I, UP, B, C4, SIM`. No `C901`, no `PLR`, no
+`max-complexity` (grepped: zero hits). Measured during the audit:
+
+```
+41  C901     complex-structure     worst: generate_economist_post (33 > 10),
+                                   validate (28), review_writer_output (24)
+28  PLR0912  too-many-branches
+21  PLR0913  too-many-arguments
+18  PLR0915  too-many-statements
+```
+
+Boeckeler names over-long functions and cyclomatic complexity as *the* typical failure
+modes of AI-written code, "even with the big models." In a repo where an agent writes most
+of the code, this dimension is unregulated.
+
+**The fix — her ESLint technique, ported.** `scripts/complexity_sensor.py` wraps ruff and
+rewrites the output into a *judgment call* rather than a bare number: this is usually a
+smell, consider splitting it, and **if the complexity is genuinely warranted you may keep
+it by recording an override in `docs/harness-overrides.md` with a one-line justification —
+not a bare `noqa`.** The recorded overrides become the owner's review queue, which is the
+whole point: it is the tuning nobody does by hand.
+
+Enforcement is scoped to **touched files** via B-030's `PostToolUse` hook — where new
+complexity is actually born — so the 41-violation legacy baseline is *recorded* rather
+than retroactively enforced, and `ci-local` still passes on day one.
+
+**Acceptance criteria:**
+- [x] An over-complex function yields the judgment-call text and a non-zero exit
+- [x] A clean file yields no output and exit 0
+- [x] `--changed` scopes to `git diff --name-only`, skipping non-Python paths
+- [x] `make ci-local` still passes (legacy backlog recorded, not enforced retroactively)
+- [x] `docs/harness-overrides.md` exists with the register format and the day-one baseline
+
+**Files:** `scripts/complexity_sensor.py`, `ruff.toml`, `docs/harness-overrides.md`,
+`tests/test_complexity_sensor.py`. **Scope:** S.
+
+### B-033 · The guide layer has never been measured, so it can only grow
+
+**The gap.** 8,031 lines across 38 `SKILL.md`, plus a 210-line `CLAUDE.md`, a **2,601-line**
+`.github/copilot-instructions.md`, a `GEMINI.md`, and a root `copilot-instructions.md`.
+Nothing measures whether any of it changes an outcome. Product evals exist
+(`logs/article_evals.json`); **harness** evals do not.
+
+> "I just don't see the future as being like 50 markdown files in our code base… and then
+> in every markdown file we have very, very important, do the following, never do the
+> following. I mean, that can't be it. Can we still call ourselves engineers if that's how
+> we're doing stuff?"
+
+Her sharper point: many skills are *model-authored*, so the model may already know their
+content — in which case the file is pure context cost.
+
+**The fix.** `scripts/skill_eval.py`: `--list` for cheap triage (line count + mtime, so
+big-old-unreferenced surfaces first); `--skill <name>` runs the skill's `eval.yaml`
+scenarios with and without the skill in context and reports the delta against the existing
+deterministic scorer. A skill with no `eval.yaml` reports **`UNMEASURED`** rather than
+passing silently. Deterministic and `--dry-run` by default, so it is free to run and
+cannot fail on auth.
+
+**Acceptance criteria:**
+- [x] `--list` reports all 38 skills, largest first
+- [x] A skill with `eval.yaml` produces a with/without delta
+- [x] A skill without one reports `UNMEASURED`; `--strict` exits non-zero
+- [x] No LLM call on the default path
+
+**Non-goal: deletion.** This item produces evidence. Cutting any skill — including the
+2,601-line copilot file — is the owner's call.
+
+**Files:** `scripts/skill_eval.py`, `tests/test_skill_eval.py`. **Scope:** M.
+
+### B-034 · The harness offers the agent tools its own guides forbid
+
+**The gap.** `.mcp.json` still ships two servers whose declared `env` is prohibited:
+
+| Server | Requires | Forbidden by |
+|---|---|---|
+| `image-generator` | `OPENAI_API_KEY` | constraints #1/#2/#4; ADR-0014 retired the DALL-E path |
+| `web-researcher` | `SERPER_API_KEY` | constraints #1/#2/#3; removed by #438 |
+
+`.claude/settings.local.json` sets `enableAllProjectMcpServers: true`, so both load every
+session and the agent is shown *"Generates Economist-style editorial illustrations using
+DALL-E 3. Requires the OPENAI_API_KEY"* directly beside the guide forbidding it.
+
+> "It also cannot be just like throwing 100 tools at the agent and like 50 sensors that
+> kind of overload it."
+
+**The fix.** Delete the `image-generator` entry; name the keyless servers explicitly instead
+of auto-approving all; and assert the absence in a test so a future re-add fails locally
+rather than silently contradicting `CLAUDE.md`.
+
+**One correction found while implementing.** `web_researcher_server.py` is **already
+keyless** — #438 stripped the Serper leg, and the module now exposes only `search_arxiv`
+and `fetch_page`, both permitted by constraint #3. Deleting the server (as first planned)
+would have removed a legitimate keyless research tool. Only the stale `env` block and the
+misleading description came out; the server stays.
+
+**Acceptance criteria:**
+- [x] `.mcp.json` contains exactly the six keyless servers
+- [x] No `OPENAI_API_KEY` / `SERPER_API_KEY` / `GEMINI_API_KEY` anywhere in `.mcp.json`
+- [x] No MCP server declares an `env` block — a stricter, more durable invariant than
+      name-matching, since any `env` requirement is a key requirement in disguise
+- [x] A test fails if any is reintroduced (`test_harness_config.py`)
+- [x] `enableAllProjectMcpServers` replaced by an explicit `enabledMcpjsonServers` list
+
+**Scope call:** `mcp_servers/image_generator_server.py` and its passing test are left in
+place. The finding was that the harness *offers* a forbidden tool; deleting the entry closes
+that. Moving the module would churn a green suite for no harness benefit, and ADR-0014
+already retired the workflow.
+
+**Files:** `.mcp.json`, `.claude/settings.local.json`, `tests/test_harness_config.py`.
+**Scope:** XS — smallest diff in the set, and it deletes a live contradiction.
+
+---
 
 ### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
 

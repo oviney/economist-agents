@@ -1,0 +1,35 @@
+# Eval scenarios for the economist-writing skill (B-033).
+#
+# The harness scores each pair with the pipeline's own deterministic rules (the
+# _BRITISH_SPELLING and _HEDGING_PHRASES dictionaries in src/agent_sdk/_shared.py) and
+# reports the mean delta. A positive delta says the skill's guidance produces prose the
+# Stage-4 gates prefer; a delta near zero says the model would have got there anyway,
+# which is the finding worth knowing.
+#
+# `with_skill` / `without_skill` are recorded outputs, not prompts — the harness is a
+# comparator, not a generator, so it stays keyless and free to run. Replace these with
+# real captured outputs as they accumulate.
+
+scenarios:
+  - name: british-spelling
+    with_skill: >-
+      The organisation analysed its review queue and found the behaviour
+      centred on a single bottleneck.
+    without_skill: >-
+      The organization analyzed its review queue and found the behavior
+      centered on a single bottleneck.
+
+  - name: no-hedging
+    with_skill: >-
+      Throughput fell 1.5% as adoption rose 25%.
+    without_skill: >-
+      One suspects throughput fell 1.5% as adoption rose 25%, and it is worth
+      noting that adoption rose 25%.
+
+  - name: already-clean-prose
+    # A deliberate control: when the model's unaided output is already correct, the
+    # delta should be ~0. A skill that only ever scores positive is measuring itself.
+    with_skill: >-
+      Review latency doubled. The cause was queue depth, not code volume.
+    without_skill: >-
+      Review latency doubled. The cause was queue depth, not code volume.

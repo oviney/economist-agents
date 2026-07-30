@@ -27,8 +27,115 @@ _(none)_
 ## Todo
 
 > **Opened 2026-07-29 from the article-two run.** **B-025** was withdrawn the same
-> day (see below) and **B-026** landed the same day (see Done); ids are never
-> reused, so both numbers stay spent. **B-027** remains open.
+> day (see below); **B-026** and **B-027** landed the same day (see Done). Ids are
+> never reused, so all three numbers stay spent. **B-028** and **B-029** are open,
+> both from the RCA on the skipped review stage.
+
+### B-028 · The unreviewed publish path must stop being the default
+
+**RCA finding, 2026-07-29.** Article two was deployed with
+`deploy_to_blog --mode post` — a PR straight into `_posts/` — skipping the B-013
+live review stage entirely. Article one had used it (`generate → --mode review →
+live unlisted /review/<slug>-<token>/ → owner approval → make publish`). The PR
+(`oviney/blog#1169`) was closed and the article re-deployed through review.
+
+**Root cause: the review stage exists only in a completed-backlog entry, and the
+tool's default mode bypasses it.** `deploy_to_blog.py:681` sets
+`default="post"`, so running the documented command produces an unreviewed
+publish with no error and no warning.
+
+**The documentation problem is systemic, not one stale line.** Five docs describe
+`deploy_to_blog` without the review step, and `CLAUDE.md` — the governing doc —
+never mentions `--mode review`, `_review`, `make publish`, or the unlisted URL at
+all (grepped: zero hits):
+
+| File | What it says |
+|---|---|
+| `docs/HANDOFF.md:48` | "Then `deploy_to_blog` opens the PR." |
+| `CONTRIBUTING.md:96` | `python -m scripts.deploy_to_blog --article output/posts/<slug>.md` |
+| `README.md:39` | "a human deploys via `scripts/deploy_to_blog.py`" |
+| `.github/copilot-instructions.md:29` | "deploy with `scripts/deploy_to_blog.py`" |
+| `docs/README.md:114` | "Deploy an approved article to the blog repo" |
+
+**Corroborating evidence that `--mode post` is the unused path:** BUG-069 (the
+missing date prefix, which makes a post unpublishable) existed *only* there.
+`promote_review.py:117` builds `f"{deploy_date}-{slug}.md"` — correct by
+construction — so the reviewed path never had it. A defect that severe surviving
+in `--mode post` is evidence real publishing does not go through it.
+
+#### Task 1 — remove the accidental default (XS, do first)
+
+`--mode` becomes **required**. Neither value is a safe default: `post` skips
+review, and making `review` the default would write to the blog's live branch on
+a bare invocation, which is worse. Forcing an explicit choice removes the
+accident without picking a wrong default.
+
+- [ ] `deploy_to_blog` with no `--mode` exits non-zero with a message naming both
+      modes and pointing at the review workflow
+- [ ] No code caller breaks — `git grep` finds **no** programmatic callers, only
+      docs, so this is safe
+- [ ] A test asserts the missing-mode failure, so a future tidy-up cannot restore
+      a silent default
+
+**Verify:** new test; `make ci-local`. **Files:** `scripts/deploy_to_blog.py`, one test.
+
+#### Task 2 — document the workflow where it governs behaviour (S)
+
+- [ ] `CLAUDE.md` gains the publish workflow as an operating instruction, not a
+      changelog reference
+- [ ] All five docs above corrected to show `--mode review` → `make publish`
+- [ ] `docs/HANDOFF.md:48` fixed specifically — that is the line that was followed
+
+**Dependencies:** Task 1. **Files:** 6 docs. **Scope:** S.
+
+#### Task 3 — decide whether `--mode post` should exist at all (needs a spec + LGTM)
+
+If review → promote is the sanctioned route, `--mode post` may have no remaining
+role: `promote_review.py` already writes `_posts/` on the live branch. Retiring it
+would make the unreviewed path *unreachable* rather than merely inconvenient,
+which is the difference between a guardrail and a suggestion. But it is a
+behavioural removal with a governance history (B-015a tuned `deploy()`'s staging
+for PR scope), so it needs a spec and an owner decision — not a quiet deletion.
+
+**Dependencies:** Tasks 1–2. **Scope:** S (spec) + S (removal), owner-gated.
+
+### B-029 · The acceptance oracle renames its input, so it does not test the deploy path
+
+**Found while fixing BUG-069, 2026-07-29.** `scripts/acceptance_blog_frontmatter.sh`
+is documented as *the* oracle — "a green local suite says nothing about what the
+blog accepts, and only the blog's own scripts are the oracle" — and `HANDOFF.md`
+names it as the source of truth. It passed on article two with 0 errors while the
+deploy path was producing an **unpublishable filename**.
+
+The reason is line 120: `STAGED="$BLOG/_posts/2026-01-01-${SLUG}.md"`. The oracle
+constructs its own dated filename instead of using the one `deploy_to_blog`
+produces, which was `_posts/<slug>.md` — undated. **The oracle validated a name
+that would never exist.** An oracle that renames its input is not testing the
+deploy path; it is testing a hypothetical one.
+
+`scripts/validate-posts.sh` cannot catch it either — it globs `_posts/*.md`
+itself rather than asking Jekyll, so an undated file validates happily. The only
+gate that would notice is the blog's own `build` (html-proofer/Jekyll), which runs
+on a PR and was never reached because #1169 was closed.
+
+**Acceptance criteria:**
+- [ ] The oracle stages the article under the **filename the deploy path
+      produces**, rather than composing its own
+- [ ] Given a deploy path that emits an undated filename, the oracle **fails**
+      (the BUG-069 reproduction — it currently passes)
+- [ ] The existing pass on a correctly-dated article is unchanged
+- [ ] The date the oracle injects into front matter stays fixed, so the run is
+      deterministic — only the *filename* derivation changes
+
+**Verify:** re-run against `output/posts/review-queue-throughput-tax.md`; confirm
+it still passes, then confirm it fails against a deliberately undated copy.
+**Files:** `scripts/acceptance_blog_frontmatter.sh`. **Scope:** S.
+
+**Risk if left:** this is the gate the project trusts most, and it has now been
+shown to give a false green on a publish-blocking defect. Every future article
+inherits that.
+
+### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
 
 ### ~~B-025~~ · WITHDRAWN 2026-07-29 — the defect record was never at risk
 

@@ -125,6 +125,33 @@ def run_command(cmd: str, cwd: Path | None = None) -> str:
 # ---------------------------------------------------------------------------
 
 
+#: A publishable `_posts/` entry: `YYYY-MM-DD-<slug>.md`, non-empty slug.
+_PUBLISHABLE_POST_NAME = re.compile(r"^\d{4}-\d{2}-\d{2}-.+\.md$")
+
+
+def is_publishable_post_name(name: str) -> bool:
+    """Return whether ``name`` is a filename Jekyll will publish as a post.
+
+    Jekyll derives a post's date and URL from its filename — `_config.yml` sets
+    ``permalink: /:year/:month/:day/:title/`` — so an undated file in ``_posts/``
+    is not a post at all. It is *silently* not a post, which is what made
+    BUG-069 survive: the blog's ``validate-posts.sh`` globs ``_posts/*.md``
+    itself rather than asking Jekyll, so an undated file validates happily.
+
+    Exposed so the acceptance oracle can assert on the name the deploy path
+    actually produces (B-029), rather than composing its own and validating a
+    filename that would never exist.
+
+    Args:
+        name: A bare filename, not a path.
+
+    Returns:
+        True when Jekyll would treat it as a publishable post.
+
+    """
+    return bool(_PUBLISHABLE_POST_NAME.match(name))
+
+
 def _dated_post_name(source_name: str, deploy_date: str) -> str:
     """Return the ``_posts`` filename for ``source_name``, stamped with the date.
 

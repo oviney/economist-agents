@@ -70,23 +70,36 @@ review, and making `review` the default would write to the blog's live branch on
 a bare invocation, which is worse. Forcing an explicit choice removes the
 accident without picking a wrong default.
 
-- [ ] `deploy_to_blog` with no `--mode` exits non-zero with a message naming both
+- [x] `deploy_to_blog` with no `--mode` exits non-zero with a message naming both
       modes and pointing at the review workflow
-- [ ] No code caller breaks — `git grep` finds **no** programmatic callers, only
+- [x] No code caller breaks — `git grep` finds **no** programmatic callers, only
       docs, so this is safe
-- [ ] A test asserts the missing-mode failure, so a future tidy-up cannot restore
+- [x] A test asserts the missing-mode failure, so a future tidy-up cannot restore
       a silent default
 
 **Verify:** new test; `make ci-local`. **Files:** `scripts/deploy_to_blog.py`, one test.
 
 #### Task 2 — document the workflow where it governs behaviour (S)
 
-- [ ] `CLAUDE.md` gains the publish workflow as an operating instruction, not a
+- [x] `CLAUDE.md` gains the publish workflow as an operating instruction, not a
       changelog reference
-- [ ] All five docs above corrected to show `--mode review` → `make publish`
-- [ ] `docs/HANDOFF.md:48` fixed specifically — that is the line that was followed
+- [x] All five docs above corrected to show `--mode review` → `make publish`
+- [x] `docs/HANDOFF.md:48` fixed specifically — that is the line that was followed
 
 **Dependencies:** Task 1. **Files:** 6 docs. **Scope:** S.
+
+**Tasks 1 and 2 DONE 2026-07-31.** `--mode` is required; `_build_parser` was split out of
+`_parse_args` so a test asserts on the *configuration* (`required is True` **and**
+`default is None`), because argparse silently accepts a default alongside `required=True` —
+and a quietly restored default is the regression worth guarding. One existing test relied on
+the default and now passes `--mode post` explicitly; B-028's prediction of no programmatic
+callers held.
+
+`CLAUDE.md` had **zero** mentions of `--mode review`, `_review`, `make publish` or the
+unlisted URL. It now carries the workflow as an operating instruction. Also corrected:
+`README.md`, `CONTRIBUTING.md`, `docs/README.md`, `docs/HANDOFF.md` (the line that was
+followed), `.github/copilot-instructions.md` — whose cited line 29 had drifted since the RCA,
+so the workflow went into its hand-authored Developer Workflow section instead.
 
 #### Task 3 — decide whether `--mode post` should exist at all (needs a spec + LGTM)
 
@@ -119,12 +132,12 @@ gate that would notice is the blog's own `build` (html-proofer/Jekyll), which ru
 on a PR and was never reached because #1169 was closed.
 
 **Acceptance criteria:**
-- [ ] The oracle stages the article under the **filename the deploy path
+- [x] The oracle stages the article under the **filename the deploy path
       produces**, rather than composing its own
-- [ ] Given a deploy path that emits an undated filename, the oracle **fails**
+- [x] Given a deploy path that emits an undated filename, the oracle **fails**
       (the BUG-069 reproduction — it currently passes)
-- [ ] The existing pass on a correctly-dated article is unchanged
-- [ ] The date the oracle injects into front matter stays fixed, so the run is
+- [x] The existing pass on a correctly-dated article is unchanged
+- [x] The date the oracle injects into front matter stays fixed, so the run is
       deterministic — only the *filename* derivation changes
 
 **Verify:** re-run against `output/posts/review-queue-throughput-tax.md`; confirm
@@ -134,6 +147,21 @@ it still passes, then confirm it fails against a deliberately undated copy.
 **Risk if left:** this is the gate the project trusts most, and it has now been
 shown to give a false green on a publish-blocking defect. Every future article
 inherits that.
+
+**DONE 2026-07-31.** The oracle now derives the staged filename from
+`deploy_to_blog._dated_post_name` — the deploy path's own function — instead of composing
+`2026-01-01-${SLUG}.md`.
+
+Deriving correctly was **not sufficient**, which is the part worth recording. B-029 already
+noted that `validate-posts.sh` globs `_posts/*.md` itself rather than asking Jekyll, so an
+undated file validates happily there; the oracle therefore cannot delegate the check. A new
+`is_publishable_post_name` predicate lives next to `_dated_post_name`, and the oracle asserts
+on it and exits 1 with a named reason. The injected front-matter date stays pinned at
+`2026-01-01`, so only the *filename* derivation changed and the run is still deterministic.
+
+The BUG-069 reproduction runs as a test rather than being asserted statically: with
+`_dated_post_name` stubbed back to its no-op behaviour, the guard exits non-zero. It is the
+same defect *class* as B-031 — a check that could not fail the thing it existed to check.
 
 ### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
 

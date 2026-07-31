@@ -223,9 +223,11 @@ class TestMain:
         monkeypatch.setattr(
             mypy_baseline,
             "run_mypy",
-            lambda paths: "scripts/agent_loader.py:1: error: boom  [misc]\n"
-            "scripts/agent_loader.py:2: error: boom  [misc]\n"
-            "scripts/agent_loader.py:3: error: boom  [misc]\n",
+            lambda paths: (
+                "scripts/agent_loader.py:1: error: boom  [misc]\n"
+                "scripts/agent_loader.py:2: error: boom  [misc]\n"
+                "scripts/agent_loader.py:3: error: boom  [misc]\n"
+            ),
         )
 
         assert mypy_baseline.main(["scripts/agent_loader.py"]) == 1

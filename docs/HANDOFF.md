@@ -21,6 +21,26 @@ stream** sits on `harness/close-the-sensor-loop` (PR #460 → #459) with B-030 �
 
 ## Branches and PRs
 
+**Local branches were cleaned up 2026-07-31: 46 → 13.** 33 were deleted, each verified
+merged first — either an ancestor of `origin/main`, or its PR appears in
+`gh pr list --state merged`. Squash-merged branches are not ancestors of `main`, so
+`--merged` alone would have missed 23 of them; the PR cross-reference is what made them
+safe.
+
+The 10 survivors are **deliberately kept** — none is merged and each needs a judgement call:
+
+| Branch | Last commit | Why it is still here |
+|---|---|---|
+| `chore/anthropic-auth-token-resolution` | 2026-06-28 | **carries `73e73c0`**, the B-023 auth commit. Keep until you are sure you never want it |
+| `chore/stage3-strip-code-fence` | 2026-06-28 | unmerged sibling of the same series |
+| `backup/pr406-before-main-refresh` | 2026-05-27 | a second backup branch — same provenance question as the one just deleted |
+| `feat/309-agent-sdk-stage3-spike` | 2026-05-27 | the Agent SDK spike; 96 commits ahead |
+| `copilot/add-{publication-validator,style-memory,web-researcher}-mcp-server` | 2026-04-05 | three MCP server branches |
+| `fix-150`, `fix-151`, `fix-153` | 2026-04-05 | MCP import fixes, same vintage |
+
+Everything from April is almost certainly dead, but "almost certainly" is what got B-023
+wrong — so they are listed rather than guessed at.
+
 | Branch | PR | Base | Contains |
 |---|---|---|---|
 | `fix/article-two-run-defects` | **#459** | `main` | BUG-066/067/068, B-024, B-026, B-027, BUG-069, **B-028 Tasks 1–2, B-029, ADR-0018**, and a merge of `main` |

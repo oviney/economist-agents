@@ -81,6 +81,9 @@ nav:
     - ADR-0013 — Keyless claude_web Research: adr/0013-keyless-claude-web-research.md
     - ADR-0014 — Retire Paid GitHub Actions Generation: adr/0014-retire-paid-github-actions-generation.md
     - ADR-0015 — Local-First Verification: adr/0015-local-first-verification.md
+    - ADR-0016 — One Pipeline Path: adr/0016-single-pipeline-path.md
+    - ADR-0017 — Gate Publishable Content at Deploy: adr/0017-gate-publishable-content-at-deploy.md
+    - ADR-0018 — Editorial Review Gate: adr/0018-editorial-review-gate.md
 
   - Skills:
     # B-035 Task 3(a): the 20 vendored copies of the upstream skills were deleted.
@@ -96,6 +99,7 @@ nav:
       - Agent Traceability: skills/agent-traceability/SKILL.md
       - Architecture Patterns: skills/architecture-patterns/SKILL.md
       - Article Evaluation: skills/article-evaluation/SKILL.md
+      - Blog Post Review: skills/blog-post-review/SKILL.md
       - Defect Prevention: skills/defect-prevention/SKILL.md
       - DevOps: skills/devops/SKILL.md
       - Economist Writing: skills/economist-writing/SKILL.md

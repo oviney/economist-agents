@@ -125,6 +125,33 @@ def run_command(cmd: str, cwd: Path | None = None) -> str:
 # ---------------------------------------------------------------------------
 
 
+#: A publishable `_posts/` entry: `YYYY-MM-DD-<slug>.md`, non-empty slug.
+_PUBLISHABLE_POST_NAME = re.compile(r"^\d{4}-\d{2}-\d{2}-.+\.md$")
+
+
+def is_publishable_post_name(name: str) -> bool:
+    """Return whether ``name`` is a filename Jekyll will publish as a post.
+
+    Jekyll derives a post's date and URL from its filename — `_config.yml` sets
+    ``permalink: /:year/:month/:day/:title/`` — so an undated file in ``_posts/``
+    is not a post at all. It is *silently* not a post, which is what made
+    BUG-069 survive: the blog's ``validate-posts.sh`` globs ``_posts/*.md``
+    itself rather than asking Jekyll, so an undated file validates happily.
+
+    Exposed so the acceptance oracle can assert on the name the deploy path
+    actually produces (B-029), rather than composing its own and validating a
+    filename that would never exist.
+
+    Args:
+        name: A bare filename, not a path.
+
+    Returns:
+        True when Jekyll would treat it as a publishable post.
+
+    """
+    return bool(_PUBLISHABLE_POST_NAME.match(name))
+
+
 def _dated_post_name(source_name: str, deploy_date: str) -> str:
     """Return the ``_posts`` filename for ``source_name``, stamped with the date.
 
@@ -644,7 +671,18 @@ def deploy_review(
 # ---------------------------------------------------------------------------
 
 
-def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+def _build_parser() -> argparse.ArgumentParser:
+    """Build the CLI parser.
+
+    Split out from `_parse_args` so tests can assert on the *configuration* —
+    specifically that `--mode` has no default (B-028 Task 1). Asserting only on
+    behaviour would let a future change reintroduce a default alongside
+    `required=True`, which argparse accepts silently.
+
+    Returns:
+        The configured parser.
+
+    """
     parser = argparse.ArgumentParser(
         description="Deploy article to blog via Pull Request"
     )
@@ -675,12 +713,20 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Prepare and validate but skip push/PR creation",
     )
+    # B-028: this carried `default="post"`, so the command as five docs
+    # described it published without review, with no error and no warning —
+    # exactly how article two skipped the B-013 review stage. Neither value is a
+    # safe default: `post` skips review, and `review` would write to the blog's
+    # live branch on a bare invocation, which is worse. Requiring the choice
+    # removes the accident without picking a wrong default.
     parser.add_argument(
         "--mode",
         choices=("post", "review"),
-        default="post",
-        help="'post' (default): open a PR into _posts/. 'review' (B-013): write "
-        "an unlisted noindex draft to _review/ on the live branch, no PR.",
+        required=True,
+        help="REQUIRED. 'review' (B-013, the sanctioned route): write an "
+        "unlisted noindex draft to _review/ on the live branch, no PR — then "
+        "`make publish SLUG=<slug>` after approval. 'post': open a PR straight "
+        "into _posts/, skipping review.",
     )
     parser.add_argument(
         "--live-branch",
@@ -692,7 +738,20 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=os.getenv("BLOG_HOST", "www.viney.ca"),
         help="Blog host for the printed review URL (default: $BLOG_HOST or 'www.viney.ca').",
     )
-    return parser.parse_args(argv)
+    return parser
+
+
+def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """Parse CLI arguments.
+
+    Args:
+        argv: Argument vector; defaults to `sys.argv[1:]`.
+
+    Returns:
+        The parsed namespace.
+
+    """
+    return _build_parser().parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:

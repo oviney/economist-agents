@@ -10,52 +10,49 @@ are carried forward below.
 
 ## State in one paragraph
 
-Two work streams are open, stacked. The **article-two defect stream** sits on
-`fix/article-two-run-defects` (PR #459 → `main`) with B-028 and B-029 still to fix. The
-**harness engineering stream** sits on `harness/close-the-sensor-loop` (PR #460 → #459),
-where B-030 … B-034 **and now B-035** are built, tested and green. Nothing is broken.
-`make ci-local` passes on the harness branch. The harness stream is **complete** — #460 is
-ready for review once #459 merges.
+Two work streams are open, stacked, and **both are complete and green**. The **article-two
+defect stream** sits on `fix/article-two-run-defects` (PR #459 → `main`): B-028 Tasks 1–2,
+B-029 and the editorial-review-gate artifacts all landed 2026-07-31, and `main` has been
+merged in, so the conflict that was blocking the stack is gone. The **harness engineering
+stream** sits on `harness/close-the-sensor-loop` (PR #460 → #459) with B-030 … B-035.
+`make ci-local` passes on both. Nothing is broken and nothing is loose on disk.
+
+**Merge #459 first, then #460.**
 
 ## Branches and PRs
 
 | Branch | PR | Base | Contains |
 |---|---|---|---|
-| `fix/article-two-run-defects` | **#459** | `main` | BUG-066/067/068, B-024, B-026, B-027, BUG-069, and the B-028/B-029 RCA notes |
+| `fix/article-two-run-defects` | **#459** | `main` | BUG-066/067/068, B-024, B-026, B-027, BUG-069, **B-028 Tasks 1–2, B-029, ADR-0018**, and a merge of `main` |
 | `harness/close-the-sensor-loop` | **#460** | `fix/article-two-run-defects` | B-030 … B-035 |
 
 **#460 is deliberately stacked on #459**, not on `main` — the harness section in
 `BACKLOG.md` is inserted after the B-028/B-029 entries #459 introduces, and those two items
 are the concrete examples the whole audit is built on. **Review and merge #459 first.**
 
-## Uncommitted work on disk — do not lose this
+## The working tree is clean — the editorial stream has landed
 
-These files are on the working tree and belong to the **editorial-review-gate** stream, not
-to either PR. They survive a `/clear` but are in no commit:
+**Resolved 2026-07-31.** The four editorial-review-gate artifacts that had been sitting
+uncommitted across several sessions are now committed on `fix/article-two-run-defects`
+(`cbf33f5`). Nothing of value is loose on disk any more.
 
-| Path | What it is |
-|---|---|
-| `docs/adr/0016-editorial-review-gate.md` | ADR (Proposed) — the deterministic evaluator cannot tell "cited" from "cited correctly" |
-| `skills/blog-post-review/` | The rubric skill ADR-0016 adopts as a distinct review stage |
-| `mkdocs.yml` (2 unstaged lines) | Nav entries for both of the above |
-| `docs/reviews/review-queue-throughput-tax-42d2fbb4.html` | The reviewed draft that motivated ADR-0016 |
+**The ADR was renumbered `0016` → `0018`.** `main` landed ADR-0016 (One Pipeline Path) and
+ADR-0017 (Gate Publishable Content at Deploy) while the draft sat on disk, so the number it
+was written against was taken. `docs/README.md` documents a single global MADR sequence, and
+`lint_adrs.py` now validates 18. Its status stays **Proposed** — committing it
+version-controls the argument, it does not decide it.
 
-They belong on `fix/article-two-run-defects` or a branch of their own — **not** on
-`harness/close-the-sensor-loop`.
+**Two traps that stream set, both hit before it landed.** They no longer apply, but the
+*pattern* recurs whenever untracked files coexist with a tracked file they are referenced
+from:
 
-**Two traps this stream sets, both hit during the B-035 session:**
-
-1. **A `git reset --hard` on the harness branch destroyed the `mkdocs.yml` change once**
-   (recovered from a pre-commit stash). B-035 needed to edit the *same file*; the safe
-   method was to write a "mine-only" copy, `git add` it, then restore the combined file to
-   the working tree — so the staged diff held only the B-035 hunk and the two editorial
-   lines stayed unstaged.
-2. **`adr-lint` fails while ADR-0016 is untracked — on both `git commit` and `git push`.**
-   The hook framework stashes unstaged changes, which removes the ADR-0016 *nav line* from
-   `mkdocs.yml`, but the ADR *file* is untracked and survives the stash — so it looks
-   unreferenced and the hook errors. Move `docs/adr/0016-editorial-review-gate.md` aside for
-   the operation and move it straight back. Expect to do this **twice** per push (once for
-   the commit, once for the push); it bit both times this session.
+1. A `git reset --hard` destroyed the `mkdocs.yml` nav change once. When one file must carry
+   hunks for two streams, write a "mine-only" copy, `git add` it, then restore the combined
+   file to the working tree — the staged diff then holds only your hunk.
+2. **`adr-lint` fails while an ADR is untracked — on both `git commit` and `git push`.** The
+   hook framework stashes unstaged changes, removing the ADR's *nav line* from `mkdocs.yml`,
+   but the ADR *file* is untracked and survives the stash, so it looks unreferenced. Move
+   the file aside for the operation and back afterwards. It bit twice.
 
 ## What landed: B-030 … B-034 (harness engineering)
 
@@ -166,18 +163,45 @@ Note: `make ci-local`'s repo-wide mypy step stays **advisory** and prints errors
 `scripts/archived/`. That is expected — the blocking gate is `mypy_baseline.py`, which is
 scoped to `scripts/*.py` and does not descend into `archived/`.
 
+## Publishing — read this before deploying anything
+
+`--mode` is now **required** on `deploy_to_blog` (B-028). The sanctioned route:
+
+```bash
+python -m scripts.deploy_to_blog --article output/posts/<slug>.md --mode review
+# read the printed https://<host>/review/<slug>-<token>/ page, then:
+make publish SLUG=<slug>
+```
+
+This hand-off previously said "Then `deploy_to_blog` opens the PR" — and that is the line
+that was followed when article two published unreviewed. `CLAUDE.md` now carries the
+workflow as an operating instruction.
+
 ## Still open
 
-- **B-028** — `deploy_to_blog.py:681` sets `default="post"`, so the documented command
-  publishes unreviewed. *(B-030's `PreToolUse` guard already enforces the policy from the
-  harness side, but the tool's own default is still wrong.)*
-- **B-029** — `acceptance_blog_frontmatter.sh:120` builds its own filename instead of using
-  the deploy path's, so the oracle passed on an unpublishable name.
-- **ADR-0016** — Proposed, uncommitted. Needs an owner decision.
+- **B-028 Task 3** — whether `--mode post` should exist at all. Tasks 1 and 2 are done;
+  Task 3 is a behavioural removal with governance history, so it needs a spec and an owner
+  decision, not a quiet deletion. **Owner-gated.**
+- **ADR-0018** — Proposed and now committed. Still needs an owner decision on whether the
+  editorial review gate is adopted.
+- **B-023** — the fate of `llm_client.py`'s Anthropic auth path. Came in from `main` during
+  the merge. Answer B-010's scope first. **Do not delete
+  `backup/integration-test-20260728`** before this is answered — it is the only copy.
 - **B-015** — every article PR needs an admin bypass to merge: `🔒 Security Audit` and
   `🖼️ Visual Regression` fail blog-side for pre-existing reasons.
 - **B-012** — deep-research mode is built; only a live acceptance run remains (~2M tokens).
   Parked as an owner cost decision, not a defect.
+
+### Closed 2026-07-31
+
+- **B-028 Tasks 1–2** — `--mode` is required; a bare invocation fails naming both choices.
+  `CLAUDE.md` had **zero** mentions of the review workflow and now documents it, along with
+  five other docs.
+- **B-029** — the oracle now stages the filename `deploy_to_blog._dated_post_name` produces
+  instead of composing `2026-01-01-<slug>.md`. Deriving correctly was **not sufficient**:
+  the blog's `validate-posts.sh` globs `_posts/*.md` itself rather than asking Jekyll, so an
+  undated file validates happily there. A new `is_publishable_post_name` predicate is
+  asserted by the oracle directly.
 
 ### Review queue the owner now owns
 

@@ -92,9 +92,20 @@ Budget ~$1 and ~35 minutes per article (measured on the B-020 acceptance runs).
 
 ### Deploying
 
-After Stage 4 passes, the article at `output/posts/<slug>.md` is ready
-for `python -m scripts.deploy_to_blog --article output/posts/<slug>.md`.
-See the deploy script's `--help` for blog-repo config.
+After Stage 4 passes, the article at `output/posts/<slug>.md` goes to the **live review
+stage first** — never straight to `_posts/`:
+
+```bash
+# 1. Unlisted noindex draft on the live branch. --mode is REQUIRED (B-028).
+python -m scripts.deploy_to_blog --article output/posts/<slug>.md --mode review
+#    prints https://<host>/review/<slug>-<token>/
+
+# 2. Read the live page. Only after approval:
+make publish SLUG=<slug>
+```
+
+`--mode` has no default: it used to be `post`, which opened a PR into `_posts/` and skipped
+review silently. See the deploy script's `--help` for blog-repo config.
 
 ## 🎯 Development Workflow
 

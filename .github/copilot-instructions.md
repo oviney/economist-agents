@@ -94,6 +94,23 @@ When adding validation rules, use `skills_manager.learn_pattern()` to persist th
 
 ## Developer Workflow
 
+### Publishing — review before publish (NON-NEGOTIABLE)
+
+Nothing reaches `_posts/` without passing through the live review stage.
+
+```bash
+# --mode is REQUIRED. There is no default.
+python -m scripts.deploy_to_blog --article output/posts/<slug>.md --mode review
+#   → unlisted noindex draft on the live branch, no PR
+#   → prints https://<host>/review/<slug>-<token>/
+# after the owner approves the live page:
+make publish SLUG=<slug>
+```
+
+`--mode` used to default to `post`, which opened a PR straight into `_posts/` and skipped
+review with no error and no warning — that is how article two published unreviewed (B-028).
+`--mode post` still exists but is not the sanctioned route.
+
 ### Environment Setup
 ```bash
 export ANTHROPIC_API_KEY='sk-ant-...'

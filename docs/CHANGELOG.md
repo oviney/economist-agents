@@ -1,5 +1,54 @@
 # Economist Agents - Development Log
 
+> **Where the record lives.** This log runs to 2026-04-26 and then stops. It is
+> not that nothing shipped — the keyless overhaul, the first published article,
+> and the B-0xx series all landed between May and July 2026. `BACKLOG.md` (Done
+> section) became the source of record in that period and remains so; ADRs cover
+> the decisions. Read those first. This file is kept for the pre-May history and
+> for entries, like the one below, that span more than a single backlog item.
+
+## 2026-07-28: Run-safety close-out — one pipeline path, bounded calls, funded retries
+
+Clears every open defect. Specs: `docs/specs/B-021-run-safety-cleanups.md`.
+Decisions: [ADR-0016](adr/0016-single-pipeline-path.md),
+[ADR-0017](adr/0017-gate-publishable-content-at-deploy.md).
+
+**What shipped:**
+- **B-021** — the three defects B-020's acceptance run exposed and deferred:
+  - **BUG-061** the writer budget could not fund its own retry policy.
+    `_WRITER_MAX_ATTEMPTS=3` against a $0.60 cumulative default and a measured
+    ~$0.42/attempt paid for exactly one attempt, so a malformed first draft — a
+    *handled* condition — aborted the run after real spend. The default is now
+    **derived** (`_WRITER_ATTEMPT_COST_USD × _WRITER_MAX_ATTEMPTS` = $1.35) so
+    the two cannot drift, and an unfundable retry is refused before dispatch.
+  - **BUG-059** cost was bounded, wall clock was not. Every SDK collector now
+    runs under `asyncio.timeout` → typed `ModelCallTimeoutError` naming the call.
+    Scope came out wider than logged: `research/_llm.py` and
+    `research/claude_web.py` had the same unbounded `async for`, and research is
+    the longest, costliest leg. Bounds are measured, not guessed.
+  - **BUG-060 + `--image-mode`** — the handshake deleted (ADR-0016), **−773 lines**.
+- **B-022** — `EconomistContentFlow`'s DALL-E branch removed; it was provably
+  dead once B-021 stopped the flow forwarding `image_mode` to `run_pipeline`.
+- **BUG-064** — graphics retries handed every attempt the *full* budget instead
+  of the remaining balance, so three tries could spend 3× the stated cap. The
+  mirror image of BUG-061, which is why it never aborted a run and sat unnoticed.
+- **BUG-065** — production escape: the `<!-- HERO IMAGE …` reviewer comment
+  shipped into a published post. Gated at the deploy boundary (ADR-0017); removed
+  from the live article in `oviney/blog#1168`.
+- **Live post cleanup** — all four B-017 slop detectors were still firing on the
+  published flaky-tests article (advisory at publish, never acted on). Prose-only
+  edit; the blog's own validators report 0 errors, 0 warnings.
+- Stale `claude-sonnet-4-20250514` default in `scripts/llm_client.py` bumped to
+  `claude-sonnet-4-6`, cherry-picked from an unpushed Mac-only branch during
+  reconciliation. The auth half of that branch is deferred as **B-023**.
+
+**Suite:** 2,381 passing / 8 skips. `make ci-local` green.
+
+**Worth carrying forward:** two of these were found by *reading code next to a
+fix*, not by a failing test — BUG-064 while fixing BUG-061, and BUG-065 while
+regenerating a slop report against the live post. Neither had a test that could
+have caught it, because both were gaps in what was being checked at all.
+
 ## 2026-04-26: Agent Fleet Phase 2 — CrewAI removed, Anthropic Agent SDK shipped (PR #315)
 
 ADR-0006 Phase 2 complete. Closes epic #308 plus skills-polish backlog (#293, #294) and #314.

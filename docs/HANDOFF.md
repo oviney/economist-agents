@@ -185,16 +185,18 @@ workflow as an operating instruction.
 
 ## Still open
 
-- **B-015** — see below. The only genuinely blocked item left.
-- **B-037** — `.python-version` pins **3.12**, but `.venv/bin/python` (what `make ci-local`
-  actually runs) is **3.13.14**. Found while fixing B-036's Python badge, which forced the
-  question of which is authoritative. ADR-0015 says "pinned to one version"; that is
-  currently untrue and nothing detects it. Not urgent — 2,607 tests pass on 3.13 — but
-  **owner-gated** on which version is wanted.
+**Two items, neither of them code in this repo.**
+
 - **B-015** — every article PR needs an admin bypass to merge: `🔒 Security Audit` and
-  `🖼️ Visual Regression` fail blog-side for pre-existing reasons.
+  `🖼️ Visual Regression` fail blog-side for pre-existing reasons (npm CVEs; stale visual
+  baselines), both are required checks, and GitHub forbids self-approval. **The fix is in
+  `oviney/blog`, not here** — bump its deps and refresh its visual baselines.
 - **B-012** — deep-research mode is built; only a live acceptance run remains (~2M tokens).
   Parked as an owner cost decision, not a defect.
+
+Also owner-actionable, but trivial: **`backup/integration-test-20260728` can now be
+deleted.** B-023 dissolved, so the auth commit it held is moot and nothing else on it is
+unlanded. Left undeleted deliberately — the "only copy" caution was well placed.
 
 ### Closed 2026-07-31
 
@@ -224,6 +226,13 @@ workflow as an operating instruction.
 - **ADR-0018** — **Accepted.** The 37-point spread (88% PASS vs 51.0 BLOCK on one article)
   decided it. Advisory-first per its own decision 3, so it informs the human who already
   approves at the B-013 stage rather than acquiring a veto.
+- **B-037** — **one** Python version now, 3.13, verified rather than asserted. The drift was
+  worse than the item recorded: four declarations disagreed, and the two nobody knew about
+  were `ruff.toml` (**py311**) and `mypy.ini` (**3.11**) — so the repo was linting against
+  py311 while running 3.13, silently forgoing three releases of modernisation checks.
+  `tests/test_python_version_consistency.py` checks every declaration *against the pin*, so
+  the next bump is a one-line change to `.python-version`. No cascade: ruff clean at py313,
+  mypy baseline unchanged at 30.
 - **B-036** — badge validation rebuilt. The badges really were stale: `CI` and
   `Quality Tests` pointed at workflows ADR-0015 deleted, and the Python badge disagreed with
   the pin. The front page claimed CI this project deliberately does not have, for months,

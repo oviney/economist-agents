@@ -6,7 +6,10 @@ Thank you for your interest in contributing to the Economist-Agents project! Thi
 
 ### Prerequisites
 
-- **Python 3.12** (pinned in `.python-version`; single version per ADR-0015)
+- **Python 3.13** (pinned in `.python-version`; single version per ADR-0015).
+  `tests/test_python_version_consistency.py` checks that the pin, `ruff.toml`,
+  `mypy.ini`, this file, the README badge, and the interpreter running the suite
+  all agree — a pin nothing verifies is a comment (B-037).
 - **Git** with pre-commit hooks enabled
 - **Virtual environment** (venv)
 

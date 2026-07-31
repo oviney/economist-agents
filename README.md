@@ -4,7 +4,7 @@
 
 [![Docs](https://github.com/oviney/economist-agents/actions/workflows/docs.yml/badge.svg)](https://github.com/oviney/economist-agents/actions/workflows/docs.yml)
 ![Verification](https://img.shields.io/badge/verification-local--first-blue)
-![Python](https://img.shields.io/badge/Python-3.12-blue)
+![Python](https://img.shields.io/badge/Python-3.13-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 > **No CI badge, by design.** [ADR-0015](docs/adr/0015-local-first-verification.md) retired

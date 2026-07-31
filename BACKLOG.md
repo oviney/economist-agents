@@ -599,10 +599,36 @@ the declaration is not what is being verified.
 This is not urgent — 2,595 tests pass on 3.13 — but it means "pinned to one version" is
 currently untrue, and nothing detects that.
 
-- [ ] Decide which is authoritative: bump `.python-version` to 3.13, or rebuild the venv on 3.12
-- [ ] Align `CONTRIBUTING.md` with whichever wins
-- [ ] A test asserting the running interpreter matches `.python-version`, so the two cannot
-      drift again silently
+**DONE 2026-07-31. Owner chose 3.13.**
+
+The drift was worse than this item recorded. Surveying every declaration turned up **four**
+different versions, not two:
+
+| Source | Claimed | Now |
+|---|---|---|
+| `.python-version` | 3.12 | **3.13** |
+| `CONTRIBUTING.md` | 3.12 | 3.13 |
+| `ruff.toml` `target-version` | **py311** | py313 |
+| `mypy.ini` `python_version` | **3.11** | 3.13 |
+| `README.md`, `GEMINI.md`, ADR-0004 | 3.13 | unchanged — already right |
+| the interpreter running the suite | 3.13.14 | unchanged — already right |
+
+So 3.13 was not a coin-flip: the documentation majority and reality already agreed on it,
+and `.python-version`, `CONTRIBUTING.md`, `ruff.toml` and `mypy.ini` were the four outliers.
+The two *tool* pins were the real find — nothing in B-037 knew about them, and linting
+against py311 while running 3.13 silently forgoes three releases of modernisation checks.
+
+`tests/test_python_version_consistency.py` now checks every declaration **against the pin
+rather than against a literal**, so the next bump is a one-line change to `.python-version`
+and the tests keep working. A test hardcoding 3.13 would only relocate the drift.
+
+- [x] Decide which is authoritative: bumped `.python-version` to 3.13
+- [x] Align `CONTRIBUTING.md`
+- [x] A test asserting the running interpreter matches `.python-version` — plus `ruff.toml`,
+      `mypy.ini`, `CONTRIBUTING.md` and the README badge, since all four had drifted too
+
+**No cascade from the tool bumps:** `ruff check .` is clean at py313, and the mypy baseline
+is unchanged at 30 errors across 11 files under `python_version = 3.13`.
 
 **Scope:** XS to decide, S to enforce. **Owner-gated** on which version is wanted.
 

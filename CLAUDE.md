@@ -46,6 +46,27 @@ If a task *seems* to need a key or a paid service, the answer is "do it keyless
 or say it cannot be done keyless" — not "add a key". Encode any new constraint
 the owner gives into this section immediately.
 
+## Working with the owner
+
+Ouray is the solo owner. These are corrections he has made repeatedly — they are
+here, in the repo, so they survive a machine change and a cleared session.
+
+- **Persist it, don't narrate it.** Never end a turn telling him to remember
+  something. If a lesson is worth keeping, write it: to this file, to
+  `BACKLOG.md`, to an ADR, to the relevant `skills/*/SKILL.md`. A lesson
+  delivered verbally dies with the session — that is what these files are for.
+- **No menus.** Do not end turns with "where next — A/B/C?". That is decision
+  fatigue, not help. Decide, state the decision, act. Surface a choice only at a
+  true fork (his answer changes the outcome and the repo cannot settle it) or
+  before an irreversible/outward action.
+- **Research, then recommend.** Don't ask what the repo can answer. Come with a
+  grounded recommendation and its trade-offs, not a survey.
+- **Ruthless simplicity.** The simplest thing that solves the real problem wins.
+  A "Not Doing" list is a good outcome, not a gap.
+- **Report faithfully.** If tests fail, say so with the output. If a step was
+  skipped, say that. Don't soften a bad result or claim completion until it is
+  actually done and verified.
+
 ## Default Operating Mode
 
 Every task follows the `skills/using-agent-skills` discovery flowchart before any code is written:
@@ -129,8 +150,9 @@ When dispatching agents via the `Agent` tool (orchestrating the fleet), the brie
 
 ## Architecture
 
-- **LLM**: Claude (Anthropic) via the Agent SDK on the Claude subscription. No DALL-E / `OPENAI_API_KEY` — image generation was retired (ADR-0014); hero images are human-supplied per constraint #4.
-- **Research**: Deterministic academic search via free, keyless providers only — arXiv + Semantic Scholar. No LLM and no pay-per-use APIs in the research path.
+- **LLM**: Claude (Anthropic) via the Agent SDK on the Claude subscription. No DALL-E / `OPENAI_API_KEY` — raster image generation was retired (ADR-0014). **Stage 3 draws the hero itself, as SVG** (B-016b) — constraint #4 as amended, not the pre-2026-07 "human-supplied hero" reading.
+- **Pipeline shape**: ONE path (ADR-0016). `python -m src.agent_sdk.pipeline "<topic>"` runs Stage 3 → Stage 4 and exits 0 when publish-ready. The #403 image handshake (`--image-mode`, `--resume`, `--no-image`, exit codes 10/11) was deleted by B-021 — those exit codes are retired, not reused.
+- **Research**: two paths. `claude_web` (ADR-0013) is the **default in practice** and the reliable one — Claude's own WebSearch/WebFetch on the subscription, which deliberately puts an LLM in the research path. `deterministic` (arXiv + Semantic Scholar, no LLM) is rate-limited from most environments and frequently aborts (BUG-050). Neither uses a pay-per-use API.
 - **Writing**: Claude via Anthropic Agent SDK (`src/agent_sdk/stage3_runner.py`).
 - **Quality gates**: Deterministic post-processing in `src/agent_sdk/stage4_runner.py`, then `scripts/publication_validator.py`.
 - **Orchestration**: `src/economist_agents/flow.py` — sequential pipeline over `src.agent_sdk.pipeline.run_pipeline`.
@@ -176,12 +198,17 @@ See `skills/python-quality/SKILL.md` for complete standards.
 |----------|----------|---------|
 | `BLOG_REPO_TOKEN` | To publish | Free GitHub token (push to `oviney/blog`) so the deploy step can open a PR. No AI key. |
 
-The keyless path uses **no paid AI keys**. Writing/graphics/vision run on the
-Claude subscription via the Agent SDK; research uses free keyless providers
-(arXiv + Semantic Scholar). There is **no `OPENAI_API_KEY`/DALL-E path** — hero
-images are human-supplied per constraint #4, and the DALL-E workflow was retired
-(ADR-0014 / B-009). Pay-per-use search APIs (Serper/Google, Brave, Tavily) were
+The keyless path uses **no paid AI keys**. Writing, graphics, the hero drawing,
+and research all run on the Claude subscription via the Agent SDK. There is **no
+`OPENAI_API_KEY`/DALL-E path** — the DALL-E workflow was retired (ADR-0014 /
+B-009) and its last vestige, `EconomistContentFlow`'s `image_mode="hero"` branch,
+was removed by B-022. Pay-per-use search APIs (Serper/Google, Brave, Tavily) were
 removed by #438.
+
+To supply hero art by hand, overwrite `output/posts/images/<slug>-hero.svg` (the
+`.image_prompt.md` sidecar is the brief) and re-run. The deploy step **refuses**
+an article still carrying the `<!-- HERO IMAGE …` reviewer comment — it escaped
+to a live post once (BUG-065, ADR-0017).
 
 > Note: a legacy paid path still exists — `EconomistContentFlow` Stage 1 topic
 > discovery calls `create_llm_client`, which needs `ANTHROPIC_API_KEY`

@@ -90,8 +90,41 @@ def _check_layout_field(self, content: str) -> list[str]:
 | "We'll fix it in code review" | Human review doesn't scale; automated prevention catches 100% of known patterns |
 | "The rule is too strict" | Better to have a false positive that gets refined than a missed defect in production |
 
+## The defects tests cannot find: gaps in what is checked at all
+
+A prevention rule guards a pattern *inside* the thing being checked. It cannot
+guard something the check never sees. Two of the four defects closed on
+2026-07-28 were of that second kind, and **neither was found by a failing test —
+both were found by reading code adjacent to an unrelated fix:**
+
+- **BUG-064** — `_graphics_with_retry` handed every attempt the FULL budget
+  instead of the remaining balance, so three retries could spend 3× the operator's
+  cap. Found while fixing **BUG-061**, its exact mirror image in the *writer* loop.
+  Every test passed throughout: the suite asserted the retry *policy*, never the
+  budget *arithmetic*, and nothing compared the two loops to each other.
+- **BUG-065** — the hero-prompt comment reached a published post. The validator
+  has a check built for exactly this ("placeholder text that should never be
+  published") and it could not fire, because the comment is injected *after*
+  Stage 4 by design. The artefact the validator blessed was not the artefact that
+  shipped (ADR-0017).
+
+**The generalisable habit:** when you fix a defect, read the *sibling* — the other
+retry loop, the other entry point, the other deploy path. Both of these bugs were
+one function away from a fix that was already being made. And when a gate exists
+for a class of problem that still escaped, ask whether the gate can *see* the
+thing at all before adding a pattern to it — a rule that can never fire is worse
+than no rule, because it reads like protection.
+
+Neither of these belongs in `check_all()`. They are recorded here because the
+lesson is about *where to look*, not about a pattern to match.
+
 ## Red Flags
 
+- **A gate that cannot see what it is meant to guard** — e.g. a check that runs
+  before the content it validates is injected. Verify the ordering, not just the
+  pattern.
+- **A fix applied to one of two mirrored code paths** — retry loops, deploy entry
+  points, `deploy()`/`deploy_review()`. Fix the sibling or log why not.
 - Prevention rule uses LLM calls instead of deterministic checks
 - Rule added to `check_all()` but no corresponding test written
 - Pattern logged but no prevention rule created within the same sprint

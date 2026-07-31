@@ -153,11 +153,17 @@ All five hooks route through `scripts/hooks/run_hook.sh`.
 
 ### Verification as of this hand-off
 
-`make ci-local` green on `harness/close-the-sensor-loop`: **2,572 passed, 9 skipped,
-coverage 81%** (threshold 70), `src/quality` above 90%, bandit clean, destructive-change
-guard clean, mypy baseline gate clean. 57 new tests this session across
-`tests/test_sync_copilot_context.py` (13), `tests/test_mypy_baseline.py` (26) and
-`tests/test_harness_hooks.py` (+18).
+`make ci-local` green on **both** branches after the merge:
+
+| Branch | Result |
+|---|---|
+| `fix/article-two-run-defects` | 2,446 passed, 9 skipped, coverage 80.46% |
+| `harness/close-the-sensor-loop` | **2,594 passed, 9 skipped, coverage 81.26%** |
+
+Threshold is 70; `src/quality` is above 90; bandit, the destructive-change guard and the
+mypy baseline gate are all clean. 78 new tests this session: `test_sync_copilot_context.py`
+(13), `test_mypy_baseline.py` (26), `test_harness_hooks.py` (+18),
+`test_deploy_mode_required.py` (6), `test_acceptance_oracle_filename.py` (15).
 
 Note: `make ci-local`'s repo-wide mypy step stays **advisory** and prints errors from
 `scripts/archived/`. That is expected — the blocking gate is `mypy_baseline.py`, which is

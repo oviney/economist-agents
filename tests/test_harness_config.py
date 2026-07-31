@@ -45,6 +45,37 @@ def precommit_hooks(precommit_config: dict) -> list[dict]:
     return [hook for repo in precommit_config["repos"] for hook in repo["hooks"]]
 
 
+class TestHooksPointAtRealScripts:
+    """A hook whose entry script does not exist is not a gate (B-036).
+
+    `badge-validation` ran `python3 scripts/validate_badges.py`, but that script
+    was archived to `scripts/archived/` in #327/#343. The hook survived because
+    its entry was `bash -c '... || true'` — so it swallowed both the stale-badge
+    failures it was meant to catch *and* the "no such file" error proving it had
+    no implementation at all.
+
+    B-031 removed the `|| true`, which correctly turned a silent phantom into a
+    loud one: the next push failed. That is the sensor working. This test
+    generalises the lesson, because the same shape can recur for any hook.
+    """
+
+    def test_every_local_hook_entry_script_exists(self, precommit_config: dict) -> None:
+        missing = []
+        for repo in precommit_config["repos"]:
+            if repo.get("repo") != "local":
+                continue
+            for hook in repo["hooks"]:
+                for token in str(hook.get("entry", "")).split():
+                    is_script = token.endswith((".py", ".sh"))
+                    if is_script and not (REPO_ROOT / token).exists():
+                        missing.append(f"{hook['id']} → {token}")
+
+        assert not missing, (
+            "pre-commit hooks reference scripts that do not exist: "
+            f"{missing}. A hook that cannot run is not a gate."
+        )
+
+
 class TestNoInertSensors:
     """B-031: four pre-commit hooks could not fail. None may again."""
 

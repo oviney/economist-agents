@@ -193,6 +193,12 @@ workflow as an operating instruction.
 - **B-023** — the fate of `llm_client.py`'s Anthropic auth path. Came in from `main` during
   the merge. Answer B-010's scope first. **Do not delete
   `backup/integration-test-20260728`** before this is answered — it is the only copy.
+- **B-036** — badge validation has no implementation. The hook pointed at
+  `scripts/validate_badges.py`, archived in #327/#343; its `|| true` hid both the stale-badge
+  failures *and* the missing-file error. B-031 removed the `|| true` and the next push
+  failed — the sensor working. Hook removed rather than resurrected (the archived copy
+  resolves paths relative to `scripts/` and exits 0 while printing failures). **Owner-gated
+  on whether README badges still matter.**
 - **B-015** — every article PR needs an admin bypass to merge: `🔒 Security Audit` and
   `🖼️ Visual Regression` fail blog-side for pre-existing reasons.
 - **B-012** — deep-research mode is built; only a live acceptance run remains (~2M tokens).

@@ -509,6 +509,38 @@ site question.
 
 ---
 
+### B-036 · Badge validation has no implementation — decide whether to restore it
+
+**Opened 2026-07-31**, found by B-031 doing its job.
+
+The `badge-validation` pre-commit hook ran `python3 scripts/validate_badges.py` to prevent
+stale README badges (BUG-023). That script was archived to `scripts/archived/` in `3cbe96d`
+(#327/#343). The hook was **inert twice over**: its entry was `bash -c '... || true'`, which
+swallowed both the stale-badge failures it existed to catch *and* the `No such file or
+directory` error proving it had no implementation.
+
+B-031 removed the `|| true`. The next push then failed — which is the sensor working
+correctly, and is how the missing script came to light at all.
+
+**The hook is removed, not resurrected.** Pointing it at the archived copy would not restore
+the gate: that script resolves its paths relative to `scripts/` (so it looks for
+`scripts/README.md` and `scripts/data/skills_state/…`), several inputs it wants no longer
+exist, and it exits 0 while printing failures — a third way it could not gate.
+
+`tests/test_harness_config.py::TestHooksPointAtRealScripts` now fails if **any** local hook
+references a script that does not exist, which generalises the defect class.
+
+**The open question is whether badge validation is wanted at all.** README badges may simply
+no longer be load-bearing; if they are, this needs a working validator rather than a
+resurrected one.
+
+- [ ] Decide: restore badge validation, or drop the requirement and remove the badges
+- [ ] If restoring: a validator that resolves paths from the repo root and exits non-zero on
+      failure, with a test proving it *can* fail
+- [ ] `scripts/archived/validate_badges.py` deleted either way — it is a trap as it stands
+
+**Scope:** S, owner-gated on whether badges matter.
+
 ### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
 
 ### B-023 · Decide the fate of `llm_client.py`'s Anthropic auth path

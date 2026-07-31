@@ -127,9 +127,25 @@ no network:
 - Inferring which claims are hedged (see above — deliberate)
 - Deriving the topic string; the pipeline still takes it as an argument
 
-## Open question — not blocking
+## Fixtures — and the one thing only the owner can supply
 
-A real artifact dropped anywhere I can read it would let me use it as a fixture, so the tests
-prove the tool against *your* output rather than my reconstruction of it. I can build and test
-without one — the design is deliberately structure-agnostic — but it would turn one fixture
-from a guess into evidence.
+**Drop point: `docs/research/samples/*.html`** (created, with a README explaining what and
+why). Any HTML artifact from a finalised research conversation.
+
+The build is **not blocked** on it. v1 ships three synthetic fixtures —
+headings-and-prose, blockquote-heavy, table-bearing — chosen to prove template independence,
+and they are enough to develop against.
+
+But a synthetic fixture only proves the converter handles *HTML I imagined*. The evidence
+that this matters is already in the repo: the one real Claude artifact here,
+`docs/reviews/review-queue-throughput-tax-42d2fbb4.html`, contains **zero `<a href>`**. A
+design that assumed "sources arrive as links" would have been wrong on the only real evidence
+available, and would have looked fine against invented fixtures. That is the third instance of
+the pattern recorded in `skills/defect-prevention/SKILL.md` — asserting from a plausible
+reading instead of measuring.
+
+**Resolution rule, so this never stalls the work:** if `docs/research/samples/` contains an
+`*.html` file, make it the primary fixture and treat the synthetic three as supplements. If
+it is empty, build and ship on the synthetic three, and record in `docs/HANDOFF.md` that the
+tool has **not yet been proven against a real artifact** — as an open item, not a silent gap.
+Do not pause to ask.

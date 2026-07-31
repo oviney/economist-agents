@@ -47,10 +47,22 @@ IS_SANDBOX=1 python -m src.agent_sdk.pipeline "<topic>" --brief docs/research/<s
 ~$1 and ~35 minutes. Then **deploy to review, never straight to `_posts/`** — see the
 publishing section below. `--mode` is required (B-028).
 
-> Note: `docs/reviews/review-queue-throughput-tax-42d2fbb4.html` is a **reviewed draft of an
-> already-published article**, not research source material (ADR-0018). It is useful only as
-> a *structural* fixture — and note it contains **zero `<a href>`**, which is why the spec
-> does not build source extraction around links.
+### The fixture, and the rule that stops it blocking
+
+`docs/research/samples/` exists as the drop point for a real Claude HTML artifact, with a
+README explaining what to put there. **Check it first:**
+
+- **Contains an `*.html`?** Make it the primary test fixture; the three synthetic fixtures
+  become supplements.
+- **Empty?** Build and ship on the synthetic three, then record in this file that the tool is
+  **not yet proven against a real artifact**. Do not pause to ask.
+
+Why it matters: a synthetic fixture only proves the converter handles HTML *we imagined*. The
+one real Claude artifact in the repo,
+`docs/reviews/review-queue-throughput-tax-42d2fbb4.html`, contains **zero `<a href>`** — so a
+design assuming "sources arrive as links" would have been wrong on the only real evidence
+available, while looking fine against invented fixtures. That file is a reviewed draft of an
+already-published article (ADR-0018), not source material; it is useful for *structure* only.
 
 ## State in one paragraph
 

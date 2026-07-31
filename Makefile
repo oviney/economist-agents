@@ -47,7 +47,8 @@ ci-local:
 	@echo "── ruff format ──"        && ruff format --check .
 	@echo "── ruff lint ──"          && ruff check .
 	@echo "── bare-name imports ──"  && python scripts/check_bare_name_imports.py
-	@echo "── mypy (advisory) ──"    && (mypy scripts/ || echo "⚠️  mypy advisory — repo-wide backlog is known-red (611 errors); NEW type errors are blocked per-commit by the pre-commit mypy hook (B-031)")
+	@echo "── mypy (advisory) ──"    && (mypy scripts/ || echo "⚠️  mypy advisory — repo-wide backlog is known-red (611 errors); NEW type errors are blocked per-commit by the baselined mypy hook (B-031, B-035 Task 2 — see docs/mypy-baseline.md)")
+	@echo "── mypy baseline gate ──" && .venv/bin/python scripts/mypy_baseline.py --all
 	@echo "── tests + coverage ──"   && pytest tests/ \
 		--cov=src --cov=scripts \
 		--cov-report=term-missing \

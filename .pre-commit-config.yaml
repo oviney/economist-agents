@@ -18,7 +18,7 @@ repos:
         description: Lint Python code with ruff (check only)
         args: []
 
-  # Mypy - Static type checking
+  # Mypy - Static type checking, gated on a per-file baseline
   #
   # B-031: this was `stages: [manual]`, so it never ran — an inert sensor next to a
   # CLAUDE.md that says "Type hints mandatory". It is now a real pre-commit hook.
@@ -27,19 +27,23 @@ repos:
   # files, but mypy follows their imports, so without the flag a commit touching one clean
   # file inherits errors from the 611-error repo-wide backlog — and the gate would be back
   # on `manual` within a day. Scoped this way it reports only errors in the files being
-  # committed: new type errors are blocked, old ones get paid down deliberately rather
-  # than all at once. Repo-wide mypy stays advisory in `make ci-local` for that reason.
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.2
+  # committed. Repo-wide mypy stays advisory in `make ci-local` for that reason.
+  #
+  # B-035 Task 2: even scoped, raw mypy blocked 12 of 48 `scripts/` files (25%) on errors
+  # the commit did not introduce — the noise-overload failure mode that gets a gate
+  # reverted to `manual`. `mypy_baseline.py` wraps the same mypy invocation and compares
+  # per-file error counts against `docs/mypy-baseline.md`, so pre-existing debt is
+  # grandfathered but a NEW error still blocks. The baseline is a count, not a mute, and
+  # `tests/test_mypy_baseline.py` fails if any number grows — raising it to unblock a
+  # commit fails the suite instead. Same mechanism B-032 used for complexity.
+  - repo: local
     hooks:
-      - id: mypy
-        name: mypy type check
-        description: Static type checking with mypy on staged files
-        files: ^scripts/
-        args: [--config-file=mypy.ini, --follow-imports=silent, --no-error-summary]
-        additional_dependencies:
-          - types-PyYAML
-          - types-requests
+      - id: mypy-baseline
+        name: mypy type check (baselined)
+        description: Block new type errors; grandfather those in docs/mypy-baseline.md
+        entry: .venv/bin/python scripts/mypy_baseline.py
+        language: system
+        files: ^scripts/.*\.py$
         verbose: true
 
   # Pytest - Run test suite on push (not commit for speed)

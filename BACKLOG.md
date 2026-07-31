@@ -527,6 +527,40 @@ site question.
 
 ---
 
+### B-038 · Ingest Claude HTML artifacts as research briefs
+
+**Opened 2026-07-31.** Spec: `docs/specs/html-research-ingestion.md` — **awaiting LGTM.**
+
+The owner researches by holding a back-and-forth conversation with Claude and finalising it
+as an **HTML artifact**, and does this often. The pipeline cannot consume HTML: `--brief`
+expects markdown at `docs/research/<slug>.md`. The only route today is manual transcription.
+
+**The measurement that shaped the design.** `load_brief_file` does exactly two things — read
+the file and strip `## Refuted…` sections — and `stage3_runner.py:249` then hands the result
+to the writer **verbatim**. So there is no schema: the only hard requirements are *markdown*
+and *`## Refuted` is honoured*. The `ai-productivity-brief.md` layout is a convention the
+deep-research harness happens to emit, not an interface.
+
+That turns the build from **claim extraction into faithful conversion**, which is the correct
+answer for artifacts whose shape varies with the conversation. A claim-extractor would have
+to guess the shape of every conversation and would silently drop what it did not recognise.
+
+**No LLM in the middle.** ADR-0018 measured what that costs: fidelity defects — a statistic
+quoted with its offsetting clause deleted, a conclusion imported into a paper that does not
+report it — survived four gates and cost a BLOCK at 51/100 on an article the deterministic
+evaluator passed at 88%. A paraphrase step sits exactly where that damage originates. The
+brief's job is transport; the judging already happened in the conversation.
+
+- [ ] `scripts/html_to_brief.py`: HTML → `docs/research/<slug>.md`, deterministic (bs4,
+      already installed — no new dependency, no key, no network)
+- [ ] Quotes, tables and URLs preserved verbatim; nothing silently dropped
+- [ ] Always emits an empty `## Refuted / unverified` section — content moved there is
+      excluded *by construction*, which is the highest-value thing the tool can do
+- [ ] Round-trip asserted against the real `load_brief_file`, not a mirrored regex
+- [ ] Usable on a real artifact without re-typing any content
+
+**Scope:** M. **Files:** `scripts/html_to_brief.py`, `tests/test_html_to_brief.py`.
+
 ### B-036 · Badge validation has no implementation — decide whether to restore it
 
 **Opened 2026-07-31**, found by B-031 doing its job.

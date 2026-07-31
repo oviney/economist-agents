@@ -14,32 +14,43 @@ gates.
 B-023 all landed; ADR-0018 accepted; the working tree is clean and both PRs are `MERGEABLE`.
 Nothing is half-finished.
 
-## Next session: generating an article from an HTML file
+## Next session: B-038, HTML research ingestion
 
-**Read this before starting — the ask does not map onto an existing flag.**
+**The owner decided to build the ingestion path** (2026-07-31). He researches by holding a
+back-and-forth conversation with Claude and finalising it as an HTML artifact, and does this
+often — so manual transcription is a recurring cost, not a one-off.
 
-The pipeline takes a **topic string**, plus an optional `--brief PATH`. Checked
-2026-07-31: `--brief` expects a *markdown* deep-research brief at
-`docs/research/<slug>.md` (`load_brief_file`, `pipeline.py:90`), added by B-012. **There is
-no HTML input path anywhere in the pipeline.** So "generate a post from this HTML file" needs
-a decision before any command is run:
+**Start here: `docs/specs/html-research-ingestion.md`. It is written and awaiting LGTM.**
+Per `CLAUDE.md`, no implementation begins until that LGTM lands.
 
-| Option | What it means |
-|---|---|
-| **Convert first** (cheapest) | Extract the HTML's substance by hand or with a one-off script into a topic string, and optionally a `docs/research/<slug>.md` brief. No code change. Start here unless this is a recurring need. |
-| **Build an ingestion path** | A real feature: HTML → research brief. Wants a spec, and a decision about whether it fetches URLs (constraint #1/#2 apply — keyless only). |
+The measurement that shaped it, so a fresh session does not re-derive it: `load_brief_file`
+does exactly two things — read the file, strip `## Refuted…` — and `stage3_runner.py:249`
+hands the result to the writer **verbatim**. **There is no schema.** The only hard
+requirements are markdown and honouring `## Refuted`. The `ai-productivity-brief.md` layout
+is a convention the deep-research harness emits, not an interface.
 
-If the HTML is `docs/reviews/review-queue-throughput-tax-42d2fbb4.html`, note that it is a
-**reviewed draft of an article that already exists**, not source material — see ADR-0018.
+That makes this **faithful conversion, not claim extraction** — the right call for artifacts
+whose shape varies with the conversation, and the one that cannot silently drop what it fails
+to recognise. Deterministic, via bs4 4.13.5 which is already installed: no new dependency, no
+key, no network.
 
-The keyless run, once you have a topic:
+**No LLM between the research and the writer.** ADR-0018 measured that cost — fidelity
+defects survived four gates and produced a 51/100 BLOCK on an article the deterministic
+evaluator passed at 88%. A paraphrase step sits exactly where that damage starts.
+
+Once a brief exists, the run is unchanged:
 
 ```bash
-IS_SANDBOX=1 python -m src.agent_sdk.pipeline "<topic>" --research-mode claude_web
+IS_SANDBOX=1 python -m src.agent_sdk.pipeline "<topic>" --brief docs/research/<slug>.md
 ```
 
 ~$1 and ~35 minutes. Then **deploy to review, never straight to `_posts/`** — see the
 publishing section below. `--mode` is required (B-028).
+
+> Note: `docs/reviews/review-queue-throughput-tax-42d2fbb4.html` is a **reviewed draft of an
+> already-published article**, not research source material (ADR-0018). It is useful only as
+> a *structural* fixture — and note it contains **zero `<a href>`**, which is why the spec
+> does not build source extraction around links.
 
 ## State in one paragraph
 

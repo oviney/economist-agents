@@ -19,6 +19,7 @@ from __future__ import annotations
 import subprocess
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import orjson
 import pytest
@@ -415,11 +416,13 @@ class TestSessionGate:
         first = session_gate.handle(
             {"session_id": "sess-A"},
             violations="scripts/foo.py:1:1 E999 SyntaxError",
+            test_failures="",
             state_dir=tmp_path,
         )
         second = session_gate.handle(
             {"session_id": "sess-A"},
             violations="scripts/foo.py:1:1 E999 SyntaxError",
+            test_failures="",
             state_dir=tmp_path,
         )
 
@@ -430,11 +433,13 @@ class TestSessionGate:
         session_gate.handle(
             {"session_id": "sess-A"},
             violations="boom",
+            test_failures="",
             state_dir=tmp_path,
         )
         other = session_gate.handle(
             {"session_id": "sess-B"},
             violations="boom",
+            test_failures="",
             state_dir=tmp_path,
         )
 
@@ -444,6 +449,7 @@ class TestSessionGate:
         result = session_gate.handle(
             {"session_id": "sess-C"},
             violations="",
+            test_failures="",
             state_dir=tmp_path,
         )
 
@@ -453,6 +459,7 @@ class TestSessionGate:
         result = session_gate.handle(
             {"session_id": "sess-D"},
             violations="scripts/foo.py:3:1 F821 undefined name",
+            test_failures="",
             state_dir=tmp_path,
         )
 
@@ -460,8 +467,251 @@ class TestSessionGate:
 
     def test_missing_session_id_still_bounds_itself(self, tmp_path: Path) -> None:
         """No session_id must not mean unlimited blocks."""
-        first = session_gate.handle({}, violations="boom", state_dir=tmp_path)
-        second = session_gate.handle({}, violations="boom", state_dir=tmp_path)
+        first = session_gate.handle(
+            {}, violations="boom", test_failures="", state_dir=tmp_path
+        )
+        second = session_gate.handle(
+            {}, violations="boom", test_failures="", state_dir=tmp_path
+        )
+
+        assert first.get("decision") == "block"
+        assert second == {}
+
+
+# ── Stop: scoped tests as the correctness signal (B-035 Task 1) ─────────────────
+
+
+class TestMatchingTestFiles:
+    """`scripts/X.py` maps to `tests/test_X.py` — nothing broader runs.
+
+    The objection to running tests in a Stop gate was cost, and the measurement
+    removed it: the full suite is ~100s, one matching test file is 3.4s, and 40
+    of 48 `scripts/` modules (83%) have a match.
+    """
+
+    def test_source_file_maps_to_its_test(self, tmp_path: Path) -> None:
+        (tmp_path / "tests").mkdir()
+        (tmp_path / "scripts").mkdir()
+        (tmp_path / "scripts" / "foo.py").touch()
+        target = tmp_path / "tests" / "test_foo.py"
+        target.touch()
+
+        found = session_gate.matching_test_files(
+            [tmp_path / "scripts" / "foo.py"],
+            repo_root=tmp_path,
+        )
+
+        assert found == [target]
+
+    def test_module_without_a_test_maps_to_nothing(self, tmp_path: Path) -> None:
+        """17% of modules have no match; they must degrade, not error."""
+        (tmp_path / "tests").mkdir()
+        (tmp_path / "scripts").mkdir()
+        (tmp_path / "scripts" / "orphan.py").touch()
+
+        found = session_gate.matching_test_files(
+            [tmp_path / "scripts" / "orphan.py"],
+            repo_root=tmp_path,
+        )
+
+        assert found == []
+
+    def test_a_changed_test_file_maps_to_itself(self, tmp_path: Path) -> None:
+        (tmp_path / "tests").mkdir()
+        target = tmp_path / "tests" / "test_foo.py"
+        target.touch()
+
+        found = session_gate.matching_test_files([target], repo_root=tmp_path)
+
+        assert found == [target]
+
+    def test_results_are_deduplicated(self, tmp_path: Path) -> None:
+        """Editing both `scripts/foo.py` and `tests/test_foo.py` runs it once."""
+        (tmp_path / "tests").mkdir()
+        (tmp_path / "scripts").mkdir()
+        (tmp_path / "scripts" / "foo.py").touch()
+        target = tmp_path / "tests" / "test_foo.py"
+        target.touch()
+
+        found = session_gate.matching_test_files(
+            [tmp_path / "scripts" / "foo.py", target],
+            repo_root=tmp_path,
+        )
+
+        assert found == [target]
+
+    def test_no_changed_files_maps_to_nothing(self, tmp_path: Path) -> None:
+        assert session_gate.matching_test_files([], repo_root=tmp_path) == []
+
+
+class TestCollectTestFailures:
+    """Tests are additive. Anything that is not a clean red result must not block."""
+
+    def test_timeout_does_not_block(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Never block on a timeout — a slow suite is not a broken one."""
+
+        def _timeout(*args: object, **kwargs: object) -> None:
+            raise subprocess.TimeoutExpired(cmd="pytest", timeout=60)
+
+        monkeypatch.setattr(subprocess, "run", _timeout)
+
+        assert session_gate.collect_test_failures([Path("tests/test_foo.py")]) == ""
+
+    def test_pytest_missing_does_not_block(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        def _explode(*args: object, **kwargs: object) -> None:
+            raise OSError("no pytest")
+
+        monkeypatch.setattr(subprocess, "run", _explode)
+
+        assert session_gate.collect_test_failures([Path("tests/test_foo.py")]) == ""
+
+    def test_no_matching_files_does_not_run_pytest(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        def _fail(*args: object, **kwargs: object) -> None:
+            raise AssertionError("pytest must not run with no targets")
+
+        monkeypatch.setattr(subprocess, "run", _fail)
+
+        assert session_gate.collect_test_failures([]) == ""
+
+    def test_passing_tests_report_nothing(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setattr(
+            subprocess,
+            "run",
+            lambda *a, **k: SimpleNamespace(returncode=0, stdout="2 passed", stderr=""),
+        )
+
+        assert session_gate.collect_test_failures([Path("tests/test_foo.py")]) == ""
+
+    def test_failing_tests_report_the_failure(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setattr(
+            subprocess,
+            "run",
+            lambda *a, **k: SimpleNamespace(
+                returncode=1,
+                stdout="FAILED tests/test_foo.py::test_bar - assert 1 == 2",
+                stderr="",
+            ),
+        )
+
+        detail = session_gate.collect_test_failures([Path("tests/test_foo.py")])
+
+        assert "test_bar" in detail
+
+    def test_does_not_recurse_into_itself(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The gate's own test file matches its mapping rule.
+
+        Without a reentrancy guard the gate spawns a pytest that re-enters the
+        gate, which spawns another. Caught by this suite hanging.
+        """
+
+        def _fail(*args: object, **kwargs: object) -> None:
+            raise AssertionError("must not spawn pytest from inside a pytest run")
+
+        monkeypatch.setenv(session_gate._REENTRY_ENV, "1")
+        monkeypatch.setattr(subprocess, "run", _fail)
+
+        assert session_gate.collect_test_failures([Path("tests/test_foo.py")]) == ""
+
+    def test_child_run_carries_the_reentry_flag(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Belt and braces: the spawned pytest is marked so it cannot recurse."""
+        seen: dict[str, object] = {}
+
+        def _capture(*args: object, **kwargs: object) -> SimpleNamespace:
+            seen.update(kwargs)
+            return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+        monkeypatch.delenv(session_gate._REENTRY_ENV, raising=False)
+        monkeypatch.setattr(subprocess, "run", _capture)
+        session_gate.collect_test_failures([Path("tests/test_foo.py")])
+
+        assert seen["env"][session_gate._REENTRY_ENV] == "1"  # type: ignore[index]
+
+    def test_uses_a_sixty_second_cap(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        seen: dict[str, object] = {}
+
+        def _capture(*args: object, **kwargs: object) -> SimpleNamespace:
+            seen.update(kwargs)
+            return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+        monkeypatch.setattr(subprocess, "run", _capture)
+        session_gate.collect_test_failures([Path("tests/test_foo.py")])
+
+        assert seen["timeout"] == 60
+
+
+class TestLintAndTestsCompose:
+    """Lint stays always-on; tests are additive, not a replacement."""
+
+    def test_red_tests_block_even_when_lint_is_clean(self, tmp_path: Path) -> None:
+        result = session_gate.handle(
+            {"session_id": "sess-T1"},
+            violations="",
+            test_failures="FAILED tests/test_foo.py::test_bar",
+            state_dir=tmp_path,
+        )
+
+        assert result.get("decision") == "block"
+        assert "test_bar" in str(result.get("reason", ""))
+
+    def test_red_lint_blocks_even_when_tests_are_clean(self, tmp_path: Path) -> None:
+        result = session_gate.handle(
+            {"session_id": "sess-T2"},
+            violations="scripts/foo.py:1:1 F821 undefined name",
+            test_failures="",
+            state_dir=tmp_path,
+        )
+
+        assert result.get("decision") == "block"
+        assert "F821" in str(result.get("reason", ""))
+
+    def test_both_red_reports_both(self, tmp_path: Path) -> None:
+        result = session_gate.handle(
+            {"session_id": "sess-T3"},
+            violations="scripts/foo.py:1:1 F821 undefined name",
+            test_failures="FAILED tests/test_foo.py::test_bar",
+            state_dir=tmp_path,
+        )
+
+        reason = str(result.get("reason", ""))
+        assert "F821" in reason
+        assert "test_bar" in reason
+
+    def test_both_clean_does_not_block(self, tmp_path: Path) -> None:
+        result = session_gate.handle(
+            {"session_id": "sess-T4"},
+            violations="",
+            test_failures="",
+            state_dir=tmp_path,
+        )
+
+        assert result == {}
+
+    def test_test_fallback_still_bounded_to_one_block(self, tmp_path: Path) -> None:
+        """The one-block-per-session bound covers the test path too."""
+        first = session_gate.handle(
+            {"session_id": "sess-T5"},
+            violations="",
+            test_failures="FAILED tests/test_foo.py::test_bar",
+            state_dir=tmp_path,
+        )
+        second = session_gate.handle(
+            {"session_id": "sess-T5"},
+            violations="",
+            test_failures="FAILED tests/test_foo.py::test_bar",
+            state_dir=tmp_path,
+        )
 
         assert first.get("decision") == "block"
         assert second == {}

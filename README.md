@@ -2,10 +2,17 @@
 
 **Multi-agent content pipeline that generates Economist-style articles with verified sources.**
 
-[![CI](https://github.com/oviney/economist-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/oviney/economist-agents/actions/workflows/ci.yml)
-[![Quality Tests](https://github.com/oviney/economist-agents/actions/workflows/quality-tests.yml/badge.svg)](https://github.com/oviney/economist-agents/actions/workflows/quality-tests.yml)
-![Python](https://img.shields.io/badge/Python-3.13-blue)
+[![Docs](https://github.com/oviney/economist-agents/actions/workflows/docs.yml/badge.svg)](https://github.com/oviney/economist-agents/actions/workflows/docs.yml)
+![Verification](https://img.shields.io/badge/verification-local--first-blue)
+![Python](https://img.shields.io/badge/Python-3.12-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+
+> **No CI badge, by design.** [ADR-0015](docs/adr/0015-local-first-verification.md) retired
+> GitHub Actions CI: `make ci-local` is the merge gate and `main` is unprotected. The `CI`
+> and `Quality Tests` badges that used to sit here pointed at workflows deleted with it —
+> stale for months, because the hook meant to catch that (BUG-023) had no implementation.
+> See B-036; `scripts/validate_badges.py` now fails on a badge that references a workflow
+> which does not exist, or a Python version that disagrees with `.python-version`.
 
 A pipeline of specialised AI agents that discovers topics, votes on them editorially,
 researches them against verifiable sources, writes them in *The Economist*'s house

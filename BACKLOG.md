@@ -530,16 +530,63 @@ exist, and it exits 0 while printing failures — a third way it could not gate.
 `tests/test_harness_config.py::TestHooksPointAtRealScripts` now fails if **any** local hook
 references a script that does not exist, which generalises the defect class.
 
-**The open question is whether badge validation is wanted at all.** README badges may simply
-no longer be load-bearing; if they are, this needs a working validator rather than a
-resurrected one.
+**DONE 2026-07-31.** Owner chose to restore it. **The badges were in fact stale**, which
+settled the question — the validator was rebuilt, not merely re-pointed.
 
-- [ ] Decide: restore badge validation, or drop the requirement and remove the badges
-- [ ] If restoring: a validator that resolves paths from the repo root and exits non-zero on
-      failure, with a test proving it *can* fail
-- [ ] `scripts/archived/validate_badges.py` deleted either way — it is a trap as it stands
+Three live defects, all caught by the new validator on its first run against the real README:
 
-**Scope:** S, owner-gated on whether badges matter.
+| Badge | Defect |
+|---|---|
+| `CI` | referenced `.github/workflows/ci.yml` — **deleted** when ADR-0015 retired GitHub Actions CI |
+| `Quality Tests` | referenced `.github/workflows/quality-tests.yml` — **also deleted** |
+| `Python` | advertised **3.13** while `.python-version` pins **3.12** |
+
+So the front page claimed CI this project deliberately does not have, for months, while the
+gate that existed to prevent exactly that could not run.
+
+`scripts/validate_badges.py` is narrow on purpose — it checks the two things that actually
+rot, and it resolves every path from the repo root rather than from `scripts/`, which is the
+bug that made the archived copy look for `scripts/README.md`.
+
+- [x] Decide: restore badge validation (the badges were stale, so the answer was clear)
+- [x] A validator that resolves paths from the repo root and exits non-zero on failure
+- [x] A test proving it *can* fail — `TestTheRealReadme` runs it against the real README, and
+      `TestExitCodes` asserts a stale badge exits 1
+- [x] `scripts/archived/validate_badges.py` deleted — it was a trap
+- [x] Hook re-wired with `.venv/bin/python`, not `python3`: the old entry used system python,
+      which here is 3.14 and carries none of the project's dependencies. A third way it
+      could not have worked.
+- [x] README badges corrected: `Docs` (a workflow that exists), a static `local-first`
+      verification badge, `Python 3.12`, MIT. A note records why there is no CI badge.
+
+**Scope:** S. **Follow-up:** see B-037 — the pin and the interpreter disagree.
+
+### B-037 · `.python-version` pins 3.12 but the venv runs 3.13.14
+
+**Opened 2026-07-31**, found while fixing B-036's Python badge.
+
+Correcting the badge required deciding which version is authoritative, and the two disagree:
+
+| Source | Version |
+|---|---|
+| `.python-version` | **3.12** |
+| `.venv/bin/python` (what `make ci-local` actually runs) | **3.13.14** |
+| `CONTRIBUTING.md` | "Python 3.12 (pinned in `.python-version`; single version per ADR-0015)" |
+
+ADR-0015 says Python is pinned to **one** version via `.python-version`, and ADR-0004
+constrains the version. The badge now follows the declared pin, which is the only defensible
+choice for a *declaration* — but the tests are green on an interpreter the pin forbids, so
+the declaration is not what is being verified.
+
+This is not urgent — 2,595 tests pass on 3.13 — but it means "pinned to one version" is
+currently untrue, and nothing detects that.
+
+- [ ] Decide which is authoritative: bump `.python-version` to 3.13, or rebuild the venv on 3.12
+- [ ] Align `CONTRIBUTING.md` with whichever wins
+- [ ] A test asserting the running interpreter matches `.python-version`, so the two cannot
+      drift again silently
+
+**Scope:** XS to decide, S to enforce. **Owner-gated** on which version is wanted.
 
 ### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
 

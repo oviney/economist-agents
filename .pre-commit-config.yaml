@@ -59,23 +59,31 @@ repos:
         always_run: true
         stages: [pre-push]  # Only run on git push, not git commit
 
-      # Badge validation (BUG-023) — REMOVED 2026-07-31, see B-036.
+      # Badge validation — REBUILT 2026-07-31 (BUG-023, B-036).
       #
-      # This hook ran `python3 scripts/validate_badges.py`, but that script was
+      # The previous hook ran `python3 scripts/validate_badges.py`, a script
       # archived to scripts/archived/ in #327/#343. Its entry was
       # `bash -c '... || true'`, which swallowed both the stale-badge failures it
       # existed to catch AND the "no such file" error proving it had no
-      # implementation at all — inert twice over.
+      # implementation — inert twice over. B-031 removed the `|| true` and the
+      # next push failed, which is how any of this surfaced.
       #
-      # B-031 removed the `|| true`, which correctly turned a silent phantom into
-      # a loud one: the next push failed. Pointing it at the archived script would
-      # not restore the gate — that copy resolves its paths relative to scripts/
-      # and the inputs it wants no longer exist.
+      # The badges had in fact gone stale: two pointed at GitHub Actions
+      # workflows ADR-0015 retired, and the Python badge disagreed with
+      # .python-version. Rewritten rather than resurrected — the archived copy
+      # resolved paths relative to scripts/ (it looked for scripts/README.md) and
+      # exited 0 while printing failures, so it could not have gated anything.
       #
-      # So the hook is removed rather than resurrected, and the *gap* is recorded
-      # in B-036. A gate that cannot run is not a gate; pretending otherwise is
-      # the exact failure mode B-031 exists to prevent.
-      # tests/test_harness_config.py asserts no hook references a missing script.
+      # Note `.venv/bin/python`, not `python3`: the old entry used system python,
+      # which here is 3.14 and has none of the project's dependencies.
+      - id: badge-validation
+        name: validate README badges
+        description: Fail when a badge outlives what it describes (BUG-023)
+        entry: .venv/bin/python scripts/validate_badges.py
+        language: system
+        pass_filenames: false
+        files: ^(README\.md|\.python-version|\.github/workflows/.*)$
+        always_run: false
 
       # ADR governance lint (skills/adr-governance/SKILL.md)
       - id: adr-lint

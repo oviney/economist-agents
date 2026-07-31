@@ -193,12 +193,11 @@ workflow as an operating instruction.
 - **B-023** — the fate of `llm_client.py`'s Anthropic auth path. Came in from `main` during
   the merge. Answer B-010's scope first. **Do not delete
   `backup/integration-test-20260728`** before this is answered — it is the only copy.
-- **B-036** — badge validation has no implementation. The hook pointed at
-  `scripts/validate_badges.py`, archived in #327/#343; its `|| true` hid both the stale-badge
-  failures *and* the missing-file error. B-031 removed the `|| true` and the next push
-  failed — the sensor working. Hook removed rather than resurrected (the archived copy
-  resolves paths relative to `scripts/` and exits 0 while printing failures). **Owner-gated
-  on whether README badges still matter.**
+- **B-037** — `.python-version` pins **3.12**, but `.venv/bin/python` (what `make ci-local`
+  actually runs) is **3.13.14**. Found while fixing B-036's Python badge, which forced the
+  question of which is authoritative. ADR-0015 says "pinned to one version"; that is
+  currently untrue and nothing detects it. Not urgent — 2,607 tests pass on 3.13 — but
+  **owner-gated** on which version is wanted.
 - **B-015** — every article PR needs an admin bypass to merge: `🔒 Security Audit` and
   `🖼️ Visual Regression` fail blog-side for pre-existing reasons.
 - **B-012** — deep-research mode is built; only a live acceptance run remains (~2M tokens).
@@ -214,6 +213,11 @@ workflow as an operating instruction.
   the blog's `validate-posts.sh` globs `_posts/*.md` itself rather than asking Jekyll, so an
   undated file validates happily there. A new `is_publishable_post_name` predicate is
   asserted by the oracle directly.
+- **B-036** — badge validation rebuilt. The badges really were stale: `CI` and
+  `Quality Tests` pointed at workflows ADR-0015 deleted, and the Python badge disagreed with
+  the pin. The front page claimed CI this project deliberately does not have, for months,
+  while the gate meant to catch that could not run. `scripts/validate_badges.py` is new,
+  resolves paths from the repo root, and exits non-zero; the archived copy is deleted.
 
 ### Review queue the owner now owns
 

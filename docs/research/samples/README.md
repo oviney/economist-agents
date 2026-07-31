@@ -36,6 +36,13 @@ They are fixtures, not content. They are read by `tests/test_html_to_brief.py`, 
 published, and never fed to the pipeline directly — the pipeline consumes the *converted*
 brief at `docs/research/<slug>.md`.
 
-If a sample contains anything you would not want in a public repo, do not commit it: put it
-outside the repo and pass the path directly. The converter takes a path argument and does not
-care where the file lives.
+**They are gitignored.** `docs/research/samples/*.html` is in `.gitignore` — this repo is
+public and the artifacts are the owner's own research conversations, so they stay on the
+machine that produced them. Decided 2026-07-31, when the first real sample landed here.
+
+That means the sample-backed test is machine-local by design: `tests/test_html_to_brief.py`
+converts every `*.html` it finds here, and skips with an explicit reason when the directory
+is empty. A fresh clone is green and honestly reports that it has not seen a real artifact.
+
+The converter takes a path argument and does not care where the file lives, so a sample you
+would rather not keep in the tree at all can sit anywhere and be passed directly.

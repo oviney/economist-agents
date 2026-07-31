@@ -529,7 +529,8 @@ site question.
 
 ### B-038 · Ingest Claude HTML artifacts as research briefs
 
-**Opened 2026-07-31.** Spec: `docs/specs/html-research-ingestion.md` — **awaiting LGTM.**
+**Opened 2026-07-31. Built 2026-07-31 — LGTM'd, implemented, all boxes ticked.** Spec:
+`docs/specs/html-research-ingestion.md`.
 
 The owner researches by holding a back-and-forth conversation with Claude and finalising it
 as an **HTML artifact**, and does this often. The pipeline cannot consume HTML: `--brief`
@@ -551,15 +552,40 @@ report it — survived four gates and cost a BLOCK at 51/100 on an article the d
 evaluator passed at 88%. A paraphrase step sits exactly where that damage originates. The
 brief's job is transport; the judging already happened in the conversation.
 
-- [ ] `scripts/html_to_brief.py`: HTML → `docs/research/<slug>.md`, deterministic (bs4,
+- [x] `scripts/html_to_brief.py`: HTML → `docs/research/<slug>.md`, deterministic (bs4,
       already installed — no new dependency, no key, no network)
-- [ ] Quotes, tables and URLs preserved verbatim; nothing silently dropped
-- [ ] Always emits an empty `## Refuted / unverified` section — content moved there is
+- [x] Quotes, tables and URLs preserved verbatim; nothing silently dropped
+- [x] Always emits an empty `## Refuted / unverified` section — content moved there is
       excluded *by construction*, which is the highest-value thing the tool can do
-- [ ] Round-trip asserted against the real `load_brief_file`, not a mirrored regex
-- [ ] Usable on a real artifact without re-typing any content
+- [x] Round-trip asserted against the real `load_brief_file`, not a mirrored regex
+- [x] Usable on a real artifact without re-typing any content
 
-**Scope:** M. **Files:** `scripts/html_to_brief.py`, `tests/test_html_to_brief.py`.
+**Scope:** M. **Files:** `scripts/html_to_brief.py`, `tests/test_html_to_brief.py`,
+`tests/fixtures/html_briefs/*.html`.
+
+**What the build added beyond the spec, and why.** Two things, both forced by the owner's
+real artifact rather than imagined:
+
+1. **Inline `<svg>` diagrams are labelled, not flattened.** Claude draws diagrams as inline
+   SVG, and the owner's artifact carries an 18-label causal-loop diagram. Flattened into a
+   paragraph its labels read as a sentence — *"Schedule Pressure Feature Velocity + – DELAY
+   B1 R1"* — which is precisely the ADR-0018 fidelity hazard: the writer would treat a
+   diagram key as a claim. Every label is kept, prefixed with *"Diagram (inline SVG in the
+   source) — labels only:"*. Nothing invented, nothing dropped, no longer mistakable for prose.
+2. **The no-drop promise is a runtime sensor, not just a test.** `find_dropped_words()`
+   compares the source's content tree against the emitted markdown on every run and warns.
+   Mutation-checked: adding `table` to `CHROME_TAGS` makes it report 48 lost words, so the
+   invariant has teeth rather than being decorative.
+
+**Samples are gitignored.** `docs/research/samples/*.html` holds the owner's own research
+conversations and this repo is public, so they stay local. The sample-backed test converts
+whatever is there and skips with an explicit reason when the directory is empty — a fresh
+clone is green *and* honest about not having seen a real artifact.
+
+**Known limit, deliberately not fixed.** Semantic styling carried only by CSS class
+(`div.card-header`, `div.subtitle`) converts to a plain paragraph, losing its heading role
+but not its text. Inferring headings from class names would be guessing at whatever CSS a
+given conversation emitted; promoting one is a one-character edit in the brief.
 
 ### B-036 · Badge validation has no implementation — decide whether to restore it
 

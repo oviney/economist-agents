@@ -10,59 +10,67 @@ generating an article → `BACKLOG.md` (B-015, B-012 are the only open items) �
 `docs/specs/b035-harness-decisions.md` only if you need the reasoning behind the harness
 gates.
 
-**Session of 2026-07-31 is closed out.** B-028, B-029, B-035, B-036, B-037, BUG-046 and
-B-023 all landed; ADR-0018 accepted; the working tree is clean and both PRs are `MERGEABLE`.
-Nothing is half-finished.
+**Session of 2026-07-31 is closed out.** B-028, B-029, B-035, B-036, B-037, BUG-046, B-023
+and **B-038** all landed; ADR-0018 accepted; the working tree is clean and both PRs are
+`MERGEABLE`. Nothing is half-finished.
 
-## Next session: B-038, HTML research ingestion
+## B-038, HTML research ingestion — BUILT 2026-07-31
 
-**The owner decided to build the ingestion path** (2026-07-31). He researches by holding a
-back-and-forth conversation with Claude and finalising it as an HTML artifact, and does this
-often — so manual transcription is a recurring cost, not a one-off.
-
-**Start here: `docs/specs/html-research-ingestion.md`. It is written and awaiting LGTM.**
-Per `CLAUDE.md`, no implementation begins until that LGTM lands.
-
-The measurement that shaped it, so a fresh session does not re-derive it: `load_brief_file`
-does exactly two things — read the file, strip `## Refuted…` — and `stage3_runner.py:249`
-hands the result to the writer **verbatim**. **There is no schema.** The only hard
-requirements are markdown and honouring `## Refuted`. The `ai-productivity-brief.md` layout
-is a convention the deep-research harness emits, not an interface.
-
-That makes this **faithful conversion, not claim extraction** — the right call for artifacts
-whose shape varies with the conversation, and the one that cannot silently drop what it fails
-to recognise. Deterministic, via bs4 4.13.5 which is already installed: no new dependency, no
-key, no network.
-
-**No LLM between the research and the writer.** ADR-0018 measured that cost — fidelity
-defects survived four gates and produced a 51/100 BLOCK on an article the deterministic
-evaluator passed at 88%. A paraphrase step sits exactly where that damage starts.
-
-Once a brief exists, the run is unchanged:
+**`scripts/html_to_brief.py` exists and works.** Spec `docs/specs/html-research-ingestion.md`
+was LGTM'd and implemented the same day; `tests/test_html_to_brief.py` is 46 tests, 94%
+coverage on the module. Nothing about it is pending.
 
 ```bash
-IS_SANDBOX=1 python -m src.agent_sdk.pipeline "<topic>" --brief docs/research/<slug>.md
+python scripts/html_to_brief.py ~/Downloads/conversation.html --slug ai-code-review
+# → docs/research/ai-code-review.md   (refuses to overwrite without --force)
+
+IS_SANDBOX=1 python -m src.agent_sdk.pipeline "<topic>" --brief docs/research/ai-code-review.md
 ```
 
-~$1 and ~35 minutes. Then **deploy to review, never straight to `_posts/`** — see the
-publishing section below. `--mode` is required (B-028).
+~$1 and ~35 minutes for the run. Then **deploy to review, never straight to `_posts/`** — see
+the publishing section below. `--mode` is required (B-028).
 
-### The fixture, and the rule that stops it blocking
+**Why it is a converter and not a claim-extractor**, so a fresh session does not re-derive it:
+`load_brief_file` does exactly two things — read the file, strip `## Refuted…` — and
+`stage3_runner.py:249` hands the result to the writer **verbatim**. **There is no schema.**
+The `ai-productivity-brief.md` layout is a convention the deep-research harness emits, not an
+interface. So the brief's job is *transport*, and there is deliberately **no LLM in the
+middle**: ADR-0018 measured that fidelity defects survived four gates and produced a 51/100
+BLOCK on an article the deterministic evaluator passed at 88%.
 
-`docs/research/samples/` exists as the drop point for a real Claude HTML artifact, with a
-README explaining what to put there. **Check it first:**
+### The three things worth knowing before you touch it
 
-- **Contains an `*.html`?** Make it the primary test fixture; the three synthetic fixtures
-  become supplements.
-- **Empty?** Build and ship on the synthetic three, then record in this file that the tool is
-  **not yet proven against a real artifact**. Do not pause to ask.
+1. **The `## Refuted / unverified` section is the point.** Every brief ends with it, empty.
+   Move a paragraph under that heading and the loader deletes it before the writer ever sees
+   it — exclusion by construction, not by the writer's discretion. The tool does **not** try
+   to infer what is hedged; that is judgment, and judgment already happened in the
+   conversation.
+2. **Never-silently-drop is enforced at runtime, not only in tests.** `find_dropped_words()`
+   diffs the source's content tree against the emitted markdown on every run and warns.
+   Mutation-checked (adding `table` to `CHROME_TAGS` makes it report 48 lost words), so it is
+   a sensor that can actually fail — B-031's whole complaint.
+3. **Inline `<svg>` diagrams are labelled, not flattened.** Claude draws diagrams as SVG; the
+   owner's first real artifact carried an 18-label causal-loop diagram. Flattened it reads as
+   prose — *"Schedule Pressure Feature Velocity + – DELAY B1 R1"* — which is the ADR-0018
+   hazard exactly: a diagram key mistaken for a claim. Labels are kept and prefixed
+   *"Diagram (inline SVG in the source) — labels only:"*.
 
-Why it matters: a synthetic fixture only proves the converter handles HTML *we imagined*. The
-one real Claude artifact in the repo,
-`docs/reviews/review-queue-throughput-tax-42d2fbb4.html`, contains **zero `<a href>`** — so a
-design assuming "sources arrive as links" would have been wrong on the only real evidence
-available, while looking fine against invented fixtures. That file is a reviewed draft of an
-already-published article (ADR-0018), not source material; it is useful for *structure* only.
+### Samples are local-only, on purpose
+
+`docs/research/samples/*.html` is **gitignored** (decided 2026-07-31): this repo is public and
+the artifacts are the owner's own research conversations. `tests/test_html_to_brief.py`
+converts whatever is present and **skips with an explicit reason** when the directory is
+empty, so a fresh clone is green *and* honest about never having seen a real artifact. Three
+synthetic fixtures (`tests/fixtures/html_briefs/`) cover headings-and-prose, blockquote-heavy
+and table-bearing shapes, and the repo's own Claude artifact
+(`docs/reviews/review-queue-throughput-tax-42d2fbb4.html`, zero `<a href>`) is a committed
+real-HTML regression test.
+
+**Proven against a real owner artifact on 2026-07-31** — an SRE quality-governance CLD guide.
+Every word survived; nothing needed re-typing. Two honest limits found on it and left
+unfixed, both one-edit-away in the brief: semantic styling carried only by CSS class
+(`div.card-header`) becomes a plain paragraph, and an artifact with no `<a href>` produces a
+brief with no citations, which the writer path and `citation_verifier` will notice downstream.
 
 ## State in one paragraph
 

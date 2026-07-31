@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>What Practitioners Actually Said About AI Code Review</title>
+  <style>blockquote { border-left: 3px solid #ccc; }</style>
+</head>
+<body>
+  <section>
+    <h1>What Practitioners Actually Said About AI Code Review</h1>
+    <p>Six interviews, lightly edited. The quotes carry the argument; the prose
+    between them is scaffolding.</p>
+
+    <h2>On review latency</h2>
+    <blockquote>
+      <p>The bot reviews in ninety seconds. The human still takes two days. We did not
+      shorten the queue; we added a step to it.</p>
+    </blockquote>
+    <p>This was the most common complaint, and it was not about quality.</p>
+
+    <blockquote>Every suggestion is plausible. That is exactly the problem &mdash; plausible
+    is the hardest thing to reject.</blockquote>
+
+    <h2>On trust</h2>
+    <blockquote>
+      <p>We turned off auto-approve after the second incident. Not because the model was
+      wrong more often than us &mdash; because when it was wrong, nobody had read the diff.</p>
+      <p>&mdash; Staff engineer, payments</p>
+    </blockquote>
+
+    <h3>The dissenting view</h3>
+    <p>One team reported the opposite, and their reasoning is worth preserving:</p>
+    <blockquote>
+      <p>Ours catches the boring class of defect &mdash; null handling, missing await,
+      logging a secret. That freed the humans to argue about design. Throughput went up
+      <strong>thirty per cent</strong> and stayed up.</p>
+    </blockquote>
+    <pre><code>if (user) { await audit.log(user.token) }  // the class it catches</code></pre>
+  </section>
+  <script>window.__CLAUDE_ARTIFACT__ = true;</script>
+</body>
+</html>

@@ -14,8 +14,11 @@ this file only points at it.
   - `skills/python-quality/SKILL.md` — full code standards
   - `skills/economist-writing/SKILL.md` — the Economist voice rules (British spelling, no
     throat-clearing, data-first / cite every claim)
-  - `skills/test-driven-development/SKILL.md` — the RED → GREEN → REFACTOR cycle
   - `skills/using-agent-skills/SKILL.md` — how to pick the right skill for a task
+- **Lifecycle skills load from the `agent-skills` plugin, not from `skills/`.** Invoke them
+  as `agent-skills:<name>` — e.g. `agent-skills:test-driven-development` for the
+  RED → GREEN → REFACTOR cycle. `docs/workflow-lifecycle.md` indexes them and links
+  upstream; B-035 Task 3(a) deleted the vendored copies that used to shadow them.
 
 ## Architecture (quick orientation)
 

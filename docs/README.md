@@ -61,24 +61,20 @@ Use [docs/adr/TEMPLATE.md](adr/TEMPLATE.md) when writing a new ADR.
 
 ## Skills
 
-The `skills/` directory holds **39 `SKILL.md` workflow definitions**. See
-[`skills/README.md`](../skills/README.md) for the full library. They fall into two groups.
+The `skills/` directory holds **18 `SKILL.md` workflow definitions** — the domain skills
+this repo maintains, plus `using-agent-skills`. See [`skills/README.md`](../skills/README.md)
+for the full library.
 
 ### Lifecycle skills (from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) — govern all work)
-- **[using-agent-skills](../skills/using-agent-skills/SKILL.md)** — meta-skill: maps a task to the right phase skill
-- **[idea-refine](../skills/idea-refine/SKILL.md)** — clarify vague requests before speccing
-- **[spec-driven-development](../skills/spec-driven-development/SKILL.md)** — spec → review → plan → review → implement
-- **[planning-and-task-breakdown](../skills/planning-and-task-breakdown/SKILL.md)** — dependency graph before sprint planning
-- **[incremental-implementation](../skills/incremental-implementation/SKILL.md)** — thin, tested, committed slices
-- **[test-driven-development](../skills/test-driven-development/SKILL.md)** — RED → GREEN → REFACTOR
-- **[code-review-and-quality](../skills/code-review-and-quality/SKILL.md)** — multi-axis review before merge
-- **[shipping-and-launch](../skills/shipping-and-launch/SKILL.md)** — pre-launch checklist and staged rollout
-- **[context-engineering](../skills/context-engineering/SKILL.md)** — focus context at session start
-- Plus supporting engineering skills: `api-and-interface-design`, `debugging-and-error-recovery`,
-  `deprecation-and-migration`, `git-workflow-and-versioning`, `performance-optimization`,
-  `security-and-hardening`, `source-driven-development`, `documentation-and-adrs`,
-  `ci-cd-and-automation`, `code-simplification`, `frontend-ui-engineering`,
-  `browser-testing-with-devtools`.
+
+**These load from the `agent-skills` plugin, not from this repo.** See
+[Workflow Lifecycle](workflow-lifecycle.md) for the phase-by-phase index and links upstream.
+B-035 Task 3(a) deleted the 20 vendored copies that used to live in `skills/`: every skill
+invocation loaded from the plugin, never from here, so the copies were unread and free to
+drift. Nothing was lost — everything deleted duplicated something that loads from elsewhere.
+
+**[using-agent-skills](../skills/using-agent-skills/SKILL.md)** is the one that stays local,
+because 32 of its lines are this repo's own Skill Routing Contract.
 
 ### Domain skills
 - **[economist-writing](../skills/economist-writing/SKILL.md)** — the writing standard for every article

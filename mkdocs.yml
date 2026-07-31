@@ -83,28 +83,13 @@ nav:
     - ADR-0015 — Local-First Verification: adr/0015-local-first-verification.md
 
   - Skills:
-    - Workflow (addyosmani/agent-skills):
-      - Using Agent Skills: skills/using-agent-skills/SKILL.md
-      - Idea Refine: skills/idea-refine/SKILL.md
-      - Spec-Driven Development: skills/spec-driven-development/SKILL.md
-      - Planning and Task Breakdown: skills/planning-and-task-breakdown/SKILL.md
-      - Context Engineering: skills/context-engineering/SKILL.md
-      - Source-Driven Development: skills/source-driven-development/SKILL.md
-      - Incremental Implementation: skills/incremental-implementation/SKILL.md
-      - Test-Driven Development: skills/test-driven-development/SKILL.md
-      - Browser Testing with DevTools: skills/browser-testing-with-devtools/SKILL.md
-      - Debugging and Error Recovery: skills/debugging-and-error-recovery/SKILL.md
-      - Code Review and Quality: skills/code-review-and-quality/SKILL.md
-      - Code Simplification: skills/code-simplification/SKILL.md
-      - Security and Hardening: skills/security-and-hardening/SKILL.md
-      - Performance Optimization: skills/performance-optimization/SKILL.md
-      - Frontend UI Engineering: skills/frontend-ui-engineering/SKILL.md
-      - API and Interface Design: skills/api-and-interface-design/SKILL.md
-      - Git Workflow and Versioning: skills/git-workflow-and-versioning/SKILL.md
-      - CI/CD and Automation: skills/ci-cd-and-automation/SKILL.md
-      - Documentation and ADRs: skills/documentation-and-adrs/SKILL.md
-      - Deprecation and Migration: skills/deprecation-and-migration/SKILL.md
-      - Shipping and Launch: skills/shipping-and-launch/SKILL.md
+    # B-035 Task 3(a): the 20 vendored copies of the upstream skills were deleted.
+    # They loaded from the addyosmani/agent-skills plugin, never from here, so the
+    # copies were unread, free to drift, and republished a third party's docs under
+    # this site. One index page links to upstream instead. `using-agent-skills`
+    # stays local for its 32 lines of Skill Routing Contract.
+    - Workflow Lifecycle (addyosmani/agent-skills): workflow-lifecycle.md
+    - Using Agent Skills: skills/using-agent-skills/SKILL.md
     - Domain (economist-agents):
       - ADR Governance: skills/adr-governance/SKILL.md
       - Agent Delegation: skills/agent-delegation/SKILL.md

@@ -33,9 +33,22 @@ class TestListSkills:
     """Cheap triage: big, old and unreferenced surfaces first."""
 
     def test_finds_the_repo_skills(self) -> None:
+        """Every `skills/` directory is discovered.
+
+        This asserted `>= 30` when the repo also vendored 20 upstream copies.
+        B-035 Task 3(a) deleted those — they loaded from the `agent-skills`
+        plugin, never from here — so a floor tied to that count now measures
+        nothing but the deletion. Comparing against the directories actually on
+        disk keeps the test about discovery, which is what it is for.
+        """
+        on_disk = {
+            d.name
+            for d in (REPO_ROOT / "skills").iterdir()
+            if (d / "SKILL.md").is_file()
+        }
         skills = list_skills(REPO_ROOT / "skills")
 
-        assert len(skills) >= 30, "the repo carries ~38 skills"
+        assert {s.name for s in skills} == on_disk
         assert all(isinstance(s, SkillSummary) for s in skills)
 
     def test_sorted_by_line_count_descending(self) -> None:

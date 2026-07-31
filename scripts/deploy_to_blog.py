@@ -644,7 +644,18 @@ def deploy_review(
 # ---------------------------------------------------------------------------
 
 
-def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+def _build_parser() -> argparse.ArgumentParser:
+    """Build the CLI parser.
+
+    Split out from `_parse_args` so tests can assert on the *configuration* —
+    specifically that `--mode` has no default (B-028 Task 1). Asserting only on
+    behaviour would let a future change reintroduce a default alongside
+    `required=True`, which argparse accepts silently.
+
+    Returns:
+        The configured parser.
+
+    """
     parser = argparse.ArgumentParser(
         description="Deploy article to blog via Pull Request"
     )
@@ -675,12 +686,20 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Prepare and validate but skip push/PR creation",
     )
+    # B-028: this carried `default="post"`, so the command as five docs
+    # described it published without review, with no error and no warning —
+    # exactly how article two skipped the B-013 review stage. Neither value is a
+    # safe default: `post` skips review, and `review` would write to the blog's
+    # live branch on a bare invocation, which is worse. Requiring the choice
+    # removes the accident without picking a wrong default.
     parser.add_argument(
         "--mode",
         choices=("post", "review"),
-        default="post",
-        help="'post' (default): open a PR into _posts/. 'review' (B-013): write "
-        "an unlisted noindex draft to _review/ on the live branch, no PR.",
+        required=True,
+        help="REQUIRED. 'review' (B-013, the sanctioned route): write an "
+        "unlisted noindex draft to _review/ on the live branch, no PR — then "
+        "`make publish SLUG=<slug>` after approval. 'post': open a PR straight "
+        "into _posts/, skipping review.",
     )
     parser.add_argument(
         "--live-branch",
@@ -692,7 +711,20 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=os.getenv("BLOG_HOST", "www.viney.ca"),
         help="Blog host for the printed review URL (default: $BLOG_HOST or 'www.viney.ca').",
     )
-    return parser.parse_args(argv)
+    return parser
+
+
+def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """Parse CLI arguments.
+
+    Args:
+        argv: Argument vector; defaults to `sys.argv[1:]`.
+
+    Returns:
+        The parsed namespace.
+
+    """
+    return _build_parser().parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:

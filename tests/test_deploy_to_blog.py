@@ -228,6 +228,11 @@ class TestDeployToBlogMain:
                     "fake-token",
                     "--article",
                     str(stale_article_file),
+                    # B-028: --mode is required now; it used to default to
+                    # "post", which is the defect that let article two publish
+                    # unreviewed. This test exercises the post path explicitly.
+                    "--mode",
+                    "post",
                 ]
             )
 

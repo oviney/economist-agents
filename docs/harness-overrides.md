@@ -33,7 +33,14 @@ the sensor matches on, so a typo silently grants no exemption (fail-closed by de
 
 ## Active overrides
 
-_(none — the register starts empty by design)_
+- `scripts/sync_copilot_context.py::format_anti_patterns_section` — three parallel
+  group-by-and-emit blocks (defects, QA skills, architecture); pre-existing and untouched by
+  B-035 Task 3(b), which changed only `update_copilot_instructions`. Splitting it is a
+  worthwhile cleanup but is not this bug fix's scope. **Review queue: pay down when this
+  formatter is next edited for its own sake.**
+- `scripts/sync_copilot_context.py::extract_architecture_patterns` — a line-oriented
+  markdown parser; the branch count is the grammar. Same provenance as above: pre-existing,
+  not touched by Task 3(b).
 
 ## Day-one baseline (NOT overrides)
 

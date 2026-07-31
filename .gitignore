@@ -10,6 +10,10 @@
 # Harness sensor history (B-030) — per-session snapshots, runtime data
 logs/sensor_history.jsonl
 
+# Stop-gate one-block-per-session sentinels (B-030) — pure runtime state.
+# Surfaced as untracked the first time the gate fired in a working tree.
+logs/.session_gate/
+
 # Python
 __pycache__/
 *.py[cod]

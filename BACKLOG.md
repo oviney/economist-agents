@@ -369,9 +369,24 @@ already retired the workflow.
 
 ### B-035 · Close the three harness decisions B-030…B-034 deliberately left open
 
-**Opened 2026-07-30.** B-030…B-034 shipped with three questions routed to the owner
-rather than guessed at. All three were then **measured** (2026-07-30) and each has one
-recommended path. This item is the execution.
+**Opened 2026-07-30. DONE 2026-07-31.** B-030…B-034 shipped with three questions routed to
+the owner rather than guessed at. All three were then **measured** (2026-07-30) and each had
+one recommended path. This item was the execution.
+
+**Outcome.** All three landed, in the order 3(b) → 2 → 1 → 3(a). Spec:
+`docs/specs/b035-harness-decisions.md`.
+
+| Task | Result |
+|---|---|
+| **3(b)** | Three defects, not one. The append bug; an unbounded `split` that would silently discard content; and both JSON extractors reading `skills/` when the state files live in `data/skills_state/`. The third was found while checking the regeneration was lossless — it would have **dropped** two of three pattern families. `.github/copilot-instructions.md`: 2,601 → 819 lines, 20 sections → 1, 58 → **84** patterns, zero lost. |
+| **2** | `scripts/mypy_baseline.py` + `docs/mypy-baseline.md`. Baseline is 11 files / 30 errors, not the measured 12: `sync_copilot_context.py` was **fixed** rather than grandfathered (four annotations). A test fails if any count grows *or* if an improved file keeps its allowance, so the baseline can only shrink. `CLAUDE.md` keeps "Type hints mandatory" — a test asserts it. |
+| **1** | Stop gate now runs `tests/test_X.py` for each changed `X.py`, 60s cap, lint-only fallback. Found in build: the gate's own test file matches its mapping rule, so it spawned a pytest that re-entered the gate. Added a reentrancy guard bounding recursion at depth one. |
+| **3(a)** | Owner approved "delete + index page" 2026-07-31. 20 dirs deleted, `using-agent-skills` kept. Guide layer **8,031 → 2,243 lines**, better than the ~2,700 estimate. `docs/workflow-lifecycle.md` is the replacement index. |
+
+**Open question, answered.** The docs site's republishing of the upstream skills was *not*
+deliberate. The decisive evidence: those copies were never what got loaded — every skill
+invocation resolves to the `agent-skills` plugin directory and prints it. They were unread
+and free to drift.
 
 #### Task 1 — the `Stop` gate should run scoped tests, not just lint (S)
 
@@ -386,10 +401,10 @@ The objection was cost, and the measurement removes it: don't run the suite, run
 signal, which the podcast calls the most important and least solved feedback loop. The
 one-block-per-session bound already caps the downside.
 
-- [ ] Changed `scripts/X.py` maps to `tests/test_X.py`; only matching files run
-- [ ] 60s cap; on timeout or no match, fall back to lint-only (never block on a timeout)
-- [ ] Lint stays the always-on part — tests are additive, not a replacement
-- [ ] A test asserts the fallback path does not block
+- [x] Changed `scripts/X.py` maps to `tests/test_X.py`; only matching files run
+- [x] 60s cap; on timeout or no match, fall back to lint-only (never block on a timeout)
+- [x] Lint stays the always-on part — tests are additive, not a replacement
+- [x] A test asserts the fallback path does not block
 
 **Files:** `scripts/hooks/session_gate.py`, `tests/test_harness_hooks.py`. **Scope:** S.
 
@@ -411,10 +426,10 @@ mechanism for complexity (`docs/harness-overrides.md`); mypy should reuse it rat
 invent a second answer to the same question. One mechanism, two sensors — and with a
 baseline the guide becomes *true* for all new code instead of aspirational.
 
-- [ ] Baseline records the 12 files, with the error count each is grandfathered at
-- [ ] A **new** error in a baselined file still blocks (baseline is per-file count, not a mute)
-- [ ] Baseline shrinks only — a test fails if a file's grandfathered count grows
-- [ ] `CLAUDE.md` keeps "Type hints mandatory"; the baseline is what makes it honest
+- [x] Baseline records the 12 files, with the error count each is grandfathered at
+- [x] A **new** error in a baselined file still blocks (baseline is per-file count, not a mute)
+- [x] Baseline shrinks only — a test fails if a file's grandfathered count grows
+- [x] `CLAUDE.md` keeps "Type hints mandatory"; the baseline is what makes it honest
 
 **Files:** `.pre-commit-config.yaml`, `docs/harness-overrides.md` (or a sibling),
 `tests/test_harness_config.py`. **Scope:** S.
@@ -444,14 +459,14 @@ agent reads; they are a stale copy of one it reads from somewhere else.
 replacing it. There are now **20 of them** (16 distinct, most 85 lines); 2,267 of 2,601
 lines sit below the first heading.
 
-- [ ] `sync_copilot_context.py` replaces rather than appends; file regenerated
+- [x] `sync_copilot_context.py` replaces rather than appends; file regenerated
       (**do this regardless of the rest — it is a bug fix, not a decision**)
-- [ ] The 19 vendored upstream skill copies deleted; `using-agent-skills` kept for its
+- [x] The 19 vendored upstream skill copies deleted; `using-agent-skills` kept for its
       32 lines of local routing contract
-- [ ] `CLAUDE.md` Key Skills section points at the plugin, not at deleted paths
-- [ ] mkdocs nav entries for the deleted skills removed
-- [ ] All 17 domain skills untouched
-- [ ] `make ci-local` green; `validate_skills.py` still passes on what remains
+- [x] `CLAUDE.md` Key Skills section points at the plugin, not at deleted paths
+- [x] mkdocs nav entries for the deleted skills removed
+- [x] All 17 domain skills untouched
+- [x] `make ci-local` green; `validate_skills.py` still passes on what remains
 
 **Net: 8,031 → ~2,700 lines with zero instructions lost**, because everything deleted
 duplicates something that loads from elsewhere.

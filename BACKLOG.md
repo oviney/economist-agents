@@ -675,8 +675,40 @@ review now run on the subscription with **no token of any kind**. Porting auth w
 authenticate a path that no longer authenticates would be strictly worse than doing nothing.
 
 `backup/integration-test-20260728` can now be deleted — the only thing on it that had not
-landed elsewhere was this auth commit, and it is moot. **Left to the owner to delete**,
-since the caution about it being the only copy was well placed.
+landed elsewhere was this auth commit, and it is moot.
+
+**DELETED 2026-07-31**, on the owner's instruction, after verification:
+
+| Check | Result |
+|---|---|
+| Present on `origin`? | **No** — local-only, so it really was the only copy |
+| Tip SHA | **`6104a4c`** (`Merge branch 'chore/stage3-strip-code-fence' into local/integration-test`) |
+| Auth commit | **`73e73c0`** — the one unlanded change, made moot by BUG-046 |
+| Source files present on the branch but absent from `main` | 18, **all deliberate removals**: `agent_registry.py` (ADR-0012), `orchestrator_agent.py` / `po_agent.py` / `sm_agent.py` (CrewAI-era, cleaned up in #327/#343), `src/backlog/migrate_backlog_to_github.py` (local-backlog migration), `src/agent_sdk/image_gate.py` (ADR-0014) |
+
+Nothing on it was unlanded work. **Recoverable from `6104a4c`** via
+`git branch <name> 6104a4c` until the objects are garbage-collected (~90 days by default) —
+which is why the SHA is recorded here rather than only in the reflog.
+
+**Correction: "it is the only copy" was never true.** Checked after deleting —
+`git branch --contains 73e73c0` still returns **`chore/anthropic-auth-token-resolution`**.
+The backup branch was a *merge* of six `chore/*` branches, and every one of them still
+exists locally:
+
+```
+chore/anthropic-auth-token-resolution   ece6f7e   <- carries the auth commit 73e73c0
+chore/stage3-strip-code-fence           6cd181c
+chore/fix-chart-embed-chart-only        38f9b9b
+chore/harden-free-research              8dbd612
+chore/remove-mcp-serper-path            b1e08fa
+chore/remove-paid-research-apis         c99fda2
+```
+
+So the caution that shaped this item for three days was based on an unverified claim, and
+one `git branch --contains` would have dissolved it. That is the same pattern B-027 exists
+to remedy and that ~~B-025~~ was recorded for: **asserting from a surface reading instead of
+measuring.** Third instance. Recorded here rather than quietly fixed, because the pattern is
+the finding.
 
 ### ~~B-025~~ · WITHDRAWN 2026-07-29 — the defect record was never at risk
 

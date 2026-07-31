@@ -41,6 +41,11 @@ the sensor matches on, so a typo silently grants no exemption (fail-closed by de
 - `scripts/sync_copilot_context.py::extract_architecture_patterns` — a line-oriented
   markdown parser; the branch count is the grammar. Same provenance as above: pre-existing,
   not touched by Task 3(b).
+- `scripts/llm_client.py::_call_anthropic` — 6 args (client, model, system, user,
+  max_tokens, temperature). Pre-existing; it is the provider ABI that `call_llm` dispatches
+  to, so the signature is the interface rather than an accumulation. Untouched by BUG-046,
+  which only added a keyless branch alongside it.
+- `scripts/llm_client.py::_call_openai` — same signature, same reason, same provenance.
 
 ## Day-one baseline (NOT overrides)
 

@@ -246,11 +246,19 @@ To supply hero art by hand, overwrite `output/posts/images/<slug>-hero.svg` (the
 an article still carrying the `<!-- HERO IMAGE …` reviewer comment — it escaped
 to a live post once (BUG-065, ADR-0017).
 
-> Note: a legacy paid path still exists — `EconomistContentFlow` Stage 1 topic
-> discovery calls `create_llm_client`, which needs `ANTHROPIC_API_KEY`
-> (BUG-046). Making the full flow keyless is tracked in **B-010**; until then the
-> keyless generator is `python -m src.agent_sdk.pipeline` (manual topic). See
-> `docs/keyless-pipeline-runbook.md`.
+> **BUG-046 is fixed (2026-07-31).** `create_llm_client` now defaults to a keyless
+> `agent_sdk` provider that runs on the Claude subscription, so
+> `EconomistContentFlow` Stage 1 (topic discovery) and Stage 2 (editorial review)
+> need **no key**. Constraint #3 now holds by construction: a stray
+> `ANTHROPIC_API_KEY` in the environment cannot silently start billing, because
+> the keyless provider wins unless `LLM_PROVIDER` explicitly names another.
+>
+> The legacy paid providers remain reachable via `LLM_PROVIDER=anthropic|openai`
+> because they pre-date the constraint — not because anything should reach for
+> them. Naming one without its key is an error, never a silent fallback.
+>
+> `python -m src.agent_sdk.pipeline` (manual topic) remains the simplest keyless
+> generator. See `docs/keyless-pipeline-runbook.md`.
 
 ## Key Skills
 

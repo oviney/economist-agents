@@ -95,9 +95,12 @@ token needs only `Contents` + `Pull requests` write on `oviney/blog` — no AI k
   image generation was retired (ADR-0014) and CLAUDE.md #4 forbids pixel models.
   To supply art by hand, overwrite `output/posts/images/<slug>-hero.svg` (the
   `.image_prompt.md` sidecar is the brief) and re-run.
-- **Topic is manual.** `pipeline.py` takes the topic as an argument; there is no
-  keyless auto-discovery. `EconomistContentFlow`'s Stage-1 discovery still needs
-  `ANTHROPIC_API_KEY` (BUG-046), so this single command is the keyless route.
+- **Topic is manual on this route.** `pipeline.py` takes the topic as an argument.
+  This used to be forced: `EconomistContentFlow`'s Stage-1 discovery required
+  `ANTHROPIC_API_KEY` (BUG-046). **That is fixed as of 2026-07-31** —
+  `create_llm_client` now defaults to a keyless `agent_sdk` provider, so the flow's
+  discovery and editorial-review stages run on the subscription too. This single
+  command remains the simplest route, not the only one.
 
 ## Deprecated path
 

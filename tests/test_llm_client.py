@@ -45,7 +45,15 @@ def clean_env():
     """Clean environment for testing."""
     # Store original env vars
     original_vars = {}
-    for key in ["OPENAI_API_KEY", "OPENAI_MODEL"]:
+    # LLM_PROVIDER and ANTHROPIC_API_KEY added with BUG-046: the keyless
+    # agent_sdk provider is now the default, so these tests must name the
+    # legacy provider they mean to exercise rather than inferring it from a key.
+    for key in [
+        "OPENAI_API_KEY",
+        "OPENAI_MODEL",
+        "ANTHROPIC_API_KEY",
+        "LLM_PROVIDER",
+    ]:
         original_vars[key] = os.environ.get(key)
         if key in os.environ:
             del os.environ[key]
@@ -92,29 +100,48 @@ class TestClientCreation:
         clean_env,
         mock_openai_client,
         capsys,
+        caplog,
     ):
         """Test that OpenAI client is created when OPENAI_API_KEY is set."""
         os.environ["OPENAI_API_KEY"] = "sk-test-key"
+        os.environ["LLM_PROVIDER"] = "openai"  # BUG-046: keyless is the default now
 
-        with mock_openai_import(mock_openai_client):
+        with mock_openai_import(mock_openai_client), caplog.at_level("INFO"):
             client = create_llm_client()
 
             assert isinstance(client, LLMClient)
             assert client.provider == "openai"
             assert client.model == "gpt-4o"
 
-            captured = capsys.readouterr()
-            assert "LLM Provider: openai" in captured.out
-            assert "Model: gpt-4o" in captured.out
+            # The provider announcement moved from print() to logger.info()
+            # with BUG-046 — CLAUDE.md mandates logger over print.
+            assert "LLM Provider: openai" in caplog.text
+            assert "Model: gpt-4o" in capsys.readouterr().out
 
-    def test_raises_error_when_no_api_key(self, clean_env):
-        """Test that error is raised when no API key is provided."""
-        with pytest.raises(ValueError, match="No API key found"):
+    def test_no_api_key_yields_the_keyless_provider(self, clean_env):
+        """No key is the *normal* case now, not an error (BUG-046).
+
+        This asserted `ValueError: No API key found`. That behaviour was the
+        defect: Operating Constraint #3 says the only LLM auth is the Claude
+        subscription, and requiring a key contradicted it — which is why
+        `EconomistContentFlow` Stage 1 could not run keyless.
+        """
+        client = create_llm_client()
+
+        assert client.provider == "agent_sdk"
+        assert client.client is None
+
+    def test_naming_a_paid_provider_without_its_key_still_errors(self, clean_env):
+        """Explicit request, absent credential — say so rather than fall back."""
+        os.environ["LLM_PROVIDER"] = "openai"
+
+        with pytest.raises(ValueError, match="OPENAI_API_KEY"):
             create_llm_client()
 
     def test_custom_model_configuration(self, clean_env, mock_openai_client):
         """Test custom model configuration via environment variable."""
         os.environ["OPENAI_API_KEY"] = "sk-test-key"
+        os.environ["LLM_PROVIDER"] = "openai"  # BUG-046: keyless is the default now
         os.environ["OPENAI_MODEL"] = "gpt-3.5-turbo"
 
         with mock_openai_import(mock_openai_client):
@@ -131,7 +158,9 @@ class TestClientCreation:
             return_value=mock_anthropic_instance,
         )
 
-        env = {"ANTHROPIC_API_KEY": "sk-ant-test"}
+        # LLM_PROVIDER is required now: a key alone no longer selects a provider,
+        # because the keyless agent_sdk path is the default (BUG-046).
+        env = {"ANTHROPIC_API_KEY": "sk-ant-test", "LLM_PROVIDER": "anthropic"}
         with (
             patch.dict(os.environ, env, clear=True),
             patch.dict(sys.modules, {"anthropic": fake_module}),
@@ -154,6 +183,7 @@ class TestErrorHandling:
     def test_missing_openai_package(self, clean_env):
         """Test behavior when openai package is not installed."""
         os.environ["OPENAI_API_KEY"] = "sk-test-key"
+        os.environ["LLM_PROVIDER"] = "openai"  # BUG-046: keyless is the default now
 
         def mock_import(name, *args, **kwargs):
             if name == "openai":
@@ -169,6 +199,7 @@ class TestErrorHandling:
     def test_rate_limit_retry_logic(self, clean_env, capsys):
         """Test rate limiting retry logic."""
         os.environ["OPENAI_API_KEY"] = "sk-test-key"
+        os.environ["LLM_PROVIDER"] = "openai"  # BUG-046: keyless is the default now
 
         mock_module = MagicMock()
         rate_limit_error = type("RateLimitError", (Exception,), {})
@@ -258,6 +289,7 @@ class TestIntegration:
     def test_full_workflow(self, clean_env, mock_openai_client, capsys):
         """Test complete workflow from client creation to LLM call."""
         os.environ["OPENAI_API_KEY"] = "sk-test-key"
+        os.environ["LLM_PROVIDER"] = "openai"  # BUG-046: keyless is the default now
 
         with mock_openai_import(mock_openai_client):
             # Create client
@@ -274,8 +306,9 @@ class TestIntegration:
             assert client.provider == "openai"
             assert client.model == "gpt-4o"
 
-            captured = capsys.readouterr()
-            assert "LLM Provider: openai" in captured.out
+            # Provider selection is logged, not printed, since BUG-046. The
+            # client's own repr carries the same fact and is what callers see.
+            assert repr(client) == "LLMClient(provider=openai, model=gpt-4o)"
 
     def test_llm_client_repr(self):
         """Test LLMClient string representation."""
@@ -294,6 +327,7 @@ class TestIntegration:
 def test_main_execution_success(clean_env, mock_openai_client, capsys):
     """Test the main execution block when run as script."""
     os.environ["OPENAI_API_KEY"] = "sk-test-key"
+    os.environ["LLM_PROVIDER"] = "openai"  # BUG-046: keyless is the default now
 
     with mock_openai_import(mock_openai_client):
         # Import and execute the main block
@@ -336,8 +370,15 @@ if __name__ == "__main__":
 
 
 def test_main_execution_failure(clean_env, capsys):
-    """Test the main execution block when API key is missing."""
-    # No API key set, should fail
+    """The main block prints an error when client creation fails.
+
+    BUG-046 changed what "fails" means here. A missing key is no longer a
+    failure — it selects the keyless agent_sdk provider — so this test used to
+    fall through to a **real** subscription call via `call_llm` and hang the
+    suite. The case that still fails is naming a paid provider without its key,
+    which is what this now exercises.
+    """
+    os.environ["LLM_PROVIDER"] = "openai"
 
     # Import the module
     from scripts import llm_client
@@ -373,4 +414,4 @@ if __name__ == "__main__":
     captured = capsys.readouterr()
     assert "Testing LLM Client Factory" in captured.out
     assert "❌ Error:" in captured.out
-    assert "No API key found" in captured.out
+    assert "OPENAI_API_KEY" in captured.out

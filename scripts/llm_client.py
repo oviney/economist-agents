@@ -50,21 +50,94 @@ class LLMClient:
 
 
 def create_llm_client(max_retries: int = 3, base_delay: int = 1) -> LLMClient:
-    """Create LLM client — prefers Anthropic, falls back to OpenAI.
+    """Create an LLM client. Keyless by default (Operating Constraint #3).
+
+    BUG-046: this used to require ``ANTHROPIC_API_KEY`` or ``OPENAI_API_KEY`` and
+    raise ``ValueError`` when neither was set, which is why
+    ``EconomistContentFlow`` Stage 1 could not run on the keyless stack — the
+    documented workaround was to skip the flow and drive
+    ``src.agent_sdk.pipeline`` with a manual topic instead.
+
+    The Agent SDK provider is now the default, so "the only LLM auth is the
+    Claude subscription" holds by construction rather than by discipline. A
+    stray key left in the environment cannot silently start billing.
+
+    The key-based providers remain reachable via ``LLM_PROVIDER`` because they
+    pre-date the constraint, not because anything should reach for them. Naming
+    one without its key is an error rather than a silent fallback — a fallback
+    would make the request ambiguous exactly when the caller was being explicit.
 
     Args:
-        max_retries: Number of retries on rate limit errors.
+        max_retries: Number of retries on rate limit errors (key-based paths).
         base_delay: Base delay in seconds for exponential backoff.
 
     Returns:
-        LLMClient configured for the available provider.
+        LLMClient for the selected provider.
+
+    Raises:
+        ValueError: If ``LLM_PROVIDER`` names an unknown provider, or names a
+            key-based provider whose key is absent.
+
+    """
+    requested = os.environ.get("LLM_PROVIDER", "").strip().lower()
+
+    if requested in ("", "agent_sdk"):
+        logger.info("🤖 LLM Provider: agent_sdk (keyless, Claude subscription)")
+        return _create_agent_sdk_client()
+
+    if requested == "anthropic":
+        if not os.environ.get("ANTHROPIC_API_KEY"):
+            raise ValueError(
+                "LLM_PROVIDER=anthropic but ANTHROPIC_API_KEY is not set. "
+                "Unset LLM_PROVIDER to use the keyless Agent SDK provider.",
+            )
+        logger.info("🤖 LLM Provider: anthropic (legacy paid path)")
+        return _create_anthropic_client()
+
+    if requested == "openai":
+        if not os.environ.get("OPENAI_API_KEY"):
+            raise ValueError(
+                "LLM_PROVIDER=openai but OPENAI_API_KEY is not set. "
+                "Unset LLM_PROVIDER to use the keyless Agent SDK provider.",
+            )
+        logger.info("🤖 LLM Provider: openai (legacy paid path)")
+        return _create_openai_client(max_retries, base_delay)
+
+    raise ValueError(
+        f"Unknown LLM_PROVIDER={requested!r}. "
+        "Valid values: agent_sdk (default), anthropic, openai.",
+    )
+
+
+def _create_agent_sdk_client() -> LLMClient:
+    """Build the keyless client that runs on the Claude subscription.
+
+    There is no credential and no SDK object to construct here — the Agent SDK's
+    ``query()`` is called per request in `_call_agent_sdk`, so the client is
+    just the provider tag and the model name.
+
+    Returns:
+        An ``agent_sdk`` LLMClient.
+
+    """
+    model = os.environ.get("AGENT_SDK_MODEL", "claude-sonnet-4-6")
+    return LLMClient(provider="agent_sdk", client=None, model=model)
+
+
+def _legacy_key_based_client(max_retries: int = 3, base_delay: int = 1) -> LLMClient:
+    """Preserve the old auto-detect order for callers that still want it.
+
+    Kept because deleting it is a separate decision from making keyless the
+    default, and nothing in-tree calls it today.
+
+    Returns:
+        LLMClient for whichever key is present.
 
     Raises:
         ValueError: If neither API key is set.
 
     """
     if os.environ.get("ANTHROPIC_API_KEY"):
-        print("🤖 LLM Provider: anthropic")
         return _create_anthropic_client()
 
     if os.environ.get("OPENAI_API_KEY"):
@@ -74,6 +147,71 @@ def create_llm_client(max_retries: int = 3, base_delay: int = 1) -> LLMClient:
     raise ValueError(
         "[LLM_CLIENT] No API key found. Set ANTHROPIC_API_KEY or OPENAI_API_KEY.",
     )
+
+
+def _call_agent_sdk(
+    system_prompt: str,
+    user_prompt: str,
+    max_tokens: int = 3000,
+    temperature: float = 1.0,
+) -> str:
+    """Call Claude through the Agent SDK — no API key, no metered billing.
+
+    Runs on the authenticated `claude` CLI / Claude subscription, which is the
+    only LLM auth this repo permits (Operating Constraint #3).
+
+    ``max_tokens`` and ``temperature`` are accepted for interface parity with the
+    key-based providers but are not forwarded: `ClaudeAgentOptions` exposes
+    neither, and silently pretending to honour them would be worse than plainly
+    not doing so. Callers use them as advisory ceilings, and no in-tree caller
+    depends on either being enforced.
+
+    Args:
+        system_prompt: System/context prompt.
+        user_prompt: User message.
+        max_tokens: Ignored; see above.
+        temperature: Ignored; see above.
+
+    Returns:
+        The assistant's text, or ``""`` when the SDK yields nothing.
+
+    Raises:
+        ImportError: If claude_agent_sdk is not installed.
+
+    """
+    import asyncio
+
+    try:
+        from claude_agent_sdk import (
+            AssistantMessage,
+            ClaudeAgentOptions,
+            TextBlock,
+            query,
+        )
+    except ImportError as err:
+        raise ImportError(
+            "[LLM_CLIENT] claude_agent_sdk not installed. "
+            "Install it: pip install claude-agent-sdk",
+        ) from err
+
+    async def _run() -> str:
+        options = ClaudeAgentOptions(
+            model=os.environ.get("AGENT_SDK_MODEL", "claude-sonnet-4-6"),
+            system_prompt=system_prompt,
+            max_turns=1,
+            permission_mode="bypassPermissions",
+            allowed_tools=[],
+            mcp_servers={},
+        )
+        parts: list[str] = []
+        async for message in query(prompt=user_prompt, options=options):
+            if isinstance(message, AssistantMessage):
+                for block in message.content:
+                    if isinstance(block, TextBlock):
+                        parts.append(block.text)
+        return "".join(parts).strip()
+
+    return asyncio.run(_run())
 
 
 def _create_anthropic_client() -> LLMClient:
@@ -186,6 +324,9 @@ def call_llm(
         Response text from LLM.
 
     """
+    if llm_client.provider == "agent_sdk":
+        return _call_agent_sdk(system_prompt, user_prompt, max_tokens, temperature)
+
     if llm_client.provider == "anthropic":
         return _call_anthropic(
             llm_client.client,

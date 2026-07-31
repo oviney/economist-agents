@@ -185,14 +185,7 @@ workflow as an operating instruction.
 
 ## Still open
 
-- **B-028 Task 3** — whether `--mode post` should exist at all. Tasks 1 and 2 are done;
-  Task 3 is a behavioural removal with governance history, so it needs a spec and an owner
-  decision, not a quiet deletion. **Owner-gated.**
-- **ADR-0018** — Proposed and now committed. Still needs an owner decision on whether the
-  editorial review gate is adopted.
-- **B-023** — the fate of `llm_client.py`'s Anthropic auth path. Came in from `main` during
-  the merge. Answer B-010's scope first. **Do not delete
-  `backup/integration-test-20260728`** before this is answered — it is the only copy.
+- **B-015** — see below. The only genuinely blocked item left.
 - **B-037** — `.python-version` pins **3.12**, but `.venv/bin/python` (what `make ci-local`
   actually runs) is **3.13.14**. Found while fixing B-036's Python badge, which forced the
   question of which is authoritative. ADR-0015 says "pinned to one version"; that is
@@ -213,6 +206,24 @@ workflow as an operating instruction.
   the blog's `validate-posts.sh` globs `_posts/*.md` itself rather than asking Jekyll, so an
   undated file validates happily there. A new `is_publishable_post_name` predicate is
   asserted by the oracle directly.
+- **BUG-046 / B-010** — the flow is **keyless end to end**. `create_llm_client` now defaults
+  to an `agent_sdk` provider running on the subscription, so `EconomistContentFlow` Stage 1
+  and Stage 2 need no key. Constraint #3 holds *by construction*: the keyless provider wins
+  even when `ANTHROPIC_API_KEY` is set, so a stray key cannot silently start billing. Paid
+  providers survive only as an explicit `LLM_PROVIDER=anthropic|openai` opt-out, and naming
+  one without its key errors rather than falling back.
+- **B-023** — **dissolved**, not answered. The question was whether porting
+  `ANTHROPIC_AUTH_TOKEN` support counts as a new key (#1) or the subscription (#3). Both
+  readings assumed the path needs a credential; it no longer does. `backup/integration-test-20260728`
+  now holds nothing unlanded and **you can delete it** — left to you, since the "only copy"
+  caution was well placed.
+- **B-028 Task 3** — **WON'T DO.** The accident is prevented three times over (`--mode`
+  required, B-030's hook denies it, six docs). Removal buys a fourth lock on a bolted door
+  and costs the escape hatch for republishing. Reopen only if a fourth unreviewed publish
+  happens *despite* all three.
+- **ADR-0018** — **Accepted.** The 37-point spread (88% PASS vs 51.0 BLOCK on one article)
+  decided it. Advisory-first per its own decision 3, so it informs the human who already
+  approves at the B-013 stage rather than acquiring a veto.
 - **B-036** — badge validation rebuilt. The badges really were stale: `CI` and
   `Quality Tests` pointed at workflows ADR-0015 deleted, and the Python badge disagreed with
   the pin. The front page claimed CI this project deliberately does not have, for months,

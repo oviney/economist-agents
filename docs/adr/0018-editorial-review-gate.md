@@ -1,7 +1,7 @@
 # ADR-0018: Editorial Review Gate for Generated Articles
 
-**Status:** Proposed
-**Date:** 2026-07-29
+**Status:** Accepted
+**Date:** 2026-07-29 · **Accepted:** 2026-07-31
 **Decision Maker:** Ouray Viney (owner)
 **Supersedes:** *(none)*
 **Superseded by:** *(none)*
@@ -80,6 +80,21 @@ Related open work: **B-028** already proposes that the unreviewed publish path s
 the default, after the RCA found `deploy_to_blog.py` sets `default="post"` and silently
 bypasses the B-013 review stage. This ADR decides what runs *in* that stage; B-028
 decides that the stage cannot be skipped.
+
+## Acceptance note (2026-07-31)
+
+Accepted as written. The decisive evidence is the **37-point spread on one article**: the
+deterministic evaluator returns 88% PASS where the rubric returns 51.0 BLOCK, and it awards
+its two *highest* sub-scores to the exact defects — 10/10 `visual_engagement` to a chart
+plotting neither figure the prose claims, 9/10 `evidence_sourcing` to a reference list
+carrying ten fidelity defects. A counting check cannot distinguish "cited" from "cited
+correctly", so that gap does not close by adding deterministic rules.
+
+Decision 3 (**advisory first, blocking later**) is the reason this is cheap to accept: the
+gate informs the human who already approves at the B-013 review stage rather than acquiring
+a veto of its own. It is an instrument for that reviewer, not a replacement for them.
+
+Keyless per Operating Constraint #3 — it runs on the Claude subscription via the Agent SDK.
 
 ## Decision
 

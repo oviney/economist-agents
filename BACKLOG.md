@@ -106,7 +106,23 @@ unlisted URL. It now carries the workflow as an operating instruction. Also corr
 followed), `.github/copilot-instructions.md` — whose cited line 29 had drifted since the RCA,
 so the workflow went into its hand-authored Developer Workflow section instead.
 
-#### Task 3 — decide whether `--mode post` should exist at all (needs a spec + LGTM)
+#### ~~Task 3~~ — WON'T DO, decided 2026-07-31
+
+**The accident is already prevented three times over**, so removal buys a fourth lock on a
+bolted door:
+
+1. `--mode` is required — a bare invocation fails (Task 1).
+2. B-030's `PreToolUse` hook **denies** `deploy_to_blog` without `--mode review`.
+3. Six documents now describe the review route, `CLAUDE.md` included (Task 2).
+
+What removal *costs* is an escape hatch — republishing, repairing a live post, anything
+where review is not the point. And it is a behavioural removal with governance history
+(B-015a tuned `deploy()`'s staging for PR scope), so it is not a cheap deletion either.
+
+Recorded rather than deleted: the original reasoning below is sound, and if a fourth
+unreviewed publish ever happens *despite* all three gates, this is the item to reopen.
+
+<details><summary>Original Task 3 rationale (kept for the record)</summary>
 
 If review → promote is the sanctioned route, `--mode post` may have no remaining
 role: `promote_review.py` already writes `_posts/` on the live branch. Retiring it
@@ -116,6 +132,8 @@ behavioural removal with a governance history (B-015a tuned `deploy()`'s staging
 for PR scope), so it needs a spec and an owner decision — not a quiet deletion.
 
 **Dependencies:** Tasks 1–2. **Scope:** S (spec) + S (removal), owner-gated.
+
+</details>
 
 ### B-029 · The acceptance oracle renames its input, so it does not test the deploy path
 
@@ -617,6 +635,22 @@ call for the owner, not an inference.
 **Answer B-010's scope first**, then either port the branch's auth commit
 (`73e73c0`) or delete `backup/integration-test-20260728`. Do not delete the
 branch before this is answered — it is the only copy.
+
+**DECIDED 2026-07-31: do not port. The question is dissolved, not answered.**
+
+The branch's work teaches `_create_anthropic_client` to accept an `ANTHROPIC_AUTH_TOKEN` or
+an `ant` OAuth profile *instead of* `ANTHROPIC_API_KEY`. Both branches of the original
+question — "is a token a new key (#1) or the subscription (#3)?" — assume the path needs a
+credential at all.
+
+It does not. **BUG-046 was fixed by making `create_llm_client` default to a keyless Agent
+SDK provider** (see BUG-046 in Done), so Stage 1 topic discovery and Stage 2 editorial
+review now run on the subscription with **no token of any kind**. Porting auth work to
+authenticate a path that no longer authenticates would be strictly worse than doing nothing.
+
+`backup/integration-test-20260728` can now be deleted — the only thing on it that had not
+landed elsewhere was this auth commit, and it is moot. **Left to the owner to delete**,
+since the caution about it being the only copy was well placed.
 
 ### ~~B-025~~ · WITHDRAWN 2026-07-29 — the defect record was never at risk
 
@@ -1173,7 +1207,19 @@ Spec: `docs/specs/B-011-retire-ci-local-verification.md`.
 A keyless run (`pipeline.py … --research-mode claude_web` → `deploy_to_blog`)
 produced a publish-valid article and opened **oviney/blog PR #1156** — the first
 live article since 2026-04-27 (pipeline had been dark ~3 months). Fixes
-BUG-047/048/049/050/051. BUG-046 resolved-by-workaround: the two-step
+**BUG-046 fully resolved 2026-07-31** (was resolved-by-workaround below).
+`create_llm_client` now defaults to a keyless `agent_sdk` provider running on the
+Claude subscription, so `EconomistContentFlow` Stage 1 (topic discovery) and
+Stage 2 (editorial review) need no key. Operating Constraint #3 now holds *by
+construction*: the keyless provider wins even when `ANTHROPIC_API_KEY` is set, so
+a stray key cannot silently start billing. Legacy paid providers survive only as
+an explicit `LLM_PROVIDER=anthropic|openai` opt-out, and naming one without its
+key is an error rather than a silent fallback. 9 new tests in
+`tests/test_llm_client_keyless.py`; `tests/test_llm_client.py` updated, since it
+encoded the old auto-detect-from-key behaviour. This also dissolves **B-023** —
+there is nothing left to authenticate.
+
+Original entry: BUG-047/048/049/050/051. BUG-046 resolved-by-workaround: the two-step
 `pipeline.py <topic>` + `deploy_to_blog` is the blessed keyless path (skips the
 paid `EconomistContentFlow` discovery); making discovery itself keyless remains a
 future enhancement. Runbook updated with the canonical command + Setup/Prereqs.

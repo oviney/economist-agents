@@ -50,10 +50,12 @@ They belong on `fix/article-two-run-defects` or a branch of their own — **not*
    method was to write a "mine-only" copy, `git add` it, then restore the combined file to
    the working tree — so the staged diff held only the B-035 hunk and the two editorial
    lines stayed unstaged.
-2. **`adr-lint` fails while ADR-0016 is untracked.** pre-commit stashes unstaged changes,
-   which removes the ADR-0016 *nav line* from `mkdocs.yml`, but the ADR *file* is untracked
-   and survives the stash — so it looks unreferenced and the hook errors. Move
-   `docs/adr/0016-editorial-review-gate.md` aside for the commit and move it straight back.
+2. **`adr-lint` fails while ADR-0016 is untracked — on both `git commit` and `git push`.**
+   The hook framework stashes unstaged changes, which removes the ADR-0016 *nav line* from
+   `mkdocs.yml`, but the ADR *file* is untracked and survives the stash — so it looks
+   unreferenced and the hook errors. Move `docs/adr/0016-editorial-review-gate.md` aside for
+   the operation and move it straight back. Expect to do this **twice** per push (once for
+   the commit, once for the push); it bit both times this session.
 
 ## What landed: B-030 … B-034 (harness engineering)
 

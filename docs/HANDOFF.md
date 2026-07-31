@@ -5,8 +5,41 @@ file is the "where were we" note a new session reads first, then overwrites when
 stale. The 2026-07-30 hand-off (B-030…B-034 close-out) is superseded; its durable warnings
 are carried forward below.
 
-**Read next, in this order:** this file → `BACKLOG.md` (B-028, B-029, B-015) →
-`docs/specs/b035-harness-decisions.md` if you need the reasoning behind the harness gates.
+**Read next, in this order:** this file → `docs/keyless-pipeline-runbook.md` if you are
+generating an article → `BACKLOG.md` (B-015, B-012 are the only open items) →
+`docs/specs/b035-harness-decisions.md` only if you need the reasoning behind the harness
+gates.
+
+**Session of 2026-07-31 is closed out.** B-028, B-029, B-035, B-036, B-037, BUG-046 and
+B-023 all landed; ADR-0018 accepted; the working tree is clean and both PRs are `MERGEABLE`.
+Nothing is half-finished.
+
+## Next session: generating an article from an HTML file
+
+**Read this before starting — the ask does not map onto an existing flag.**
+
+The pipeline takes a **topic string**, plus an optional `--brief PATH`. Checked
+2026-07-31: `--brief` expects a *markdown* deep-research brief at
+`docs/research/<slug>.md` (`load_brief_file`, `pipeline.py:90`), added by B-012. **There is
+no HTML input path anywhere in the pipeline.** So "generate a post from this HTML file" needs
+a decision before any command is run:
+
+| Option | What it means |
+|---|---|
+| **Convert first** (cheapest) | Extract the HTML's substance by hand or with a one-off script into a topic string, and optionally a `docs/research/<slug>.md` brief. No code change. Start here unless this is a recurring need. |
+| **Build an ingestion path** | A real feature: HTML → research brief. Wants a spec, and a decision about whether it fetches URLs (constraint #1/#2 apply — keyless only). |
+
+If the HTML is `docs/reviews/review-queue-throughput-tax-42d2fbb4.html`, note that it is a
+**reviewed draft of an article that already exists**, not source material — see ADR-0018.
+
+The keyless run, once you have a topic:
+
+```bash
+IS_SANDBOX=1 python -m src.agent_sdk.pipeline "<topic>" --research-mode claude_web
+```
+
+~$1 and ~35 minutes. Then **deploy to review, never straight to `_posts/`** — see the
+publishing section below. `--mode` is required (B-028).
 
 ## State in one paragraph
 

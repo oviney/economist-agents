@@ -1,6 +1,6 @@
 # Spec — No sensor ships without a proof it can fail (B-043)
 
-**Status:** DRAFT — awaiting owner LGTM · **Opened:** 2026-08-01
+**Status:** IMPLEMENTED 2026-08-01 (LGTM'd the same day) · **Opened:** 2026-08-01
 **Absorbs:** B-040 (review-gate calibration) as the inferential-sensor arm
 **Framework:** `docs/reviews/harness-engineering-assessment-2026-07-29.md` (SE Radio 730,
 Birgitta Boeckeler on harness engineering)
@@ -159,12 +159,21 @@ TDD per `agent-skills:test-driven-development`. Deterministic, keyless, no netwo
 
 ## Success criteria
 
-- [ ] `scripts/check_sensor_proofs.py` runs in `make ci-local` and fails on an unregistered sensor
-- [ ] Every sensor script in `scripts/` appears in `docs/sensors/register.yaml`
-- [ ] `lint_adrs.py` and `check_bare_name_imports.py` — the two with **zero** tests — get proofs first
-- [ ] The three mutation proofs run by hand on 2026-08-01 exist as tests, not as shell history
-- [ ] The checker has its own proof of teeth
-- [ ] `make ci-local` green; ≥80% coverage on the new module; no new dependency, no key, no network
+- [x] `scripts/check_sensor_proofs.py` runs in `make ci-local` and fails on an unregistered sensor
+      — verified *in situ*, not only against fixtures: adding a recipe invoking a new script to
+      the real `Makefile` made the real gate exit 1 naming it; reverting restored green
+- [x] Every sensor script in `scripts/` appears in `docs/sensors/register.yaml` — 20 entries,
+      16 found by discovery and 4 declared (see open question 1)
+- [x] `lint_adrs.py` and `check_bare_name_imports.py` — the two with **zero** tests — get proofs
+      first: `tests/test_lint_adrs.py` (16 tests, one governance defect planted per rule) and
+      `tests/test_check_bare_name_imports.py` (10)
+- [x] The three mutation proofs run by hand on 2026-08-01 exist as tests, not as shell history.
+      Two already survived in `test_ci_gate_is_reproducible.py`; the CHROME_TAGS/no-drop one did
+      **not** and is now `TestTheNoDropInvariantHasTeeth`
+- [x] The checker has its own proof of teeth — `TestItsOwnProofOfTeeth`, four tests, both
+      directions of the mutation
+- [x] `make ci-local` green; **93%** coverage on the new module; no new dependency (PyYAML was
+      already a requirement), no key, no network
 
 ## Implementation order
 
@@ -190,13 +199,67 @@ TDD per `agent-skills:test-driven-development`. Deterministic, keyless, no netwo
 
 ## Open questions
 
-1. **What counts as a sensor?** Proposed: anything whose non-zero exit or emitted issue can
-   block a commit, a push, `ci-local`, or a publish. That includes `publication_validator` and
-   excludes `article_evaluator` (it scores, it does not gate). Worth the owner's ruling, because
-   it sets the register's boundary and therefore the gate's scope.
-2. **Do pre-commit hooks count separately from the scripts they invoke?** A hook can be inert
-   while its script is fine — `validate_badges` was `|| true` for exactly that reason. Leaning
-   yes, as register entries with the hook id as `id`.
-3. **B-042 has no home in this taxonomy.** A sensor with the wrong setpoint is neither inert nor
-   inaccurate; it works, and the system is worse for it. Boeckeler's framework does not name it.
-   Worth an ADR on its own, separate from this spec.
+### 1. What counts as a sensor? — ANSWERED 2026-08-01, measured
+
+**The proposed definition was right in substance and wrong in one word.** It said *"anything
+whose **non-zero exit** can block a commit, a push, `ci-local`, or a publish"*. Measured against
+the repo, non-zero exit is the wrong test, because **every harness hook exits 0, always** — by
+design, so a broken hook cannot brick the session. They refuse via JSON instead:
+
+| Wired into `.claude/settings.json` | How it refuses | Sensor? |
+|---|---|---|
+| `guard_constraints.py` | `permissionDecision: "deny"` — refuses the tool call | **yes** |
+| `session_gate.py` | `decision: "block"` — refuses the turn ending | **yes** |
+| `post_edit_sensor.py` | `additionalContext` only | **no — it reports** |
+| `session_context.py` | `additionalContext` only | **no — it reports** |
+
+So the operative test is **"can it refuse?"**, not "can it exit non-zero". Adopted definition:
+
+> A **sensor** is anything a **gate site** invokes that can refuse — deny a tool call, block a
+> turn, or exit non-zero. **Gate sites** are the `Makefile`, `.pre-commit-config.yaml`,
+> `.claude/settings.json`, and the publish entrypoints.
+
+**This is enforced, not asserted.** `check_sensor_proofs.py` *reads* those four files and demands
+a register entry for every in-repo script it finds. Discovery from wiring rather than from a
+filename pattern is the load-bearing choice: `scripts/*_guard.py` would be gameable by renaming
+and blind to a sensor added under any other name.
+
+**The two named cases resolve as proposed, both confirmed by measurement:**
+
+- **`publication_validator` — in.** Imported by *both* publish entrypoints and run as the
+  acceptance oracle; an `is_valid=False` stops the publish. Discovery finds it via the publish
+  path without it being named anywhere in the checker.
+- **`article_evaluator` — out.** Grepped for across the Makefile, pre-commit config, harness
+  settings and the publish path: **zero gate-site references.** It scores and nothing reads the
+  score as a verdict — which is exactly how it scored the fabricated article **76** while the
+  validator passed it. A score is not a gate.
+
+  *Worth stating so the two lists are never conflated:* `article_evaluator.py` **is** on
+  `destructive_change_guard`'s `CRITICAL_FILES`. Being protected from being gutted is not the
+  same as being a sensor, and it does not earn a register entry.
+
+**One thing the definition alone does not cover, so the register carries it explicitly.** Four
+real sensors are invoked by no gate site: the `Makefile`'s own toolchain resolution and its
+`mypy-advisory` exit-code logic (proved by `test_ci_gate_is_reproducible.py`),
+`html_to_brief`'s runtime no-drop invariant, and `complexity_sensor`. Extra entries beyond what
+discovery finds are allowed for exactly this reason — discovery sets the **floor** on the
+register, not the ceiling.
+
+**Measured result: 20 registered — 19 proved, 0 unproved, 1 report-only.**
+
+### 2. Do hooks count separately from the scripts they invoke? — ANSWERED: yes
+
+Implemented. `.claude/settings.json` is parsed for `run_hook.sh <name>` and each resolved
+`scripts/hooks/<name>.py` is registered in its own right, as are the pre-commit `entry:` targets.
+The reasoning in the question holds and is why: a hook can be inert while its script is fine,
+which is what `validate_badges` was for months.
+
+### 3. B-042 has no home in this taxonomy — still open, deliberately
+
+A sensor with the wrong setpoint is neither inert nor inaccurate; it works, and the system is
+worse for it. Boeckeler's framework does not name it, and a proof of teeth cannot catch it —
+`missing_chart` **fires correctly**. Still worth an ADR on its own, separate from this spec.
+
+The register does not fix it, but it now has one concrete place where the gap is visible: the
+`publication_validator` entry carries a note saying that `missing_chart` fires correctly and is
+still a defect, so the next reader of the register meets the limit rather than inferring it.

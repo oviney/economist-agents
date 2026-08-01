@@ -105,6 +105,7 @@ ci-local: require-venv
 		--exclude '*/.venv/*,*/__pycache__/*,scripts/archived' \
 		--severity-level medium -q
 	@echo "── destructive-change guard ──" && $(PY) scripts/destructive_change_guard.py
+	@echo "── sensor proofs ──"           && $(PY) scripts/check_sensor_proofs.py
 	@echo "✅ ci-local passed — you are the merge gate (main is unprotected)."
 
 publish: require-venv

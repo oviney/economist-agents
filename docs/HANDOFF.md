@@ -3,43 +3,98 @@
 Written for a fresh session after `/clear`. `BACKLOG.md` stays the source of record; this file
 is the "where were we" note a new session reads first, then overwrites when it goes stale.
 
-**Read next, in this order:** this file → `docs/specs/sensor-proof-of-teeth.md` (**B-043 is the
-next work**) → `docs/reviews/harness-engineering-assessment-2026-07-29.md` for the framework it
-sits in → `BACKLOG.md`.
+**Read next, in this order:** this file → `BACKLOG.md` → `docs/reviews/harness-engineering-assessment-2026-07-29.md`
+for the framework the last four items sit in.
 
-**Session of 2026-08-01 is closed out.** PRs #459, #460, #461 and #462 all merged; `main` is
-clean with no open PRs; `make ci-local` green at **2,689 tests**. B-038, B-039, B-040 and B-041
-landed. B-042 and B-043 are specced and open.
+**Session of 2026-08-01 is closed out.** PRs #459 … #462 merged; B-038 … B-041 landed. **B-043
+is now built** (branch `harness/sensor-proof-of-teeth`). **B-042 is the next work**, and it is
+the one item that is specced only as a backlog entry rather than a full spec.
 
-## The next work: B-043 — no sensor ships without a proof it can fail
+## B-043 — BUILT 2026-08-01. No sensor ships without a proof it can fail
 
-**Spec: `docs/specs/sensor-proof-of-teeth.md`, awaiting LGTM.** Per `CLAUDE.md`, no
-implementation begins until that lands.
+**Spec: `docs/specs/sensor-proof-of-teeth.md`** (status IMPLEMENTED; its open questions are now
+answered with measurements rather than left hanging).
+
+| | |
+|---|---|
+| `scripts/check_sensor_proofs.py` | the gate — a `make ci-local` step |
+| `docs/sensors/register.yaml` | 20 entries: **19 proved, 0 unproved, 1 report-only** |
+| `tests/test_check_sensor_proofs.py` | 33 tests, incl. the checker's own proof of teeth |
 
 **The one-line argument, so a fresh session does not re-derive it.** The 2026-07-29 assessment
 graded this repo *guide-maximal, sensor-disconnected*. B-030 … B-035 fixed the wiring — sensors
 now fire in the agent's loop. 2026-08-01 produced four independent proofs that **nothing
-validates the sensors themselves**:
+validates the sensors themselves**: a fifth inert sensor found after B-031 fixed four (B-039),
+one that had never run (B-040), one that was biased (B-041), and one whose setpoint manufactured
+the defect it prevents (B-042). **B-031 fixed four named sensors; it did not fix the class.**
 
-| | Kind of failure |
-|---|---|
-| B-039 | A **fifth** inert sensor, found after B-031 fixed four |
-| B-040 | A sensor that **never runs**, with no ground truth |
-| B-041 | A **biased** sensor — the ledger recorded only successful runs |
-| B-042 | A sensor whose **setpoint manufactured the defect** it prevents |
+### The three things worth knowing before you touch it
 
-**B-031 fixed four named sensors; it did not fix the class.**
+1. **Discovery reads the wiring, not filenames.** The checker parses the `Makefile`,
+   `.pre-commit-config.yaml`, `.claude/settings.json` and the publish entrypoints, and fails
+   until every in-repo script they invoke has a register entry. A `scripts/*_guard.py` glob would
+   have been gameable by renaming and blind to a sensor added under any other name — and the
+   whole complaint about B-031 is that fixing four sensors *by name* left a fifth to find.
+   **So: add a sensor to any of those four files and `make ci-local` goes red until you register
+   it.** That is the feature, not a snag.
+2. **It was verified in situ, not only against fixtures.** Adding a recipe invoking a new script
+   to the real `Makefile` made the real gate exit 1 naming it; reverting restored green. B-039's
+   third lesson applied to its own successor — `export PATH :=` looked right and did nothing.
+3. **What it cannot do is stated in its own docstring.** It verifies a proof *exists and runs*.
+   It cannot verify a proof is *genuine*: `assert True` under an honest-sounding name passes.
+   Mutation-testing the mutation tests is where the value curve goes flat. The `mutation:` field
+   is the substitute — it makes genuineness a one-glance review check. **Do not build toward
+   closing that hole.**
 
-**The design constraint that decides the whole build: the fix must be a sensor, not a guide.**
-Writing "every sensor must have a teeth test" into a `SKILL.md` reproduces exactly what this
-repo was graded down for — constraint #1 had zero computational backing until B-030, and B-028
-was a review stage that existed as prose while the tool's default bypassed it. A rule nothing
-enforces gets skipped.
+### What counts as a sensor — answered, and the proposal needed one correction
 
-**B-040 is absorbed** as the inferential arm: computational sensors are proved by mutation,
+The proposed definition said *"anything whose **non-zero exit** can block a commit, push,
+`ci-local`, or a publish"*. Measured, non-zero exit is the wrong test: **every harness hook exits
+0 by design**, so a broken hook cannot brick the session, and they refuse via JSON instead.
+`guard_constraints` returns `permissionDecision: "deny"` and `session_gate` returns
+`decision: "block"`; `post_edit_sensor` and `session_context` return only `additionalContext`.
+
+> Adopted: **a sensor is anything a gate site invokes that can *refuse*** — deny a tool call,
+> block a turn, or exit non-zero.
+
+Both named cases resolved as proposed, both checked rather than assumed. `publication_validator`
+is **in**. `article_evaluator` is **out** — zero gate-site references anywhere; it scored the
+fabricated article 76 while the validator passed it, which is exactly what "scores but does not
+gate" looks like. It *is* on `destructive_change_guard`'s `CRITICAL_FILES`, and being protected
+from being gutted is not the same as being a sensor — do not conflate the two lists.
+
+**B-040 stays absorbed** as the inferential arm: computational sensors are proved by mutation,
 inferential ones by labelled cases. Eight already exist in `docs/evals/review-gate/cases/`.
 `docs/specs/review-gate-calibration.md` remains the detailed design and its sequencing is
-unchanged — build after n≈5 real reviews.
+unchanged — **build after n≈5 real reviews**, which accrue free from the B-013 review stage.
+The inferential runner was deliberately not built.
+
+### The three hand-run mutation proofs are now tests
+
+Two already survived in tests written for other reasons — the `(mypy || echo advisory)` exit-127
+one and the `export PATH` vs stub-`ruff` one, both in `tests/test_ci_gate_is_reproducible.py`.
+**The third did not**: nothing mutated `CHROME_TAGS` to prove the no-drop invariant would notice.
+It is now `tests/test_html_to_brief.py::TestTheNoDropInvariantHasTeeth`.
+
+Two sensors had **zero** tests and now have 26 between them: `tests/test_lint_adrs.py` (16, one
+governance defect planted per rule) and `tests/test_check_bare_name_imports.py` (10).
+
+One inherited proof was quietly weak and got tightened: `test_schema_validation_rejects_invalid`
+asserted `pytest.raises((ValueError, Exception))`, which passes on *any* error — a typo in the
+fixture would have satisfied it. That is B-039's defect in miniature, in a test.
+
+## The next work: B-042 — the mandatory-chart gate
+
+**Specced only as a `BACKLOG.md` entry, not a full spec.** Per `CLAUDE.md`, write the spec first;
+it changes a CRITICAL gate carrying a stated editorial standard, and the same reasoning that kept
+B-040 at spec-only applies.
+
+**B-043 deliberately does not fix it**, and the reason is worth keeping: `missing_chart` **fires
+correctly**. The defect is its *setpoint* — a chart is mandatory even when the research carries no
+chartable data, so the pipeline invented four percentages to comply. A proof of teeth cannot catch
+a wrong setpoint, which is the taxonomy gap the spec's open question 3 names and leaves for its own
+ADR. The `publication_validator` register entry carries a note saying so, so the next reader of
+the register meets the limit rather than inferring it.
 
 ## Blocked on the owner, not on code
 

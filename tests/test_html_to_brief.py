@@ -17,6 +17,7 @@ from pathlib import Path
 import pytest
 from bs4 import BeautifulSoup
 
+from scripts import html_to_brief
 from scripts.html_to_brief import (
     REFUTED_HEADING,
     BriefConversionError,
@@ -528,3 +529,72 @@ class TestHtmlToMarkdownDirectly:
         assert "Section" in body
         assert "Prose." in body
         assert REFUTED_HEADING not in body
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Proof of teeth for the no-drop invariant (B-043)
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+class TestTheNoDropInvariantHasTeeth:
+    """The third of the three mutations run by hand on 2026-08-01, recorded here
+    so it stops living in shell history (B-043).
+
+    `TestNothingSilentlyDropped` above is this converter's most important sensor:
+    it is the only thing standing between a research brief and silently losing a
+    paragraph on its way to the writer, and a lost paragraph is invisible
+    downstream — the article simply never mentions it.
+
+    A test that asserts an invariant holds says nothing about whether it would
+    *notice* the invariant breaking. So this class breaks it on purpose. Adding
+    `table` to `CHROME_TAGS` makes the converter discard tabular content, and the
+    invariant must report the loss; the hand-run version of this reported 48 lost
+    words.
+
+    This is why `content_words()` computes the expected set from `SPEC_CHROME_TAGS`
+    hardcoded in this file rather than importing `CHROME_TAGS` from the module. If
+    it imported it, the expectation would move with the mutation and the whole
+    check would pass while content vanished — a sensor calibrated against the thing
+    it is measuring.
+    """
+
+    def test_dropping_a_content_tag_is_reported(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        html = read_fixture("table_bearing")
+        monkeypatch.setattr(
+            html_to_brief, "CHROME_TAGS", (*SPEC_CHROME_TAGS, "table", "tbody", "tr")
+        )
+
+        out = words(build_brief(html, source_name="table_bearing.html"))
+
+        missing = content_words(html) - out
+        assert missing, (
+            "CHROME_TAGS now discards tables, so the invariant must report the "
+            "lost words — it did not, which means it could not have caught this"
+        )
+
+    def test_the_same_fixture_is_clean_unmutated(self) -> None:
+        """The control. Without it the assertion above would also pass against an
+        invariant that reports losses unconditionally."""
+        html = read_fixture("table_bearing")
+
+        out = words(build_brief(html, source_name="table_bearing.html"))
+
+        assert not content_words(html) - out
+
+    def test_the_runtime_check_reports_a_loss(self) -> None:
+        """`find_dropped_words` runs on every real conversion, not only in tests.
+        Feed it a markdown rendering with content removed and it must say so."""
+        html = read_fixture("headings_and_prose")
+        markdown = build_brief(html, source_name="headings_and_prose.html")
+
+        truncated = "\n".join(markdown.splitlines()[:3])
+
+        assert html_to_brief.find_dropped_words(html, truncated)
+
+    def test_the_runtime_check_is_silent_on_a_faithful_conversion(self) -> None:
+        html = read_fixture("headings_and_prose")
+        markdown = build_brief(html, source_name="headings_and_prose.html")
+
+        assert not html_to_brief.find_dropped_words(html, markdown)

@@ -228,7 +228,13 @@ def test_schema_validation_rejects_invalid(tmp_path: Path) -> None:
     p = tmp_path / "bad_metadata.yaml"
     p.write_text(yaml.dump(data))
 
-    with pytest.raises((ValueError, Exception)):
+    # B-043: this was `pytest.raises((ValueError, Exception))`, which passes on ANY
+    # error — an import failure or a typo in the fixture would have satisfied it just
+    # as well as the schema rejection it claims to prove. That is the same defect
+    # B-039 found in `(mypy || echo "advisory")`: a check that cannot tell "ran and
+    # found the problem" from "never ran". This is the registered proof of teeth for
+    # the agent-yaml sensor, so it names the exception it expects.
+    with pytest.raises(ValueError, match="failed schema validation"):
         load_agent(p)
 
 

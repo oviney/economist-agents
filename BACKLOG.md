@@ -647,6 +647,88 @@ Mutation-checked, so the new sensor is not decorative: the old
 form exits non-zero. `make install` now creates the venv if it is absent, so require-venv's
 instruction points at a target that actually works from nothing.
 
+### B-040 · Calibrate the editorial review gate so it can be promoted
+
+**Opened 2026-08-01.** Spec: `docs/specs/review-gate-calibration.md` — **awaiting LGTM.**
+
+ADR-0018 Decision 3 keeps `blog-post-review` advisory and says "promote to blocking once a
+false-positive rate is known." **Nothing has ever produced that number.** The gate has run
+exactly once, by hand, on one article — and that run contained a near-false-positive (a
+summarised Graphite fetch would have reported a false G2 failure on a correct figure). So the
+only instrument that catches fidelity defects the deterministic evaluator provably cannot
+(88% PASS vs 51 BLOCK on the same article) is frozen by a missing measurement.
+
+Reviewed against Anthropic's [Demystifying evals for AI
+agents](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents), the eval
+surface is lopsided in one specific way: **code-based graders are strong** (`article_evaluator`
+at 841 records, `publication_validator`, `_shared.py`, `skill_eval`), and the one model-based
+grader **has no ground truth to be checked against**. `logs/article_evals.json` is production
+monitoring, not an eval set. The guide's instruction — *"20-50 simple tasks drawn from real
+failures"* — is satisfiable today at **finding** granularity: ADR-0018 enumerates 10 labelled
+fidelity defects plus the 1 labelled near-false-positive.
+
+- [ ] ~25 cases, ≥40% negatives, each traceable to a real article or a real finding
+- [ ] Report false-positive and false-negative rates **separately, with `n`** — never averaged
+- [ ] Keyless judge via the Agent SDK; case selection and arithmetic deterministic
+- [ ] Sufficient for the owner to answer ADR-0018 Decision 3
+
+**Build after n≈5 real reviews**, which accrue free from the B-013 review stage the owner
+already performs — the only added cost is recording, per gate, whether he agreed. The harness
+design depends on what those runs show: a gate that blocks everything needs threshold tuning,
+one that passes everything needs anchor revision (ADR-0018's own warning: "scores clustering
+above 85 would mean the rubric is broken rather than the pipeline"). Different tools.
+
+**Scope:** M. **Files:** `scripts/calibrate_review_gate.py`, `docs/evals/review-gate/`,
+`tests/test_calibrate_review_gate.py`.
+
+**Shipped 2026-08-01 alongside the spec, because waiting corrupts the baseline:**
+
+- [x] **G5 added to the machine-readable verdict block.** ADR-0018 Decision 2 says G5 was
+      amended "into the machine-readable verdict block". It reached `SKILL.md:165` but **not**
+      `REVIEW_PROMPT.md:85` — the file actually pasted into a review session — nor the rubric
+      card. Every review until now silently dropped the result of the gate that exists
+      *because* a reversed DORA statistic passed the other four.
+- [x] **Runbook cost/duration figures replaced with the recorded range** (see B-041).
+
+### B-041 · The hero draw's worst case is 3× the longest run ever recorded, and nothing attributes it
+
+**Opened 2026-08-01**, found by the owner asking whether "~35 minutes" was ludicrous. It was
+— but not in the direction either of us assumed.
+
+`logs/agent_sdk_costs.jsonl` has recorded `wall_seconds` and per-stage cost **since
+2026-04-26**, and no recorded run exceeds **15.4 minutes**; four of the five are under 5. The
+"~$1 and ~35 minutes" in `docs/HANDOFF.md` and the runbook was folklore contradicted by the
+repo's own data. **The instrument existed and went unread** while its contradiction was
+repeated in two documents — and this session quoted it back to the owner and defended it
+before checking. That is the `defect-prevention` surface-reading class again, in a session
+that had just added an entry to it.
+
+The real finding is underneath. A run started 2026-08-01 blew past every recorded figure, and
+the log says why:
+
+```
+WARNING src.agent_sdk.hero_author: Hero attempt 1/2 timed out after 600s
+```
+
+`hero_author.py`: `_DRAW_TIMEOUT_S = 600`, `_MAX_STRUCTURAL_ATTEMPTS = 2`,
+`_MAX_CRITIQUE_RETRIES = 1` → **2 redraws × 2 attempts × 600s = 40 minutes of hero drawing
+alone**, before critique (2 × 180s). A *successful* draw is measured at 454s. So the pipeline
+has two utterly different durations — ~4 minutes when the hero lands first try, up to ~46
+when it does not — and the ledger cannot distinguish them, because the hero sits inside
+`stage3_seconds` with no sub-timing.
+
+The constants are not arbitrary; the comments record that 240s and $0.40 were "each
+independently fatal". The problem is not the ceiling, it is that **a 10× duration swing is
+invisible in the only place anyone would look for it.**
+
+- [ ] Record hero draw seconds, attempt count and timeout count as their own ledger fields
+- [ ] Decide whether a timed-out first attempt should retry at all, given the measured note
+      that "the critique does NOT converge" and each redraw "cost ~8 minutes and bought nothing"
+- [ ] Once attributable, state the honest range in the runbook: typical vs timeout path
+
+**Scope:** S. **Files:** `src/agent_sdk/hero_author.py`, `src/agent_sdk/pipeline.py`,
+`docs/keyless-pipeline-runbook.md`.
+
 ### B-036 · Badge validation has no implementation — decide whether to restore it
 
 **Opened 2026-07-31**, found by B-031 doing its job.

@@ -62,6 +62,27 @@ stripped automatically). **This is opt-in and heavy** — one deep-research run 
 ~2M tokens and can hit your session limit — so `claude_web` stays the everyday
 default; reserve `--brief` for the pieces that warrant it.
 
+### What a run actually costs — read the ledger, do not quote a remembered figure
+
+`logs/agent_sdk_costs.jsonl` records `wall_seconds`, `stage3_seconds` and per-stage cost for
+every run, and has since 2026-04-26. Across the five recorded runs:
+
+| | Wall clock | Total cost | Research share |
+|---|---|---|---|
+| Range | **3.4 – 15.4 min** | **$0.25 – $1.31** | $0.00 – $0.88 |
+| Typical (`--brief`, research skipped) | 3.4 – 4.8 min | $0.25 – $0.49 | $0.00 |
+| The one live-research run | 15.4 min | $1.31 | $0.88 |
+
+```bash
+.venv/bin/python -c "import json;[print(r['timestamp'][:10], round(r['wall_seconds']/60,1),'min', '\$'+str(round(r['total_cost_usd'],2))) for r in map(json.loads, open('logs/agent_sdk_costs.jsonl'))]"
+```
+
+`docs/HANDOFF.md` and this runbook used to say "~$1 and ~35 minutes". No recorded run has
+ever come close to 35 minutes. A 2026-08-01 session quoted that number back to the owner and
+defended it before checking the ledger sitting in `logs/`. **The instrument existed; nobody
+read it.** That is a worse failure than not measuring, because the folklore number is the one
+everybody repeats. If a run feels slow, add its row and compare — do not estimate.
+
 ## 2. Publish (keyless — free GitHub token, opens a PR you review)
 
 ```bash
@@ -81,8 +102,8 @@ token needs only `Contents` + `Pull requests` write on `oviney/blog` — no AI k
 |-------|-----------|------------|
 | Research | `claude_web` → `query()` + WebSearch/WebFetch | none (subscription) |
 | Writer + Graphics | Stage 3 `query()` | none (subscription) |
-| Hero image | skipped in `chart_only` | none |
-| Vision alt/caption | not invoked in `chart_only` (hero only) | none (subscription) |
+| Hero image | Stage 3 draws it as SVG itself (B-016b) | none (subscription) |
+| Vision alt/caption | Stage 3 `query()` over the drawn hero | none (subscription) |
 | Quality gates + validator | deterministic Python | none |
 
 ## Honest limitations

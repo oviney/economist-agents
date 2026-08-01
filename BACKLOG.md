@@ -822,8 +822,13 @@ that kept B-040 at spec-only applies. Spec first.
 
 ### B-043 · No sensor ships without a proof it can fail
 
-**Opened 2026-08-01.** Spec: `docs/specs/sensor-proof-of-teeth.md` — **awaiting LGTM.**
+**Opened 2026-08-01. DONE 2026-08-01.** Spec: `docs/specs/sensor-proof-of-teeth.md`.
 **Absorbs B-040** as its inferential-sensor arm.
+
+**Shipped:** `scripts/check_sensor_proofs.py` runs as a `make ci-local` step,
+`docs/sensors/register.yaml` holds 20 entries (**19 proved, 0 unproved, 1 report-only**), and
+`tests/test_check_sensor_proofs.py` carries the checker's own proof of teeth. Two sensors that
+had **zero** tests now have 26 between them.
 
 The 2026-07-29 SE Radio 730 assessment graded this repo *guide-maximal, sensor-disconnected*;
 B-030 … B-035 fixed the wiring. **The next failure mode is that nothing validates the sensors
@@ -854,18 +859,43 @@ constraint #1 ("NO new API keys. Ever.") had zero computational backing until B-
 was a review stage that existed as prose while the tool default bypassed it. A rule nothing
 enforces gets skipped.
 
-- [ ] `scripts/check_sensor_proofs.py` in `make ci-local`, failing on an unregistered sensor
-- [ ] `docs/sensors/register.yaml` covering all 13, `proof: none` allowed as a recorded baseline
-- [ ] `lint_adrs` and `check_bare_name_imports` proved first — the two real gaps
-- [ ] The three hand-run mutation proofs exist as tests, not shell history
-- [ ] The checker has its own proof of teeth
+- [x] `scripts/check_sensor_proofs.py` in `make ci-local`, failing on an unregistered sensor
+- [x] `docs/sensors/register.yaml` covering all of them, `proof: none` allowed as a recorded
+      baseline — **not needed in the end**, every discovered sensor got a real proof
+- [x] `lint_adrs` and `check_bare_name_imports` proved first — the two real gaps
+- [x] The three hand-run mutation proofs exist as tests, not shell history
+- [x] The checker has its own proof of teeth
 
 **Scope:** M. **Files:** `scripts/check_sensor_proofs.py`, `docs/sensors/register.yaml`,
 `tests/test_check_sensor_proofs.py`.
 
-**Open question for the owner, because it sets the gate's scope:** what counts as a sensor?
-Proposed — anything whose non-zero exit can block a commit, push, `ci-local`, or publish. That
-includes `publication_validator` and excludes `article_evaluator`, which scores but does not gate.
+**Discovery reads the wiring, not filenames.** The checker parses the `Makefile`,
+`.pre-commit-config.yaml`, `.claude/settings.json` and the publish entrypoints, and demands a
+register entry for every in-repo script they invoke. A `scripts/*_guard.py` glob would have been
+gameable by renaming and blind to anything added under another name — and the whole complaint
+about B-031 is that fixing four sensors *by name* left a fifth to be found.
+
+**Verified in situ, because a fixture passing is not the claim.** Adding a recipe invoking a new
+script to the real `Makefile` made the real gate exit 1 naming it; reverting restored green. This
+is B-039's third lesson applied to its own successor — `export PATH :=` looked right, `make
+showpath` confirmed it, and only running a recipe against a stub binary showed it did nothing.
+
+**The limit is stated, not papered over.** The checker verifies a proof *exists and runs*; it
+cannot verify a proof is *genuine* — `assert True` under an honest-sounding test name would pass.
+Mutation-testing the mutation tests is where the value curve goes flat, so the `mutation:` field
+exists instead, to make genuineness a one-glance review-time check.
+
+**Open question ANSWERED — what counts as a sensor.** The proposal was right in substance and
+wrong in one word: "non-zero exit" is the wrong test, because **every harness hook exits 0 by
+design** and refuses via JSON. Measured, `guard_constraints` denies a tool call and `session_gate`
+blocks a turn, while `post_edit_sensor` and `session_context` return only `additionalContext`.
+Adopted: *a sensor is anything a gate site invokes that can **refuse** — deny a tool call, block a
+turn, or exit non-zero.* Both named cases resolve as proposed and both were checked, not assumed:
+`publication_validator` is **in** (imported by both publish entrypoints, its verdict stops a
+publish); `article_evaluator` is **out** (zero gate-site references anywhere — it scored the
+fabricated article 76 while the validator passed it, which is precisely a score and not a gate).
+Note it *is* on `destructive_change_guard`'s `CRITICAL_FILES`: being protected from being gutted
+is not the same as being a sensor. Full reasoning in the spec's open-questions section.
 
 ### B-036 · Badge validation has no implementation — decide whether to restore it
 

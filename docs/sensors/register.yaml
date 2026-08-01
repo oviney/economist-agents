@@ -1,0 +1,284 @@
+# The sensor register (B-043) — no sensor ships without a proof it can fail.
+#
+# Checked by `scripts/check_sensor_proofs.py`, which runs in `make ci-local`.
+# Spec: `docs/specs/sensor-proof-of-teeth.md`.
+#
+# WHY THIS FILE EXISTS. The 2026-07-29 harness assessment graded this repo
+# guide-maximal and sensor-disconnected. B-030…B-035 fixed the wiring. Then a
+# single day produced four independent proofs that nothing validated the sensors
+# themselves: a fifth inert sensor (B-039), one that had never run (B-040), one
+# that was biased (B-041), and one whose setpoint manufactured the defect it
+# prevents (B-042). B-031 fixed four sensors by name; it did not fix the class.
+#
+# THE CONTRACT.
+#   * A script is a sensor when a gate site invokes it. Gate sites are read from
+#     the wiring — the Makefile, .pre-commit-config.yaml, .claude/settings.json,
+#     and the publish entrypoints — never guessed from filenames. Add a sensor to
+#     any of those and this gate fails until it is registered here.
+#   * `regulates` says what defect it catches. `mutation` says what its proof
+#     breaks to make it fire. Both exist so a reviewer can check the claim against
+#     the test in one glance, without reading the whole file.
+#   * `proof` names a test that exists and runs. `none` is a legitimate baseline
+#     with a recorded `reason`, and the count of those is the burndown
+#     (`python scripts/check_sensor_proofs.py --list`). `n/a` marks something a
+#     gate site wires in that cannot block anything.
+#
+# THE LIMIT, STATED RATHER THAN PAPERED OVER. The checker verifies a proof exists
+# and runs. It cannot verify the proof is genuine — a test named
+# `test_gutting_a_critical_file_is_caught` whose body is `assert True` would pass.
+# Closing that hole means mutation-testing the mutation tests, which is where the
+# value curve goes flat. Genuineness is a review-time concern; `mutation:` is what
+# makes it a one-glance review.
+
+sensors:
+  # ── merge gate (make ci-local) ────────────────────────────────────────────
+
+  - id: bare_name_imports
+    script: scripts/check_bare_name_imports.py
+    regulates: >-
+      Bare-name imports of scripts/ modules. `from llm_client import call_llm`
+      resolves through sys.path, so any module of that name anywhere on the path
+      silently wins — the CVE-377-adjacent module-spoofing class. ADR-0010
+      mandates the fully-qualified form.
+    proof: tests/test_check_bare_name_imports.py::TestItFiresOnTheDefectItExistsFor::test_a_bare_from_import_is_caught
+    mutation: >-
+      Plant `from llm_client import call_llm` in a fixture tree alongside a real
+      scripts/llm_client.py, run the guard, assert exit 1 — with the
+      fully-qualified form as the control.
+
+  - id: destructive_change_guard
+    script: scripts/destructive_change_guard.py
+    regulates: >-
+      A critical file gutted rather than edited — the characteristic AI-agent
+      failure where a file is rewritten from scratch and the tests pass because
+      the tests went with it.
+    proof: tests/test_destructive_change_guard.py::TestItCatchesARealGutting::test_gutting_a_critical_file_is_caught
+    mutation: >-
+      In a real git repo, truncate a file on CRITICAL_FILES from 100 lines to a
+      stub, run the guard, assert it blocks and reports 99%. Real git rather than
+      mocked diff stats: B-039's third finding was a fix that looked right and did
+      nothing, and mocking the plumbing would assume away exactly that.
+
+  - id: mypy_baseline
+    script: scripts/mypy_baseline.py
+    regulates: >-
+      New type errors, while grandfathering the 30 pre-existing ones in
+      docs/mypy-baseline.md. The baseline is a count, not a mute — raising a
+      number to unblock a commit fails the suite instead.
+    proof: tests/test_mypy_baseline.py::TestCheck::test_new_error_in_baselined_file_blocks
+    mutation: >-
+      Report one more error in a baselined file than its grandfathered count and
+      assert the check blocks; a file at or below its baseline is the control.
+
+  - id: sensor_proof_gate
+    script: scripts/check_sensor_proofs.py
+    regulates: >-
+      Sensors added without a proof they can fail — this file's own contract. A
+      sensor that cannot fail is worse than none, because it reads as coverage.
+    proof: tests/test_check_sensor_proofs.py::TestItsOwnProofOfTeeth::test_a_wired_sensor_absent_from_the_register_fails
+    mutation: >-
+      Point the checker at a fixture tree whose Makefile runs a sensor absent from
+      the register and assert it fails; registering that same sensor is the
+      control. A checker that cannot fail is the joke B-043 exists to prevent.
+
+  - id: ci_gate_toolchain
+    script: Makefile
+    regulates: >-
+      The merge gate resolving its tools from ambient PATH, so it means something
+      different on every machine. ADR-0015 makes `make ci-local` THE gate — there
+      is no GitHub Actions and main is unprotected.
+    proof: tests/test_ci_gate_is_reproducible.py::TestTheGateUsesThePinnedVenv::test_a_venv_tool_wins_over_the_ambient_one
+    mutation: >-
+      Run `make lint` in a sandbox against a stub .venv/bin/ruff that prints a
+      marker, on a PATH with no venv, and assert the venv copy won. `export PATH :=`
+      passes a grep of the Makefile and fails this: GNU make 3.81 direct-execs
+      metacharacter-free recipe lines against its own startup PATH.
+
+  - id: mypy_advisory_step
+    script: Makefile
+    regulates: >-
+      An advisory step that cannot tell "I ran and found problems" from "I never
+      ran". The old `(mypy || echo advisory)` printed the same reassuring line for
+      both, which is how a fifth inert sensor survived B-031.
+    proof: tests/test_ci_gate_is_reproducible.py::TestTheMypyAdvisoryCannotMaskAMissingTool::test_a_mypy_that_could_not_run_fails_the_gate
+    mutation: >-
+      Run the step against a stub mypy exiting 127 and assert the gate fails;
+      exit 1 (real type errors) staying advisory is the control.
+
+  # ── pre-commit / pre-push ─────────────────────────────────────────────────
+
+  - id: adr_lint
+    script: scripts/lint_adrs.py
+    regulates: >-
+      ADR governance per skills/adr-governance/SKILL.md — one canonical location,
+      one number per ADR, a status from a closed set, an mkdocs entry, and
+      supersession links that point both ways.
+    proof: tests/test_lint_adrs.py::TestItFiresOnEachGovernanceDefect::test_a_duplicate_number_is_caught
+    mutation: >-
+      Add a second ADR numbered 0001 to a fixture tree and assert the lint reports
+      a duplicate. This happened for real: ADR-0018 was renumbered from 0016 after
+      main landed a different 0016 while the draft sat on disk. Nine sibling tests
+      cover the other rules, each planting one defect.
+
+  - id: arch_review
+    script: scripts/pre_commit_arch_check.py
+    regulates: >-
+      Architectural anti-patterns in staged Python — ADR-002 direct LLM imports,
+      unprotected json.loads, hardcoded secrets, and print() used for errors.
+    proof: tests/test_pre_commit_arch_check.py::TestCheckHardcodedSecrets::test_api_key_assignment_flagged
+    mutation: >-
+      Write a file assigning a literal API key and assert the check flags it;
+      the os.environ form is the control.
+
+  - id: badge_validation
+    script: scripts/validate_badges.py
+    regulates: >-
+      README badges that outlive what they describe (BUG-023). Two pointed at
+      GitHub Actions workflows ADR-0015 deleted, so the front page claimed CI this
+      project deliberately does not have — for months, while the hook meant to
+      catch it was `|| true`.
+    proof: tests/test_validate_badges.py::TestExitCodes::test_stale_badge_exits_non_zero
+    mutation: >-
+      Point a badge at a workflow file that does not exist and assert a non-zero
+      exit; a badge matching a real workflow is the control.
+
+  - id: skill_anatomy
+    script: scripts/validate_skills.py
+    regulates: >-
+      SKILL.md frontmatter and required sections (docs/skill-anatomy.md), so the
+      guide layer stays structurally checkable rather than free prose.
+    proof: tests/test_validate_skills.py::TestMainExitCodes::test_nonzero_exit_when_any_fails
+    mutation: >-
+      Write a SKILL.md whose frontmatter name disagrees with its directory and
+      assert a non-zero exit; a well-formed skill is the control.
+
+  - id: agent_yaml_validation
+    script: scripts/agent_loader.py
+    regulates: >-
+      Agent YAML configs drifting from agents/schema.json (ADR-0001), which would
+      surface as a runtime failure mid-pipeline rather than at commit time.
+    proof: tests/test_agent_loader.py::test_schema_validation_rejects_invalid
+    mutation: >-
+      Load an agent YAML missing a schema-required field and assert it is
+      rejected; the valid config is the control.
+
+  # ── the agent's own loop (.claude/settings.json, B-030) ───────────────────
+
+  - id: constraint_guard
+    script: scripts/hooks/guard_constraints.py
+    regulates: >-
+      CLAUDE.md constraints #1-#3 and the B-028 review stage, as PreToolUse denies
+      rather than prose. Constraint #1 — "NO new API keys. Ever." — is the most
+      emphatic sentence in the repo and had zero computational backing until this
+      hook existed.
+    proof: tests/test_harness_hooks.py::TestForbiddenKeyGuard::test_denies_introducing_a_forbidden_key
+    mutation: >-
+      Feed it a command that assigns a forbidden key and assert a deny; feeding it
+      a command that merely greps for the same key must NOT deny, because a guard
+      calibrated to block reads gets switched off within a day.
+
+  - id: session_gate
+    script: scripts/hooks/session_gate.py
+    regulates: >-
+      A turn ending on a red tree. Blocks once per session — an unconditional Stop
+      hook is a session trap — on lint over changed files or the tests that cover
+      them.
+    proof: tests/test_harness_hooks.py::TestLintAndTestsCompose::test_red_tests_block_even_when_lint_is_clean
+    mutation: >-
+      Present failing tests with clean lint and assert it blocks, and the mirror
+      case with red lint and clean tests; both clean is the control. Every
+      degraded path (timeout, pytest missing, no match) must NOT block.
+
+  - id: post_edit_sensor
+    script: scripts/hooks/post_edit_sensor.py
+    regulates: >-
+      Lint and complexity findings on a file the agent just wrote, fed back into
+      context while it still has the context to fix them. It reports rather than
+      blocks, but it can still fail to notice, which is what its proof tests.
+    proof: tests/test_harness_hooks.py::TestPostEditSensor::test_reports_complexity_back_to_the_agent
+    mutation: >-
+      Write a file with an over-complex function and assert the sensor reports it
+      back; a clean file producing no feedback is the control.
+
+  - id: session_context
+    script: scripts/hooks/session_context.py
+    regulates: >-
+      Nothing. It injects the five constraints, the branch and the open backlog at
+      SessionStart.
+    proof: n/a
+    reason: >-
+      It returns additionalContext and cannot deny a call or fail a gate, so there
+      is no "can it fail?" to answer — it is an informant, not a sensor. It is
+      nonetheless covered by tests/test_harness_hooks.py::TestSessionContext.
+
+  # ── the publish path — highest blast radius ───────────────────────────────
+
+  - id: publication_validator
+    script: scripts/publication_validator.py
+    regulates: >-
+      Everything standing between a draft and the live blog: frontmatter, dates,
+      categories, word count, image metadata, references, placeholder text and
+      unresolved verification flags. Run by both publish entrypoints as the
+      acceptance oracle.
+    proof: tests/test_publication_validator.py::TestPublicationValidatorContent::test_placeholder_text_rejected
+    mutation: >-
+      Take a valid article, insert "TODO: write this section" into the body, and
+      assert it is rejected with the placeholder_text check named. Roughly twenty
+      sibling tests mutate one field each the same way.
+      NOTE — B-042: missing_chart fires CORRECTLY and is still a defect, because
+      its setpoint requires a chart even when the research carries no data. A
+      proof of teeth cannot catch a wrong setpoint. That is B-042's item, not this
+      register's, and is the taxonomy gap the spec's open question 3 names.
+
+  - id: unreviewed_publish_guard
+    script: scripts/deploy_to_blog.py
+    regulates: >-
+      Publishing without the B-013 live review stage. `--mode` used to default to
+      `post`, so the documented command bypassed review with no warning — which is
+      how article two was published unreviewed (B-028). It also refuses an article
+      still carrying the `<!-- HERO IMAGE` reviewer comment (BUG-065, ADR-0017).
+    proof: tests/test_deploy_mode_required.py::TestModeIsRequired::test_missing_mode_exits_non_zero
+    mutation: >-
+      Invoke the parser with no --mode and assert a non-zero exit naming both
+      choices; each explicit mode parsing is the control. Asserting no default is
+      configured is the part that would catch a re-introduced default.
+
+  - id: promote_review
+    script: scripts/promote_review.py
+    regulates: >-
+      An approved review draft being promoted to _posts/ despite failing the
+      validator. This is the last gate before a permanent slug — there are no
+      redirects on the blog.
+    proof: tests/test_promote_review.py::TestPromote::test_validation_failure_blocks_publish
+    mutation: >-
+      Make the validator reject the draft and assert the promotion is blocked and
+      nothing is pushed; the passing draft is the control.
+
+  # ── runtime invariants ────────────────────────────────────────────────────
+
+  - id: no_drop_invariant
+    script: scripts/html_to_brief.py
+    regulates: >-
+      Research content silently lost converting a Claude HTML artifact to a brief.
+      A lost paragraph is invisible downstream — the article simply never mentions
+      it — so the converter diffs its own output on every run rather than only in
+      the suite.
+    proof: tests/test_html_to_brief.py::TestTheNoDropInvariantHasTeeth::test_dropping_a_content_tag_is_reported
+    mutation: >-
+      Add `table` to CHROME_TAGS so the converter discards tabular content, and
+      assert the invariant reports the lost words; the hand-run version of this on
+      2026-08-01 reported 48. The control is the same fixture unmutated. The
+      expected word set is computed from SPEC_CHROME_TAGS hardcoded in the test
+      rather than imported, so the expectation cannot move with the mutation.
+
+  - id: complexity_sensor
+    script: scripts/complexity_sensor.py
+    regulates: >-
+      Unregulated complexity, the characteristic AI-code failure mode (B-032).
+      Emits a judgment call rather than a hard block, with recorded overrides in
+      docs/harness-overrides.md so a suppression is visible at review time.
+    proof: tests/test_complexity_sensor.py::TestScanPaths::test_flags_an_over_complex_function
+    mutation: >-
+      Scan a file containing a function over the ruff.toml max-complexity and
+      assert it is flagged; a clean file is the control, and a recorded override
+      must remove the finding from the report rather than from the scan.

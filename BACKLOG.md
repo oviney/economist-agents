@@ -721,13 +721,59 @@ The constants are not arbitrary; the comments record that 240s and $0.40 were "e
 independently fatal". The problem is not the ceiling, it is that **a 10× duration swing is
 invisible in the only place anyone would look for it.**
 
-- [ ] Record hero draw seconds, attempt count and timeout count as their own ledger fields
-- [ ] Decide whether a timed-out first attempt should retry at all, given the measured note
-      that "the critique does NOT converge" and each redraw "cost ~8 minutes and bought nothing"
-- [ ] Once attributable, state the honest range in the runbook: typical vs timeout path
+- [x] Record hero draw seconds, attempt count and timeout count as their own ledger fields
+- [x] Decide whether a timed-out first attempt should retry at all
+- [x] Bound the aggregate, not just each call
+- [ ] Once several runs carry `hero_*` fields, state the honest range in the runbook:
+      typical vs timeout path
 
-**Scope:** S. **Files:** `src/agent_sdk/hero_author.py`, `src/agent_sdk/pipeline.py`,
-`docs/keyless-pipeline-runbook.md`.
+**Scope:** S. **Files:** `src/agent_sdk/hero_author.py`, `src/agent_sdk/stage3_runner.py`,
+`src/agent_sdk/pipeline.py`, `tests/test_hero_author.py`.
+
+**FIXED 2026-08-01, and the run that prompted it settled the design question.**
+
+The run finished while this item was being written, and it is the whole argument:
+
+| | |
+|---|---|
+| Wall clock | **31.8 min** — twice the previous record |
+| Cost | $1.01, of which $0.18 graphics |
+| Hero attempt 1 | timed out at 600s |
+| Hero attempt 2 | **also timed out at 600s**, carrying the "return a simpler drawing with fewer, larger shapes" instruction |
+| Hero produced | **none** |
+
+So **20 of the 31.8 minutes bought nothing**, and the article is unpublishable — the blog
+requires a resolvable `image:`. It also retires the open question: the shrink-the-ask retry
+does not work. One timeout is a diagnosis, not a transient.
+
+That reframed the fix. An aggregate budget of 1200s would have changed this run by **zero
+seconds** (2 × 600 = 1200 exactly). The ceiling has to make the second full-price attempt
+*impossible*, not merely capped:
+
+- `_HERO_TOTAL_BUDGET_S = 900` — one measured successful draw (454s) plus its critique (180s)
+  plus slack, and equal to the longest *complete* pipeline run ever recorded.
+- `_MIN_USEFUL_DRAW_S = 450` — no observed successful draw has finished faster than 454s.
+
+Those two numbers separate the retry cases by arithmetic rather than by a special case, which
+is why the fix is small. A **rejected** attempt returns in seconds and leaves the budget
+almost intact, so it retries exactly as before. A **timed-out** attempt has consumed 600s by
+definition, leaving 300s — under the floor — so it stops. Cheap signal, retry; expensive
+silence, stop.
+
+Worst case: **46 min → 15 min.** This run's failure mode: **20 min → 10 min.**
+
+**And the folklore was not baseless after all.** The earlier correction — "no recorded run
+exceeds 15.4 minutes" — was true of the ledger, and the ledger was the wrong instrument: it
+had only ever recorded runs where the hero landed. "~35 minutes" was a real memory of the
+timeout path that nothing had ever written down. Both halves were right, which is exactly the
+case for the `hero_*` fields: the ledger now distinguishes the two populations it was
+silently averaging.
+
+**Found in passing, and it may explain the thin ledger.** A value orjson cannot serialise
+does not fail the write loudly — `pipeline.py` catches it and logs "cost log write failed
+(non-fatal)", so the entire row disappears. Five rows across four months of runs is suspicious
+on its own. `_numeric()` now coerces at the boundary; whether earlier rows were lost this way
+is unverified and worth a look before anyone trends this data.
 
 ### B-036 · Badge validation has no implementation — decide whether to restore it
 

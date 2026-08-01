@@ -27,7 +27,18 @@ python scripts/html_to_brief.py ~/Downloads/conversation.html --slug ai-code-rev
 IS_SANDBOX=1 python -m src.agent_sdk.pipeline "<topic>" --brief docs/research/ai-code-review.md
 ```
 
-~$1 and ~35 minutes for the run. Then **deploy to review, never straight to `_posts/`** — see
+**Cost and duration, from the ledger rather than from memory.** `logs/agent_sdk_costs.jsonl`
+records `wall_seconds` and per-stage cost for every run and has since April. Across the five
+recorded runs: **3.4–15.4 minutes, $0.25–$1.31**. Only one exceeded 5 minutes, and that one
+spent $0.88 of its $1.31 on live research, which `--brief` skips entirely. The figure this
+file used to quote — "~$1 and ~35 minutes" — was folklore contradicted by the repo's own
+data; a 2026-08-01 session repeated it back to the owner before checking. Read the ledger:
+
+```bash
+.venv/bin/python -c "import json;[print(r['timestamp'][:10], round(r['wall_seconds']/60,1),'min', '\$'+str(round(r['total_cost_usd'],2))) for r in map(json.loads, open('logs/agent_sdk_costs.jsonl'))]"
+```
+
+Then **deploy to review, never straight to `_posts/`** — see
 the publishing section below. `--mode` is required (B-028).
 
 **Why it is a converter and not a claim-extractor**, so a fresh session does not re-derive it:

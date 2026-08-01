@@ -85,6 +85,26 @@ class PipelineResult:
     article_chars: int
     hero_critique: str = ""
     hero_error: str = ""
+    # B-041: hero spend, surfaced in the cost ledger so the duration swing is
+    # attributable instead of hidden inside stage3_seconds.
+    hero_seconds: float = 0.0
+    hero_attempts: int = 0
+    hero_timeouts: int = 0
+
+
+def _numeric(source: object, name: str) -> float:
+    """Read a numeric metric off a Stage 3 result, tolerating test doubles.
+
+    ``getattr`` on a ``MagicMock`` returns another ``MagicMock`` rather than the
+    default, and these values reach the JSON cost ledger — where an unserialisable
+    value does not fail loudly, it makes the whole row vanish into a "cost log
+    write failed (non-fatal)" warning. Anything that is not a real number becomes
+    zero.
+    """
+    value = getattr(source, name, 0.0)
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return 0.0
+    return float(value)
 
 
 def load_brief_file(path: str | Path) -> str:
@@ -201,6 +221,13 @@ async def run_pipeline(
         # image_prompt above.
         hero_critique=getattr(stage3, "hero_critique", ""),
         hero_error=getattr(stage3, "hero_error", ""),
+        # ...but these reach the JSON cost ledger, and `getattr` on a MagicMock
+        # returns another MagicMock rather than the default, which orjson cannot
+        # serialise. Coerce, so a test double degrades to zero instead of
+        # silently killing the whole ledger write (B-041).
+        hero_seconds=_numeric(stage3, "hero_seconds"),
+        hero_attempts=int(_numeric(stage3, "hero_attempts")),
+        hero_timeouts=int(_numeric(stage3, "hero_timeouts")),
     )
     wall_seconds = result.stage3_seconds + result.stage4_seconds
     try:
@@ -313,6 +340,12 @@ def _append_cost_log(result: PipelineResult, total_wall_seconds: float) -> None:
         "stage3_seconds": result.stage3_seconds,
         "stage4_seconds": result.stage4_seconds,
         "wall_seconds": total_wall_seconds,
+        # B-041: the hero dominates duration and used to hide inside
+        # stage3_seconds, so a 4-minute run and a 20-minute one were
+        # indistinguishable here. `hero_timeouts > 0` means the expensive path.
+        "hero_seconds": result.hero_seconds,
+        "hero_attempts": result.hero_attempts,
+        "hero_timeouts": result.hero_timeouts,
         "editorial_score": result.editorial_score,
         "gates_passed": result.gates_passed,
         "publication_validator_passed": result.publication_validator_passed,

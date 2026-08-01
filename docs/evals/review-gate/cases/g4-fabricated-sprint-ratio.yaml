@@ -1,0 +1,14 @@
+id: g4-fabricated-sprint-ratio
+gate: G4
+expected: fail
+source: testing-shortcuts-migration-deadline
+passage: >-
+  A programme that cuts two sprints of testing to capture perceived velocity
+  typically surrenders six to eight sprints of migration progress to the rework
+  spiral that follows.
+why: >-
+  No source in the article, and nothing in the brief, supports a 2-to-6-or-8 sprint
+  ratio. "Typically" asserts a distribution over programmes that no cited work
+  reports. The surrounding paragraph cites Capers Jones for a 10-20x defect-cost
+  multiplier, which is a different quantity entirely and cannot be transformed into
+  this one.

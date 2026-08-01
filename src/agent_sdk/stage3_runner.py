@@ -349,6 +349,12 @@ class Stage3Result:
         ""  # B-016b: unresolved composition defects (CLI exits non-zero)
     )
     hero_error: str = ""  # B-016b: why no hero exists (empty when hero_path is set)
+    # B-041: the hero's own spend. It dominates the run's duration and used to be
+    # invisible inside `wall_seconds`, so a 4-minute run and a 20-minute one were
+    # indistinguishable in the ledger.
+    hero_seconds: float = 0.0
+    hero_attempts: int = 0
+    hero_timeouts: int = 0
     #: B-024: the requested research mode yielded nothing and the deterministic
     #: providers supplied the brief. The article is sourced differently from the
     #: one commissioned, so the reviewer must be told rather than left to infer it.
@@ -913,6 +919,9 @@ async def run_stage3(
     hero_path: Path | None = None
     hero_critique = ""
     hero_error = ""
+    hero_seconds = 0.0
+    hero_attempts = 0
+    hero_timeouts = 0
     if image_prompt:
         # Imported at call time: hero_author needs _collect_text from this module,
         # so a module-level import here would be a cycle.
@@ -927,6 +936,20 @@ async def run_stage3(
             model=graphics_model,
         )
         hero_path, hero_critique, hero_error = hero.path, hero.critique, hero.error
+        hero_seconds, hero_attempts, hero_timeouts = (
+            hero.seconds,
+            hero.attempts,
+            hero.timeouts,
+        )
+        # B-041: log the hero's own spend. A timed-out attempt costs its full
+        # allowance and produces nothing, and the difference between a 4-minute
+        # run and a 20-minute one is entirely here.
+        logger.info(
+            "Hero: %.0fs, %s attempt(s), %s timeout(s)",
+            hero_seconds,
+            hero_attempts,
+            hero_timeouts,
+        )
         if hero_path:
             logger.info("Drew hero: %s", hero_path)
         else:
@@ -960,6 +983,9 @@ async def run_stage3(
         hero_path=hero_path,
         hero_critique=hero_critique,
         hero_error=hero_error,
+        hero_seconds=hero_seconds,
+        hero_attempts=hero_attempts,
+        hero_timeouts=hero_timeouts,
     )
 
 

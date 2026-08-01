@@ -98,3 +98,8 @@ temp_blog_repo/
 # committed. tests/test_html_to_brief.py picks up whatever is here and skips cleanly
 # when there is nothing. The README explaining the drop point IS tracked.
 docs/research/samples/*.html
+
+# ...and the brief converted from one. Same content, same reason. Other briefs in
+# docs/research/ are committed normally; only ones derived from a local-only artifact
+# are ignored, one line each.
+docs/research/sre-quality-governance.md

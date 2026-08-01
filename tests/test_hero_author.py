@@ -438,3 +438,173 @@ class TestCallableFromAnEventLoop:
             brief=_BRIEF, slug="s", images_dir=tmp_path
         )
         assert result.path is not None
+
+
+class TestTheHeroWorkIsBounded:
+    """B-041: the per-call timeout bounded a *call*; nothing bounded the hero.
+
+    ``2 redraws x 2 structural attempts x 600s`` = 40 minutes of drawing before
+    critique, on a call whose measured successful duration is 454s — and it was
+    invisible, because the hero sits inside ``stage3_seconds`` with no sub-timing.
+    A run on 2026-08-01 hit that path live. These tests pin the aggregate ceiling
+    with a fake clock, so they cost milliseconds rather than the thing they bound.
+    """
+
+    @pytest.fixture
+    def clock(self, monkeypatch: pytest.MonkeyPatch) -> list[float]:
+        """A monotonic clock the test advances by hand. ``clock[0]`` is 'now'."""
+        now = [0.0]
+        monkeypatch.setattr(hero_author, "_now", lambda: now[0])
+        return now
+
+    @pytest.fixture
+    def timing_out_draw(
+        self, monkeypatch: pytest.MonkeyPatch, clock: list[float]
+    ) -> list[float]:
+        """Every draw burns its whole allowance and yields nothing. Records the
+        timeout each call was given, which is the thing the budget must shrink."""
+        given: list[float] = []
+
+        async def _draw(
+            prompt: str, model: str, *, timeout: float
+        ) -> tuple[str, float]:
+            given.append(timeout)
+            clock[0] += timeout
+            raise TimeoutError
+
+        monkeypatch.setattr(hero_author, "_draw", _draw)
+        return given
+
+    def test_the_worst_case_is_bounded_by_the_total_budget(
+        self,
+        tmp_path: Path,
+        clock: list[float],
+        timing_out_draw: list[float],
+        _no_render: None,
+    ) -> None:
+        hero_author.author_hero_svg(brief=_BRIEF, slug="s", images_dir=tmp_path)
+
+        assert clock[0] <= hero_author._HERO_TOTAL_BUDGET_S
+
+    def test_that_ceiling_is_far_below_the_old_unbounded_worst_case(self) -> None:
+        # What the composition used to permit, before any critique time.
+        old_worst_case = (
+            (hero_author._MAX_CRITIQUE_RETRIES + 1)
+            * hero_author._MAX_STRUCTURAL_ATTEMPTS
+            * hero_author._DRAW_TIMEOUT_S
+        )
+
+        assert old_worst_case >= 2400  # 40 minutes, the defect
+        assert old_worst_case / 2 >= hero_author._HERO_TOTAL_BUDGET_S
+
+    def test_a_draw_is_not_started_when_it_cannot_finish(
+        self,
+        tmp_path: Path,
+        clock: list[float],
+        timing_out_draw: list[float],
+        _no_render: None,
+    ) -> None:
+        hero_author.author_hero_svg(brief=_BRIEF, slug="s", images_dir=tmp_path)
+
+        # Every call must have been given enough time to plausibly succeed;
+        # starting one with less buys a guaranteed timeout.
+        assert all(t >= hero_author._MIN_USEFUL_DRAW_S for t in timing_out_draw)
+
+    def test_the_last_call_is_capped_by_what_is_left_not_by_the_per_call_timeout(
+        self,
+        tmp_path: Path,
+        clock: list[float],
+        timing_out_draw: list[float],
+        _no_render: None,
+    ) -> None:
+        hero_author.author_hero_svg(brief=_BRIEF, slug="s", images_dir=tmp_path)
+
+        assert timing_out_draw, "expected at least one draw"
+        assert sum(timing_out_draw) <= hero_author._HERO_TOTAL_BUDGET_S
+
+    def test_exhausting_the_budget_degrades_instead_of_raising(
+        self,
+        tmp_path: Path,
+        clock: list[float],
+        timing_out_draw: list[float],
+        _no_render: None,
+    ) -> None:
+        # Stage 3 must never crash on a hero problem.
+        result = hero_author.author_hero_svg(
+            brief=_BRIEF, slug="s", images_dir=tmp_path
+        )
+
+        assert result.path is None
+        assert result.error
+
+    def test_it_reports_how_long_it_took_and_how_many_attempts_it_burned(
+        self,
+        tmp_path: Path,
+        clock: list[float],
+        timing_out_draw: list[float],
+        _no_render: None,
+    ) -> None:
+        # B-041's second half: a 10x duration swing must never again be invisible.
+        result = hero_author.author_hero_svg(
+            brief=_BRIEF, slug="s", images_dir=tmp_path
+        )
+
+        assert result.seconds > 0
+        assert result.attempts == len(timing_out_draw)
+        assert result.timeouts == len(timing_out_draw)
+
+    def test_the_happy_path_is_unchanged_and_costs_one_call(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, clock: list[float]
+    ) -> None:
+        monkeypatch.setattr(hero_author, "render_to_png", lambda svg, png: None)
+        recorder = _Recorder([_GOOD_SVG])
+        monkeypatch.setattr(hero_author, "_collect_text", recorder)
+
+        result = hero_author.author_hero_svg(
+            brief=_BRIEF, slug="s", images_dir=tmp_path
+        )
+
+        assert result.path is not None, result.error
+        assert result.attempts == 1
+        assert result.timeouts == 0
+
+    def test_a_timed_out_attempt_is_not_retried_at_full_price(
+        self,
+        tmp_path: Path,
+        clock: list[float],
+        timing_out_draw: list[float],
+        _no_render: None,
+    ) -> None:
+        """The 2026-08-01 regression, pinned.
+
+        Attempt 1 timed out at 600s; attempt 2 carried the "draw something
+        simpler" instruction and timed out at 600s too. Twenty minutes, no hero,
+        and an article the blog cannot publish because `image:` is required.
+        One timeout is a diagnosis, not a transient.
+        """
+        result = hero_author.author_hero_svg(
+            brief=_BRIEF, slug="s", images_dir=tmp_path
+        )
+
+        assert result.timeouts == 1, "a second full-price attempt was paid for"
+        assert clock[0] <= hero_author._DRAW_TIMEOUT_S
+
+    def test_a_rejected_attempt_is_still_retried(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, clock: list[float]
+    ) -> None:
+        """The other half of the distinction: rejection is cheap, so it retries.
+
+        Bounding the aggregate must not silently disable the structural retry —
+        a rejected draw returns in seconds and leaves the budget almost intact.
+        """
+        monkeypatch.setattr(hero_author, "render_to_png", lambda svg, png: None)
+        recorder = _Recorder([_BAD_SVG, _GOOD_SVG])
+        monkeypatch.setattr(hero_author, "_collect_text", recorder)
+
+        result = hero_author.author_hero_svg(
+            brief=_BRIEF, slug="s", images_dir=tmp_path
+        )
+
+        assert result.path is not None, result.error
+        assert result.attempts == 2
+        assert result.timeouts == 0

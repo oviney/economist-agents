@@ -30,6 +30,7 @@ import asyncio
 import json
 import logging
 import re
+import time
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -64,6 +65,39 @@ _MAX_CRITIQUE_RETRIES = 1
 #: 240s, $0.40) were each independently fatal.
 _DRAW_TIMEOUT_S = 600
 _CRITIQUE_TIMEOUT_S = 180
+
+#: B-041: the ceiling above bounds a *call*. Nothing bounded the hero. Composed,
+#: the loops permitted ``2 redraws x 2 structural attempts x 600s`` = **40 minutes
+#: of drawing** before critique — against a measured successful draw of 454s and a
+#: longest-ever whole-pipeline run of 15.4 minutes. A run on 2026-08-01 hit that
+#: path live and was still going at 27 minutes.
+#:
+#: The 2026-08-01 run settled what a retry after a timeout is worth: attempt 1
+#: timed out at 600s, attempt 2 — carrying the "return a simpler drawing with
+#: fewer, larger shapes" instruction — **also timed out at 600s**, and the run
+#: produced no hero at all. Twenty minutes, nothing to show, and an article the
+#: blog cannot publish because ``image:`` is required.
+#:
+#: So the ceiling is set to make that second full-price attempt impossible rather
+#: than merely capped: 900s is one measured successful draw (454s) plus its
+#: critique (180s) plus slack, and equals the longest *complete* pipeline run ever
+#: recorded. Failure now costs 600s and stops.
+_HERO_TOTAL_BUDGET_S = 900
+
+#: No observed successful draw has ever completed in under 454s. Beginning one
+#: with less than this remaining buys a guaranteed timeout at full price, so the
+#: floor sits just under the measurement.
+#:
+#: This is what separates the two retry cases, and the distinction is the whole
+#: fix: a *rejected* attempt returns quickly and leaves plenty of budget, so it is
+#: retried as before. A *timed-out* attempt has consumed 600s by definition,
+#: leaving 300s — below this floor — so it is not retried. Cheap signal, retry;
+#: expensive silence, stop.
+_MIN_USEFUL_DRAW_S = 450
+
+#: Indirection so the budget is testable with a fake clock instead of by waiting
+#: twenty minutes for the thing it exists to prevent.
+_now = time.monotonic
 
 #: Thinking consumes turns, so a one-turn cap fails with "Reached maximum number
 #: of turns (1)" before any text arrives. Measured working value: 3.
@@ -167,12 +201,20 @@ class HeroResult:
             which includes the case where the critique could not run at all.
         error: Why no hero exists. Empty when ``path`` is set.
         cost_usd: Total subscription cost of the attempts.
+        seconds: Wall clock spent on the whole hero — B-041. Without it a 10x
+            duration swing hides inside ``stage3_seconds``.
+        attempts: Drawing calls made, including ones that timed out.
+        timeouts: How many of those attempts hit their allowance. A run with
+            ``timeouts > 0`` is on the expensive path and should be read as such.
     """
 
     path: Path | None
     critique: str = ""
     error: str = ""
     cost_usd: float = 0.0
+    seconds: float = 0.0
+    attempts: int = 0
+    timeouts: int = 0
 
 
 def _extract_svg(text: str) -> str:
@@ -200,8 +242,13 @@ def _parse_verdict(text: str) -> list[str]:
     return [str(d).strip() for d in defects if str(d).strip()]
 
 
-async def _draw(prompt: str, model: str) -> tuple[str, float]:
-    """One bounded drawing call. Raises on timeout so the caller can retry."""
+async def _draw(prompt: str, model: str, *, timeout: float) -> tuple[str, float]:
+    """One bounded drawing call. Raises on timeout so the caller can retry.
+
+    ``timeout`` is whatever the hero's remaining budget allows, never simply
+    ``_DRAW_TIMEOUT_S`` — that constant bounds a call, and B-041 was about the
+    aggregate.
+    """
     return await asyncio.wait_for(
         _collect_text(
             prompt,
@@ -210,8 +257,113 @@ async def _draw(prompt: str, model: str) -> tuple[str, float]:
             max_turns=_DRAW_MAX_TURNS,
             max_budget_usd=_DRAW_BUDGET_USD,
         ),
-        timeout=_DRAW_TIMEOUT_S,
+        timeout=timeout,
     )
+
+
+@dataclass
+class _Budget:
+    """The aggregate wall-clock ceiling for one hero (B-041).
+
+    Every draw and critique spends from the same pot, so retries compose into a
+    bounded total instead of multiplying. Also carries the counters that make the
+    spend attributable afterwards — the swing was invisible before because the
+    hero sits inside ``stage3_seconds`` with no sub-timing.
+    """
+
+    started: float
+    attempts: int = 0
+    timeouts: int = 0
+
+    @property
+    def spent(self) -> float:
+        return _now() - self.started
+
+    @property
+    def remaining(self) -> float:
+        return _HERO_TOTAL_BUDGET_S - self.spent
+
+    def can_draw(self) -> bool:
+        """False when what is left cannot plausibly produce a drawing."""
+        return self.remaining >= _MIN_USEFUL_DRAW_S
+
+    def draw_timeout(self) -> float:
+        return min(_DRAW_TIMEOUT_S, self.remaining)
+
+
+async def _draw_valid_svg(
+    brief: str, carry_forward: str, model: str, budget: _Budget
+) -> tuple[str, str, float]:
+    """Draw until the structural gate accepts, attempts run out, or budget does.
+
+    Returns ``(svg, last_error, cost)``. An empty ``svg`` means no structurally
+    valid drawing was produced and ``last_error`` says why.
+    """
+    last_error = ""
+    cost = 0.0
+
+    for attempt in range(_MAX_STRUCTURAL_ATTEMPTS):
+        if not budget.can_draw():
+            last_error = (
+                f"hero budget exhausted after {budget.spent:.0f}s of "
+                f"{_HERO_TOTAL_BUDGET_S}s — not starting an attempt that cannot finish"
+            )
+            logger.warning("%s", last_error)
+            break
+
+        prompt = f"Draw the hero illustration.\n\n{brief}"
+        if carry_forward:
+            prompt += (
+                "\n\nA previous attempt was rejected for these composition "
+                f"faults — fix them specifically:\n{carry_forward}"
+            )
+        if last_error:
+            prompt += (
+                f"\n\nYour previous SVG failed validation: {last_error}\n"
+                "Return corrected SVG source only."
+            )
+
+        allowance = budget.draw_timeout()
+        budget.attempts += 1
+        try:
+            text, call_cost = await _draw(prompt, model, timeout=allowance)
+        except TimeoutError:
+            # Retryable: a stalled generation is not a reason to give up, but it
+            # must not hang. Shrink the ask on the way round.
+            budget.timeouts += 1
+            last_error = (
+                f"generation exceeded {allowance:.0f}s — return a simpler "
+                "drawing with fewer, larger shapes"
+            )
+            logger.warning(
+                "Hero attempt %s/%s timed out after %.0fs (%.0fs of %ss budget left)",
+                attempt + 1,
+                _MAX_STRUCTURAL_ATTEMPTS,
+                allowance,
+                max(budget.remaining, 0),
+                _HERO_TOTAL_BUDGET_S,
+            )
+            continue
+        except Exception as exc:  # noqa: BLE001 - degrade, never crash Stage 3
+            logger.warning("Hero authoring call failed: %s", exc)
+            return "", str(exc), cost
+        cost += call_cost
+
+        candidate = _extract_svg(text)
+        try:
+            check_hero_svg(candidate)
+        except HeroSvgError as exc:
+            last_error = str(exc)
+            logger.info(
+                "Hero attempt %s/%s rejected: %s",
+                attempt + 1,
+                _MAX_STRUCTURAL_ATTEMPTS,
+                last_error,
+            )
+            continue
+        return candidate, "", cost
+
+    return "", last_error, cost
 
 
 async def _author(brief: str, slug: str, images_dir: Path, model: str) -> HeroResult:
@@ -219,64 +371,39 @@ async def _author(brief: str, slug: str, images_dir: Path, model: str) -> HeroRe
     png_path = images_dir / f"{slug}-hero.preview.png"
     cost = 0.0
     carry_forward = ""
+    budget = _Budget(started=_now())
+
+    def done(**kwargs: object) -> HeroResult:
+        """Every exit reports the spend, so B-041's swing stays attributable."""
+        return HeroResult(
+            cost_usd=cost,
+            seconds=budget.spent,
+            attempts=budget.attempts,
+            timeouts=budget.timeouts,
+            **kwargs,  # type: ignore[arg-type]
+        )
 
     for redraw in range(_MAX_CRITIQUE_RETRIES + 1):
-        # ── structural loop ────────────────────────────────────────────
-        svg = ""
-        last_error = ""
-        for attempt in range(_MAX_STRUCTURAL_ATTEMPTS):
-            prompt = f"Draw the hero illustration.\n\n{brief}"
-            if carry_forward:
-                prompt += (
-                    "\n\nA previous attempt was rejected for these composition "
-                    f"faults — fix them specifically:\n{carry_forward}"
-                )
-            if last_error:
-                prompt += (
-                    f"\n\nYour previous SVG failed validation: {last_error}\n"
-                    "Return corrected SVG source only."
-                )
-            try:
-                text, call_cost = await _draw(prompt, model)
-            except TimeoutError:
-                # Retryable: a stalled generation is not a reason to give up, but
-                # it must not hang. Shrink the ask on the way round.
-                last_error = (
-                    f"generation exceeded {_DRAW_TIMEOUT_S}s — return a simpler "
-                    "drawing with fewer, larger shapes"
-                )
-                logger.warning(
-                    "Hero attempt %s/%s timed out after %ss",
-                    attempt + 1,
-                    _MAX_STRUCTURAL_ATTEMPTS,
-                    _DRAW_TIMEOUT_S,
-                )
-                continue
-            except Exception as exc:  # noqa: BLE001 - degrade, never crash Stage 3
-                logger.warning("Hero authoring call failed: %s", exc)
-                return HeroResult(path=None, error=str(exc), cost_usd=cost)
-            cost += call_cost
-
-            candidate = _extract_svg(text)
-            try:
-                check_hero_svg(candidate)
-            except HeroSvgError as exc:
-                last_error = str(exc)
-                logger.info(
-                    "Hero attempt %s/%s rejected: %s",
-                    attempt + 1,
-                    _MAX_STRUCTURAL_ATTEMPTS,
-                    last_error,
-                )
-                continue
-            svg = candidate
-            break
+        svg, last_error, call_cost = await _draw_valid_svg(
+            brief, carry_forward, model, budget
+        )
+        cost += call_cost
 
         if not svg:
-            return HeroResult(path=None, error=last_error, cost_usd=cost)
+            return done(path=None, error=last_error)
 
         images_dir.mkdir(parents=True, exist_ok=True)
         svg_path.write_text(svg)
+
+        # A hero is on disk and structurally valid. The critique is additional
+        # value, not a precondition, so it never spends past the ceiling.
+        if budget.remaining < _CRITIQUE_TIMEOUT_S:
+            logger.warning(
+                "Hero budget spent (%.0fs of %ss) — keeping the drawing, skipping critique",
+                budget.spent,
+                _HERO_TOTAL_BUDGET_S,
+            )
+            return done(path=svg_path)
 
         # ── compositional loop ─────────────────────────────────────────
         defects = await _critique(svg_path, png_path, model)
@@ -290,7 +417,7 @@ async def _author(brief: str, slug: str, images_dir: Path, model: str) -> HeroRe
             logger.info("Hero framing: %s", observation)
 
         if not defects:
-            return HeroResult(path=svg_path, cost_usd=cost)
+            return done(path=svg_path)
 
         carry_forward = "\n".join(f"- {d}" for d in defects)
         # `redraw` is 0-based and the last pass has no redraw left, so report
@@ -308,7 +435,7 @@ async def _author(brief: str, slug: str, images_dir: Path, model: str) -> HeroRe
     # and hand the critique back so the CLI can exit non-zero. Shipping silently
     # would rely on a warning nobody reads; discarding it would report the wrong
     # fault ("hero image not set") for a composition problem.
-    return HeroResult(path=svg_path, critique=carry_forward, cost_usd=cost)
+    return done(path=svg_path, critique=carry_forward)
 
 
 async def _critique(svg_path: Path, png_path: Path, model: str) -> list[str]:

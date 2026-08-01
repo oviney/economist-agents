@@ -62,6 +62,60 @@ stripped automatically). **This is opt-in and heavy** — one deep-research run 
 ~2M tokens and can hit your session limit — so `claude_web` stays the everyday
 default; reserve `--brief` for the pieces that warrant it.
 
+### ⚠ `--brief` with an uncited artifact will manufacture citations
+
+**Measured 2026-08-01, on the first real B-038 run.** The brief was converted from an owner
+research artifact that contained **zero `<a href>` and one unsourced statistic**. `--brief`
+skips the research step, so the writer received an argument with no evidence — and filled the
+gap itself. The article came back with:
+
+- a chart carrying **four invented percentages** (62/46/28/12%) presented with an axis and a
+  measured-sounding subtitle, where the brief had contained exactly one number;
+- prose describing that chart as showing accumulation and a threshold it does not plot —
+  ADR-0018's chart finding reproduced exactly, one day after that ADR was accepted;
+- a **named real executive** given a motive the cited annual report cannot support;
+- a fabricated ratio ("cuts two sprints … *typically* surrenders six to eight");
+- three references, **zero URLs**.
+
+`article_evaluator` scored it **76** and the publication validator **passed** it, because
+counting checks can see "chart embedded: yes" and "3 references cited" and nothing further.
+That is the 88%-vs-51 gap of ADR-0018, live.
+
+**The tool did what it was asked.** The defect is upstream: an artifact with no evidence is
+not a research brief, it is an argument. Before running `--brief`:
+
+```bash
+grep -c 'href=' <artifact>.html      # zero links is the warning sign
+grep -c '](http' docs/research/<slug>.md   # and in the converted brief
+```
+
+If that returns 0, either add sources to the artifact first — `docs/research/artifact-sourcing-prompt.md`
+is a prompt to paste back into the conversation that produced it — or expect to review the
+output as fabrication-until-proven-otherwise. **Never publish such a run without the
+`blog-post-review` gate.** The eight labelled defects from this run are now calibration cases
+in `docs/evals/review-gate/cases/` (B-040).
+
+### What a run actually costs — read the ledger, do not quote a remembered figure
+
+`logs/agent_sdk_costs.jsonl` records `wall_seconds`, `stage3_seconds` and per-stage cost for
+every run, and has since 2026-04-26. Across the five recorded runs:
+
+| | Wall clock | Total cost | Research share |
+|---|---|---|---|
+| Range | **3.4 – 15.4 min** | **$0.25 – $1.31** | $0.00 – $0.88 |
+| Typical (`--brief`, research skipped) | 3.4 – 4.8 min | $0.25 – $0.49 | $0.00 |
+| The one live-research run | 15.4 min | $1.31 | $0.88 |
+
+```bash
+.venv/bin/python -c "import json;[print(r['timestamp'][:10], round(r['wall_seconds']/60,1),'min', '\$'+str(round(r['total_cost_usd'],2))) for r in map(json.loads, open('logs/agent_sdk_costs.jsonl'))]"
+```
+
+`docs/HANDOFF.md` and this runbook used to say "~$1 and ~35 minutes". No recorded run has
+ever come close to 35 minutes. A 2026-08-01 session quoted that number back to the owner and
+defended it before checking the ledger sitting in `logs/`. **The instrument existed; nobody
+read it.** That is a worse failure than not measuring, because the folklore number is the one
+everybody repeats. If a run feels slow, add its row and compare — do not estimate.
+
 ## 2. Publish (keyless — free GitHub token, opens a PR you review)
 
 ```bash
@@ -81,8 +135,8 @@ token needs only `Contents` + `Pull requests` write on `oviney/blog` — no AI k
 |-------|-----------|------------|
 | Research | `claude_web` → `query()` + WebSearch/WebFetch | none (subscription) |
 | Writer + Graphics | Stage 3 `query()` | none (subscription) |
-| Hero image | skipped in `chart_only` | none |
-| Vision alt/caption | not invoked in `chart_only` (hero only) | none (subscription) |
+| Hero image | Stage 3 draws it as SVG itself (B-016b) | none (subscription) |
+| Vision alt/caption | Stage 3 `query()` over the drawn hero | none (subscription) |
 | Quality gates + validator | deterministic Python | none |
 
 ## Honest limitations

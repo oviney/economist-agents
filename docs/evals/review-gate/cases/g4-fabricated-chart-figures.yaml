@@ -1,0 +1,15 @@
+id: g4-fabricated-chart-figures
+gate: G4
+expected: fail
+source: testing-shortcuts-migration-deadline
+passage: >-
+  Chart "The rework tax — engineering capacity consumed by defect rework, by
+  test-coverage level": No test automation 62%, Manual tests only 46%,
+  Unit tests only 28%, Full test pyramid 12%.
+why: >-
+  All four figures are invented. The research brief this article was written from
+  contained exactly one number ("up to 40% of engineering capacity") and no
+  citations at all; none of the three references reports capacity-by-coverage-level
+  data. The chart presents fabricated values with an axis and a measured-sounding
+  subtitle. This is the highest-severity class: a reader cannot distinguish it from
+  a real dataset.

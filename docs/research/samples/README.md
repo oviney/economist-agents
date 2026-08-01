@@ -17,6 +17,21 @@ docs/research/samples/platform-eng-adoption.html
 
 Nothing else needs to change. The converter and its tests discover whatever is here.
 
+## Check it has sources before you run the pipeline on it
+
+**Measured 2026-08-01:** an artifact here with zero `<a href>` produced an article with a
+fabricated chart, an unsupportable attribution to a named executive, and three reference
+entries carrying no URLs — because `--brief` skips research, so the writer had no evidence and
+supplied its own. The deterministic evaluator scored it 76 and passed it.
+
+```bash
+grep -c 'href=' docs/research/samples/<file>.html   # zero is the warning sign
+```
+
+If it returns 0, paste `docs/research/artifact-sourcing-prompt.md` back into the conversation
+that produced the artifact and re-export. An artifact with no evidence is an argument, not a
+research brief, and nothing downstream can tell the difference.
+
 ## Why real samples, not invented ones
 
 The tests can run on synthetic fixtures, and v1 ships with three (headings-and-prose,

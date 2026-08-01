@@ -82,7 +82,7 @@ Then a fenced JSON block so the pipeline can gate automatically:
 {
   "verdict": "",
   "weighted_score": 0,
-  "gates": {"G1": "", "G2": "", "G3": "", "G4": ""},
+  "gates": {"G1": "", "G2": "", "G3": "", "G4": "", "G5": ""},
   "dimensions": {"evidence": 0, "falsifiability": 0, "thesis": 0, "actionability": 0, "voice": 0, "craft": 0},
   "blocking_findings": [],
   "reviewer_confidence_pct": 0

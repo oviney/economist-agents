@@ -1,18 +1,76 @@
-# Hand-off — 2026-07-31
+# Hand-off — 2026-08-01
 
-Written for a fresh session after `/clear`. `BACKLOG.md` stays the source of record; this
-file is the "where were we" note a new session reads first, then overwrites when it goes
-stale. The 2026-07-30 hand-off (B-030…B-034 close-out) is superseded; its durable warnings
-are carried forward below.
+Written for a fresh session after `/clear`. `BACKLOG.md` stays the source of record; this file
+is the "where were we" note a new session reads first, then overwrites when it goes stale.
 
-**Read next, in this order:** this file → `docs/keyless-pipeline-runbook.md` if you are
-generating an article → `BACKLOG.md` (B-015, B-012 are the only open items) →
-`docs/specs/b035-harness-decisions.md` only if you need the reasoning behind the harness
-gates.
+**Read next, in this order:** this file → `docs/specs/sensor-proof-of-teeth.md` (**B-043 is the
+next work**) → `docs/reviews/harness-engineering-assessment-2026-07-29.md` for the framework it
+sits in → `BACKLOG.md`.
 
-**Session of 2026-07-31 is closed out.** B-028, B-029, B-035, B-036, B-037, BUG-046, B-023
-and **B-038** all landed; ADR-0018 accepted; the working tree is clean and both PRs are
-`MERGEABLE`. Nothing is half-finished.
+**Session of 2026-08-01 is closed out.** PRs #459, #460, #461 and #462 all merged; `main` is
+clean with no open PRs; `make ci-local` green at **2,689 tests**. B-038, B-039, B-040 and B-041
+landed. B-042 and B-043 are specced and open.
+
+## The next work: B-043 — no sensor ships without a proof it can fail
+
+**Spec: `docs/specs/sensor-proof-of-teeth.md`, awaiting LGTM.** Per `CLAUDE.md`, no
+implementation begins until that lands.
+
+**The one-line argument, so a fresh session does not re-derive it.** The 2026-07-29 assessment
+graded this repo *guide-maximal, sensor-disconnected*. B-030 … B-035 fixed the wiring — sensors
+now fire in the agent's loop. 2026-08-01 produced four independent proofs that **nothing
+validates the sensors themselves**:
+
+| | Kind of failure |
+|---|---|
+| B-039 | A **fifth** inert sensor, found after B-031 fixed four |
+| B-040 | A sensor that **never runs**, with no ground truth |
+| B-041 | A **biased** sensor — the ledger recorded only successful runs |
+| B-042 | A sensor whose **setpoint manufactured the defect** it prevents |
+
+**B-031 fixed four named sensors; it did not fix the class.**
+
+**The design constraint that decides the whole build: the fix must be a sensor, not a guide.**
+Writing "every sensor must have a teeth test" into a `SKILL.md` reproduces exactly what this
+repo was graded down for — constraint #1 had zero computational backing until B-030, and B-028
+was a review stage that existed as prose while the tool's default bypassed it. A rule nothing
+enforces gets skipped.
+
+**B-040 is absorbed** as the inferential arm: computational sensors are proved by mutation,
+inferential ones by labelled cases. Eight already exist in `docs/evals/review-gate/cases/`.
+`docs/specs/review-gate-calibration.md` remains the detailed design and its sequencing is
+unchanged — build after n≈5 real reviews.
+
+## Blocked on the owner, not on code
+
+Two round-trips only he can make. The `testing-shortcuts-migration-deadline` article is blocked
+on both and **should not be published as it stands** — see B-040's calibration cases for why.
+
+1. **Re-source the artifact.** Paste `docs/research/artifact-sourcing-prompt.md` into the
+   Claude.ai conversation that produced `sre-quality-governance-guide.html`. That artifact had
+   **zero citations**, and `--brief` skips research, so the writer fabricated: a chart with four
+   invented percentages, a named real executive given an unsupportable motive, three references
+   with no URLs. `article_evaluator` scored it **76** and the validator **passed** it.
+2. **Draw the hero.** The prompt is in the article as a `<!-- HERO IMAGE` comment and in
+   `output/posts/testing-shortcuts-migration-deadline.image_prompt.md`. Two hero draws timed out
+   at 600s each. B-041 now caps that at 10 minutes, but it will likely still fail, so Gemini /
+   Nano Banana by hand is the realistic route. **A PNG hero needs a `.webp` sibling** — the
+   blog's `responsive-image.html` rewrites `.png` → `.webp`.
+
+## Traps that cost real time on 2026-08-01
+
+- **`make ci-local` needs the venv**, and now enforces it (B-039). Bare `python` does not exist
+  on macOS outside one.
+- **`export PATH :=` in a Makefile does not do what it looks like.** GNU make 3.81 direct-execs
+  recipe lines with no shell metacharacters and resolves them against its own startup PATH.
+  Name `$(VENV_BIN)/<tool>` explicitly. Only a test running `make` against a stub binary catches
+  this; a grep of the Makefile passes on the broken fix.
+- **Read `logs/agent_sdk_costs.jsonl`; never quote a remembered duration.** This session repeated
+  "~35 minutes" from the docs and defended it before checking. Both halves turned out true: the
+  ledger had only ever recorded runs where the hero landed, so it could not see the timeout path.
+- **The publish-guard PreToolUse hook matches on a bare string**, so it blocks any command whose
+  text mentions the deploy script — including a `grep` for it, and including a heredoc that only
+  documents it. Split the command or write the file with an editor tool.
 
 ## B-038, HTML research ingestion — BUILT 2026-07-31
 

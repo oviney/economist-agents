@@ -820,6 +820,53 @@ that kept B-040 at spec-only applies. Spec first.
 **Scope:** M. **Files:** `scripts/publication_validator.py`, `src/agent_sdk/_shared.py`
 (`_auto_embed_chart`), `src/agent_sdk/stage3_runner.py`.
 
+### B-043 · No sensor ships without a proof it can fail
+
+**Opened 2026-08-01.** Spec: `docs/specs/sensor-proof-of-teeth.md` — **awaiting LGTM.**
+**Absorbs B-040** as its inferential-sensor arm.
+
+The 2026-07-29 SE Radio 730 assessment graded this repo *guide-maximal, sensor-disconnected*;
+B-030 … B-035 fixed the wiring. **The next failure mode is that nothing validates the sensors
+themselves**, and 2026-08-01 produced four independent proofs in one day:
+
+| Finding | Kind of sensor failure |
+|---|---|
+| **B-039** | A **fifth** inert sensor — `(mypy \|\| echo advisory)` returned exit 0 against a stub exiting 127 — found *after* B-031 fixed four |
+| **B-040** | A sensor that **never runs**, with no ground truth |
+| **B-041** | A **biased** sensor: the ledger recorded only runs where the hero succeeded, hiding a 10x duration swing |
+| **B-042** | A sensor whose **setpoint manufactured the defect** it exists to prevent |
+
+**B-031 fixed four named sensors; it did not fix the class.** That is the argument for a
+standing check rather than another audit.
+
+The technique already exists — used three times on 2026-08-01, at a terminal, unrecorded.
+Mutate something, check whether the sensor notices. The third instance is the one that matters:
+`export PATH := .venv/bin:$(PATH)` looked right, `make showpath` confirmed it, and running
+`make lint` against a stub `ruff` showed the ambient ruff still won. **A grep of the Makefile
+would have passed on a fix that fixed nothing.**
+
+Measured baseline: 13 sensor scripts; `lint_adrs.py` and `check_bare_name_imports.py` have
+**zero tests**; the rest have unit tests (does the code work) not efficacy tests (does it fire).
+
+**The design constraint that decides everything: the fix must be a sensor, not a guide.**
+Writing the rule into a `SKILL.md` reproduces exactly what this repo was graded down for —
+constraint #1 ("NO new API keys. Ever.") had zero computational backing until B-030, and B-028
+was a review stage that existed as prose while the tool default bypassed it. A rule nothing
+enforces gets skipped.
+
+- [ ] `scripts/check_sensor_proofs.py` in `make ci-local`, failing on an unregistered sensor
+- [ ] `docs/sensors/register.yaml` covering all 13, `proof: none` allowed as a recorded baseline
+- [ ] `lint_adrs` and `check_bare_name_imports` proved first — the two real gaps
+- [ ] The three hand-run mutation proofs exist as tests, not shell history
+- [ ] The checker has its own proof of teeth
+
+**Scope:** M. **Files:** `scripts/check_sensor_proofs.py`, `docs/sensors/register.yaml`,
+`tests/test_check_sensor_proofs.py`.
+
+**Open question for the owner, because it sets the gate's scope:** what counts as a sensor?
+Proposed — anything whose non-zero exit can block a commit, push, `ci-local`, or publish. That
+includes `publication_validator` and excludes `article_evaluator`, which scores but does not gate.
+
 ### B-036 · Badge validation has no implementation — decide whether to restore it
 
 **Opened 2026-07-31**, found by B-031 doing its job.

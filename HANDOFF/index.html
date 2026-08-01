@@ -23,7 +23,7 @@
     
     
       
-        <title>Hand-off — 2026-07-31 - Economist Agents</title>
+        <title>Hand-off — 2026-08-01 - Economist Agents</title>
       
     
     
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#hand-off-2026-07-31" class="md-skip">
+        <a href="#hand-off-2026-08-01" class="md-skip">
           Skip to content
         </a>
       
@@ -108,7 +108,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Hand-off — 2026-07-31
+              Hand-off — 2026-08-01
             
           </span>
         </div>
@@ -2523,6 +2523,39 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#the-next-work-b-043-no-sensor-ships-without-a-proof-it-can-fail" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The next work: B-043 — no sensor ships without a proof it can fail
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blocked-on-the-owner-not-on-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Blocked on the owner, not on code
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#traps-that-cost-real-time-on-2026-08-01" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Traps that cost real time on 2026-08-01
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#b-038-html-research-ingestion-built-2026-07-31" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2791,18 +2824,88 @@
   
 
 
-<h1 id="hand-off-2026-07-31">Hand-off — 2026-07-31<a class="headerlink" href="#hand-off-2026-07-31" title="Permanent link">&para;</a></h1>
-<p>Written for a fresh session after <code>/clear</code>. <code>BACKLOG.md</code> stays the source of record; this
-file is the "where were we" note a new session reads first, then overwrites when it goes
-stale. The 2026-07-30 hand-off (B-030…B-034 close-out) is superseded; its durable warnings
-are carried forward below.</p>
-<p><strong>Read next, in this order:</strong> this file → <code>docs/keyless-pipeline-runbook.md</code> if you are
-generating an article → <code>BACKLOG.md</code> (B-015, B-012 are the only open items) →
-<code>docs/specs/b035-harness-decisions.md</code> only if you need the reasoning behind the harness
-gates.</p>
-<p><strong>Session of 2026-07-31 is closed out.</strong> B-028, B-029, B-035, B-036, B-037, BUG-046, B-023
-and <strong>B-038</strong> all landed; ADR-0018 accepted; the working tree is clean and both PRs are
-<code>MERGEABLE</code>. Nothing is half-finished.</p>
+<h1 id="hand-off-2026-08-01">Hand-off — 2026-08-01<a class="headerlink" href="#hand-off-2026-08-01" title="Permanent link">&para;</a></h1>
+<p>Written for a fresh session after <code>/clear</code>. <code>BACKLOG.md</code> stays the source of record; this file
+is the "where were we" note a new session reads first, then overwrites when it goes stale.</p>
+<p><strong>Read next, in this order:</strong> this file → <code>docs/specs/sensor-proof-of-teeth.md</code> (<strong>B-043 is the
+next work</strong>) → <code>docs/reviews/harness-engineering-assessment-2026-07-29.md</code> for the framework it
+sits in → <code>BACKLOG.md</code>.</p>
+<p><strong>Session of 2026-08-01 is closed out.</strong> PRs #459, #460, #461 and #462 all merged; <code>main</code> is
+clean with no open PRs; <code>make ci-local</code> green at <strong>2,689 tests</strong>. B-038, B-039, B-040 and B-041
+landed. B-042 and B-043 are specced and open.</p>
+<h2 id="the-next-work-b-043-no-sensor-ships-without-a-proof-it-can-fail">The next work: B-043 — no sensor ships without a proof it can fail<a class="headerlink" href="#the-next-work-b-043-no-sensor-ships-without-a-proof-it-can-fail" title="Permanent link">&para;</a></h2>
+<p><strong>Spec: <code>docs/specs/sensor-proof-of-teeth.md</code>, awaiting LGTM.</strong> Per <code>CLAUDE.md</code>, no
+implementation begins until that lands.</p>
+<p><strong>The one-line argument, so a fresh session does not re-derive it.</strong> The 2026-07-29 assessment
+graded this repo <em>guide-maximal, sensor-disconnected</em>. B-030 … B-035 fixed the wiring — sensors
+now fire in the agent's loop. 2026-08-01 produced four independent proofs that <strong>nothing
+validates the sensors themselves</strong>:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Kind of failure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B-039</td>
+<td>A <strong>fifth</strong> inert sensor, found after B-031 fixed four</td>
+</tr>
+<tr>
+<td>B-040</td>
+<td>A sensor that <strong>never runs</strong>, with no ground truth</td>
+</tr>
+<tr>
+<td>B-041</td>
+<td>A <strong>biased</strong> sensor — the ledger recorded only successful runs</td>
+</tr>
+<tr>
+<td>B-042</td>
+<td>A sensor whose <strong>setpoint manufactured the defect</strong> it prevents</td>
+</tr>
+</tbody>
+</table>
+<p><strong>B-031 fixed four named sensors; it did not fix the class.</strong></p>
+<p><strong>The design constraint that decides the whole build: the fix must be a sensor, not a guide.</strong>
+Writing "every sensor must have a teeth test" into a <code>SKILL.md</code> reproduces exactly what this
+repo was graded down for — constraint #1 had zero computational backing until B-030, and B-028
+was a review stage that existed as prose while the tool's default bypassed it. A rule nothing
+enforces gets skipped.</p>
+<p><strong>B-040 is absorbed</strong> as the inferential arm: computational sensors are proved by mutation,
+inferential ones by labelled cases. Eight already exist in <code>docs/evals/review-gate/cases/</code>.
+<code>docs/specs/review-gate-calibration.md</code> remains the detailed design and its sequencing is
+unchanged — build after n≈5 real reviews.</p>
+<h2 id="blocked-on-the-owner-not-on-code">Blocked on the owner, not on code<a class="headerlink" href="#blocked-on-the-owner-not-on-code" title="Permanent link">&para;</a></h2>
+<p>Two round-trips only he can make. The <code>testing-shortcuts-migration-deadline</code> article is blocked
+on both and <strong>should not be published as it stands</strong> — see B-040's calibration cases for why.</p>
+<ol>
+<li><strong>Re-source the artifact.</strong> Paste <code>docs/research/artifact-sourcing-prompt.md</code> into the
+   Claude.ai conversation that produced <code>sre-quality-governance-guide.html</code>. That artifact had
+   <strong>zero citations</strong>, and <code>--brief</code> skips research, so the writer fabricated: a chart with four
+   invented percentages, a named real executive given an unsupportable motive, three references
+   with no URLs. <code>article_evaluator</code> scored it <strong>76</strong> and the validator <strong>passed</strong> it.</li>
+<li><strong>Draw the hero.</strong> The prompt is in the article as a <code>&lt;!-- HERO IMAGE</code> comment and in
+   <code>output/posts/testing-shortcuts-migration-deadline.image_prompt.md</code>. Two hero draws timed out
+   at 600s each. B-041 now caps that at 10 minutes, but it will likely still fail, so Gemini /
+   Nano Banana by hand is the realistic route. <strong>A PNG hero needs a <code>.webp</code> sibling</strong> — the
+   blog's <code>responsive-image.html</code> rewrites <code>.png</code> → <code>.webp</code>.</li>
+</ol>
+<h2 id="traps-that-cost-real-time-on-2026-08-01">Traps that cost real time on 2026-08-01<a class="headerlink" href="#traps-that-cost-real-time-on-2026-08-01" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><code>make ci-local</code> needs the venv</strong>, and now enforces it (B-039). Bare <code>python</code> does not exist
+  on macOS outside one.</li>
+<li><strong><code>export PATH :=</code> in a Makefile does not do what it looks like.</strong> GNU make 3.81 direct-execs
+  recipe lines with no shell metacharacters and resolves them against its own startup PATH.
+  Name <code>$(VENV_BIN)/&lt;tool&gt;</code> explicitly. Only a test running <code>make</code> against a stub binary catches
+  this; a grep of the Makefile passes on the broken fix.</li>
+<li><strong>Read <code>logs/agent_sdk_costs.jsonl</code>; never quote a remembered duration.</strong> This session repeated
+  "~35 minutes" from the docs and defended it before checking. Both halves turned out true: the
+  ledger had only ever recorded runs where the hero landed, so it could not see the timeout path.</li>
+<li><strong>The publish-guard PreToolUse hook matches on a bare string</strong>, so it blocks any command whose
+  text mentions the deploy script — including a <code>grep</code> for it, and including a heredoc that only
+  documents it. Split the command or write the file with an editor tool.</li>
+</ul>
 <h2 id="b-038-html-research-ingestion-built-2026-07-31">B-038, HTML research ingestion — BUILT 2026-07-31<a class="headerlink" href="#b-038-html-research-ingestion-built-2026-07-31" title="Permanent link">&para;</a></h2>
 <p><strong><code>scripts/html_to_brief.py</code> exists and works.</strong> Spec <code>docs/specs/html-research-ingestion.md</code>
 was LGTM'd and implemented the same day; <code>tests/test_html_to_brief.py</code> is 46 tests, 94%

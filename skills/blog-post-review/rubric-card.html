@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>viney.ca Editorial Review Rubric</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EEF0F2;
+    --card:#FFFFFF;
+    --ink:#16191C;
+    --slate:#4A5560;
+    --rule:#C3C9CE;
+    --rule-hair:#DDE1E4;
+    --fail:#A4262C;
+    --pass:#1F6F63;
+    --warn:#8A6114;
+    --disp:"IBM Plex Sans Condensed",system-ui,sans-serif;
+    --body:"IBM Plex Sans",system-ui,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--body);font-size:15px;line-height:1.55;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:48px 28px 96px}
+
+  /* masthead */
+  .eyebrow{
+    font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--slate);
+  }
+  h1{
+    font-family:var(--disp);font-weight:700;font-size:clamp(30px,5.5vw,46px);
+    line-height:1.02;letter-spacing:-.015em;margin:10px 0 14px;
+  }
+  .standfirst{max-width:62ch;color:var(--slate);margin:0 0 34px}
+  .rule{height:2px;background:var(--ink);margin:0 0 34px}
+
+  /* signature: gate strip */
+  .gatestrip{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:2px;
+    background:var(--rule);border:2px solid var(--ink);margin-bottom:8px;
+  }
+  .gate{background:var(--card);padding:14px 12px 16px}
+  .gate .id{
+    font-family:var(--mono);font-size:11px;font-weight:600;
+    color:var(--fail);letter-spacing:.08em;
+  }
+  .gate .nm{
+    font-family:var(--disp);font-weight:600;font-size:15px;
+    line-height:1.15;margin:5px 0 6px;
+  }
+  .gate .fw{font-size:12.5px;color:var(--slate);line-height:1.4}
+  .stripnote{
+    font-family:var(--mono);font-size:11px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--fail);margin:0 0 42px;
+  }
+
+  /* signature: verdict scale */
+  .scale{border:2px solid var(--ink);background:var(--card);margin-bottom:42px}
+  .bands{display:flex;height:56px;border-bottom:2px solid var(--ink)}
+  .band{
+    flex:1;display:flex;align-items:center;justify-content:center;
+    font-family:var(--disp);font-weight:700;font-size:14px;
+    letter-spacing:.04em;border-right:1px solid var(--rule-hair);
+  }
+  .band:last-child{border-right:0}
+  .b-rework{flex:0 0 65%;color:var(--fail)}
+  .b-revise{flex:0 0 15%;color:var(--warn);font-size:12px}
+  .b-publish{flex:0 0 20%;color:var(--pass)}
+  .ticks{display:flex;font-family:var(--mono);font-size:11px;color:var(--slate)}
+  .ticks div{
+    flex:1;padding:7px 10px;border-right:1px solid var(--rule-hair);
+  }
+  .ticks div:last-child{border-right:0;text-align:right}
+
+  h2{
+    font-family:var(--disp);font-weight:700;font-size:13px;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--slate);
+    margin:0 0 16px;padding-bottom:8px;border-bottom:1px solid var(--rule);
+  }
+  section{margin-bottom:46px}
+
+  /* dimension ledger */
+  .dim{
+    display:grid;grid-template-columns:52px 1fr;gap:0 18px;
+    padding:16px 0;border-bottom:1px solid var(--rule-hair);
+  }
+  .dim:last-child{border-bottom:0}
+  .wt{
+    font-family:var(--mono);font-weight:600;font-size:19px;
+    color:var(--ink);padding-top:1px;
+  }
+  .wt span{display:block;font-size:9.5px;font-weight:400;color:var(--slate);letter-spacing:.08em}
+  .dimname{font-family:var(--disp);font-weight:600;font-size:17.5px;margin-bottom:3px}
+  .five{color:var(--slate);font-size:14.5px}
+  .five b{color:var(--ink);font-weight:500}
+
+  /* tells */
+  ul.tells{list-style:none;padding:0;margin:0;columns:2;column-gap:34px}
+  ul.tells li{
+    font-size:14px;padding:5px 0 5px 16px;position:relative;
+    break-inside:avoid;color:var(--slate);
+  }
+  ul.tells li::before{
+    content:"";position:absolute;left:0;top:12px;
+    width:6px;height:2px;background:var(--fail);
+  }
+  ul.tells li b{color:var(--ink);font-weight:500}
+
+  /* calibration callout */
+  .calib{
+    border-left:3px solid var(--ink);padding:2px 0 2px 20px;
+    max-width:64ch;
+  }
+  .calib p{margin:0 0 12px}
+  .calib p:last-child{margin:0}
+  .num{font-family:var(--mono);font-weight:600}
+
+  /* tiers */
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{
+    text-align:left;font-family:var(--mono);font-size:10.5px;font-weight:600;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--slate);
+    padding:0 12px 8px 0;border-bottom:1px solid var(--rule);
+  }
+  td{padding:11px 12px 11px 0;border-bottom:1px solid var(--rule-hair);vertical-align:top}
+  td:first-child{
+    font-family:var(--mono);font-weight:600;width:58px;white-space:nowrap;
+  }
+  tr.t4 td{color:var(--fail)}
+
+  footer{
+    margin-top:56px;padding-top:18px;border-top:2px solid var(--ink);
+    font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+    color:var(--slate);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  }
+
+  @media (max-width:760px){
+    .gatestrip{grid-template-columns:1fr 1fr}
+    ul.tells{columns:1}
+    .bands{height:auto;flex-direction:column}
+    .band{flex:1 1 auto!important;padding:11px;border-right:0;border-bottom:1px solid var(--rule-hair)}
+    .ticks{display:none}
+  }
+  @media print{
+    body{background:#fff}.wrap{padding:0}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">viney.ca &nbsp;/&nbsp; economist-agents &nbsp;/&nbsp; production gate</p>
+  <h1>Editorial Review Rubric</h1>
+  <p class="standfirst">Applied to every post the pipeline generates, before publication. Five blocking gates,
+  six weighted dimensions, one reproducible verdict. The audience checks numbers, so the
+  review checks them first.</p>
+  <div class="rule"></div>
+
+  <section>
+    <h2>Blocking gates</h2>
+    <div class="gatestrip">
+      <div class="gate">
+        <div class="id">G1</div>
+        <div class="nm">Source resolvability</div>
+        <div class="fw">Every figure resolves to a real locatable document. Unreachable equals unverified equals blocked.</div>
+      </div>
+      <div class="gate">
+        <div class="id">G2</div>
+        <div class="nm">Citation fidelity</div>
+        <div class="fw">The source supports that exact claim, without inflating its sample, scope, or confidence.</div>
+      </div>
+      <div class="gate">
+        <div class="id">G3</div>
+        <div class="nm">Arithmetic integrity</div>
+        <div class="fw">Every calculation reproduces. Units consistent, denominators stated, rounding not thesis-biased.</div>
+      </div>
+      <div class="gate">
+        <div class="id">G4</div>
+        <div class="nm">No fabrication</div>
+        <div class="fw">No invented quotes, people, companies, metrics, or studies. Indistinguishable counts as invented.</div>
+      </div>
+    </div>
+    <p class="stripnote">One gate failure blocks publication regardless of weighted score</p>
+  </section>
+
+  <section>
+    <h2>Verdict scale</h2>
+    <div class="scale">
+      <div class="bands">
+        <div class="band b-rework">REWORK &nbsp;&middot;&nbsp; back to the Editorial Board</div>
+        <div class="band b-revise">REVISE</div>
+        <div class="band b-publish">PUBLISH</div>
+      </div>
+      <div class="ticks">
+        <div style="flex:0 0 65%">0</div>
+        <div style="flex:0 0 15%">65</div>
+        <div style="flex:0 0 20%">80 &nbsp;&rarr;&nbsp; 100</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Weighted dimensions</h2>
+
+    <div class="dim">
+      <div class="wt">25<span>PCT</span></div>
+      <div>
+        <div class="dimname">Evidence density and quality</div>
+        <p class="five"><b>A 5:</b> claims rest on primary sources. Sample sizes and study limits appear
+        in the text. The post knows which direction its own evidence is wrong.</p>
+      </div>
+    </div>
+
+    <div class="dim">
+      <div class="wt">20<span>PCT</span></div>
+      <div>
+        <div class="dimname">Falsifiability and honesty</div>
+        <p class="five"><b>A 5:</b> names the conditions under which the thesis fails, presents the
+        strongest opposing case in its own best form, attaches explicit confidence to contested claims.</p>
+      </div>
+    </div>
+
+    <div class="dim">
+      <div class="wt">15<span>PCT</span></div>
+      <div>
+        <div class="dimname">Thesis originality and structure</div>
+        <p class="five"><b>A 5:</b> a claim a well-read practitioner has not encountered, argued in a
+        line rather than a list. Delete any section and the argument should visibly weaken.</p>
+      </div>
+    </div>
+
+    <div class="dim">
+      <div class="wt">15<span>PCT</span></div>
+      <div>
+        <div class="dimname">Practitioner actionability</div>
+        <p class="five"><b>A 5:</b> a named action, a named owner role, and a named measurement that
+        would show in six weeks whether it worked.</p>
+      </div>
+    </div>
+
+    <div class="dim">
+      <div class="wt">15<span>PCT</span></div>
+      <div>
+        <div class="dimname">Voice fidelity</div>
+        <p class="five"><b>A 5:</b> quantitative by default, vendor-neutral, skeptical of consensus
+        including its own priors. Contrarianism is not skepticism and caps this dimension at 2.</p>
+      </div>
+    </div>
+
+    <div class="dim">
+      <div class="wt">10<span>PCT</span></div>
+      <div>
+        <div class="dimname">Craft and packaging</div>
+        <p class="five"><b>A 5:</b> clean prose, no LLM tells, and a title that claims exactly what
+        the body delivers. Over-promise spends the trust the brand runs on.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Calibration discipline</h2>
+    <div class="calib">
+      <p>A competent post that breaks no new ground lands near <span class="num">70</span>. Reserve
+      <span class="num">90</span> and above for a post someone else would cite. If most posts score
+      above <span class="num">85</span>, the rubric is broken, not the pipeline.</p>
+      <p>Overclaiming and hedging-until-unfalsifiable score equally low on dimension two. They are
+      the same failure of nerve.</p>
+      <p>Every finding carries a confidence percentage. A claim flagged at 60 percent and one flagged
+      at 95 percent must not read the same way to the author.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>LLM tells, flagged under craft</h2>
+    <ul class="tells">
+      <li><b>Scene-setting abstraction</b> as the opening move</li>
+      <li><b>Negation-elevation:</b> not just a testing problem, a trust problem</li>
+      <li><b>Rule-of-three padding</b> where two or four would be honest</li>
+      <li><b>Empty register words:</b> leverage, delve, landscape, robust, seamless, crucial</li>
+      <li><b>Symmetrical section lengths</b>, meaning the outline drove the content</li>
+      <li><b>A conclusion that restates</b> the introduction without moving</li>
+      <li><b>Stacked hedging:</b> may potentially contribute to</li>
+      <li><b>Fake precision</b>, an estimate carried to two decimals</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Source tiers</h2>
+    <table>
+      <thead><tr><th>Tier</th><th>Accepts</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Peer-reviewed papers, regulatory filings, published telemetry and incident data, surveys with disclosed methodology, standards bodies</td></tr>
+        <tr><td>2</td><td>Engineering blogs from the organization that ran the experiment, conference talks with data, government statistics</td></tr>
+        <tr><td>3</td><td>Analyst reports behind the abstract, trade press, textbooks</td></tr>
+        <tr class="t4"><td>4</td><td>Vendor marketing, aggregator listicles, unattributed industry-consensus figures, other AI-generated content. Cannot support a load-bearing claim.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer>
+    <span>blog-post-review &nbsp;v1.0</span>
+    <span>Verdict emitted as JSON for automated gating</span>
+  </footer>
+
+</div>
+</body>
+</html>

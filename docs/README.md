@@ -111,7 +111,9 @@ The `skills/` directory holds **39 `SKILL.md` workflow definitions**. See
 - `scripts/publication_validator.py` - Final publication quality gate
 - `scripts/quality_dashboard.py` - Quality tracking dashboard
 - `scripts/blog_quality_audit.py` - Blog validation
-- `scripts/deploy_to_blog.py` - Deploy an approved article to the blog repo
+- `scripts/deploy_to_blog.py --mode review` - Deploy to the unlisted review URL (the
+  sanctioned route; `--mode` is required, there is no default — B-028)
+- `make publish SLUG=<slug>` - Promote an **approved** review draft into `_posts/`
 
 > Note: `scripts/economist_agent.py` is **deprecated** (it emits a warning); the pipeline
 > now runs through `src/agent_sdk/`.

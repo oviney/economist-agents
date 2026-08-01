@@ -192,6 +192,36 @@ See `skills/python-quality/SKILL.md` for complete standards.
 8. **British spelling** (`_shared.py`): American → British replacements
 9. **Publication validator** (`publication_validator.py`): frontmatter, categories, word count, author, image metadata, placeholders
 
+## Publishing workflow (NON-NEGOTIABLE — review before publish)
+
+**Nothing reaches `_posts/` without passing through the live review stage.** This is an
+operating instruction, not a changelog reference.
+
+```bash
+# 1. Generate
+python -m src.agent_sdk.pipeline "<topic>" --research-mode claude_web
+
+# 2. Deploy to the unlisted review URL. --mode is REQUIRED; there is no default.
+python -m scripts.deploy_to_blog --article output/posts/<slug>.md --mode review
+#    → writes a noindex draft to _review/ on the live branch, no PR
+#    → prints https://<host>/review/<slug>-<token>/
+
+# 3. Owner reads the live page and approves. THEN, and only then:
+make publish SLUG=<slug>
+```
+
+**Why `--mode` is required.** It used to default to `post`, so the command as documented
+opened a PR straight into `_posts/` and skipped review entirely — which is how article two
+was published unreviewed (B-028). Neither value is a safe default: `post` skips review, and
+`review` would write to the blog's live branch on a bare invocation. So the choice is
+explicit and a bare invocation fails.
+
+`--mode post` still exists but is **not** the sanctioned route. Whether it should exist at
+all is B-028 Task 3, and is owner-gated.
+
+> The `PreToolUse` Bash hook (B-030) denies `deploy_to_blog` without `--mode review`, so the
+> harness enforces this too. Two independent gates, deliberately.
+
 ## Environment Variables
 
 | Variable | Required | Purpose |

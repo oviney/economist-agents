@@ -265,6 +265,10 @@ class TestRenderToPng:
         svg = tmp_path / "h.svg"
         svg.write_text(_svg())
         monkeypatch.setattr(hero_svg.shutil, "which", lambda _: None)
+        # Since BUG-068 an empty PATH is no longer "no Chrome" — app-bundle
+        # locations are searched too — so the bundle candidates must be cleared
+        # as well or this passes only on machines without Chrome installed.
+        monkeypatch.setattr(hero_svg, "_CHROME_APP_PATHS", ())
         assert render_to_png(svg, tmp_path / "h.png") is None
 
     def test_chrome_failure_degrades_to_none(

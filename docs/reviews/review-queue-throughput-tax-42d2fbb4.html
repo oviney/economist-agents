@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Review: Merge Pending / Code Review Queues (BLOCK, 51)</title>
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1a1a1a; --muted: #5c5c5c; --rule: #e0ddd8;
+    --fail: #a8322d; --pass: #1f6f4a; --warn: #9a6a00; --accent: #a8322d;
+    --panel: #faf8f5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16181a; --fg: #e8e6e3; --muted: #a0a0a0; --rule: #33373b;
+      --fail: #e8736c; --pass: #5fbf8f; --warn: #d9a63b; --accent: #e8736c;
+      --panel: #1d2023;
+    }
+  }
+  body {
+    background: var(--bg); color: var(--fg); margin: 0 auto; padding: 2.5rem 1.5rem 5rem;
+    max-width: 52rem; line-height: 1.62;
+    font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    font-size: 17px;
+  }
+  h1 { font-size: 1.75rem; line-height: 1.25; margin: 0 0 .4rem; letter-spacing: -.01em; }
+  h2 {
+    font-size: .82rem; text-transform: uppercase; letter-spacing: .09em;
+    font-family: ui-sans-serif, -apple-system, "Segoe UI", sans-serif;
+    margin: 3rem 0 .9rem; padding-bottom: .45rem; border-bottom: 2px solid var(--fg);
+  }
+  h3 { font-size: 1.02rem; margin: 1.8rem 0 .5rem; }
+  .sub { color: var(--muted); font-size: .95rem; margin: 0 0 2rem; }
+  .verdict-box {
+    background: var(--panel); border-left: 5px solid var(--fail);
+    padding: 1.3rem 1.5rem; margin: 0 0 1.5rem;
+  }
+  .verdict-word {
+    font-family: ui-sans-serif, -apple-system, sans-serif; font-weight: 700;
+    font-size: 2.1rem; letter-spacing: -.02em; color: var(--fail); line-height: 1;
+  }
+  .score { font-size: 1.05rem; color: var(--muted); margin-top: .55rem; }
+  .score strong { color: var(--fg); font-size: 1.3rem; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .93rem; }
+  th, td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th {
+    font-family: ui-sans-serif, -apple-system, sans-serif; font-size: .72rem;
+    text-transform: uppercase; letter-spacing: .07em; color: var(--muted);
+    border-bottom: 1.5px solid var(--fg);
+  }
+  .tw { overflow-x: auto; }
+  .fail { color: var(--fail); font-weight: 700; }
+  .pass { color: var(--pass); font-weight: 700; }
+  .warn { color: var(--warn); font-weight: 700; }
+  .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  blockquote {
+    margin: .8rem 0; padding: .5rem 0 .5rem 1.1rem;
+    border-left: 3px solid var(--rule); color: var(--fg); font-style: italic;
+  }
+  .calc {
+    background: var(--panel); border: 1px solid var(--rule); border-radius: 3px;
+    padding: .85rem 1rem; margin: .9rem 0; font-size: .88rem; line-height: 1.75;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace; font-style: normal;
+    overflow-x: auto;
+  }
+  .finding { margin: 2rem 0; padding-left: 1rem; border-left: 3px solid var(--fail); }
+  .finding.ok { border-left-color: var(--pass); }
+  .finding-id {
+    font-family: ui-sans-serif, -apple-system, sans-serif; font-weight: 700;
+    font-size: .78rem; letter-spacing: .05em; text-transform: uppercase; color: var(--muted);
+  }
+  .conf {
+    font-family: ui-sans-serif, sans-serif; font-size: .76rem; color: var(--muted);
+    border: 1px solid var(--rule); border-radius: 10px; padding: .1rem .5rem; margin-left: .4rem;
+    white-space: nowrap;
+  }
+  .fix { margin: 1.8rem 0; }
+  .repl {
+    background: var(--panel); border-left: 3px solid var(--pass);
+    padding: .8rem 1rem; margin: .6rem 0; font-size: .95rem;
+  }
+  code {
+    font-family: ui-monospace, Menlo, monospace; font-size: .86em;
+    background: var(--panel); padding: .1em .35em; border-radius: 3px;
+  }
+  pre {
+    background: var(--panel); border: 1px solid var(--rule); border-radius: 3px;
+    padding: 1rem; overflow-x: auto; font-size: .84rem; line-height: 1.6;
+  }
+  pre code { background: none; padding: 0; }
+  .meta { color: var(--muted); font-size: .86rem; font-family: ui-sans-serif, sans-serif; }
+  ul { padding-left: 1.3rem; }
+  li { margin: .35rem 0; }
+</style>
+</head>
+<body>
+
+<h1>Merge Pending: Code Review Queues Are Engineering's Most Expensive Line Item</h1>
+<p class="sub">
+  Editorial review against the empirical-skeptic rubric.<br>
+  Post: <code>viney.ca/review/review-queue-throughput-tax-42d2fbb4</code>, by Ouray Viney, dated 29 Jul 2026, 6 min read.<br>
+  Reviewed 29 Jul 2026. All six cited sources fetched and read; two read as raw page text after summarisation proved incomplete.
+</p>
+
+<h2>1. Verdict</h2>
+
+<div class="verdict-box">
+  <div class="verdict-word">BLOCK</div>
+  <div class="score">Weighted score <strong>51.0</strong> / 100. Two gates fail. Even with all gates passing, 51 sits in REWORK territory (below 65).</div>
+</div>
+
+<div class="tw">
+<table>
+  <thead><tr><th>Gate</th><th>Check</th><th>Result</th><th>Reason</th></tr></thead>
+  <tbody>
+    <tr><td class="num">G1</td><td>Source resolvability</td><td class="fail">FAIL</td><td>Three figures unresolvable at their cited sources, one of them entirely unsourced</td></tr>
+    <tr><td class="num">G2</td><td>Citation fidelity</td><td class="fail">FAIL</td><td>Six fidelity defects, including a misdescribed denominator and a conclusion attributed to a paper that does not draw it</td></tr>
+    <tr><td class="num">G3</td><td>Arithmetic integrity</td><td class="pass">PASS</td><td>Every recomputable figure reproduces; rounding is honest and runs against the thesis. One rounding discrepancy noted, not disqualifying</td></tr>
+    <tr><td class="num">G4</td><td>No fabrication</td><td class="warn">PASS (conditional)</td><td>No invented quote, person, study or anecdote. One figure cannot currently be distinguished from invention; see G4 below for what flips this</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>2. Gate findings</h2>
+
+<h3>G1: Source resolvability <span class="fail">FAIL</span></h3>
+
+<div class="finding">
+  <div class="finding-id">G1.a &nbsp;154 per cent PR size figure <span class="conf">confidence 90%</span></div>
+  <blockquote>"those same squads absorbed a 91 per cent increase in PR review time and a 154 per cent surge in average PR size"</blockquote>
+  <p>The 91 per cent figure is on the cited Faros page. The 154 per cent figure is not. I read the full page text at
+  <code>faros.ai/ai-productivity-paradox</code> and queried it specifically for any PR size statistic. The page carries
+  98 per cent (PRs merged), 21 per cent (tasks completed), 91 per cent (review times), and the statement that DORA metrics
+  "remain largely unchanged." There is no PR size figure of any value.</p>
+  <p>Nor is it in the article's own chart, which plots something else entirely (see G2.g). Status: <strong>UNVERIFIED</strong>.
+  Most likely it comes from a fuller Faros asset or a superseded version of the page, but an empirical-skeptic post cannot
+  ship a number that a reader following the citation cannot find.</p>
+</div>
+
+<div class="finding">
+  <div class="finding-id">G1.b &nbsp;1,055 and 201 minute pickup times <span class="conf">confidence 85%</span></div>
+  <blockquote>"Agentic AI PRs ... sit idle for 1,055 minutes before anyone opens them, against 201 minutes for unassisted work."</blockquote>
+  <p>The cited LinearB page is a landing page gated by repeated "Download your free copy" calls to action. It publishes
+  <em>ratios</em>, not absolute minutes: "AI PRs wait 4.6x longer before review" and "Agentic AI PRs have a PR Pickup Time
+  5.3x longer than Unassisted ones." Neither 1,055 nor 201 appears anywhere publicly reachable. Status: <strong>UNVERIFIED</strong>.</p>
+  <p>These are probably in the gated PDF, which is why my confidence is 85 rather than higher. But the citation as printed
+  sends the reader to a page that cannot confirm the two numbers the article's only chart is built from.</p>
+</div>
+
+<div class="finding">
+  <div class="finding-id">G1.c &nbsp;The cost of a senior engineer hour <span class="conf">confidence 100%</span></div>
+  <blockquote>"a principal or staff engineer whose hour costs an employer fifty pounds or more on any conservative reckoning"</blockquote>
+  <p>No source, and this figure is load-bearing: it is the only monetary input in a post whose title claims to identify
+  engineering's most expensive line item. "On any conservative reckoning" is doing the work a citation should do.</p>
+  <p>Two further problems. First, the currency is wrong for the evidence base: every dataset in the post (Graphite, LinearB,
+  Faros, DORA) is US-centric, and the author is Canadian. Second, 50 pounds per hour is not conservative so much as
+  simply low. A UK principal engineer on 110,000 pounds, loaded at 1.4x across roughly 1,800 productive hours, costs about
+  86 pounds per hour:</p>
+  <div class="calc">110,000 &times; 1.4 = 154,000 fully loaded<br>154,000 &divide; 1,800 h = <strong>85.6 /h</strong> &nbsp;(vs. 50 stated)</div>
+  <p>Understating the input weakens the author's own case, so this is not thesis-favouring. It is still an unsourced number
+  carrying a titular claim.</p>
+</div>
+
+<h3>G2: Citation fidelity <span class="fail">FAIL</span></h3>
+
+<div class="finding">
+  <div class="finding-id">G2.a &nbsp;The nine hour baseline is misdescribed <span class="conf">confidence 95%</span></div>
+  <blockquote>"A median pull request requiring a review takes 14 hours to merge, according to Graphite Research, against nine hours for one merged without review"</blockquote>
+  <p>Graphite's own TL;DR, read directly from the page:</p>
+  <blockquote>"The median active developer's PR is merged 9 hours after publishing. When excluding PRs merged without any reviews, the median developer's time to merge increases 55%, from 9 to 14 hours."</blockquote>
+  <p>The 9 hour figure is the median across <em>all</em> of an active developer's PRs, reviewed and unreviewed together. It is
+  not the median for PRs merged without review, which is what the post says it is. The true no-review median is unpublished
+  and necessarily lower than 9 hours, since removing the unreviewed PRs from the pool pushes the median <em>up</em> to 14.</p>
+  <p>Note the direction: the post's error <em>understates</em> the gap it wants to dramatise. The 55 per cent is Graphite's own
+  number, correctly reproduced. This is a precision failure, not a spin failure, but the denominator is wrong as printed.</p>
+</div>
+
+<div class="finding">
+  <div class="finding-id">G2.b &nbsp;A predictor ranking the source does not make <span class="conf">confidence 90%</span></div>
+  <blockquote>"PR size, author seniority, and lines changed all trail behind review presence as predictors of cycle time."</blockquote>
+  <p>Graphite's actual ranked list, verbatim from the page, of factors that most affect time to merge once you limit to
+  reviewed PRs: <em>time to first review, the number of reviews, the number of lines modified in the PR, company size.</em></p>
+  <ul>
+    <li><strong>"Author seniority" does not appear anywhere in the source.</strong> It is attributed to a ranking that does not contain it.</li>
+    <li><strong>"PR size" and "lines changed" are the same variable</strong>, Graphite's "lines modified", listed twice as though they were two independent predictors.</li>
+    <li>Two factors that <em>are</em> in the source and rank above lines modified, time to first review and number of reviews, go unmentioned. Both would have strengthened the post's queue thesis considerably.</li>
+  </ul>
+  <p>A rule-of-three construction has here produced an invented predictor and a duplicate. The source supports the headline
+  claim that review presence dominates; it does not support the specific ranking asserted.</p>
+</div>
+
+<div class="finding">
+  <div class="finding-id">G2.c &nbsp;An organisational conclusion imported into a paper that does not reach it <span class="conf">confidence 85%</span></div>
+  <blockquote>"Engineers generated substantially more code; the queue absorbed the surplus and returned nothing measurable at the organisational level."</blockquote>
+  <p>This sits in the paragraph reporting arXiv 2607.01904 and reads as that paper's finding. It is not. The paper reports
+  per-capita throughput (2.09x), per-reviewer load roughly doubling, automated review overtaking human review, and that
+  "merge and revert rates held steady." It reports <strong>no organisation-level delivery outcome at all</strong>: no DORA metrics,
+  no lead time, no delivery velocity. The "nothing measurable at the organisational level" claim belongs to Faros and DORA
+  and has been transplanted into a citation that cannot carry it.</p>
+</div>
+
+<div class="finding">
+  <div class="finding-id">G2.d &nbsp;A "blunt conclusion" the authors do not state <span class="conf">confidence 70%</span></div>
+  <blockquote>"The authors drew a blunt conclusion: the review pipeline, not code-writing speed, is the operative constraint on delivery."</blockquote>
+  <p>The abstract does not state this. It describes review being restructured around automation, with per-reviewer load
+  doubling. The paper's <em>title</em>, "AI Writes Faster Than Humans Can Review," clearly gestures at the claim, which is why
+  confidence is 70 rather than higher; the full text may well argue it explicitly. But "the authors drew a blunt conclusion"
+  is a specific attribution, and it is being hung on a title rather than on a quoted finding.</p>
+</div>
+
+<div class="finding">
+  <div class="finding-id">G2.e &nbsp;The qualifier removed from the headline statistic <span class="conf">confidence 95%</span></div>
+  <p>The post's opening statistic is LinearB's 4.6x pickup delay. LinearB states it as one sentence:</p>
+  <blockquote>"AI PRs wait 4.6x longer before review, but are reviewed 2x faster once picked up."</blockquote>
+  <p>The post takes the first clause and drops the second. The omitted half is directly material: it partially offsets the
+  queue penalty that the entire article is built on, and it comes from the same sentence of the same source. This is the
+  single most consequential fidelity defect in the piece, because the counter-evidence was not merely available, it was
+  inside the quotation being used.</p>
+</div>
+
+<div class="finding">
+  <div class="finding-id">G2.f &nbsp;Per cent presented as percentage points <span class="conf">confidence 80%</span></div>
+  <blockquote>"A 25-percentage-point rise in AI tool adoption correlates with an estimated 1.5 per cent decrease in software delivery throughput and a 7.2 per cent decrease in stability."</blockquote>
+  <p>The 1.5 and 7.2 figures are correct and verified. The framing is not. RedMonk's wording is "if AI adoption increases by
+  25%", which is ambiguous between a relative increase and a percentage-point increase, and RedMonk does not disambiguate.
+  The post silently resolves the ambiguity into the more precise-sounding "25-percentage-point", which the source does not
+  license. The post's "correlates with an estimated" is otherwise a fair rendering of DORA's model-based "is expected to."</p>
+</div>
+
+<div class="finding">
+  <div class="finding-id">G2.g &nbsp;The chart does not show what the text says it shows <span class="conf">confidence 98%</span></div>
+  <blockquote>"The chart below makes clear, however, that those same squads absorbed a 91 per cent increase in PR review time and a 154 per cent surge in average PR size"</blockquote>
+  <p>I rendered the page and inspected the chart. It is titled "The queue, not the commit", subtitled "Median minutes a pull
+  request waits before a reviewer opens it, by authorship type", and plots exactly two bars: Unassisted PRs at 201 minutes
+  and Agentic AI PRs at 1,055 minutes. It contains <strong>neither</strong> the 91 per cent review-time increase nor the 154 per cent
+  PR size surge. It is LinearB pickup data, not Faros review-time data.</p>
+  <p>It is also not "below" the sentence in any useful sense: it renders at the very bottom of the article, after the final
+  paragraph and immediately above the References heading, roughly three sections past the reference to it. A reader who
+  follows the pointer finds an unrelated chart. The chart additionally carries no source attribution and its accessible name
+  is the bare string "Chart", which is an alt-text failure.</p>
+</div>
+
+<h3>G3: Arithmetic integrity <span class="pass">PASS</span></h3>
+
+<div class="finding ok">
+  <p>Every figure that can be recomputed reproduces. Shown rather than asserted:</p>
+  <div class="calc">
+    <strong>Review penalty</strong><br>
+    14 h &divide; 9 h = 1.5556 &rarr; +55.6% &rarr; stated as "55 per cent" &nbsp;<span class="pass">reproduces</span> (rounded down, against thesis)<br><br>
+    <strong>AI PR rework share</strong><br>
+    100% &minus; 32.7% = 67.3%; two in three = 66.67%; 67.3 &gt; 66.67<br>
+    &rarr; "more than two in three" &nbsp;<span class="pass">reproduces</span><br><br>
+    <strong>Agents below signal threshold</strong><br>
+    12 &divide; 13 = 0.92308 &rarr; 92.31%, stated as "92.3 per cent" &nbsp;<span class="pass">reproduces exactly</span><br><br>
+    <strong>Code review agent study, rounding</strong><br>
+    45.20 &rarr; 45.2 &nbsp;|&nbsp; 68.37 &rarr; 68.4 &nbsp;|&nbsp; 34.88 &rarr; 34.9 &nbsp;|&nbsp; 21.60 &rarr; 21.6 &nbsp;<span class="pass">all correct</span><br><br>
+    <strong>Pickup multiple, internal consistency</strong><br>
+    1,055 &divide; 201 = 5.2488 &rarr; 5.25x, which rounds to <strong>5.2x</strong><br>
+    LinearB publishes <strong>5.3x</strong>; 201 &times; 5.3 = 1,065.3 &ne; 1,055; 1,055 &divide; 5.3 = 199.1 &ne; 201<br>
+    &rarr; <span class="warn">discrepancy of about 10 minutes</span>, consistent with rounding of the underlying values<br><br>
+    <strong>Output multiple</strong><br>
+    2.09x stated as "twice the historical rate" &nbsp;<span class="pass">reproduces</span> (rounded down)
+  </div>
+  <p><strong>Rounding direction audit.</strong> The rubric asks whether rounding consistently favours the thesis. It does not.
+  55.6 to 55, 5.25x to "five times", and 2.09x to "twice" all round <em>against</em> the argument being made. This is genuine
+  discipline and it materially raised my confidence that the numbers were handled rather than generated.</p>
+  <p><strong>Why this passes despite the missing cost model.</strong> G3 fails when a stated calculation does not reproduce.
+  Here no cost calculation exists to check: the post writes "Multiply across a fifty-person organisation" and then does not
+  multiply. That is a scope and title-fidelity failure, charged under G1.c and dimension 6, not an arithmetic error. The one
+  real discrepancy, 5.25x against a published 5.3x, is a rounding artifact and does not rise to a gate failure.</p>
+</div>
+
+<h3>G4: No fabrication <span class="warn">PASS, conditional</span></h3>
+
+<div class="finding ok">
+  <p>All six sources exist and were read. Both arXiv papers are real, correctly titled, correctly attributed, and their
+  numbers match to the decimal place:</p>
+  <ul>
+    <li><strong>arXiv 2607.01904</strong>, He, Agarwal, Denisov-Blanch, Azaletskiy, Koyejo, Vasilescu, submitted 2 Jul 2026. 802 developers, 196,212 PRs, Jan 2024 to Apr 2026, 2.09x baseline. Every parameter in the post checks out.</li>
+    <li><strong>arXiv 2604.03196</strong>, Chowdhury, Banik, Ferdous, Shamim. 3,109 PRs, 19,450 comments, 45.20 vs 68.37 per cent merge, 34.88 vs 21.60 per cent abandonment, 12 of 13 agents below a 60 per cent signal ratio. Every figure checks out.</li>
+  </ul>
+  <p>No invented quotation, person, company anecdote, or internal metric anywhere in the piece. That is a real strength and
+  it is the main reason this post is blocked on rigour rather than on honesty.</p>
+  <p><strong>The conditional.</strong> The 154 per cent PR size figure (G1.a) cannot at present be distinguished from invention,
+  which is the literal G4 trigger. I am passing the gate because the leading hypothesis is provenance, not fabrication: three
+  of the four figures attributed to that same Faros page verified exactly, which is not the pattern of a pipeline inventing
+  statistics. <strong>If the author cannot produce a locatable source for 154 per cent, this converts to a G4 failure</strong>,
+  which is a considerably more serious finding than the G1 failure it currently sits under.</p>
+</div>
+
+<h2>3. Dimension scores</h2>
+
+<div class="tw">
+<table>
+  <thead><tr><th>#</th><th>Dimension</th><th class="num">Score</th><th class="num">Weight</th><th class="num">Contribution</th><th>Justification</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="num">1</td><td>Evidence density and quality</td><td class="num">3 / 5</td><td class="num">25%</td><td class="num">15.0</td>
+      <td>Verified Tier 1 spine in the two arXiv papers plus Graphite's primary telemetry, which is above pipeline baseline. Against that: the load-bearing DORA claim is superseded and reversed (see section 4); the headline 4.6x rests on gated vendor content; the only monetary input is unsourced; and no citation is ever interrogated for the direction of its own error, which the anchors identify as the move that separates a 4 from a 3. "Numbers are sourced but not interrogated" is the 3 anchor verbatim.</td>
+    </tr>
+    <tr>
+      <td class="num">2</td><td>Falsifiability and honesty</td><td class="num">2 / 5</td><td class="num">20%</td><td class="num">8.0</td>
+      <td>No falsification condition anywhere. No confidence attached to any contested claim. The counter-evidence inside its own cited sentence is deleted (G2.e), the DORA 2025 reversal goes unmentioned, and the selection-effect confound in the 9-versus-14 comparison is not merely unaddressed but actively closed off by calling the gap "the privilege of a second opinion". Rhetoric forecloses doubt: "That rescue fails", "the arithmetic is unforgiving". This is the 2 anchor: a contested claim presented as settled.</td>
+    </tr>
+    <tr>
+      <td class="num">3</td><td>Thesis originality and structure</td><td class="num">3 / 5</td><td class="num">15%</td><td class="num">9.0</td>
+      <td>Competent synthesis, well sequenced, and the queueing frame is executed cleanly. But the central thesis is approximately the title of one of its own sources ("AI Writes Faster Than Humans Can Review"), which caps originality for a well-read practitioner in mid-2026. Structure diagnostic: "Automation as a False Escape Route" is genuinely load-bearing and earns its place; the Faros paragraph is partly redundant against the DORA paragraph, both establishing flat organisational delivery.</td>
+    </tr>
+    <tr>
+      <td class="num">4</td><td>Practitioner actionability</td><td class="num">1 / 5</td><td class="num">15%</td><td class="num">3.0</td>
+      <td>The weakest dimension by a distance. The post contains no action at all: no named intervention, no owner role, no measurement. The nearest thing is the implication that review capacity should not be treated as fixed overhead, which is never stated as something to do. A QE lead cannot take this into a Monday planning session and change anything, and could not tell in six weeks whether it helped. This is the 1 anchor: implies action without offering any.</td>
+    </tr>
+    <tr>
+      <td class="num">5</td><td>Voice fidelity</td><td class="num">4 / 5</td><td class="num">15%</td><td class="num">12.0</td>
+      <td>The strongest dimension and close to house best. Quantitative by default, reaching for a number before an adjective. Vendor-neutral throughout: LinearB, Faros and Graphite appear as data sources, never as endorsements, which is notable given three of them sell into this exact problem. Short declarative sentences carry the claims, and the standfirst ("QUEUE GROWS; SPRINTS DRAIN") lands. Held to 4 by the currency mismatch and by a closing register that turns persuasive where it should stay empirical ("pressurises, and eventually bursts", "acquired a negative sign").</td>
+    </tr>
+    <tr>
+      <td class="num">6</td><td>Craft and packaging</td><td class="num">2 / 5</td><td class="num">10%</td><td class="num">4.0</td>
+      <td>Prose itself is clean and largely free of the usual tells. Scored at 2 on the title-fidelity rule: "Engineering's Most Expensive Line Item" promises a costed ledger, the body announces that "the unit economics are stark" and that "the arithmetic is unforgiving", and then no arithmetic appears. Compounded by the broken chart (G2.g). Tells logged below.</td>
+    </tr>
+    <tr>
+      <td colspan="4"><strong>Weighted total</strong></td><td class="num"><strong>51.0</strong></td>
+      <td>15.0 + 8.0 + 9.0 + 3.0 + 12.0 + 4.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h3>LLM tells logged under dimension 6</h3>
+<ul>
+  <li><strong>Scene-setting abstraction opening.</strong> "Every engineering director's post-mortem eventually arrives at the same embarrassing truth." Mild, and it recovers fast into a real number.</li>
+  <li><strong>Negation-elevation, five times.</strong> "The bottleneck was not the engineers"; "Keyboards are not the constraint. Queues are"; "The queue, not the commit"; "the review pipeline, not code-writing speed"; "bounded not by how fast code is written but by how fast qualified humans can judge". Once is a motif, five times is a tic, and it is also the chart title.</li>
+  <li><strong>Rule-of-three padding that introduced an error.</strong> "PR size, author seniority, and lines changed" is three items where the source lists four different ones, and two of the three are the same variable. See G2.b: the padding caused the defect.</li>
+  <li><strong>Fake precision.</strong> "92.3 per cent of the 13 agents" for what is 12 of 13.</li>
+  <li><strong>Conclusion restating the opening.</strong> The close returns to the intro's "Keyboards are not the constraint" without having added a new claim, though it does add force.</li>
+  <li><strong>Near-symmetrical sections</strong> of roughly 200, 250, 250 and 300 words, suggesting an outline drove the shape.</li>
+  <li><strong>Clean on register words.</strong> No leverage, delve, landscape, realm, robust or seamless. Genuinely good.</li>
+  <li><strong>House-style flag, not scored.</strong> The post uses em dashes ("are not accelerating their pipelines &mdash; they are financing"; "eventually bursts &mdash; usually during"). The rubric permits them and they are used consistently, so no deduction. Flagging only because your standing instruction is to strip em dashes from anything in your own voice, and this piece carries your byline. Rubric and standing preference conflict here; worth reconciling once rather than per post.</li>
+</ul>
+
+<h2>4. The strongest objection</h2>
+
+<p><strong>DORA reversed the throughput finding seven months before this post published, and the same analyst at the same
+publication wrote it up.</strong></p>
+
+<p>The post's causal engine is that flooding the intake without widening the review throat makes delivery slower. Its
+empirical anchor for the "slower" half is DORA 2024 via RedMonk: a 25 per cent rise in AI adoption associated with a 1.5
+per cent throughput decrease. The post then treats this as the settled state of the evidence, twice, and rests its climax
+on it: "an AI productivity narrative that the DORA data refuse to validate."</p>
+
+<p>DORA 2025, published 18 December 2025 and analysed by Rachel Stephens at RedMonk, the same author whose 2024 piece the
+post cites:</p>
+
+<blockquote>"Usage increased. Also over the year, AI's relationship with throughput shifted from negative to positive."</blockquote>
+
+<p>Nearly 5,000 respondents. AI adoption is now associated with <em>higher</em> delivery throughput. The single load-bearing
+statistic behind the post's central mechanism has been superseded by its own source lineage, and the post neither cites nor
+acknowledges the update. A reader who checks the citation trail one step further than the post did arrives at the opposite
+conclusion, which is the specific failure mode an empirical-skeptic brand cannot absorb.</p>
+
+<p>What makes this objection genuinely interesting rather than merely fatal: <strong>DORA 2025 did not reverse the stability
+finding.</strong> Stability remains negatively associated with AI adoption, with more rework and more change failures, and DORA
+added a Rework Rate metric in response. So the honest 2026 version of this post is not "the queue makes delivery slower."
+It is closer to <em>AI adoption now buys throughput and pays for it in stability and rework, and the review queue is where
+that bill arrives.</em> That thesis survives every source in the piece, including the ones that currently contradict it, and
+it is a better argument than the one on the page.</p>
+
+<h3>Second objection: the review penalty is substantially a selection effect</h3>
+
+<p>The post reads Graphite's 9-versus-14 hour gap as the cost of review: "a 55 per cent penalty for the privilege of a second
+opinion." That treats which PRs get reviewed as random. Graphite's own companion research shows it is anything but:</p>
+
+<ul>
+  <li>"13% of all PRs merged by active committers since 2023 are merged without any reviews", but "the median developer merges just 0.6% of their PRs without review."</li>
+  <li>"15% of developers are responsible for 83% of all PRs merged without review."</li>
+  <li>"The median engineer at an org with 50+ committers merges &lt;0.5% of their PRs without any review", against 5 per cent at orgs of 11 to 20 committers.</li>
+  <li>From the cited page itself: "Developers who merge more frequently also tend to merge faster and merge more often without waiting for reviews."</li>
+</ul>
+
+<p>The unreviewed population is a small, highly concentrated tail of prolific committers at small organisations. The gap
+between it and everything else measures who skips review and on what, at least as much as it measures what review costs.
+The post's own primary source contains the material to complicate its headline number, and the post does not use it.</p>
+
+<p><strong>Credit where it is due.</strong> The post does anticipate and dispatch the most obvious objection, that automated
+reviewers can absorb the load, and it does so with the best evidence in the piece: a real study, precisely quoted, showing
+agent-only PRs merging at 45.2 against 68.4 per cent and 12 of 13 agents below a 60 per cent signal ratio. That section is
+the article working as intended.</p>
+
+<h2>5. Fixes, ranked</h2>
+
+<div class="fix">
+  <h3>Fix 1. Address the DORA 2025 reversal. Highest impact by a wide margin.</h3>
+  <p><strong>Location:</strong> "Automation as a False Escape Route", the DORA paragraph, and the closing clause "an AI
+  productivity narrative that the DORA data refuse to validate."</p>
+  <p><strong>Problem:</strong> The load-bearing throughput statistic is superseded. Fixes gate G2, dimension 1 and dimension 2
+  at once, and strengthens rather than weakens the piece.</p>
+  <p><strong>Replacement</strong> for the DORA passage:</p>
+  <div class="repl">Google's 2024 DORA report, analysed by RedMonk's Rachel Stephens, found that a 25 per cent rise in AI adoption
+  was associated with an estimated 1.5 per cent decrease in delivery throughput and a 7.2 per cent decrease in stability.
+  That finding has since been half-retracted by its own authors, and the half that survived is the more damaging one. DORA
+  2025, drawing on nearly 5,000 respondents, reports that AI's relationship with throughput "shifted from negative to
+  positive" over the year. Adoption now moves work through the system faster. What did not shift is stability: AI adoption
+  remains associated with rising instability, more change failures and more rework, to the point that DORA added a Rework
+  Rate metric to track it.<br><br>
+  That revision does not rescue the queue. It relocates the bill. Throughput gains are real and now measurable; they are
+  being financed by rework and instability, and rework is precisely what returns to the review queue for a second pass.
+  The 2024 reading was that AI adoption made delivery slower. The 2026 reading is narrower and harder to dismiss: AI
+  adoption buys throughput on credit, and the review queue is where the interest is charged.</div>
+  <p class="meta">Requires retitling the section, since automation is no longer purely a false escape route, and adjusting the
+  closing clause: "an AI productivity narrative that the DORA data validate only on throughput, and refuse to validate on
+  anything that happens after the merge."</p>
+</div>
+
+<div class="fix">
+  <h3>Fix 2. Build the ledger the title promises, or change the title.</h3>
+  <p><strong>Location:</strong> "Reviewing the Reviewer Problem", the "fifty pounds" passage.</p>
+  <p><strong>Problem:</strong> G1.c plus the dimension 6 title failure. The post claims stark unit economics and unforgiving
+  arithmetic, then performs none. Fixing this also lifts dimension 4, since a costed model is itself decision-relevant.</p>
+  <p><strong>Replacement:</strong></p>
+  <div class="repl">Put a number on it. Take a fifty-engineer organisation with ten senior reviewers, and assume each spends
+  five hours a week in review, which is conservative against Faros's reported 91 per cent increase in review time. At
+  LinearB's 32.7 per cent acceptance rate for AI-generated PRs, roughly two thirds of the time spent on that cohort buys
+  nothing that ships.<br><br>
+  Ten reviewers &times; 5 h/week &times; 67.3 per cent wasted = 33.7 reviewer-hours a week.<br>
+  Across 46 working weeks: 1,550 hours.<br>
+  At a fully loaded principal-engineer cost of 85 dollars an hour: <strong>132,000 dollars a year</strong>, or about
+  0.8 full-time senior engineers.<br><br>
+  Every input there is an assumption and the output should be read as an order of magnitude, not an invoice. Note what it
+  shows: against a fifty-person payroll, this is under one per cent of engineering cost. The review queue is not the most
+  expensive line item on the ledger. It is something more awkward: an unbudgeted charge levied specifically against the
+  people whose attention is hardest to replace, and it appears on no dashboard at all.</div>
+  <p class="meta">This kills the current title. It should. "Most Expensive Line Item" is not defensible at any plausible set of
+  inputs and it is the kind of claim this audience will run the numbers on. Suggested replacement, which the body actually
+  delivers: <strong>"Merge Pending: The Review Queue Is Where AI's Productivity Gains Go To Die"</strong>, or, closer to the
+  revised thesis, <strong>"Merge Pending: AI Buys Throughput On Credit, And Review Is Where The Bill Lands"</strong>.</p>
+</div>
+
+<div class="fix">
+  <h3>Fix 3. Restore LinearB's second clause.</h3>
+  <p><strong>Location:</strong> Opening paragraph, the 4.6x statistic.</p>
+  <p><strong>Problem:</strong> G2.e. Deleting the offsetting half of a quoted sentence is the defect most corrosive to an
+  empirical-skeptic brand, and it is trivially fixable.</p>
+  <div class="repl">According to LinearB's 2026 Software Engineering Benchmarks Report, which analysed 8.1 million pull
+  requests across more than 4,800 organisations, AI-assisted PRs wait 4.6 times longer for a reviewer to pick them up than
+  manually written code. They are then reviewed about twice as fast once someone opens them, which tells you the delay is
+  not comprehension difficulty. It is queueing. The wait is not in the reading; it is in the waiting to be read.</div>
+  <p class="meta">The omitted clause, restored, is better evidence for the thesis than its absence was. Fast review of
+  long-queued PRs is exactly what a capacity constraint looks like rather than a complexity one.</p>
+</div>
+
+<div class="fix">
+  <h3>Fix 4. Correct the Graphite denominator and the predictor list.</h3>
+  <p><strong>Location:</strong> Opening paragraph.</p>
+  <p><strong>Problem:</strong> G2.a and G2.b. Two defects, one of which asserts a predictor ("author seniority") absent from
+  the source.</p>
+  <div class="repl">Graphite Research puts the median active developer's pull request at 9 hours from publish to merge. Strip
+  out the PRs merged with no review at all and that median rises 55 per cent, to 14 hours. Reviews, in Graphite's own
+  ranking, are the single largest determinant of time to merge, ahead of the number of reviews, the lines modified, and
+  company size. Keyboards are not the constraint. Queues are.<br><br>
+  One caveat the data demand: PRs that skip review are not a random sample. Graphite finds that 13 per cent of merged PRs
+  go unreviewed, but the median developer accounts for 0.6 per cent of them, and 15 per cent of developers account for 83
+  per cent. The unreviewed pool is a narrow tail of prolific committers at smaller organisations. Some of that 55 per cent
+  is what review costs; some is who skips it. Treat it as an upper bound on the review penalty, not a measurement of it.</div>
+  <p class="meta">The caveat costs the post nothing rhetorically and buys most of the dimension 2 deficit back, because it
+  demonstrates knowing which way the citation is wrong. That is the exact move the evidence anchor rewards at 4.</p>
+</div>
+
+<div class="fix">
+  <h3>Fix 5. Fix the chart, or delete the sentence pointing at it.</h3>
+  <p><strong>Location:</strong> Faros paragraph, and the chart at the foot of the article.</p>
+  <p><strong>Problem:</strong> G2.g. The text sends the reader to a chart showing different data, three sections away.</p>
+  <p>Three things to do:</p>
+  <ul>
+    <li>Move the chart up to the Faros paragraph, or point to it accurately. Since it plots LinearB pickup minutes, it belongs beside the 4.6x discussion in the opening, not beside the Faros percentages.</li>
+    <li>Rewrite the referring sentence so it describes the chart it actually has: <em>"Those same squads absorbed a 91 per cent increase in PR review time with no measurable improvement in deployment frequency, lead time, or change failure rate."</em> No chart reference, and no 154 per cent (see Fix 6).</li>
+    <li>Add a source line to the chart ("Source: LinearB, 2026 Software Engineering Benchmarks Report") and real alt text, currently the bare string "Chart". Suggested: <em>"Bar chart: median minutes before a reviewer opens a PR. Unassisted 201 minutes; agentic AI 1,055 minutes."</em></li>
+  </ul>
+</div>
+
+<div class="fix">
+  <h3>Fix 6. Source or cut the 154 per cent, and source the pickup minutes.</h3>
+  <p><strong>Location:</strong> Faros paragraph; the chart.</p>
+  <p><strong>Problem:</strong> G1.a and G1.b, and the conditional on G4.</p>
+  <ul>
+    <li><strong>154 per cent:</strong> not on the cited page. Either cite the specific Faros asset and page it appears on, or cut it. Do not leave it standing on a URL that does not contain it. If no source can be produced, this becomes a fabrication finding, so resolve it explicitly rather than quietly deleting it.</li>
+    <li><strong>1,055 and 201 minutes:</strong> cite the gated report properly, with the report page or figure number, so a reader knows the numbers live behind a download rather than on the landing page. Also reconcile the rounding: as printed they yield 5.25x against LinearB's published 5.3x.</li>
+  </ul>
+</div>
+
+<div class="fix">
+  <h3>Fix 7. Add an action and a falsification condition.</h3>
+  <p><strong>Location:</strong> New closing section, before the final paragraph.</p>
+  <p><strong>Problem:</strong> Dimension 4 at 1 out of 5, and the absence of any falsification condition under dimension 2.
+  Worth 5 to 6 points on its own.</p>
+  <div class="repl">If the queue is the constraint, three things follow, and all three are measurable by the end of a quarter.<br><br>
+  Instrument pickup time, not cycle time. Most engineering dashboards report time to merge, which blends queueing with
+  review effort and hides the former inside the latter. Split them. The number that matters is median minutes from PR
+  published to first reviewer comment, cut by authorship type. If AI-authored PRs show a materially worse pickup time than
+  human-authored ones, you have the constraint on a chart.<br><br>
+  Budget review capacity explicitly when you buy generation capacity. A tool rollout that raises output per engineer needs a
+  named reviewer allocation attached to the same business case, in hours per week, owned by the engineering manager who
+  approved the rollout. Review capacity treated as residual will be consumed as residual.<br><br>
+  Gate on acceptance rate, not volume. At a 32.7 per cent acceptance rate for AI-generated PRs, volume of PRs opened is an
+  actively misleading metric. Track the merge rate of AI-authored PRs per team, and treat a falling rate as a signal to
+  slow generation rather than to add reviewers.<br><br>
+  I would abandon this position on one piece of evidence: an organisation that materially raises per-engineer output, holds
+  reviewer headcount flat, and still improves deployment frequency and change failure rate over two consecutive quarters.
+  That would mean review capacity was elastic and the queue was never the binding constraint. I have not seen it published.
+  DORA 2025's throughput reversal is the closest anyone has come, and it bought that throughput with rework, which is the
+  queue collecting anyway.</div>
+</div>
+
+<h2>6. What is working</h2>
+
+<p>Brief, as specified, and limited to what is genuinely above pipeline baseline.</p>
+
+<ul>
+  <li><strong>The two arXiv citations are exemplary.</strong> Real papers, correct titles, correct author lists, and every
+  figure accurate to the decimal place: 802 developers, 196,212 PRs, 45.20 against 68.37 per cent, 12 of 13 agents. Sourcing
+  at this precision is rare in generated editorial and it is the reason this review reads as a rigour problem rather than an
+  integrity problem. Keep doing exactly this.</li>
+  <li><strong>Rounding discipline runs against the thesis.</strong> 55.6 to "55 per cent", 5.25x to "five times", 2.09x to
+  "twice". A pipeline optimising for impact rounds the other way. This is the single most trust-earning property of the draft.</li>
+  <li><strong>The automation counter-argument is pre-empted with the best evidence in the piece.</strong> Reaching for the
+  code-review-agent study to close off "just use bots" is the structural move that separates an argument from an assertion,
+  and that section is load-bearing under the delete-it test.</li>
+  <li><strong>Vendor neutrality holds under pressure.</strong> Three of the four data sources sell tooling into this exact
+  problem, and none is endorsed or even implicitly recommended. That is harder than it looks and it was done cleanly.</li>
+  <li><strong>The voice is close to house best.</strong> Numbers before adjectives, short sentences carrying the claims, and a
+  standfirst that earns its place. Dimension 5 at 4 out of 5 is the highest score here and it is not a consolation prize.</li>
+</ul>
+
+<h2>Machine-readable verdict</h2>
+
+<pre><code>{
+  "verdict": "BLOCK",
+  "weighted_score": 51.0,
+  "gates": {"G1": "fail", "G2": "fail", "G3": "pass", "G4": "pass"},
+  "dimensions": {"evidence": 3, "falsifiability": 2, "thesis": 3, "actionability": 1, "voice": 4, "craft": 2},
+  "blocking_findings": [
+    "G1.a: 154% PR size figure not present on cited Faros page; UNVERIFIED",
+    "G1.b: 1,055 and 201 minute pickup times not on cited LinearB page (gated report); UNVERIFIED",
+    "G1.c: 'fifty pounds or more' per senior-engineer hour is entirely unsourced and load-bearing for the title claim",
+    "G2.a: Graphite's 9 hours is the all-PR median for active developers, not the median for PRs merged without review",
+    "G2.b: 'author seniority' is not in Graphite's predictor ranking; 'PR size' and 'lines changed' duplicate one variable",
+    "G2.c: 'returned nothing measurable at the organisational level' attributed to arXiv 2607.01904, which reports no organisation-level outcome",
+    "G2.d: 'the authors drew a blunt conclusion' attributes to the abstract a conclusion it does not state",
+    "G2.e: LinearB's offsetting clause 'but are reviewed 2x faster once picked up' omitted from the headline statistic",
+    "G2.f: source says 'increases by 25%'; post asserts '25-percentage-point' without licence",
+    "G2.g: chart referenced as showing 91% review time and 154% PR size actually plots pickup minutes, and sits three sections away"
+  ],
+  "conditional_findings": [
+    "G4 passes conditionally: if no source can be produced for the 154% figure, it converts to a fabrication failure",
+    "G3 discrepancy noted, not disqualifying: 1055/201 = 5.25x against LinearB's published 5.3x"
+  ],
+  "superseded_evidence": [
+    "DORA 2024 throughput finding (-1.5%) reversed by DORA 2025 (throughput relationship shifted negative to positive), published 2025-12-18 by the same RedMonk author the post cites, seven months before this post"
+  ],
+  "reviewer_confidence_pct": 85
+}</code></pre>
+
+<p class="meta" style="margin-top:2.5rem">
+  Verification log: all six cited sources fetched and read. graphite.com/research/median-time-to-merge-prs and the post
+  itself were read as raw rendered page text after summarised fetches proved incomplete, which changed one finding: the 55
+  per cent penalty does reproduce and is Graphite's own figure, contrary to an earlier reading. The published chart was
+  inspected visually. Two additional sources were consulted as counter-evidence and are not cited by the post:
+  redmonk.com/rstephens/2025/12/18/dora2025 and graphite.com/research/prs-merged-without-review. Residual uncertainty
+  concentrates on whether the 154 per cent and the two pickup-minute figures exist inside gated vendor assets, which is why
+  reviewer confidence is 85 rather than higher.
+</p>
+
+</body>
+</html>

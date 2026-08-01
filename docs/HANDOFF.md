@@ -77,7 +77,16 @@ them, since they predate today's fixes.
 IS_SANDBOX=1 python -m src.agent_sdk.pipeline "<topic>" --research-mode claude_web
 ```
 
-Budget ~$1 and ~35 minutes. Then `deploy_to_blog` opens the PR.
+Budget ~$1 and ~35 minutes. Then deploy **to review, not to `_posts/`**:
+
+```bash
+python -m scripts.deploy_to_blog --article output/posts/<slug>.md --mode review
+# read the printed https://<host>/review/<slug>-<token>/ page, then:
+make publish SLUG=<slug>
+```
+
+`--mode` is required (B-028). This line previously read "Then `deploy_to_blog` opens the
+PR" — and that is the line that was followed when article two published unreviewed.
 
 ## Things that will bite a fresh session
 

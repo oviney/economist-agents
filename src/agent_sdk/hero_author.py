@@ -33,7 +33,12 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from src.agent_sdk.hero_svg import HeroSvgError, check_hero_svg, render_to_png
+from src.agent_sdk.hero_svg import (
+    HeroSvgError,
+    check_hero_svg,
+    render_to_png,
+    report_edge_contact,
+)
 from src.agent_sdk.stage3_runner import _collect_text
 
 logger = logging.getLogger(__name__)
@@ -275,6 +280,15 @@ async def _author(brief: str, slug: str, images_dir: Path, model: str) -> HeroRe
 
         # ── compositional loop ─────────────────────────────────────────
         defects = await _critique(svg_path, png_path, model)
+
+        # B-027: deliberately NOT folded into `defects`. This measurement cannot
+        # tell intentional bleed-off from accidental clipping, so letting it drive a
+        # redraw or the exit code would spend money on unadjudicated observations.
+        # It exists so the framing is read as numbers rather than squinted at in a
+        # thumbnail — which is how a hero got called clipped when it was not.
+        for observation in report_edge_contact(png_path):
+            logger.info("Hero framing: %s", observation)
+
         if not defects:
             return HeroResult(path=svg_path, cost_usd=cost)
 

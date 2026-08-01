@@ -117,9 +117,39 @@ Path(out).write_text(
 )
 PY
 
-STAGED="$BLOG/_posts/2026-01-01-${SLUG}.md"
+# B-029: this was STAGED="$BLOG/_posts/2026-01-01-${SLUG}.md" — the oracle
+# composed its own dated filename instead of using the one deploy_to_blog
+# produces. It therefore passed with 0 errors on article two while the deploy
+# path was emitting an undated, unpublishable name (BUG-069). An oracle that
+# renames its input is not testing the deploy path; it is testing a hypothetical
+# one. Ask the deploy path for the name it would really use.
+#
+# The injected front-matter date stays fixed at 2026-01-01 so the run remains
+# deterministic — only the *filename* derivation changes.
+POST_NAME="$("$PY" - "$ARTICLE" <<'PY'
+import sys
+from pathlib import Path
+
+from scripts.deploy_to_blog import _dated_post_name, is_publishable_post_name
+
+name = _dated_post_name(Path(sys.argv[1]).name, "2026-01-01")
+
+# validate-posts.sh globs _posts/*.md itself rather than asking Jekyll, so an
+# undated file validates happily there. The oracle cannot delegate this check.
+if not is_publishable_post_name(name):
+    sys.exit(f"unpublishable: {name!r}")
+
+print(name)
+PY
+)" || {
+  echo "ACCEPTANCE FAILED — the deploy path produced an unpublishable _posts/ filename."
+  echo "Jekyll needs YYYY-MM-DD-<slug>.md; see BUG-069 and B-029."
+  exit 1
+}
+
+STAGED="$BLOG/_posts/${POST_NAME}"
 cp "$LINKED" "$STAGED"
-echo "staged: $(basename "$STAGED")  (slug ${#SLUG} chars)"
+echo "staged: $(basename "$STAGED")  (slug ${#SLUG} chars, name from deploy path)"
 echo
 
 FAILED=0

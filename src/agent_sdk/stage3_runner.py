@@ -59,7 +59,13 @@ from src.agent_sdk._shared import (
 from src.agent_sdk.chart_renderer import ChartRenderError, render_chart
 from src.agent_sdk.hero_svg import HERO_IMAGES_DIR
 from src.agent_sdk.image_prompt_synth import PromptSynthError, compose_prompt
-from src.agent_sdk.research.claude_web import build_claude_web_brief
+from src.agent_sdk.research.claude_web import (
+    brief_has_findings,
+    build_claude_web_brief,
+)
+from src.agent_sdk.research.deep_research import (
+    brief_has_findings as deep_brief_has_findings,
+)
 from src.agent_sdk.research.deep_research import build_deep_research_brief
 from src.agent_sdk.tools.research_tools import SourceFetchSession, build_search_tool
 
@@ -180,6 +186,91 @@ FORMATTING:
 - Do not emit the article more than once; output exactly one article per response"""
 
 
+def _fallback_to_deterministic(
+    topic: str, failed_mode: str, spent_usd: float
+) -> tuple[str, float, bool]:
+    """Supply the brief from the keyless providers after ``failed_mode`` found nothing.
+
+    One place for the downgrade policy and its message, shared by every mode that
+    can come back empty (B-024, B-026). ``spent_usd`` is carried forward rather
+    than reset: the failed leg's spend is real, and a run report that dropped it
+    would understate what the article cost.
+
+    Raises:
+        EmptyResearchBriefError: propagated from ``build_research_brief`` when the
+            deterministic providers find nothing either — the abort underneath the
+            fallback.
+    """
+    logger.warning(
+        "%s research produced no findings — falling back to the keyless "
+        "deterministic providers (arXiv + Semantic Scholar). This article will be "
+        "sourced differently from a %s-researched one (B-024)",
+        failed_mode,
+        failed_mode,
+    )
+    return build_research_brief(topic), spent_usd, True
+
+
+async def _acquire_research_brief(
+    topic: str,
+    research_mode: str,
+    brief_override: str | None,
+) -> tuple[str, float, bool]:
+    """Produce the research brief the writer will use.
+
+    Returns ``(brief, cost_usd, downgraded)``, where ``downgraded`` is True when
+    the requested mode yielded nothing and the keyless deterministic providers
+    supplied the brief instead.
+
+    Research path is deterministic by default; "deep" (#390) opts into the
+    recursive multi-hop loop; "claude_web" (B-006) is the keyless path — Claude
+    does its own web research via the Agent SDK (no Serper key). RESEARCH_MODE
+    env overrides the argument. An unrecognised value fails closed to
+    deterministic (a typo must not silently disable the expensive deep path or
+    the keyless path) and is logged so operators can confirm.
+
+    B-024/BUG-067 — the failure policy. ``build_claude_web_brief`` degrades softly
+    to a findings-free brief on any SDK failure, which used to reach the writer
+    and produce an *ungrounded* article. It now falls back to the deterministic
+    providers, with abort underneath: if nothing yields findings,
+    ``EmptyResearchBriefError`` propagates (``build_research_brief`` raises it),
+    matching the deterministic path's long-standing behaviour. The downgrade is
+    logged at WARNING and reported to the caller, because a fallback article is
+    sourced differently from the one that was commissioned.
+
+    Raises:
+        EmptyResearchBriefError: when no provider yields any findings.
+    """
+    if brief_override is not None:
+        # B-012: opt-in --brief — a pre-built deep-research brief (refuted claims
+        # already stripped by pipeline.load_brief_file) is used verbatim; the
+        # research step is skipped entirely (no cost).
+        logger.info("Research: using supplied --brief (%d chars)", len(brief_override))
+        return brief_override, 0.0, False
+
+    resolved_research_mode = os.environ.get("RESEARCH_MODE", research_mode)
+    if resolved_research_mode not in ("deterministic", "deep", "claude_web"):
+        logger.warning(
+            "Unrecognised research mode %r; using deterministic",
+            resolved_research_mode,
+        )
+        resolved_research_mode = "deterministic"
+    logger.info("Research mode: %s", resolved_research_mode)
+
+    if resolved_research_mode == "deep":
+        brief, cost = await build_deep_research_brief(topic)
+        if deep_brief_has_findings(brief, topic):
+            return brief, cost, False
+        return _fallback_to_deterministic(topic, "deep", cost)
+    if resolved_research_mode != "claude_web":
+        return build_research_brief(topic), 0.0, False
+
+    brief, cost = await build_claude_web_brief(topic)
+    if brief_has_findings(brief, topic):
+        return brief, cost, False
+    return _fallback_to_deterministic(topic, "claude_web", cost)
+
+
 def _build_writer_prompt(topic: str, research_brief: str, style_section: str) -> str:
     """Build the Stage 3 writer user-prompt.
 
@@ -258,6 +349,10 @@ class Stage3Result:
         ""  # B-016b: unresolved composition defects (CLI exits non-zero)
     )
     hero_error: str = ""  # B-016b: why no hero exists (empty when hero_path is set)
+    #: B-024: the requested research mode yielded nothing and the deterministic
+    #: providers supplied the brief. The article is sourced differently from the
+    #: one commissioned, so the reviewer must be told rather than left to infer it.
+    research_downgraded: bool = False
 
 
 _TITLE_FIELD_PATTERN = re.compile(r'^title:\s*["\']?(.*?)["\']?\s*$', re.MULTILINE)
@@ -645,27 +740,9 @@ async def run_stage3(
     # env overrides the argument. An unrecognised value fails closed to
     # deterministic (a typo must not silently disable the expensive deep path or
     # the keyless path) and is logged so operators can confirm.
-    if brief_override is not None:
-        # B-012: opt-in --brief — a pre-built deep-research brief (refuted claims
-        # already stripped by pipeline.load_brief_file) is used verbatim; the
-        # research step is skipped entirely (no cost).
-        research_brief, research_cost = brief_override, 0.0
-        logger.info("Research: using supplied --brief (%d chars)", len(research_brief))
-    else:
-        resolved_research_mode = os.environ.get("RESEARCH_MODE", research_mode)
-        if resolved_research_mode not in ("deterministic", "deep", "claude_web"):
-            logger.warning(
-                "Unrecognised research mode %r; using deterministic",
-                resolved_research_mode,
-            )
-            resolved_research_mode = "deterministic"
-        logger.info("Research mode: %s", resolved_research_mode)
-        if resolved_research_mode == "deep":
-            research_brief, research_cost = await build_deep_research_brief(topic)
-        elif resolved_research_mode == "claude_web":
-            research_brief, research_cost = await build_claude_web_brief(topic)
-        else:
-            research_brief, research_cost = build_research_brief(topic), 0.0
+    research_brief, research_cost, research_downgraded = await _acquire_research_brief(
+        topic, research_mode, brief_override
+    )
     logger.info("Research brief: %d chars", len(research_brief))
 
     style_context = _fetch_style_context(topic)
@@ -872,6 +949,7 @@ async def run_stage3(
         graphics_model=graphics_model,
         wall_seconds=elapsed,
         research_brief_chars=len(research_brief),
+        research_downgraded=research_downgraded,
         article_chars=len(article),
         stat_audit_removed=max(stat_audit_removed, 0),
         writer_search_calls=search_session.calls_made,

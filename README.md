@@ -36,7 +36,10 @@ The pipeline runs in stages, orchestrated by `src/economist_agents/flow.py` over
 4. **Stage 4 — editorial review** (`src/agent_sdk/stage4_runner.py`): deterministic
    post-processing quality gates (see below), then `scripts/publication_validator.py`.
 5. **Publish or revise** — articles are written to `output/` (configurable via
-   `OUTPUT_DIR`). Nothing auto-publishes; a human deploys via `scripts/deploy_to_blog.py`.
+   `OUTPUT_DIR`). Nothing auto-publishes. A human deploys to an unlisted review URL with
+   `deploy_to_blog --mode review`, reads the live page, then runs `make publish SLUG=<slug>`.
+   `--mode` is required — there is no default, because the old default skipped review
+   (B-028).
 
 ### Quality gates (enforced deterministically)
 

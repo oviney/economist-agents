@@ -26,6 +26,145 @@ _(none)_
 
 ## Todo
 
+> **Opened 2026-07-29 from the article-two run.** **B-025** was withdrawn the same
+> day (see below); **B-026** and **B-027** landed the same day (see Done). Ids are
+> never reused, so all three numbers stay spent. **B-028** and **B-029** are open,
+> both from the RCA on the skipped review stage.
+
+### B-028 · The unreviewed publish path must stop being the default
+
+**RCA finding, 2026-07-29.** Article two was deployed with
+`deploy_to_blog --mode post` — a PR straight into `_posts/` — skipping the B-013
+live review stage entirely. Article one had used it (`generate → --mode review →
+live unlisted /review/<slug>-<token>/ → owner approval → make publish`). The PR
+(`oviney/blog#1169`) was closed and the article re-deployed through review.
+
+**Root cause: the review stage exists only in a completed-backlog entry, and the
+tool's default mode bypasses it.** `deploy_to_blog.py:681` sets
+`default="post"`, so running the documented command produces an unreviewed
+publish with no error and no warning.
+
+**The documentation problem is systemic, not one stale line.** Five docs describe
+`deploy_to_blog` without the review step, and `CLAUDE.md` — the governing doc —
+never mentions `--mode review`, `_review`, `make publish`, or the unlisted URL at
+all (grepped: zero hits):
+
+| File | What it says |
+|---|---|
+| `docs/HANDOFF.md:48` | "Then `deploy_to_blog` opens the PR." |
+| `CONTRIBUTING.md:96` | `python -m scripts.deploy_to_blog --article output/posts/<slug>.md` |
+| `README.md:39` | "a human deploys via `scripts/deploy_to_blog.py`" |
+| `.github/copilot-instructions.md:29` | "deploy with `scripts/deploy_to_blog.py`" |
+| `docs/README.md:114` | "Deploy an approved article to the blog repo" |
+
+**Corroborating evidence that `--mode post` is the unused path:** BUG-069 (the
+missing date prefix, which makes a post unpublishable) existed *only* there.
+`promote_review.py:117` builds `f"{deploy_date}-{slug}.md"` — correct by
+construction — so the reviewed path never had it. A defect that severe surviving
+in `--mode post` is evidence real publishing does not go through it.
+
+#### Task 1 — remove the accidental default (XS, do first)
+
+`--mode` becomes **required**. Neither value is a safe default: `post` skips
+review, and making `review` the default would write to the blog's live branch on
+a bare invocation, which is worse. Forcing an explicit choice removes the
+accident without picking a wrong default.
+
+- [x] `deploy_to_blog` with no `--mode` exits non-zero with a message naming both
+      modes and pointing at the review workflow
+- [x] No code caller breaks — `git grep` finds **no** programmatic callers, only
+      docs, so this is safe
+- [x] A test asserts the missing-mode failure, so a future tidy-up cannot restore
+      a silent default
+
+**Verify:** new test; `make ci-local`. **Files:** `scripts/deploy_to_blog.py`, one test.
+
+#### Task 2 — document the workflow where it governs behaviour (S)
+
+- [x] `CLAUDE.md` gains the publish workflow as an operating instruction, not a
+      changelog reference
+- [x] All five docs above corrected to show `--mode review` → `make publish`
+- [x] `docs/HANDOFF.md:48` fixed specifically — that is the line that was followed
+
+**Dependencies:** Task 1. **Files:** 6 docs. **Scope:** S.
+
+**Tasks 1 and 2 DONE 2026-07-31.** `--mode` is required; `_build_parser` was split out of
+`_parse_args` so a test asserts on the *configuration* (`required is True` **and**
+`default is None`), because argparse silently accepts a default alongside `required=True` —
+and a quietly restored default is the regression worth guarding. One existing test relied on
+the default and now passes `--mode post` explicitly; B-028's prediction of no programmatic
+callers held.
+
+`CLAUDE.md` had **zero** mentions of `--mode review`, `_review`, `make publish` or the
+unlisted URL. It now carries the workflow as an operating instruction. Also corrected:
+`README.md`, `CONTRIBUTING.md`, `docs/README.md`, `docs/HANDOFF.md` (the line that was
+followed), `.github/copilot-instructions.md` — whose cited line 29 had drifted since the RCA,
+so the workflow went into its hand-authored Developer Workflow section instead.
+
+#### Task 3 — decide whether `--mode post` should exist at all (needs a spec + LGTM)
+
+If review → promote is the sanctioned route, `--mode post` may have no remaining
+role: `promote_review.py` already writes `_posts/` on the live branch. Retiring it
+would make the unreviewed path *unreachable* rather than merely inconvenient,
+which is the difference between a guardrail and a suggestion. But it is a
+behavioural removal with a governance history (B-015a tuned `deploy()`'s staging
+for PR scope), so it needs a spec and an owner decision — not a quiet deletion.
+
+**Dependencies:** Tasks 1–2. **Scope:** S (spec) + S (removal), owner-gated.
+
+### B-029 · The acceptance oracle renames its input, so it does not test the deploy path
+
+**Found while fixing BUG-069, 2026-07-29.** `scripts/acceptance_blog_frontmatter.sh`
+is documented as *the* oracle — "a green local suite says nothing about what the
+blog accepts, and only the blog's own scripts are the oracle" — and `HANDOFF.md`
+names it as the source of truth. It passed on article two with 0 errors while the
+deploy path was producing an **unpublishable filename**.
+
+The reason is line 120: `STAGED="$BLOG/_posts/2026-01-01-${SLUG}.md"`. The oracle
+constructs its own dated filename instead of using the one `deploy_to_blog`
+produces, which was `_posts/<slug>.md` — undated. **The oracle validated a name
+that would never exist.** An oracle that renames its input is not testing the
+deploy path; it is testing a hypothetical one.
+
+`scripts/validate-posts.sh` cannot catch it either — it globs `_posts/*.md`
+itself rather than asking Jekyll, so an undated file validates happily. The only
+gate that would notice is the blog's own `build` (html-proofer/Jekyll), which runs
+on a PR and was never reached because #1169 was closed.
+
+**Acceptance criteria:**
+- [x] The oracle stages the article under the **filename the deploy path
+      produces**, rather than composing its own
+- [x] Given a deploy path that emits an undated filename, the oracle **fails**
+      (the BUG-069 reproduction — it currently passes)
+- [x] The existing pass on a correctly-dated article is unchanged
+- [x] The date the oracle injects into front matter stays fixed, so the run is
+      deterministic — only the *filename* derivation changes
+
+**Verify:** re-run against `output/posts/review-queue-throughput-tax.md`; confirm
+it still passes, then confirm it fails against a deliberately undated copy.
+**Files:** `scripts/acceptance_blog_frontmatter.sh`. **Scope:** S.
+
+**Risk if left:** this is the gate the project trusts most, and it has now been
+shown to give a false green on a publish-blocking defect. Every future article
+inherits that.
+
+**DONE 2026-07-31.** The oracle now derives the staged filename from
+`deploy_to_blog._dated_post_name` — the deploy path's own function — instead of composing
+`2026-01-01-${SLUG}.md`.
+
+Deriving correctly was **not sufficient**, which is the part worth recording. B-029 already
+noted that `validate-posts.sh` globs `_posts/*.md` itself rather than asking Jekyll, so an
+undated file validates happily there; the oracle therefore cannot delegate the check. A new
+`is_publishable_post_name` predicate lives next to `_dated_post_name`, and the oracle asserts
+on it and exits 1 with a named reason. The injected front-matter date stays pinned at
+`2026-01-01`, so only the *filename* derivation changed and the run is still deterministic.
+
+The BUG-069 reproduction runs as a test rather than being asserted statically: with
+`_dated_post_name` stubbed back to its no-op behaviour, the guard exits non-zero. It is the
+same defect *class* as B-031 — a check that could not fail the thing it existed to check.
+
+### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
+
 ### B-023 · Decide the fate of `llm_client.py`'s Anthropic auth path
 
 Surfaced 2026-07-28 while reconciling `backup/integration-test-20260728`, a
@@ -53,6 +192,27 @@ call for the owner, not an inference.
 **Answer B-010's scope first**, then either port the branch's auth commit
 (`73e73c0`) or delete `backup/integration-test-20260728`. Do not delete the
 branch before this is answered — it is the only copy.
+
+### ~~B-025~~ · WITHDRAWN 2026-07-29 — the defect record was never at risk
+
+Opened on the claim that `.gitignore`'s `data/*` left
+`data/skills_state/defect_tracker.json` untracked, so BUG-066/067/068 existed only
+on one laptop. **The claim was false and the item is void.**
+
+`git ls-files` shows the tracker has been tracked all along, and tracked files are
+unaffected by `.gitignore`. `git cat-file -p HEAD:…` confirms all three defects are
+committed in `8e34ef5`, all `resolved`.
+
+The mistake: `git add` printed *"The following paths are ignored… data/skills_state"*
+— a hint about the **directory** pattern — and that was read as the add having
+failed. It had not; the already-tracked file was staged regardless and went into
+the commit. A hint was mistaken for an error, and a whole backlog item was built
+on it before anyone checked `git ls-files`.
+
+Recorded rather than deleted because it is the second instance in one session of
+asserting a defect from a surface reading instead of measuring — the first being
+the hero "clipping" that a four-line pixel check disproved. That pattern is the
+actual finding here, and **B-027** is its concrete remedy.
 
 ### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
 
@@ -115,6 +275,67 @@ researcher would ship — but one topic cost ~102 agents / ~2M tokens / ~15 min 
 brief) lives at `docs/research/ai-productivity-brief.md`.
 
 ## Done
+
+### B-027 · Hero framing is measured — but it cannot be adjudicated — 2026-07-29
+
+**Scoped as a clipping detector; shipped as a measurement, because the detector is
+not achievable.** That negative result is the finding worth keeping.
+
+The trigger: a hero was reported as having a clipped top card. It did not. The
+claim came from glancing at a thumbnail, and a four-line border-pixel check
+disproved it — at the cost of a $0.49 redraw that fixed nothing. The nine
+structural rules check viewBox, aspect ratio, element counts and text bans; none
+measured framing. Real clipping *has* happened (B-020: a clipped queue stack, a
+chart line off the right edge), so the gap was real.
+
+`report_edge_contact()` measures the rendered PNG rather than the SVG — a true SVG
+bounding box needs transform composition and path-data parsing, which is hard and
+prone to false failures on valid geometry.
+
+**Two design corrections, both found by testing rather than reasoning:**
+
+1. *Coverage thresholds do not work.* The first implementation flagged a full-bleed
+   floor band, because a band spanning the full width necessarily puts a partial
+   run on **both** vertical edges. Full-bleed is now excluded structurally: a
+   border pixel counts only when the perpendicular line through it is not uniform.
+2. *Intent is invisible.* Run against the real heroes, the check fires on both —
+   and correctly so. The shipped hero has a desk rect from `x=0` stopping at
+   `x=680`: it bleeds off one side deliberately, and that is **geometrically
+   identical** to a shape accidentally clipped. No pixel test can separate them.
+
+So it reports what is true ("content meets the left edge across 10% of it without
+crossing the frame") and leaves the verdict to a human. It is **not** folded into
+`defects`, so it never drives a redraw or the exit code — letting unadjudicated
+observations spend money is the mistake that started this item.
+`TestEdgeContactIsAMeasurementNotAVerdict` pins the limitation so nobody later
+suppresses the "false positives"; they are not false, they are unjudged.
+
+9 tests in `tests/test_hero_edge_contact.py`, including the full-bleed control that
+the first implementation failed. Wired into `hero_author._author` at INFO.
+
+### B-026 · B-024 criterion 3 now holds for every research mode — 2026-07-29
+
+B-024 shipped the research-failure policy for `claude_web` and `deterministic` but
+left `deep` unguarded, which meant its own criterion 3 ("on any
+`--research-mode`") was not true. `build_deep_research_brief` has its own
+duplicated `_RESEARCH_BRIEF_GUARDRAILS` and its own
+`_format_brief(topic, findings)`, so `_acquire_research_brief` returned whatever it
+produced with no emptiness check — the exact hole BUG-067 was. The deferral was
+honest (B-012 leaves `deep` unexercised, so a guard there would be untested code)
+and a unit test removed the objection.
+
+**Writing the guard found a case the `claude_web` predicate would have missed.** A
+deep brief whose *every* subquestion answers `- No evidence found.` carries no
+evidence at all, yet is not string-equal to a freshly formatted empty brief — so
+the equality check that suffices for `claude_web` returns "has findings" for it.
+`deep_research.brief_has_findings` therefore checks both: string-equality with the
+empty brief, **and** whether any bullet is something other than the no-evidence
+line. `_NO_EVIDENCE_LINE` is now a named constant so the formatter and the
+predicate cannot drift apart.
+
+Also collapsed the duplicated downgrade block into `_fallback_to_deterministic()`,
+so the policy and its warning live in one place for every mode that can come back
+empty. 8 tests in `tests/test_research_failure_fallback.py`; `make ci-local` green.
 
 ### B-022 · The DALL-E branch is gone from `EconomistContentFlow` — 2026-07-28
 

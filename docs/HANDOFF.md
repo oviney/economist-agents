@@ -89,6 +89,47 @@ fixture would have satisfied it. That is B-039's defect in miniature, in a test.
 it changes a CRITICAL gate carrying a stated editorial standard, and the same reasoning that kept
 B-040 at spec-only applies.
 
+### Resume prompt — paste after `/goal` in a fresh session
+
+Kept here rather than retyped, so the next session starts from measurements instead of memory.
+**`/goal` caps its argument at 4,000 characters**; this is 3,701, so it fits as-is — trim wording,
+not facts, if you add to it.
+
+```text
+Using agent-skills, take B-042 — the mandatory-chart gate manufactures the fabrication it should prevent.
+
+Read docs/HANDOFF.md first (it opens with B-043 as built and names B-042 as next), then B-042 in BACKLOG.md, then docs/reviews/harness-engineering-assessment-2026-07-29.md for the framework.
+
+B-042 HAS NO SPEC — only a BACKLOG entry. Write the spec and stop for LGTM. Do not go straight to implementation: it changes a CRITICAL gate carrying a stated editorial standard ("Charts are mandatory per Economist editorial standards"), and the same reasoning that kept B-040 at spec-only applies.
+
+The measured facts, verified 2026-08-01. Do not re-derive them:
+
+1. publication_validator.py:1031 makes a chart mandatory at CRITICAL whenever no chart ref exists. On the 2026-08-01 run a brief containing ONE number yielded a chart carrying four invented percentages (62/46/28/12%), with an axis and a measured-sounding subtitle. That was compliance, not a rogue writer.
+2. orphaned_chart (publication_validator.py:1056, HIGH) then fires unless prose near the embed says "chart"/"figure"/"shows"/"illustrates" — pushing the writer to describe the chart, with nothing verifying the description is true. That is how "As the chart below illustrates, undetected defects do not flow linearly into rework" came to be written about a static four-bar comparison.
+3. Two gates combined manufactured two defects. article_evaluator then scored the result 76 and the validator PASSED it.
+4. Two of the eight calibration cases are this defect — docs/evals/review-gate/cases/g4-fabricated-chart-figures.yaml and g2-chart-shows-something-other-than-claimed.yaml. Use them as the regression targets rather than inventing new ones.
+5. The owner's stated position (2026-08-01): a chart is mandatory WHEN THE RESEARCH SUPPORTS ONE, not because an article exists.
+
+B-043 deliberately did not fix this, and the reason decides the spec's shape: missing_chart fires CORRECTLY. The defect is its setpoint. A proof of teeth cannot catch a wrong setpoint — that is the taxonomy gap the sensor spec's open question 3 leaves for its own ADR, and it is still open. Decide whether that ADR belongs in this spec or beside it.
+
+Files: scripts/publication_validator.py, src/agent_sdk/_shared.py (_auto_embed_chart at 664, called at 887), src/agent_sdk/stage3_runner.py.
+
+You inherit a standing check B-043 shipped. scripts/check_sensor_proofs.py runs in make ci-local and fails when a script a gate site invokes has no proof in docs/sensors/register.yaml — add or move a sensor and the gate goes red until you register it. Run `.venv/bin/python scripts/check_sensor_proofs.py --list` to see the 20 entries. publication_validator's entry carries a B-042 note that must be updated if you change its setpoint.
+
+Branch off main. Run make ci-local before you push — you are the merge gate, main is unprotected, it needs the venv on PATH, and it is now 2,761 tests.
+
+Traps, all in docs/HANDOFF.md: bare `python` does not exist outside the venv; `export PATH :=` in a Makefile does NOT make make use it (GNU make 3.81 direct-execs metacharacter-free lines against its own startup PATH — name $(VENV_BIN)/<tool>); read logs/agent_sdk_costs.jsonl rather than quoting a remembered duration; and the publish-guard PreToolUse hook matches a bare string, so it blocks any command whose text merely mentions the deploy script, including a grep or a heredoc — split the command or use an editor tool.
+
+Still blocked on the owner, not on code: the testing-shortcuts-migration-deadline article needs its artifact re-sourced (docs/research/artifact-sourcing-prompt.md) and its hero drawn by hand. It should not be published as it stands — B-042 is why.
+```
+
+### The facts that prompt asserts, and where they were checked
+
+Every line number in it was verified on 2026-08-01 rather than carried from the backlog:
+`missing_chart` CRITICAL at `publication_validator.py:1031`, `orphaned_chart` HIGH at `:1056`,
+`_auto_embed_chart` at `src/agent_sdk/_shared.py:664` called at `:887`, and both chart
+calibration cases present in `docs/evals/review-gate/cases/`.
+
 **B-043 deliberately does not fix it**, and the reason is worth keeping: `missing_chart` **fires
 correctly**. The defect is its *setpoint* — a chart is mandatory even when the research carries no
 chartable data, so the pipeline invented four percentages to comply. A proof of teeth cannot catch

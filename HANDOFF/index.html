@@ -2523,10 +2523,60 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-next-work-b-043-no-sensor-ships-without-a-proof-it-can-fail" class="md-nav__link">
+  <a href="#b-043-built-2026-08-01-no-sensor-ships-without-a-proof-it-can-fail" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The next work: B-043 — no sensor ships without a proof it can fail
+        B-043 — BUILT 2026-08-01. No sensor ships without a proof it can fail
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="B-043 — BUILT 2026-08-01. No sensor ships without a proof it can fail">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-three-things-worth-knowing-before-you-touch-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The three things worth knowing before you touch it
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-counts-as-a-sensor-answered-and-the-proposal-needed-one-correction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What counts as a sensor — answered, and the proposal needed one correction
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-three-hand-run-mutation-proofs-are-now-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The three hand-run mutation proofs are now tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-next-work-b-042-the-mandatory-chart-gate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The next work: B-042 — the mandatory-chart gate
       
     </span>
   </a>
@@ -2568,7 +2618,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#the-three-things-worth-knowing-before-you-touch-it" class="md-nav__link">
+  <a href="#the-three-things-worth-knowing-before-you-touch-it_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         The three things worth knowing before you touch it
@@ -2827,55 +2877,100 @@
 <h1 id="hand-off-2026-08-01">Hand-off — 2026-08-01<a class="headerlink" href="#hand-off-2026-08-01" title="Permanent link">&para;</a></h1>
 <p>Written for a fresh session after <code>/clear</code>. <code>BACKLOG.md</code> stays the source of record; this file
 is the "where were we" note a new session reads first, then overwrites when it goes stale.</p>
-<p><strong>Read next, in this order:</strong> this file → <code>docs/specs/sensor-proof-of-teeth.md</code> (<strong>B-043 is the
-next work</strong>) → <code>docs/reviews/harness-engineering-assessment-2026-07-29.md</code> for the framework it
-sits in → <code>BACKLOG.md</code>.</p>
-<p><strong>Session of 2026-08-01 is closed out.</strong> PRs #459, #460, #461 and #462 all merged; <code>main</code> is
-clean with no open PRs; <code>make ci-local</code> green at <strong>2,689 tests</strong>. B-038, B-039, B-040 and B-041
-landed. B-042 and B-043 are specced and open.</p>
-<h2 id="the-next-work-b-043-no-sensor-ships-without-a-proof-it-can-fail">The next work: B-043 — no sensor ships without a proof it can fail<a class="headerlink" href="#the-next-work-b-043-no-sensor-ships-without-a-proof-it-can-fail" title="Permanent link">&para;</a></h2>
-<p><strong>Spec: <code>docs/specs/sensor-proof-of-teeth.md</code>, awaiting LGTM.</strong> Per <code>CLAUDE.md</code>, no
-implementation begins until that lands.</p>
-<p><strong>The one-line argument, so a fresh session does not re-derive it.</strong> The 2026-07-29 assessment
-graded this repo <em>guide-maximal, sensor-disconnected</em>. B-030 … B-035 fixed the wiring — sensors
-now fire in the agent's loop. 2026-08-01 produced four independent proofs that <strong>nothing
-validates the sensors themselves</strong>:</p>
+<p><strong>Read next, in this order:</strong> this file → <code>BACKLOG.md</code> → <code>docs/reviews/harness-engineering-assessment-2026-07-29.md</code>
+for the framework the last four items sit in.</p>
+<p><strong>Session of 2026-08-01 is closed out.</strong> PRs #459 … #462 merged; B-038 … B-041 landed. <strong>B-043
+is now built</strong> (branch <code>harness/sensor-proof-of-teeth</code>). <strong>B-042 is the next work</strong>, and it is
+the one item that is specced only as a backlog entry rather than a full spec.</p>
+<h2 id="b-043-built-2026-08-01-no-sensor-ships-without-a-proof-it-can-fail">B-043 — BUILT 2026-08-01. No sensor ships without a proof it can fail<a class="headerlink" href="#b-043-built-2026-08-01-no-sensor-ships-without-a-proof-it-can-fail" title="Permanent link">&para;</a></h2>
+<p><strong>Spec: <code>docs/specs/sensor-proof-of-teeth.md</code></strong> (status IMPLEMENTED; its open questions are now
+answered with measurements rather than left hanging).</p>
 <table>
 <thead>
 <tr>
 <th></th>
-<th>Kind of failure</th>
+<th></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>B-039</td>
-<td>A <strong>fifth</strong> inert sensor, found after B-031 fixed four</td>
+<td><code>scripts/check_sensor_proofs.py</code></td>
+<td>the gate — a <code>make ci-local</code> step</td>
 </tr>
 <tr>
-<td>B-040</td>
-<td>A sensor that <strong>never runs</strong>, with no ground truth</td>
+<td><code>docs/sensors/register.yaml</code></td>
+<td>20 entries: <strong>19 proved, 0 unproved, 1 report-only</strong></td>
 </tr>
 <tr>
-<td>B-041</td>
-<td>A <strong>biased</strong> sensor — the ledger recorded only successful runs</td>
-</tr>
-<tr>
-<td>B-042</td>
-<td>A sensor whose <strong>setpoint manufactured the defect</strong> it prevents</td>
+<td><code>tests/test_check_sensor_proofs.py</code></td>
+<td>33 tests, incl. the checker's own proof of teeth</td>
 </tr>
 </tbody>
 </table>
-<p><strong>B-031 fixed four named sensors; it did not fix the class.</strong></p>
-<p><strong>The design constraint that decides the whole build: the fix must be a sensor, not a guide.</strong>
-Writing "every sensor must have a teeth test" into a <code>SKILL.md</code> reproduces exactly what this
-repo was graded down for — constraint #1 had zero computational backing until B-030, and B-028
-was a review stage that existed as prose while the tool's default bypassed it. A rule nothing
-enforces gets skipped.</p>
-<p><strong>B-040 is absorbed</strong> as the inferential arm: computational sensors are proved by mutation,
+<p><strong>The one-line argument, so a fresh session does not re-derive it.</strong> The 2026-07-29 assessment
+graded this repo <em>guide-maximal, sensor-disconnected</em>. B-030 … B-035 fixed the wiring — sensors
+now fire in the agent's loop. 2026-08-01 produced four independent proofs that <strong>nothing
+validates the sensors themselves</strong>: a fifth inert sensor found after B-031 fixed four (B-039),
+one that had never run (B-040), one that was biased (B-041), and one whose setpoint manufactured
+the defect it prevents (B-042). <strong>B-031 fixed four named sensors; it did not fix the class.</strong></p>
+<h3 id="the-three-things-worth-knowing-before-you-touch-it">The three things worth knowing before you touch it<a class="headerlink" href="#the-three-things-worth-knowing-before-you-touch-it" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Discovery reads the wiring, not filenames.</strong> The checker parses the <code>Makefile</code>,
+   <code>.pre-commit-config.yaml</code>, <code>.claude/settings.json</code> and the publish entrypoints, and fails
+   until every in-repo script they invoke has a register entry. A <code>scripts/*_guard.py</code> glob would
+   have been gameable by renaming and blind to a sensor added under any other name — and the
+   whole complaint about B-031 is that fixing four sensors <em>by name</em> left a fifth to find.
+   <strong>So: add a sensor to any of those four files and <code>make ci-local</code> goes red until you register
+   it.</strong> That is the feature, not a snag.</li>
+<li><strong>It was verified in situ, not only against fixtures.</strong> Adding a recipe invoking a new script
+   to the real <code>Makefile</code> made the real gate exit 1 naming it; reverting restored green. B-039's
+   third lesson applied to its own successor — <code>export PATH :=</code> looked right and did nothing.</li>
+<li><strong>What it cannot do is stated in its own docstring.</strong> It verifies a proof <em>exists and runs</em>.
+   It cannot verify a proof is <em>genuine</em>: <code>assert True</code> under an honest-sounding name passes.
+   Mutation-testing the mutation tests is where the value curve goes flat. The <code>mutation:</code> field
+   is the substitute — it makes genuineness a one-glance review check. <strong>Do not build toward
+   closing that hole.</strong></li>
+</ol>
+<h3 id="what-counts-as-a-sensor-answered-and-the-proposal-needed-one-correction">What counts as a sensor — answered, and the proposal needed one correction<a class="headerlink" href="#what-counts-as-a-sensor-answered-and-the-proposal-needed-one-correction" title="Permanent link">&para;</a></h3>
+<p>The proposed definition said <em>"anything whose </em><em>non-zero exit</em><em> can block a commit, push,
+<code>ci-local</code>, or a publish"</em>. Measured, non-zero exit is the wrong test: <strong>every harness hook exits
+0 by design</strong>, so a broken hook cannot brick the session, and they refuse via JSON instead.
+<code>guard_constraints</code> returns <code>permissionDecision: "deny"</code> and <code>session_gate</code> returns
+<code>decision: "block"</code>; <code>post_edit_sensor</code> and <code>session_context</code> return only <code>additionalContext</code>.</p>
+<blockquote>
+<p>Adopted: <strong>a sensor is anything a gate site invokes that can <em>refuse</em></strong> — deny a tool call,
+block a turn, or exit non-zero.</p>
+</blockquote>
+<p>Both named cases resolved as proposed, both checked rather than assumed. <code>publication_validator</code>
+is <strong>in</strong>. <code>article_evaluator</code> is <strong>out</strong> — zero gate-site references anywhere; it scored the
+fabricated article 76 while the validator passed it, which is exactly what "scores but does not
+gate" looks like. It <em>is</em> on <code>destructive_change_guard</code>'s <code>CRITICAL_FILES</code>, and being protected
+from being gutted is not the same as being a sensor — do not conflate the two lists.</p>
+<p><strong>B-040 stays absorbed</strong> as the inferential arm: computational sensors are proved by mutation,
 inferential ones by labelled cases. Eight already exist in <code>docs/evals/review-gate/cases/</code>.
 <code>docs/specs/review-gate-calibration.md</code> remains the detailed design and its sequencing is
-unchanged — build after n≈5 real reviews.</p>
+unchanged — <strong>build after n≈5 real reviews</strong>, which accrue free from the B-013 review stage.
+The inferential runner was deliberately not built.</p>
+<h3 id="the-three-hand-run-mutation-proofs-are-now-tests">The three hand-run mutation proofs are now tests<a class="headerlink" href="#the-three-hand-run-mutation-proofs-are-now-tests" title="Permanent link">&para;</a></h3>
+<p>Two already survived in tests written for other reasons — the <code>(mypy || echo advisory)</code> exit-127
+one and the <code>export PATH</code> vs stub-<code>ruff</code> one, both in <code>tests/test_ci_gate_is_reproducible.py</code>.
+<strong>The third did not</strong>: nothing mutated <code>CHROME_TAGS</code> to prove the no-drop invariant would notice.
+It is now <code>tests/test_html_to_brief.py::TestTheNoDropInvariantHasTeeth</code>.</p>
+<p>Two sensors had <strong>zero</strong> tests and now have 26 between them: <code>tests/test_lint_adrs.py</code> (16, one
+governance defect planted per rule) and <code>tests/test_check_bare_name_imports.py</code> (10).</p>
+<p>One inherited proof was quietly weak and got tightened: <code>test_schema_validation_rejects_invalid</code>
+asserted <code>pytest.raises((ValueError, Exception))</code>, which passes on <em>any</em> error — a typo in the
+fixture would have satisfied it. That is B-039's defect in miniature, in a test.</p>
+<h2 id="the-next-work-b-042-the-mandatory-chart-gate">The next work: B-042 — the mandatory-chart gate<a class="headerlink" href="#the-next-work-b-042-the-mandatory-chart-gate" title="Permanent link">&para;</a></h2>
+<p><strong>Specced only as a <code>BACKLOG.md</code> entry, not a full spec.</strong> Per <code>CLAUDE.md</code>, write the spec first;
+it changes a CRITICAL gate carrying a stated editorial standard, and the same reasoning that kept
+B-040 at spec-only applies.</p>
+<p><strong>B-043 deliberately does not fix it</strong>, and the reason is worth keeping: <code>missing_chart</code> <strong>fires
+correctly</strong>. The defect is its <em>setpoint</em> — a chart is mandatory even when the research carries no
+chartable data, so the pipeline invented four percentages to comply. A proof of teeth cannot catch
+a wrong setpoint, which is the taxonomy gap the spec's open question 3 names and leaves for its own
+ADR. The <code>publication_validator</code> register entry carries a note saying so, so the next reader of
+the register meets the limit rather than inferring it.</p>
 <h2 id="blocked-on-the-owner-not-on-code">Blocked on the owner, not on code<a class="headerlink" href="#blocked-on-the-owner-not-on-code" title="Permanent link">&para;</a></h2>
 <p>Two round-trips only he can make. The <code>testing-shortcuts-migration-deadline</code> article is blocked
 on both and <strong>should not be published as it stands</strong> — see B-040's calibration cases for why.</p>
@@ -2932,7 +3027,7 @@ The <code>ai-productivity-brief.md</code> layout is a convention the deep-resear
 interface. So the brief's job is <em>transport</em>, and there is deliberately <strong>no LLM in the
 middle</strong>: ADR-0018 measured that fidelity defects survived four gates and produced a 51/100
 BLOCK on an article the deterministic evaluator passed at 88%.</p>
-<h3 id="the-three-things-worth-knowing-before-you-touch-it">The three things worth knowing before you touch it<a class="headerlink" href="#the-three-things-worth-knowing-before-you-touch-it" title="Permanent link">&para;</a></h3>
+<h3 id="the-three-things-worth-knowing-before-you-touch-it_1">The three things worth knowing before you touch it<a class="headerlink" href="#the-three-things-worth-knowing-before-you-touch-it_1" title="Permanent link">&para;</a></h3>
 <ol>
 <li><strong>The <code>## Refuted / unverified</code> section is the point.</strong> Every brief ends with it, empty.
    Move a paragraph under that heading and the loader deletes it before the writer ever sees

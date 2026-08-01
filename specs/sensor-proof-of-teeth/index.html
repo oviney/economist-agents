@@ -2708,6 +2708,45 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Open questions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-what-counts-as-a-sensor-answered-2026-08-01-measured" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What counts as a sensor? — ANSWERED 2026-08-01, measured
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-do-hooks-count-separately-from-the-scripts-they-invoke-answered-yes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Do hooks count separately from the scripts they invoke? — ANSWERED: yes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-b-042-has-no-home-in-this-taxonomy-still-open-deliberately" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. B-042 has no home in this taxonomy — still open, deliberately
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -2731,7 +2770,7 @@
 
 
 <h1 id="spec-no-sensor-ships-without-a-proof-it-can-fail-b-043">Spec — No sensor ships without a proof it can fail (B-043)<a class="headerlink" href="#spec-no-sensor-ships-without-a-proof-it-can-fail-b-043" title="Permanent link">&para;</a></h1>
-<p><strong>Status:</strong> DRAFT — awaiting owner LGTM · <strong>Opened:</strong> 2026-08-01
+<p><strong>Status:</strong> IMPLEMENTED 2026-08-01 (LGTM'd the same day) · <strong>Opened:</strong> 2026-08-01
 <strong>Absorbs:</strong> B-040 (review-gate calibration) as the inferential-sensor arm
 <strong>Framework:</strong> <code>docs/reviews/harness-engineering-assessment-2026-07-29.md</code> (SE Radio 730,
 Birgitta Boeckeler on harness engineering)</p>
@@ -2874,12 +2913,21 @@ without reading the whole file.</p>
 </ul>
 <h2 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h2>
 <ul>
-<li>[ ] <code>scripts/check_sensor_proofs.py</code> runs in <code>make ci-local</code> and fails on an unregistered sensor</li>
-<li>[ ] Every sensor script in <code>scripts/</code> appears in <code>docs/sensors/register.yaml</code></li>
-<li>[ ] <code>lint_adrs.py</code> and <code>check_bare_name_imports.py</code> — the two with <strong>zero</strong> tests — get proofs first</li>
-<li>[ ] The three mutation proofs run by hand on 2026-08-01 exist as tests, not as shell history</li>
-<li>[ ] The checker has its own proof of teeth</li>
-<li>[ ] <code>make ci-local</code> green; ≥80% coverage on the new module; no new dependency, no key, no network</li>
+<li>[x] <code>scripts/check_sensor_proofs.py</code> runs in <code>make ci-local</code> and fails on an unregistered sensor
+      — verified <em>in situ</em>, not only against fixtures: adding a recipe invoking a new script to
+      the real <code>Makefile</code> made the real gate exit 1 naming it; reverting restored green</li>
+<li>[x] Every sensor script in <code>scripts/</code> appears in <code>docs/sensors/register.yaml</code> — 20 entries,
+      16 found by discovery and 4 declared (see open question 1)</li>
+<li>[x] <code>lint_adrs.py</code> and <code>check_bare_name_imports.py</code> — the two with <strong>zero</strong> tests — get proofs
+      first: <code>tests/test_lint_adrs.py</code> (16 tests, one governance defect planted per rule) and
+      <code>tests/test_check_bare_name_imports.py</code> (10)</li>
+<li>[x] The three mutation proofs run by hand on 2026-08-01 exist as tests, not as shell history.
+      Two already survived in <code>test_ci_gate_is_reproducible.py</code>; the CHROME_TAGS/no-drop one did
+      <strong>not</strong> and is now <code>TestTheNoDropInvariantHasTeeth</code></li>
+<li>[x] The checker has its own proof of teeth — <code>TestItsOwnProofOfTeeth</code>, four tests, both
+      directions of the mutation</li>
+<li>[x] <code>make ci-local</code> green; <strong>93%</strong> coverage on the new module; no new dependency (PyYAML was
+      already a requirement), no key, no network</li>
 </ul>
 <h2 id="implementation-order">Implementation order<a class="headerlink" href="#implementation-order" title="Permanent link">&para;</a></h2>
 <ol>
@@ -2904,18 +2952,84 @@ without reading the whole file.</p>
   <code>missing_chart</code> fires <em>correctly</em> — the defect is the setpoint, not the sensor.</li>
 </ul>
 <h2 id="open-questions">Open questions<a class="headerlink" href="#open-questions" title="Permanent link">&para;</a></h2>
-<ol>
-<li><strong>What counts as a sensor?</strong> Proposed: anything whose non-zero exit or emitted issue can
-   block a commit, a push, <code>ci-local</code>, or a publish. That includes <code>publication_validator</code> and
-   excludes <code>article_evaluator</code> (it scores, it does not gate). Worth the owner's ruling, because
-   it sets the register's boundary and therefore the gate's scope.</li>
-<li><strong>Do pre-commit hooks count separately from the scripts they invoke?</strong> A hook can be inert
-   while its script is fine — <code>validate_badges</code> was <code>|| true</code> for exactly that reason. Leaning
-   yes, as register entries with the hook id as <code>id</code>.</li>
-<li><strong>B-042 has no home in this taxonomy.</strong> A sensor with the wrong setpoint is neither inert nor
-   inaccurate; it works, and the system is worse for it. Boeckeler's framework does not name it.
-   Worth an ADR on its own, separate from this spec.</li>
-</ol>
+<h3 id="1-what-counts-as-a-sensor-answered-2026-08-01-measured">1. What counts as a sensor? — ANSWERED 2026-08-01, measured<a class="headerlink" href="#1-what-counts-as-a-sensor-answered-2026-08-01-measured" title="Permanent link">&para;</a></h3>
+<p><strong>The proposed definition was right in substance and wrong in one word.</strong> It said <em>"anything
+whose </em><em>non-zero exit</em><em> can block a commit, a push, <code>ci-local</code>, or a publish"</em>. Measured against
+the repo, non-zero exit is the wrong test, because <strong>every harness hook exits 0, always</strong> — by
+design, so a broken hook cannot brick the session. They refuse via JSON instead:</p>
+<table>
+<thead>
+<tr>
+<th>Wired into <code>.claude/settings.json</code></th>
+<th>How it refuses</th>
+<th>Sensor?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>guard_constraints.py</code></td>
+<td><code>permissionDecision: "deny"</code> — refuses the tool call</td>
+<td><strong>yes</strong></td>
+</tr>
+<tr>
+<td><code>session_gate.py</code></td>
+<td><code>decision: "block"</code> — refuses the turn ending</td>
+<td><strong>yes</strong></td>
+</tr>
+<tr>
+<td><code>post_edit_sensor.py</code></td>
+<td><code>additionalContext</code> only</td>
+<td><strong>no — it reports</strong></td>
+</tr>
+<tr>
+<td><code>session_context.py</code></td>
+<td><code>additionalContext</code> only</td>
+<td><strong>no — it reports</strong></td>
+</tr>
+</tbody>
+</table>
+<p>So the operative test is <strong>"can it refuse?"</strong>, not "can it exit non-zero". Adopted definition:</p>
+<blockquote>
+<p>A <strong>sensor</strong> is anything a <strong>gate site</strong> invokes that can refuse — deny a tool call, block a
+turn, or exit non-zero. <strong>Gate sites</strong> are the <code>Makefile</code>, <code>.pre-commit-config.yaml</code>,
+<code>.claude/settings.json</code>, and the publish entrypoints.</p>
+</blockquote>
+<p><strong>This is enforced, not asserted.</strong> <code>check_sensor_proofs.py</code> <em>reads</em> those four files and demands
+a register entry for every in-repo script it finds. Discovery from wiring rather than from a
+filename pattern is the load-bearing choice: <code>scripts/*_guard.py</code> would be gameable by renaming
+and blind to a sensor added under any other name.</p>
+<p><strong>The two named cases resolve as proposed, both confirmed by measurement:</strong></p>
+<ul>
+<li><strong><code>publication_validator</code> — in.</strong> Imported by <em>both</em> publish entrypoints and run as the
+  acceptance oracle; an <code>is_valid=False</code> stops the publish. Discovery finds it via the publish
+  path without it being named anywhere in the checker.</li>
+<li><strong><code>article_evaluator</code> — out.</strong> Grepped for across the Makefile, pre-commit config, harness
+  settings and the publish path: <strong>zero gate-site references.</strong> It scores and nothing reads the
+  score as a verdict — which is exactly how it scored the fabricated article <strong>76</strong> while the
+  validator passed it. A score is not a gate.</li>
+</ul>
+<p><em>Worth stating so the two lists are never conflated:</em> <code>article_evaluator.py</code> <strong>is</strong> on
+  <code>destructive_change_guard</code>'s <code>CRITICAL_FILES</code>. Being protected from being gutted is not the
+  same as being a sensor, and it does not earn a register entry.</p>
+<p><strong>One thing the definition alone does not cover, so the register carries it explicitly.</strong> Four
+real sensors are invoked by no gate site: the <code>Makefile</code>'s own toolchain resolution and its
+<code>mypy-advisory</code> exit-code logic (proved by <code>test_ci_gate_is_reproducible.py</code>),
+<code>html_to_brief</code>'s runtime no-drop invariant, and <code>complexity_sensor</code>. Extra entries beyond what
+discovery finds are allowed for exactly this reason — discovery sets the <strong>floor</strong> on the
+register, not the ceiling.</p>
+<p><strong>Measured result: 20 registered — 19 proved, 0 unproved, 1 report-only.</strong></p>
+<h3 id="2-do-hooks-count-separately-from-the-scripts-they-invoke-answered-yes">2. Do hooks count separately from the scripts they invoke? — ANSWERED: yes<a class="headerlink" href="#2-do-hooks-count-separately-from-the-scripts-they-invoke-answered-yes" title="Permanent link">&para;</a></h3>
+<p>Implemented. <code>.claude/settings.json</code> is parsed for <code>run_hook.sh &lt;name&gt;</code> and each resolved
+<code>scripts/hooks/&lt;name&gt;.py</code> is registered in its own right, as are the pre-commit <code>entry:</code> targets.
+The reasoning in the question holds and is why: a hook can be inert while its script is fine,
+which is what <code>validate_badges</code> was for months.</p>
+<h3 id="3-b-042-has-no-home-in-this-taxonomy-still-open-deliberately">3. B-042 has no home in this taxonomy — still open, deliberately<a class="headerlink" href="#3-b-042-has-no-home-in-this-taxonomy-still-open-deliberately" title="Permanent link">&para;</a></h3>
+<p>A sensor with the wrong setpoint is neither inert nor inaccurate; it works, and the system is
+worse for it. Boeckeler's framework does not name it, and a proof of teeth cannot catch it —
+<code>missing_chart</code> <strong>fires correctly</strong>. Still worth an ADR on its own, separate from this spec.</p>
+<p>The register does not fix it, but it now has one concrete place where the gap is visible: the
+<code>publication_validator</code> entry carries a note saying that <code>missing_chart</code> fires correctly and is
+still a defect, so the next reader of the register meets the limit rather than inferring it.</p>
 
 
 

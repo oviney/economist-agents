@@ -130,6 +130,7 @@ second:
 | A hero image had a clipped top card | a four-line border-pixel check | a $0.49 redraw that fixed nothing (B-027) |
 | `.gitignore` left `defect_tracker.json` untracked, so three defects existed on one laptop only | `git ls-files` | a whole backlog item, opened and withdrawn (~~B-025~~) |
 | `backup/integration-test-20260728` was "the only copy" of the auth work | `git branch --contains 73e73c0` | three days of caution shaping B-023's framing |
+| `export PATH := $(CURDIR)/.venv/bin:$(PATH)` makes `make` use the pinned toolchain | `make lint` against a stub `ruff` that prints a marker | none — a behavioural test caught it before it shipped (B-039) |
 
 The shape is identical every time. An observation arrives that *looks* like
 evidence — a thumbnail, a `git add` hint about a directory pattern, a branch name
@@ -148,8 +149,22 @@ If you cannot name such a command, say so explicitly and mark the claim as
 unverified rather than asserting it. This is cheap: all three commands above are
 sub-second, and all three were available at the moment the claim was made.
 
+**The fourth instance is the one to study, because the surface reading was a *fix*,
+not a defect.** `export PATH := $(CURDIR)/.venv/bin:$(PATH)` is the obvious way to
+point a Makefile at a pinned venv, it reads correctly, and `make showpath` prints
+the exported value — three independent signals all agreeing. It still did not work:
+GNU make 3.81 direct-execs any recipe line with no shell metacharacters and resolves
+the binary against its own startup PATH, so `ruff check .` kept using the ambient
+ruff while `mypy …; status=$$?` used the venv. Nothing short of running a recipe
+against a stub binary would have shown that.
+
+So the rule extends: **a fix that looks right is a claim too.** Name the command that
+would show it does not work, and prefer a test that *executes* the thing over one that
+reads it. A grep asserting the Makefile "contains the PATH line" would have passed on
+a change that fixed nothing, and the gate would have stayed silently broken.
+
 This is a *habit*, not a `check_all()` rule — there is no artefact to pattern-match
-against. It is recorded here because three instances make it a class, not an
+against. It is recorded here because four instances make it a class, not an
 accident.
 
 ## Red Flags

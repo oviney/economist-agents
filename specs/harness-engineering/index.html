@@ -1,0 +1,3141 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Multi-agent content pipeline that generates Economist-style articles with autonomous research, writing, illustration, and deployment">
+      
+      
+      
+        <link rel="canonical" href="https://oviney.github.io/economist-agents/specs/harness-engineering/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Spec: Harness engineering — close the sensor loop (B-030 … B-034) - Economist Agents</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#spec-harness-engineering-close-the-sensor-loop-b-030-b-034" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Economist Agents" class="md-header__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Economist Agents
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Spec: Harness engineering — close the sensor loop (B-030 … B-034)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="amber"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/oviney/economist-agents" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    oviney/economist-agents
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../agent-registry-spec/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../adr/0001-extract-agent-definitions-to-yaml/" class="md-tabs__link">
+          
+  
+  
+  ADRs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../workflow-lifecycle/" class="md-tabs__link">
+          
+  
+  
+  Skills
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../guides/WORKFLOW_GUIDE/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../AGENT_PROMPT_PATTERNS/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../AGENT_VELOCITY_ANALYSIS/" class="md-tabs__link">
+          
+  
+  
+  Performance
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Economist Agents" class="md-nav__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Economist Agents
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/oviney/economist-agents" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    oviney/economist-agents
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../agent-registry-spec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../FLOW_ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../AUTONOMOUS_ORCHESTRATION_STRATEGY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autonomous Orchestration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ARCHITECTURE_PATTERNS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ARCHITECTURE_REVIEW_PROCESS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Review Process
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADRs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADRs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0001-extract-agent-definitions-to-yaml/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0001 — Extract Agent Definitions to YAML
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0002-agent-registry-pattern/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0002 — Agent Registry Pattern (Superseded)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0003-phased-crewai-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0003 — Phased CrewAI Migration (Superseded)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0004-python-version-constraint/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0004 — Python Version Constraint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0005-agile-discipline-enforcement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0005 — Agile Discipline Enforcement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0006-agent-framework-selection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0006 — Agent Framework Selection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0007-content-intelligence-engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0007 — Content Intelligence Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0008-agent-skill-governance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0008 — Agent Skill Governance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0009-architecture-audit-rubric/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0009 — Architecture Audit Rubric
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0010-scripts-to-src-migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0010 — Scripts to src Migration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0011-opt-in-recursive-deep-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0011 — Opt-In Recursive Deep Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0012-retire-agent-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0012 — Retire the AgentRegistry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0013-keyless-claude-web-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0013 — Keyless claude_web Research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0014-retire-paid-github-actions-generation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0014 — Retire Paid GitHub Actions Generation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0015-local-first-verification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0015 — Local-First Verification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0016-single-pipeline-path/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0016 — One Pipeline Path
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0017-gate-publishable-content-at-deploy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0017 — Gate Publishable Content at Deploy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0018-editorial-review-gate/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0018 — Editorial Review Gate
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Skills
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Skills
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflow-lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow Lifecycle (addyosmani/agent-skills)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../skills/using-agent-skills/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Using Agent Skills
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_3" id="__nav_5_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Domain (economist-agents)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Domain (economist-agents)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../skills/adr-governance/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR Governance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../skills/agent-delegation/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Delegation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../skills/agent-traceability/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Traceability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../skills/architecture-patterns/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../skills/article-evaluation/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Article Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../skills/blog-post-review/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog Post Review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../skills/defect-prevention/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Defect Prevention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../skills/devops/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DevOps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../skills/economist-writing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Economist Writing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../skills/editorial-illustration/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Editorial Illustration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../skills/mcp-development/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../skills/observability/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../skills/python-quality/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python Quality
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../skills/quality-gates/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quality Gates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../skills/research-sourcing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research Sourcing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../skills/testing/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../skills/visual-qa/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visual QA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/WORKFLOW_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/BLOG_DEPLOYMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/COPILOT_SYNC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Copilot Sync
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/CI_MONITORING_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CI Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/PYTHON_VERSION_TROUBLESHOOTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/IMPLEMENTATION_ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/VALIDATION_QUICK_REF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation Quick Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../AGENT_PROMPT_PATTERNS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Prompt Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../AGENT_QUALITY_GATES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quality Gates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../DEFINITION_OF_DONE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Definition of Done
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../DEFECT_PREVENTION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Defect Prevention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CHART_DESIGN_SPEC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chart Design Spec
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Performance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../AGENT_VELOCITY_ANALYSIS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Velocity Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../SPRINT_DISCIPLINE_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint Discipline Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#assumptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Assumptions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objective
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commands
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#project-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Project structure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-style" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code style
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing strategy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#boundaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Boundaries
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-five-items" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The five items
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The five items">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#b-030-wire-the-sensors-into-the-agents-loop-hooks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B-030 · Wire the sensors into the agent's loop (hooks)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-031-make-the-inert-sensors-honest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B-031 · Make the inert sensors honest
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-032-a-complexity-sensor-with-a-tuned-message" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B-032 · A complexity sensor with a tuned message
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-033-make-the-guide-layer-measurable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B-033 · Make the guide layer measurable
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-034-shrink-the-tool-surface-to-what-the-guides-permit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B-034 · Shrink the tool surface to what the guides permit
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-order" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation order
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#success-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Success criteria
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions-for-the-owner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open questions for the owner
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="spec-harness-engineering-close-the-sensor-loop-b-030-b-034">Spec: Harness engineering — close the sensor loop (B-030 … B-034)<a class="headerlink" href="#spec-harness-engineering-close-the-sensor-loop-b-030-b-034" title="Permanent link">&para;</a></h1>
+<p><strong>Status:</strong> DRAFT — implemented same session under the owner's autonomous mandate
+<strong>Date:</strong> 2026-07-29
+<strong>Assessment:</strong> <code>docs/reviews/harness-engineering-assessment-2026-07-29.md</code>
+<strong>Source framework:</strong> SE Radio 730 — Birgitta Boeckeler on harness engineering
+<strong>Related open items:</strong> B-028 (a guide the default ignores), B-029 (an oracle that cannot fail)</p>
+<hr />
+<h2 id="assumptions">Assumptions<a class="headerlink" href="#assumptions" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Harness layer only.</strong> This spec changes the Claude Code harness (<code>.claude/</code>,
+   <code>.mcp.json</code>, <code>.pre-commit-config.yaml</code>, <code>ruff.toml</code>, <code>scripts/hooks/</code>). It does not
+   change the content pipeline's behaviour. B-028's own fix (<code>deploy_to_blog.py</code>
+   <code>default="post"</code>) stays with B-028; B-030 makes the policy unskippable from the harness
+   side regardless of that default.</li>
+<li><strong>Keyless throughout.</strong> Every sensor added here is <code>ruff</code>, <code>git</code>, <code>pytest</code>, or Python
+   stdlib. No new dependency, no key, no paid service. Constraints #1–#3 hold by
+   construction.</li>
+<li><strong><code>.claude/settings.json</code> is committed; <code>.claude/settings.local.json</code> stays personal.</strong>
+   Hooks are team policy and must be in version control. The existing 122-entry permission
+   allowlist stays in <code>settings.local.json</code> untouched.</li>
+<li><strong>The <code>Stop</code> gate must be bounded.</strong> An unbounded blocking <code>Stop</code> hook can trap a
+   session in a loop. It blocks <strong>at most once per session</strong>, keyed by <code>session_id</code>.</li>
+<li><strong>Pre-existing violations are not a wall.</strong> 41 <code>C901</code> + 75 <code>PLR09xx</code> violations exist
+   today. The complexity sensor is scoped to <em>files the agent just touched</em>, not the whole
+   tree, and ships with a recorded-override path.</li>
+</ol>
+<h2 id="objective">Objective<a class="headerlink" href="#objective" title="Permanent link">&para;</a></h2>
+<p>The repo has a strong sensor inventory and no wiring: every sensor fires at the owner's
+gate (<code>pre-commit</code>, <code>make ci-local</code>), so the owner performs the triage an agent could have
+performed mid-session. Success is that <strong>the agent gets the feedback first</strong>, that
+<strong>sensors which cannot fail are either fixed or removed</strong>, and that <strong>the guide layer
+becomes measurable</strong> so it can shrink.</p>
+<p>Concretely, when this is done:</p>
+<ul>
+<li>Editing a Python file produces lint + complexity feedback <em>inside the session</em>.</li>
+<li>Introducing a forbidden API key or an unreviewed publish is <strong>denied by the harness</strong>,
+  not merely discouraged by prose.</li>
+<li>Ending a turn with a red tree is caught by the harness once, with a reason.</li>
+<li>Sensor state is recorded per session so "did violations spike mid-session?" is answerable.</li>
+<li>Every pre-commit hook can actually fail.</li>
+<li>Any skill can be evaluated with/without and deleted if it does not move a score.</li>
+</ul>
+<h2 id="commands">Commands<a class="headerlink" href="#commands" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># The gate (unchanged, still the merge authority)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>make<span class="w"> </span>ci-local
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># New: complexity sensor, standalone</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>scripts.complexity_sensor<span class="w"> </span>src/agent_sdk/stage3_runner.py
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>scripts.complexity_sensor<span class="w"> </span>--changed<span class="w">        </span><span class="c1"># git-diff scoped</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1"># New: skill eval harness</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>scripts.skill_eval<span class="w"> </span>--list
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>scripts.skill_eval<span class="w"> </span>--skill<span class="w"> </span>economist-writing
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="c1"># New: hook scripts are exercised by piping the documented stdin payload</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;{&quot;session_id&quot;:&quot;t&quot;,&quot;tool_name&quot;:&quot;Edit&quot;,&quot;tool_input&quot;:{&quot;file_path&quot;:&quot;scripts/foo.py&quot;}}&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>scripts.hooks.post_edit_sensor
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="c1"># Tests for everything added here</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>.venv/bin/pytest<span class="w"> </span>tests/test_harness_hooks.py<span class="w"> </span>tests/test_complexity_sensor.py<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">                 </span>tests/test_skill_eval.py<span class="w"> </span>tests/test_harness_config.py<span class="w"> </span>-q
+</code></pre></div>
+<h2 id="project-structure">Project structure<a class="headerlink" href="#project-structure" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>.claude/settings.json              → NEW, committed: the hook wiring (team policy)
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>scripts/hooks/__init__.py          → NEW: hook package
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>scripts/hooks/_io.py               → NEW: stdin/stdout JSON contract, shared
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>scripts/hooks/post_edit_sensor.py  → NEW: PostToolUse — format, lint, complexity
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>scripts/hooks/guard_constraints.py → NEW: PreToolUse — deny forbidden keys / unreviewed publish
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>scripts/hooks/session_gate.py      → NEW: Stop — bounded red-tree gate
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>scripts/hooks/session_context.py   → NEW: SessionStart — constraints + branch + open items
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>scripts/complexity_sensor.py       → NEW: C901/PLR wrapper with the tuned message
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>scripts/skill_eval.py              → NEW: with/without skill eval harness
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>logs/sensor_history.jsonl          → NEW (gitignored): per-session sensor snapshots
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>docs/harness-overrides.md          → NEW: the recorded-override register
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>tests/test_harness_hooks.py        → NEW
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>tests/test_complexity_sensor.py    → NEW
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>tests/test_skill_eval.py           → NEW
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>tests/test_harness_config.py       → NEW: asserts config invariants (no inert hooks, no forbidden keys)
+</code></pre></div>
+<h2 id="code-style">Code style<a class="headerlink" href="#code-style" title="Permanent link">&para;</a></h2>
+<p>Repo standards apply (<code>skills/python-quality</code>): type hints mandatory, docstrings required,
+<code>orjson</code> not <code>json</code>, <code>logger</code> not <code>print()</code>. Hook scripts are the one place a
+<code>print()</code>-shaped write is correct, because <strong>stdout is the hook's return channel</strong> — so
+they use an explicit <code>sys.stdout.write</code> of an <code>orjson</code>-serialised payload, never a bare
+<code>print</code> for logging.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">emit</span><span class="p">(</span><span class="n">payload</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Write a hook response to stdout — the harness&#39;s only return channel.</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="sd">    Hooks communicate by serialising JSON to stdout; logging must go to stderr so it</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="sd">    cannot corrupt the payload.</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">orjson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+</code></pre></div>
+<p>A hook must <strong>never</strong> crash the session. Every entry point wraps its body and exits 0 with
+an empty payload on unexpected failure — a broken sensor degrades to no sensor, never to a
+blocked developer.</p>
+<h2 id="testing-strategy">Testing strategy<a class="headerlink" href="#testing-strategy" title="Permanent link">&para;</a></h2>
+<p><code>pytest</code>, tests in <code>tests/</code>, no network (<code>tests/_netguard.py</code> already enforces this).
+Every hook is tested by <strong>piping its documented stdin payload</strong> and asserting on the
+parsed stdout payload — the same contract the harness uses, so a passing test means the
+hook works, not that its internals are reachable.</p>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Level</th>
+<th>Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hook JSON contract</td>
+<td>unit</td>
+<td><code>test_harness_hooks.py</code> — payload in, payload out, for every hook</td>
+</tr>
+<tr>
+<td>Deny decisions</td>
+<td>unit</td>
+<td>forbidden-key Bash, <code>--mode post</code> deploy, and their allowed twins</td>
+</tr>
+<tr>
+<td><code>Stop</code> bounding</td>
+<td>unit</td>
+<td>second call in the same session must not block</td>
+</tr>
+<tr>
+<td>Never-crash guarantee</td>
+<td>unit</td>
+<td>malformed stdin → exit 0, empty payload</td>
+</tr>
+<tr>
+<td>Complexity message</td>
+<td>unit</td>
+<td>violation → judgment-call text + override instruction present</td>
+</tr>
+<tr>
+<td>Config invariants</td>
+<td>unit</td>
+<td><code>test_harness_config.py</code> — no <code>\|\| true</code> hook, no duplicate hook id, no forbidden key in <code>.mcp.json</code>, hooks present in <code>.claude/settings.json</code></td>
+</tr>
+<tr>
+<td>Skill eval</td>
+<td>unit</td>
+<td>scenario scoring is deterministic and with/without produces a delta</td>
+</tr>
+</tbody>
+</table>
+<p>Coverage: <code>make ci-local</code> thresholds are authoritative (70% overall, 90% <code>src/quality</code>).
+New code must not lower them.</p>
+<h2 id="boundaries">Boundaries<a class="headerlink" href="#boundaries" title="Permanent link">&para;</a></h2>
+<p><strong>Always</strong>
+- Keep every hook exit-0-on-error. A sensor may report; it may not break the session.
+- Bound anything that blocks. <code>Stop</code> blocks once per session, maximum.
+- Scope edit-time sensors to the touched file, never the whole tree.
+- Make the message actionable: what is wrong, what the judgment call is, how to record an
+  override.</p>
+<p><strong>Ask first</strong>
+- Raising <code>max-complexity</code> above 10, or adding a blanket <code>noqa</code> instead of a recorded
+  override.
+- Deleting any skill that a <code>B-033</code> eval says is inert (the eval informs the owner; it does
+  not license deletion).
+- Any change to <code>deploy_to_blog.py</code>'s own default — that is B-028's decision to make.</p>
+<p><strong>Never</strong>
+- Add a sensor that cannot fail. If it can only pass, delete it instead.
+- Add a hook that requires an API key, a paid service, or network access.
+- Weaken <code>ci-local</code> to make a new sensor green.
+- Reintroduce <code>image-generator</code> / <code>web-researcher</code> to <code>.mcp.json</code>.</p>
+<hr />
+<h2 id="the-five-items">The five items<a class="headerlink" href="#the-five-items" title="Permanent link">&para;</a></h2>
+<h3 id="b-030-wire-the-sensors-into-the-agents-loop-hooks">B-030 · Wire the sensors into the agent's loop (hooks)<a class="headerlink" href="#b-030-wire-the-sensors-into-the-agents-loop-hooks" title="Permanent link">&para;</a></h3>
+<p><strong>Problem.</strong> Zero hooks. No project <code>.claude/settings.json</code>. Every sensor fires at the
+owner's gate.</p>
+<p><strong>Change.</strong> Commit <code>.claude/settings.json</code> with five hook wirings:</p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Matcher</th>
+<th>Script</th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PostToolUse</code></td>
+<td><code>Edit\|Write</code></td>
+<td><code>scripts.hooks.post_edit_sensor</code></td>
+<td>On <code>*.py</code>: <code>ruff format</code> + <code>ruff check --fix</code> the file, then report anything left plus complexity findings as <code>additionalContext</code>. Records a snapshot.</td>
+</tr>
+<tr>
+<td><code>PreToolUse</code></td>
+<td><code>Bash</code></td>
+<td><code>scripts.hooks.guard_constraints</code></td>
+<td><code>permissionDecision: "deny"</code> for forbidden-key introduction and for <code>deploy_to_blog</code> without <code>--mode review</code>.</td>
+</tr>
+<tr>
+<td><code>PreToolUse</code></td>
+<td><code>Write\|Edit</code></td>
+<td><code>scripts.hooks.guard_constraints</code></td>
+<td>Same deny set, for the file-write path (e.g. writing a key into <code>.env.example</code> or <code>.mcp.json</code>).</td>
+</tr>
+<tr>
+<td><code>Stop</code></td>
+<td>—</td>
+<td><code>scripts.hooks.session_gate</code></td>
+<td>If tracked Python files are dirty and <code>ruff check</code> is red, <code>decision: "block"</code> <strong>once per session</strong> with the violations as the reason.</td>
+</tr>
+<tr>
+<td><code>SessionStart</code></td>
+<td>—</td>
+<td><code>scripts.hooks.session_context</code></td>
+<td>Injects the five non-negotiable constraints, the branch, and open <code>B-</code> items as <code>additionalContext</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Acceptance</strong>
+- <code>jq -e '.hooks.PostToolUse[].hooks[].command' .claude/settings.json</code> exits 0.
+- Piping the documented payload to each hook returns a valid payload and exit 0.
+- A forbidden-key Bash command is denied; <code>git status</code> is not.
+- A <code>deploy_to_blog --mode post</code> command is denied; <code>--mode review</code> is not.
+- <code>session_gate</code> blocks on the first call and does not block on the second with the same
+  <code>session_id</code>.
+- Malformed stdin yields exit 0 and an empty payload for every hook.
+- <code>logs/sensor_history.jsonl</code> gains a line per recorded snapshot; the file is gitignored.</p>
+<p><strong>Revives.</strong> <code>scripts/agent_trace_logger.py</code>, currently dead code, becomes the snapshot
+writer — closing the observability gap the assessment flagged (§3.6).</p>
+<h3 id="b-031-make-the-inert-sensors-honest">B-031 · Make the inert sensors honest<a class="headerlink" href="#b-031-make-the-inert-sensors-honest" title="Permanent link">&para;</a></h3>
+<p><strong>Problem.</strong> Four sensors cannot fail (assessment §3.3), so a green run proves nothing.</p>
+<p><strong>Change</strong>
+1. <strong>mypy</strong> — remove <code>stages: [manual]</code>; run it on <code>scripts/</code> as a real pre-commit hook.
+   <code>mypy.ini</code> stays non-strict (611 known errors is a separate project), but the hook must
+   <em>fail on new errors in the files being committed</em>, which is what per-file pre-commit
+   invocation gives. <code>ci-local</code>'s advisory wrapper is retained deliberately and its comment
+   updated to say why: repo-wide mypy is known-red, per-commit mypy is not.
+2. <strong>coverage</strong> — delete the duplicate <code>pytest-coverage</code> manual hook. <code>make test</code>'s
+   threshold rises from 40 to 70 so it matches <code>ci-local</code>. One number, one place.
+3. <strong>badge validation</strong> — drop <code>|| true</code>. If <code>validate_badges.py</code> fails, the commit fails.
+4. <strong><code>validate-skills</code></strong> — delete the duplicate registration and the duplicated
+   <code>always_run: false</code> key.</p>
+<p><strong>Acceptance</strong>
+- <code>test_harness_config.py</code> asserts: no pre-commit hook entry contains <code>|| true</code>; no hook
+  <code>id</code> appears twice; <code>make test</code> and <code>ci-local</code> declare the same <code>--cov-fail-under</code>.
+- <code>pre-commit run --all-files</code> behaves as documented (a real failure fails).</p>
+<p><strong>Explicitly out of scope.</strong> B-029's oracle fix (<code>acceptance_blog_frontmatter.sh:120</code>). It
+is the same <em>class</em> of defect and is cross-referenced from both items, but it lives in the
+blog deploy path, not the harness, and B-029 owns it.</p>
+<h3 id="b-032-a-complexity-sensor-with-a-tuned-message">B-032 · A complexity sensor with a tuned message<a class="headerlink" href="#b-032-a-complexity-sensor-with-a-tuned-message" title="Permanent link">&para;</a></h3>
+<p><strong>Problem.</strong> <code>ruff.toml</code> regulates no complexity dimension. Measured: 41 <code>C901</code> (worst 33),
+28 <code>PLR0912</code>, 21 <code>PLR0913</code>, 18 <code>PLR0915</code>.</p>
+<p><strong>Change.</strong> <code>scripts/complexity_sensor.py</code> wraps
+<code>ruff check --select C901,PLR0911,PLR0912,PLR0913,PLR0915</code> and rewrites the output into a
+judgment-call message, per Boeckeler's ESLint technique:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>COMPLEXITY SENSOR — scripts/foo.py
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>  bar() is too complex (18 &gt; 10)
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>This is usually a smell. Consider: is this function doing more than one thing?
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>Can a branch become a guard clause, or a block become a named helper?
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>Make a judgment call. If the complexity is genuinely warranted — a dispatch table,
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>a parser, generated code, test data — you may keep it by recording an override in
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>docs/harness-overrides.md with a one-line justification. Do NOT add a bare noqa.
+</code></pre></div>
+<p><code>ruff.toml</code> gains <code>[lint.mccabe] max-complexity = 10</code> and the <code>C901</code>/<code>PLR09xx</code> selectors
+scoped via <code>[lint.per-file-ignores]</code> so the 41 pre-existing violations do not break
+<code>ci-local</code> on day one; the sensor is enforced on <strong>touched files</strong> through B-030's
+<code>PostToolUse</code> hook, which is where new complexity is actually born.</p>
+<p><strong>Acceptance</strong>
+- A synthetic over-complex function produces the judgment-call text and a non-zero exit.
+- A clean file produces no output and exit 0.
+- <code>--changed</code> scopes to <code>git diff --name-only</code> and skips non-Python paths.
+- <code>make ci-local</code> still passes — the legacy backlog is recorded, not enforced retroactively.
+- <code>docs/harness-overrides.md</code> exists with the register's format and the day-one baseline.</p>
+<h3 id="b-033-make-the-guide-layer-measurable">B-033 · Make the guide layer measurable<a class="headerlink" href="#b-033-make-the-guide-layer-measurable" title="Permanent link">&para;</a></h3>
+<p><strong>Problem.</strong> 8,031 lines of <code>SKILL.md</code> have never been measured. Boeckeler's point is that
+many skills are model-authored and the model may already know their content.</p>
+<p><strong>Change.</strong> <code>scripts/skill_eval.py</code> — a with/without harness:</p>
+<ul>
+<li><code>--list</code> enumerates skills with their line count and last-modified date (the cheap
+  triage: big + old + never-referenced is the deletion candidate).</li>
+<li><code>--skill &lt;name&gt;</code> runs the skill's declared scenarios twice — context with the skill, and
+  context without it — scoring each output with the existing deterministic scorer
+  (<code>scripts/article_evaluator.py</code> for content skills; a rubric hook for others) and reports
+  the delta.</li>
+<li>Scenarios live in <code>skills/&lt;name&gt;/eval.yaml</code>; a skill with no <code>eval.yaml</code> reports
+  <code>UNMEASURED</code> rather than passing silently.</li>
+</ul>
+<p><strong>Acceptance</strong>
+- <code>--list</code> reports all 38 skills, sorted by line count descending.
+- A skill with an <code>eval.yaml</code> produces a with/without delta.
+- A skill without one reports <code>UNMEASURED</code> and exits non-zero under <code>--strict</code>.
+- The harness makes <strong>no LLM call by default</strong> (<code>--dry-run</code> is the default; scoring is
+  deterministic) so it is free to run and cannot fail on auth.</p>
+<p><strong>Non-goal.</strong> Deleting skills. This item produces the evidence; the owner decides.</p>
+<h3 id="b-034-shrink-the-tool-surface-to-what-the-guides-permit">B-034 · Shrink the tool surface to what the guides permit<a class="headerlink" href="#b-034-shrink-the-tool-surface-to-what-the-guides-permit" title="Permanent link">&para;</a></h3>
+<p><strong>Problem.</strong> <code>.mcp.json</code> ships <code>image-generator</code> (<code>OPENAI_API_KEY</code>) and <code>web-researcher</code>
+(<code>SERPER_API_KEY</code>), both prohibited; <code>enableAllProjectMcpServers: true</code> loads them every
+session. The harness offers tools its own guides forbid.</p>
+<p><strong>Change</strong>
+1. Delete the <code>image-generator</code> entry from <code>.mcp.json</code> (genuinely DALL-E, genuinely needs
+   the key).
+2. <strong>Corrected during implementation:</strong> <code>web_researcher_server.py</code> is <em>already keyless</em> —
+   #438 stripped the Serper leg and the module now exposes only <code>search_arxiv</code> and
+   <code>fetch_page</code>, both permitted by constraint #3. Deleting the server would have removed a
+   legitimate keyless research tool. Only the stale <code>env</code> block and the misleading
+   description were removed; the server stays. This is why the spec is a living document:
+   the original plan was wrong about the code.
+3. Replace <code>enableAllProjectMcpServers: true</code> with <code>enabledMcpjsonServers</code> naming the six
+   keyless servers explicitly.
+4. <code>test_harness_config.py</code> asserts no forbidden key name appears in <code>.mcp.json</code>, and
+   additionally that <strong>no server declares any <code>env</code> block at all</strong> — an env requirement is
+   a key requirement in disguise, so the stricter invariant is the durable one.</p>
+<p><strong>Acceptance</strong>
+- <code>.mcp.json</code> contains exactly the six keyless servers.
+- No <code>OPENAI_API_KEY</code> / <code>SERPER_API_KEY</code> / <code>GEMINI_API_KEY</code> in <code>.mcp.json</code>.
+- No MCP server declares an <code>env</code> requirement.
+- The config test fails if any is reintroduced.</p>
+<p><strong>Scope call:</strong> <code>mcp_servers/image_generator_server.py</code> and its passing test are left in
+place. The finding was that the <em>harness offers</em> a forbidden tool; deleting the entry closes
+that. Moving the module would churn a green test suite for no harness benefit, and ADR-0014
+already retired the workflow. Retiring the dead module is a separate cleanup.</p>
+<hr />
+<h2 id="implementation-order">Implementation order<a class="headerlink" href="#implementation-order" title="Permanent link">&para;</a></h2>
+<p><code>B-034</code> → <code>B-031</code> → <code>B-032</code> → <code>B-030</code> → <code>B-033</code>.</p>
+<p>Highest <em>leverage</em> is B-030, but it is not first: B-034 and B-031 are near-zero-risk
+cleanups that shrink the surface B-030 must reason about, and B-032 supplies the sensor
+B-030's <code>PostToolUse</code> hook calls. B-033 is last because its value depends on the session
+recording B-030 introduces.</p>
+<h2 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[ ] <code>.claude/settings.json</code> is committed and every hook returns a valid payload for its
+      documented stdin.</li>
+<li>[ ] A forbidden key and an unreviewed publish are <strong>denied</strong>, not discouraged.</li>
+<li>[ ] <code>Stop</code> blocks a red tree once per session, never twice.</li>
+<li>[ ] No pre-commit hook can pass unconditionally.</li>
+<li>[ ] <code>make test</code> and <code>make ci-local</code> agree on one coverage threshold.</li>
+<li>[ ] The complexity sensor emits the judgment-call message and an override path.</li>
+<li>[ ] <code>.mcp.json</code> holds only keyless servers, enforced by a test.</li>
+<li>[ ] <code>scripts/skill_eval.py --list</code> reports all 38 skills; unmeasured skills say so.</li>
+<li>[ ] <code>logs/sensor_history.jsonl</code> records snapshots via the revived trace logger.</li>
+<li>[ ] <code>make ci-local</code> passes.</li>
+</ul>
+<h2 id="open-questions-for-the-owner">Open questions for the owner<a class="headerlink" href="#open-questions-for-the-owner" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong><code>Stop</code> gate strictness.</strong> It currently blocks only on <code>ruff check</code> failure over dirty
+   tracked Python files. Should it also block on a failing <em>test</em> for those files? That is
+   stronger and slower; it is one line to enable.</li>
+<li><strong>mypy per-commit.</strong> B-031 makes mypy blocking per-commit while leaving repo-wide mypy
+   advisory. The alternative is deleting "Type hints mandatory" from <code>CLAUDE.md</code> and letting
+   the sensor define the standard. Item shipped with the former; say the word for the latter.</li>
+<li><strong>Skill deletion.</strong> B-033 will likely find that <code>.github/copilot-instructions.md</code>
+   (2,601 lines) and several skills are inert. Deletion needs your call, per Boundaries.</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

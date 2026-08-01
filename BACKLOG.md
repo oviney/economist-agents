@@ -587,6 +587,66 @@ clone is green *and* honest about not having seen a real artifact.
 but not its text. Inferring headings from class names would be guessing at whatever CSS a
 given conversation emitted; promoting one is a one-character edit in the brief.
 
+### B-039 · The merge gate runs whatever toolchain the machine happens to have
+
+**Opened 2026-08-01**, found by `make ci-local` failing on a file the session never touched.
+
+ADR-0015 makes `make ci-local` *the* merge gate — there is no GitHub Actions, and `main` is
+unprotected. So the gate has to mean the same thing on every machine and in every shell. It
+does not. Every recipe resolves its tools from ambient `PATH`, not from the venv this repo
+pins, and line 51 (`.venv/bin/python scripts/mypy_baseline.py`) shows someone already hit
+this and patched the one line instead of the class.
+
+Three symptoms, all measured on 2026-08-01, not inferred:
+
+| Symptom | Measured |
+|---|---|
+| **The gate lints with an unpinned ruff.** `requirements-dev.txt` pins `ruff==0.14.10` *exactly*; the gate ran homebrew's **0.15.9** and demanded a reformat of `tests/test_mypy_baseline.py`, which no one had edited. | `ruff --version` → 0.15.9 ambient vs 0.14.10 in `.venv` |
+| **The gate cannot run in a clean shell at all.** Line 49 calls bare `python`, which does not exist on macOS outside an activated venv. | `make ci-local` → `/bin/sh: python: command not found`, Error 127 |
+| **The advisory mypy step reports a missing tool as a pass.** `(mypy scripts/ \|\| echo "advisory")` swallows exit 127 exactly like exit 1, so "mypy found 187 errors" and "mypy was never installed" print the same line. `mypy` and `bandit` are both absent from ambient `PATH` here. | `sh -c '(mypy scripts/ \|\| echo advisory)'` → `mypy: command not found` then the advisory text, exit 0 |
+
+The third is the serious one, and it is **B-031's complaint exactly**: a sensor that cannot
+distinguish "I ran and found problems" from "I never ran". The first is B-037's sibling — that
+item found four declarations of the Python version disagreeing with the interpreter actually
+running the suite; this is the same drift one level down, in the *tool* versions.
+
+**Fix:** put `.venv/bin` first on `PATH` for the whole Makefile, guard every tool-running
+target behind a `require-venv` check that fails loudly rather than falling through to ambient
+binaries, and split the mypy advisory into its own target that distinguishes exit >1 (did not
+run — fail the gate) from exit 1 (type errors — advisory, as intended).
+
+- [x] `make ci-local` resolves ruff, mypy, pytest, bandit and coverage from `.venv/bin`
+- [x] A missing venv fails with an instruction, instead of silently using ambient tools
+- [x] The mypy advisory step fails the gate when mypy did not run
+- [x] Regression tests that *execute* the Makefile against stub tools, not greps of its text
+
+**Scope:** S. **Files:** `Makefile`, `tests/test_ci_gate_is_reproducible.py`.
+
+**DONE 2026-08-01. The obvious fix did not work, and only a running test caught it.**
+
+`export PATH := $(CURDIR)/.venv/bin:$(PATH)` is the one-line fix everyone reaches for, it
+reads correctly, and `make showpath` confirms the exported value. It still left `ruff check .`
+running the ambient ruff. **GNU make 3.81 — what macOS ships — direct-execs any recipe line
+containing no shell metacharacters, and resolves the binary against make's own startup PATH
+rather than the exported one.** So `mypy ...; status=$$?` used the venv (it has a `;`, so a
+shell runs it) while `ruff check .` did not. The fix is to name `$(VENV_BIN)/<tool>`
+explicitly in every recipe; the `export PATH` stays, but only for what *child* processes
+look up.
+
+A grep-the-Makefile test would have passed the moment the plausible-looking line was
+written. The test that executes `make lint` against a stub `ruff` failed, which is the whole
+argument for behavioural sensors — and the **fourth** instance of the pattern in
+`skills/defect-prevention/SKILL.md`: asserting from a plausible reading instead of measuring.
+
+Verified from a bare shell (`env -i PATH=/usr/bin:/bin:/opt/homebrew/bin make ci-local`,
+no activated venv, no PATH prefix): green, 2,680 tests. Before this change that invocation
+died at step 3 with `python: command not found`.
+
+Mutation-checked, so the new sensor is not decorative: the old
+`(mypy … || echo "advisory")` form exits **0** against a `mypy` stub that exits 127; the new
+form exits non-zero. `make install` now creates the venv if it is absent, so require-venv's
+instruction points at a target that actually works from nothing.
+
 ### B-036 · Badge validation has no implementation — decide whether to restore it
 
 **Opened 2026-07-31**, found by B-031 doing its job.

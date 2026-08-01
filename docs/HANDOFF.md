@@ -72,16 +72,36 @@ unfixed, both one-edit-away in the brief: semantic styling carried only by CSS c
 (`div.card-header`) becomes a plain paragraph, and an artifact with no `<a href>` produces a
 brief with no citations, which the writer path and `citation_verifier` will notice downstream.
 
+## B-039 — the merge gate now runs the pinned toolchain
+
+**Fixed 2026-08-01.** `make ci-local` resolved its tools from ambient `PATH`, so the gate did
+not mean the same thing twice: it linted with homebrew's ruff 0.15.9 while
+`requirements-dev.txt` pins `ruff==0.14.10` exactly, it could not run at all in a shell
+without an activated venv (bare `python`), and its advisory mypy step printed the same
+reassuring line for "found 187 errors" and "mypy is not installed".
+
+Every recipe now names `$(VENV_BIN)/<tool>` explicitly, `require-venv` fails with an
+instruction instead of falling through to ambient binaries, `make install` creates the venv
+if it is missing, and `mypy-advisory` is its own target that fails the gate on exit >1.
+
+**The trap, worth knowing before you touch the Makefile:** `export PATH := …/.venv/bin:$(PATH)`
+does *not* do the job on its own, however right it looks. GNU make 3.81 (what macOS ships)
+direct-execs recipe lines with no shell metacharacters and resolves them against its own
+startup PATH — so `ruff check .` kept using ambient ruff while `mypy …; status=$$?` used the
+venv. `tests/test_ci_gate_is_reproducible.py` executes `make` against stub binaries for
+exactly this reason; a grep of the Makefile would have passed on the broken fix. Recorded as
+the fourth instance in `skills/defect-prevention/SKILL.md`.
+
+Verified from a bare shell — `env -i PATH=/usr/bin:/bin:/opt/homebrew/bin make ci-local` —
+green at 2,680 tests, where that same invocation previously died at step 3.
+
 ## State in one paragraph
 
-Two work streams are open, stacked, and **both are complete and green**. The **article-two
-defect stream** sits on `fix/article-two-run-defects` (PR #459 → `main`): B-028 Tasks 1–2,
-B-029 and the editorial-review-gate artifacts all landed 2026-07-31, and `main` has been
-merged in, so the conflict that was blocking the stack is gone. The **harness engineering
-stream** sits on `harness/close-the-sensor-loop` (PR #460 → #459) with B-030 … B-035.
-`make ci-local` passes on both. Nothing is broken and nothing is loose on disk.
-
-**Merge #459 first, then #460.**
+**Both stacked streams merged to `main` on 2026-08-01 and their branches are deleted.**
+PR #459 (article-two defects: B-028 Tasks 1–2, B-029, the editorial-review-gate artifacts)
+and PR #460 (harness engineering: B-030 … B-035, plus B-038) are in. Merge commits, not
+rebases — #459 carried a merge of `main`, which GitHub refuses to rebase. `make ci-local` is
+green on `main` at 2,680 tests. No open PRs. Nothing is loose on disk.
 
 ## Branches and PRs
 

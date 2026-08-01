@@ -1,4 +1,4 @@
-.PHONY: install test lint format type-check mypy-advisory quality ci-local clean help publish require-venv
+.PHONY: install test lint format type-check mypy-advisory quality ci-local clean help art publish require-venv
 
 # B-039: ADR-0015 makes `make ci-local` THE merge gate — there is no GitHub Actions and
 # main is unprotected — so it has to mean the same thing on every machine and in every
@@ -107,6 +107,10 @@ ci-local: require-venv
 	@echo "── destructive-change guard ──" && $(PY) scripts/destructive_change_guard.py
 	@echo "── sensor proofs ──"           && $(PY) scripts/check_sensor_proofs.py
 	@echo "✅ ci-local passed — you are the merge gate (main is unprotected)."
+
+art: require-venv
+	@if [ -z "$(SLUG)" ]; then echo "Usage: make art SLUG=<slug>"; exit 2; fi
+	$(PY) -m scripts.finalise_art --slug $(SLUG)
 
 publish: require-venv
 	@if [ -z "$(SLUG)" ]; then echo "Usage: make publish SLUG=<slug>"; exit 2; fi

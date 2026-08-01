@@ -145,10 +145,14 @@ class TestRunPipeline:
 class TestRoiTelemetryWiring:
     """Issue #333 AC2: run_pipeline records cost via ROITracker."""
 
-    def test_pipeline_records_writer_and_graphics_cost_in_roi_log(
+    def test_pipeline_records_writer_cost_in_roi_log(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """Writer + graphics costs from PipelineResult land in execution_roi.json."""
+        """Writer cost from PipelineResult lands in execution_roi.json.
+
+        B-042 removed the graphics entry with the graphics stage. A stage that
+        can only ever log $0.00 is the always-zero reading B-041 objected to.
+        """
         from src.telemetry.roi_tracker import ROITracker
 
         # Isolate the cost log and the ROI tracker singleton.
@@ -175,15 +179,14 @@ class TestRoiTelemetryWiring:
         assert len(executions) == 1, "Expected one pipeline execution in ROI log"
         execution = executions[0]
         assert execution["agent"] == "pipeline"
-        # Total recorded cost equals writer + graphics from the SDK, not a
+        # Recorded cost is the SDK's own writer figure, not a
         # token-times-pricing recomputation.
-        assert execution["total_cost_usd"] == pytest.approx(
-            stage3.writer_cost_usd + stage3.graphics_cost_usd
-        )
-        # Both calls are individually recorded so per-model attribution holds.
+        assert execution["total_cost_usd"] == pytest.approx(stage3.writer_cost_usd)
         models = [call["model"] for call in execution["llm_calls"]]
         assert stage3.writer_model in models
-        assert stage3.graphics_model in models
+        assert len(execution["llm_calls"]) == 1, (
+            "a graphics entry would mean the deleted stage is back"
+        )
 
     def test_pipeline_returns_result_when_roi_logging_fails(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch

@@ -10,7 +10,6 @@ Verifies that:
 from __future__ import annotations
 
 import asyncio
-from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -81,18 +80,11 @@ class TestMalformedArticleError:
             patch(
                 "src.agent_sdk.stage3_runner.build_research_brief", return_value="brief"
             ),
+            # B-042: one model call, not two. The second was the graphics agent
+            # producing chart JSON; there is no graphics agent.
             patch(
                 "src.agent_sdk.stage3_runner._collect_text",
-                new=AsyncMock(
-                    side_effect=[
-                        (valid, 0.01),
-                        ('{"title":"Chart","data":[{"metric":"A","value":1}]}', 0.005),
-                    ]
-                ),
-            ),
-            patch(
-                "src.agent_sdk.stage3_runner.render_chart",
-                return_value=Path("output/charts/test.png"),
+                new=AsyncMock(side_effect=[(valid, 0.01)]),
             ),
         ):
             result = asyncio.run(run_stage3("AI Testing"))

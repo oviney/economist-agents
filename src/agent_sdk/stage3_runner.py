@@ -18,7 +18,6 @@ Design:
 from __future__ import annotations
 
 import asyncio
-import json
 import logging
 import os
 import re
@@ -47,17 +46,15 @@ from src.agent_sdk._shared import (
     _ALLOWED_MODELS as _ALLOWED_MODELS,
 )
 from src.agent_sdk._shared import (
-    GRAPHICS_AGENT_PROMPT,
     BudgetExceededError,
     ModelCallTimeoutError,
     build_research_brief,
     canonical_slug,
+    propose_chart_spec,
 )
 from src.agent_sdk._shared import (
     audit_article_stats as _audit_article_stats,
 )
-from src.agent_sdk.chart_renderer import ChartRenderError, render_chart
-from src.agent_sdk.hero_svg import HERO_IMAGES_DIR
 from src.agent_sdk.image_prompt_synth import PromptSynthError, compose_prompt
 from src.agent_sdk.research.claude_web import (
     brief_has_findings,
@@ -311,10 +308,9 @@ def _build_writer_prompt(topic: str, research_brief: str, style_section: str) ->
         f"concrete example or data point from the brief rather than adding "
         f"another heading or filler. End with a `## References` section "
         f"containing 3+ numbered citations.\n\n"
-        f"At least one paragraph in the body must reference the chart "
-        f"explicitly — write something like 'as the chart shows', "
-        f"'the chart makes clear', or 'the chart below illustrates'. "
-        f"This is required by the publication validator.\n\n"
+        f"Do NOT reference a chart, figure or graph. There is none to "
+        f"reference at writing time, and any chart is chosen and drawn later "
+        f"by the editor from the brief's own figures (B-042).\n\n"
         f"RESEARCH BRIEF (use ONLY these sources and statistics — do NOT "
         f"invent any statistics, researcher names, or URLs):\n\n"
         f"{research_brief}"
@@ -328,33 +324,25 @@ class Stage3Result:
 
     topic: str
     article: str
-    chart_data: dict
+    #: B-042: chart figures EXTRACTED from the brief for the owner to frame and
+    #: render, or ``None`` when the brief carries no numeric claim — which is a
+    #: first-class outcome meaning "no chart is warranted". Never model-authored;
+    #: the field it replaces (``chart_data``) held generated JSON, and that is
+    #: what invented four percentages.
+    chart_proposal: dict | None
     total_cost_usd: float
     writer_cost_usd: float
-    graphics_cost_usd: float
     research_cost_usd: float
     writer_model: str
-    graphics_model: str
     wall_seconds: float
     research_brief_chars: int
     article_chars: int
     stat_audit_removed: int
     writer_search_calls: int = 0  # #389: on-demand source searches the writer made
-    chart_path: Path | None = None  # #403 slice 1: rendered chart PNG
+    chart_spec_path: Path | None = None  # B-042: the proposal the owner edits
     prompt_path: Path | None = None  # #403 slice 3: image-prompt artefact
     slug: str = ""  # #403 slice 3: canonical slug for downstream resume
     image_prompt: str = ""  # #403 slice 3: the prompt text itself
-    hero_path: Path | None = None  # B-016b: Claude-drawn hero SVG
-    hero_critique: str = (
-        ""  # B-016b: unresolved composition defects (CLI exits non-zero)
-    )
-    hero_error: str = ""  # B-016b: why no hero exists (empty when hero_path is set)
-    # B-041: the hero's own spend. It dominates the run's duration and used to be
-    # invisible inside `wall_seconds`, so a 4-minute run and a 20-minute one were
-    # indistinguishable in the ledger.
-    hero_seconds: float = 0.0
-    hero_attempts: int = 0
-    hero_timeouts: int = 0
     #: B-024: the requested research mode yielded nothing and the deterministic
     #: providers supplied the brief. The article is sourced differently from the
     #: one commissioned, so the reviewer must be told rather than left to infer it.
@@ -592,132 +580,19 @@ async def _collect_text(
     return "".join(pieces), cost
 
 
-def _parse_chart_json(text: str) -> dict:
-    """Extract the chart dict from raw model output.
-
-    The model frequently wraps JSON in ```json fences``` — strip those,
-    then parse. On failure, fall back to embedding the raw text under
-    ``specification`` so downstream code does not crash.
-    """
-    cleaned = text.strip()
-    if cleaned.startswith("```"):
-        first_nl = cleaned.find("\n")
-        cleaned = cleaned[first_nl + 1 :] if first_nl != -1 else cleaned[3:]
-        cleaned = cleaned.removesuffix("```")
-        cleaned = cleaned.strip()
-    try:
-        return json.loads(cleaned)
-    except (json.JSONDecodeError, ValueError):
-        return {"specification": text}
-
-
-def _ensure_chart_title(chart_data: dict, article: str, topic: str) -> dict:
-    """Backfill a chart title when the graphics model omits one (BUG-043).
-
-    The chart is required downstream, so a missing/empty ``title`` must not crash
-    the render. The backfill is **data-descriptive and never the article
-    headline** (per B-007): prefer the chart's own ``subtitle`` (which describes
-    the data), else a neutral generic label. ``article``/``topic`` are accepted
-    for signature stability but deliberately not used as the title.
-    """
-    title = chart_data.get("title")
-    if isinstance(title, str) and title.strip():
-        return chart_data
-    subtitle = chart_data.get("subtitle")
-    derived = (
-        subtitle.strip()
-        if isinstance(subtitle, str) and subtitle.strip()
-        else "Key figures"
-    )[:80]
-    logger.warning("Graphics output had no chart title; backfilled %r", derived)
-    return {**chart_data, "title": derived}
-
-
-#: The graphics agent is as prone to malformed output as the writer, which gets
-#: _WRITER_MAX_ATTEMPTS. It had none, so one bad JSON spec killed the pipeline
-#: AFTER the writer had already succeeded and cost ~$0.85 (BUG-063, found by the
-#: B-020 acceptance run).
-_GRAPHICS_MAX_ATTEMPTS = 3
-
-
-async def _graphics_with_retry(
-    collect: Any,
-    graphics_prompt: str,
-    graphics_model: str,
-    graphics_budget_usd: float | None,
-    article: str,
-    topic: str,
-    chart_path: Path,
-) -> tuple[dict, float, int]:
-    """Generate a chart spec and render it, retrying a spec the renderer rejects.
-
-    Chart failures stay fatal — a missing chart leaves a broken body embed — but
-    "fatal" should mean "the agent could not produce a valid spec in N tries",
-    not "the first try was malformed".
-
-    Returns ``(chart_data, cost, attempts)``. Raises the last
-    :class:`ChartRenderError` when every attempt fails.
-    """
-    cost = 0.0
-    last_error: ChartRenderError | None = None
-    prompt = graphics_prompt
-
-    for attempt in range(1, _GRAPHICS_MAX_ATTEMPTS + 1):
-        # BUG-064: the cap is on the STAGE, not on one attempt. Hand each attempt
-        # the remaining balance — as the writer loop does — or three retries can
-        # spend three times the number the operator set.
-        remaining_budget = (
-            None
-            if graphics_budget_usd is None
-            else max(0.0, graphics_budget_usd - cost)
-        )
-        text, call_cost = await collect(
-            prompt,
-            GRAPHICS_AGENT_PROMPT,
-            model=graphics_model,
-            max_budget_usd=remaining_budget,
-            # Turn headroom: the subscription CLI can need >1 turn for the JSON
-            # (BUG-042). Kept small — no tools are exposed for graphics.
-            max_turns=4,
-            label=f"graphics (attempt {attempt}/{_GRAPHICS_MAX_ATTEMPTS})",
-        )
-        cost += call_cost
-        chart_data = _ensure_chart_title(_parse_chart_json(text), article, topic)
-        try:
-            render_chart(chart_data, chart_path)
-        except ChartRenderError as exc:
-            last_error = exc
-            logger.warning(
-                "Graphics attempt %s/%s produced an unrenderable spec: %s; retrying",
-                attempt,
-                _GRAPHICS_MAX_ATTEMPTS,
-                exc,
-            )
-            # Feed the renderer's own message back — without it the agent has no
-            # idea what to change and simply repeats itself.
-            prompt = (
-                f"{graphics_prompt}\n\nYour previous chart JSON was rejected by "
-                f"the renderer: {exc}\nReturn corrected JSON only."
-            )
-            continue
-        return chart_data, cost, attempt
-
-    assert last_error is not None
-    raise last_error
-
-
 async def run_stage3(
     topic: str,
     writer_budget_usd: float | None = DEFAULT_WRITER_BUDGET_USD,
-    graphics_budget_usd: float | None = 0.10,
     writer_model: str = DEFAULT_WRITER_MODEL,
-    graphics_model: str = DEFAULT_GRAPHICS_MODEL,
     research_mode: str = "deterministic",
     brief_override: str | None = None,
 ) -> Stage3Result:
     """Generate one article via the Agent SDK and return captured metrics.
 
-    Mirrors ``Stage3Crew.kickoff`` so output is comparable.
+    B-042: there is no graphics call and no hero draw. Stage 3 writes the
+    article, extracts candidate chart figures from the brief, and writes the
+    hero brief. Every image is the owner's; see
+    ``docs/specs/mandatory-chart-setpoint.md``.
 
     Args:
         topic: Article topic.
@@ -725,17 +600,13 @@ async def run_stage3(
             Defaults to ``DEFAULT_WRITER_BUDGET_USD`` — one measured attempt
             (~$0.45) × ``_WRITER_MAX_ATTEMPTS`` — so the retry policy is always
             funded (BUG-061). ``None`` disables the cap.
-        graphics_budget_usd: Hard cap for the graphics call. Default
-            0.10 (~3× headroom over ~$0.03).
         writer_model: Model id for the Writer call. Default Sonnet 4.6
             because the Story 4 verification run showed Opus 4.7 cost
             3.4× more for a marginally LOWER score on this task. Override
             with WRITER_MODEL env var if your topic needs deeper reasoning.
-        graphics_model: Model id for the Graphics call. Default Sonnet
-            4.6; override with GRAPHICS_MODEL env var.
 
     Returns:
-        Stage3Result with article text, chart dict, cost, and timing.
+        Stage3Result with article text, the chart proposal, cost, and timing.
 
     """
     start = time.perf_counter()
@@ -856,33 +727,28 @@ async def run_stage3(
     stat_audit_removed = pre_audit_article.count(".") - audited.count(".")
     article = _normalize_paragraphs(audited)
 
-    graphics_prompt = (
-        "Generate the chart JSON for this article. Output a single valid "
-        "JSON object with keys: title, subtitle, data (list of "
-        "{metric, value, unit, color}), colors (navy/burgundy hex map), "
-        "dimensions (width/height). No commentary, no markdown fences.\n\n"
-        "One axis, one measure: every data item must be the same kind of measure "
-        "on the same scale (all percentages, OR all counts — never mixed), within "
-        "~1 order of magnitude, with correct units. Pick the single measure that "
-        "best carries the article's argument.\n\n"
-        f"Article excerpt:\n{article[:2500]}"
-    )
-    # #403 slice 1: render the chart spec to a real PNG. Render failures stay
-    # fatal (a missing chart leaves a broken body embed) but are now retried
-    # first — one malformed spec used to kill the run after the writer had
-    # already succeeded (BUG-063).
+    # B-042: the chart is PROPOSED, not generated. The graphics stage that used
+    # to live here asked a model for chart JSON while handing it the article and
+    # never the brief, so it invented four percentages to satisfy a CRITICAL
+    # `missing_chart` check. Extraction has no fabrication path: every figure
+    # below came out of the brief by regex. The owner frames and renders it via
+    # `make chart SLUG=…`. See docs/specs/mandatory-chart-setpoint.md.
     slug = _slug_for_chart(article, topic)
-    chart_path = Path("output/charts") / f"{slug}.png"
-    chart_data, graphics_cost, graphics_attempts = await _graphics_with_retry(
-        _collect_text,
-        graphics_prompt,
-        graphics_model,
-        graphics_budget_usd,
-        article,
-        topic,
-        chart_path,
-    )
-    logger.info("Rendered chart: %s (attempt %s)", chart_path, graphics_attempts)
+    chart_proposal = propose_chart_spec(research_brief)
+    chart_spec_path: Path | None = None
+    if chart_proposal is not None:
+        chart_spec_path = Path("output/charts") / f"{slug}.spec.json"
+        chart_spec_path.parent.mkdir(parents=True, exist_ok=True)
+        chart_spec_path.write_bytes(
+            orjson.dumps(chart_proposal, option=orjson.OPT_INDENT_2),
+        )
+        logger.info(
+            "Proposed %d chart figure(s) from the brief: %s",
+            len(chart_proposal["data"]),
+            chart_spec_path,
+        )
+    else:
+        logger.info("No numeric claim in the brief — no chart proposed")
 
     # #403 slice 3: synthesise the ChatGPT-handoff prompt and persist it
     # as a sibling artefact. The prompt is built from the article's own
@@ -911,81 +777,33 @@ async def run_stage3(
     except PromptSynthError as exc:
         logger.warning("Image prompt synthesis skipped (%s)", exc)
 
-    # B-016b: Claude draws the hero from that same brief. The blog REQUIRES a
-    # resolvable `image:` (both its validators error without one), so an article
-    # with no hero is unpublishable — but a hero problem must never corrupt or
-    # abort an otherwise good article. So this never raises: the outcome is
-    # reported on Stage3Result and the CLI owns the exit code.
-    hero_path: Path | None = None
-    hero_critique = ""
-    hero_error = ""
-    hero_seconds = 0.0
-    hero_attempts = 0
-    hero_timeouts = 0
-    if image_prompt:
-        # Imported at call time: hero_author needs _collect_text from this module,
-        # so a module-level import here would be a cycle.
-        from src.agent_sdk.hero_author import author_hero_svg_async
-
-        # Async entry point: run_stage3 is already inside an event loop, so the
-        # sync wrapper would raise and silently lose the hero.
-        hero = await author_hero_svg_async(
-            brief=image_prompt,
-            slug=slug,
-            images_dir=HERO_IMAGES_DIR,
-            model=graphics_model,
-        )
-        hero_path, hero_critique, hero_error = hero.path, hero.critique, hero.error
-        hero_seconds, hero_attempts, hero_timeouts = (
-            hero.seconds,
-            hero.attempts,
-            hero.timeouts,
-        )
-        # B-041: log the hero's own spend. A timed-out attempt costs its full
-        # allowance and produces nothing, and the difference between a 4-minute
-        # run and a 20-minute one is entirely here.
-        logger.info(
-            "Hero: %.0fs, %s attempt(s), %s timeout(s)",
-            hero_seconds,
-            hero_attempts,
-            hero_timeouts,
-        )
-        if hero_path:
-            logger.info("Drew hero: %s", hero_path)
-        else:
-            logger.warning("No hero drawn (%s)", hero_error or "unknown reason")
-    else:
-        hero_error = "no image_alt in frontmatter, so there was no brief to draw from"
-        logger.warning("Skipping hero: %s", hero_error)
+    # B-042: Stage 3 no longer draws the hero. The owner authors every image the
+    # blog publishes, because fully automated visual generation has not produced
+    # outcomes he will stand behind — the fabricated chart is the measured
+    # instance. What ships from here is the *brief* (written above), and the
+    # review packet points him at it. Operating Constraint #4 records the
+    # reversal of B-016b's Claude-draws-the-hero amendment.
 
     elapsed = time.perf_counter() - start
 
     return Stage3Result(
         topic=topic,
         article=article,
-        chart_data=chart_data,
-        total_cost_usd=writer_cost + graphics_cost + research_cost,
+        chart_proposal=chart_proposal,
+        total_cost_usd=writer_cost + research_cost,
         writer_cost_usd=writer_cost,
-        graphics_cost_usd=graphics_cost,
         research_cost_usd=research_cost,
         writer_model=writer_model,
-        graphics_model=graphics_model,
         wall_seconds=elapsed,
         research_brief_chars=len(research_brief),
         research_downgraded=research_downgraded,
         article_chars=len(article),
         stat_audit_removed=max(stat_audit_removed, 0),
         writer_search_calls=search_session.calls_made,
-        chart_path=chart_path,
+        chart_spec_path=chart_spec_path,
         prompt_path=prompt_path,
         slug=slug,
         image_prompt=image_prompt,
-        hero_path=hero_path,
-        hero_critique=hero_critique,
-        hero_error=hero_error,
-        hero_seconds=hero_seconds,
-        hero_attempts=hero_attempts,
-        hero_timeouts=hero_timeouts,
     )
 
 
@@ -1006,24 +824,32 @@ def main() -> None:
     out_dir = Path("logs/spike")
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "agent_sdk_article.md").write_text(result.article)
-    (out_dir / "agent_sdk_chart.json").write_bytes(
-        orjson.dumps(result.chart_data, option=orjson.OPT_INDENT_2),
+    (out_dir / "agent_sdk_chart_proposal.json").write_bytes(
+        orjson.dumps(result.chart_proposal, option=orjson.OPT_INDENT_2),
     )
     metrics = {
-        k: v for k, v in asdict(result).items() if k not in ("article", "chart_data")
+        k: v
+        for k, v in asdict(result).items()
+        if k not in ("article", "chart_proposal")
     }
     (out_dir / "agent_sdk_metrics.json").write_bytes(
         orjson.dumps(metrics, option=orjson.OPT_INDENT_2),
     )
 
+    proposed = (
+        f"{len(result.chart_proposal['data'])} chart figure(s) proposed"
+        if result.chart_proposal
+        else "no chart proposed (no numeric claim in the brief)"
+    )
     print(
         f"Stage 3 complete: ${result.total_cost_usd:.4f} "
-        f"(writer ${result.writer_cost_usd:.4f}, "
-        f"graphics ${result.graphics_cost_usd:.4f}), "
+        f"(writer ${result.writer_cost_usd:.4f}), "
         f"{result.wall_seconds:.1f}s, "
-        f"{result.article_chars} chars.",
+        f"{result.article_chars} chars, {proposed}.",
     )
-    print("Artefacts: logs/spike/agent_sdk_{article.md,chart.json,metrics.json}")
+    print(
+        "Artefacts: logs/spike/agent_sdk_{article.md,chart_proposal.json,metrics.json}"
+    )
 
 
 if __name__ == "__main__":

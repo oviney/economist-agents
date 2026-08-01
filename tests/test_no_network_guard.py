@@ -97,11 +97,14 @@ class TestLiveModelCallsAreBlocked:
         with pytest.raises(LiveModelCallInTestError):
             asyncio.run(stage3_runner._collect_text("hi", "sys"))
 
-    def test_the_hero_path_cannot_reach_the_model_either(self, tmp_path) -> None:  # type: ignore[no-untyped-def]
-        # The specific gap that caused this: hero_author._collect_text is a
-        # DIFFERENT reference from stage3_runner._collect_text.
-        from src.agent_sdk.hero_author import author_hero_svg
+    def test_there_is_no_second_model_reference_left_to_leak(self) -> None:
+        """B-042: the gap this test was written for is gone with `hero_author`.
 
-        result = author_hero_svg(brief="draw", slug="s", images_dir=tmp_path)
-        assert result.path is None
-        assert "real Agent SDK" in result.error
+        The original defect was that ``hero_author._collect_text`` was a
+        DIFFERENT reference from ``stage3_runner._collect_text``, so guarding one
+        left the other live. ``hero_author`` is deleted — the owner draws the
+        hero — so assert the module cannot come back rather than deleting the
+        test and losing the lesson.
+        """
+        with pytest.raises(ImportError):
+            import src.agent_sdk.hero_author  # noqa: F401

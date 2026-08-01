@@ -22,13 +22,12 @@ import orjson
 from src.agent_sdk._shared import (
     SearchProvidersEmptyError,
     SearchProvidersFailedError,
-    _auto_embed_chart,
     canonical_slug,
     describe_slug,
 )
 from src.agent_sdk.hero_svg import HERO_IMAGES_DIR
+from src.agent_sdk.review_packet import notify, write_packet
 from src.agent_sdk.stage3_runner import (
-    DEFAULT_GRAPHICS_MODEL,
     DEFAULT_WRITER_BUDGET_USD,
     DEFAULT_WRITER_MODEL,
     run_stage3,
@@ -68,7 +67,9 @@ class PipelineResult:
 
     topic: str
     article: str
-    chart_data: dict
+    #: B-042: figures extracted from the brief for the owner to frame, or None
+    #: when the brief carries no numeric claim.
+    chart_proposal: dict | None
     editorial_score: int
     gates_passed: int
     publication_ready: bool
@@ -76,20 +77,15 @@ class PipelineResult:
     publication_validator_issues: list[dict[str, str]]
     total_cost_usd: float
     writer_cost_usd: float
-    graphics_cost_usd: float
     research_cost_usd: float
     writer_model: str
-    graphics_model: str
     stage3_seconds: float
     stage4_seconds: float
     article_chars: int
-    hero_critique: str = ""
-    hero_error: str = ""
-    # B-041: hero spend, surfaced in the cost ledger so the duration swing is
-    # attributable instead of hidden inside stage3_seconds.
-    hero_seconds: float = 0.0
-    hero_attempts: int = 0
-    hero_timeouts: int = 0
+    #: B-042: what the review packet needs to tell the owner what to make.
+    slug: str = ""
+    image_prompt: str = ""
+    chart_spec_path: Path | None = None
 
 
 def _numeric(source: object, name: str) -> float:
@@ -121,88 +117,58 @@ def load_brief_file(path: str | Path) -> str:
     return text.strip() + "\n"
 
 
-def _prepare_for_stage4(article: str, *, hero_drawn: bool) -> str:
-    """Embed the chart and, when there is no hero, strip the hero metadata.
+def _prepare_for_stage4(article: str) -> str:
+    """Strip the hero metadata the writer emitted.
 
-    This behaviour used to be gated behind ``image_mode="chart_only"``, which was
-    built on the premise that the article ships WITHOUT a hero — so it stripped
-    ``image_alt``/``image_caption`` along with ``image:``. B-016b made that
-    premise false, and the blog requires both fields, so a drawn hero produced an
-    article rejected for "missing image_alt" (B-020 run 4). Strip only when there
-    really is no hero.
+    B-042: no art exists at this point in the run and none will — the owner
+    authors every image. So ``image:``/``image_alt``/``image_caption`` are
+    always stripped, and the article validates as art-pending (Phase A). The
+    chart is no longer embedded here either: there is no chart until the owner
+    renders one, and embedding a path to a PNG nobody has drawn is what made
+    ``missing_chart`` satisfiable by a broken link.
     """
-    # Embed the chart while the hero-image slug is still present (the chart path
-    # is derived from it), THEN strip — stripping first would leave
-    # _auto_embed_chart with no slug and fail the required-chart check (BUG-040).
-    article = _auto_embed_chart(article)
-    if hero_drawn:
-        return article
     return _strip_image_frontmatter(article)
-
-
-def _maybe_inject_hero_prompt(
-    article: str, *, image_prompt: str, hero_drawn: bool
-) -> str:
-    """Surface the hero-image prompt for a reviewer — only if no hero was drawn.
-
-    Injecting it alongside a hero that already exists tells the reviewer to
-    hand-make art the pipeline just produced.
-    """
-    if image_prompt and not hero_drawn:
-        return _inject_hero_prompt_comment(article, image_prompt)
-    return article
 
 
 async def run_pipeline(
     topic: str,
     writer_budget_usd: float | None = DEFAULT_WRITER_BUDGET_USD,
-    graphics_budget_usd: float | None = 0.10,
     writer_model: str = DEFAULT_WRITER_MODEL,
-    graphics_model: str = DEFAULT_GRAPHICS_MODEL,
     research_mode: Literal["deterministic", "deep", "claude_web"] = "deterministic",
     brief_override: str | None = None,
 ) -> PipelineResult:
     """Generate one article through the Agent SDK pipeline — Stage 3 then Stage 4.
 
-    There is one path (B-021). Stage 3 draws the hero SVG itself (B-016b), so the
-    article ships with its hero and chart. If no hero was drawn, the hero
-    frontmatter is stripped so the draft validates on its chart alone and the
-    hero-image *prompt* is surfaced inline for a reviewer to supply art by hand
-    (CLAUDE.md Operating Constraint #4).
+    There is one path (B-021), and it still exits 0 with a complete, fully-gated
+    article — nothing pauses mid-run, so ADR-0016 holds. What changed in B-042 is
+    what "complete" means: the pipeline produces everything a *machine* can
+    produce and hands the art off. No hero is drawn and no chart is generated;
+    the run ends with a review packet naming what the owner must make.
     """
     stage3 = await run_stage3(
         topic,
         writer_budget_usd=writer_budget_usd,
-        graphics_budget_usd=graphics_budget_usd,
         writer_model=writer_model,
-        graphics_model=graphics_model,
         research_mode=research_mode,
         brief_override=brief_override,
     )
-    hero_drawn = bool(getattr(stage3, "hero_path", None))
-    article_for_stage4 = _prepare_for_stage4(stage3.article, hero_drawn=hero_drawn)
-    stage4 = run_stage4(article_for_stage4, stage3.chart_data)
+    article_for_stage4 = _prepare_for_stage4(stage3.article)
+    stage4 = run_stage4(article_for_stage4)
 
-    # Surface the hero-image prompt inline when no hero was drawn, so a reviewer
-    # can supply art at PR-review time (CLAUDE.md Operating Constraint #4).
-    # Injected AFTER Stage 4 so validation is unchanged.
-    final_article = _maybe_inject_hero_prompt(
-        stage4.article,
-        image_prompt=getattr(stage3, "image_prompt", ""),
-        hero_drawn=hero_drawn,
-    )
-
-    # The blog requires a resolvable `image:` (B-019), so link the hero asset if
-    # one has been drawn for this slug. No asset -> the key stays absent and the
-    # blog will reject the article; drawing it automatically is B-016b.
-    final_article = _link_hero_asset(
-        final_article, canonical_slug(final_article, topic)
+    # Surface the hero brief inline so it travels with the article the owner
+    # reads. Injected AFTER Stage 4 so validation is unchanged, and refused at
+    # the deploy boundary if it is still there (BUG-065, ADR-0017).
+    image_prompt = getattr(stage3, "image_prompt", "")
+    final_article = (
+        _inject_hero_prompt_comment(stage4.article, image_prompt)
+        if image_prompt
+        else stage4.article
     )
 
     result = PipelineResult(
         topic=topic,
         article=final_article,
-        chart_data=stage3.chart_data,
+        chart_proposal=getattr(stage3, "chart_proposal", None),
         editorial_score=stage4.editorial_score,
         gates_passed=stage4.gates_passed,
         publication_ready=stage4.publication_ready,
@@ -210,24 +176,14 @@ async def run_pipeline(
         publication_validator_issues=stage4.publication_validator_issues,
         total_cost_usd=stage3.total_cost_usd,
         writer_cost_usd=stage3.writer_cost_usd,
-        graphics_cost_usd=stage3.graphics_cost_usd,
         research_cost_usd=stage3.research_cost_usd,
         writer_model=stage3.writer_model,
-        graphics_model=stage3.graphics_model,
         stage3_seconds=stage3.wall_seconds,
         stage4_seconds=stage4.wall_seconds,
         article_chars=len(final_article),
-        # getattr: test doubles stand in for Stage3Result, same reason as
-        # image_prompt above.
-        hero_critique=getattr(stage3, "hero_critique", ""),
-        hero_error=getattr(stage3, "hero_error", ""),
-        # ...but these reach the JSON cost ledger, and `getattr` on a MagicMock
-        # returns another MagicMock rather than the default, which orjson cannot
-        # serialise. Coerce, so a test double degrades to zero instead of
-        # silently killing the whole ledger write (B-041).
-        hero_seconds=_numeric(stage3, "hero_seconds"),
-        hero_attempts=int(_numeric(stage3, "hero_attempts")),
-        hero_timeouts=int(_numeric(stage3, "hero_timeouts")),
+        slug=getattr(stage3, "slug", "") or canonical_slug(final_article, topic),
+        image_prompt=image_prompt,
+        chart_spec_path=getattr(stage3, "chart_spec_path", None),
     )
     wall_seconds = result.stage3_seconds + result.stage4_seconds
     try:
@@ -245,9 +201,11 @@ def _record_roi(result: PipelineResult) -> None:
     """Record this pipeline run in the ROI telemetry log.
 
     Uses the SDK-reported ``total_cost_usd`` rather than the local pricing
-    table so the recorded cost matches the actual API charge. The writer
-    and graphics calls are logged as separate ``log_llm_call`` entries so
-    per-model attribution is preserved in ``logs/execution_roi.json``.
+    table so the recorded cost matches the actual API charge.
+
+    B-042 removed the graphics entry: there is no graphics call. A stage that
+    can only ever log $0.00 is the kind of always-zero reading B-041 objected
+    to, so it is gone rather than left recording nothing.
     """
     tracker: ROITracker = get_tracker()
     execution_id = tracker.start_execution(ROI_PIPELINE_AGENT)
@@ -259,15 +217,6 @@ def _record_roi(result: PipelineResult) -> None:
         output_tokens=0,
         cost_usd=result.writer_cost_usd,
         metadata={"stage": "writer", "topic": result.topic},
-    )
-    tracker.log_llm_call(
-        execution_id=execution_id,
-        agent=ROI_PIPELINE_AGENT,
-        model=result.graphics_model,
-        input_tokens=0,
-        output_tokens=0,
-        cost_usd=result.graphics_cost_usd,
-        metadata={"stage": "graphics", "topic": result.topic},
     )
     tracker.end_execution(execution_id)
 
@@ -333,19 +282,18 @@ def _append_cost_log(result: PipelineResult, total_wall_seconds: float) -> None:
         "topic": result.topic,
         "total_cost_usd": result.total_cost_usd,
         "writer_cost_usd": result.writer_cost_usd,
-        "graphics_cost_usd": result.graphics_cost_usd,
         "research_cost_usd": result.research_cost_usd,
         "writer_model": result.writer_model,
-        "graphics_model": result.graphics_model,
         "stage3_seconds": result.stage3_seconds,
         "stage4_seconds": result.stage4_seconds,
         "wall_seconds": total_wall_seconds,
-        # B-041: the hero dominates duration and used to hide inside
-        # stage3_seconds, so a 4-minute run and a 20-minute one were
-        # indistinguishable here. `hero_timeouts > 0` means the expensive path.
-        "hero_seconds": result.hero_seconds,
-        "hero_attempts": result.hero_attempts,
-        "hero_timeouts": result.hero_timeouts,
+        # B-042: the hero fields B-041 added are gone with the hero draw. They
+        # measured a stage that no longer runs, and the duration swing they
+        # existed to attribute cannot recur — nothing in a run now blocks on a
+        # model drawing a picture.
+        "chart_figures_proposed": (
+            len(result.chart_proposal["data"]) if result.chart_proposal else 0
+        ),
         "editorial_score": result.editorial_score,
         "gates_passed": result.gates_passed,
         "publication_validator_passed": result.publication_validator_passed,
@@ -375,24 +323,9 @@ def main(argv: list[str] | None = None) -> None:
         ),
     )
     parser.add_argument(
-        "--graphics-budget",
-        type=float,
-        default=0.40,
-        help=(
-            "Hard cap on graphics cost in USD (default 0.40). Higher than the "
-            "library default because the subscription CLI uses multiple turns "
-            "for the chart JSON (see BUG-042)."
-        ),
-    )
-    parser.add_argument(
         "--writer-model",
         default=DEFAULT_WRITER_MODEL,
         help=f"Writer model id (default {DEFAULT_WRITER_MODEL})",
-    )
-    parser.add_argument(
-        "--graphics-model",
-        default=DEFAULT_GRAPHICS_MODEL,
-        help=f"Graphics model id (default {DEFAULT_GRAPHICS_MODEL})",
     )
     parser.add_argument(
         "--research-only",
@@ -435,14 +368,13 @@ def main(argv: list[str] | None = None) -> None:
         _run_research_only(topic)
         return
 
-    # The only path (B-021): Stage 3 draws the hero and Stage 4 validates, end to
-    # end, keyless (pair with --research-mode claude_web for zero keys).
+    # The only path (B-021): Stage 3 writes, Stage 4 validates, end to end,
+    # keyless (pair with --research-mode claude_web for zero keys). B-042: the
+    # run ends with a review packet, not with finished art.
     _run_end_to_end(
         topic,
         writer_budget=args.writer_budget,
-        graphics_budget=args.graphics_budget,
         writer_model=args.writer_model,
-        graphics_model=args.graphics_model,
         research_mode=args.research_mode,
         brief_override=load_brief_file(args.brief) if args.brief else None,
     )
@@ -525,17 +457,15 @@ def _run_end_to_end(
     topic: str,
     *,
     writer_budget: float | None,
-    graphics_budget: float | None,
     writer_model: str,
-    graphics_model: str,
     research_mode: str,
     brief_override: str | None = None,
 ) -> None:
-    """Run the pipeline end to end and write the finished article.
+    """Run the pipeline end to end, write the article, and hand off the art.
 
-    With ``--research-mode claude_web`` this is fully keyless — Stage 3
-    writer/graphics, the hero drawing, and research all run on the Claude
-    subscription via the Agent SDK; no ANTHROPIC/OPENAI/SERPER key is used.
+    With ``--research-mode claude_web`` this is fully keyless — the writer and
+    research both run on the Claude subscription via the Agent SDK; no
+    ANTHROPIC/OPENAI/SERPER key is used.
     """
     print(f"Running Agent SDK pipeline on: {topic}")
     print(f"  Research mode: {research_mode}; models: writer={writer_model}")
@@ -544,9 +474,7 @@ def _run_end_to_end(
             run_pipeline(
                 topic,
                 writer_budget_usd=writer_budget,
-                graphics_budget_usd=graphics_budget,
                 writer_model=writer_model,
-                graphics_model=graphics_model,
                 research_mode=research_mode,
                 brief_override=brief_override,
             )
@@ -587,29 +515,15 @@ def _run_end_to_end(
     # output path (B-019).
     print(f"  {describe_slug(result.article, topic)}")
 
-    # B-016b failure policy. The hero is a separate axis from the validator: the
-    # blog requires a resolvable image:, and an unresolved composition critique
-    # must not ship on a permanent public page just because a warning was logged.
-    hero_failed = bool(result.hero_critique or result.hero_error)
-    if result.hero_error:
-        print(f"❌ No hero drawn: {result.hero_error}", file=sys.stderr)
-        print(
-            "   The blog requires a resolvable image: — it will reject this "
-            "article until a hero exists.",
-            file=sys.stderr,
-        )
-    if result.hero_critique:
-        print(
-            "❌ Hero composition still defective after redraws "
-            "(the SVG is on disk — look at it, then redraw or accept):",
-            file=sys.stderr,
-        )
-        for line in result.hero_critique.splitlines():
-            print(f"  {line}", file=sys.stderr)
+    # B-042: the run ends by handing off, not by finishing. Writing the packet
+    # must not be able to lose a good article, so a failure here is reported and
+    # the exit code still reflects the gates.
+    packet_path: Path | None = None
+    try:
+        packet_path = write_packet(result, article_path)
+    except OSError as exc:
+        print(f"⚠️  Review packet could not be written: {exc}", file=sys.stderr)
 
-    if result.publication_validator_passed and not hero_failed:
-        print("✅ Publication validator PASSED — article is publish-ready.")
-        sys.exit(0)
     if not result.publication_validator_passed:
         print("❌ Publication validator found issues:", file=sys.stderr)
         for issue in result.publication_validator_issues:
@@ -618,7 +532,23 @@ def _run_end_to_end(
                 f"{issue.get('message')}",
                 file=sys.stderr,
             )
-    sys.exit(1)
+        sys.exit(1)
+
+    chart_line = (
+        f"{len(result.chart_proposal['data'])} chart figure(s) proposed"
+        if result.chart_proposal
+        else "no chart proposed (no numeric claim in the brief)"
+    )
+    print("\n✅ Every gate passed. The prose is ready; the art is yours.")
+    print(f"  Hero: draw it at output/posts/images/{result.slug}-hero.svg")
+    print(f"  Chart: {chart_line}")
+    if packet_path:
+        print(f"\n📋 Review packet — read this next: {packet_path}")
+    notify(
+        "Article ready for your review",
+        f"{result.slug} — passed every gate. Hero and chart are yours.",
+    )
+    sys.exit(0)
 
 
 def _run_research_only(topic: str) -> None:

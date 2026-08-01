@@ -98,30 +98,6 @@ _ALLOWED_MODELS: frozenset[str] = frozenset(
 
 # ─── Stage 3: research brief + stat audit ──────────────────────────────
 
-GRAPHICS_AGENT_PROMPT = """
-You are a Data Visualization Specialist.
-Your goal is to take complex data and describe how it should be visualized.
-
-CRITICAL — one axis, one measure (a chart is a horizontal bar chart on ONE
-linear axis):
-- Every bar MUST be the same kind of measure on the same scale. NEVER mix a
-  percentage (e.g. 84) with a raw count (e.g. 150000) in the same chart — the
-  large value swallows the axis and the small bars vanish. If the article has
-  both, pick ONE coherent measure and drop the rest.
-- Choose the single measure that best advances the article's thesis (the point
-  the prose already makes), not a grab-bag of every number in the piece.
-- Keep the largest and smallest values within ~1 order of magnitude of each
-  other. If they aren't, they don't belong on the same chart.
-- Set each item's `unit` correctly: a count is not a percentage. Do not label a
-  raw number "%".
-
-Economist style:
-- Clean, minimalist design; inline labels instead of legends.
-- Proper zone boundaries (red bar, title, chart, x-axis, source).
-- High-quality export (PNG, 300 DPI).
-"""
-
-
 _STAT_PATTERN = re.compile(
     r"(\d+(?:\.\d+)?)\s*"
     r"(%|per\s*cent|billion|million|thousand|trillion|fold|times\b|x\b)",
@@ -139,6 +115,70 @@ def _extract_stats(text: str) -> list[str]:
         context = re.sub(r"\s+", " ", context)
         stats.append(context)
     return stats
+
+
+def propose_chart_spec(research_brief: str) -> dict[str, Any] | None:
+    """Propose chart rows by *extracting* figures from the brief. No LLM.
+
+    B-042. The graphics stage used to ask a model for chart JSON while handing
+    it the article and never the brief, so it invented four percentages to
+    satisfy a CRITICAL ``missing_chart`` check. Extraction removes the
+    generative step: every value here came out of *research_brief* by regex, so
+    there is no fabrication path left to audit.
+
+    What is deliberately NOT filled in:
+
+    - ``title``/``subtitle`` and every ``metric`` label are empty. Framing is an
+      editorial judgment, and a plausible machine-written label is precisely what
+      made the fabricated chart indistinguishable from a real dataset.
+    - No colours, no ordering, no selection. A brief's figures are rarely one
+      coherent measure, and ``chart_renderer._validate_spec`` rejects a spec
+      spanning too many magnitudes (B-014) — picking the measure is the owner's
+      call, and an untouched proposal will not render.
+
+    Scope limit, stated because the packet reports it: this reuses
+    ``_STAT_PATTERN``, the same definition of "a numeric claim" the prose stat
+    audit uses, which requires a unit (``%``, ``billion``, ``fold``, …). Bare
+    counts and years are not proposed — that is what keeps citation markers and
+    dates out of the candidate list, at the cost of missing unit-less counts.
+
+    Args:
+        research_brief: The brief the writer was given, verbatim.
+
+    Returns:
+        A chart spec skeleton for the owner to complete, or ``None`` when the
+        brief contains no numeric claim — a first-class outcome meaning
+        "no chart is warranted here".
+    """
+    rows: list[dict[str, Any]] = []
+    seen: set[tuple[float, str]] = set()
+
+    for match in _STAT_PATTERN.finditer(research_brief):
+        value = float(match.group(1))
+        unit = match.group(2).strip()
+        key = (value, unit.lower())
+        if key in seen:
+            continue
+        seen.add(key)
+
+        start = max(0, match.start() - 60)
+        end = min(len(research_brief), match.end() + 60)
+        context = re.sub(r"\s+", " ", research_brief[start:end].strip())
+        rows.append(
+            {
+                "metric": "",
+                "value": int(value) if value.is_integer() else value,
+                "unit": unit,
+                "source": f"brief: '{context}'",
+            },
+        )
+
+    if not rows:
+        logger.info("Chart proposal: no numeric claim in the brief — no chart proposed")
+        return None
+
+    logger.info("Chart proposal: %d candidate figure(s) extracted", len(rows))
+    return {"title": "", "subtitle": "", "data": rows, "source": ""}
 
 
 def build_research_brief(topic: str) -> str:
@@ -884,7 +924,10 @@ def apply_editorial_fixes(article: str, current_date: str | None = None) -> str:
             fm = _truncate_description(fm)
             text = "---" + fm + "---" + parts[2]
 
-    text = _auto_embed_chart(text)
+    # B-042: the chart embed used to be inserted here, unconditionally, pointing
+    # at a PNG that may never have been rendered. It now happens in `make art`,
+    # after the owner has actually made the chart — an embed is a claim that a
+    # figure exists, and Stage 4 was in no position to make it.
     text = _enforce_heading_limit(text)
     text = re.sub(r"  +", " ", text)
 

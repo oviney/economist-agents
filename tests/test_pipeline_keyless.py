@@ -204,7 +204,7 @@ def test_end_to_end_cli_writes_article_and_exits_zero(
         return PipelineResult(
             topic=topic,
             article='---\nlayout: post\ntitle: "A Good Title"\n---\n\nBody.\n',
-            chart_data={},
+            chart_proposal=None,
             editorial_score=1.0,
             gates_passed=True,
             publication_ready=True,
@@ -212,10 +212,8 @@ def test_end_to_end_cli_writes_article_and_exits_zero(
             publication_validator_issues=[],
             total_cost_usd=0.1,
             writer_cost_usd=0.05,
-            graphics_cost_usd=0.02,
             research_cost_usd=0.03,
             writer_model="w",
-            graphics_model="g",
             stage3_seconds=0.1,
             stage4_seconds=0.1,
             article_chars=42,
@@ -227,9 +225,7 @@ def test_end_to_end_cli_writes_article_and_exits_zero(
         pipe._run_end_to_end(
             "topic",
             writer_budget=0.3,
-            graphics_budget=0.1,
             writer_model="w",
-            graphics_model="g",
             research_mode="claude_web",
         )
     assert exc.value.code == 0

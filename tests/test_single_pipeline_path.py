@@ -30,12 +30,17 @@ _ARTICLE = (
 )
 
 
-def _stage3(hero: Path | None, image_prompt: str = "") -> AsyncMock:
-    """A Stage 3 result standing in for a completed generation."""
+def _stage3(image_prompt: str = "", chart_proposal: dict | None = None) -> AsyncMock:
+    """A Stage 3 result standing in for a completed generation.
+
+    B-042: no ``hero_path`` and no ``chart_data``. Stage 3 draws nothing and
+    generates no chart figures; it proposes figures extracted from the brief.
+    """
     result = AsyncMock()
     result.article = _ARTICLE
-    result.chart_data = {"title": "T", "data": []}
-    result.hero_path = hero
+    result.chart_proposal = chart_proposal
+    result.chart_spec_path = None
+    result.slug = "x"
     result.image_prompt = image_prompt
     return result
 
@@ -82,35 +87,53 @@ def test_run_pipeline_no_longer_takes_an_image_mode() -> None:
     assert "image_mode" not in inspect.signature(pipe.run_pipeline).parameters
 
 
-def test_a_drawn_hero_keeps_its_frontmatter(tmp_path: Path, monkeypatch) -> None:
-    """The B-020 run-4 defect: stripping image_alt from an article that HAS a
-    hero got it rejected by the blog for a missing image_alt."""
+def test_the_hero_frontmatter_is_stripped_because_no_art_exists_yet(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """B-042: art is the owner's, so at Stage 4 there is never a hero to keep.
+
+    The inverse of the B-020 run-4 defect. That one stripped `image_alt` from an
+    article that HAD a hero; now nothing has a hero at this point, and pointing
+    `image:` at a file nobody drew is what the deploy gate refuses.
+    """
     monkeypatch.chdir(tmp_path)
-    hero = tmp_path / "x-hero.svg"
-    hero.write_text("<svg/>")
-    monkeypatch.setattr(pipe, "run_stage3", AsyncMock(return_value=_stage3(hero)))
-    monkeypatch.setattr(pipe, "run_stage4", lambda article, chart: _stage4(article))
+    monkeypatch.setattr(pipe, "run_stage3", AsyncMock(return_value=_stage3()))
+    monkeypatch.setattr(pipe, "run_stage4", lambda article: _stage4(article))
 
     result = asyncio.run(pipe.run_pipeline("topic"))
 
-    assert "image:" in result.article
+    assert "image:" not in result.article
 
 
-def test_without_a_hero_the_prompt_is_surfaced_for_the_reviewer(
-    tmp_path: Path, monkeypatch
-) -> None:
-    """Constraint #4 keeps the prompt sidecar available for hand-supplied art."""
+def test_the_hero_brief_is_surfaced_for_the_owner(tmp_path: Path, monkeypatch) -> None:
+    """Constraint #4 as amended by B-042: the owner draws it, from this brief."""
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(
         pipe,
         "run_stage3",
-        AsyncMock(return_value=_stage3(None, image_prompt="Draw a thing")),
+        AsyncMock(return_value=_stage3(image_prompt="Draw a thing")),
     )
-    monkeypatch.setattr(pipe, "run_stage4", lambda article, chart: _stage4(article))
+    monkeypatch.setattr(pipe, "run_stage4", lambda article: _stage4(article))
 
     result = asyncio.run(pipe.run_pipeline("topic"))
 
     assert "Draw a thing" in result.article
+
+
+def test_there_is_no_graphics_stage_left_to_fabricate_with(
+    tmp_path, monkeypatch
+) -> None:
+    """B-042 AC2, asserted structurally.
+
+    The four invented percentages of case g4 cannot recur, because the code that
+    could invent them does not exist. This asserts the absence rather than
+    filtering the output — a filter can be bypassed; a missing stage cannot.
+    """
+    import src.agent_sdk.stage3_runner as s3
+
+    for name in ("_graphics_with_retry", "_parse_chart_json", "_ensure_chart_title"):
+        assert not hasattr(s3, name), f"{name} is back"
+    assert "graphics_model" not in inspect.signature(pipe.run_pipeline).parameters
 
 
 def _stage4(article: str):

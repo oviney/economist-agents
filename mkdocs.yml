@@ -84,6 +84,7 @@ nav:
     - ADR-0016 — One Pipeline Path: adr/0016-single-pipeline-path.md
     - ADR-0017 — Gate Publishable Content at Deploy: adr/0017-gate-publishable-content-at-deploy.md
     - ADR-0018 — Editorial Review Gate: adr/0018-editorial-review-gate.md
+    - ADR-0019 — A Setpoint Is a Decision About Who Decides: adr/0019-a-setpoint-is-a-decision-about-who-decides.md
 
   - Skills:
     # B-035 Task 3(a): the 20 vendored copies of the upstream skills were deleted.

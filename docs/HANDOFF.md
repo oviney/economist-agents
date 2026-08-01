@@ -6,9 +6,15 @@ is the "where were we" note a new session reads first, then overwrites when it g
 **Read next, in this order:** this file → `BACKLOG.md` → `docs/reviews/harness-engineering-assessment-2026-07-29.md`
 for the framework the last four items sit in.
 
-**Session of 2026-08-01 is closed out.** PRs #459 … #462 merged; B-038 … B-041 landed. **B-043
-is now built** (branch `harness/sensor-proof-of-teeth`). **B-042 is the next work**, and it is
-the one item that is specced only as a backlog entry rather than a full spec.
+**Session of 2026-08-01 is closed out.** PRs #459 … #462 merged; B-038 … B-041 landed. B-043
+is built. **B-042 is now BUILT too** (branch `feat/b042-owner-owns-art`) — see the section
+below; it changed the operating model, not just a gate.
+
+> **The single most important thing to know before you touch anything:** the pipeline no
+> longer produces any image. **The owner draws every hero and makes every chart.** A run ends
+> with a review packet at `output/posts/<slug>.review.md` and a desktop notification, not with
+> a publishable post. Operating Constraint #4 was amended — this **reverses** B-016b's
+> "Claude draws the hero as SVG". See ADR-0019.
 
 ## B-043 — BUILT 2026-08-01. No sensor ships without a proof it can fail
 
@@ -83,59 +89,65 @@ One inherited proof was quietly weak and got tightened: `test_schema_validation_
 asserted `pytest.raises((ValueError, Exception))`, which passes on *any* error — a typo in the
 fixture would have satisfied it. That is B-039's defect in miniature, in a test.
 
-## The next work: B-042 — the mandatory-chart gate
+## B-042 — BUILT 2026-08-01. The owner owns every image
 
-**Specced only as a `BACKLOG.md` entry, not a full spec.** Per `CLAUDE.md`, write the spec first;
-it changes a CRITICAL gate carrying a stated editorial standard, and the same reasoning that kept
-B-040 at spec-only applies.
+**Spec:** `docs/specs/mandatory-chart-setpoint.md` · **Decision:** **ADR-0019 — a setpoint is a
+decision about who decides** · **Closes B-041 as mooted.**
 
-### Resume prompt — paste after `/goal` in a fresh session
+### The argument, so a fresh session does not re-derive it
 
-Kept here rather than retyped, so the next session starts from measurements instead of memory.
-**`/goal` caps its argument at 4,000 characters**; this is 3,701, so it fits as-is — trim wording,
-not facts, if you add to it.
+`missing_chart` was CRITICAL, so a brief carrying one number still required a chart, and the
+pipeline complied by inventing four percentages (62/46/28/12%). **Nothing malfunctioned.** The
+instinct is to tune the setpoint — make it conditional, audit the figures. Both were designed
+and both were discarded. The defect was not a mistuned threshold but a **decision held by the
+wrong party**: whether an article warrants a chart is judged against the research, which the
+validator never sees. So the fix removes the sensor's *authority*, not its threshold.
 
-```text
-Using agent-skills, take B-042 — the mandatory-chart gate manufactures the fabrication it should prevent.
+Two findings settled it, both verified against the code rather than the backlog:
 
-Read docs/HANDOFF.md first (it opens with B-043 as built and names B-042 as next), then B-042 in BACKLOG.md, then docs/reviews/harness-engineering-assessment-2026-07-29.md for the framework.
+1. **`orphaned_chart` could never fire, for any input.** `missing_chart` returns early unless a
+   `/assets/charts/….png` ref exists, so by the time the orphan scan ran the content provably
+   contained the substring "chart" — in the embed URL. A passing test named
+   `test_orphaned_chart_flagged` asserted `== 0` and documented the inertness as intended.
+2. **`orphaned_chart` did not push the writer — the writer prompt did.** `stage3_runner.py`
+   ordered the writer to reference the chart "as the chart shows", *citing the validator*. That
+   wrote case `g2`. Repairing `orphaned_chart` would have made B-042 worse, since its only
+   remedy is "add a sentence about the chart".
 
-B-042 HAS NO SPEC — only a BACKLOG entry. Write the spec and stop for LGTM. Do not go straight to implementation: it changes a CRITICAL gate carrying a stated editorial standard ("Charts are mandatory per Economist editorial standards"), and the same reasoning that kept B-040 at spec-only applies.
+### What changed
 
-The measured facts, verified 2026-08-01. Do not re-derive them:
+| | |
+|---|---|
+| Deleted | `missing_chart`, `orphaned_chart`, the graphics stage, `hero_author.py`, the writer's chart-sentence instruction, Stage 4's unconditional chart embed |
+| New | `propose_chart_spec` (regex extraction from the brief, **no LLM**), `review_packet.py`, `scripts/finalise_art.py`, `make art SLUG=…` |
+| Moved | art presence → the deploy gate (ADR-0017). **This is now the ONLY thing enforcing it** |
 
-1. publication_validator.py:1031 makes a chart mandatory at CRITICAL whenever no chart ref exists. On the 2026-08-01 run a brief containing ONE number yielded a chart carrying four invented percentages (62/46/28/12%), with an axis and a measured-sounding subtitle. That was compliance, not a rogue writer.
-2. orphaned_chart (publication_validator.py:1056, HIGH) then fires unless prose near the embed says "chart"/"figure"/"shows"/"illustrates" — pushing the writer to describe the chart, with nothing verifying the description is true. That is how "As the chart below illustrates, undetected defects do not flow linearly into rework" came to be written about a static four-bar comparison.
-3. Two gates combined manufactured two defects. article_evaluator then scored the result 76 and the validator PASSED it.
-4. Two of the eight calibration cases are this defect — docs/evals/review-gate/cases/g4-fabricated-chart-figures.yaml and g2-chart-shows-something-other-than-claimed.yaml. Use them as the regression targets rather than inventing new ones.
-5. The owner's stated position (2026-08-01): a chart is mandatory WHEN THE RESEARCH SUPPORTS ONE, not because an article exists.
+**The chart proposal cannot fabricate**, by construction: every value is pulled out of the
+brief by `_STAT_PATTERN` — the same definition the prose stat audit already used. Titles and
+metric labels are left **empty** on purpose, so an untouched proposal will not render
+(`chart_renderer._validate_spec` refuses it) and the owner has to supply the framing.
 
-B-043 deliberately did not fix this, and the reason decides the spec's shape: missing_chart fires CORRECTLY. The defect is its setpoint. A proof of teeth cannot catch a wrong setpoint — that is the taxonomy gap the sensor spec's open question 3 leaves for its own ADR, and it is still open. Decide whether that ADR belongs in this spec or beside it.
+### The workflow now
 
-Files: scripts/publication_validator.py, src/agent_sdk/_shared.py (_auto_embed_chart at 664, called at 887), src/agent_sdk/stage3_runner.py.
-
-You inherit a standing check B-043 shipped. scripts/check_sensor_proofs.py runs in make ci-local and fails when a script a gate site invokes has no proof in docs/sensors/register.yaml — add or move a sensor and the gate goes red until you register it. Run `.venv/bin/python scripts/check_sensor_proofs.py --list` to see the 20 entries. publication_validator's entry carries a B-042 note that must be updated if you change its setpoint.
-
-Branch off main. Run make ci-local before you push — you are the merge gate, main is unprotected, it needs the venv on PATH, and it is now 2,761 tests.
-
-Traps, all in docs/HANDOFF.md: bare `python` does not exist outside the venv; `export PATH :=` in a Makefile does NOT make make use it (GNU make 3.81 direct-execs metacharacter-free lines against its own startup PATH — name $(VENV_BIN)/<tool>); read logs/agent_sdk_costs.jsonl rather than quoting a remembered duration; and the publish-guard PreToolUse hook matches a bare string, so it blocks any command whose text merely mentions the deploy script, including a grep or a heredoc — split the command or use an editor tool.
-
-Still blocked on the owner, not on code: the testing-shortcuts-migration-deadline article needs its artifact re-sourced (docs/research/artifact-sourcing-prompt.md) and its hero drawn by hand. It should not be published as it stands — B-042 is why.
+```bash
+python -m src.agent_sdk.pipeline "<topic>" --research-mode claude_web   # → .review.md + banner
+# draw output/posts/images/<slug>-hero.svg; edit output/charts/<slug>.spec.json if proposed
+make art SLUG=<slug>              # renders spec (a hand-made PNG wins), embeds, links hero
+python -m scripts.deploy_to_blog --article output/posts/<slug>.md --mode review
+make publish SLUG=<slug>
 ```
 
-### The facts that prompt asserts, and where they were checked
+### Three things worth knowing before you touch it
 
-Every line number in it was verified on 2026-08-01 rather than carried from the backlog:
-`missing_chart` CRITICAL at `publication_validator.py:1031`, `orphaned_chart` HIGH at `:1056`,
-`_auto_embed_chart` at `src/agent_sdk/_shared.py:664` called at `:887`, and both chart
-calibration cases present in `docs/evals/review-gate/cases/`.
-
-**B-043 deliberately does not fix it**, and the reason is worth keeping: `missing_chart` **fires
-correctly**. The defect is its *setpoint* — a chart is mandatory even when the research carries no
-chartable data, so the pipeline invented four percentages to comply. A proof of teeth cannot catch
-a wrong setpoint, which is the taxonomy gap the spec's open question 3 names and leaves for its own
-ADR. The `publication_validator` register entry carries a note saying so, so the next reader of
-the register meets the limit rather than inferring it.
+1. **A green validator no longer means publishable.** Phase A says the *prose* is ready. The
+   deploy gate refuses a missing hero. If `_require_hero` stops working, nothing catches it —
+   which is why `TestTheArtGateHasTeeth` mutates four different ways, including a detonator
+   proving the refusal happens before any clone.
+2. **This is not the #403 handshake ADR-0016 deleted.** That paused Stage 3 and exited 10
+   before Stage 4 ever ran. This runs everything, passes every gate, exits 0, *then* hands off.
+   One path, no resume state, exit codes 10/11 still retired.
+3. **`make art` never overwrites a hand-made PNG.** That is the fully-manual escape hatch, and
+   silently rendering over it would reintroduce the automation this item removed.
 
 ## Blocked on the owner, not on code
 

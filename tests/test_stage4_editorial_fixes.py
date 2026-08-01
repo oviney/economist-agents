@@ -187,45 +187,31 @@ class TestCategoryNormalization:
         assert "Test Automation" in result
 
 
-class TestChartAutoEmbed:
-    """Auto-insert chart embed when missing."""
+class TestStage4NoLongerEmbedsACharter:
+    """B-042: Stage 4 stopped inserting a chart embed unconditionally.
 
-    def test_chart_inserted_before_references(self) -> None:
+    An embed is a *claim that a figure exists*, and Stage 4 was in no position
+    to make it: the PNG was often never rendered, so the embed satisfied
+    `missing_chart` with a broken link. The embed now happens in `make art`,
+    after the owner has actually made the chart — see
+    `tests/test_finalise_art.py`. `_auto_embed_chart` itself is unchanged and
+    still tested there.
+    """
+
+    def test_no_chart_is_embedded_by_stage_four(self) -> None:
         article = (
             "---\ntitle: My Slug\nimage: /assets/images/my-slug.png\n---\n"
             "Article body.\n\n## References\n\n1. Source"
         )
-        result = _apply_editorial_fixes(article)
-        assert "![Chart](/assets/charts/my-slug.png)" in result
-        assert result.index("![Chart]") < result.index("## References")
+        assert "![Chart]" not in _apply_editorial_fixes(article)
 
-    def test_chart_not_doubled_if_present(self) -> None:
+    def test_an_existing_chart_embed_is_left_alone(self) -> None:
+        """The owner's own embed must survive Stage 4 untouched."""
         article = (
             "---\ntitle: My Slug\nimage: /assets/images/my-slug.png\n---\n"
             "Body.\n\n![Chart](/assets/charts/my-slug.png)\n\n## References\n"
         )
-        result = _apply_editorial_fixes(article)
-        assert result.count("![Chart]") == 1
-
-    def test_chart_embedded_from_title_when_no_image_field(self) -> None:
-        # chart_only mode strips the hero ``image:`` frontmatter; the chart slug
-        # now falls back to the title so the mandatory-chart gate is still met.
-        article = "---\ntitle: Test\n---\nBody.\n\n## References\n"
-        result = _apply_editorial_fixes(article)
-        assert "![Chart](/assets/charts/test.png)" in result
-
-    def test_no_chart_if_no_image_and_no_title(self) -> None:
-        article = "---\nlayout: post\n---\nBody.\n\n## References\n"
-        result = _apply_editorial_fixes(article)
-        assert "![Chart]" not in result
-
-    def test_chart_appended_if_no_references_section(self) -> None:
-        article = (
-            "---\ntitle: My Slug\nimage: /assets/images/my-slug.png\n---\n"
-            "Article body with no references."
-        )
-        result = _apply_editorial_fixes(article)
-        assert "![Chart](/assets/charts/my-slug.png)" in result
+        assert _apply_editorial_fixes(article).count("![Chart]") == 1
 
 
 class TestNewHedgingPhrases:

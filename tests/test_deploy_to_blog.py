@@ -38,8 +38,25 @@ _DATE_INJECT_RE = re.compile(r"(^date:\s*)\d{4}-\d{2}-\d{2}", re.MULTILINE)
 _FILENAME_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}-")
 
 
-def _make_article(*, date: str = "2026-01-15") -> str:
+#: B-042: the deploy gate refuses an article with no hero on disk, because Phase
+#: A (the pipeline's own validation) deliberately no longer blocks on art. These
+#: fixtures are about deploy *mechanics*, so they carry a hero to get past that
+#: gate; `TestTheArtGateHasTeeth` is where its absence is asserted on purpose.
+HERO_NAME = "specific-descriptive-article-title-hero.svg"
+
+
+def write_hero(name: str = HERO_NAME) -> Path:
+    """Materialise a hero under the CWD where ``_require_hero`` looks for it."""
+    hero_dir = Path("output") / "posts" / "images"
+    hero_dir.mkdir(parents=True, exist_ok=True)
+    hero = hero_dir / name
+    hero.write_text('<svg xmlns="http://www.w3.org/2000/svg"><desc>A hero</desc></svg>')
+    return hero
+
+
+def _make_article(*, date: str = "2026-01-15", hero: str | None = HERO_NAME) -> str:
     """Return a minimal valid article with the given date."""
+    image_line = f"image: /assets/images/{hero}\n" if hero else ""
     return (
         f"---\n"
         f"layout: post\n"
@@ -47,6 +64,7 @@ def _make_article(*, date: str = "2026-01-15") -> str:
         f"date: {date}\n"
         f'author: "Ouray Viney"\n'
         f'categories: ["Quality Engineering"]\n'
+        f"{image_line}"
         f"---\n\n"
         f"{VALID_BODY}\n\n"
         f"{VALID_REFERENCES}\n"
@@ -126,6 +144,7 @@ class TestDeployToBlogMain:
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> Path:
         monkeypatch.chdir(tmp_path)
+        write_hero()
         p = tmp_path / "2026-01-15-stale-article.md"
         p.write_text(_make_article(date="2026-01-15"))
         return p
@@ -319,6 +338,7 @@ class TestDeployCallable:
         # Work inside tmp_path so the blog clone dir ('temp_blog_repo')
         # is created in an isolated location.
         monkeypatch.chdir(tmp_path)
+        write_hero()
         article = tmp_path / "2026-01-15-callable-deploy.md"
         article.write_text(_make_article(date="2026-01-15"))
         return article
@@ -586,6 +606,7 @@ class TestGovernanceSafeStaging:
     @pytest.fixture
     def article_file(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         monkeypatch.chdir(tmp_path)
+        write_hero()
         p = tmp_path / "2026-01-15-governance-article.md"
         p.write_text(_make_article(date="2026-01-15"))
         return p
@@ -643,3 +664,104 @@ class TestGovernanceSafeStaging:
             assert target in {"_posts", "assets"}, (
                 f"'{target}' is outside the governance-safe zone (_posts, assets)"
             )
+
+
+class TestTheArtGateHasTeeth:
+    """B-042 AC5 — the deploy gate is now the ONLY thing enforcing art presence.
+
+    Phase A (the pipeline's own validation) deliberately stopped blocking on
+    art: the owner has not drawn it when the pipeline runs. That makes this the
+    load-bearing check — if it does not refuse, nothing does, and an article
+    ships to a permanent URL with a broken or missing hero.
+
+    So these are mutation proofs, not coverage: each removes exactly one thing
+    and asserts the gate notices. `missing_chart` had 3 passing tests and was
+    still the wrong gate; `orphaned_chart` had a passing test asserting it could
+    never fire. A test that only proves the happy path proves nothing here.
+    """
+
+    @pytest.fixture
+    def article_file(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+        monkeypatch.chdir(tmp_path)
+        article = tmp_path / "2026-01-15-art-gate.md"
+        article.write_text(_make_article())
+        return article
+
+    def test_no_hero_on_disk_is_refused(self, article_file: Path) -> None:
+        """The article names a hero; nobody drew it. Mutation: hero absent."""
+        with pytest.raises(dtb.DeployError, match="no file exists at"):
+            dtb.deploy(
+                article_path=article_file,
+                blog_owner="o",
+                blog_repo="r",
+                token="t",
+            )
+
+    def test_no_image_field_at_all_is_refused(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Mutation: the `image:` line itself is gone.
+
+        This is the shape the pipeline now emits — Stage 4 strips hero
+        frontmatter because no art exists yet — so it is the realistic mistake,
+        not a contrived one.
+        """
+        monkeypatch.chdir(tmp_path)
+        write_hero()
+        article = tmp_path / "2026-01-15-no-image.md"
+        article.write_text(_make_article(hero=None))
+        with pytest.raises(dtb.DeployError, match="no `image:` in its frontmatter"):
+            dtb.deploy(
+                article_path=article,
+                blog_owner="o",
+                blog_repo="r",
+                token="t",
+            )
+
+    def test_review_mode_is_gated_identically(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A review deploy publishes to a live URL, so it gets the same gate.
+
+        Gating only `deploy()` would leave the route the workflow actually uses
+        ungated — which is precisely how article two was published unreviewed
+        (B-028): the guarded path was not the travelled one.
+        """
+        monkeypatch.chdir(tmp_path)
+        article = tmp_path / "2026-01-15-review-gate.md"
+        article.write_text(_make_article())
+        with pytest.raises(dtb.DeployError, match="no file exists at"):
+            dtb.deploy_review(
+                article_path=article,
+                blog_owner="o",
+                blog_repo="r",
+                token="t",
+            )
+
+    def test_the_gate_fires_before_any_clone(
+        self, article_file: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A rejected article must cost nothing — no network, no clone.
+
+        `run_command` is replaced with a detonator: if the gate runs late, the
+        test fails with the git command that should never have been reached.
+        """
+
+        def explode(cmd: str, cwd=None) -> str:
+            raise AssertionError(f"gate ran too late; reached: {cmd}")
+
+        with (
+            patch.object(dtb, "run_command", side_effect=explode),
+            pytest.raises(dtb.DeployError),
+        ):
+            dtb.deploy(
+                article_path=article_file,
+                blog_owner="o",
+                blog_repo="r",
+                token="t",
+            )
+
+    def test_a_drawn_hero_passes_the_gate(self, article_file: Path) -> None:
+        """The control. Without it, a gate that refuses everything would pass."""
+        write_hero()
+        dtb._require_hero(article_file)

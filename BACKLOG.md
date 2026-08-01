@@ -724,11 +724,21 @@ invisible in the only place anyone would look for it.**
 - [x] Record hero draw seconds, attempt count and timeout count as their own ledger fields
 - [x] Decide whether a timed-out first attempt should retry at all
 - [x] Bound the aggregate, not just each call
-- [ ] Once several runs carry `hero_*` fields, state the honest range in the runbook:
-      typical vs timeout path
+- [x] ~~State the honest range in the runbook once several runs carry `hero_*` fields~~ —
+      **overtaken by B-042.** No run will ever carry them again.
 
-**Scope:** S. **Files:** `src/agent_sdk/hero_author.py`, `src/agent_sdk/stage3_runner.py`,
-`src/agent_sdk/pipeline.py`, `tests/test_hero_author.py`.
+**CLOSED 2026-08-01 as MOOTED by B-042.** The owner now draws every hero by hand, so
+`hero_author.py` is deleted and the pipeline contains no draw to time. The 10× duration swing
+this item existed to make visible cannot recur, and the `hero_*` ledger fields were removed
+with it rather than left recording a permanent zero — which would have been this item's own
+complaint (a reading that looks authoritative and measures nothing).
+
+**The lesson outlives the item, and is worth keeping:** the ledger recorded only runs where
+the hero landed, so it could not see the timeout path at all. A log that is written on
+success and not on failure is not a partial instrument, it is a misleading one. See ADR-0019.
+
+**Scope:** S. **Files:** ~~`src/agent_sdk/hero_author.py`~~ (deleted),
+`src/agent_sdk/stage3_runner.py`, `src/agent_sdk/pipeline.py`.
 
 **FIXED 2026-08-01, and the run that prompted it settled the design question.**
 
@@ -804,18 +814,24 @@ written about a static four-bar comparison, reproducing ADR-0018's chart finding
 **Two gates, combined, manufactured two defects.** A rule meant to enforce evidence produced
 fabricated evidence, and the deterministic evaluator then scored the result 76 and passed it.
 
-- [ ] Decide the editorial policy: is a chart genuinely mandatory, or mandatory *when the
-      research supports one*? The owner's stated position (2026-08-01) is the latter
-- [ ] Make the requirement conditional on chartable, sourced data existing — not on the
-      article's existence
-- [ ] `orphaned_chart` must not be satisfiable by adding a describing sentence alone; a
-      description that cannot be checked is worse than no description
-- [ ] Regression case: a brief with no quantitative data must produce an article with **no
-      chart** and still pass, rather than an article with an invented one
+- [x] Decide the editorial policy — **the owner owns every image, charts included** (stated
+      2026-08-01). Not "mandatory when the research supports one" but "his call, always"
+- [x] Make the requirement conditional — **superseded by deletion.** `missing_chart` is gone.
+      The setpoint was not mistuned, it was held by the wrong party: whether an article
+      warrants a chart is judged against the research, which the validator never sees
+- [x] `orphaned_chart` must not be satisfiable by a describing sentence — **deleted.** It
+      could never fire at all (`missing_chart` returns early unless a `/assets/charts/….png`
+      ref exists, so the content always contained "chart"), and a *working* one would have
+      pushed the writer to describe the chart, which is what wrote case `g2`
+- [x] Regression case: a brief with no quantitative data produces an article with no chart
+      that passes — `tests/test_publication_validator.py::TestChartIsNotTheValidatorsDecision`
 
-**Do not fix this in the moment.** It changes a CRITICAL gate carrying a stated editorial
-standard ("Charts are mandatory per Economist editorial standards"), and the same reasoning
-that kept B-040 at spec-only applies. Spec first.
+**DONE 2026-08-01.** Spec: `docs/specs/mandatory-chart-setpoint.md`. Decision: **ADR-0019** —
+a setpoint is a decision about who decides. The pipeline no longer draws a hero or generates
+chart data; it *extracts* candidate figures from the brief with provenance and hands off a
+review packet (`output/posts/<slug>.review.md`). Art presence is gated at deploy (ADR-0017),
+which is now the only thing enforcing it. Operating Constraint #4 amended — this reverses
+B-016b. **B-041 is mooted** and closed with it.
 
 **Scope:** M. **Files:** `scripts/publication_validator.py`, `src/agent_sdk/_shared.py`
 (`_auto_embed_chart`), `src/agent_sdk/stage3_runner.py`.

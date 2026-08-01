@@ -47,6 +47,36 @@ the sensor matches on, so a typo silently grants no exemption (fail-closed by de
   which only added a keyless branch alongside it.
 - `scripts/llm_client.py::_call_openai` — same signature, same reason, same provenance.
 
+### Recorded by B-042 (2026-08-01)
+
+All six are **pre-existing** and none was introduced by B-042; they became live because the
+sensor is scoped to files an agent touches and B-042 touched these files. Four were not
+modified at all, and the two that were each took a single added line. Two got *smaller*.
+Recorded rather than refactored because refactoring a function this change did not otherwise
+alter would bury the diff a reviewer needs to read.
+
+- `scripts/deploy_to_blog.py::deploy` — B-042 added exactly one line
+  (`_require_hero(article_path)`) to a function that was already 99 statements. The
+  clone → copy → validate → commit → push sequence is a linear script; splitting it would
+  spread the ordering constraints that make it correct across call boundaries.
+  **Review queue: worth extracting the copy-assets block when this is next opened for its own
+  sake.**
+- `scripts/deploy_to_blog.py::deploy_review` — same one-line addition, same provenance, same
+  reasoning. The duplication between the two is itself the real finding, and is out of scope
+  here.
+- `scripts/publication_validator.py::_check_image_contract` — untouched by B-042. A
+  field-by-field frontmatter contract check; the branch count is the number of fields.
+- `src/agent_sdk/_shared.py::apply_editorial_fixes` — untouched except that B-042 **removed**
+  a call from it (the unconditional chart embed), so it is one statement shorter than before.
+  It is a pipeline of independent text fixes; the length is the number of fixes.
+- `src/agent_sdk/_shared.py::audit_article_stats` — untouched by B-042.
+- `src/agent_sdk/stage3_runner.py::_collect_text` — untouched by B-042. The 9 arguments are
+  the Agent SDK call surface (model, budget, turns, timeout, label, tools…).
+- `src/agent_sdk/stage3_runner.py::run_stage3` — B-042 **cut this from 83 statements to 64**
+  by deleting the graphics stage and the hero draw, and dropped it below the C901 and
+  PLR0912 thresholds it used to exceed. Still over the statement limit. Left recorded rather
+  than pushed further in the same change.
+
 ## Day-one baseline (NOT overrides)
 
 The audit measured the following on `src/` + `scripts/` at the time the sensor landed.

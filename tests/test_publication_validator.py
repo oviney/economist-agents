@@ -379,51 +379,63 @@ class TestPublicationValidatorBlogContract:
         assert len(heading_issues) == 1
 
 
-class TestPublicationValidatorChart:
-    """Chart reference validation checks."""
+class TestChartIsNotTheValidatorsDecision:
+    """B-042: the validator no longer rules on whether an article needs a chart.
 
-    def test_article_with_chart_passes(self) -> None:
-        validator = PublicationValidator(expected_date="2026-04-03")
-        article = _make_article()  # includes chart embed by default
-        is_valid, issues = validator.validate(article)
-        chart_issues = [i for i in issues if i["check"] == "missing_chart"]
-        assert len(chart_issues) == 0
+    ``missing_chart`` (CRITICAL) required one on every article, so a brief with
+    no chartable data still forced the pipeline to produce a chart — and it
+    complied by inventing four percentages. ``orphaned_chart`` (HIGH) could
+    never fire at all: ``missing_chart`` returns early unless a
+    ``/assets/charts/….png`` reference exists, so by the time the orphan scan
+    ran, the content provably contained the substring "chart" in the embed URL.
 
-    def test_article_without_chart_rejected(self) -> None:
-        validator = PublicationValidator(expected_date="2026-04-03")
+    Whether an article warrants a chart is judged against the research, which
+    the validator never sees. Art presence is now enforced at the deploy
+    boundary (ADR-0017). See docs/specs/mandatory-chart-setpoint.md.
+    """
+
+    def test_article_without_chart_is_accepted(self) -> None:
+        """AC1: the regression target — no chartable data, no chart, still passes.
+
+        ``require_image_file=False`` is Phase A: the pipeline validates before
+        the owner has drawn anything, so hero presence is the deploy gate's
+        business, not this one's.
+        """
+        validator = PublicationValidator(
+            expected_date="2026-04-03", require_image_file=False
+        )
         article = _make_article(chart_embed="")
         is_valid, issues = validator.validate(article)
-        assert not is_valid
-        chart_issues = [i for i in issues if i["check"] == "missing_chart"]
-        assert len(chart_issues) == 1
-        assert chart_issues[0]["severity"] == "CRITICAL"
+        assert is_valid, issues
+        assert not [i for i in issues if i["check"] == "missing_chart"]
 
-    def test_chart_not_in_assets_charts_rejected(self) -> None:
-        """Chart must be in /assets/charts/ path to count."""
-        validator = PublicationValidator(expected_date="2026-04-03")
-        bad_chart = "\n\n![Chart](/images/some-chart.png)\n"
-        article = _make_article(chart_embed=bad_chart)
-        is_valid, issues = validator.validate(article)
-        assert not is_valid
-        chart_issues = [i for i in issues if i["check"] == "missing_chart"]
-        assert len(chart_issues) == 1
+    def test_article_with_chart_is_also_accepted(self) -> None:
+        """AC4's counterpart: charts stay welcome, they are just not compelled."""
+        validator = PublicationValidator(
+            expected_date="2026-04-03", require_image_file=False
+        )
+        is_valid, issues = validator.validate(_make_article())
+        assert is_valid, issues
 
-    def test_orphaned_chart_flagged(self) -> None:
-        """Charts in /assets/charts/ inherently contain the word 'chart' in the URL,
-        so the orphan detection check (which looks for 'chart' in content) won't fire.
-        This test verifies that behaviour: a chart in /assets/charts/ is NOT flagged
-        as orphaned even when the body text itself contains no explicit mention.
+    def test_neither_chart_check_can_fire_any_more(self) -> None:
+        """Structural: both checks are gone, not merely unreachable.
+
+        ``orphaned_chart`` spent its whole life unable to fire while a passing
+        test asserted that as intended behaviour. Assert on the check names so a
+        reintroduction is caught by name rather than by severity arithmetic.
         """
         validator = PublicationValidator(expected_date="2026-04-03")
         body = " ".join(["word"] * 850)
-        chart_embed = (
-            "\n\n![Data visualisation](/assets/charts/test-chart.png)"
-            "\n\n![Other image](/images/other.png)\n"
-        )
-        article = _make_article(body=body, chart_embed=chart_embed)
-        is_valid, issues = validator.validate(article)
-        orphan_issues = [i for i in issues if i["check"] == "orphaned_chart"]
-        assert len(orphan_issues) == 0
+        chart_embed = "\n\n![Data visualisation](/assets/charts/test-chart.png)\n"
+        for article in (
+            _make_article(chart_embed=""),
+            _make_article(body=body, chart_embed=chart_embed),
+            _make_article(chart_embed="\n\n![Chart](/images/elsewhere.png)\n"),
+        ):
+            _, issues = validator.validate(article)
+            names = {i["check"] for i in issues}
+            assert "missing_chart" not in names
+            assert "orphaned_chart" not in names
 
 
 class TestPublicationValidatorEnding:

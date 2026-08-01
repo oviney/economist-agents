@@ -2562,6 +2562,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#b-039-the-merge-gate-now-runs-the-pinned-toolchain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B-039 — the merge gate now runs the pinned toolchain
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#state-in-one-paragraph" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2841,14 +2852,30 @@ Every word survived; nothing needed re-typing. Two honest limits found on it and
 unfixed, both one-edit-away in the brief: semantic styling carried only by CSS class
 (<code>div.card-header</code>) becomes a plain paragraph, and an artifact with no <code>&lt;a href&gt;</code> produces a
 brief with no citations, which the writer path and <code>citation_verifier</code> will notice downstream.</p>
+<h2 id="b-039-the-merge-gate-now-runs-the-pinned-toolchain">B-039 — the merge gate now runs the pinned toolchain<a class="headerlink" href="#b-039-the-merge-gate-now-runs-the-pinned-toolchain" title="Permanent link">&para;</a></h2>
+<p><strong>Fixed 2026-08-01.</strong> <code>make ci-local</code> resolved its tools from ambient <code>PATH</code>, so the gate did
+not mean the same thing twice: it linted with homebrew's ruff 0.15.9 while
+<code>requirements-dev.txt</code> pins <code>ruff==0.14.10</code> exactly, it could not run at all in a shell
+without an activated venv (bare <code>python</code>), and its advisory mypy step printed the same
+reassuring line for "found 187 errors" and "mypy is not installed".</p>
+<p>Every recipe now names <code>$(VENV_BIN)/&lt;tool&gt;</code> explicitly, <code>require-venv</code> fails with an
+instruction instead of falling through to ambient binaries, <code>make install</code> creates the venv
+if it is missing, and <code>mypy-advisory</code> is its own target that fails the gate on exit &gt;1.</p>
+<p><strong>The trap, worth knowing before you touch the Makefile:</strong> <code>export PATH := …/.venv/bin:$(PATH)</code>
+does <em>not</em> do the job on its own, however right it looks. GNU make 3.81 (what macOS ships)
+direct-execs recipe lines with no shell metacharacters and resolves them against its own
+startup PATH — so <code>ruff check .</code> kept using ambient ruff while <code>mypy …; status=$$?</code> used the
+venv. <code>tests/test_ci_gate_is_reproducible.py</code> executes <code>make</code> against stub binaries for
+exactly this reason; a grep of the Makefile would have passed on the broken fix. Recorded as
+the fourth instance in <code>skills/defect-prevention/SKILL.md</code>.</p>
+<p>Verified from a bare shell — <code>env -i PATH=/usr/bin:/bin:/opt/homebrew/bin make ci-local</code> —
+green at 2,680 tests, where that same invocation previously died at step 3.</p>
 <h2 id="state-in-one-paragraph">State in one paragraph<a class="headerlink" href="#state-in-one-paragraph" title="Permanent link">&para;</a></h2>
-<p>Two work streams are open, stacked, and <strong>both are complete and green</strong>. The <strong>article-two
-defect stream</strong> sits on <code>fix/article-two-run-defects</code> (PR #459 → <code>main</code>): B-028 Tasks 1–2,
-B-029 and the editorial-review-gate artifacts all landed 2026-07-31, and <code>main</code> has been
-merged in, so the conflict that was blocking the stack is gone. The <strong>harness engineering
-stream</strong> sits on <code>harness/close-the-sensor-loop</code> (PR #460 → #459) with B-030 … B-035.
-<code>make ci-local</code> passes on both. Nothing is broken and nothing is loose on disk.</p>
-<p><strong>Merge #459 first, then #460.</strong></p>
+<p><strong>Both stacked streams merged to <code>main</code> on 2026-08-01 and their branches are deleted.</strong>
+PR #459 (article-two defects: B-028 Tasks 1–2, B-029, the editorial-review-gate artifacts)
+and PR #460 (harness engineering: B-030 … B-035, plus B-038) are in. Merge commits, not
+rebases — #459 carried a merge of <code>main</code>, which GitHub refuses to rebase. <code>make ci-local</code> is
+green on <code>main</code> at 2,680 tests. No open PRs. Nothing is loose on disk.</p>
 <h2 id="branches-and-prs">Branches and PRs<a class="headerlink" href="#branches-and-prs" title="Permanent link">&para;</a></h2>
 <p><strong>Local branches were cleaned up 2026-07-31: 46 → 13.</strong> 33 were deleted, each verified
 merged first — either an ancestor of <code>origin/main</code>, or its PR appears in

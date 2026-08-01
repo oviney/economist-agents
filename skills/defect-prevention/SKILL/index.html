@@ -3069,6 +3069,11 @@ second:</p>
 <td><code>git branch --contains 73e73c0</code></td>
 <td>three days of caution shaping B-023's framing</td>
 </tr>
+<tr>
+<td><code>export PATH := $(CURDIR)/.venv/bin:$(PATH)</code> makes <code>make</code> use the pinned toolchain</td>
+<td><code>make lint</code> against a stub <code>ruff</code> that prints a marker</td>
+<td>none — a behavioural test caught it before it shipped (B-039)</td>
+</tr>
 </tbody>
 </table>
 <p>The shape is identical every time. An observation arrives that <em>looks</em> like
@@ -3084,8 +3089,20 @@ disprove it — then run that command first.</strong></p>
 <p>If you cannot name such a command, say so explicitly and mark the claim as
 unverified rather than asserting it. This is cheap: all three commands above are
 sub-second, and all three were available at the moment the claim was made.</p>
+<p><strong>The fourth instance is the one to study, because the surface reading was a <em>fix</em>,
+not a defect.</strong> <code>export PATH := $(CURDIR)/.venv/bin:$(PATH)</code> is the obvious way to
+point a Makefile at a pinned venv, it reads correctly, and <code>make showpath</code> prints
+the exported value — three independent signals all agreeing. It still did not work:
+GNU make 3.81 direct-execs any recipe line with no shell metacharacters and resolves
+the binary against its own startup PATH, so <code>ruff check .</code> kept using the ambient
+ruff while <code>mypy …; status=$$?</code> used the venv. Nothing short of running a recipe
+against a stub binary would have shown that.</p>
+<p>So the rule extends: <strong>a fix that looks right is a claim too.</strong> Name the command that
+would show it does not work, and prefer a test that <em>executes</em> the thing over one that
+reads it. A grep asserting the Makefile "contains the PATH line" would have passed on
+a change that fixed nothing, and the gate would have stayed silently broken.</p>
 <p>This is a <em>habit</em>, not a <code>check_all()</code> rule — there is no artefact to pattern-match
-against. It is recorded here because three instances make it a class, not an
+against. It is recorded here because four instances make it a class, not an
 accident.</p>
 <h2 id="red-flags">Red Flags<a class="headerlink" href="#red-flags" title="Permanent link">&para;</a></h2>
 <ul>

@@ -2581,6 +2581,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="The next work: B-042 — the mandatory-chart gate">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#resume-prompt-paste-after-goal-in-a-fresh-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resume prompt — paste after /goal in a fresh session
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-facts-that-prompt-asserts-and-where-they-were-checked" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The facts that prompt asserts, and where they were checked
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2965,6 +2993,41 @@ fixture would have satisfied it. That is B-039's defect in miniature, in a test.
 <p><strong>Specced only as a <code>BACKLOG.md</code> entry, not a full spec.</strong> Per <code>CLAUDE.md</code>, write the spec first;
 it changes a CRITICAL gate carrying a stated editorial standard, and the same reasoning that kept
 B-040 at spec-only applies.</p>
+<h3 id="resume-prompt-paste-after-goal-in-a-fresh-session">Resume prompt — paste after <code>/goal</code> in a fresh session<a class="headerlink" href="#resume-prompt-paste-after-goal-in-a-fresh-session" title="Permanent link">&para;</a></h3>
+<p>Kept here rather than retyped, so the next session starts from measurements instead of memory.
+<strong><code>/goal</code> caps its argument at 4,000 characters</strong>; this is 3,701, so it fits as-is — trim wording,
+not facts, if you add to it.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Using agent-skills, take B-042 — the mandatory-chart gate manufactures the fabrication it should prevent.
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Read docs/HANDOFF.md first (it opens with B-043 as built and names B-042 as next), then B-042 in BACKLOG.md, then docs/reviews/harness-engineering-assessment-2026-07-29.md for the framework.
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>B-042 HAS NO SPEC — only a BACKLOG entry. Write the spec and stop for LGTM. Do not go straight to implementation: it changes a CRITICAL gate carrying a stated editorial standard (&quot;Charts are mandatory per Economist editorial standards&quot;), and the same reasoning that kept B-040 at spec-only applies.
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>The measured facts, verified 2026-08-01. Do not re-derive them:
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>1. publication_validator.py:1031 makes a chart mandatory at CRITICAL whenever no chart ref exists. On the 2026-08-01 run a brief containing ONE number yielded a chart carrying four invented percentages (62/46/28/12%), with an axis and a measured-sounding subtitle. That was compliance, not a rogue writer.
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>2. orphaned_chart (publication_validator.py:1056, HIGH) then fires unless prose near the embed says &quot;chart&quot;/&quot;figure&quot;/&quot;shows&quot;/&quot;illustrates&quot; — pushing the writer to describe the chart, with nothing verifying the description is true. That is how &quot;As the chart below illustrates, undetected defects do not flow linearly into rework&quot; came to be written about a static four-bar comparison.
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>3. Two gates combined manufactured two defects. article_evaluator then scored the result 76 and the validator PASSED it.
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>4. Two of the eight calibration cases are this defect — docs/evals/review-gate/cases/g4-fabricated-chart-figures.yaml and g2-chart-shows-something-other-than-claimed.yaml. Use them as the regression targets rather than inventing new ones.
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>5. The owner&#39;s stated position (2026-08-01): a chart is mandatory WHEN THE RESEARCH SUPPORTS ONE, not because an article exists.
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>B-043 deliberately did not fix this, and the reason decides the spec&#39;s shape: missing_chart fires CORRECTLY. The defect is its setpoint. A proof of teeth cannot catch a wrong setpoint — that is the taxonomy gap the sensor spec&#39;s open question 3 leaves for its own ADR, and it is still open. Decide whether that ADR belongs in this spec or beside it.
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>Files: scripts/publication_validator.py, src/agent_sdk/_shared.py (_auto_embed_chart at 664, called at 887), src/agent_sdk/stage3_runner.py.
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>You inherit a standing check B-043 shipped. scripts/check_sensor_proofs.py runs in make ci-local and fails when a script a gate site invokes has no proof in docs/sensors/register.yaml — add or move a sensor and the gate goes red until you register it. Run `.venv/bin/python scripts/check_sensor_proofs.py --list` to see the 20 entries. publication_validator&#39;s entry carries a B-042 note that must be updated if you change its setpoint.
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>Branch off main. Run make ci-local before you push — you are the merge gate, main is unprotected, it needs the venv on PATH, and it is now 2,761 tests.
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>Traps, all in docs/HANDOFF.md: bare `python` does not exist outside the venv; `export PATH :=` in a Makefile does NOT make make use it (GNU make 3.81 direct-execs metacharacter-free lines against its own startup PATH — name $(VENV_BIN)/&lt;tool&gt;); read logs/agent_sdk_costs.jsonl rather than quoting a remembered duration; and the publish-guard PreToolUse hook matches a bare string, so it blocks any command whose text merely mentions the deploy script, including a grep or a heredoc — split the command or use an editor tool.
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>Still blocked on the owner, not on code: the testing-shortcuts-migration-deadline article needs its artifact re-sourced (docs/research/artifact-sourcing-prompt.md) and its hero drawn by hand. It should not be published as it stands — B-042 is why.
+</code></pre></div>
+<h3 id="the-facts-that-prompt-asserts-and-where-they-were-checked">The facts that prompt asserts, and where they were checked<a class="headerlink" href="#the-facts-that-prompt-asserts-and-where-they-were-checked" title="Permanent link">&para;</a></h3>
+<p>Every line number in it was verified on 2026-08-01 rather than carried from the backlog:
+<code>missing_chart</code> CRITICAL at <code>publication_validator.py:1031</code>, <code>orphaned_chart</code> HIGH at <code>:1056</code>,
+<code>_auto_embed_chart</code> at <code>src/agent_sdk/_shared.py:664</code> called at <code>:887</code>, and both chart
+calibration cases present in <code>docs/evals/review-gate/cases/</code>.</p>
 <p><strong>B-043 deliberately does not fix it</strong>, and the reason is worth keeping: <code>missing_chart</code> <strong>fires
 correctly</strong>. The defect is its <em>setpoint</em> — a chart is mandatory even when the research carries no
 chartable data, so the pipeline invented four percentages to comply. A proof of teeth cannot catch
@@ -3005,10 +3068,10 @@ on both and <strong>should not be published as it stands</strong> — see B-040'
 <p><strong><code>scripts/html_to_brief.py</code> exists and works.</strong> Spec <code>docs/specs/html-research-ingestion.md</code>
 was LGTM'd and implemented the same day; <code>tests/test_html_to_brief.py</code> is 46 tests, 94%
 coverage on the module. Nothing about it is pending.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python<span class="w"> </span>scripts/html_to_brief.py<span class="w"> </span>~/Downloads/conversation.html<span class="w"> </span>--slug<span class="w"> </span>ai-code-review
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1"># → docs/research/ai-code-review.md   (refuses to overwrite without --force)</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nv">IS_SANDBOX</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">&quot;&lt;topic&gt;&quot;</span><span class="w"> </span>--brief<span class="w"> </span>docs/research/ai-code-review.md
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python<span class="w"> </span>scripts/html_to_brief.py<span class="w"> </span>~/Downloads/conversation.html<span class="w"> </span>--slug<span class="w"> </span>ai-code-review
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c1"># → docs/research/ai-code-review.md   (refuses to overwrite without --force)</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nv">IS_SANDBOX</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">&quot;&lt;topic&gt;&quot;</span><span class="w"> </span>--brief<span class="w"> </span>docs/research/ai-code-review.md
 </code></pre></div>
 <p><strong>Cost and duration, from the ledger rather than from memory.</strong> <code>logs/agent_sdk_costs.jsonl</code>
 records <code>wall_seconds</code> and per-stage cost for every run and has since April. Across the five
@@ -3016,7 +3079,7 @@ recorded runs: <strong>3.4–15.4 minutes, $0.25–$1.31</strong>. Only one exce
 spent $0.88 of its $1.31 on live research, which <code>--brief</code> skips entirely. The figure this
 file used to quote — "~$1 and ~35 minutes" — was folklore contradicted by the repo's own
 data; a 2026-08-01 session repeated it back to the owner before checking. Read the ledger:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>.venv/bin/python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import json;[print(r[&#39;timestamp&#39;][:10], round(r[&#39;wall_seconds&#39;]/60,1),&#39;min&#39;, &#39;\$&#39;+str(round(r[&#39;total_cost_usd&#39;],2))) for r in map(json.loads, open(&#39;logs/agent_sdk_costs.jsonl&#39;))]&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>.venv/bin/python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import json;[print(r[&#39;timestamp&#39;][:10], round(r[&#39;wall_seconds&#39;]/60,1),&#39;min&#39;, &#39;\$&#39;+str(round(r[&#39;total_cost_usd&#39;],2))) for r in map(json.loads, open(&#39;logs/agent_sdk_costs.jsonl&#39;))]&quot;</span>
 </code></pre></div>
 <p>Then <strong>deploy to review, never straight to <code>_posts/</code></strong> — see
 the publishing section below. <code>--mode</code> is required (B-028).</p>
@@ -3332,9 +3395,9 @@ mypy baseline gate are all clean. 78 new tests this session: <code>test_sync_cop
 scoped to <code>scripts/*.py</code> and does not descend into <code>archived/</code>.</p>
 <h2 id="publishing-read-this-before-deploying-anything">Publishing — read this before deploying anything<a class="headerlink" href="#publishing-read-this-before-deploying-anything" title="Permanent link">&para;</a></h2>
 <p><code>--mode</code> is now <strong>required</strong> on <code>deploy_to_blog</code> (B-028). The sanctioned route:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>python<span class="w"> </span>-m<span class="w"> </span>scripts.deploy_to_blog<span class="w"> </span>--article<span class="w"> </span>output/posts/&lt;slug&gt;.md<span class="w"> </span>--mode<span class="w"> </span>review
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1"># read the printed https://&lt;host&gt;/review/&lt;slug&gt;-&lt;token&gt;/ page, then:</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>make<span class="w"> </span>publish<span class="w"> </span><span class="nv">SLUG</span><span class="o">=</span>&lt;slug&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python<span class="w"> </span>-m<span class="w"> </span>scripts.deploy_to_blog<span class="w"> </span>--article<span class="w"> </span>output/posts/&lt;slug&gt;.md<span class="w"> </span>--mode<span class="w"> </span>review
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># read the printed https://&lt;host&gt;/review/&lt;slug&gt;-&lt;token&gt;/ page, then:</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>make<span class="w"> </span>publish<span class="w"> </span><span class="nv">SLUG</span><span class="o">=</span>&lt;slug&gt;
 </code></pre></div>
 <p>This hand-off previously said "Then <code>deploy_to_blog</code> opens the PR" — and that is the line
 that was followed when article two published unreviewed. <code>CLAUDE.md</code> now carries the

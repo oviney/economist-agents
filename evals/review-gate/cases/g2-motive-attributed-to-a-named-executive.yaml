@@ -1,0 +1,14 @@
+id: g2-motive-attributed-to-a-named-executive
+gate: G2
+expected: fail
+source: testing-shortcuts-migration-deadline
+passage: >-
+  TSB Bank's chief executive Paul Pester ran precisely this playbook in April 2018,
+  accelerating a platform migration onto Sabadell's new core banking system over a
+  single weekend.
+why: >-
+  The verifiable facts are right — TSB, Pester, Sabadell, the April 2018 weekend
+  cutover. The claim attached to them is not: "ran precisely this playbook" asserts
+  that testing was cut for schedule velocity, and the cited source (TSB's Annual
+  Report and Accounts 2018) does not support that motive. A real, named person
+  carrying an unsupportable attribution is the most damaging shape this defect takes.

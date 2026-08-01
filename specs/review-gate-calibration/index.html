@@ -10,7 +10,7 @@
       
       
       
-        <link rel="canonical" href="https://oviney.github.io/economist-agents/keyless-pipeline-runbook/">
+        <link rel="canonical" href="https://oviney.github.io/economist-agents/specs/review-gate-calibration/">
       
       
       
@@ -18,19 +18,19 @@
         
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
-        <title>Runbook: Keyless pipeline on the Claude subscription (B-006 / B-009 / B-010) - Economist Agents</title>
+        <title>Spec — Calibrating the editorial review gate (B-040) - Economist Agents</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -49,7 +49,7 @@
       
     
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#runbook-keyless-pipeline-on-the-claude-subscription-b-006-b-009-b-010" class="md-skip">
+        <a href="#spec-calibrating-the-editorial-review-gate-b-040" class="md-skip">
           Skip to content
         </a>
       
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="Economist Agents" class="md-header__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+    <a href="../.." title="Economist Agents" class="md-header__button md-logo" aria-label="Economist Agents" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -108,7 +108,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Runbook: Keyless pipeline on the Claude subscription (B-006 / B-009 / B-010)
+              Spec — Calibrating the editorial review gate (B-040)
             
           </span>
         </div>
@@ -221,7 +221,7 @@
   
   
     <li class="md-tabs__item">
-      <a href=".." class="md-tabs__link">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -240,7 +240,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../getting-started/" class="md-tabs__link">
+      <a href="../../getting-started/" class="md-tabs__link">
         
   
   
@@ -261,7 +261,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../agent-registry-spec/" class="md-tabs__link">
+        <a href="../../agent-registry-spec/" class="md-tabs__link">
           
   
   
@@ -281,7 +281,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../adr/0001-extract-agent-definitions-to-yaml/" class="md-tabs__link">
+        <a href="../../adr/0001-extract-agent-definitions-to-yaml/" class="md-tabs__link">
           
   
   
@@ -301,7 +301,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../workflow-lifecycle/" class="md-tabs__link">
+        <a href="../../workflow-lifecycle/" class="md-tabs__link">
           
   
   
@@ -321,7 +321,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../guides/WORKFLOW_GUIDE/" class="md-tabs__link">
+        <a href="../../guides/WORKFLOW_GUIDE/" class="md-tabs__link">
           
   
   
@@ -341,7 +341,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../AGENT_PROMPT_PATTERNS/" class="md-tabs__link">
+        <a href="../../AGENT_PROMPT_PATTERNS/" class="md-tabs__link">
           
   
   
@@ -361,7 +361,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../AGENT_VELOCITY_ANALYSIS/" class="md-tabs__link">
+        <a href="../../AGENT_VELOCITY_ANALYSIS/" class="md-tabs__link">
           
   
   
@@ -395,7 +395,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="Economist Agents" class="md-nav__button md-logo" aria-label="Economist Agents" data-md-component="logo">
+    <a href="../.." title="Economist Agents" class="md-nav__button md-logo" aria-label="Economist Agents" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -425,7 +425,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -452,7 +452,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../getting-started/" class="md-nav__link">
+      <a href="../../getting-started/" class="md-nav__link">
         
   
   
@@ -533,7 +533,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../agent-registry-spec/" class="md-nav__link">
+      <a href="../../agent-registry-spec/" class="md-nav__link">
         
   
   
@@ -561,7 +561,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../FLOW_ARCHITECTURE/" class="md-nav__link">
+      <a href="../../FLOW_ARCHITECTURE/" class="md-nav__link">
         
   
   
@@ -589,7 +589,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../AUTONOMOUS_ORCHESTRATION_STRATEGY/" class="md-nav__link">
+      <a href="../../AUTONOMOUS_ORCHESTRATION_STRATEGY/" class="md-nav__link">
         
   
   
@@ -617,7 +617,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ARCHITECTURE_PATTERNS/" class="md-nav__link">
+      <a href="../../ARCHITECTURE_PATTERNS/" class="md-nav__link">
         
   
   
@@ -645,7 +645,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ARCHITECTURE_REVIEW_PROCESS/" class="md-nav__link">
+      <a href="../../ARCHITECTURE_REVIEW_PROCESS/" class="md-nav__link">
         
   
   
@@ -734,7 +734,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0001-extract-agent-definitions-to-yaml/" class="md-nav__link">
+      <a href="../../adr/0001-extract-agent-definitions-to-yaml/" class="md-nav__link">
         
   
   
@@ -762,7 +762,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0002-agent-registry-pattern/" class="md-nav__link">
+      <a href="../../adr/0002-agent-registry-pattern/" class="md-nav__link">
         
   
   
@@ -790,7 +790,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0003-phased-crewai-migration/" class="md-nav__link">
+      <a href="../../adr/0003-phased-crewai-migration/" class="md-nav__link">
         
   
   
@@ -818,7 +818,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0004-python-version-constraint/" class="md-nav__link">
+      <a href="../../adr/0004-python-version-constraint/" class="md-nav__link">
         
   
   
@@ -846,7 +846,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0005-agile-discipline-enforcement/" class="md-nav__link">
+      <a href="../../adr/0005-agile-discipline-enforcement/" class="md-nav__link">
         
   
   
@@ -874,7 +874,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0006-agent-framework-selection/" class="md-nav__link">
+      <a href="../../adr/0006-agent-framework-selection/" class="md-nav__link">
         
   
   
@@ -902,7 +902,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0007-content-intelligence-engine/" class="md-nav__link">
+      <a href="../../adr/0007-content-intelligence-engine/" class="md-nav__link">
         
   
   
@@ -930,7 +930,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0008-agent-skill-governance/" class="md-nav__link">
+      <a href="../../adr/0008-agent-skill-governance/" class="md-nav__link">
         
   
   
@@ -958,7 +958,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0009-architecture-audit-rubric/" class="md-nav__link">
+      <a href="../../adr/0009-architecture-audit-rubric/" class="md-nav__link">
         
   
   
@@ -986,7 +986,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0010-scripts-to-src-migration/" class="md-nav__link">
+      <a href="../../adr/0010-scripts-to-src-migration/" class="md-nav__link">
         
   
   
@@ -1014,7 +1014,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0011-opt-in-recursive-deep-research/" class="md-nav__link">
+      <a href="../../adr/0011-opt-in-recursive-deep-research/" class="md-nav__link">
         
   
   
@@ -1042,7 +1042,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0012-retire-agent-registry/" class="md-nav__link">
+      <a href="../../adr/0012-retire-agent-registry/" class="md-nav__link">
         
   
   
@@ -1070,7 +1070,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0013-keyless-claude-web-research/" class="md-nav__link">
+      <a href="../../adr/0013-keyless-claude-web-research/" class="md-nav__link">
         
   
   
@@ -1098,7 +1098,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0014-retire-paid-github-actions-generation/" class="md-nav__link">
+      <a href="../../adr/0014-retire-paid-github-actions-generation/" class="md-nav__link">
         
   
   
@@ -1126,7 +1126,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0015-local-first-verification/" class="md-nav__link">
+      <a href="../../adr/0015-local-first-verification/" class="md-nav__link">
         
   
   
@@ -1154,7 +1154,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0016-single-pipeline-path/" class="md-nav__link">
+      <a href="../../adr/0016-single-pipeline-path/" class="md-nav__link">
         
   
   
@@ -1182,7 +1182,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0017-gate-publishable-content-at-deploy/" class="md-nav__link">
+      <a href="../../adr/0017-gate-publishable-content-at-deploy/" class="md-nav__link">
         
   
   
@@ -1210,7 +1210,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../adr/0018-editorial-review-gate/" class="md-nav__link">
+      <a href="../../adr/0018-editorial-review-gate/" class="md-nav__link">
         
   
   
@@ -1299,7 +1299,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow-lifecycle/" class="md-nav__link">
+      <a href="../../workflow-lifecycle/" class="md-nav__link">
         
   
   
@@ -1327,7 +1327,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/using-agent-skills/SKILL/" class="md-nav__link">
+      <a href="../../skills/using-agent-skills/SKILL/" class="md-nav__link">
         
   
   
@@ -1409,7 +1409,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/adr-governance/SKILL/" class="md-nav__link">
+      <a href="../../skills/adr-governance/SKILL/" class="md-nav__link">
         
   
   
@@ -1437,7 +1437,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/agent-delegation/SKILL/" class="md-nav__link">
+      <a href="../../skills/agent-delegation/SKILL/" class="md-nav__link">
         
   
   
@@ -1465,7 +1465,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/agent-traceability/SKILL/" class="md-nav__link">
+      <a href="../../skills/agent-traceability/SKILL/" class="md-nav__link">
         
   
   
@@ -1493,7 +1493,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/architecture-patterns/SKILL/" class="md-nav__link">
+      <a href="../../skills/architecture-patterns/SKILL/" class="md-nav__link">
         
   
   
@@ -1521,7 +1521,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/article-evaluation/SKILL/" class="md-nav__link">
+      <a href="../../skills/article-evaluation/SKILL/" class="md-nav__link">
         
   
   
@@ -1549,7 +1549,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/blog-post-review/SKILL/" class="md-nav__link">
+      <a href="../../skills/blog-post-review/SKILL/" class="md-nav__link">
         
   
   
@@ -1577,7 +1577,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/defect-prevention/SKILL/" class="md-nav__link">
+      <a href="../../skills/defect-prevention/SKILL/" class="md-nav__link">
         
   
   
@@ -1605,7 +1605,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/devops/SKILL/" class="md-nav__link">
+      <a href="../../skills/devops/SKILL/" class="md-nav__link">
         
   
   
@@ -1633,7 +1633,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/economist-writing/SKILL/" class="md-nav__link">
+      <a href="../../skills/economist-writing/SKILL/" class="md-nav__link">
         
   
   
@@ -1661,7 +1661,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/editorial-illustration/SKILL/" class="md-nav__link">
+      <a href="../../skills/editorial-illustration/SKILL/" class="md-nav__link">
         
   
   
@@ -1689,7 +1689,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/mcp-development/SKILL/" class="md-nav__link">
+      <a href="../../skills/mcp-development/SKILL/" class="md-nav__link">
         
   
   
@@ -1717,7 +1717,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/observability/SKILL/" class="md-nav__link">
+      <a href="../../skills/observability/SKILL/" class="md-nav__link">
         
   
   
@@ -1745,7 +1745,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/python-quality/SKILL/" class="md-nav__link">
+      <a href="../../skills/python-quality/SKILL/" class="md-nav__link">
         
   
   
@@ -1773,7 +1773,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/quality-gates/SKILL/" class="md-nav__link">
+      <a href="../../skills/quality-gates/SKILL/" class="md-nav__link">
         
   
   
@@ -1801,7 +1801,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/research-sourcing/SKILL/" class="md-nav__link">
+      <a href="../../skills/research-sourcing/SKILL/" class="md-nav__link">
         
   
   
@@ -1829,7 +1829,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/testing/SKILL/" class="md-nav__link">
+      <a href="../../skills/testing/SKILL/" class="md-nav__link">
         
   
   
@@ -1857,7 +1857,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../skills/visual-qa/SKILL/" class="md-nav__link">
+      <a href="../../skills/visual-qa/SKILL/" class="md-nav__link">
         
   
   
@@ -1954,7 +1954,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/WORKFLOW_GUIDE/" class="md-nav__link">
+      <a href="../../guides/WORKFLOW_GUIDE/" class="md-nav__link">
         
   
   
@@ -1982,7 +1982,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/BLOG_DEPLOYMENT/" class="md-nav__link">
+      <a href="../../guides/BLOG_DEPLOYMENT/" class="md-nav__link">
         
   
   
@@ -2010,7 +2010,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/COPILOT_SYNC/" class="md-nav__link">
+      <a href="../../guides/COPILOT_SYNC/" class="md-nav__link">
         
   
   
@@ -2038,7 +2038,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/CI_MONITORING_GUIDE/" class="md-nav__link">
+      <a href="../../guides/CI_MONITORING_GUIDE/" class="md-nav__link">
         
   
   
@@ -2066,7 +2066,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/PYTHON_VERSION_TROUBLESHOOTING/" class="md-nav__link">
+      <a href="../../guides/PYTHON_VERSION_TROUBLESHOOTING/" class="md-nav__link">
         
   
   
@@ -2094,7 +2094,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/IMPLEMENTATION_ROADMAP/" class="md-nav__link">
+      <a href="../../guides/IMPLEMENTATION_ROADMAP/" class="md-nav__link">
         
   
   
@@ -2122,7 +2122,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/VALIDATION_QUICK_REF/" class="md-nav__link">
+      <a href="../../guides/VALIDATION_QUICK_REF/" class="md-nav__link">
         
   
   
@@ -2211,7 +2211,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../AGENT_PROMPT_PATTERNS/" class="md-nav__link">
+      <a href="../../AGENT_PROMPT_PATTERNS/" class="md-nav__link">
         
   
   
@@ -2239,7 +2239,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../AGENT_QUALITY_GATES/" class="md-nav__link">
+      <a href="../../AGENT_QUALITY_GATES/" class="md-nav__link">
         
   
   
@@ -2267,7 +2267,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../DEFINITION_OF_DONE/" class="md-nav__link">
+      <a href="../../DEFINITION_OF_DONE/" class="md-nav__link">
         
   
   
@@ -2295,7 +2295,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../DEFECT_PREVENTION/" class="md-nav__link">
+      <a href="../../DEFECT_PREVENTION/" class="md-nav__link">
         
   
   
@@ -2323,7 +2323,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../CHART_DESIGN_SPEC/" class="md-nav__link">
+      <a href="../../CHART_DESIGN_SPEC/" class="md-nav__link">
         
   
   
@@ -2412,7 +2412,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../AGENT_VELOCITY_ANALYSIS/" class="md-nav__link">
+      <a href="../../AGENT_VELOCITY_ANALYSIS/" class="md-nav__link">
         
   
   
@@ -2440,7 +2440,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../SPRINT_DISCIPLINE_GUIDE/" class="md-nav__link">
+      <a href="../../SPRINT_DISCIPLINE_GUIDE/" class="md-nav__link">
         
   
   
@@ -2468,7 +2468,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../CHANGELOG/" class="md-nav__link">
+      <a href="../../CHANGELOG/" class="md-nav__link">
         
   
   
@@ -2523,55 +2523,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#one-time-setup" class="md-nav__link">
+  <a href="#objective" class="md-nav__link">
     <span class="md-ellipsis">
       
-        One-time setup
+        Objective
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#1-generate-keyless" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Generate (keyless)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="1. Generate (keyless)">
+    <nav class="md-nav" aria-label="Objective">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#opt-in-brief-for-flagship-posts-b-012" class="md-nav__link">
+  <a href="#why-this-and-not-something-else" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Opt-in: --brief for flagship posts (B-012)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#-brief-with-an-uncited-artifact-will-manufacture-citations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ⚠ --brief with an uncited artifact will manufacture citations
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#what-a-run-actually-costs-read-the-ledger-do-not-quote-a-remembered-figure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What a run actually costs — read the ledger, do not quote a remembered figure
+        Why this and not something else
       
     </span>
   </a>
@@ -2584,10 +2551,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-publish-keyless-free-github-token-opens-a-pr-you-review" class="md-nav__link">
+  <a href="#what-calibration-means-here-precisely" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Publish (keyless — free GitHub token, opens a PR you review)
+        What "calibration" means here, precisely
       
     </span>
   </a>
@@ -2595,10 +2562,71 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-runs-and-on-what-auth" class="md-nav__link">
+  <a href="#design" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What runs, and on what auth
+        Design
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Design">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-unit-of-work-is-a-finding-not-an-article" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The unit of work is a finding, not an article
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#balance-is-not-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Balance is not optional
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#isolated-judge-per-gate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Isolated judge per gate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deterministic-where-possible-model-based-where-necessary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deterministic where possible, model-based where necessary
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commands
       
     </span>
   </a>
@@ -2606,10 +2634,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#honest-limitations" class="md-nav__link">
+  <a href="#project-structure" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Honest limitations
+        Project structure
       
     </span>
   </a>
@@ -2617,10 +2645,76 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#deprecated-path" class="md-nav__link">
+  <a href="#testing-strategy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Deprecated path
+        Testing strategy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#boundaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Boundaries
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#success-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Success criteria
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#not-in-scope-for-v1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Not in scope for v1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sequencing-why-this-is-specced-now-and-built-later" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sequencing — why this is specced now and built later
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites-shipped-alongside-this-spec-2026-08-01" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites shipped alongside this spec (2026-08-01)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open questions
       
     </span>
   </a>
@@ -2647,187 +2741,237 @@
   
 
 
-<h1 id="runbook-keyless-pipeline-on-the-claude-subscription-b-006-b-009-b-010">Runbook: Keyless pipeline on the Claude subscription (B-006 / B-009 / B-010)<a class="headerlink" href="#runbook-keyless-pipeline-on-the-claude-subscription-b-006-b-009-b-010" title="Permanent link">&para;</a></h1>
-<p>Generate <strong>and publish</strong> an article with <strong>no paid API keys</strong> — no
-<code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, or <code>SERPER_API_KEY</code>. All LLM work
-(writer, graphics, research, vision) runs on your Claude subscription through
-the Agent SDK (<code>claude_agent_sdk.query()</code> → the authenticated <code>claude</code> CLI).
-Publishing opens a PR on the blog repo using a <strong>free</strong> GitHub token.</p>
-<p>This is the canonical, verified path (B-010 acceptance run: keyless generate +
-blog PR on 2026-07-21).</p>
-<h2 id="one-time-setup">One-time setup<a class="headerlink" href="#one-time-setup" title="Permanent link">&para;</a></h2>
-<p>The pipeline has historically only run in GitHub Actions, so a local checkout
-needs provisioning. On a stock Debian/Ubuntu python, <code>ensurepip</code> is stripped, so
-<code>python3 -m venv</code> produces a venv without pip — bootstrap it with <code>get-pip.py</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv<span class="w">                                   </span><span class="c1"># .venv is gitignored</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>curl<span class="w"> </span>-sS<span class="w"> </span>https://bootstrap.pypa.io/get-pip.py<span class="w"> </span><span class="p">|</span><span class="w"> </span>.venv/bin/python<span class="w">   </span><span class="c1"># ensurepip is stripped</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>.venv/bin/pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt<span class="w">               </span><span class="c1"># ~100 packages</span>
-</code></pre></div>
-<p>The <code>claude</code> CLI must be installed and logged in to your subscription (<code>claude</code>
-on PATH; credentials in <code>~/.claude/</code>).</p>
-<h2 id="1-generate-keyless">1. Generate (keyless)<a class="headerlink" href="#1-generate-keyless" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># IS_SANDBOX=1 is required ONLY when running as root — the SDK otherwise refuses</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c1"># --dangerously-skip-permissions. Drop it if you run as a normal user.</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nv">IS_SANDBOX</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">&quot;your topic here&quot;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span>--research-mode<span class="w"> </span>claude_web
-</code></pre></div>
-<ul>
-<li><code>--research-mode claude_web</code> — <strong>use this.</strong> Claude does its own live web
-  research via built-in <code>WebSearch</code>/<code>WebFetch</code> (ADR-0013). The <code>deterministic</code>
-  mode (arXiv + Semantic Scholar) is heavily rate-limited from most environments
-  and frequently aborts the run with empty research (BUG-050); <code>claude_web</code>
-  avoids those APIs entirely and is the reliable keyless default.</li>
-<li>There are no image modes any more (B-021). The run goes end to end: Stage 3
-  draws the hero SVG itself (B-016b) alongside the chart, and writes
-  <code>output/posts/&lt;slug&gt;.md</code>.</li>
-</ul>
-<p>Exit <code>0</code> = publication validator passed (publish-ready); <code>1</code> = validator issues;
-<code>2</code> = research failed (retry, or you are on <code>deterministic</code> — switch to
-<code>claude_web</code>).</p>
-<h3 id="opt-in-brief-for-flagship-posts-b-012">Opt-in: <code>--brief</code> for flagship posts (B-012)<a class="headerlink" href="#opt-in-brief-for-flagship-posts-b-012" title="Permanent link">&para;</a></h3>
-<p>For a cornerstone post where sourcing quality matters most, run the
-<code>deep-research</code> harness first to produce a verified, cited brief
-(<code>docs/research/&lt;slug&gt;.md</code>), then hand it to the writer:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">IS_SANDBOX</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">&quot;&lt;topic&gt;&quot;</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span>--brief<span class="w"> </span>docs/research/&lt;slug&gt;.md
-</code></pre></div>
-<p><code>--brief</code> skips the research step and uses that file (refuted claims are
-stripped automatically). <strong>This is opt-in and heavy</strong> — one deep-research run is
-~2M tokens and can hit your session limit — so <code>claude_web</code> stays the everyday
-default; reserve <code>--brief</code> for the pieces that warrant it.</p>
-<h3 id="-brief-with-an-uncited-artifact-will-manufacture-citations">⚠ <code>--brief</code> with an uncited artifact will manufacture citations<a class="headerlink" href="#-brief-with-an-uncited-artifact-will-manufacture-citations" title="Permanent link">&para;</a></h3>
-<p><strong>Measured 2026-08-01, on the first real B-038 run.</strong> The brief was converted from an owner
-research artifact that contained <strong>zero <code>&lt;a href&gt;</code> and one unsourced statistic</strong>. <code>--brief</code>
-skips the research step, so the writer received an argument with no evidence — and filled the
-gap itself. The article came back with:</p>
-<ul>
-<li>a chart carrying <strong>four invented percentages</strong> (62/46/28/12%) presented with an axis and a
-  measured-sounding subtitle, where the brief had contained exactly one number;</li>
-<li>prose describing that chart as showing accumulation and a threshold it does not plot —
-  ADR-0018's chart finding reproduced exactly, one day after that ADR was accepted;</li>
-<li>a <strong>named real executive</strong> given a motive the cited annual report cannot support;</li>
-<li>a fabricated ratio ("cuts two sprints … <em>typically</em> surrenders six to eight");</li>
-<li>three references, <strong>zero URLs</strong>.</li>
-</ul>
-<p><code>article_evaluator</code> scored it <strong>76</strong> and the publication validator <strong>passed</strong> it, because
-counting checks can see "chart embedded: yes" and "3 references cited" and nothing further.
-That is the 88%-vs-51 gap of ADR-0018, live.</p>
-<p><strong>The tool did what it was asked.</strong> The defect is upstream: an artifact with no evidence is
-not a research brief, it is an argument. Before running <code>--brief</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>grep<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;href=&#39;</span><span class="w"> </span>&lt;artifact&gt;.html<span class="w">      </span><span class="c1"># zero links is the warning sign</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>grep<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;](http&#39;</span><span class="w"> </span>docs/research/&lt;slug&gt;.md<span class="w">   </span><span class="c1"># and in the converted brief</span>
-</code></pre></div>
-<p>If that returns 0, either add sources to the artifact first — <code>docs/research/artifact-sourcing-prompt.md</code>
-is a prompt to paste back into the conversation that produced it — or expect to review the
-output as fabrication-until-proven-otherwise. <strong>Never publish such a run without the
-<code>blog-post-review</code> gate.</strong> The eight labelled defects from this run are now calibration cases
-in <code>docs/evals/review-gate/cases/</code> (B-040).</p>
-<h3 id="what-a-run-actually-costs-read-the-ledger-do-not-quote-a-remembered-figure">What a run actually costs — read the ledger, do not quote a remembered figure<a class="headerlink" href="#what-a-run-actually-costs-read-the-ledger-do-not-quote-a-remembered-figure" title="Permanent link">&para;</a></h3>
-<p><code>logs/agent_sdk_costs.jsonl</code> records <code>wall_seconds</code>, <code>stage3_seconds</code> and per-stage cost for
-every run, and has since 2026-04-26. Across the five recorded runs:</p>
+<h1 id="spec-calibrating-the-editorial-review-gate-b-040">Spec — Calibrating the editorial review gate (B-040)<a class="headerlink" href="#spec-calibrating-the-editorial-review-gate-b-040" title="Permanent link">&para;</a></h1>
+<p><strong>Status:</strong> DRAFT — awaiting owner LGTM · <strong>Opened:</strong> 2026-08-01
+<strong>Blocks:</strong> ADR-0018 Decision 3 (advisory → blocking)
+<strong>Reference:</strong> <a href="https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents">Demystifying evals for AI agents</a> (Anthropic, engineering blog)</p>
+<h2 id="objective">Objective<a class="headerlink" href="#objective" title="Permanent link">&para;</a></h2>
+<p>ADR-0018 adopted <code>skills/blog-post-review</code> and deliberately kept it <strong>advisory</strong>:</p>
+<blockquote>
+<p>Run the gate in advisory mode first, blocking later. … It does not automatically block a
+publish until calibration data exists. … Promote to blocking once a false-positive rate is
+known.</p>
+</blockquote>
+<p><strong>Nothing has ever produced that number.</strong> The gate has been executed exactly once, by hand,
+on one article. So the most capable instrument in the pipeline — the only one that catches
+fidelity defects the deterministic evaluator provably cannot — is frozen in advisory mode by
+a measurement nobody has taken.</p>
+<p>This spec defines that measurement. <strong>It is not a plan to make the gate blocking.</strong> It
+produces the evidence that decision needs; the decision stays the owner's.</p>
+<h3 id="why-this-and-not-something-else">Why this and not something else<a class="headerlink" href="#why-this-and-not-something-else" title="Permanent link">&para;</a></h3>
+<p>Reviewing the repo against the Anthropic evals guide, the eval surface is lopsided in a
+specific way:</p>
 <table>
 <thead>
 <tr>
-<th></th>
-<th>Wall clock</th>
-<th>Total cost</th>
-<th>Research share</th>
+<th>Guide's requirement</th>
+<th>This repo</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Range</td>
-<td><strong>3.4 – 15.4 min</strong></td>
-<td><strong>$0.25 – $1.31</strong></td>
-<td>$0.00 – $0.88</td>
+<td>Code-based graders</td>
+<td><strong>Strong</strong> — <code>article_evaluator</code> (5 dimensions, 841 records), <code>publication_validator</code>, <code>_shared.py</code> gates, <code>skill_eval</code></td>
 </tr>
 <tr>
-<td>Typical (<code>--brief</code>, research skipped)</td>
-<td>3.4 – 4.8 min</td>
-<td>$0.25 – $0.49</td>
-<td>$0.00</td>
+<td>Model-based grader</td>
+<td>Exists — <code>blog-post-review</code>, 5 gates + 6 weighted dimensions</td>
 </tr>
 <tr>
-<td>The one live-research run</td>
-<td>15.4 min</td>
-<td>$1.31</td>
-<td>$0.88</td>
+<td>"LLM-as-judge graders should be closely calibrated with human experts"</td>
+<td><strong>Absent.</strong> n=1, and that run contained a near-false-positive</td>
+</tr>
+<tr>
+<td>A fixed eval set with known verdicts</td>
+<td><strong>Absent.</strong> <code>logs/article_evals.json</code> is 841 rows of <em>production monitoring</em>, not an eval set</td>
+</tr>
+<tr>
+<td>Balanced positive <strong>and</strong> negative cases</td>
+<td>Present in exactly one file (<code>skills/economist-writing/eval.yaml</code>)</td>
+</tr>
+<tr>
+<td>Capability vs regression evals</td>
+<td>Not distinguished</td>
 </tr>
 </tbody>
 </table>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>.venv/bin/python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import json;[print(r[&#39;timestamp&#39;][:10], round(r[&#39;wall_seconds&#39;]/60,1),&#39;min&#39;, &#39;\$&#39;+str(round(r[&#39;total_cost_usd&#39;],2))) for r in map(json.loads, open(&#39;logs/agent_sdk_costs.jsonl&#39;))]&quot;</span>
-</code></pre></div>
-<p><code>docs/HANDOFF.md</code> and this runbook used to say "~$1 and ~35 minutes". No recorded run has
-ever come close to 35 minutes. A 2026-08-01 session quoted that number back to the owner and
-defended it before checking the ledger sitting in <code>logs/</code>. <strong>The instrument existed; nobody
-read it.</strong> That is a worse failure than not measuring, because the folklore number is the one
-everybody repeats. If a run feels slow, add its row and compare — do not estimate.</p>
-<h2 id="2-publish-keyless-free-github-token-opens-a-pr-you-review">2. Publish (keyless — free GitHub token, opens a PR you review)<a class="headerlink" href="#2-publish-keyless-free-github-token-opens-a-pr-you-review" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">BLOG_REPO_TOKEN</span><span class="o">=</span>&lt;free<span class="w"> </span>GitHub<span class="w"> </span>PAT<span class="w"> </span>with<span class="w"> </span>push<span class="w"> </span>to<span class="w"> </span>oviney/blog&gt;<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span>.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>scripts.deploy_to_blog<span class="w"> </span>--blog-owner<span class="w"> </span>oviney<span class="w"> </span>--blog-repo<span class="w"> </span>blog
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="c1"># add --dry-run first to validate without pushing.</span>
-</code></pre></div>
-<p>This clones the blog repo, commits the latest <code>output/posts/*</code> article + chart
-on a <code>content/&lt;slug&gt;-&lt;ts&gt;</code> branch, and opens a PR on <code>oviney/blog</code>. <strong>You review
-and merge that PR to go live</strong> — the human publication gate is unchanged. The
-token needs only <code>Contents</code> + <code>Pull requests</code> write on <code>oviney/blog</code> — no AI key.</p>
-<h2 id="what-runs-and-on-what-auth">What runs, and on what auth<a class="headerlink" href="#what-runs-and-on-what-auth" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Stage</th>
-<th>Mechanism</th>
-<th>Key needed</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Research</td>
-<td><code>claude_web</code> → <code>query()</code> + WebSearch/WebFetch</td>
-<td>none (subscription)</td>
-</tr>
-<tr>
-<td>Writer + Graphics</td>
-<td>Stage 3 <code>query()</code></td>
-<td>none (subscription)</td>
-</tr>
-<tr>
-<td>Hero image</td>
-<td>Stage 3 draws it as SVG itself (B-016b)</td>
-<td>none (subscription)</td>
-</tr>
-<tr>
-<td>Vision alt/caption</td>
-<td>Stage 3 <code>query()</code> over the drawn hero</td>
-<td>none (subscription)</td>
-</tr>
-<tr>
-<td>Quality gates + validator</td>
-<td>deterministic Python</td>
-<td>none</td>
-</tr>
-</tbody>
-</table>
-<h2 id="honest-limitations">Honest limitations<a class="headerlink" href="#honest-limitations" title="Permanent link">&para;</a></h2>
+<p>The gap is not "we need more graders". It is that the one judgment-based grader has no ground
+truth to be checked against, so it cannot be trusted, improved, or promoted.</p>
+<h2 id="what-calibration-means-here-precisely">What "calibration" means here, precisely<a class="headerlink" href="#what-calibration-means-here-precisely" title="Permanent link">&para;</a></h2>
+<p>Not "does the rubric score articles well." That is unfalsifiable. Calibration is <strong>agreement
+between the rubric's verdict and the owner's verdict, per gate, on the same input.</strong></p>
+<p>Ground truth is the owner's judgement. The guide is explicit that human graders establish
+ground truth and that model graders must be checked against them — a rubric cannot calibrate
+itself, and an LLM cannot supply the ground truth for an LLM judge (that is the ADR-0018
+failure mode one level up).</p>
+<p>Two numbers come out, and they are not symmetric in cost:</p>
 <ul>
-<li><strong><code>claude_web</code> research is non-deterministic</strong> and puts an LLM in the research
-  path — a deliberate, opt-in departure from the LLM-free default (ADR-0013).
-  Source quality depends on the model's search behaviour; the
-  <code>citation_verifier</code> / <code>publication_validator</code> citation gates still apply.</li>
-<li><strong>The hero is Claude-drawn SVG, never raster.</strong> There is no DALL-E path —
-  image generation was retired (ADR-0014) and CLAUDE.md #4 forbids pixel models.
-  To supply art by hand, overwrite <code>output/posts/images/&lt;slug&gt;-hero.svg</code> (the
-  <code>.image_prompt.md</code> sidecar is the brief) and re-run.</li>
-<li><strong>Topic is manual on this route.</strong> <code>pipeline.py</code> takes the topic as an argument.
-  This used to be forced: <code>EconomistContentFlow</code>'s Stage-1 discovery required
-  <code>ANTHROPIC_API_KEY</code> (BUG-046). <strong>That is fixed as of 2026-07-31</strong> —
-  <code>create_llm_client</code> now defaults to a keyless <code>agent_sdk</code> provider, so the flow's
-  discovery and editorial-review stages run on the subscription too. This single
-  command remains the simplest route, not the only one.</li>
+<li><strong>False-positive rate</strong> — the gate fails something the owner would have passed. This is the
+  number ADR-0018 blocks on, because a blocking gate with false positives stops good articles
+  and trains the owner to override it, which destroys the gate.</li>
+<li><strong>False-negative rate</strong> — the gate passes something the owner would have failed. Cheaper
+  today, because a human still approves every publish. It becomes the important number only
+  <em>after</em> promotion to blocking.</li>
 </ul>
-<h2 id="deprecated-path">Deprecated path<a class="headerlink" href="#deprecated-path" title="Permanent link">&para;</a></h2>
-<p><code>scripts/economist_agent.py</code> still requires a paid key and will exit with a
-pointer here if run keyless. Use <code>python -m src.agent_sdk.pipeline</code> instead.</p>
+<h2 id="design">Design<a class="headerlink" href="#design" title="Permanent link">&para;</a></h2>
+<h3 id="the-unit-of-work-is-a-finding-not-an-article">The unit of work is a finding, not an article<a class="headerlink" href="#the-unit-of-work-is-a-finding-not-an-article" title="Permanent link">&para;</a></h3>
+<p>This is the load-bearing design decision. The obvious approach — collect 20–50 articles with
+verdicts — is not available: the repo has 2 generated articles and 26 published ones, and
+producing more costs a pipeline run each.</p>
+<p>But the guide's actual instruction is <strong>"20-50 simple tasks drawn from real failures"</strong> — and
+real failures already exist at finding granularity:</p>
+<ul>
+<li><strong>10 labelled fidelity defects</strong> from the one real review (ADR-0018 enumerates them: a
+  9-hour baseline described as measuring something it does not, a predictor attributed to a
+  ranking that does not contain it, an organisation-level conclusion imported into a paper
+  reporting no organisation-level outcome, a statistic with its offsetting clause deleted, a
+  chart referenced as showing figures it does not contain, …)</li>
+<li><strong>1 labelled near-false-positive</strong> — the summarised Graphite fetch that would have produced
+  a false G2 failure on a figure that is correct and is Graphite's own published number. This
+  one case is worth more than the ten positives, because it is the only direct evidence about
+  the failure mode that actually blocks promotion.</li>
+</ul>
+<p>Each becomes a case: <strong>passage + gate + expected verdict + why</strong>. A case is small, unambiguous
+and cheap, and one article yields ten of them.</p>
+<h3 id="balance-is-not-optional">Balance is not optional<a class="headerlink" href="#balance-is-not-optional" title="Permanent link">&para;</a></h3>
+<p>The guide's web-search example makes the point: a set containing only cases where the agent
+<em>should</em> fire optimises a one-sided detector. A gate evaluated only on real defects will
+appear excellent right up until it blocks everything.</p>
+<p>So roughly <strong>half the set must be negatives</strong> — correct passages, mined from the 26 published
+articles, where the expected verdict is <em>pass</em>. These are the cases that detect an over-eager
+judge, and they are the ones today's evidence base has exactly one of.</p>
+<p>Target: <strong>~25 cases, ~10 positive / ~15 negative.</strong> The guide notes small sets suffice early
+because effect sizes are large. Twenty-five is enough to distinguish "fires on nothing" from
+"fires on everything"; it is not enough for a confidence interval, and the report must say so.</p>
+<h3 id="isolated-judge-per-gate">Isolated judge per gate<a class="headerlink" href="#isolated-judge-per-gate" title="Permanent link">&para;</a></h3>
+<p>The guide recommends grading "each dimension with an isolated LLM-as-judge rather than using
+one to grade all dimensions." <code>REVIEW_PROMPT.md</code> currently grades 5 gates and 6 weighted
+dimensions in one 99-line pass.</p>
+<p><strong>v1 does not change the rubric.</strong> It runs the gate <strong>as accepted on 2026-07-31</strong>, so the
+baseline measures the artefact the owner approved. Splitting into isolated per-gate judges is
+a <em>second</em> experiment, run against that baseline, and it is the natural first use of the
+harness rather than a precondition for it. Changing the instrument and measuring it in the
+same step would leave neither result interpretable.</p>
+<h3 id="deterministic-where-possible-model-based-where-necessary">Deterministic where possible, model-based where necessary<a class="headerlink" href="#deterministic-where-possible-model-based-where-necessary" title="Permanent link">&para;</a></h3>
+<p>Case selection, bookkeeping, agreement arithmetic and the report are plain Python — no LLM.
+The judge is the only model-based component, invoked keyless via the Agent SDK per Operating
+Constraint #3. This keeps the harness re-runnable at zero marginal cost, which is the
+property that decides whether it gets run twice.</p>
+<h2 id="commands">Commands<a class="headerlink" href="#commands" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Run the whole calibration set and write a report</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>python<span class="w"> </span>scripts/calibrate_review_gate.py<span class="w"> </span>--cases<span class="w"> </span>docs/evals/review-gate/<span class="w"> </span>--out<span class="w"> </span>logs/review_gate_calibration.json
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Re-run a single gate&#39;s cases while iterating on the rubric</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>python<span class="w"> </span>scripts/calibrate_review_gate.py<span class="w"> </span>--gate<span class="w"> </span>G5
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Report only, from the last run (no model calls)</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>python<span class="w"> </span>scripts/calibrate_review_gate.py<span class="w"> </span>--report
+</code></pre></div>
+<h2 id="project-structure">Project structure<a class="headerlink" href="#project-structure" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>docs/evals/review-gate/cases/*.yaml   # one file per case: passage, gate, expected, why
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>docs/evals/review-gate/README.md      # how to add a case; the balance rule
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>scripts/calibrate_review_gate.py      # runner + agreement arithmetic + report
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>tests/test_calibrate_review_gate.py   # tests of the harness, with the judge stubbed
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>logs/review_gate_calibration.json     # append-only; one row per calibration run
+</code></pre></div>
+<p>Case format:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">g2-baseline-measures-something-else</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nt">gate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">G2</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nt">expected</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fail</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">review-queue-throughput-tax</span><span class="w">   </span><span class="c1"># provenance — a real failure, not an invention</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nt">passage</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;-</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="no">The 9-hour baseline shows review latency is dominated by queue depth.</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="nt">why</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;-</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="no">The cited study&#39;s 9-hour figure measures time-to-first-comment, not total latency.</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="no">The claim overstates the source&#39;s scope. ADR-0018 finding 3.</span>
+</code></pre></div>
+<h2 id="testing-strategy">Testing strategy<a class="headerlink" href="#testing-strategy" title="Permanent link">&para;</a></h2>
+<p>TDD per <code>agent-skills:test-driven-development</code>. <code>tests/test_calibrate_review_gate.py</code>,
+deterministic, <strong>no model calls in the test suite</strong> — the judge is stubbed, so the tests
+exercise the harness and the arithmetic, not Claude:</p>
+<ul>
+<li>Agreement arithmetic is correct for hand-computed fixtures, including the degenerate cases
+  (all-pass, all-fail, empty)</li>
+<li>False-positive and false-negative rates are reported <strong>separately</strong>, never averaged into a
+  single "accuracy" that hides which direction the gate errs in</li>
+<li>A case file missing <code>expected</code> or <code>why</code> is rejected loudly rather than skipped</li>
+<li>The set's positive/negative balance is reported on every run, so drifting to one-sided is
+  visible</li>
+<li><code>n</code> is reported alongside every rate; a rate from fewer than 20 cases is labelled
+  provisional in the output itself</li>
+<li>Re-running with the judge stubbed to a fixed verdict reproduces byte-identical arithmetic</li>
+</ul>
+<h2 id="boundaries">Boundaries<a class="headerlink" href="#boundaries" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Always:</strong> report false positives and false negatives separately, with <code>n</code>; keep case
+  provenance (a case is drawn from a real failure or a real published article, never invented);
+  keep the harness keyless and re-runnable.</li>
+<li><strong>Ask first:</strong> any change to <code>rubric.md</code> or <code>REVIEW_PROMPT.md</code> scoring — those are the
+  instrument under test, and ADR-0018 is one day old; promoting the gate to blocking.</li>
+<li><strong>Never:</strong> use an LLM to generate ground-truth verdicts (that is the failure mode this
+  measures); average the two error rates into one number; report a rate without <code>n</code>; let the
+  harness edit the rubric it is measuring.</li>
+</ul>
+<h2 id="success-criteria">Success criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[ ] <code>python scripts/calibrate_review_gate.py</code> runs the full set keyless and writes a report</li>
+<li>[ ] The report states, separately and with <code>n</code>: false-positive rate, false-negative rate,
+      per-gate agreement, and the positive/negative balance of the set</li>
+<li>[ ] ≥20 cases, ≥40% of them negatives, every one traceable to a real article or a real finding</li>
+<li>[ ] The output is sufficient to answer ADR-0018 Decision 3 — i.e. the owner can read it and
+      decide promote / do not promote / fix the rubric first</li>
+<li>[ ] <code>make ci-local</code> green; ≥80% coverage on the new module</li>
+<li>[ ] No new dependency, no key, no network beyond the judge's own source fetching</li>
+</ul>
+<h2 id="not-in-scope-for-v1">Not in scope for v1<a class="headerlink" href="#not-in-scope-for-v1" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>pass@k / pass^k.</strong> The guide positions these for mature agents measuring small
+  improvements. Five recorded pipeline runs and one gate execution is not that.</li>
+<li><strong>Promoting the gate to blocking.</strong> This produces the evidence; ADR-0018 Decision 3 stays
+  the owner's call.</li>
+<li><strong>Splitting the rubric into isolated per-gate judges.</strong> The obvious first experiment <em>after</em>
+  a baseline exists, not before.</li>
+<li><strong>A dashboard.</strong> <code>logs/review_gate_calibration.json</code> is append-only; reading it is a
+  one-liner. <code>skills/observability</code> already claims a <code>quality_dashboard.json</code> that does not
+  exist — adding a second unread artefact is the wrong direction.</li>
+<li><strong>Re-measuring the deterministic evaluator.</strong> The 88%-vs-51 spread is measured, documented
+  and accepted. Nothing further to learn.</li>
+</ul>
+<h2 id="sequencing-why-this-is-specced-now-and-built-later">Sequencing — why this is specced now and built later<a class="headerlink" href="#sequencing-why-this-is-specced-now-and-built-later" title="Permanent link">&para;</a></h2>
+<p>The harness design depends on data the repo does not yet have. If the gate BLOCKs everything,
+the useful work is threshold tuning. If it passes everything, ADR-0018's own warning applies —
+"scores clustering above 85 would mean the rubric is broken rather than the pipeline" — and
+the useful work is anchor revision. Those are different tools.</p>
+<p><strong>Build after n≈5 real reviews.</strong> Those accrue for free: every article already goes to the
+unlisted review URL for owner approval (B-013 / B-028), so the only added cost is the owner
+recording, per gate, whether they agreed. One line per run. Shipping becomes data collection
+instead of a separate project.</p>
+<p>Until then this spec sits here, and the two prerequisites below ship immediately because
+waiting on them corrupts the data the baseline is made of.</p>
+<h2 id="prerequisites-shipped-alongside-this-spec-2026-08-01">Prerequisites shipped alongside this spec (2026-08-01)<a class="headerlink" href="#prerequisites-shipped-alongside-this-spec-2026-08-01" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>G5 added to the machine-readable verdict block in <code>REVIEW_PROMPT.md</code> and the rubric
+   card.</strong> ADR-0018 Decision 2 states G5 was amended "into the machine-readable verdict
+   block"; it reached <code>SKILL.md:165</code> but <strong>not</strong> <code>REVIEW_PROMPT.md:85</code>, which is the file
+   actually pasted into a review session. Every review run until now would have silently
+   dropped G5's result — the gate that exists precisely because a reversed DORA statistic
+   passed the other four.</li>
+<li><strong>The runbook's cost/duration figures replaced with the recorded range.</strong> <code>HANDOFF.md</code> and
+   the runbook said "~$1 and ~35 minutes"; <code>logs/agent_sdk_costs.jsonl</code> has recorded
+   <code>wall_seconds</code> per run since April and no run has exceeded <strong>15.4 minutes</strong>. The instrument
+   existed and went unread while its folklore contradiction got repeated in two documents.</li>
+</ol>
+<h2 id="open-questions">Open questions<a class="headerlink" href="#open-questions" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Who writes the negative cases?</strong> Mining ~15 correct passages from the 26 published
+   articles is mechanical but needs judgement about what "correct" means. Proposed: the agent
+   drafts them with provenance, the owner spot-checks a sample rather than all fifteen.</li>
+<li><strong>Does a G1 UNVERIFIED count as a false positive</strong> when the source is real but unreachable
+   at review time? The rubric says "unverified is not false, but this blog cannot ship an
+   unverified number" — defensible as policy, but it will inflate the false-positive rate
+   against a human who would fetch the source a second time. Proposed: count it as a distinct
+   third outcome, <code>unverified</code>, and report it separately rather than folding it either way.</li>
+</ol>
 
 
 
@@ -2883,10 +3027,10 @@ pointer here if run keyless. Use <code>python -m src.agent_sdk.pipeline</code> i
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

@@ -2812,7 +2812,15 @@ coverage on the module. Nothing about it is pending.</p>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nv">IS_SANDBOX</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">&quot;&lt;topic&gt;&quot;</span><span class="w"> </span>--brief<span class="w"> </span>docs/research/ai-code-review.md
 </code></pre></div>
-<p>~$1 and ~35 minutes for the run. Then <strong>deploy to review, never straight to <code>_posts/</code></strong> — see
+<p><strong>Cost and duration, from the ledger rather than from memory.</strong> <code>logs/agent_sdk_costs.jsonl</code>
+records <code>wall_seconds</code> and per-stage cost for every run and has since April. Across the five
+recorded runs: <strong>3.4–15.4 minutes, $0.25–$1.31</strong>. Only one exceeded 5 minutes, and that one
+spent $0.88 of its $1.31 on live research, which <code>--brief</code> skips entirely. The figure this
+file used to quote — "~$1 and ~35 minutes" — was folklore contradicted by the repo's own
+data; a 2026-08-01 session repeated it back to the owner before checking. Read the ledger:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>.venv/bin/python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import json;[print(r[&#39;timestamp&#39;][:10], round(r[&#39;wall_seconds&#39;]/60,1),&#39;min&#39;, &#39;\$&#39;+str(round(r[&#39;total_cost_usd&#39;],2))) for r in map(json.loads, open(&#39;logs/agent_sdk_costs.jsonl&#39;))]&quot;</span>
+</code></pre></div>
+<p>Then <strong>deploy to review, never straight to <code>_posts/</code></strong> — see
 the publishing section below. <code>--mode</code> is required (B-028).</p>
 <p><strong>Why it is a converter and not a claim-extractor</strong>, so a fresh session does not re-derive it:
 <code>load_brief_file</code> does exactly two things — read the file, strip <code>## Refuted…</code> — and
@@ -3126,9 +3134,9 @@ mypy baseline gate are all clean. 78 new tests this session: <code>test_sync_cop
 scoped to <code>scripts/*.py</code> and does not descend into <code>archived/</code>.</p>
 <h2 id="publishing-read-this-before-deploying-anything">Publishing — read this before deploying anything<a class="headerlink" href="#publishing-read-this-before-deploying-anything" title="Permanent link">&para;</a></h2>
 <p><code>--mode</code> is now <strong>required</strong> on <code>deploy_to_blog</code> (B-028). The sanctioned route:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python<span class="w"> </span>-m<span class="w"> </span>scripts.deploy_to_blog<span class="w"> </span>--article<span class="w"> </span>output/posts/&lt;slug&gt;.md<span class="w"> </span>--mode<span class="w"> </span>review
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c1"># read the printed https://&lt;host&gt;/review/&lt;slug&gt;-&lt;token&gt;/ page, then:</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>make<span class="w"> </span>publish<span class="w"> </span><span class="nv">SLUG</span><span class="o">=</span>&lt;slug&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>python<span class="w"> </span>-m<span class="w"> </span>scripts.deploy_to_blog<span class="w"> </span>--article<span class="w"> </span>output/posts/&lt;slug&gt;.md<span class="w"> </span>--mode<span class="w"> </span>review
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1"># read the printed https://&lt;host&gt;/review/&lt;slug&gt;-&lt;token&gt;/ page, then:</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>make<span class="w"> </span>publish<span class="w"> </span><span class="nv">SLUG</span><span class="o">=</span>&lt;slug&gt;
 </code></pre></div>
 <p>This hand-off previously said "Then <code>deploy_to_blog</code> opens the PR" — and that is the line
 that was followed when article two published unreviewed. <code>CLAUDE.md</code> now carries the

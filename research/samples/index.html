@@ -2534,6 +2534,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#check-it-has-sources-before-you-run-the-pipeline-on-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check it has sources before you run the pipeline on it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#why-real-samples-not-invented-ones" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2587,6 +2598,16 @@ what the conversation was about:</p>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>docs/research/samples/platform-eng-adoption.html
 </code></pre></div>
 <p>Nothing else needs to change. The converter and its tests discover whatever is here.</p>
+<h2 id="check-it-has-sources-before-you-run-the-pipeline-on-it">Check it has sources before you run the pipeline on it<a class="headerlink" href="#check-it-has-sources-before-you-run-the-pipeline-on-it" title="Permanent link">&para;</a></h2>
+<p><strong>Measured 2026-08-01:</strong> an artifact here with zero <code>&lt;a href&gt;</code> produced an article with a
+fabricated chart, an unsupportable attribution to a named executive, and three reference
+entries carrying no URLs — because <code>--brief</code> skips research, so the writer had no evidence and
+supplied its own. The deterministic evaluator scored it 76 and passed it.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>grep<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;href=&#39;</span><span class="w"> </span>docs/research/samples/&lt;file&gt;.html<span class="w">   </span><span class="c1"># zero is the warning sign</span>
+</code></pre></div>
+<p>If it returns 0, paste <code>docs/research/artifact-sourcing-prompt.md</code> back into the conversation
+that produced the artifact and re-export. An artifact with no evidence is an argument, not a
+research brief, and nothing downstream can tell the difference.</p>
 <h2 id="why-real-samples-not-invented-ones">Why real samples, not invented ones<a class="headerlink" href="#why-real-samples-not-invented-ones" title="Permanent link">&para;</a></h2>
 <p>The tests can run on synthetic fixtures, and v1 ships with three (headings-and-prose,
 blockquote-heavy, table-bearing) precisely so the tool is not blocked on a sample. But a

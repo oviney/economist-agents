@@ -18,21 +18,33 @@ repos:
         description: Lint Python code with ruff (check only)
         args: []
 
-  # Mypy - Static type checking (temporarily non-blocking)
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.2
+  # Mypy - Static type checking, gated on a per-file baseline
+  #
+  # B-031: this was `stages: [manual]`, so it never ran — an inert sensor next to a
+  # CLAUDE.md that says "Type hints mandatory". It is now a real pre-commit hook.
+  #
+  # `--follow-imports=silent` is what makes that survivable. pre-commit passes the staged
+  # files, but mypy follows their imports, so without the flag a commit touching one clean
+  # file inherits errors from the 611-error repo-wide backlog — and the gate would be back
+  # on `manual` within a day. Scoped this way it reports only errors in the files being
+  # committed. Repo-wide mypy stays advisory in `make ci-local` for that reason.
+  #
+  # B-035 Task 2: even scoped, raw mypy blocked 12 of 48 `scripts/` files (25%) on errors
+  # the commit did not introduce — the noise-overload failure mode that gets a gate
+  # reverted to `manual`. `mypy_baseline.py` wraps the same mypy invocation and compares
+  # per-file error counts against `docs/mypy-baseline.md`, so pre-existing debt is
+  # grandfathered but a NEW error still blocks. The baseline is a count, not a mute, and
+  # `tests/test_mypy_baseline.py` fails if any number grows — raising it to unblock a
+  # commit fails the suite instead. Same mechanism B-032 used for complexity.
+  - repo: local
     hooks:
-      - id: mypy
-        name: mypy type check
-        description: Static type checking with mypy (non-blocking)
-        files: ^scripts/
-        args: [--config-file=mypy.ini, --no-error-summary]
-        additional_dependencies:
-          - types-PyYAML
-          - types-requests
+      - id: mypy-baseline
+        name: mypy type check (baselined)
+        description: Block new type errors; grandfather those in docs/mypy-baseline.md
+        entry: .venv/bin/python scripts/mypy_baseline.py
+        language: system
+        files: ^scripts/.*\.py$
         verbose: true
-        # Temporarily non-blocking - 498 type errors to be fixed in separate PR
-        stages: [manual]
 
   # Pytest - Run test suite on push (not commit for speed)
   - repo: local
@@ -47,14 +59,30 @@ repos:
         always_run: true
         stages: [pre-push]  # Only run on git push, not git commit
 
-      # Badge validation - Prevent stale badges (BUG-023)
+      # Badge validation — REBUILT 2026-07-31 (BUG-023, B-036).
+      #
+      # The previous hook ran `python3 scripts/validate_badges.py`, a script
+      # archived to scripts/archived/ in #327/#343. Its entry was
+      # `bash -c '... || true'`, which swallowed both the stale-badge failures it
+      # existed to catch AND the "no such file" error proving it had no
+      # implementation — inert twice over. B-031 removed the `|| true` and the
+      # next push failed, which is how any of this surfaced.
+      #
+      # The badges had in fact gone stale: two pointed at GitHub Actions
+      # workflows ADR-0015 retired, and the Python badge disagreed with
+      # .python-version. Rewritten rather than resurrected — the archived copy
+      # resolved paths relative to scripts/ (it looked for scripts/README.md) and
+      # exited 0 while printing failures, so it could not have gated anything.
+      #
+      # Note `.venv/bin/python`, not `python3`: the old entry used system python,
+      # which here is 3.14 and has none of the project's dependencies.
       - id: badge-validation
         name: validate README badges
-        description: Ensure badges match live data (prevents BUG-023)
-        entry: bash -c 'python3 scripts/validate_badges.py || true'
+        description: Fail when a badge outlives what it describes (BUG-023)
+        entry: .venv/bin/python scripts/validate_badges.py
         language: system
         pass_filenames: false
-        files: ^(README\.md|quality_score\.json|data/skills_state/sprint_tracker\.json|.*_badge\.json)$
+        files: ^(README\.md|\.python-version|\.github/workflows/.*)$
         always_run: false
 
       # ADR governance lint (skills/adr-governance/SKILL.md)
@@ -86,16 +114,9 @@ repos:
         pass_filenames: false
         files: ^agents/.*\.yaml$
 
-      # Skills format validation (GH #294)
-      - id: validate-skills
-        name: validate SKILL.md format
-        description: Enforce skill anatomy (docs/skill-anatomy.md)
-        entry: python3 scripts/validate_skills.py
-        language: system
-        pass_filenames: false
-        files: ^skills/.*/SKILL\.md$
-        always_run: false
-        always_run: false
+      # B-031: a second `validate-skills` registration lived here — same hook id as
+      # the one above, and with `always_run: false` duplicated as a YAML key so the
+      # later mapping silently won. Removed; the registration above is the only one.
 
       # Architecture review - catches anti-patterns before CI (issue: pre-commit-arch-review)
       - id: arch-review
@@ -133,21 +154,8 @@ repos:
         name: check for merge conflicts
         description: Check for merge conflict markers
 
-  # Pre-push hook for coverage check (temporarily manual while building up coverage)
-  - repo: local
-    hooks:
-      - id: pytest-coverage
-        name: pytest with coverage
-        description: Run tests with coverage check (>40%)
-        entry: pytest
-        args:
-          - tests/
-          - --cov=scripts
-          - --cov-report=term-missing
-          - --cov-fail-under=40
-          - -v
-        language: system
-        pass_filenames: false
-        always_run: true
-        # Temporarily manual - current coverage 51.92%, target 80%
-        stages: [manual]
+  # B-031: a `pytest-coverage` hook lived here on `stages: [manual]`, so it never
+  # ran, and it declared a 40% threshold while `make ci-local` declared 70% — two
+  # numbers for one gate, neither enforced here. Removed. Coverage has exactly one
+  # authority: `make ci-local` (70% overall, 90% src/quality), which `make test`
+  # now matches. The `pytest` pre-push hook above still runs the suite.

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Platform Engineering Adoption: What the Evidence Says</title>
+  <style>body { font-family: Georgia, serif; max-width: 42rem; }</style>
+</head>
+<body>
+  <header><nav>Home &middot; Research &middot; About</nav></header>
+  <main>
+    <h1>Platform Engineering Adoption: What the Evidence Says</h1>
+    <p>Internal developer platforms are pitched as a cure for cognitive load. The
+    evidence is thinner than the pitch, and it splits by organisation size.</p>
+
+    <h2>Where the claim comes from</h2>
+    <p>The 2024 <a href="https://dora.dev/research/2024/dora-report/">DORA report</a>
+    found that platform teams correlate with throughput gains only above roughly
+    <strong>1,500 engineers</strong>. Below that threshold the effect is <em>not</em>
+    distinguishable from noise.</p>
+    <p>A second reading, from <a href="https://www.thoughtworks.com/radar">the Thoughtworks
+    Radar</a>, places platform-as-a-product in <code>adopt</code> but qualifies it with a
+    team-size caveat.</p>
+
+    <h3>The caveat everyone drops</h3>
+    <p>The throughput figure is measured against teams that had no golden path at all.
+    It is not a comparison against a well-run monorepo.</p>
+
+    <h2>What to watch</h2>
+    <ul>
+      <li>Platform team headcount as a share of engineering</li>
+      <li>Time-to-first-deploy for a new service
+        <ul>
+          <li>Measured from repository creation</li>
+          <li>Excluding approval queues</li>
+        </ul>
+      </li>
+      <li>Voluntary adoption rate &mdash; the only honest signal</li>
+    </ul>
+
+    <ol>
+      <li>Measure the baseline before building anything.</li>
+      <li>Ship one golden path.</li>
+      <li>Refuse to mandate it for six months.</li>
+    </ol>
+  </main>
+  <footer>Generated in conversation &copy; 2026</footer>
+  <script>console.log("analytics beacon");</script>
+</body>
+</html>

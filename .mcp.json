@@ -34,20 +34,7 @@
       "args": [
         "mcp_servers/web_researcher_server.py"
       ],
-      "env": {
-        "SERPER_API_KEY": "${SERPER_API_KEY}"
-      },
-      "description": "Web search (Serper/Google), Google Scholar, arXiv academic search, and page fetching as MCP tools"
-    },
-    "image-generator": {
-      "command": "python3",
-      "args": [
-        "mcp_servers/image_generator_server.py"
-      ],
-      "env": {
-        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
-      },
-      "description": "DALL-E 3 image generation for the content pipeline"
+      "description": "Keyless arXiv academic search and page fetching. The paid search leg was removed by #438; its stale env requirement was removed by B-034 (CLAUDE.md constraints #1-#3)"
     },
     "published-topics": {
       "command": "python3",

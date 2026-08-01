@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Build vs Buy: Observability, Costed</title>
+  <link rel="stylesheet" href="artifact.css">
+</head>
+<body>
+  <div class="artifact">
+    <h1>Build vs Buy: Observability, Costed</h1>
+    <p>Two tables carry this analysis. Dropping them would lose the comparison entirely.</p>
+
+    <h2>Headline costs</h2>
+    <table>
+      <thead>
+        <tr><th>Option</th><th>Year-one cost</th><th>Ongoing FTE</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Vendor SaaS</td><td>$240,000</td><td>0.5</td><td>Priced per host | per GB ingested</td></tr>
+        <tr><td>Self-hosted OSS</td><td>$95,000</td><td>2.0</td><td>Includes<br>on-call rotation</td></tr>
+        <tr><td>Hybrid</td><td>$160,000</td><td>1.2</td><td>Traces vendor-side, metrics local</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Second-order effects</h2>
+    <table>
+      <tr><td>Retention</td><td>13 months</td><td>Vendor default; extending costs 40% more</td></tr>
+      <tr><td>Cardinality ceiling</td><td>~1M series</td><td>Self-hosted hits this first</td></tr>
+    </table>
+
+    <p>The vendor's own documentation is unusually candid about the ceiling:
+    <q>High-cardinality labels are the single most common cause of unexpected bills.</q>
+    <cite>Vendor pricing FAQ, 2026</cite></p>
+
+    <p>Full pricing detail lives at
+    <a href="https://example.com/pricing?tier=enterprise&amp;region=us-east-1">the enterprise
+    pricing page</a>, which changed twice during this analysis.</p>
+
+    <hr>
+
+    <p><b>Bottom line:</b> hybrid wins on cost only if <i>trace volume</i> stays below
+    2 TB per month.</p>
+  </div>
+  <footer><small>Artifact export</small></footer>
+</body>
+</html>

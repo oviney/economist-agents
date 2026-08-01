@@ -22,6 +22,13 @@ single source of truth for skill semantics and lifecycle. See
 Every non-trivial task moves through these phases in order. Improvising the lifecycle
 by hand instead of invoking the skill is a blocker.
 
+**These are not files in this directory.** They load from the `agent-skills` plugin and are
+invoked as `agent-skills:<name>`. B-035 Task 3(a) deleted the 20 vendored copies that used
+to sit here: every invocation loaded from the plugin, never from this repo, so the copies
+were unread and free to drift. `../docs/workflow-lifecycle.md` indexes them with links
+upstream. `using-agent-skills` is the exception and is still local, for its 32 lines of
+Skill Routing Contract.
+
 | Phase | Skill | Purpose |
 |-------|-------|---------|
 | triage | `using-agent-skills` | Meta-skill: maps a task to the right phase skill |
@@ -75,7 +82,7 @@ supporting assets alongside the `SKILL.md`.
 1. Follow the structure of an existing `SKILL.md` (frontmatter + workflow body).
 2. Keep the skill focused on **one** workflow; cross-reference rather than duplicate.
 3. If it changes the lifecycle, update the routing contract in [`CLAUDE.md`](../CLAUDE.md).
-4. See the [documentation-and-adrs](documentation-and-adrs/SKILL.md) skill for how to
+4. See the `agent-skills:documentation-and-adrs` skill for how to
    record the decision.
 
 See [`CONTRIBUTING.md`](../CONTRIBUTING.md) for the review checklist.

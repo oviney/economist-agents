@@ -1,7 +1,7 @@
 # Ruff configuration for economist-agents
 
 # Target Python 3.11+
-target-version = "py311"
+target-version = "py313"
 
 # Line length
 line-length = 88
@@ -45,6 +45,18 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 [lint.isort]
 known-first-party = ["scripts"]
+
+# B-032 — the single source of truth for the complexity threshold.
+#
+# C901 and the PLR09xx family are deliberately NOT in `select` above: the repo carries 41
+# pre-existing C901 violations (worst: 33) and 75 PLR09xx, so selecting them globally
+# would turn `make ci-local` red on day one and the sensor would be disabled within the
+# hour. Instead `scripts/complexity_sensor.py` selects them explicitly and is pointed at
+# *touched files* by the PostToolUse hook in .claude/settings.json — where new complexity
+# is actually born. The threshold below is what that sensor reads, so raising it here
+# raises it everywhere, once.
+[lint.mccabe]
+max-complexity = 10
 
 [format]
 # Use double quotes for strings

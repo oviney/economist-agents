@@ -20,11 +20,13 @@ install:
 	pre-commit install --hook-type pre-push
 	@echo "✅ Installation complete"
 
+# B-031: threshold was 40 here and 70 in ci-local. One gate, one number — this
+# matches ci-local so a green `make test` means the same thing as a green gate.
 test:
 	pytest tests/ -v \
-		--cov=scripts \
+		--cov=src --cov=scripts \
 		--cov-report=term-missing \
-		--cov-fail-under=40
+		--cov-fail-under=70
 
 lint:
 	ruff check .
@@ -45,7 +47,8 @@ ci-local:
 	@echo "── ruff format ──"        && ruff format --check .
 	@echo "── ruff lint ──"          && ruff check .
 	@echo "── bare-name imports ──"  && python scripts/check_bare_name_imports.py
-	@echo "── mypy (advisory) ──"    && (mypy scripts/ || echo "⚠️  mypy advisory — known debt, non-blocking")
+	@echo "── mypy (advisory) ──"    && (mypy scripts/ || echo "⚠️  mypy advisory — repo-wide backlog is known-red (611 errors); NEW type errors are blocked per-commit by the baselined mypy hook (B-031, B-035 Task 2 — see docs/mypy-baseline.md)")
+	@echo "── mypy baseline gate ──" && .venv/bin/python scripts/mypy_baseline.py --all
 	@echo "── tests + coverage ──"   && pytest tests/ \
 		--cov=src --cov=scripts \
 		--cov-report=term-missing \

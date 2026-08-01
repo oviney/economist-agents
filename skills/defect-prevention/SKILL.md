@@ -118,8 +118,46 @@ than no rule, because it reads like protection.
 Neither of these belongs in `check_all()`. They are recorded here because the
 lesson is about *where to look*, not about a pattern to match.
 
+## The defect that was never there: asserting from a surface reading
+
+The costliest defects in this repo's record are not the ones that shipped. They
+are the three that **did not exist** and were acted on anyway. Each was asserted
+from a glance, and each was disproved by a single command that takes under a
+second:
+
+| Claim | Disproved by | Cost of not running it first |
+|---|---|---|
+| A hero image had a clipped top card | a four-line border-pixel check | a $0.49 redraw that fixed nothing (B-027) |
+| `.gitignore` left `defect_tracker.json` untracked, so three defects existed on one laptop only | `git ls-files` | a whole backlog item, opened and withdrawn (~~B-025~~) |
+| `backup/integration-test-20260728` was "the only copy" of the auth work | `git branch --contains 73e73c0` | three days of caution shaping B-023's framing |
+
+The shape is identical every time. An observation arrives that *looks* like
+evidence — a thumbnail, a `git add` hint about a directory pattern, a branch name
+with "backup" in it. It gets promoted to a finding without the one check that
+would settle it, and then work is built on top.
+
+Note what the second one actually was: `git add` printed *"The following paths
+are ignored… data/skills_state"*, a **hint** about the directory pattern. The
+already-tracked file was staged anyway and went into the commit. A hint was read
+as an error.
+
+**The rule: before an observation becomes a finding, name the command that would
+disprove it — then run that command first.**
+
+If you cannot name such a command, say so explicitly and mark the claim as
+unverified rather than asserting it. This is cheap: all three commands above are
+sub-second, and all three were available at the moment the claim was made.
+
+This is a *habit*, not a `check_all()` rule — there is no artefact to pattern-match
+against. It is recorded here because three instances make it a class, not an
+accident.
+
 ## Red Flags
 
+- **A claim about the repo's state that no command was run to confirm** — "the
+  only copy", "that file is untracked", "the image is clipped". Run the command.
+- **A tool hint read as a tool error** — `git add`'s ignored-paths notice is the
+  worked example. Check the exit code and the resulting state, not the prose.
 - **A gate that cannot see what it is meant to guard** — e.g. a check that runs
   before the content it validates is injected. Verify the ordering, not just the
   pattern.

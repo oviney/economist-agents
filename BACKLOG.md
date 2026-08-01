@@ -30,6 +30,11 @@ _(none)_
 > day (see below); **B-026** and **B-027** landed the same day (see Done). Ids are
 > never reused, so all three numbers stay spent. **B-028** and **B-029** are open,
 > both from the RCA on the skipped review stage.
+>
+> **Opened 2026-07-29 from the harness audit.** **B-030 … B-034** come from auditing
+> this repo against SE Radio 730 (harness engineering). They generalise B-028 and
+> B-029: a guide the default ignores, and a sensor that cannot fail. See the
+> "Harness engineering" section below.
 
 ### B-028 · The unreviewed publish path must stop being the default
 
@@ -101,7 +106,23 @@ unlisted URL. It now carries the workflow as an operating instruction. Also corr
 followed), `.github/copilot-instructions.md` — whose cited line 29 had drifted since the RCA,
 so the workflow went into its hand-authored Developer Workflow section instead.
 
-#### Task 3 — decide whether `--mode post` should exist at all (needs a spec + LGTM)
+#### ~~Task 3~~ — WON'T DO, decided 2026-07-31
+
+**The accident is already prevented three times over**, so removal buys a fourth lock on a
+bolted door:
+
+1. `--mode` is required — a bare invocation fails (Task 1).
+2. B-030's `PreToolUse` hook **denies** `deploy_to_blog` without `--mode review`.
+3. Six documents now describe the review route, `CLAUDE.md` included (Task 2).
+
+What removal *costs* is an escape hatch — republishing, repairing a live post, anything
+where review is not the point. And it is a behavioural removal with governance history
+(B-015a tuned `deploy()`'s staging for PR scope), so it is not a cheap deletion either.
+
+Recorded rather than deleted: the original reasoning below is sound, and if a fourth
+unreviewed publish ever happens *despite* all three gates, this is the item to reopen.
+
+<details><summary>Original Task 3 rationale (kept for the record)</summary>
 
 If review → promote is the sanctioned route, `--mode post` may have no remaining
 role: `promote_review.py` already writes `_posts/` on the live branch. Retiring it
@@ -111,6 +132,8 @@ behavioural removal with a governance history (B-015a tuned `deploy()`'s staging
 for PR scope), so it needs a spec and an owner decision — not a quiet deletion.
 
 **Dependencies:** Tasks 1–2. **Scope:** S (spec) + S (removal), owner-gated.
+
+</details>
 
 ### B-029 · The acceptance oracle renames its input, so it does not test the deploy path
 
@@ -163,6 +186,512 @@ The BUG-069 reproduction runs as a test rather than being asserted statically: w
 `_dated_post_name` stubbed back to its no-op behaviour, the guard exits non-zero. It is the
 same defect *class* as B-031 — a check that could not fail the thing it existed to check.
 
+---
+
+## Harness engineering (B-030 … B-034) — opened 2026-07-29
+
+> **Source:** an audit of this repo against *SE Radio 730 — Birgitta Boeckeler on
+> Harness Engineering for AI Agents*. Full findings in
+> `docs/reviews/harness-engineering-assessment-2026-07-29.md`; spec in
+> `docs/specs/harness-engineering.md`.
+>
+> **The finding in one line.** This repo is **guide-maximal and
+> sensor-disconnected**: 8,031 lines of `SKILL.md` plus a strong sensor inventory
+> (ruff, mypy, pytest, bandit, four custom guards) with **zero hooks** wiring them
+> together — so every sensor fires at the owner's gate rather than the agent's, and
+> the owner performs triage an agent could have done mid-session.
+>
+> Boeckeler's framework splits harness work into **guides** (feed-forward: markdown,
+> codemods) and **sensors** (feedback: static analysis, tests — "that starts another
+> little loop where the agent tries to self-correct and then asks the sensor again").
+> Her warnings land squarely on **B-028** (*"a guide the default ignores"*) and
+> **B-029** (*"if my pipeline is always green… I would get suspicious"*) — those two
+> items are this episode's central failures, already self-diagnosed. B-030…B-034
+> generalise the fix.
+>
+> **Implementation order: B-034 → B-031 → B-032 → B-030 → B-033.** B-030 is the
+> highest-leverage item but not the first: 034 and 031 shrink the surface, 032
+> supplies the sensor 030 calls, and 033's value depends on 030's session recording.
+>
+> **Status 2026-07-29: all five BUILT on `fix/article-two-run-defects`, `make ci-local`
+> green** (2515 passed, 9 skipped, coverage 80.38%, `src/quality` 97%, bandit clean).
+> They stay in Todo until merged — per this file's convention, "done" means merged to
+> `main` via reviewed PR, and the owner is the merge gate (ADR-0015). Three decisions
+> are flagged for the owner in the spec's Open Questions: whether the `Stop` gate should
+> also run tests, whether mypy's per-commit enforcement is the right trade, and which
+> unmeasured guides to cut.
+
+### B-030 · Sensors must fire in the agent's loop, not only at the owner's gate
+
+**The gap.** There is no project `.claude/settings.json` at all;
+`.claude/settings.local.json` holds 122 permission entries and **no `hooks` key**. The
+only hooks anywhere are two user-level `terminal-notifier` calls. Every computational
+sensor is bound to `pre-commit`, `pre-push`, or `make ci-local`. An agent can therefore
+write 200 lines of Python and end its turn with the tree red and no signal having reached
+it; the owner discovers this later, with the agent's context already stale.
+
+**The fix — five hook wirings** in a committed `.claude/settings.json`:
+
+| Event | Matcher | Behaviour |
+|---|---|---|
+| `PostToolUse` | `Edit\|Write` | On `*.py`: format + autofix the touched file, then feed anything remaining (plus complexity findings from B-032) back as `additionalContext`. |
+| `PreToolUse` | `Bash` | **Deny** forbidden-key introduction and `deploy_to_blog` without `--mode review`. |
+| `PreToolUse` | `Write\|Edit` | Same deny set on the file-write path. |
+| `Stop` | — | Red tracked-Python tree → `decision: "block"` **once per session**, violations as the reason. |
+| `SessionStart` | — | Inject the five non-negotiable constraints, branch, and open `B-` items. |
+
+**Why the `PreToolUse` denies matter more than they look.** `CLAUDE.md` constraint #1 —
+**"NO new API keys. Ever."** — is the most emphatic sentence in the repo and has *zero*
+computational backing (grepped: neither `destructive_change_guard.py` nor
+`pre_commit_arch_check.py` mentions `OPENAI_API_KEY`). B-028 is the same shape: the review
+stage is prose, and the tool's default ignores it. **A policy expressed as a guide is
+skippable; expressed as a deny it is not.** This item does not touch
+`deploy_to_blog.py`'s default — that stays B-028's call — it makes the policy hold from
+the harness side either way.
+
+**Acceptance criteria:**
+- [x] `.claude/settings.json` is committed; `jq -e` resolves every hook command
+- [x] Each hook returns a valid payload and exit 0 for its documented stdin
+- [x] A forbidden-key `Bash` command is denied; `git status` is not
+- [x] `deploy_to_blog --mode post` is denied; `--mode review` is not
+- [x] `session_gate` blocks on first call, **does not block** on the second with the same
+      `session_id` (an unbounded blocking `Stop` hook is a session trap — this is the
+      guardrail, not a nicety)
+- [x] Malformed stdin → exit 0, empty payload, for **every** hook (a broken sensor must
+      degrade to no sensor, never to a blocked developer)
+- [x] `logs/sensor_history.jsonl` gains a snapshot line per edit; gitignored
+
+**Side benefit — revives dead code.** `scripts/agent_trace_logger.py` is a complete,
+schema-versioned, secret-redacting trace logger whose **only importer is its own test**.
+It becomes the snapshot writer, closing the observability gap Boeckeler describes ("how
+did the number of analysis violations evolve?").
+
+**Files:** `.claude/settings.json`, `scripts/hooks/*`, `.gitignore`,
+`tests/test_harness_hooks.py`. **Scope:** M.
+
+### B-031 · Four sensors cannot currently fail
+
+**The gap.** A green run proves nothing, because four gates are structurally incapable of
+going red:
+
+| Sensor | Why it is inert |
+|---|---|
+| mypy | `stages: [manual]`, `strict = False`, `check_untyped_defs = False`, **and** `ci-local` wraps it in `\|\| echo "advisory"` — while `CLAUDE.md` says "Type hints mandatory" |
+| coverage (pre-push) | `stages: [manual]` → never runs; and `make test` says 40 while `ci-local` says 70 |
+| badge validation | `entry: bash -c '... \|\| true'` — cannot fail, by construction, on a hook whose stated purpose is preventing BUG-023 |
+| `validate-skills` | registered **twice** under the same `id`, second copy has `always_run: false` duplicated as a YAML key |
+
+**The fix.** mypy becomes a real per-commit hook on the files being committed (repo-wide
+mypy stays advisory — 611 known errors is a separate project, and the `ci-local` comment
+now says so instead of implying debt-free). One coverage number, in one place. `|| true`
+deleted. Duplicate registration deleted.
+
+**Acceptance criteria:**
+- [x] No pre-commit hook entry contains `|| true` — asserted by test
+- [x] No hook `id` appears twice — asserted by test
+- [x] `make test` and `make ci-local` declare the **same** `--cov-fail-under`
+- [x] `pre-commit run --all-files` fails when a checked condition actually fails
+
+**Cross-reference, not scope.** **B-029** is the same class of defect — an oracle that
+renames its input and so cannot fail — but it lives in the blog deploy path and B-029 owns
+its fix. Both items are instances of one rule: *a sensor that cannot fire is worse than no
+sensor, because it manufactures confidence.*
+
+**Files:** `.pre-commit-config.yaml`, `Makefile`, `tests/test_harness_config.py`.
+**Scope:** S.
+
+### B-032 · Nothing regulates complexity — the characteristic AI-code failure mode
+
+**The gap.** `ruff.toml` selects `E, W, F, I, UP, B, C4, SIM`. No `C901`, no `PLR`, no
+`max-complexity` (grepped: zero hits). Measured during the audit:
+
+```
+41  C901     complex-structure     worst: generate_economist_post (33 > 10),
+                                   validate (28), review_writer_output (24)
+28  PLR0912  too-many-branches
+21  PLR0913  too-many-arguments
+18  PLR0915  too-many-statements
+```
+
+Boeckeler names over-long functions and cyclomatic complexity as *the* typical failure
+modes of AI-written code, "even with the big models." In a repo where an agent writes most
+of the code, this dimension is unregulated.
+
+**The fix — her ESLint technique, ported.** `scripts/complexity_sensor.py` wraps ruff and
+rewrites the output into a *judgment call* rather than a bare number: this is usually a
+smell, consider splitting it, and **if the complexity is genuinely warranted you may keep
+it by recording an override in `docs/harness-overrides.md` with a one-line justification —
+not a bare `noqa`.** The recorded overrides become the owner's review queue, which is the
+whole point: it is the tuning nobody does by hand.
+
+Enforcement is scoped to **touched files** via B-030's `PostToolUse` hook — where new
+complexity is actually born — so the 41-violation legacy baseline is *recorded* rather
+than retroactively enforced, and `ci-local` still passes on day one.
+
+**Acceptance criteria:**
+- [x] An over-complex function yields the judgment-call text and a non-zero exit
+- [x] A clean file yields no output and exit 0
+- [x] `--changed` scopes to `git diff --name-only`, skipping non-Python paths
+- [x] `make ci-local` still passes (legacy backlog recorded, not enforced retroactively)
+- [x] `docs/harness-overrides.md` exists with the register format and the day-one baseline
+
+**Files:** `scripts/complexity_sensor.py`, `ruff.toml`, `docs/harness-overrides.md`,
+`tests/test_complexity_sensor.py`. **Scope:** S.
+
+### B-033 · The guide layer has never been measured, so it can only grow
+
+**The gap.** 8,031 lines across 38 `SKILL.md`, plus a 210-line `CLAUDE.md`, a **2,601-line**
+`.github/copilot-instructions.md`, a `GEMINI.md`, and a root `copilot-instructions.md`.
+Nothing measures whether any of it changes an outcome. Product evals exist
+(`logs/article_evals.json`); **harness** evals do not.
+
+> "I just don't see the future as being like 50 markdown files in our code base… and then
+> in every markdown file we have very, very important, do the following, never do the
+> following. I mean, that can't be it. Can we still call ourselves engineers if that's how
+> we're doing stuff?"
+
+Her sharper point: many skills are *model-authored*, so the model may already know their
+content — in which case the file is pure context cost.
+
+**The fix.** `scripts/skill_eval.py`: `--list` for cheap triage (line count + mtime, so
+big-old-unreferenced surfaces first); `--skill <name>` runs the skill's `eval.yaml`
+scenarios with and without the skill in context and reports the delta against the existing
+deterministic scorer. A skill with no `eval.yaml` reports **`UNMEASURED`** rather than
+passing silently. Deterministic and `--dry-run` by default, so it is free to run and
+cannot fail on auth.
+
+**Acceptance criteria:**
+- [x] `--list` reports all 38 skills, largest first
+- [x] A skill with `eval.yaml` produces a with/without delta
+- [x] A skill without one reports `UNMEASURED`; `--strict` exits non-zero
+- [x] No LLM call on the default path
+
+**Non-goal: deletion.** This item produces evidence. Cutting any skill — including the
+2,601-line copilot file — is the owner's call.
+
+**Files:** `scripts/skill_eval.py`, `tests/test_skill_eval.py`. **Scope:** M.
+
+### B-034 · The harness offers the agent tools its own guides forbid
+
+**The gap.** `.mcp.json` still ships two servers whose declared `env` is prohibited:
+
+| Server | Requires | Forbidden by |
+|---|---|---|
+| `image-generator` | `OPENAI_API_KEY` | constraints #1/#2/#4; ADR-0014 retired the DALL-E path |
+| `web-researcher` | `SERPER_API_KEY` | constraints #1/#2/#3; removed by #438 |
+
+`.claude/settings.local.json` sets `enableAllProjectMcpServers: true`, so both load every
+session and the agent is shown *"Generates Economist-style editorial illustrations using
+DALL-E 3. Requires the OPENAI_API_KEY"* directly beside the guide forbidding it.
+
+> "It also cannot be just like throwing 100 tools at the agent and like 50 sensors that
+> kind of overload it."
+
+**The fix.** Delete the `image-generator` entry; name the keyless servers explicitly instead
+of auto-approving all; and assert the absence in a test so a future re-add fails locally
+rather than silently contradicting `CLAUDE.md`.
+
+**One correction found while implementing.** `web_researcher_server.py` is **already
+keyless** — #438 stripped the Serper leg, and the module now exposes only `search_arxiv`
+and `fetch_page`, both permitted by constraint #3. Deleting the server (as first planned)
+would have removed a legitimate keyless research tool. Only the stale `env` block and the
+misleading description came out; the server stays.
+
+**Acceptance criteria:**
+- [x] `.mcp.json` contains exactly the six keyless servers
+- [x] No `OPENAI_API_KEY` / `SERPER_API_KEY` / `GEMINI_API_KEY` anywhere in `.mcp.json`
+- [x] No MCP server declares an `env` block — a stricter, more durable invariant than
+      name-matching, since any `env` requirement is a key requirement in disguise
+- [x] A test fails if any is reintroduced (`test_harness_config.py`)
+- [x] `enableAllProjectMcpServers` replaced by an explicit `enabledMcpjsonServers` list
+
+**Scope call:** `mcp_servers/image_generator_server.py` and its passing test are left in
+place. The finding was that the harness *offers* a forbidden tool; deleting the entry closes
+that. Moving the module would churn a green suite for no harness benefit, and ADR-0014
+already retired the workflow.
+
+**Files:** `.mcp.json`, `.claude/settings.local.json`, `tests/test_harness_config.py`.
+**Scope:** XS — smallest diff in the set, and it deletes a live contradiction.
+
+### B-035 · Close the three harness decisions B-030…B-034 deliberately left open
+
+**Opened 2026-07-30. DONE 2026-07-31.** B-030…B-034 shipped with three questions routed to
+the owner rather than guessed at. All three were then **measured** (2026-07-30) and each had
+one recommended path. This item was the execution.
+
+**Outcome.** All three landed, in the order 3(b) → 2 → 1 → 3(a). Spec:
+`docs/specs/b035-harness-decisions.md`.
+
+| Task | Result |
+|---|---|
+| **3(b)** | Three defects, not one. The append bug; an unbounded `split` that would silently discard content; and both JSON extractors reading `skills/` when the state files live in `data/skills_state/`. The third was found while checking the regeneration was lossless — it would have **dropped** two of three pattern families. `.github/copilot-instructions.md`: 2,601 → 819 lines, 20 sections → 1, 58 → **84** patterns, zero lost. |
+| **2** | `scripts/mypy_baseline.py` + `docs/mypy-baseline.md`. Baseline is 11 files / 30 errors, not the measured 12: `sync_copilot_context.py` was **fixed** rather than grandfathered (four annotations). A test fails if any count grows *or* if an improved file keeps its allowance, so the baseline can only shrink. `CLAUDE.md` keeps "Type hints mandatory" — a test asserts it. |
+| **1** | Stop gate now runs `tests/test_X.py` for each changed `X.py`, 60s cap, lint-only fallback. Found in build: the gate's own test file matches its mapping rule, so it spawned a pytest that re-entered the gate. Added a reentrancy guard bounding recursion at depth one. |
+| **3(a)** | Owner approved "delete + index page" 2026-07-31. 20 dirs deleted, `using-agent-skills` kept. Guide layer **8,031 → 2,243 lines**, better than the ~2,700 estimate. `docs/workflow-lifecycle.md` is the replacement index. |
+
+**Open question, answered.** The docs site's republishing of the upstream skills was *not*
+deliberate. The decisive evidence: those copies were never what got loaded — every skill
+invocation resolves to the `agent-skills` plugin directory and prints it. They were unread
+and free to drift.
+
+#### Task 1 — the `Stop` gate should run scoped tests, not just lint (S)
+
+| Measurement | Value |
+|---|---|
+| Full suite | ~100s |
+| One matching test file | **3.4s** (6.2s wall) |
+| `scripts/` modules with a matching `tests/test_<name>.py` | **40 of 48 (83%)** |
+
+The objection was cost, and the measurement removes it: don't run the suite, run the
+*matching* files. Lint regulates maintainability only; a red test is the correctness
+signal, which the podcast calls the most important and least solved feedback loop. The
+one-block-per-session bound already caps the downside.
+
+- [x] Changed `scripts/X.py` maps to `tests/test_X.py`; only matching files run
+- [x] 60s cap; on timeout or no match, fall back to lint-only (never block on a timeout)
+- [x] Lint stays the always-on part — tests are additive, not a replacement
+- [x] A test asserts the fallback path does not block
+
+**Files:** `scripts/hooks/session_gate.py`, `tests/test_harness_hooks.py`. **Scope:** S.
+
+#### Task 2 — mypy needs a baseline, not a weaker guide (S)
+
+| Measurement | Value |
+|---|---|
+| `scripts/*.py` mypy-clean under `--follow-imports=silent` | 36 of 48 |
+| Would block a commit **merely by being touched** | **12 (25%)** |
+
+As shipped, one commit in four touching `scripts/` is blocked by errors it did not
+introduce — including `publication_validator.py`, `editorial_board.py` and, pointedly,
+`destructive_change_guard.py`. That is the noise-overload failure mode that gets a gate
+reverted to `manual`, which is how mypy went inert in the first place.
+
+**Do not delete "Type hints mandatory" from `CLAUDE.md`.** Record the 12 known-dirty files
+as a baseline and block only on errors outside it. B-032 already built this exact
+mechanism for complexity (`docs/harness-overrides.md`); mypy should reuse it rather than
+invent a second answer to the same question. One mechanism, two sensors — and with a
+baseline the guide becomes *true* for all new code instead of aspirational.
+
+- [x] Baseline records the 12 files, with the error count each is grandfathered at
+- [x] A **new** error in a baselined file still blocks (baseline is per-file count, not a mute)
+- [x] Baseline shrinks only — a test fails if a file's grandfathered count grows
+- [x] `CLAUDE.md` keeps "Type hints mandatory"; the baseline is what makes it honest
+
+**Files:** `.pre-commit-config.yaml`, `docs/harness-overrides.md` (or a sibling),
+`tests/test_harness_config.py`. **Scope:** S.
+
+#### Task 3 — cut ~5,300 of 8,031 guide lines without losing one instruction (M)
+
+The reference-count hypothesis from the audit was **wrong** — every skill is referenced ≥3
+times via the mkdocs nav, so it discriminates nothing. Two stronger signals replaced it.
+
+**(a) The local skills are duplicates of a repo that loads from elsewhere.**
+
+| Finding | Lines |
+|---|---|
+| Byte-identical to upstream `addyosmani/agent-skills` | 15 skills, **4,488** |
+| Diverged by 2–4 lines only (trivial) | 4 skills, ~1,120 |
+| Genuinely diverged — `using-agent-skills`, the Skill Routing Contract | 32 of 174 lines |
+| Local-only domain skills (economist-writing, python-quality, …) | 17 skills — **keep all** |
+
+Decisive: **every skill invoked during the 2026-07-29 session loaded from
+`/Users/ouray.viney/code/agent-skills/skills/`, not from `economist-agents/skills/`** (each
+invocation prints its base directory). The repo's own skills are not in the invocable skill
+list at all — `CLAUDE.md` reaches them as file paths. Those 4,488 lines are not a guide the
+agent reads; they are a stale copy of one it reads from somewhere else.
+
+**(b) `.github/copilot-instructions.md` is not a 2,601-line guide — it is a generator bug.**
+`scripts/sync_copilot_context.py` **appends** its "Learned Anti-Patterns" section instead of
+replacing it. There are now **20 of them** (16 distinct, most 85 lines); 2,267 of 2,601
+lines sit below the first heading.
+
+- [x] `sync_copilot_context.py` replaces rather than appends; file regenerated
+      (**do this regardless of the rest — it is a bug fix, not a decision**)
+- [x] The 19 vendored upstream skill copies deleted; `using-agent-skills` kept for its
+      32 lines of local routing contract
+- [x] `CLAUDE.md` Key Skills section points at the plugin, not at deleted paths
+- [x] mkdocs nav entries for the deleted skills removed
+- [x] All 17 domain skills untouched
+- [x] `make ci-local` green; `validate_skills.py` still passes on what remains
+
+**Net: 8,031 → ~2,700 lines with zero instructions lost**, because everything deleted
+duplicates something that loads from elsewhere.
+
+**Open question that gates (b) only:** the public docs site currently republishes those 19
+upstream skills. If republishing addyosmani's skills under `oviney`'s docs was deliberate,
+that changes Task 3(a) — it does not change 3(b) or Tasks 1–2.
+
+**Files:** `scripts/sync_copilot_context.py`, `.github/copilot-instructions.md`, 19
+`skills/*/` directories, `CLAUDE.md`, `mkdocs.yml`. **Scope:** M, owner-gated on the docs
+site question.
+
+---
+
+### B-038 · Ingest Claude HTML artifacts as research briefs
+
+**Opened 2026-07-31. Built 2026-07-31 — LGTM'd, implemented, all boxes ticked.** Spec:
+`docs/specs/html-research-ingestion.md`.
+
+The owner researches by holding a back-and-forth conversation with Claude and finalising it
+as an **HTML artifact**, and does this often. The pipeline cannot consume HTML: `--brief`
+expects markdown at `docs/research/<slug>.md`. The only route today is manual transcription.
+
+**The measurement that shaped the design.** `load_brief_file` does exactly two things — read
+the file and strip `## Refuted…` sections — and `stage3_runner.py:249` then hands the result
+to the writer **verbatim**. So there is no schema: the only hard requirements are *markdown*
+and *`## Refuted` is honoured*. The `ai-productivity-brief.md` layout is a convention the
+deep-research harness happens to emit, not an interface.
+
+That turns the build from **claim extraction into faithful conversion**, which is the correct
+answer for artifacts whose shape varies with the conversation. A claim-extractor would have
+to guess the shape of every conversation and would silently drop what it did not recognise.
+
+**No LLM in the middle.** ADR-0018 measured what that costs: fidelity defects — a statistic
+quoted with its offsetting clause deleted, a conclusion imported into a paper that does not
+report it — survived four gates and cost a BLOCK at 51/100 on an article the deterministic
+evaluator passed at 88%. A paraphrase step sits exactly where that damage originates. The
+brief's job is transport; the judging already happened in the conversation.
+
+- [x] `scripts/html_to_brief.py`: HTML → `docs/research/<slug>.md`, deterministic (bs4,
+      already installed — no new dependency, no key, no network)
+- [x] Quotes, tables and URLs preserved verbatim; nothing silently dropped
+- [x] Always emits an empty `## Refuted / unverified` section — content moved there is
+      excluded *by construction*, which is the highest-value thing the tool can do
+- [x] Round-trip asserted against the real `load_brief_file`, not a mirrored regex
+- [x] Usable on a real artifact without re-typing any content
+
+**Scope:** M. **Files:** `scripts/html_to_brief.py`, `tests/test_html_to_brief.py`,
+`tests/fixtures/html_briefs/*.html`.
+
+**What the build added beyond the spec, and why.** Two things, both forced by the owner's
+real artifact rather than imagined:
+
+1. **Inline `<svg>` diagrams are labelled, not flattened.** Claude draws diagrams as inline
+   SVG, and the owner's artifact carries an 18-label causal-loop diagram. Flattened into a
+   paragraph its labels read as a sentence — *"Schedule Pressure Feature Velocity + – DELAY
+   B1 R1"* — which is precisely the ADR-0018 fidelity hazard: the writer would treat a
+   diagram key as a claim. Every label is kept, prefixed with *"Diagram (inline SVG in the
+   source) — labels only:"*. Nothing invented, nothing dropped, no longer mistakable for prose.
+2. **The no-drop promise is a runtime sensor, not just a test.** `find_dropped_words()`
+   compares the source's content tree against the emitted markdown on every run and warns.
+   Mutation-checked: adding `table` to `CHROME_TAGS` makes it report 48 lost words, so the
+   invariant has teeth rather than being decorative.
+
+**Samples are gitignored.** `docs/research/samples/*.html` holds the owner's own research
+conversations and this repo is public, so they stay local. The sample-backed test converts
+whatever is there and skips with an explicit reason when the directory is empty — a fresh
+clone is green *and* honest about not having seen a real artifact.
+
+**Known limit, deliberately not fixed.** Semantic styling carried only by CSS class
+(`div.card-header`, `div.subtitle`) converts to a plain paragraph, losing its heading role
+but not its text. Inferring headings from class names would be guessing at whatever CSS a
+given conversation emitted; promoting one is a one-character edit in the brief.
+
+### B-036 · Badge validation has no implementation — decide whether to restore it
+
+**Opened 2026-07-31**, found by B-031 doing its job.
+
+The `badge-validation` pre-commit hook ran `python3 scripts/validate_badges.py` to prevent
+stale README badges (BUG-023). That script was archived to `scripts/archived/` in `3cbe96d`
+(#327/#343). The hook was **inert twice over**: its entry was `bash -c '... || true'`, which
+swallowed both the stale-badge failures it existed to catch *and* the `No such file or
+directory` error proving it had no implementation.
+
+B-031 removed the `|| true`. The next push then failed — which is the sensor working
+correctly, and is how the missing script came to light at all.
+
+**The hook is removed, not resurrected.** Pointing it at the archived copy would not restore
+the gate: that script resolves its paths relative to `scripts/` (so it looks for
+`scripts/README.md` and `scripts/data/skills_state/…`), several inputs it wants no longer
+exist, and it exits 0 while printing failures — a third way it could not gate.
+
+`tests/test_harness_config.py::TestHooksPointAtRealScripts` now fails if **any** local hook
+references a script that does not exist, which generalises the defect class.
+
+**DONE 2026-07-31.** Owner chose to restore it. **The badges were in fact stale**, which
+settled the question — the validator was rebuilt, not merely re-pointed.
+
+Three live defects, all caught by the new validator on its first run against the real README:
+
+| Badge | Defect |
+|---|---|
+| `CI` | referenced `.github/workflows/ci.yml` — **deleted** when ADR-0015 retired GitHub Actions CI |
+| `Quality Tests` | referenced `.github/workflows/quality-tests.yml` — **also deleted** |
+| `Python` | advertised **3.13** while `.python-version` pins **3.12** |
+
+So the front page claimed CI this project deliberately does not have, for months, while the
+gate that existed to prevent exactly that could not run.
+
+`scripts/validate_badges.py` is narrow on purpose — it checks the two things that actually
+rot, and it resolves every path from the repo root rather than from `scripts/`, which is the
+bug that made the archived copy look for `scripts/README.md`.
+
+- [x] Decide: restore badge validation (the badges were stale, so the answer was clear)
+- [x] A validator that resolves paths from the repo root and exits non-zero on failure
+- [x] A test proving it *can* fail — `TestTheRealReadme` runs it against the real README, and
+      `TestExitCodes` asserts a stale badge exits 1
+- [x] `scripts/archived/validate_badges.py` deleted — it was a trap
+- [x] Hook re-wired with `.venv/bin/python`, not `python3`: the old entry used system python,
+      which here is 3.14 and carries none of the project's dependencies. A third way it
+      could not have worked.
+- [x] README badges corrected: `Docs` (a workflow that exists), a static `local-first`
+      verification badge, `Python 3.12`, MIT. A note records why there is no CI badge.
+
+**Scope:** S. **Follow-up:** see B-037 — the pin and the interpreter disagree.
+
+### B-037 · `.python-version` pins 3.12 but the venv runs 3.13.14
+
+**Opened 2026-07-31**, found while fixing B-036's Python badge.
+
+Correcting the badge required deciding which version is authoritative, and the two disagree:
+
+| Source | Version |
+|---|---|
+| `.python-version` | **3.12** |
+| `.venv/bin/python` (what `make ci-local` actually runs) | **3.13.14** |
+| `CONTRIBUTING.md` | "Python 3.12 (pinned in `.python-version`; single version per ADR-0015)" |
+
+ADR-0015 says Python is pinned to **one** version via `.python-version`, and ADR-0004
+constrains the version. The badge now follows the declared pin, which is the only defensible
+choice for a *declaration* — but the tests are green on an interpreter the pin forbids, so
+the declaration is not what is being verified.
+
+This is not urgent — 2,595 tests pass on 3.13 — but it means "pinned to one version" is
+currently untrue, and nothing detects that.
+
+**DONE 2026-07-31. Owner chose 3.13.**
+
+The drift was worse than this item recorded. Surveying every declaration turned up **four**
+different versions, not two:
+
+| Source | Claimed | Now |
+|---|---|---|
+| `.python-version` | 3.12 | **3.13** |
+| `CONTRIBUTING.md` | 3.12 | 3.13 |
+| `ruff.toml` `target-version` | **py311** | py313 |
+| `mypy.ini` `python_version` | **3.11** | 3.13 |
+| `README.md`, `GEMINI.md`, ADR-0004 | 3.13 | unchanged — already right |
+| the interpreter running the suite | 3.13.14 | unchanged — already right |
+
+So 3.13 was not a coin-flip: the documentation majority and reality already agreed on it,
+and `.python-version`, `CONTRIBUTING.md`, `ruff.toml` and `mypy.ini` were the four outliers.
+The two *tool* pins were the real find — nothing in B-037 knew about them, and linting
+against py311 while running 3.13 silently forgoes three releases of modernisation checks.
+
+`tests/test_python_version_consistency.py` now checks every declaration **against the pin
+rather than against a literal**, so the next bump is a one-line change to `.python-version`
+and the tests keep working. A test hardcoding 3.13 would only relocate the drift.
+
+- [x] Decide which is authoritative: bumped `.python-version` to 3.13
+- [x] Align `CONTRIBUTING.md`
+- [x] A test asserting the running interpreter matches `.python-version` — plus `ruff.toml`,
+      `mypy.ini`, `CONTRIBUTING.md` and the README badge, since all four had drifted too
+
+**No cascade from the tool bumps:** `ruff check .` is clean at py313, and the mypy baseline
+is unchanged at 30 errors across 11 files under `python_version = 3.13`.
+
+**Scope:** XS to decide, S to enforce. **Owner-gated** on which version is wanted.
+
 ### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
 
 ### B-023 · Decide the fate of `llm_client.py`'s Anthropic auth path
@@ -192,6 +721,54 @@ call for the owner, not an inference.
 **Answer B-010's scope first**, then either port the branch's auth commit
 (`73e73c0`) or delete `backup/integration-test-20260728`. Do not delete the
 branch before this is answered — it is the only copy.
+
+**DECIDED 2026-07-31: do not port. The question is dissolved, not answered.**
+
+The branch's work teaches `_create_anthropic_client` to accept an `ANTHROPIC_AUTH_TOKEN` or
+an `ant` OAuth profile *instead of* `ANTHROPIC_API_KEY`. Both branches of the original
+question — "is a token a new key (#1) or the subscription (#3)?" — assume the path needs a
+credential at all.
+
+It does not. **BUG-046 was fixed by making `create_llm_client` default to a keyless Agent
+SDK provider** (see BUG-046 in Done), so Stage 1 topic discovery and Stage 2 editorial
+review now run on the subscription with **no token of any kind**. Porting auth work to
+authenticate a path that no longer authenticates would be strictly worse than doing nothing.
+
+`backup/integration-test-20260728` can now be deleted — the only thing on it that had not
+landed elsewhere was this auth commit, and it is moot.
+
+**DELETED 2026-07-31**, on the owner's instruction, after verification:
+
+| Check | Result |
+|---|---|
+| Present on `origin`? | **No** — local-only, so it really was the only copy |
+| Tip SHA | **`6104a4c`** (`Merge branch 'chore/stage3-strip-code-fence' into local/integration-test`) |
+| Auth commit | **`73e73c0`** — the one unlanded change, made moot by BUG-046 |
+| Source files present on the branch but absent from `main` | 18, **all deliberate removals**: `agent_registry.py` (ADR-0012), `orchestrator_agent.py` / `po_agent.py` / `sm_agent.py` (CrewAI-era, cleaned up in #327/#343), `src/backlog/migrate_backlog_to_github.py` (local-backlog migration), `src/agent_sdk/image_gate.py` (ADR-0014) |
+
+Nothing on it was unlanded work. **Recoverable from `6104a4c`** via
+`git branch <name> 6104a4c` until the objects are garbage-collected (~90 days by default) —
+which is why the SHA is recorded here rather than only in the reflog.
+
+**Correction: "it is the only copy" was never true.** Checked after deleting —
+`git branch --contains 73e73c0` still returns **`chore/anthropic-auth-token-resolution`**.
+The backup branch was a *merge* of six `chore/*` branches, and every one of them still
+exists locally:
+
+```
+chore/anthropic-auth-token-resolution   ece6f7e   <- carries the auth commit 73e73c0
+chore/stage3-strip-code-fence           6cd181c
+chore/fix-chart-embed-chart-only        38f9b9b
+chore/harden-free-research              8dbd612
+chore/remove-mcp-serper-path            b1e08fa
+chore/remove-paid-research-apis         c99fda2
+```
+
+So the caution that shaped this item for three days was based on an unverified claim, and
+one `git branch --contains` would have dissolved it. That is the same pattern B-027 exists
+to remedy and that ~~B-025~~ was recorded for: **asserting from a surface reading instead of
+measuring.** Third instance. Recorded here rather than quietly fixed, because the pattern is
+the finding.
 
 ### ~~B-025~~ · WITHDRAWN 2026-07-29 — the defect record was never at risk
 
@@ -748,7 +1325,19 @@ Spec: `docs/specs/B-011-retire-ci-local-verification.md`.
 A keyless run (`pipeline.py … --research-mode claude_web` → `deploy_to_blog`)
 produced a publish-valid article and opened **oviney/blog PR #1156** — the first
 live article since 2026-04-27 (pipeline had been dark ~3 months). Fixes
-BUG-047/048/049/050/051. BUG-046 resolved-by-workaround: the two-step
+**BUG-046 fully resolved 2026-07-31** (was resolved-by-workaround below).
+`create_llm_client` now defaults to a keyless `agent_sdk` provider running on the
+Claude subscription, so `EconomistContentFlow` Stage 1 (topic discovery) and
+Stage 2 (editorial review) need no key. Operating Constraint #3 now holds *by
+construction*: the keyless provider wins even when `ANTHROPIC_API_KEY` is set, so
+a stray key cannot silently start billing. Legacy paid providers survive only as
+an explicit `LLM_PROVIDER=anthropic|openai` opt-out, and naming one without its
+key is an error rather than a silent fallback. 9 new tests in
+`tests/test_llm_client_keyless.py`; `tests/test_llm_client.py` updated, since it
+encoded the old auto-detect-from-key behaviour. This also dissolves **B-023** —
+there is nothing left to authenticate.
+
+Original entry: BUG-047/048/049/050/051. BUG-046 resolved-by-workaround: the two-step
 `pipeline.py <topic>` + `deploy_to_blog` is the blessed keyless path (skips the
 paid `EconomistContentFlow` discovery); making discovery itself keyless remains a
 future enhancement. Runbook updated with the canonical command + Setup/Prereqs.

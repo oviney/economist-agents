@@ -2,11 +2,12 @@
 """Sync learned patterns from skills and docs into Copilot instructions.
 
 This script reads patterns from:
-- skills/*.json (defect tracker, blog QA skills, etc.)
+- data/skills_state/*.json (defect tracker, blog QA skills, etc.)
 - docs/ARCHITECTURE_PATTERNS.md (architectural anti-patterns)
 
 And updates .github/copilot-instructions.md with a "Learned Anti-Patterns"
-section that Copilot can use to enforce quality rules in real-time.
+section that Copilot can use to enforce quality rules in real-time. The section
+is *replaced* on every run, never appended to.
 
 Usage:
     python3 scripts/sync_copilot_context.py
@@ -29,6 +30,41 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# The generated section's heading, and the hand-authored heading it is inserted
+# before. Both are markdown H2s, which is what makes section boundaries findable.
+GENERATED_HEADING = "## Learned Anti-Patterns"
+INSERTION_MARKER = "## Additional Resources"
+
+
+def strip_generated_sections(content: str, heading: str = GENERATED_HEADING) -> str:
+    """Remove every previously generated section from ``content``.
+
+    A section runs from its ``## `` heading to the next ``## `` heading at the
+    same level, or to end-of-file. Without this the sync appends rather than
+    replaces: ``.github/copilot-instructions.md`` had accumulated 20 copies of
+    the same section, 2,267 of its 2,601 lines (B-035 Task 3(b)).
+
+    Args:
+        content: Full markdown document
+        heading: The H2 heading that marks a generated section
+
+    Returns:
+        ``content`` with all such sections removed
+
+    """
+    kept: list[str] = []
+    skipping = False
+
+    for line in content.split("\n"):
+        if line.startswith("## "):
+            # Any H2 ends the section being skipped; this one starts a new skip
+            # only if it is the generated heading.
+            skipping = line.strip() == heading
+        if not skipping:
+            kept.append(line)
+
+    return "\n".join(kept)
+
 
 class PatternExtractor:
     """Extract learned patterns from various sources."""
@@ -41,7 +77,10 @@ class PatternExtractor:
 
         """
         self.root_dir = root_dir
-        self.skills_dir = root_dir / "skills"
+        # Runtime state lives in data/skills_state/ (CLAUDE.md), not skills/,
+        # which holds SKILL.md workflow definitions. Reading the wrong directory
+        # made both JSON extractors return empty and warn (B-035 Task 3(b)).
+        self.skills_dir = root_dir / "data" / "skills_state"
         self.docs_dir = root_dir / "docs"
         self.copilot_file = root_dir / ".github" / "copilot-instructions.md"
 
@@ -52,7 +91,7 @@ class PatternExtractor:
             List of defect patterns with root causes and prevention strategies
 
         """
-        patterns = []
+        patterns: list[dict[str, Any]] = []
         tracker_file = self.skills_dir / "defect_tracker.json"
 
         if not tracker_file.exists():
@@ -90,7 +129,7 @@ class PatternExtractor:
             List of QA skill patterns
 
         """
-        patterns = []
+        patterns: list[dict[str, Any]] = []
         qa_file = self.skills_dir / "blog_qa_skills.json"
 
         if not qa_file.exists():
@@ -128,7 +167,7 @@ class PatternExtractor:
             List of architectural patterns
 
         """
-        patterns = []
+        patterns: list[dict[str, Any]] = []
         arch_file = self.docs_dir / "ARCHITECTURE_PATTERNS.md"
 
         if not arch_file.exists():
@@ -137,8 +176,8 @@ class PatternExtractor:
 
         try:
             content = arch_file.read_text()
-            current_category = None
-            current_pattern = {}
+            current_category: str | None = None
+            current_pattern: dict[str, Any] = {}
 
             for line in content.split("\n"):
                 line = line.strip()
@@ -207,8 +246,10 @@ class PatternExtractor:
         sections.append("## Learned Anti-Patterns")
         sections.append("")
         sections.append(
-            f"*Auto-generated from skills/*.json and docs/ARCHITECTURE_PATTERNS.md "
-            f"on {datetime.now().strftime('%Y-%m-%d')}*",
+            f"*Auto-generated from data/skills_state/*.json and "
+            f"docs/ARCHITECTURE_PATTERNS.md on "
+            f"{datetime.now().strftime('%Y-%m-%d')} — regenerated in full each run; "
+            f"do not edit by hand.*",
         )
         sections.append("")
 
@@ -311,16 +352,23 @@ class PatternExtractor:
         try:
             content = self.copilot_file.read_text()
 
-            # Find insertion point (before "## Additional Resources" or at end)
-            if "## Additional Resources" in content:
-                parts = content.split("## Additional Resources")
+            # Replace, don't append: drop the sections previous runs wrote before
+            # inserting this one, or the file grows by a section per sync.
+            content = strip_generated_sections(content)
+
+            # Find insertion point (before "## Additional Resources" or at end).
+            # maxsplit=1 — an unbounded split discards everything past the second
+            # marker, because only parts[0] and parts[1] are reassembled.
+            if INSERTION_MARKER in content:
+                before, after = content.split(INSERTION_MARKER, 1)
                 updated_content = (
-                    parts[0].rstrip()
+                    before.rstrip()
                     + "\n\n"
                     + anti_patterns_section
                     + "\n\n"
-                    + "## Additional Resources"
-                    + parts[1]
+                    + INSERTION_MARKER
+                    + after.rstrip()
+                    + "\n"
                 )
             else:
                 updated_content = (

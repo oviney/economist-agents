@@ -69,15 +69,17 @@ here, in the repo, so they survive a machine change and a cleared session.
 
 ## Default Operating Mode
 
-Every task follows the `skills/using-agent-skills` discovery flowchart before any code is written:
+Every task follows the `agent-skills:using-agent-skills` discovery flowchart before any code
+is written. **Lifecycle skills load from the `agent-skills` plugin, not from this repo's
+`skills/` directory** — invoke them as `agent-skills:<name>`:
 
 ```
 Task arrives
-  ├── Vague idea?              → skills/idea-refine (clarify first)
-  ├── New feature/change?      → skills/spec-driven-development (spec → human review → plan → human review → implement)
-  ├── Have a spec, need tasks? → skills/planning-and-task-breakdown (dependency graph → human review)
-  ├── Implementing?            → skills/incremental-implementation (thin slices, each tested + committed)
-  ├── Deploying?               → skills/shipping-and-launch (pre-launch checklist, staged rollout)
+  ├── Vague idea?              → agent-skills:idea-refine (clarify first)
+  ├── New feature/change?      → agent-skills:spec-driven-development (spec → human review → plan → human review → implement)
+  ├── Have a spec, need tasks? → agent-skills:planning-and-task-breakdown (dependency graph → human review)
+  ├── Implementing?            → agent-skills:incremental-implementation (thin slices, each tested + committed)
+  ├── Deploying?               → agent-skills:shipping-and-launch (pre-launch checklist, staged rollout)
   └── Bug / defect?            → log in defect_tracker → spec → fix → regression test
 ```
 
@@ -142,7 +144,10 @@ agent-skill should we use next?" (see #405).
 4. **Answer by name.** When asked for the next skill, name the lifecycle's next
    phase skill (or state the install gap per rule 3). Nothing else.
 
-The six lifecycle skills are currently installed under `skills/`.
+The six lifecycle skills are installed via the **`agent-skills` plugin** and are invoked as
+`agent-skills:<name>`. They are deliberately *not* vendored into this repo's `skills/`
+directory — B-035 Task 3(a) deleted the copies that were, because they were never what got
+loaded. `docs/workflow-lifecycle.md` indexes them and links upstream.
 
 ### Dispatching worker agents
 
@@ -162,7 +167,8 @@ When dispatching agents via the `Agent` tool (orchestrating the fleet), the brie
 ```
 agents/skills_configs/    # Agent YAML configs (research-analyst, content-writer, etc.)
 data/skills_state/        # Runtime state JSON (sprint tracker, metrics, defect tracker)
-skills/*/SKILL.md         # Skill workflow definitions (39 skills — see Key Skills below)
+skills/*/SKILL.md         # Domain skill definitions (18 — see Key Skills below).
+                          # Lifecycle skills live in the agent-skills plugin, not here.
 src/agent_sdk/            # Anthropic Agent SDK runners (stage3, stage4, pipeline, _shared)
 src/economist_agents/     # Flow orchestration, adapters
 scripts/                  # Standalone scripts (publication_validator, citation_verifier, etc.)
@@ -240,24 +246,41 @@ To supply hero art by hand, overwrite `output/posts/images/<slug>-hero.svg` (the
 an article still carrying the `<!-- HERO IMAGE …` reviewer comment — it escaped
 to a live post once (BUG-065, ADR-0017).
 
-> Note: a legacy paid path still exists — `EconomistContentFlow` Stage 1 topic
-> discovery calls `create_llm_client`, which needs `ANTHROPIC_API_KEY`
-> (BUG-046). Making the full flow keyless is tracked in **B-010**; until then the
-> keyless generator is `python -m src.agent_sdk.pipeline` (manual topic). See
-> `docs/keyless-pipeline-runbook.md`.
+> **BUG-046 is fixed (2026-07-31).** `create_llm_client` now defaults to a keyless
+> `agent_sdk` provider that runs on the Claude subscription, so
+> `EconomistContentFlow` Stage 1 (topic discovery) and Stage 2 (editorial review)
+> need **no key**. Constraint #3 now holds by construction: a stray
+> `ANTHROPIC_API_KEY` in the environment cannot silently start billing, because
+> the keyless provider wins unless `LLM_PROVIDER` explicitly names another.
+>
+> The legacy paid providers remain reachable via `LLM_PROVIDER=anthropic|openai`
+> because they pre-date the constraint — not because anything should reach for
+> them. Naming one without its key is an error, never a silent fallback.
+>
+> `python -m src.agent_sdk.pipeline` (manual topic) remains the simplest keyless
+> generator. See `docs/keyless-pipeline-runbook.md`.
 
 ## Key Skills
 
 ### Workflow (addyosmani/agent-skills — governs all work)
-- `skills/using-agent-skills/SKILL.md` — Meta-skill: maps task type to the right skill
-- `skills/context-engineering/SKILL.md` — Focus context at session start
-- `skills/idea-refine/SKILL.md` — Clarify vague requests before speccing
-- `skills/spec-driven-development/SKILL.md` — Spec → human review → plan → human review → implement
-- `skills/planning-and-task-breakdown/SKILL.md` — Dependency graph before sprint planning
-- `skills/incremental-implementation/SKILL.md` — Thin slices, each tested and committed
-- `skills/test-driven-development/SKILL.md` — RED → GREEN → REFACTOR
-- `skills/code-review-and-quality/SKILL.md` — Multi-axis review before merge
-- `skills/shipping-and-launch/SKILL.md` — Pre-launch checklist, staged rollout, rollback
+
+**These load from the `agent-skills` plugin, not from this repo.** Invoke them by name
+(`Skill agent-skills:<name>`); there are no local files to read. B-035 Task 3(a) deleted the
+20 vendored copies that used to sit in `skills/` — they were never what got loaded, so they
+could only drift. `docs/workflow-lifecycle.md` is the index and links to upstream.
+
+- `agent-skills:using-agent-skills` — Meta-skill: maps task type to the right skill
+- `agent-skills:context-engineering` — Focus context at session start
+- `agent-skills:idea-refine` — Clarify vague requests before speccing
+- `agent-skills:spec-driven-development` — Spec → human review → plan → human review → implement
+- `agent-skills:planning-and-task-breakdown` — Dependency graph before sprint planning
+- `agent-skills:incremental-implementation` — Thin slices, each tested and committed
+- `agent-skills:test-driven-development` — RED → GREEN → REFACTOR
+- `agent-skills:code-review-and-quality` — Multi-axis review before merge
+- `agent-skills:shipping-and-launch` — Pre-launch checklist, staged rollout, rollback
+
+`skills/using-agent-skills/SKILL.md` is the one local copy kept, because 32 of its lines are
+this repo's Skill Routing Contract rather than upstream content.
 
 ### Domain
 - `skills/economist-writing/SKILL.md` — The 10 writing rules

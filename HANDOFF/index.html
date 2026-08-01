@@ -1213,6 +1213,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0018-editorial-review-gate/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0018 — Editorial Review Gate
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2105,6 +2133,34 @@
     
   
     Article Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../skills/blog-post-review/SKILL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog Post Review
   
 
     
@@ -3253,7 +3309,13 @@ the blog bumps its deps and refreshes its baselines — see B-015.</p>
 them, since they predate today's fixes.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">IS_SANDBOX</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">&quot;&lt;topic&gt;&quot;</span><span class="w"> </span>--research-mode<span class="w"> </span>claude_web
 </code></pre></div>
-<p>Budget ~$1 and ~35 minutes. Then <code>deploy_to_blog</code> opens the PR.</p>
+<p>Budget ~$1 and ~35 minutes. Then deploy <strong>to review, not to <code>_posts/</code></strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>python<span class="w"> </span>-m<span class="w"> </span>scripts.deploy_to_blog<span class="w"> </span>--article<span class="w"> </span>output/posts/&lt;slug&gt;.md<span class="w"> </span>--mode<span class="w"> </span>review
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1"># read the printed https://&lt;host&gt;/review/&lt;slug&gt;-&lt;token&gt;/ page, then:</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>make<span class="w"> </span>publish<span class="w"> </span><span class="nv">SLUG</span><span class="o">=</span>&lt;slug&gt;
+</code></pre></div>
+<p><code>--mode</code> is required (B-028). This line previously read "Then <code>deploy_to_blog</code> opens the
+PR" — and that is the line that was followed when article two published unreviewed.</p>
 <h2 id="things-that-will-bite-a-fresh-session">Things that will bite a fresh session<a class="headerlink" href="#things-that-will-bite-a-fresh-session" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>A green <code>make ci-local</code> says nothing about what the blog accepts.</strong> Four

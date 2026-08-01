@@ -1,0 +1,13 @@
+id: g2-invented-programme-scale
+gate: G2
+expected: fail
+source: testing-shortcuts-migration-deadline
+passage: >-
+  On a programme staffed by several hundred engineers, an unplanned rework load
+  absorbing forty percent of development capacity is the equivalent of losing more
+  than a hundred engineers mid-sprint.
+why: >-
+  The 40% is faithful to the brief. The programme size is not — nothing in the brief
+  or the references establishes "several hundred engineers", and the arithmetic that
+  follows depends entirely on it. A correct calculation over an invented denominator
+  reads as evidence and is not.

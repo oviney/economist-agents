@@ -1,0 +1,14 @@
+id: g2-chart-shows-something-other-than-claimed
+gate: G2
+expected: fail
+source: testing-shortcuts-migration-deadline
+passage: >-
+  As the chart below illustrates, undetected defects do not flow linearly into
+  rework. They accumulate across integration layers until a critical threshold
+  triggers systemic production failures.
+why: >-
+  The chart is a static four-bar comparison of rework share by test-coverage level.
+  It contains no time axis, no accumulation, no threshold and no non-linearity, so
+  it cannot illustrate any of the three properties the sentence attributes to it.
+  This is ADR-0018's chart finding reproduced exactly — "a chart referenced as
+  showing figures it does not contain" — one day after that ADR was accepted.

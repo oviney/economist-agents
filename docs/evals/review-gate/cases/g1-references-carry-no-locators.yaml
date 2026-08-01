@@ -1,0 +1,16 @@
+id: g1-references-carry-no-locators
+gate: G1
+expected: fail
+source: testing-shortcuts-migration-deadline
+passage: >-
+  ## References
+  1. TSB Bank PLC. Annual Report and Accounts 2018. TSB Banking Group, 2019.
+  2. Capers Jones. Software Assessments, Benchmarks, and Best Practices.
+     Addison-Wesley Professional, 2010.
+  3. Nicole Forsgren, Jez Humble, and Gene Kim. Accelerate. IT Revolution Press, 2018.
+why: >-
+  Three references, zero URLs or DOIs. Each names a real work, so this is not
+  fabrication, but nothing here resolves to a locatable document without the reader
+  doing the search themselves — which is what G1 exists to prevent. The publication
+  year on the Jones title should also be checked; that edition is widely catalogued
+  as 2000, not 2010.

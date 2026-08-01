@@ -62,6 +62,39 @@ stripped automatically). **This is opt-in and heavy** — one deep-research run 
 ~2M tokens and can hit your session limit — so `claude_web` stays the everyday
 default; reserve `--brief` for the pieces that warrant it.
 
+### ⚠ `--brief` with an uncited artifact will manufacture citations
+
+**Measured 2026-08-01, on the first real B-038 run.** The brief was converted from an owner
+research artifact that contained **zero `<a href>` and one unsourced statistic**. `--brief`
+skips the research step, so the writer received an argument with no evidence — and filled the
+gap itself. The article came back with:
+
+- a chart carrying **four invented percentages** (62/46/28/12%) presented with an axis and a
+  measured-sounding subtitle, where the brief had contained exactly one number;
+- prose describing that chart as showing accumulation and a threshold it does not plot —
+  ADR-0018's chart finding reproduced exactly, one day after that ADR was accepted;
+- a **named real executive** given a motive the cited annual report cannot support;
+- a fabricated ratio ("cuts two sprints … *typically* surrenders six to eight");
+- three references, **zero URLs**.
+
+`article_evaluator` scored it **76** and the publication validator **passed** it, because
+counting checks can see "chart embedded: yes" and "3 references cited" and nothing further.
+That is the 88%-vs-51 gap of ADR-0018, live.
+
+**The tool did what it was asked.** The defect is upstream: an artifact with no evidence is
+not a research brief, it is an argument. Before running `--brief`:
+
+```bash
+grep -c 'href=' <artifact>.html      # zero links is the warning sign
+grep -c '](http' docs/research/<slug>.md   # and in the converted brief
+```
+
+If that returns 0, either add sources to the artifact first — `docs/research/artifact-sourcing-prompt.md`
+is a prompt to paste back into the conversation that produced it — or expect to review the
+output as fabrication-until-proven-otherwise. **Never publish such a run without the
+`blog-post-review` gate.** The eight labelled defects from this run are now calibration cases
+in `docs/evals/review-gate/cases/` (B-040).
+
 ### What a run actually costs — read the ledger, do not quote a remembered figure
 
 `logs/agent_sdk_costs.jsonl` records `wall_seconds`, `stage3_seconds` and per-stage cost for

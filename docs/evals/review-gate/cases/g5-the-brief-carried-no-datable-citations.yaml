@@ -1,0 +1,18 @@
+id: g5-the-brief-carried-no-datable-citations
+gate: G5
+expected: pass
+source: testing-shortcuts-migration-deadline
+passage: >-
+  Nicole Forsgren, Jez Humble, and Gene Kim's Accelerate research, which analysed
+  survey data from more than 2,000 technology teams across four years, found that
+  high-performing engineering teams invest consistently in comprehensive automated
+  testing.
+why: >-
+  A NEGATIVE case for G5 specifically. Accelerate (2018) is a book, not an annually
+  re-run report, so there is no later edition from the same publisher revising the
+  finding — the DORA reports that succeeded it are a different publication line.
+  G5 must not fire merely because a citation is old; supersession is the test, not
+  age. Note this case is a G5 pass while the same passage's "2,000 technology teams"
+  is a separate, weaker G2 question (the usual figure is ~23,000 responses across
+  ~2,000 organisations) — kept apart deliberately, per the guide's one-judge-per-
+  dimension rule.

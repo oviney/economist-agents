@@ -1,0 +1,17 @@
+id: g2-loop-description-is-faithful
+gate: G2
+expected: pass
+source: testing-shortcuts-migration-deadline
+passage: >-
+  When schedule pressure rises, the first sacrifice is almost invariably testing and
+  automation effort. Fewer test gates create an immediate perception of higher
+  feature velocity, which registers in sprint reviews as migration progress, which
+  briefly relieves the schedule pressure that triggered the cut. Formal causal loop
+  analysis labels this Loop B1 — a balancing loop that delivers genuine, if
+  temporary, relief.
+why: >-
+  A NEGATIVE case. This is a faithful restatement of the source brief's Loop B1,
+  including its polarity and its "short-term illusion" framing, adding no quantities
+  and no attribution. A gate that flags this is over-firing on unquantified
+  reasoning, which is exactly the false positive that would make the gate unusable
+  as a blocker.

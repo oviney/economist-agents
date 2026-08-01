@@ -775,6 +775,51 @@ does not fail the write loudly — `pipeline.py` catches it and logs "cost log w
 on its own. `_numeric()` now coerces at the boundary; whether earlier rows were lost this way
 is unverified and worth a look before anyone trends this data.
 
+### B-042 · The mandatory-chart gate manufactures the fabrication it should prevent
+
+**Opened 2026-08-01**, found by the owner asking "if we don't need a chart, why build one?"
+He is right, and the repo currently disagrees with him — in a way that produced two of the
+eight calibration cases logged the same day.
+
+`publication_validator.py:1031` makes a chart **mandatory at CRITICAL severity**:
+
+```python
+if not chart_refs:
+    "check": "missing_chart",
+    "severity": "CRITICAL",
+    "message": "Article missing required chart — every article must include at least one data chart"
+```
+
+So when the research carries no quantitative data, the pipeline is *required* to produce a
+chart regardless. On the 2026-08-01 run it did exactly that: a brief containing one number
+yielded a chart carrying four invented percentages (62/46/28/12%), presented with an axis and
+a measured-sounding subtitle. **That was compliance, not a rogue writer.**
+
+The next check compounds it. `orphaned_chart` (HIGH) fires unless the prose contains "chart",
+"figure", "shows" or "illustrates" near the embed — pushing the writer to add a sentence
+describing the chart, with nothing verifying the description is true. That is how "As the
+chart below illustrates, undetected defects do not flow linearly into rework" came to be
+written about a static four-bar comparison, reproducing ADR-0018's chart finding exactly.
+
+**Two gates, combined, manufactured two defects.** A rule meant to enforce evidence produced
+fabricated evidence, and the deterministic evaluator then scored the result 76 and passed it.
+
+- [ ] Decide the editorial policy: is a chart genuinely mandatory, or mandatory *when the
+      research supports one*? The owner's stated position (2026-08-01) is the latter
+- [ ] Make the requirement conditional on chartable, sourced data existing — not on the
+      article's existence
+- [ ] `orphaned_chart` must not be satisfiable by adding a describing sentence alone; a
+      description that cannot be checked is worse than no description
+- [ ] Regression case: a brief with no quantitative data must produce an article with **no
+      chart** and still pass, rather than an article with an invented one
+
+**Do not fix this in the moment.** It changes a CRITICAL gate carrying a stated editorial
+standard ("Charts are mandatory per Economist editorial standards"), and the same reasoning
+that kept B-040 at spec-only applies. Spec first.
+
+**Scope:** M. **Files:** `scripts/publication_validator.py`, `src/agent_sdk/_shared.py`
+(`_auto_embed_chart`), `src/agent_sdk/stage3_runner.py`.
+
 ### B-036 · Badge validation has no implementation — decide whether to restore it
 
 **Opened 2026-07-31**, found by B-031 doing its job.

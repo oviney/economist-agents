@@ -1201,10 +1201,27 @@
       "prevention_test_file": "tests/test_normalize_paragraphs.py",
       "introduced_in_commit": "95c838ce",
       "introduced_date": "2026-08-01"
+    },
+    {
+      "id": "BUG-072",
+      "severity": "high",
+      "discovered_in": "acceptance",
+      "discovered_date": "2026-08-02T00:00:00",
+      "description": "`make art` crashed with UnicodeDecodeError on a real PNG hero. _hero_description called path.read_text() on any hero to harvest an SVG <desc>; a PNG is binary. .png is a first-class hero format (_HERO_SUFFIXES lists it, deploy generates its .webp sibling), so this was a supported path that had never been exercised.",
+      "component": "pipeline",
+      "status": "fixed",
+      "fixed_date": "2026-08-02T00:00:00",
+      "is_production_escape": false,
+      "root_cause": "test_gap",
+      "root_cause_notes": "PNG heroes in test_frontmatter_blog_contract.py are created with (images / 'my-slug-hero.png').write_text('stub') \u2014 a text file wearing a .png name \u2014 so read_text() always succeeded. Same class as BUG-070: the fixture is not what reality produces. Found by putting a real Gemini PNG on disk and running make art.",
+      "prevention_test_added": true,
+      "prevention_test_file": "tests/test_hero_description.py",
+      "introduced_in_commit": "unknown",
+      "introduced_date": "2026-07-29"
     }
   ],
   "summary": {
-    "total_bugs": 54,
+    "total_bugs": 55,
     "fixed_bugs": 7,
     "production_bugs": 6,
     "defect_escape_rate": 42.9,
@@ -1242,6 +1259,6 @@
     "avg_time_to_resolve_days": 2.0,
     "avg_critical_ttd_days": 3.7,
     "last_updated": "2026-08-02T00:00:00",
-    "total": 54
+    "total": 55
   }
 }

@@ -2662,6 +2662,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#resume-prompt-paste-after-goal-in-a-fresh-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resume prompt — paste after /goal in a fresh session
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#blocked-on-the-owner-not-on-code" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3113,20 +3124,51 @@ metric labels are left <strong>empty</strong> on purpose, so an untouched propos
 <li><strong><code>make art</code> never overwrites a hand-made PNG.</strong> That is the fully-manual escape hatch, and
    silently rendering over it would reintroduce the automation this item removed.</li>
 </ol>
+<h2 id="resume-prompt-paste-after-goal-in-a-fresh-session">Resume prompt — paste after <code>/goal</code> in a fresh session<a class="headerlink" href="#resume-prompt-paste-after-goal-in-a-fresh-session" title="Permanent link">&para;</a></h2>
+<p>Kept here rather than retyped, so the next session starts from measurements instead of memory.
+<strong><code>/goal</code> caps its argument at 4,000 characters</strong>; this is 2,989, so it fits as-is — trim
+wording, not facts, if you add to it.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Using agent-skills, run the FIRST live acceptance of the B-042 hand-off flow, and publish the article it is blocking.
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>Read docs/HANDOFF.md first, then BACKLOG.md. B-042 is BUILT and merged (PR #465, ADR-0019): the pipeline no longer produces any image. The owner draws every hero and makes every chart. A run ends with output/posts/&lt;slug&gt;.review.md and a desktop banner.
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>THE GAP, stated plainly: every part of that flow is unit-tested and NOT ONE STEP HAS EVER RUN LIVE. 2,747 tests pass and no real article has been through pipeline -&gt; packet -&gt; make art -&gt; deploy review. This repo&#39;s own record says that distinction matters: four consecutive defects were green locally and rejected by the blog (docs/blog-integration-constraints.md). Treat this as acceptance, not as a demo.
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>The subject is testing-shortcuts-migration-deadline, which is already blocked on exactly these steps and must NOT publish as it stands.
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>1. Re-source its research. Paste docs/research/artifact-sourcing-prompt.md into the Claude.ai conversation that produced sre-quality-governance-guide.html. That artifact had ZERO citations and --brief skips research, so the writer fabricated: a chart with four invented percentages, a named real executive given an unsupportable motive, three references with no URLs. Convert with scripts/html_to_brief.py.
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>2. Re-run the pipeline on the new brief. Expect no chart generated and no hero drawn.
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>3. Read the packet as the owner would and judge it, do not just check it exists: does the chart section name real sourced figures, or correctly say the brief has no numeric claim? Is the hero brief usable? File anything unusable as a defect.
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>4. Owner draws the hero at output/posts/images/&lt;slug&gt;-hero.svg (SVG preferred; a .png needs a .webp sibling). Then make art SLUG=&lt;slug&gt;.
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>5. Deploy --mode review, read the LIVE page, then make publish SLUG=&lt;slug&gt;.
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>VERIFY THE GATE, do not assume it: before drawing the hero, try a review deploy and confirm it REFUSES. That gate is now the only thing enforcing art presence — Phase A deliberately does not block on art. If it does not refuse, nothing does.
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>Traps, all real, all cost time before:
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>- bare `python` does not exist outside .venv; make ci-local needs .venv/bin on PATH.
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>- The publish-guard PreToolUse hook matches a bare string, so it blocks any command whose TEXT mentions the deploy script — including a grep or a heredoc. Split the command or use an editor tool.
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>- --mode is REQUIRED on deploy; there is no default and `post` skips review (B-028).
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>- Read logs/agent_sdk_costs.jsonl for durations; never quote a remembered figure. Note the hero_* fields are gone (B-041 closed as mooted) so old rows are not comparable.
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>- A green run means the PROSE is ready, not that the post is complete.
+<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>
+<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>Report faithfully: if the packet is unhelpful or the gate misfires, say so with the output and log a defect rather than working around it. Branch off main, make ci-local before pushing — you are the merge gate, main is unprotected.
+</code></pre></div>
 <h2 id="blocked-on-the-owner-not-on-code">Blocked on the owner, not on code<a class="headerlink" href="#blocked-on-the-owner-not-on-code" title="Permanent link">&para;</a></h2>
-<p>Two round-trips only he can make. The <code>testing-shortcuts-migration-deadline</code> article is blocked
-on both and <strong>should not be published as it stands</strong> — see B-040's calibration cases for why.</p>
+<p>Two round-trips only he can make, and they are now step 1 and step 4 of the resume prompt above
+rather than loose ends. The <code>testing-shortcuts-migration-deadline</code> article is blocked on both and
+<strong>should not be published as it stands</strong> — see B-040's calibration cases for why.</p>
 <ol>
 <li><strong>Re-source the artifact.</strong> Paste <code>docs/research/artifact-sourcing-prompt.md</code> into the
    Claude.ai conversation that produced <code>sre-quality-governance-guide.html</code>. That artifact had
    <strong>zero citations</strong>, and <code>--brief</code> skips research, so the writer fabricated: a chart with four
    invented percentages, a named real executive given an unsupportable motive, three references
    with no URLs. <code>article_evaluator</code> scored it <strong>76</strong> and the validator <strong>passed</strong> it.</li>
-<li><strong>Draw the hero.</strong> The prompt is in the article as a <code>&lt;!-- HERO IMAGE</code> comment and in
-   <code>output/posts/testing-shortcuts-migration-deadline.image_prompt.md</code>. Two hero draws timed out
-   at 600s each. B-041 now caps that at 10 minutes, but it will likely still fail, so Gemini /
-   Nano Banana by hand is the realistic route. <strong>A PNG hero needs a <code>.webp</code> sibling</strong> — the
-   blog's <code>responsive-image.html</code> rewrites <code>.png</code> → <code>.webp</code>.</li>
+<li><strong>Draw the hero.</strong> The brief is in the article as a <code>&lt;!-- HERO IMAGE</code> comment, in
+   <code>output/posts/testing-shortcuts-migration-deadline.image_prompt.md</code>, and inlined in the review
+   packet. <strong>B-042 settled the "will the draw time out" question by deleting the draw</strong> — there is
+   no automated hero any more, so the by-hand route is not a fallback, it is the route. <strong>A PNG
+   hero needs a <code>.webp</code> sibling</strong> — the blog's <code>responsive-image.html</code> rewrites <code>.png</code> → <code>.webp</code>;
+   an SVG needs none. Then <code>make art SLUG=&lt;slug&gt;</code> links it and takes alt text from its <code>&lt;desc&gt;</code>.</li>
 </ol>
 <h2 id="traps-that-cost-real-time-on-2026-08-01">Traps that cost real time on 2026-08-01<a class="headerlink" href="#traps-that-cost-real-time-on-2026-08-01" title="Permanent link">&para;</a></h2>
 <ul>
@@ -3147,10 +3189,10 @@ on both and <strong>should not be published as it stands</strong> — see B-040'
 <p><strong><code>scripts/html_to_brief.py</code> exists and works.</strong> Spec <code>docs/specs/html-research-ingestion.md</code>
 was LGTM'd and implemented the same day; <code>tests/test_html_to_brief.py</code> is 46 tests, 94%
 coverage on the module. Nothing about it is pending.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python<span class="w"> </span>scripts/html_to_brief.py<span class="w"> </span>~/Downloads/conversation.html<span class="w"> </span>--slug<span class="w"> </span>ai-code-review
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c1"># → docs/research/ai-code-review.md   (refuses to overwrite without --force)</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nv">IS_SANDBOX</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">&quot;&lt;topic&gt;&quot;</span><span class="w"> </span>--brief<span class="w"> </span>docs/research/ai-code-review.md
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>python<span class="w"> </span>scripts/html_to_brief.py<span class="w"> </span>~/Downloads/conversation.html<span class="w"> </span>--slug<span class="w"> </span>ai-code-review
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1"># → docs/research/ai-code-review.md   (refuses to overwrite without --force)</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nv">IS_SANDBOX</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">&quot;&lt;topic&gt;&quot;</span><span class="w"> </span>--brief<span class="w"> </span>docs/research/ai-code-review.md
 </code></pre></div>
 <p><strong>Cost and duration, from the ledger rather than from memory.</strong> <code>logs/agent_sdk_costs.jsonl</code>
 records <code>wall_seconds</code> and per-stage cost for every run and has since April. Across the five
@@ -3158,7 +3200,7 @@ recorded runs: <strong>3.4–15.4 minutes, $0.25–$1.31</strong>. Only one exce
 spent $0.88 of its $1.31 on live research, which <code>--brief</code> skips entirely. The figure this
 file used to quote — "~$1 and ~35 minutes" — was folklore contradicted by the repo's own
 data; a 2026-08-01 session repeated it back to the owner before checking. Read the ledger:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>.venv/bin/python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import json;[print(r[&#39;timestamp&#39;][:10], round(r[&#39;wall_seconds&#39;]/60,1),&#39;min&#39;, &#39;\$&#39;+str(round(r[&#39;total_cost_usd&#39;],2))) for r in map(json.loads, open(&#39;logs/agent_sdk_costs.jsonl&#39;))]&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>.venv/bin/python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import json;[print(r[&#39;timestamp&#39;][:10], round(r[&#39;wall_seconds&#39;]/60,1),&#39;min&#39;, &#39;\$&#39;+str(round(r[&#39;total_cost_usd&#39;],2))) for r in map(json.loads, open(&#39;logs/agent_sdk_costs.jsonl&#39;))]&quot;</span>
 </code></pre></div>
 <p>Then <strong>deploy to review, never straight to <code>_posts/</code></strong> — see
 the publishing section below. <code>--mode</code> is required (B-028).</p>
@@ -3474,9 +3516,9 @@ mypy baseline gate are all clean. 78 new tests this session: <code>test_sync_cop
 scoped to <code>scripts/*.py</code> and does not descend into <code>archived/</code>.</p>
 <h2 id="publishing-read-this-before-deploying-anything">Publishing — read this before deploying anything<a class="headerlink" href="#publishing-read-this-before-deploying-anything" title="Permanent link">&para;</a></h2>
 <p><code>--mode</code> is now <strong>required</strong> on <code>deploy_to_blog</code> (B-028). The sanctioned route:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python<span class="w"> </span>-m<span class="w"> </span>scripts.deploy_to_blog<span class="w"> </span>--article<span class="w"> </span>output/posts/&lt;slug&gt;.md<span class="w"> </span>--mode<span class="w"> </span>review
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># read the printed https://&lt;host&gt;/review/&lt;slug&gt;-&lt;token&gt;/ page, then:</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>make<span class="w"> </span>publish<span class="w"> </span><span class="nv">SLUG</span><span class="o">=</span>&lt;slug&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python<span class="w"> </span>-m<span class="w"> </span>scripts.deploy_to_blog<span class="w"> </span>--article<span class="w"> </span>output/posts/&lt;slug&gt;.md<span class="w"> </span>--mode<span class="w"> </span>review
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="c1"># read the printed https://&lt;host&gt;/review/&lt;slug&gt;-&lt;token&gt;/ page, then:</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>make<span class="w"> </span>publish<span class="w"> </span><span class="nv">SLUG</span><span class="o">=</span>&lt;slug&gt;
 </code></pre></div>
 <p>This hand-off previously said "Then <code>deploy_to_blog</code> opens the PR" — and that is the line
 that was followed when article two published unreviewed. <code>CLAUDE.md</code> now carries the

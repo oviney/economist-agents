@@ -1231,6 +1231,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0019-a-setpoint-is-a-decision-about-who-decides/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0019 — A Setpoint Is a Decision About Who Decides
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2553,6 +2581,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Active overrides">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#recorded-by-b-042-2026-08-01" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recorded by B-042 (2026-08-01)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2635,6 +2680,35 @@ the sensor matches on, so a typo silently grants no exemption (fail-closed by de
   to, so the signature is the interface rather than an accumulation. Untouched by BUG-046,
   which only added a keyless branch alongside it.</li>
 <li><code>scripts/llm_client.py::_call_openai</code> — same signature, same reason, same provenance.</li>
+</ul>
+<h3 id="recorded-by-b-042-2026-08-01">Recorded by B-042 (2026-08-01)<a class="headerlink" href="#recorded-by-b-042-2026-08-01" title="Permanent link">&para;</a></h3>
+<p>All six are <strong>pre-existing</strong> and none was introduced by B-042; they became live because the
+sensor is scoped to files an agent touches and B-042 touched these files. Four were not
+modified at all, and the two that were each took a single added line. Two got <em>smaller</em>.
+Recorded rather than refactored because refactoring a function this change did not otherwise
+alter would bury the diff a reviewer needs to read.</p>
+<ul>
+<li><code>scripts/deploy_to_blog.py::deploy</code> — B-042 added exactly one line
+  (<code>_require_hero(article_path)</code>) to a function that was already 99 statements. The
+  clone → copy → validate → commit → push sequence is a linear script; splitting it would
+  spread the ordering constraints that make it correct across call boundaries.
+  <strong>Review queue: worth extracting the copy-assets block when this is next opened for its own
+  sake.</strong></li>
+<li><code>scripts/deploy_to_blog.py::deploy_review</code> — same one-line addition, same provenance, same
+  reasoning. The duplication between the two is itself the real finding, and is out of scope
+  here.</li>
+<li><code>scripts/publication_validator.py::_check_image_contract</code> — untouched by B-042. A
+  field-by-field frontmatter contract check; the branch count is the number of fields.</li>
+<li><code>src/agent_sdk/_shared.py::apply_editorial_fixes</code> — untouched except that B-042 <strong>removed</strong>
+  a call from it (the unconditional chart embed), so it is one statement shorter than before.
+  It is a pipeline of independent text fixes; the length is the number of fixes.</li>
+<li><code>src/agent_sdk/_shared.py::audit_article_stats</code> — untouched by B-042.</li>
+<li><code>src/agent_sdk/stage3_runner.py::_collect_text</code> — untouched by B-042. The 9 arguments are
+  the Agent SDK call surface (model, budget, turns, timeout, label, tools…).</li>
+<li><code>src/agent_sdk/stage3_runner.py::run_stage3</code> — B-042 <strong>cut this from 83 statements to 64</strong>
+  by deleting the graphics stage and the hero draw, and dropped it below the C901 and
+  PLR0912 thresholds it used to exceed. Still over the statement limit. Left recorded rather
+  than pushed further in the same change.</li>
 </ul>
 <h2 id="day-one-baseline-not-overrides">Day-one baseline (NOT overrides)<a class="headerlink" href="#day-one-baseline-not-overrides" title="Permanent link">&para;</a></h2>
 <p>The audit measured the following on <code>src/</code> + <code>scripts/</code> at the time the sensor landed.

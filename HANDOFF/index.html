@@ -1231,6 +1231,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0019-a-setpoint-is-a-decision-about-who-decides/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR-0019 — A Setpoint Is a Decision About Who Decides
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2573,22 +2601,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-next-work-b-042-the-mandatory-chart-gate" class="md-nav__link">
+  <a href="#b-042-built-2026-08-01-the-owner-owns-every-image" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The next work: B-042 — the mandatory-chart gate
+        B-042 — BUILT 2026-08-01. The owner owns every image
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="The next work: B-042 — the mandatory-chart gate">
+    <nav class="md-nav" aria-label="B-042 — BUILT 2026-08-01. The owner owns every image">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#resume-prompt-paste-after-goal-in-a-fresh-session" class="md-nav__link">
+  <a href="#the-argument-so-a-fresh-session-does-not-re-derive-it" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Resume prompt — paste after /goal in a fresh session
+        The argument, so a fresh session does not re-derive it
       
     </span>
   </a>
@@ -2596,10 +2624,32 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#the-facts-that-prompt-asserts-and-where-they-were-checked" class="md-nav__link">
+  <a href="#what-changed" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The facts that prompt asserts, and where they were checked
+        What changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-workflow-now" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The workflow now
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#three-things-worth-knowing-before-you-touch-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Three things worth knowing before you touch it
       
     </span>
   </a>
@@ -2907,9 +2957,16 @@
 is the "where were we" note a new session reads first, then overwrites when it goes stale.</p>
 <p><strong>Read next, in this order:</strong> this file → <code>BACKLOG.md</code> → <code>docs/reviews/harness-engineering-assessment-2026-07-29.md</code>
 for the framework the last four items sit in.</p>
-<p><strong>Session of 2026-08-01 is closed out.</strong> PRs #459 … #462 merged; B-038 … B-041 landed. <strong>B-043
-is now built</strong> (branch <code>harness/sensor-proof-of-teeth</code>). <strong>B-042 is the next work</strong>, and it is
-the one item that is specced only as a backlog entry rather than a full spec.</p>
+<p><strong>Session of 2026-08-01 is closed out.</strong> PRs #459 … #462 merged; B-038 … B-041 landed. B-043
+is built. <strong>B-042 is now BUILT too</strong> (branch <code>feat/b042-owner-owns-art</code>) — see the section
+below; it changed the operating model, not just a gate.</p>
+<blockquote>
+<p><strong>The single most important thing to know before you touch anything:</strong> the pipeline no
+longer produces any image. <strong>The owner draws every hero and makes every chart.</strong> A run ends
+with a review packet at <code>output/posts/&lt;slug&gt;.review.md</code> and a desktop notification, not with
+a publishable post. Operating Constraint #4 was amended — this <strong>reverses</strong> B-016b's
+"Claude draws the hero as SVG". See ADR-0019.</p>
+</blockquote>
 <h2 id="b-043-built-2026-08-01-no-sensor-ships-without-a-proof-it-can-fail">B-043 — BUILT 2026-08-01. No sensor ships without a proof it can fail<a class="headerlink" href="#b-043-built-2026-08-01-no-sensor-ships-without-a-proof-it-can-fail" title="Permanent link">&para;</a></h2>
 <p><strong>Spec: <code>docs/specs/sensor-proof-of-teeth.md</code></strong> (status IMPLEMENTED; its open questions are now
 answered with measurements rather than left hanging).</p>
@@ -2989,51 +3046,73 @@ governance defect planted per rule) and <code>tests/test_check_bare_name_imports
 <p>One inherited proof was quietly weak and got tightened: <code>test_schema_validation_rejects_invalid</code>
 asserted <code>pytest.raises((ValueError, Exception))</code>, which passes on <em>any</em> error — a typo in the
 fixture would have satisfied it. That is B-039's defect in miniature, in a test.</p>
-<h2 id="the-next-work-b-042-the-mandatory-chart-gate">The next work: B-042 — the mandatory-chart gate<a class="headerlink" href="#the-next-work-b-042-the-mandatory-chart-gate" title="Permanent link">&para;</a></h2>
-<p><strong>Specced only as a <code>BACKLOG.md</code> entry, not a full spec.</strong> Per <code>CLAUDE.md</code>, write the spec first;
-it changes a CRITICAL gate carrying a stated editorial standard, and the same reasoning that kept
-B-040 at spec-only applies.</p>
-<h3 id="resume-prompt-paste-after-goal-in-a-fresh-session">Resume prompt — paste after <code>/goal</code> in a fresh session<a class="headerlink" href="#resume-prompt-paste-after-goal-in-a-fresh-session" title="Permanent link">&para;</a></h3>
-<p>Kept here rather than retyped, so the next session starts from measurements instead of memory.
-<strong><code>/goal</code> caps its argument at 4,000 characters</strong>; this is 3,701, so it fits as-is — trim wording,
-not facts, if you add to it.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Using agent-skills, take B-042 — the mandatory-chart gate manufactures the fabrication it should prevent.
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Read docs/HANDOFF.md first (it opens with B-043 as built and names B-042 as next), then B-042 in BACKLOG.md, then docs/reviews/harness-engineering-assessment-2026-07-29.md for the framework.
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>B-042 HAS NO SPEC — only a BACKLOG entry. Write the spec and stop for LGTM. Do not go straight to implementation: it changes a CRITICAL gate carrying a stated editorial standard (&quot;Charts are mandatory per Economist editorial standards&quot;), and the same reasoning that kept B-040 at spec-only applies.
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>The measured facts, verified 2026-08-01. Do not re-derive them:
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>1. publication_validator.py:1031 makes a chart mandatory at CRITICAL whenever no chart ref exists. On the 2026-08-01 run a brief containing ONE number yielded a chart carrying four invented percentages (62/46/28/12%), with an axis and a measured-sounding subtitle. That was compliance, not a rogue writer.
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>2. orphaned_chart (publication_validator.py:1056, HIGH) then fires unless prose near the embed says &quot;chart&quot;/&quot;figure&quot;/&quot;shows&quot;/&quot;illustrates&quot; — pushing the writer to describe the chart, with nothing verifying the description is true. That is how &quot;As the chart below illustrates, undetected defects do not flow linearly into rework&quot; came to be written about a static four-bar comparison.
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>3. Two gates combined manufactured two defects. article_evaluator then scored the result 76 and the validator PASSED it.
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>4. Two of the eight calibration cases are this defect — docs/evals/review-gate/cases/g4-fabricated-chart-figures.yaml and g2-chart-shows-something-other-than-claimed.yaml. Use them as the regression targets rather than inventing new ones.
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>5. The owner&#39;s stated position (2026-08-01): a chart is mandatory WHEN THE RESEARCH SUPPORTS ONE, not because an article exists.
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>B-043 deliberately did not fix this, and the reason decides the spec&#39;s shape: missing_chart fires CORRECTLY. The defect is its setpoint. A proof of teeth cannot catch a wrong setpoint — that is the taxonomy gap the sensor spec&#39;s open question 3 leaves for its own ADR, and it is still open. Decide whether that ADR belongs in this spec or beside it.
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>Files: scripts/publication_validator.py, src/agent_sdk/_shared.py (_auto_embed_chart at 664, called at 887), src/agent_sdk/stage3_runner.py.
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>You inherit a standing check B-043 shipped. scripts/check_sensor_proofs.py runs in make ci-local and fails when a script a gate site invokes has no proof in docs/sensors/register.yaml — add or move a sensor and the gate goes red until you register it. Run `.venv/bin/python scripts/check_sensor_proofs.py --list` to see the 20 entries. publication_validator&#39;s entry carries a B-042 note that must be updated if you change its setpoint.
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>Branch off main. Run make ci-local before you push — you are the merge gate, main is unprotected, it needs the venv on PATH, and it is now 2,761 tests.
-<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>
-<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>Traps, all in docs/HANDOFF.md: bare `python` does not exist outside the venv; `export PATH :=` in a Makefile does NOT make make use it (GNU make 3.81 direct-execs metacharacter-free lines against its own startup PATH — name $(VENV_BIN)/&lt;tool&gt;); read logs/agent_sdk_costs.jsonl rather than quoting a remembered duration; and the publish-guard PreToolUse hook matches a bare string, so it blocks any command whose text merely mentions the deploy script, including a grep or a heredoc — split the command or use an editor tool.
-<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>
-<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>Still blocked on the owner, not on code: the testing-shortcuts-migration-deadline article needs its artifact re-sourced (docs/research/artifact-sourcing-prompt.md) and its hero drawn by hand. It should not be published as it stands — B-042 is why.
+<h2 id="b-042-built-2026-08-01-the-owner-owns-every-image">B-042 — BUILT 2026-08-01. The owner owns every image<a class="headerlink" href="#b-042-built-2026-08-01-the-owner-owns-every-image" title="Permanent link">&para;</a></h2>
+<p><strong>Spec:</strong> <code>docs/specs/mandatory-chart-setpoint.md</code> · <strong>Decision:</strong> <strong>ADR-0019 — a setpoint is a
+decision about who decides</strong> · <strong>Closes B-041 as mooted.</strong></p>
+<h3 id="the-argument-so-a-fresh-session-does-not-re-derive-it">The argument, so a fresh session does not re-derive it<a class="headerlink" href="#the-argument-so-a-fresh-session-does-not-re-derive-it" title="Permanent link">&para;</a></h3>
+<p><code>missing_chart</code> was CRITICAL, so a brief carrying one number still required a chart, and the
+pipeline complied by inventing four percentages (62/46/28/12%). <strong>Nothing malfunctioned.</strong> The
+instinct is to tune the setpoint — make it conditional, audit the figures. Both were designed
+and both were discarded. The defect was not a mistuned threshold but a <strong>decision held by the
+wrong party</strong>: whether an article warrants a chart is judged against the research, which the
+validator never sees. So the fix removes the sensor's <em>authority</em>, not its threshold.</p>
+<p>Two findings settled it, both verified against the code rather than the backlog:</p>
+<ol>
+<li><strong><code>orphaned_chart</code> could never fire, for any input.</strong> <code>missing_chart</code> returns early unless a
+   <code>/assets/charts/….png</code> ref exists, so by the time the orphan scan ran the content provably
+   contained the substring "chart" — in the embed URL. A passing test named
+   <code>test_orphaned_chart_flagged</code> asserted <code>== 0</code> and documented the inertness as intended.</li>
+<li><strong><code>orphaned_chart</code> did not push the writer — the writer prompt did.</strong> <code>stage3_runner.py</code>
+   ordered the writer to reference the chart "as the chart shows", <em>citing the validator</em>. That
+   wrote case <code>g2</code>. Repairing <code>orphaned_chart</code> would have made B-042 worse, since its only
+   remedy is "add a sentence about the chart".</li>
+</ol>
+<h3 id="what-changed">What changed<a class="headerlink" href="#what-changed" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Deleted</td>
+<td><code>missing_chart</code>, <code>orphaned_chart</code>, the graphics stage, <code>hero_author.py</code>, the writer's chart-sentence instruction, Stage 4's unconditional chart embed</td>
+</tr>
+<tr>
+<td>New</td>
+<td><code>propose_chart_spec</code> (regex extraction from the brief, <strong>no LLM</strong>), <code>review_packet.py</code>, <code>scripts/finalise_art.py</code>, <code>make art SLUG=…</code></td>
+</tr>
+<tr>
+<td>Moved</td>
+<td>art presence → the deploy gate (ADR-0017). <strong>This is now the ONLY thing enforcing it</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>The chart proposal cannot fabricate</strong>, by construction: every value is pulled out of the
+brief by <code>_STAT_PATTERN</code> — the same definition the prose stat audit already used. Titles and
+metric labels are left <strong>empty</strong> on purpose, so an untouched proposal will not render
+(<code>chart_renderer._validate_spec</code> refuses it) and the owner has to supply the framing.</p>
+<h3 id="the-workflow-now">The workflow now<a class="headerlink" href="#the-workflow-now" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">&quot;&lt;topic&gt;&quot;</span><span class="w"> </span>--research-mode<span class="w"> </span>claude_web<span class="w">   </span><span class="c1"># → .review.md + banner</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1"># draw output/posts/images/&lt;slug&gt;-hero.svg; edit output/charts/&lt;slug&gt;.spec.json if proposed</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>make<span class="w"> </span>art<span class="w"> </span><span class="nv">SLUG</span><span class="o">=</span>&lt;slug&gt;<span class="w">              </span><span class="c1"># renders spec (a hand-made PNG wins), embeds, links hero</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>python<span class="w"> </span>-m<span class="w"> </span>scripts.deploy_to_blog<span class="w"> </span>--article<span class="w"> </span>output/posts/&lt;slug&gt;.md<span class="w"> </span>--mode<span class="w"> </span>review
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>make<span class="w"> </span>publish<span class="w"> </span><span class="nv">SLUG</span><span class="o">=</span>&lt;slug&gt;
 </code></pre></div>
-<h3 id="the-facts-that-prompt-asserts-and-where-they-were-checked">The facts that prompt asserts, and where they were checked<a class="headerlink" href="#the-facts-that-prompt-asserts-and-where-they-were-checked" title="Permanent link">&para;</a></h3>
-<p>Every line number in it was verified on 2026-08-01 rather than carried from the backlog:
-<code>missing_chart</code> CRITICAL at <code>publication_validator.py:1031</code>, <code>orphaned_chart</code> HIGH at <code>:1056</code>,
-<code>_auto_embed_chart</code> at <code>src/agent_sdk/_shared.py:664</code> called at <code>:887</code>, and both chart
-calibration cases present in <code>docs/evals/review-gate/cases/</code>.</p>
-<p><strong>B-043 deliberately does not fix it</strong>, and the reason is worth keeping: <code>missing_chart</code> <strong>fires
-correctly</strong>. The defect is its <em>setpoint</em> — a chart is mandatory even when the research carries no
-chartable data, so the pipeline invented four percentages to comply. A proof of teeth cannot catch
-a wrong setpoint, which is the taxonomy gap the spec's open question 3 names and leaves for its own
-ADR. The <code>publication_validator</code> register entry carries a note saying so, so the next reader of
-the register meets the limit rather than inferring it.</p>
+<h3 id="three-things-worth-knowing-before-you-touch-it">Three things worth knowing before you touch it<a class="headerlink" href="#three-things-worth-knowing-before-you-touch-it" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>A green validator no longer means publishable.</strong> Phase A says the <em>prose</em> is ready. The
+   deploy gate refuses a missing hero. If <code>_require_hero</code> stops working, nothing catches it —
+   which is why <code>TestTheArtGateHasTeeth</code> mutates four different ways, including a detonator
+   proving the refusal happens before any clone.</li>
+<li><strong>This is not the #403 handshake ADR-0016 deleted.</strong> That paused Stage 3 and exited 10
+   before Stage 4 ever ran. This runs everything, passes every gate, exits 0, <em>then</em> hands off.
+   One path, no resume state, exit codes 10/11 still retired.</li>
+<li><strong><code>make art</code> never overwrites a hand-made PNG.</strong> That is the fully-manual escape hatch, and
+   silently rendering over it would reintroduce the automation this item removed.</li>
+</ol>
 <h2 id="blocked-on-the-owner-not-on-code">Blocked on the owner, not on code<a class="headerlink" href="#blocked-on-the-owner-not-on-code" title="Permanent link">&para;</a></h2>
 <p>Two round-trips only he can make. The <code>testing-shortcuts-migration-deadline</code> article is blocked
 on both and <strong>should not be published as it stands</strong> — see B-040's calibration cases for why.</p>

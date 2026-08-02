@@ -1,3 +1,37 @@
+# Hand-off — 2026-08-02
+
+## The B-042 hand-off has now run live. It broke twice. Both are fixed.
+
+**Read `docs/reviews/b042-live-acceptance-2026-08-02.md` before touching this flow.**
+PR #466 merged; `make ci-local` green on `main` at **2,759 passed, 9 skipped**.
+
+The art gate was verified by making it fail on purpose — four probes, all exit 1, none
+cloned, run with a deliberately invalid token so a gate failure would have failed closed at
+auth. **It refuses. That part is real.**
+
+Two defects that 2,747 passing tests could not see, both now with regression tests:
+
+- **BUG-070** — `make art` set `image:` but left the `<!-- HERO IMAGE` comment, so
+  `deploy --mode review` refused its own output. The documented sequence could not complete.
+  Every fixture in `test_finalise_art.py` used an article the pipeline never produces.
+- **BUG-071** — `## References` rendered as literal text. The stat audit swallows the blank
+  line above it on *every* article; Stage 4's unconditional chart embed had been sitting in
+  the gap supplying it by accident, and B-042 deleted that embed. The CRITICAL check written
+  for exactly this was blinded by a single trailing space the same edit left behind.
+
+**The live article is `migration-deadline-testing-trap`** (the slug changed — it derives from
+the writer's title). Validator PASSED, 6 references all with URLs, no chart generated, 19
+figures proposed from the brief with every label left empty. **It is not published**, and
+should not be until the three editorial flags in the record are read.
+
+**What is left is in B-044, and it is not code:** draw the hero, then `make art` → deploy
+review → `make publish`. Steps 4 and 5 have still never run live, because the hero is yours.
+
+`BLOG_REPO_TOKEN` is *not* a blocker despite being absent from `.env` — `gh` is authenticated
+as `oviney` with `repo` scope and ADMIN on `oviney/blog`, so `--token $(gh auth token)` works.
+
+---
+
 # Hand-off — 2026-08-01
 
 Written for a fresh session after `/clear`. `BACKLOG.md` stays the source of record; this file

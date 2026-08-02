@@ -441,10 +441,24 @@ _IMAGE_ALT_LINE = re.compile(r"^image_alt:.*$\n?", re.MULTILINE)
 
 
 def _hero_description(path: Path) -> str:
-    """The hero's ``<desc>``, cleaned for use as YAML-safe alt text."""
+    """The hero's ``<desc>``, cleaned for use as YAML-safe alt text.
+
+    Only an SVG has one. BUG-072: this read *any* hero as text, so a real PNG —
+    a first-class hero format, listed in ``_HERO_SUFFIXES`` and given a ``.webp``
+    sibling at deploy — raised ``UnicodeDecodeError`` and took ``make art`` down
+    with it. The suite missed it because its PNG heroes are written with
+    ``write_text("stub")``, which is a text file wearing a ``.png`` name.
+
+    A PNG hero therefore has no alt text to harvest, and the caller leaves
+    ``image_alt`` for a human. That is correct rather than a gap: alt text
+    describes what was drawn, and nothing on disk can tell us that about a
+    raster.
+    """
+    if path.suffix.lower() != ".svg":
+        return ""
     try:
         match = _HERO_DESC.search(path.read_text())
-    except OSError:
+    except (OSError, UnicodeDecodeError):
         return ""
     if not match:
         return ""

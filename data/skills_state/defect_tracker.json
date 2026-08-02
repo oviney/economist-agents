@@ -436,7 +436,7 @@
         "Added LENGTH as first MANDATORY rule in writer prompt",
         "Documented gate vs target in prompt (gate=700, target=800-1000)"
       ],
-      "fix_notes": "Aligned word-count gates across codebase to 700 (matches publication_validator.py and skills/economist-writing/SKILL.md sweet-spot floor). Updated agent_reviewer.py, editorial_judge.py, skill_synthesizer.py from 800→700. Strengthened stage3_crew.py writer prompt with explicit LENGTH rule (700-1200 words, target 800-1000) in MANDATORY block."
+      "fix_notes": "Aligned word-count gates across codebase to 700 (matches publication_validator.py and skills/economist-writing/SKILL.md sweet-spot floor). Updated agent_reviewer.py, editorial_judge.py, skill_synthesizer.py from 800\u2192700. Strengthened stage3_crew.py writer prompt with explicit LENGTH rule (700-1200 words, target 800-1000) in MANDATORY block."
     },
     {
       "id": "BUG-030",
@@ -502,7 +502,7 @@
       "status": "fixed",
       "fixed_date": "2026-04-26T16:56:33.701701",
       "fix_commit": "2cf28a4",
-      "fix_notes": "Allow `_client` injection to bypass the availability guard — caller is supplying whatever interface chroma would provide.",
+      "fix_notes": "Allow `_client` injection to bypass the availability guard \u2014 caller is supplying whatever interface chroma would provide.",
       "root_cause": "code_logic",
       "root_cause_notes": "Availability guard checked before honouring injection.",
       "is_production_escape": false,
@@ -531,7 +531,7 @@
         "new_validation"
       ],
       "prevention_actions": [
-        "Add a regression test asserting the dashboard's sprint-trends section renders with non-empty content when sprint_history.json contains ≥2 sprints.",
+        "Add a regression test asserting the dashboard's sprint-trends section renders with non-empty content when sprint_history.json contains \u22652 sprints.",
         "Grep audit: any future state-file relocation must update all readers in one commit."
       ]
     },
@@ -540,20 +540,20 @@
       "severity": "high",
       "discovered_in": "test_failure",
       "discovered_date": "2026-04-26T16:56:33.701701",
-      "description": "scripts/defect_tracker.py reads from legacy `skills/defect_tracker.json` instead of `data/skills_state/defect_tracker.json` — same migration miss as BUG-034",
+      "description": "scripts/defect_tracker.py reads from legacy `skills/defect_tracker.json` instead of `data/skills_state/defect_tracker.json` \u2014 same migration miss as BUG-034",
       "component": "defect_tracker",
       "status": "fixed",
       "fixed_date": "2026-04-26T16:56:33.701701",
       "fix_commit": "2cf28a4",
       "fix_notes": "Path updated to data/skills_state/.",
       "root_cause": "integration_error",
-      "root_cause_notes": "Same migration as BUG-034 — three readers missed when state files moved.",
+      "root_cause_notes": "Same migration as BUG-034 \u2014 three readers missed when state files moved.",
       "is_production_escape": true,
       "prevention_strategy": [
         "new_validation"
       ],
       "prevention_actions": [
-        "See BUG-034 — same prevention applies."
+        "See BUG-034 \u2014 same prevention applies."
       ]
     },
     {
@@ -561,20 +561,20 @@
       "severity": "high",
       "discovered_in": "test_failure",
       "discovered_date": "2026-04-26T16:56:33.701701",
-      "description": "scripts/agent_metrics.py reads from legacy `skills/agent_metrics.json` instead of `data/skills_state/agent_metrics.json` — same migration miss as BUG-034/035",
+      "description": "scripts/agent_metrics.py reads from legacy `skills/agent_metrics.json` instead of `data/skills_state/agent_metrics.json` \u2014 same migration miss as BUG-034/035",
       "component": "agent_metrics",
       "status": "fixed",
       "fixed_date": "2026-04-26T16:56:33.701701",
       "fix_commit": "2cf28a4",
       "fix_notes": "Path updated to data/skills_state/.",
       "root_cause": "integration_error",
-      "root_cause_notes": "Same migration as BUG-034 — three readers missed when state files moved.",
+      "root_cause_notes": "Same migration as BUG-034 \u2014 three readers missed when state files moved.",
       "is_production_escape": true,
       "prevention_strategy": [
         "new_validation"
       ],
       "prevention_actions": [
-        "See BUG-034 — same prevention applies."
+        "See BUG-034 \u2014 same prevention applies."
       ]
     },
     {
@@ -608,16 +608,16 @@
           "patch_frontmatter_extensible": "_patch_frontmatter (flow.py ~line 413) uses regex string injection. Straightforward to extend. Existing tests in TestPatchFrontmatter (test_flow_agent_sdk.py lines 339-357) cover the pattern.",
           "anthropic_mock_pattern": "conftest.py has mock_anthropic_client fixture (lines 26-38). Claude vision calls use the same query() async generator path. Mockable via patch of src.agent_sdk.stage3_runner.query.",
           "gaps_identified": [
-            "_FakePipelineResult (test_flow_agent_sdk.py lines 28-45) has no image_alt or image_caption fields — must be extended.",
+            "_FakePipelineResult (test_flow_agent_sdk.py lines 28-45) has no image_alt or image_caption fields \u2014 must be extended.",
             "No test currently validates stage3 output through publication_validator image metadata CRITICAL gates end-to-end."
           ],
           "critical_blocker": "Writer prompt (stage3_runner.py lines 253-256) MUST be updated first to require both fields. Vision refinement and frontmatter injection have nothing to refine until the writer emits these fields.",
           "recommended_test_plan": {
-            "test_writer_emits_fields": "tests/test_flow_agent_sdk.py — new TestWriterFrontmatter class",
-            "test_vision_refinement": "tests/test_flow_agent_sdk.py — new TestVisionRefinement class, patch query()",
-            "test_integration": "tests/test_flow_agent_sdk.py — extend TestQualityGate: mock pipeline → validator passes image gates",
-            "test_patch_frontmatter": "tests/test_flow_agent_sdk.py — extend TestPatchFrontmatter",
-            "sequence": "TDD: RED (write failing tests) → update prompt → GREEN → add vision step → REFACTOR"
+            "test_writer_emits_fields": "tests/test_flow_agent_sdk.py \u2014 new TestWriterFrontmatter class",
+            "test_vision_refinement": "tests/test_flow_agent_sdk.py \u2014 new TestVisionRefinement class, patch query()",
+            "test_integration": "tests/test_flow_agent_sdk.py \u2014 extend TestQualityGate: mock pipeline \u2192 validator passes image gates",
+            "test_patch_frontmatter": "tests/test_flow_agent_sdk.py \u2014 extend TestPatchFrontmatter",
+            "sequence": "TDD: RED (write failing tests) \u2192 update prompt \u2192 GREEN \u2192 add vision step \u2192 REFACTOR"
           }
         }
       },
@@ -799,7 +799,7 @@
       "github_issue": null,
       "is_production_escape": false,
       "root_cause": "code_logic",
-      "root_cause_notes": "DIAGNOSED (generous --writer-budget 3.00 run): DUAL cause. (1) Under-budget — the run completed at $0.5907 total, but the defaults (run_pipeline writer 0.30 / CLI 0.60) are exhausted once the writer retries. (2) The writer emits conversational preamble on some attempts (e.g. 'The search tool is wired to arXiv... I'll write the article grounded in...'), failing the well-formed check (starts_with_dash=False) and forcing a retry that burns budget. Fix: port the closed PR #441 _extract_article preamble/fence recovery into the stage3 retry loop so preamble attempts recover in-place instead of retrying, AND raise the default writer budget for margin. NOTE: a generous-budget run DID produce a publish-valid article (publication_validator PASSED) — keyless generation works.",
+      "root_cause_notes": "DIAGNOSED (generous --writer-budget 3.00 run): DUAL cause. (1) Under-budget \u2014 the run completed at $0.5907 total, but the defaults (run_pipeline writer 0.30 / CLI 0.60) are exhausted once the writer retries. (2) The writer emits conversational preamble on some attempts (e.g. 'The search tool is wired to arXiv... I'll write the article grounded in...'), failing the well-formed check (starts_with_dash=False) and forcing a retry that burns budget. Fix: port the closed PR #441 _extract_article preamble/fence recovery into the stage3 retry loop so preamble attempts recover in-place instead of retrying, AND raise the default writer budget for margin. NOTE: a generous-budget run DID produce a publish-valid article (publication_validator PASSED) \u2014 keyless generation works.",
       "discovered_by": "B-009 T1 fail-fast keyless run",
       "prevention_test_added": true,
       "fixed_date": "2026-07-22T00:00:00",
@@ -844,13 +844,13 @@
       "severity": "high",
       "discovered_in": "development",
       "discovered_date": "2026-07-22T00:00:00",
-      "description": "Keyless deterministic research is unreliable and aborts the whole pipeline. The two free providers (arXiv, Semantic Scholar) rate-limit/err heavily (HTTP 429/503); when BOTH fail on a topic, deterministic research returns zero sources and the empty-research guard (#438) aborts the run (exit 2, 'Pipeline aborted: research failed', provider_failed={'arxiv':True,'semantic_scholar':True}). Observed live: a default-budget keyless run aborted before the writer. This is the primary blocker to reliable keyless article production — bigger than the writer bugs. Likely mitigation: default the keyless path to research_mode='claude_web' (ADR-0013, Claude's own WebSearch on the subscription — not the rate-limited academic APIs), which is exactly why claude_web was introduced.",
+      "description": "Keyless deterministic research is unreliable and aborts the whole pipeline. The two free providers (arXiv, Semantic Scholar) rate-limit/err heavily (HTTP 429/503); when BOTH fail on a topic, deterministic research returns zero sources and the empty-research guard (#438) aborts the run (exit 2, 'Pipeline aborted: research failed', provider_failed={'arxiv':True,'semantic_scholar':True}). Observed live: a default-budget keyless run aborted before the writer. This is the primary blocker to reliable keyless article production \u2014 bigger than the writer bugs. Likely mitigation: default the keyless path to research_mode='claude_web' (ADR-0013, Claude's own WebSearch on the subscription \u2014 not the rate-limited academic APIs), which is exactly why claude_web was introduced.",
       "component": "agent_sdk.pipeline research (deterministic) / empty-research guard",
       "status": "fixed",
       "github_issue": null,
       "is_production_escape": false,
       "root_cause": "integration_error",
-      "root_cause_notes": "Keyless research depends on free rate-limited APIs with an abort-on-empty guard. Decide the reliable keyless research mode (claude_web vs hardened deterministic) — affects B-010's canonical-command choice and the live-run acceptance gate.",
+      "root_cause_notes": "Keyless research depends on free rate-limited APIs with an abort-on-empty guard. Decide the reliable keyless research mode (claude_web vs hardened deterministic) \u2014 affects B-010's canonical-command choice and the live-run acceptance gate.",
       "discovered_by": "B-010 T1 validation run",
       "prevention_test_added": false,
       "fixed_date": "2026-07-22T00:00:00",
@@ -861,13 +861,13 @@
       "severity": "medium",
       "discovered_in": "production",
       "discovered_date": "2026-07-24T00:00:00",
-      "description": "B-013 review drafts rendered BARE on the live blog — no <head>, no theme, no noindex meta — defeating both the 'review the post in the real theme' goal and the noindex acceptance criterion. Caught by the live leak test after merging oviney/blog PR #1157 (the other 6/7 checks passed: draft absent from homepage/blog/feed.xml/sitemap.xml/search + robots.txt disallows /review/).",
+      "description": "B-013 review drafts rendered BARE on the live blog \u2014 no <head>, no theme, no noindex meta \u2014 defeating both the 'review the post in the real theme' goal and the noindex acceptance criterion. Caught by the live leak test after merging oviney/blog PR #1157 (the other 6/7 checks passed: draft absent from homepage/blog/feed.xml/sitemap.xml/search + robots.txt disallows /review/).",
       "component": "oviney/blog _layouts/review.html (B-013 blog-side)",
       "status": "resolved",
       "github_issue": "oviney/blog#1159",
       "is_production_escape": true,
       "root_cause": "integration_error",
-      "root_cause_notes": "review.html extended `layout: single`, assuming the remote minimal-mistakes theme. This blog has remote_theme COMMENTED OUT and uses local layouts (default/page/post) — there is no `single` layout, so the parent layout silently did not apply and the draft rendered as bare markdown-to-HTML. Real posts use `layout: post` -> `default.html`, whose <head> emits the page.noindex robots meta. Assumption about the target repo's theme was not verified before shipping.",
+      "root_cause_notes": "review.html extended `layout: single`, assuming the remote minimal-mistakes theme. This blog has remote_theme COMMENTED OUT and uses local layouts (default/page/post) \u2014 there is no `single` layout, so the parent layout silently did not apply and the draft rendered as bare markdown-to-HTML. Real posts use `layout: post` -> `default.html`, whose <head> emits the page.noindex robots meta. Assumption about the target repo's theme was not verified before shipping.",
       "discovered_by": "leak-test (deploy_review --mode review + read-only feed/sitemap/homepage/noindex checks)",
       "prevention_test_added": "Acceptance leak-test checklist in docs/specs/B-013-blog-side.md is the regression gate; run it on any change to the review collection/layout before calling B-013 done.",
       "fixed_date": "2026-07-24T00:00:00",
@@ -905,7 +905,7 @@
       "github_issue": "",
       "is_production_escape": false,
       "root_cause": "requirements_gap",
-      "root_cause_notes": "CONSTRAINT CONFLICT — must be resolved by the owner before any fix. CLAUDE.md constraint #4 (NON-NEGOTIABLE) currently forbids pipeline hero-image generation of ANY kind — not DALL-E/Gemini (needs a keyed service, violates constraint #1), and explicitly 'not procedural/PIL image generation either'; the hero is human-supplied from a prompt. So this request REVERSES documented policy. Feasible keyless interpretations to consider: (i) charts — already allowed & keyless (code-drawn), extend coverage to multiple figures per post; (ii) hero as a CODE/SVG-drawn editorial illustration authored by Claude (keyless, but currently banned by #4's 'no procedural' clause); (iii) true raster AI hero art — needs an image model = a keyed/paid service = blocked by constraints #1/#2 unless the owner adds one. NEXT STEP: owner decides whether to amend constraint #4 and which interpretation is in scope, then spec it (spec-driven-development).",
+      "root_cause_notes": "CONSTRAINT CONFLICT \u2014 must be resolved by the owner before any fix. CLAUDE.md constraint #4 (NON-NEGOTIABLE) currently forbids pipeline hero-image generation of ANY kind \u2014 not DALL-E/Gemini (needs a keyed service, violates constraint #1), and explicitly 'not procedural/PIL image generation either'; the hero is human-supplied from a prompt. So this request REVERSES documented policy. Feasible keyless interpretations to consider: (i) charts \u2014 already allowed & keyless (code-drawn), extend coverage to multiple figures per post; (ii) hero as a CODE/SVG-drawn editorial illustration authored by Claude (keyless, but currently banned by #4's 'no procedural' clause); (iii) true raster AI hero art \u2014 needs an image model = a keyed/paid service = blocked by constraints #1/#2 unless the owner adds one. NEXT STEP: owner decides whether to amend constraint #4 and which interpretation is in scope, then spec it (spec-driven-development).",
       "discovered_by": "owner report",
       "prevention_test_added": "",
       "fixed_date": "",
@@ -918,17 +918,17 @@
       "severity": "high",
       "discovered_in": "production",
       "discovered_date": "2026-07-24T00:00:00",
-      "description": "OWNER-REPORTED (prose). The generated flaky-tests article ('Green Light, Red Ledger…') reads like AI slop despite passing the deterministic economist-writing gates. It CLEARS the mechanical checks (named companies: Atlassian/Google/Microsoft/CloudBees; <=4 headings; colon-twist title; data-dense; no lists) yet still exhibits AI tells the current Stage-4 banned-phrase list does not catch.",
+      "description": "OWNER-REPORTED (prose). The generated flaky-tests article ('Green Light, Red Ledger\u2026') reads like AI slop despite passing the deterministic economist-writing gates. It CLEARS the mechanical checks (named companies: Atlassian/Google/Microsoft/CloudBees; <=4 headings; colon-twist title; data-dense; no lists) yet still exhibits AI tells the current Stage-4 banned-phrase list does not catch.",
       "component": "src/agent_sdk._shared (Stage 4 polish / banned-phrase list) + skills/economist-writing enforcement",
       "status": "resolved",
       "github_issue": "",
       "is_production_escape": true,
       "root_cause": "validation_gap",
-      "root_cause_notes": "Concrete AI-slop tells found on review against skills/economist-writing (none are in the current deterministic banlist): (1) EM-DASH rhythm — em-dashes used as the default connective, often 1-2 per paragraph. (2) META-COMMENTARY on its own argument: 'The argument here is blunter than most engineering post-mortems allow'; 'The numbers, once examined, make this case almost without assistance'; 'The most interesting question is not whether flaky tests are expensive… it is why'. (3) 'NOT X BUT Y' antithesis scaffold repeated ~6x: 'not cutting corners—she is making a…decision', 'not a nuisance …but a quantifiable payroll cost', 'not defective code but tests', 'not merely expensive but epistemically impossible'. (4) UNFALSIFIABLE SUPERLATIVES / overreach: 'No other category of engineering waste operates so openly and at such scale with so little executive scrutiny.' (5) PURPLE / MIXED-METAPHOR pile-up: dripping tap -> flooding basement -> 'the plumber charges considerably more than the pipe was worth'; 'offloaded from the pipeline to the engineer's nervous system'; 'the engineer is hunting a ghost'; 'auto-retry is an anaesthetic, not a cure'. (6) FAUX-SPECIFIC cuteness: 'a test decided to behave differently on a Tuesday'. These pass because Stage 4 only strips a fixed hedging/closing set; the rhythmic + rhetorical AI tells are unlisted.",
+      "root_cause_notes": "Concrete AI-slop tells found on review against skills/economist-writing (none are in the current deterministic banlist): (1) EM-DASH rhythm \u2014 em-dashes used as the default connective, often 1-2 per paragraph. (2) META-COMMENTARY on its own argument: 'The argument here is blunter than most engineering post-mortems allow'; 'The numbers, once examined, make this case almost without assistance'; 'The most interesting question is not whether flaky tests are expensive\u2026 it is why'. (3) 'NOT X BUT Y' antithesis scaffold repeated ~6x: 'not cutting corners\u2014she is making a\u2026decision', 'not a nuisance \u2026but a quantifiable payroll cost', 'not defective code but tests', 'not merely expensive but epistemically impossible'. (4) UNFALSIFIABLE SUPERLATIVES / overreach: 'No other category of engineering waste operates so openly and at such scale with so little executive scrutiny.' (5) PURPLE / MIXED-METAPHOR pile-up: dripping tap -> flooding basement -> 'the plumber charges considerably more than the pipe was worth'; 'offloaded from the pipeline to the engineer's nervous system'; 'the engineer is hunting a ghost'; 'auto-retry is an anaesthetic, not a cure'. (6) FAUX-SPECIFIC cuteness: 'a test decided to behave differently on a Tuesday'. These pass because Stage 4 only strips a fixed hedging/closing set; the rhythmic + rhetorical AI tells are unlisted.",
       "discovered_by": "owner report + economist-writing skill review",
       "prevention_test_added": "",
       "fixed_date": "",
-      "fix_notes": "Candidate fixes (spec first): extend the deterministic banlist / add heuristics for em-dash density, 'not X but Y' frequency, meta-commentary stems ('the argument here', 'the numbers…make this case'), and superlative overreach; and/or add an economist-writing Stage-4 judge pass that flags these. Add regression fixtures built from the tells above.",
+      "fix_notes": "Candidate fixes (spec first): extend the deterministic banlist / add heuristics for em-dash density, 'not X but Y' frequency, meta-commentary stems ('the argument here', 'the numbers\u2026make this case'), and superlative overreach; and/or add an economist-writing Stage-4 judge pass that flags these. Add regression fixtures built from the tells above.",
       "resolution": "B-017: four flag-only detectors (em_dash_density, antithesis_scaffold, meta_commentary, unfalsifiable_superlative) added to publication_validator.py; HIGH/MEDIUM never CRITICAL. Verified on the real article. Metaphor tell (#5) is semantic - parked, not faked. Spec: docs/specs/B-017-ai-slop-enforcement.md",
       "resolved_date": "2026-07-24"
     },
@@ -979,7 +979,7 @@
       "title": "Six tests in test_economist_agent.py made live arXiv/citation HTTP calls; the merge gate's runtime was set by a third party's rate limiter",
       "description": "TestRunResearchAgent and TestIntegration patched agents.research_agent.call_llm but not the TWO other network paths inside ResearchAgent.research: _gather_arxiv_research (live arXiv HTTP) and scripts.citation_verifier.verify_citations (fetches every citation URL).",
       "evidence": "pytest --durations on the file: 34 passed in 624.53s (10m24s), with six tests accounting for 620s (127.75/127.24/122.40/97.14/96.21/50.21). Log shows 'arXiv transient error (HTTP 429 ...); retry 2/3 after 1.5s'. Reproduced on a clean tree via git stash, so it predates B-019.",
-      "root_cause": "Incomplete mocking at the wrong boundary. The tests were written against the LLM seam; the arXiv provider and citation verifier are reached deeper inside ResearchAgent.research and were never stubbed. Because the production code catches network errors and retries with backoff, the tests still PASSED — the defect was invisible except as duration, which is why it survived so long.",
+      "root_cause": "Incomplete mocking at the wrong boundary. The tests were written against the LLM seam; the arXiv provider and citation verifier are reached deeper inside ResearchAgent.research and were never stubbed. Because the production code catches network errors and retries with backoff, the tests still PASSED \u2014 the defect was invisible except as duration, which is why it survived so long.",
       "impact": "Severity raised MEDIUM -> HIGH on measurement. Cost is not a fixed ~2 min as first assessed: arXiv rate-limits under repeated runs, so the gate got slower the more it was used and was unbounded. make ci-local is the only merge gate (ADR-0015); it also failed offline and depended on arXiv availability.",
       "proposed_fix": "Patch ResearchAgent._gather_arxiv_research in the TestRunResearchAgent fixture to return an empty insights dict. Add a suite-wide guard test that fails if any test opens a socket.",
       "resolved_date": "2026-07-26",
@@ -1014,7 +1014,7 @@
       "evidence": "Noted while building B-016b; image_gate is still imported by pipeline for the --resume handshake path.",
       "root_cause": "Left behind by the DALL-E retirement (ADR-0014 / B-009). The handshake path that uses it predates SVG heroes.",
       "impact": "Misleading rather than broken: a reader of the code may believe hero images are gated on PNG dimensions. Also constrains the --resume handshake to PNG drops.",
-      "proposed_fix": "Decide the fate of the --resume image handshake now that Stage 3 draws the hero. If the handshake stays, teach it check_hero_svg for .svg drops; if it goes, delete image_gate.py with it. Spec-worthy, not a patch — it is on a user-facing path.",
+      "proposed_fix": "Decide the fate of the --resume image handshake now that Stage 3 draws the hero. If the handshake stays, teach it check_hero_svg for .svg drops; if it goes, delete image_gate.py with it. Spec-worthy, not a patch \u2014 it is on a user-facing path.",
       "fixed_date": "2026-07-28T00:00:00",
       "resolved_date": "2026-07-28",
       "prevention_test_added": "tests/test_single_pipeline_path.py",
@@ -1030,7 +1030,7 @@
       "description": "The writer budget is consumed ACROSS retry attempts, not per attempt: each attempt is given the remaining balance. One Sonnet writer attempt costs ~$0.42, so a first attempt that produces malformed output (a normal, handled condition with _WRITER_MAX_ATTEMPTS=3) leaves too little for the second, which then aborts the whole pipeline with BudgetExceededError.",
       "evidence": "B-020 acceptance run, 2026-07-27, default budgets: 'Writer attempt 1/3 produced malformed output (starts_with_dash=True, body_empty=True); retrying' then 'BudgetExceededError: cap=$0.3352, cost_at_abort=$0.4216'. $0.3352 is $0.60 minus the ~$0.26 the malformed attempt already spent. Pipeline exited 1 after ~14 min with no article.",
       "root_cause": "The default was never validated against a real retry. Its own help text claims it is 'sized for Sonnet with retries + tool turns', but at ~$0.42 per attempt three attempts need ~$1.26 and even two need ~$0.85.",
-      "impact": "The DEFAULT invocation fails whenever the writer's first attempt is malformed — which happened on the very first real end-to-end run. Wastes ~14 minutes and the cost of the attempts, and produces no article. The retry mechanism that exists to add resilience instead guarantees failure.",
+      "impact": "The DEFAULT invocation fails whenever the writer's first attempt is malformed \u2014 which happened on the very first real end-to-end run. Wastes ~14 minutes and the cost of the attempts, and produces no article. The retry mechanism that exists to add resilience instead guarantees failure.",
       "proposed_fix": "Raise the default to ~$1.60 (3 attempts x $0.42 plus headroom) and correct the help text with the measured per-attempt cost. Consider giving each attempt its own cap rather than sharing one balance, so a wasted attempt cannot starve the retry it exists to enable. Verify by running with the default and forcing a retry.",
       "workaround": "Pass --writer-budget 1.60 explicitly.",
       "fixed_date": "2026-07-28T00:00:00",
@@ -1049,8 +1049,8 @@
       "description": "hero_author holds its OWN reference to _collect_text. The ~10 test files that patch stage3_runner._collect_text therefore did not cover the hero step, which called the real Agent SDK during the test suite.",
       "evidence": "output/posts/test.image_prompt.md and output/posts/images/test-hero.svg appeared in the repo during a gate run, containing REAL generated content built from a test fixture's frontmatter ('Subject: alt', 'Editorial framing: cap'). Decisive measurement: the gate timed out at 900s (EXIT=124) before the guard and ran in 119.05s with 2371 passed after it.",
       "root_cause": "Introduced by me in B-016b. The BUG-058 socket guard cannot see these calls: claude_agent_sdk.query spawns a subprocess CLI, so no in-process socket opens.",
-      "impact": "Every make ci-local made live subscription calls (~$0.45 and ~450s each) and wrote generated artefacts into output/. The gate became unusable — it timed out — which would have pushed people to skip it, the exact failure that let BUG-055..057 reach main.",
-      "resolution": "netguard.install_model_guard patches stage3_runner.query — the single chokepoint every model call funnels through — as an autouse fixture with the @pytest.mark.allow_network opt-out. Tests that legitimately exercise _collect_text internals patch it themselves and their patch wins. Regression: 3 tests in test_no_network_guard.py, one specifically covering the separate-reference trap. Zero existing tests broke, confirming none were relying on the real SDK."
+      "impact": "Every make ci-local made live subscription calls (~$0.45 and ~450s each) and wrote generated artefacts into output/. The gate became unusable \u2014 it timed out \u2014 which would have pushed people to skip it, the exact failure that let BUG-055..057 reach main.",
+      "resolution": "netguard.install_model_guard patches stage3_runner.query \u2014 the single chokepoint every model call funnels through \u2014 as an autouse fixture with the @pytest.mark.allow_network opt-out. Tests that legitimately exercise _collect_text internals patch it themselves and their patch wins. Regression: 3 tests in test_no_network_guard.py, one specifically covering the separate-reference trap. Zero existing tests broke, confirming none were relying on the real SDK."
     },
     {
       "id": "BUG-063",
@@ -1064,14 +1064,14 @@
       "impact": "Wastes the entire writer stage (~$0.85 and several minutes) on a graphics failure that a retry would likely absorb. Blocks B-020 acceptance.",
       "proposed_fix": "Give the graphics call the same bounded retry the writer has, feeding the ChartRenderError message back so the agent can correct the spec. Reuse the writer's attempt-loop shape rather than inventing a second one.",
       "resolved_date": "2026-07-27",
-      "resolution": "_graphics_with_retry in stage3_runner gives the graphics agent 3 bounded attempts, feeding ChartRenderError's own message back so it knows what to correct. Chart failures stay fatal, but 'fatal' now means 'no valid spec in 3 tries' rather than 'the first try was malformed'. Made async deliberately — a sync helper called from the async run_stage3 would have repeated the asyncio.run-inside-a-loop bug fixed the same day. Regression: tests/test_graphics_retry.py (3 tests). One existing test (test_run_stage3_fails_when_chart_render_fails) supplied only two mock replies so the retry hit StopIteration; its fixture was fixed, not its assertion."
+      "resolution": "_graphics_with_retry in stage3_runner gives the graphics agent 3 bounded attempts, feeding ChartRenderError's own message back so it knows what to correct. Chart failures stay fatal, but 'fatal' now means 'no valid spec in 3 tries' rather than 'the first try was malformed'. Made async deliberately \u2014 a sync helper called from the async run_stage3 would have repeated the asyncio.run-inside-a-loop bug fixed the same day. Regression: tests/test_graphics_retry.py (3 tests). One existing test (test_run_stage3_fails_when_chart_render_fails) supplied only two mock replies so the retry hit StopIteration; its fixture was fixed, not its assertion."
     },
     {
       "id": "BUG-064",
       "severity": "MEDIUM",
       "status": "resolved",
       "discovered_date": "2026-07-28T00:00:00",
-      "description": "_graphics_with_retry passes the FULL graphics_budget_usd to every attempt rather than the remaining balance, so _GRAPHICS_MAX_ATTEMPTS=3 can spend up to 3x the cap the operator set. The writer loop decrements correctly (see BUG-061); graphics is the mirror-image inconsistency. Not a run-aborter — it silently overspends instead of under-funding. Measured graphics cost has already reached $0.41 against a $0.40 cap on one B-020 run (logs/agent_sdk_costs.jsonl 2026-07-28T01:22).",
+      "description": "_graphics_with_retry passes the FULL graphics_budget_usd to every attempt rather than the remaining balance, so _GRAPHICS_MAX_ATTEMPTS=3 can spend up to 3x the cap the operator set. The writer loop decrements correctly (see BUG-061); graphics is the mirror-image inconsistency. Not a run-aborter \u2014 it silently overspends instead of under-funding. Measured graphics cost has already reached $0.41 against a $0.40 cap on one B-020 run (logs/agent_sdk_costs.jsonl 2026-07-28T01:22).",
       "component": "src/agent_sdk/stage3_runner.py::_graphics_with_retry",
       "github_issue": "",
       "is_production_escape": false,
@@ -1098,7 +1098,7 @@
       "discovered_by": "manual review of the live post while regenerating the B-017 slop list",
       "prevention_test_added": "tests/test_deploy_rejects_hero_prompt_comment.py",
       "fixed_date": "2026-07-28T00:00:00",
-      "fix_notes": "Gated at the DEPLOY boundary, not in publication_validator: the comment is injected after run_stage4 by design, so the validator cannot see it, and it is legitimate in the local artifact — only illegitimate on the blog. _reject_unrendered_hero_prompt guards BOTH deploy() and deploy_review() (a review deploy is a live URL too) and fires before any clone/push, so a rejected article costs nothing. Rejects rather than strips: stripping would hide that no hero was drawn. Removed from the live post in oviney/blog#1168.",
+      "fix_notes": "Gated at the DEPLOY boundary, not in publication_validator: the comment is injected after run_stage4 by design, so the validator cannot see it, and it is legitimate in the local artifact \u2014 only illegitimate on the blog. _reject_unrendered_hero_prompt guards BOTH deploy() and deploy_review() (a review deploy is a live URL too) and fires before any clone/push, so a rejected article costs nothing. Rejects rather than strips: stripping would hide that no hero was drawn. Removed from the live post in oviney/blog#1168.",
       "resolved_date": "2026-07-28",
       "verification": "4 regression tests + make ci-local green (2026-07-28)"
     },
@@ -1169,10 +1169,25 @@
       "fix_notes": "Extracted _dated_post_name(source_name, deploy_date): strip any existing YYYY-MM-DD- prefix, then always prefix the deploy date. Handles both shapes so the date cannot go missing again. WHY NO GATE CAUGHT IT, which is the more useful finding: scripts/validate-posts.sh globs _posts/*.md itself rather than asking Jekyll, so it validates an undated file happily; and acceptance_blog_frontmatter.sh stages its OWN copy as _posts/2026-01-01-<slug>.md - a different filename from the one the deploy path produces. The oracle passed on a name that would never exist. An oracle that renames its input is not testing the deploy path.",
       "resolved_date": "2026-07-29",
       "verification": "RED->GREEN on tests/test_deploy_post_filename.py (3 tests); dry-run now targets _posts/2026-07-29-review-queue-throughput-tax.md"
+    },
+    {
+      "id": "BUG-070",
+      "severity": "high",
+      "discovered_in": "acceptance",
+      "discovered_date": "2026-08-02T00:00:00",
+      "description": "`make art` sets `image:` but never removes the `<!-- HERO IMAGE` prompt comment, so the documented B-042 sequence (draw hero -> make art -> deploy --mode review) is refused by _reject_unrendered_hero_prompt. The happy path cannot complete without an undocumented manual edit.",
+      "component": "finalise_art",
+      "status": "open",
+      "is_production_escape": false,
+      "root_cause": "validation_gap",
+      "root_cause_notes": "scripts/finalise_art.py calls pipeline._link_hero_asset, which edits only the frontmatter (image:, image_alt:). The body comment injected by pipeline._inject_hero_prompt_comment is left in place. Two gates written in different items (BUG-065's comment refusal, B-042's art hand-off) were never run against each other end to end; every unit test covers one or the other. Reproduced live 2026-08-02 with four deploy probes.",
+      "prevention_test_added": false,
+      "introduced_in_commit": "95c838ce",
+      "introduced_date": "2026-08-01"
     }
   ],
   "summary": {
-    "total_bugs": 14,
+    "total_bugs": 53,
     "fixed_bugs": 7,
     "production_bugs": 6,
     "defect_escape_rate": 42.9,
@@ -1209,7 +1224,7 @@
     "avg_time_to_detect_days": 4.1,
     "avg_time_to_resolve_days": 2.0,
     "avg_critical_ttd_days": 3.7,
-    "last_updated": "2026-07-24T00:00:00",
-    "total": 21
+    "last_updated": "2026-08-02T00:00:00",
+    "total": 53
   }
 }

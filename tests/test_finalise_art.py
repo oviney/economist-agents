@@ -14,10 +14,22 @@ from pathlib import Path
 
 import pytest
 
+from scripts.deploy_to_blog import _reject_unrendered_hero_prompt, _require_hero
 from scripts.finalise_art import finalise
 
 _ARTICLE = (
     '---\nlayout: post\ntitle: "My Slug"\n---\n\n'
+    "Body paragraph one.\n\n## References\n\n1. A\n"
+)
+
+#: What the pipeline actually writes. Every other fixture in this file omits the
+#: reviewer comment, which is how BUG-070 stayed invisible: the suite tested
+#: ``finalise`` against an article the pipeline never produces.
+_ARTICLE_WITH_HERO_PROMPT = (
+    '---\nlayout: post\ntitle: "My Slug"\n---\n\n'
+    "<!-- HERO IMAGE — generate an image from the prompt below, then replace "
+    "this whole comment with it (see output/posts/<slug>.image_prompt.md):\n\n"
+    "Subject: an editorial illustration of something.\n-->\n\n"
     "Body paragraph one.\n\n## References\n\n1. A\n"
 )
 
@@ -124,6 +136,55 @@ class TestTheHeroIsLinked:
         article = (workspace / "output" / "posts" / "my-slug.md").read_text()
         assert "image:" not in article
         assert "deploy will refuse" in capsys.readouterr().err
+
+
+class TestTheHandOffSurvivesTheDeployGate:
+    """BUG-070. The two art gates were never run against each other.
+
+    ``_reject_unrendered_hero_prompt`` (BUG-065) refuses an article still
+    carrying the reviewer comment; ``make art`` (B-042) is what is supposed to
+    replace it. Every test above uses an article with **no** comment in it, so
+    the whole suite passed while the documented sequence — draw hero, ``make
+    art``, ``deploy --mode review`` — could not complete. Reproduced live on
+    2026-08-02, the first real run of the hand-off.
+    """
+
+    def test_finalise_removes_the_reviewer_comment(self, workspace: Path) -> None:
+        article_path = workspace / "output" / "posts" / "my-slug.md"
+        article_path.write_text(_ARTICLE_WITH_HERO_PROMPT)
+        _write_hero(workspace)
+
+        assert finalise("my-slug") == 0
+
+        article = article_path.read_text()
+        assert "<!-- HERO IMAGE" not in article, "the deploy gate will refuse this"
+        assert "image: /assets/images/my-slug-hero.svg" in article
+
+    def test_the_deploy_gate_accepts_what_finalise_produces(
+        self, workspace: Path
+    ) -> None:
+        """The end-to-end property, asserted against the real gate.
+
+        Importing the gate here is the point: a test that only checked for the
+        absence of a substring could drift from what deploy actually refuses.
+        """
+        article_path = workspace / "output" / "posts" / "my-slug.md"
+        article_path.write_text(_ARTICLE_WITH_HERO_PROMPT)
+        _write_hero(workspace)
+        finalise("my-slug")
+
+        _reject_unrendered_hero_prompt(article_path)
+        _require_hero(article_path)
+
+    def test_an_article_without_the_comment_is_unchanged_by_the_removal(
+        self, workspace: Path
+    ) -> None:
+        """Scope guard: the stripper must not touch anything else."""
+        _write_hero(workspace)
+        assert finalise("my-slug") == 0
+        article = (workspace / "output" / "posts" / "my-slug.md").read_text()
+        assert "Body paragraph one." in article
+        assert "## References" in article
 
 
 def test_a_missing_article_is_an_error(workspace: Path) -> None:

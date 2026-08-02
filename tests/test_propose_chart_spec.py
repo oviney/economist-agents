@@ -112,6 +112,76 @@ class TestFramingIsLeftToTheOwner:
         assert len(keys) == len(set(keys))
 
 
+_BRIEF_WITH_RANGES = """
+## Research brief — ranges
+
+Oliver Wyman recommends earmarking 15-20% of IT budgets for debt reduction;
+organisations that defer until crisis spend 30–40% on emergency programmes.
+A defect costs 60 to 100 times more to fix once it reaches production.
+Separately, a clean point measurement: 54% of migrations ran behind schedule.
+"""
+
+
+class TestARangeEndpointIsNotAMeasurement:
+    """B-044, observed on the first real packet (2026-08-02).
+
+    The brief said "earmark 15–20% of IT budgets" and "spending 30–40%"; the
+    proposal offered rows reading ``20 %`` and ``40 %``. The value does appear
+    in the brief, so this was never fabrication — but a chart built from those
+    rows would state a range endpoint as a measurement, which is the same thing
+    the reader cannot distinguish from real data.
+
+    So a range bound is **not proposed at all**, in the same spirit as bare
+    counts and years: the proposal deliberately under-offers, and the packet
+    says what it left out so the owner can add it back knowingly.
+    """
+
+    def test_neither_end_of_a_hyphen_range_is_proposed(self) -> None:
+        spec = propose_chart_spec(_BRIEF_WITH_RANGES)
+        assert spec is not None
+        values = {row["value"] for row in spec["data"]}
+        assert 20 not in values, "proposed the upper bound of 15-20%"
+        assert 15 not in values
+
+    def test_neither_end_of_an_en_dash_range_is_proposed(self) -> None:
+        spec = propose_chart_spec(_BRIEF_WITH_RANGES)
+        assert spec is not None
+        values = {row["value"] for row in spec["data"]}
+        assert 40 not in values, "proposed the upper bound of 30–40%"
+        assert 30 not in values
+
+    def test_a_written_out_range_is_not_proposed(self) -> None:
+        """ "60 to 100 times" is a range in prose, not two measurements."""
+        spec = propose_chart_spec(_BRIEF_WITH_RANGES)
+        assert spec is not None
+        assert 100 not in {row["value"] for row in spec["data"]}
+
+    def test_a_genuine_point_measurement_survives(self) -> None:
+        """Scope guard: the exclusion must not swallow real figures."""
+        spec = propose_chart_spec(_BRIEF_WITH_RANGES)
+        assert spec is not None
+        assert 54 in {row["value"] for row in spec["data"]}
+
+
+class TestProvenanceIsReadable:
+    """B-044: the context window cut mid-word on the real packet.
+
+    The first row read ``'cts: Skipping Rigour Guarantees Overruns - Three-…'``.
+    The figure and its unit were right; the provenance was just hard to read,
+    which matters because reading it is the owner's only check on the number.
+    """
+
+    def test_context_does_not_begin_mid_word(self) -> None:
+        brief = (
+            "Overruns and rework dominate the failure modes reported across "
+            "the surveyed programmes, of which 75% exceeded budget."
+        )
+        spec = propose_chart_spec(brief)
+        assert spec is not None
+        context = spec["data"][0]["source"].removeprefix("brief: ").strip("'")
+        assert brief.startswith(context) or f" {context}" in f" {brief}"
+
+
 class TestTheProposalIsNotSilentlyRenderable:
     """The renderer must reject a proposal until the owner has framed it.
 

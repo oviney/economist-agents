@@ -123,7 +123,9 @@ def _format_chart(result: _PacketSource) -> str:
             "(`%`, `per cent`, `billion`, `million`, `thousand`, `trillion`, "
             "`fold`, `times`, `x`). Bare counts and years are deliberately not "
             'proposed, so a figure written as "1,200 engineers" would not '
-            "appear above — if you know of one, it is yours to add.",
+            "appear above — if you know of one, it is yours to add. Neither is "
+            'either end of a range: "15–20%" is not a measurement, and a row '
+            "reading `20 %` would read as one.",
         ]
         return "\n".join(lines)
 
@@ -141,6 +143,10 @@ def _format_chart(result: _PacketSource) -> str:
         "data. Delete the rows you do not want: these are candidates, not a "
         "chart. One axis, one measure — the renderer rejects a spec whose values "
         "span too many orders of magnitude (B-014).",
+        "",
+        "Two kinds of figure are deliberately left out, so you know to add them "
+        'yourself if you want them: bare counts and years ("1,200 engineers"), '
+        'and either end of a range ("15–20%" is not a measurement).',
         "",
         "| value | unit | found in the brief as |",
         "|---|---|---|",

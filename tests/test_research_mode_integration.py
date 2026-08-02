@@ -67,8 +67,9 @@ def test_deep_mode_uses_deep_research_and_records_cost(
     deep.assert_awaited_once_with("topic")
     det.assert_not_called()
     assert result.research_cost_usd == 0.5
-    # research cost flows into the run total alongside writer + graphics
-    assert result.total_cost_usd == pytest.approx(0.04 + 0.01 + 0.5)
+    # Research cost flows into the run total alongside the writer. B-042 removed
+    # the graphics term: there is no graphics call to cost.
+    assert result.total_cost_usd == pytest.approx(0.04 + 0.5)
 
 
 def test_env_var_overrides_argument(tmp_path: Path, monkeypatch) -> None:

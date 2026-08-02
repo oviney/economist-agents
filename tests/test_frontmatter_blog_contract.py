@@ -281,11 +281,16 @@ class TestHeroAssetIsLinked:
         )
 
 
-class TestHeroMetadataSurvivesWhenAHeroExists:
-    """chart_only was built on 'this article ships without a hero', which B-016b
-    made false. It stripped image_alt/image_caption and injected a 'generate an
-    image from this prompt' comment — so the blog rejected the article for
-    'missing image_alt' even though a hero had been drawn (B-020 run 4)."""
+class TestHeroFrontmatterIsAlwaysStrippedNow:
+    """B-042: the pipeline never draws a hero, so there is never one to keep.
+
+    This class used to assert BOTH branches of a `hero_drawn` flag. The flag is
+    gone: `_prepare_for_stage4` always strips, because at Stage 4 the owner has
+    not drawn anything yet and the writer's `image_alt` is a drawing brief, not
+    alt text. The hero is linked later by `make art`, which takes alt text from
+    the SVG's own <desc> — see TestAltTextComesFromTheDrawing below, which is
+    the surviving half of the B-020 run-4/run-5 lesson.
+    """
 
     @staticmethod
     def _article() -> str:
@@ -293,41 +298,23 @@ class TestHeroMetadataSurvivesWhenAHeroExists:
             '---\nlayout: post\ntitle: "T"\n'
             'image_alt: "A developer waiting beside a queue of review cards"\n'
             'image_caption: "Waiting is the work nobody bills"\n'
-            "---\n\n## Body\n\nText. As the chart shows, it costs.\n\n"
+            "---\n\n## Body\n\nText. It costs.\n\n"
             "## References\n\n1. A\n2. B\n3. C\n"
         )
 
-    def test_alt_and_caption_are_kept_when_a_hero_was_drawn(self) -> None:
+    def test_writer_supplied_hero_metadata_is_stripped(self) -> None:
         from src.agent_sdk.pipeline import _prepare_for_stage4
 
-        out = _prepare_for_stage4(self._article(), hero_drawn=True)
-        assert "image_alt:" in out
-        assert "image_caption:" in out
-
-    def test_alt_and_caption_are_stripped_when_no_hero_exists(self) -> None:
-        # Unchanged behaviour for the genuinely-heroless case.
-        from src.agent_sdk.pipeline import _prepare_for_stage4
-
-        out = _prepare_for_stage4(self._article(), hero_drawn=False)
+        out = _prepare_for_stage4(self._article())
         assert "image_alt:" not in out
+        assert "image_caption:" not in out
 
-    def test_the_hero_prompt_comment_is_not_injected_when_a_hero_exists(self) -> None:
-        from src.agent_sdk.pipeline import _maybe_inject_hero_prompt
+    def test_the_hero_brief_is_injected_for_the_owner(self) -> None:
+        """The brief always travels with the article, because art is always due."""
+        from src.agent_sdk.pipeline import _inject_hero_prompt_comment
 
-        out = _maybe_inject_hero_prompt(
-            "---\nlayout: post\n---\n\nBody.\n",
-            image_prompt="draw something",
-            hero_drawn=True,
-        )
-        assert "HERO IMAGE" not in out
-
-    def test_the_hero_prompt_comment_is_still_injected_without_a_hero(self) -> None:
-        from src.agent_sdk.pipeline import _maybe_inject_hero_prompt
-
-        out = _maybe_inject_hero_prompt(
-            "---\nlayout: post\n---\n\nBody.\n",
-            image_prompt="draw something",
-            hero_drawn=False,
+        out = _inject_hero_prompt_comment(
+            "---\nlayout: post\n---\n\nBody.\n", "draw something"
         )
         assert "HERO IMAGE" in out
 

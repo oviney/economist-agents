@@ -217,8 +217,11 @@ class PublicationValidator:
         # Check 6: Weak endings (CRITICAL - blocks publication)
         self._check_weak_endings(article_content)
 
-        # Check 7: Chart references (orphaned charts)
-        self._check_chart_references(article_content)
+        # Check 7 was the chart gate. Deleted by B-042: whether an article
+        # warrants a chart is an editorial judgment made against the research,
+        # and the validator has neither the research at validation time nor the
+        # standing to make it. Art presence is enforced at the deploy boundary
+        # instead (ADR-0017). See docs/specs/mandatory-chart-setpoint.md.
 
         # Check 8: References section (FEATURE-001)
         self._check_references_section(article_content)
@@ -1022,44 +1025,6 @@ class PublicationValidator:
                     "fix": "Rewrite ending with a vivid prediction, metaphor, or concrete forward-looking statement",
                 },
             )
-
-    def _check_chart_references(self, content: str):
-        """Check that articles include at least one chart in /assets/charts/ and flag orphaned charts that lack text references."""
-        # Find all chart image references pointing to /assets/charts/
-        chart_refs = re.findall(r"!\[.*?\]\((/assets/charts/.*?\.png)\)", content)
-
-        if not chart_refs:
-            self.issues.append(
-                {
-                    "check": "missing_chart",
-                    "severity": "CRITICAL",
-                    "message": "Article missing required chart — every article must include at least one data chart",
-                    "details": "Charts are mandatory per Economist editorial standards. "
-                    "A chart image must be embedded as ![...](/assets/charts/<slug>.png)",
-                    "fix": "Run the graphics_agent to generate a chart and embed it in the article body",
-                },
-            )
-            return
-
-        # Check for orphaned charts (embedded but never mentioned in text)
-        content_lower = content.lower()
-        has_chart_mention = any(
-            word in content_lower
-            for word in ["chart", "figure", "graph", "shows", "illustrates"]
-        )
-
-        if not has_chart_mention:
-            for chart_ref in chart_refs:
-                chart_file = chart_ref.split("/")[-1]
-                self.issues.append(
-                    {
-                        "check": "orphaned_chart",
-                        "severity": "HIGH",
-                        "message": f"Chart embedded but never referenced: {chart_file}",
-                        "details": 'Chart should be mentioned in the article text (e.g., "As the chart shows...")',
-                        "fix": "Add a sentence referencing the chart near where it appears",
-                    },
-                )
 
     def _check_references_section(self, content: str):
         """Check for References section (FEATURE-001)

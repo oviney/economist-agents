@@ -82,6 +82,50 @@ def _reject_unrendered_hero_prompt(article_path: Path) -> None:
     )
 
 
+#: Where the owner drops the hero he drew. Matches ``hero_svg.HERO_IMAGES_DIR``;
+#: duplicated as a literal so this gate has no import-time dependency on the
+#: pipeline package it guards.
+_HERO_SOURCE_DIR = Path("output") / "posts" / "images"
+
+_IMAGE_FIELD = re.compile(r"^image:\s*(\S+)\s*$", re.MULTILINE)
+
+
+def _require_hero(article_path: Path) -> None:
+    """Refuse to deploy an article with no hero on disk (B-042).
+
+    This is the load-bearing half of the two-phase art gate. Phase A — the
+    pipeline's own validation — deliberately does **not** block on art, because
+    the owner has not drawn it yet when the pipeline runs. So if this gate does
+    not refuse, nothing does.
+
+    The blog requires a resolvable ``image:``: measured 2026-07-26, both
+    ``validate-posts.sh`` and ``validate-post-quality.sh`` error with "hero image
+    not set". An article that reaches here without one cannot publish, and
+    finding that out from the blog's CI — after a push — is the expensive way to
+    learn it.
+    """
+    content = article_path.read_text()
+    match = _IMAGE_FIELD.search(content)
+    if match is None:
+        raise DeployError(
+            f"{article_path.name} has no `image:` in its frontmatter, so no hero "
+            "has been supplied. The blog requires a resolvable hero and will "
+            "reject this article. Draw one at "
+            f"{_HERO_SOURCE_DIR}/<slug>-hero.svg, then run "
+            "`make art SLUG=<slug>` to link it (the brief is in the article's "
+            "`.image_prompt.md` sidecar and the review packet)."
+        )
+
+    hero_name = Path(match.group(1)).name
+    if not (_HERO_SOURCE_DIR / hero_name).is_file():
+        raise DeployError(
+            f"{article_path.name} references hero {hero_name!r} but no file "
+            f"exists at {_HERO_SOURCE_DIR / hero_name}. Deploying would push a "
+            "broken <img> to a permanent URL. Draw the hero, or run "
+            "`make art SLUG=<slug>` to re-link what is actually on disk."
+        )
+
+
 @dataclass
 class DeployResult:
     """Structured outcome of a deploy() / deploy_review() call."""
@@ -253,6 +297,8 @@ def deploy(
     # BUG-065: check the local file BEFORE any clone/push work, so a rejected
     # article costs nothing and the error is about the article, not about git.
     _reject_unrendered_hero_prompt(article_path)
+    # B-042: art presence is enforced here because Phase A no longer does it.
+    _require_hero(article_path)
     if not blog_owner or not blog_repo:
         raise DeployError("blog_owner and blog_repo are required")
     if not token:
@@ -573,6 +619,8 @@ def deploy_review(
     # BUG-065: check the local file BEFORE any clone/push work, so a rejected
     # article costs nothing and the error is about the article, not about git.
     _reject_unrendered_hero_prompt(article_path)
+    # B-042: art presence is enforced here because Phase A no longer does it.
+    _require_hero(article_path)
     if not blog_owner or not blog_repo:
         raise DeployError("blog_owner and blog_repo are required")
     if not token:

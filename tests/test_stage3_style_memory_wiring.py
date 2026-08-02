@@ -24,7 +24,6 @@ from __future__ import annotations
 
 import asyncio
 import re
-from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -86,12 +85,9 @@ def stub_pipeline(captured_prompts):
             "_collect_text",
             AsyncMock(side_effect=fake_collect_text),
         ),
-        patch.object(
-            stage3_runner,
-            "render_chart",
-            return_value=Path("output/charts/test.png"),
-        ),
     ):
+        # B-042: no `render_chart` patch — Stage 3 no longer renders anything.
+        # The chart is extracted from the brief and left for the owner to frame.
         yield
 
 

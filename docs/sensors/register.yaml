@@ -225,10 +225,16 @@ sensors:
       Take a valid article, insert "TODO: write this section" into the body, and
       assert it is rejected with the placeholder_text check named. Roughly twenty
       sibling tests mutate one field each the same way.
-      NOTE — B-042: missing_chart fires CORRECTLY and is still a defect, because
-      its setpoint requires a chart even when the research carries no data. A
-      proof of teeth cannot catch a wrong setpoint. That is B-042's item, not this
-      register's, and is the taxonomy gap the spec's open question 3 names.
+      RESOLVED — B-042 (2026-08-01): this entry used to carry a note that
+      `missing_chart` fired correctly and was still a defect, because its setpoint
+      demanded a chart the research could not support. Both chart checks are now
+      DELETED rather than retuned. The setpoint was not mistuned — it was held by
+      the wrong party: whether an article warrants a chart is judged against the
+      research, which this sensor never sees. `orphaned_chart` went with it, having
+      been provably unable to fire (`missing_chart` returns early unless a
+      `/assets/charts/….png` ref exists, so the content always contained the
+      substring "chart"). Art presence is now regulated at the deploy boundary —
+      see `unreviewed_publish_guard`. See ADR-0019.
 
   - id: unreviewed_publish_guard
     script: scripts/deploy_to_blog.py
@@ -237,11 +243,39 @@ sensors:
       `post`, so the documented command bypassed review with no warning — which is
       how article two was published unreviewed (B-028). It also refuses an article
       still carrying the `<!-- HERO IMAGE` reviewer comment (BUG-065, ADR-0017).
-    proof: tests/test_deploy_mode_required.py::TestModeIsRequired::test_missing_mode_exits_non_zero
+      B-042 added the art-presence gate: an article with no `image:`, or one
+      naming a hero that is not on disk, is refused before any clone. This is now
+      the ONLY thing enforcing art presence — the pipeline's own validation
+      deliberately does not block on art, because the owner has not drawn it when
+      the pipeline runs. If this does not refuse, nothing does.
+    proof: tests/test_deploy_to_blog.py::TestTheArtGateHasTeeth::test_no_hero_on_disk_is_refused
     mutation: >-
-      Invoke the parser with no --mode and assert a non-zero exit naming both
-      choices; each explicit mode parsing is the control. Asserting no default is
-      configured is the part that would catch a re-introduced default.
+      Delete the hero the article references and assert the deploy is refused
+      naming the missing path; a drawn hero is the control. Siblings mutate the
+      `image:` line away entirely (the shape the pipeline now emits), assert
+      `deploy_review` is gated identically because a review URL is live too, and
+      replace `run_command` with a detonator to prove the refusal happens before
+      any clone. `--mode` has its own proof in
+      tests/test_deploy_mode_required.py::TestModeIsRequired::test_missing_mode_exits_non_zero.
+
+  - id: finalise_art
+    script: scripts/finalise_art.py
+    regulates: >-
+      B-042. Two things, both refusals rather than repairs. It will not render a
+      chart spec the owner has not framed — the proposal ships with an empty
+      title and empty metric labels, and `chart_renderer._validate_spec` rejects
+      that, so an untouched proposal produces nothing instead of an unlabelled
+      chart. And it will not overwrite a hand-made PNG with a spec-rendered one,
+      which would be the automation this item exists to remove, reintroduced at
+      the last step.
+    proof: tests/test_finalise_art.py::TestTheOwnersArtIsNeverOverwritten::test_an_existing_png_is_left_alone
+    mutation: >-
+      Put hand-made bytes at the chart path, supply a *valid* spec beside it, run
+      the finaliser, and assert the bytes are unchanged. Without the
+      already-exists guard the spec renders over them and the assertion fails.
+      The sibling `test_an_unframed_spec_is_refused_and_leaves_no_embed` mutates
+      the spec back to the proposal's placeholders and asserts no PNG and no
+      embed — the property that makes shipping an untouched proposal safe.
 
   - id: promote_review
     script: scripts/promote_review.py

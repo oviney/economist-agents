@@ -18,6 +18,7 @@ from unittest.mock import patch
 import pytest
 
 import scripts.deploy_to_blog as dtb
+from tests.test_deploy_to_blog import write_hero
 
 VALID_REFERENCES = """## References
 
@@ -27,6 +28,8 @@ VALID_BODY = " ".join(["word"] * 850)
 
 
 def _make_article(*, date: str = "2026-01-15") -> str:
+    # B-042: the hero line gets this fixture past the deploy art gate. Review is
+    # a live URL too, so it is gated exactly like a publish.
     return (
         "---\n"
         "layout: post\n"
@@ -34,6 +37,7 @@ def _make_article(*, date: str = "2026-01-15") -> str:
         f"date: {date}\n"
         'author: "Ouray Viney"\n'
         'categories: ["Quality Engineering"]\n'
+        "image: /assets/images/specific-descriptive-article-title-hero.svg\n"
         "---\n\n"
         f"{VALID_BODY}\n\n"
         "![Chart](output/charts/my-draft.png)\n\n"
@@ -60,6 +64,7 @@ class TestDeployReview:
     @pytest.fixture
     def article_file(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         monkeypatch.chdir(tmp_path)
+        write_hero()
         article = tmp_path / "2026-01-15-my-draft.md"
         article.write_text(_make_article())
         charts = tmp_path / "output" / "charts"

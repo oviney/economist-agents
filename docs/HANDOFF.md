@@ -149,21 +149,56 @@ make publish SLUG=<slug>
 3. **`make art` never overwrites a hand-made PNG.** That is the fully-manual escape hatch, and
    silently rendering over it would reintroduce the automation this item removed.
 
+## Resume prompt — paste after `/goal` in a fresh session
+
+Kept here rather than retyped, so the next session starts from measurements instead of memory.
+**`/goal` caps its argument at 4,000 characters**; this is 2,989, so it fits as-is — trim
+wording, not facts, if you add to it.
+
+```text
+Using agent-skills, run the FIRST live acceptance of the B-042 hand-off flow, and publish the article it is blocking.
+
+Read docs/HANDOFF.md first, then BACKLOG.md. B-042 is BUILT and merged (PR #465, ADR-0019): the pipeline no longer produces any image. The owner draws every hero and makes every chart. A run ends with output/posts/<slug>.review.md and a desktop banner.
+
+THE GAP, stated plainly: every part of that flow is unit-tested and NOT ONE STEP HAS EVER RUN LIVE. 2,747 tests pass and no real article has been through pipeline -> packet -> make art -> deploy review. This repo's own record says that distinction matters: four consecutive defects were green locally and rejected by the blog (docs/blog-integration-constraints.md). Treat this as acceptance, not as a demo.
+
+The subject is testing-shortcuts-migration-deadline, which is already blocked on exactly these steps and must NOT publish as it stands.
+
+1. Re-source its research. Paste docs/research/artifact-sourcing-prompt.md into the Claude.ai conversation that produced sre-quality-governance-guide.html. That artifact had ZERO citations and --brief skips research, so the writer fabricated: a chart with four invented percentages, a named real executive given an unsupportable motive, three references with no URLs. Convert with scripts/html_to_brief.py.
+2. Re-run the pipeline on the new brief. Expect no chart generated and no hero drawn.
+3. Read the packet as the owner would and judge it, do not just check it exists: does the chart section name real sourced figures, or correctly say the brief has no numeric claim? Is the hero brief usable? File anything unusable as a defect.
+4. Owner draws the hero at output/posts/images/<slug>-hero.svg (SVG preferred; a .png needs a .webp sibling). Then make art SLUG=<slug>.
+5. Deploy --mode review, read the LIVE page, then make publish SLUG=<slug>.
+
+VERIFY THE GATE, do not assume it: before drawing the hero, try a review deploy and confirm it REFUSES. That gate is now the only thing enforcing art presence — Phase A deliberately does not block on art. If it does not refuse, nothing does.
+
+Traps, all real, all cost time before:
+- bare `python` does not exist outside .venv; make ci-local needs .venv/bin on PATH.
+- The publish-guard PreToolUse hook matches a bare string, so it blocks any command whose TEXT mentions the deploy script — including a grep or a heredoc. Split the command or use an editor tool.
+- --mode is REQUIRED on deploy; there is no default and `post` skips review (B-028).
+- Read logs/agent_sdk_costs.jsonl for durations; never quote a remembered figure. Note the hero_* fields are gone (B-041 closed as mooted) so old rows are not comparable.
+- A green run means the PROSE is ready, not that the post is complete.
+
+Report faithfully: if the packet is unhelpful or the gate misfires, say so with the output and log a defect rather than working around it. Branch off main, make ci-local before pushing — you are the merge gate, main is unprotected.
+```
+
 ## Blocked on the owner, not on code
 
-Two round-trips only he can make. The `testing-shortcuts-migration-deadline` article is blocked
-on both and **should not be published as it stands** — see B-040's calibration cases for why.
+Two round-trips only he can make, and they are now step 1 and step 4 of the resume prompt above
+rather than loose ends. The `testing-shortcuts-migration-deadline` article is blocked on both and
+**should not be published as it stands** — see B-040's calibration cases for why.
 
 1. **Re-source the artifact.** Paste `docs/research/artifact-sourcing-prompt.md` into the
    Claude.ai conversation that produced `sre-quality-governance-guide.html`. That artifact had
    **zero citations**, and `--brief` skips research, so the writer fabricated: a chart with four
    invented percentages, a named real executive given an unsupportable motive, three references
    with no URLs. `article_evaluator` scored it **76** and the validator **passed** it.
-2. **Draw the hero.** The prompt is in the article as a `<!-- HERO IMAGE` comment and in
-   `output/posts/testing-shortcuts-migration-deadline.image_prompt.md`. Two hero draws timed out
-   at 600s each. B-041 now caps that at 10 minutes, but it will likely still fail, so Gemini /
-   Nano Banana by hand is the realistic route. **A PNG hero needs a `.webp` sibling** — the
-   blog's `responsive-image.html` rewrites `.png` → `.webp`.
+2. **Draw the hero.** The brief is in the article as a `<!-- HERO IMAGE` comment, in
+   `output/posts/testing-shortcuts-migration-deadline.image_prompt.md`, and inlined in the review
+   packet. **B-042 settled the "will the draw time out" question by deleting the draw** — there is
+   no automated hero any more, so the by-hand route is not a fallback, it is the route. **A PNG
+   hero needs a `.webp` sibling** — the blog's `responsive-image.html` rewrites `.png` → `.webp`;
+   an SVG needs none. Then `make art SLUG=<slug>` links it and takes alt text from its `<desc>`.
 
 ## Traps that cost real time on 2026-08-01
 

@@ -927,20 +927,54 @@ class PublicationValidator:
             return None
         return Path("output/posts/images") / Path(image).name
 
+    @staticmethod
+    def _heading_lacks_blank_line_before(body: str) -> bool:
+        """Return whether any heading sits directly below a non-blank line.
+
+        BUG-071. The blog renders with kramdown, which — unlike CommonMark —
+        will not start a block element on the line after a paragraph. So a
+        heading with no blank line above it renders as literal ``## References``
+        text inside the paragraph. Verified by running kramdown, not inferred.
+
+        This is line-based on purpose. The regex below it allows exactly one
+        whitespace character between the sentence and the marker, so the real
+        article — which ended ``deadline. `` with a trailing space — slipped
+        past a CRITICAL gate written for precisely this defect.
+
+        Fenced code blocks are skipped: ``# a comment`` in a shell example is
+        not a heading, and a false alarm on the packet's own commands would
+        train the reader to ignore the check.
+        """
+        in_fence = False
+        previous = ""
+        for line in body.split("\n"):
+            if line.lstrip().startswith(("```", "~~~")):
+                in_fence = not in_fence
+            elif not in_fence and re.match(r"#{1,6}\s", line) and previous.strip():
+                return True
+            previous = line
+        return False
+
     def _check_heading_structure(self, content: str) -> None:
-        """Reject inline markdown headings embedded inside paragraphs."""
+        """Reject markdown headings kramdown will not render as headings."""
         body = (
             content.split("---", 2)[2]
             if content.startswith("---") and len(content.split("---", 2)) >= 3
             else content
         )
-        if re.search(r"[^\s]\s##\s", body):
+        if re.search(r"[^\s]\s##\s", body) or self._heading_lacks_blank_line_before(
+            body
+        ):
             self.issues.append(
                 {
                     "check": "inline_heading_marker",
                     "severity": "CRITICAL",
-                    "message": "Heading markers are embedded inside paragraph text",
-                    "details": "Malformed markdown like '... sentence. ## Heading' must not publish",
+                    "message": "A heading will not render as a heading",
+                    "details": (
+                        "kramdown needs a blank line above a heading. Both "
+                        "'... sentence. ## Heading' and a heading on the line "
+                        "directly below a paragraph render as literal text"
+                    ),
                     "fix": "Move each markdown heading to its own line with surrounding paragraph breaks",
                 },
             )

@@ -379,6 +379,19 @@ def _slug_for_chart(article: str, topic: str) -> str:
 
 _INLINE_HEADING_PATTERN = re.compile(r"[ \t]+(##+ +[A-Z][^\n]*)")
 _HEADING_LINE_PATTERN = re.compile(r"(?<!\n\n)(^|\n)(##+ +[^\n]+)\n(?!\n)")
+#: BUG-071. A heading already on its own line, but with a paragraph directly
+#: above it. kramdown will not start a block element on the line after a
+#: paragraph, so it renders as literal ``## References`` text.
+#:
+#: The stat audit manufactures this on every article — it splits on
+#: ``(?<=[.!?])\s+``, swallowing the newline before ``## References``, and
+#: rejoins with a space. Stage 4's unconditional chart embed used to sit in
+#: that gap and supply the blank line by accident; B-042 deleted it, so the
+#: first chart-less article is the first one where the heading breaks.
+#:
+#: ``[ \t]*`` before the newline matters: the audit leaves a trailing space, and
+#: that one character is also what blinded ``inline_heading_marker`` to it.
+_HEADING_NEEDS_BLANK_BEFORE = re.compile(r"(?<=\S)[ \t]*\n(#{1,6} +[^\n]+)")
 _DUPLICATE_FRONTMATTER_PATTERN = re.compile(r"\n---\nlayout:.*", re.DOTALL)
 
 
@@ -389,8 +402,13 @@ def _normalize_paragraphs(text: str) -> str:
     on the same line (``"...the easy part. ## The Perception Gap"``).
     Lift any inline heading onto its own line, then ensure every heading
     has a blank line before and after it.
+
+    The "before" half is BUG-071: a heading can also arrive already on its own
+    line with a paragraph directly above it, which kramdown renders as literal
+    text. See ``_HEADING_NEEDS_BLANK_BEFORE``.
     """
     text = _INLINE_HEADING_PATTERN.sub(r"\n\n\1", text)
+    text = _HEADING_NEEDS_BLANK_BEFORE.sub(r"\n\n\1", text)
     text = _HEADING_LINE_PATTERN.sub(r"\1\2\n\n", text)
     return text
 

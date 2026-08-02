@@ -26,6 +26,33 @@ _(none)_
 
 ## Todo
 
+### B-044 · Finish the B-042 acceptance — the two steps only the owner can take
+
+**Opened 2026-08-02** from the first live run of the hand-off. Full record:
+`docs/reviews/b042-live-acceptance-2026-08-02.md`.
+
+The flow now works end to end in code — **BUG-070** and **BUG-071** were found live and are
+fixed, with regression tests. What remains is not code:
+
+1. **Draw the hero** at `output/posts/images/migration-deadline-testing-trap-hero.svg`. The
+   brief is in the review packet and the `.image_prompt.md` sidecar. Then `make art
+   SLUG=migration-deadline-testing-trap`, deploy `--mode review`, read the live page,
+   `make publish`. Steps 4 and 5 have **never run live** and will not until the hero exists.
+2. **Re-source the artifact**, if the B-038 HTML→brief path is to be accepted too. This run
+   used `claude_web` instead, because the Claude.ai conversation that produced
+   `sre-quality-governance-guide.html` could not be identified from `recents` — the artifact
+   dates to **Jul 21 13:04** and nothing in the list obviously matches it. Pasting into a
+   guessed thread was not worth the risk.
+
+**Read the article before publishing.** Three editorial items are flagged in the record — the
+contested IBM 60-to-1 ratio carrying an uncited "corroborated by every serious study"
+sentence, a reference list that is mostly secondary sources, and 8 quantified claims without
+inline attribution.
+
+**Two small, non-blocking improvements to the chart proposal**, both observed on the real
+packet: range endpoints are extracted as point values ("15–20%" proposes a row reading
+`20 %`), and the ±60-character context window cuts mid-word.
+
 > **Opened 2026-07-29 from the article-two run.** **B-025** was withdrawn the same
 > day (see below); **B-026** and **B-027** landed the same day (see Done). Ids are
 > never reused, so all three numbers stay spent. **B-028** and **B-029** are open,

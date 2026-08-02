@@ -25,6 +25,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import re
 import sys
 from pathlib import Path
 
@@ -42,6 +43,15 @@ CHARTS_DIR = Path("output/charts")
 #: still empty would produce a chart with no title and unlabelled bars, which is
 #: worse than no chart — so the renderer's own validation is allowed to refuse,
 #: and this message explains why rather than surfacing a bare stack trace.
+#: The reviewer comment ``pipeline._inject_hero_prompt_comment`` writes. Its own
+#: text says "replace this whole comment with it", and until BUG-070 nothing
+#: did — so ``make art`` set ``image:`` and the deploy gate refused the result,
+#: making the documented sequence impossible to complete.
+#:
+#: Non-greedy to the first ``-->`` is safe: the injector neutralises any ``-->``
+#: inside the prompt precisely so it cannot terminate the comment early.
+_HERO_PROMPT_BLOCK = re.compile(r"<!-- HERO IMAGE.*?-->\n*", re.DOTALL)
+
 _UNFRAMED_HINT = (
     "The chart spec still has the placeholders the proposal left for you: a "
     "`title`, and a `metric` label on every row you keep. Fill those in (and "
@@ -100,6 +110,10 @@ def finalise(slug: str) -> int:
         )
     else:
         print(f"  Hero: linked {HERO_IMAGES_DIR}/{slug}-hero.*")
+        # Only once the hero is actually linked. Stripping the brief while no
+        # hero exists would delete the instructions and leave the article
+        # looking finished, when the honest outcome is deploy's refusal.
+        article = _HERO_PROMPT_BLOCK.sub("", article)
 
     article_path.write_text(article)
     print(f"\nUpdated {article_path}")

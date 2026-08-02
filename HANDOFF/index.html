@@ -2551,10 +2551,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-b-042-hand-off-has-now-run-live-it-broke-twice-both-are-fixed" class="md-nav__link">
+  <a href="#the-hand-off-ran-end-to-end-and-the-article-is-published" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The B-042 hand-off has now run live. It broke twice. Both are fixed.
+        The hand-off ran end to end and the article is published
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-the-acceptance-found-before-publication-the-earlier-record" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What the acceptance found before publication (the earlier record)
       
     </span>
   </a>
@@ -2582,7 +2593,29 @@
 
 
 <h1 id="hand-off-2026-08-02">Hand-off — 2026-08-02<a class="headerlink" href="#hand-off-2026-08-02" title="Permanent link">&para;</a></h1>
-<h2 id="the-b-042-hand-off-has-now-run-live-it-broke-twice-both-are-fixed">The B-042 hand-off has now run live. It broke twice. Both are fixed.<a class="headerlink" href="#the-b-042-hand-off-has-now-run-live-it-broke-twice-both-are-fixed" title="Permanent link">&para;</a></h2>
+<h2 id="the-hand-off-ran-end-to-end-and-the-article-is-published">The hand-off ran end to end and the article is published<a class="headerlink" href="#the-hand-off-ran-end-to-end-and-the-article-is-published" title="Permanent link">&para;</a></h2>
+<p><a href="https://www.viney.ca/2026/08/02/migration-deadline-testing-trap/">https://www.viney.ca/2026/08/02/migration-deadline-testing-trap/</a> — pipeline → packet →
+owner's hero → <code>make art</code> → <code>--mode review</code> → owner approval → <code>make publish</code>, all live.
+<strong>B-044 is DONE.</strong> Blog CI green on every workflow, including the <code>Quality Tests</code> job that
+B-015 says needs an admin bypass; it passed unaided here.</p>
+<p><strong>Four defects were found by running it. None was visible to 2,747 passing tests.</strong>
+BUG-070 (<code>make art</code> left the comment deploy refuses on), BUG-071 (<code>## References</code> rendered as
+literal text), BUG-072 (<code>make art</code> crashed on a real PNG hero), and the chart proposal
+offering range endpoints as measurements. Three of the four share one root cause: <strong>the test
+fixture was not what the pipeline actually produces</strong> — <code>write_text("stub")</code> for a PNG,
+articles with no hero comment, articles with a chart embed papering over a missing blank line.
+If you write a fixture by hand, check it against real output first.</p>
+<p><strong>The one thing no gate could have caught.</strong> The draft's subtitle and a section title rested
+on the IBM Systems Sciences Institute 1:15:60-100 defect-cost ratio, propped up by "they have
+since been corroborated by every serious study that followed" — the reverse of the truth. The
+Institute was a staff training programme; the figure traces to Pressman (1987) citing course
+notes with no data. The validator passed it, the evaluator scored it 86. <strong>A human reading the
+rendered page is the only sensor that finds that class of defect</strong>, which is the argument for
+the review stage stated as a measurement rather than a principle.</p>
+<p>Also worth knowing: <code>deploy_review</code> mints a fresh token every run and never retires the
+previous draft, so a redeploy leaves the superseded copy live. Removed by hand three times on
+2026-08-02.</p>
+<h2 id="what-the-acceptance-found-before-publication-the-earlier-record">What the acceptance found before publication (the earlier record)<a class="headerlink" href="#what-the-acceptance-found-before-publication-the-earlier-record" title="Permanent link">&para;</a></h2>
 <p><strong>Read <code>docs/reviews/b042-live-acceptance-2026-08-02.md</code> before touching this flow.</strong>
 PR #466 merged; <code>make ci-local</code> green on <code>main</code> at <strong>2,759 passed, 9 skipped</strong>.</p>
 <p>The art gate was verified by making it fail on purpose — four probes, all exit 1, none

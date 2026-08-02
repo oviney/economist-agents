@@ -117,6 +117,39 @@ def _extract_stats(text: str) -> list[str]:
     return stats
 
 
+#: A figure that is the upper end of a range, matched against the text *before*
+#: it: "15–20%", "30-40%", "60 to 100 times". B-044, observed on the first real
+#: packet — the brief said "earmark 15–20% of IT budgets" and the proposal
+#: offered a row reading ``20 %``. The value is in the brief, so this was never
+#: fabrication; but a chart built from that row states a range endpoint as a
+#: measurement, which is the thing a reader cannot tell from real data.
+#:
+#: Only the upper end needs excluding: the lower end carries no unit of its own,
+#: so ``_STAT_PATTERN`` never matched it in the first place.
+_RANGE_UPPER_BOUND = re.compile(r"\d\s*(?:[-–—]|to)\s*$")
+
+#: How much of the brief to quote either side of a figure as provenance.
+_CONTEXT_CHARS = 60
+
+
+def _quote_context(brief: str, start: int, end: int) -> str:
+    """Quote the brief around a figure, without cutting words in half.
+
+    B-044: the first real packet opened a row with
+    ``'cts: Skipping Rigour Guarantees Overruns - Three-…'``. The figure and its
+    unit were right; only the provenance was hard to read — which matters,
+    because reading it is the owner's only check on the number.
+    """
+    left = max(0, start - _CONTEXT_CHARS)
+    right = min(len(brief), end + _CONTEXT_CHARS)
+    quoted = brief[left:right]
+    if left > 0 and not brief[left - 1].isspace():
+        quoted = re.sub(r"^\S*\s*", "", quoted)
+    if right < len(brief) and not brief[right].isspace():
+        quoted = re.sub(r"\s*\S*$", "", quoted)
+    return re.sub(r"\s+", " ", quoted.strip())
+
+
 def propose_chart_spec(research_brief: str) -> dict[str, Any] | None:
     """Propose chart rows by *extracting* figures from the brief. No LLM.
 
@@ -154,6 +187,8 @@ def propose_chart_spec(research_brief: str) -> dict[str, Any] | None:
     seen: set[tuple[float, str]] = set()
 
     for match in _STAT_PATTERN.finditer(research_brief):
+        if _RANGE_UPPER_BOUND.search(research_brief[: match.start()]):
+            continue
         value = float(match.group(1))
         unit = match.group(2).strip()
         key = (value, unit.lower())
@@ -161,9 +196,7 @@ def propose_chart_spec(research_brief: str) -> dict[str, Any] | None:
             continue
         seen.add(key)
 
-        start = max(0, match.start() - 60)
-        end = min(len(research_brief), match.end() + 60)
-        context = re.sub(r"\s+", " ", research_brief[start:end].strip())
+        context = _quote_context(research_brief, match.start(), match.end())
         rows.append(
             {
                 "metric": "",

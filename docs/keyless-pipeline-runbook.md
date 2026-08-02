@@ -38,11 +38,14 @@ IS_SANDBOX=1 .venv/bin/python -m src.agent_sdk.pipeline "your topic here" \
   mode (arXiv + Semantic Scholar) is heavily rate-limited from most environments
   and frequently aborts the run with empty research (BUG-050); `claude_web`
   avoids those APIs entirely and is the reliable keyless default.
-- There are no image modes any more (B-021). The run goes end to end: Stage 3
-  draws the hero SVG itself (B-016b) alongside the chart, and writes
+- There are no image modes any more (B-021). The run goes end to end and writes
   `output/posts/<slug>.md`.
+- **It produces no images (B-042).** The owner draws every hero and makes every
+  chart. The run ends with a review packet at `output/posts/<slug>.review.md`
+  and a desktop banner; finish the art, then `make art SLUG=<slug>`.
 
-Exit `0` = publication validator passed (publish-ready); `1` = validator issues;
+Exit `0` = every gate passed — **the prose is ready, the post is not complete**;
+`1` = validator issues;
 `2` = research failed (retry, or you are on `deterministic` — switch to
 `claude_web`).
 
@@ -134,9 +137,10 @@ token needs only `Contents` + `Pull requests` write on `oviney/blog` — no AI k
 | Stage | Mechanism | Key needed |
 |-------|-----------|------------|
 | Research | `claude_web` → `query()` + WebSearch/WebFetch | none (subscription) |
-| Writer + Graphics | Stage 3 `query()` | none (subscription) |
-| Hero image | Stage 3 draws it as SVG itself (B-016b) | none (subscription) |
-| Vision alt/caption | Stage 3 `query()` over the drawn hero | none (subscription) |
+| Writer | Stage 3 `query()` | none (subscription) |
+| Chart figures | `propose_chart_spec` — regex extraction from the brief, **no LLM** | none |
+| Chart render | `make art` → `chart_renderer.py` (matplotlib), from a spec you framed | none |
+| Hero image | **you draw it** (B-042) | none |
 | Quality gates + validator | deterministic Python | none |
 
 ## Honest limitations
@@ -145,10 +149,12 @@ token needs only `Contents` + `Pull requests` write on `oviney/blog` — no AI k
   path — a deliberate, opt-in departure from the LLM-free default (ADR-0013).
   Source quality depends on the model's search behaviour; the
   `citation_verifier` / `publication_validator` citation gates still apply.
-- **The hero is Claude-drawn SVG, never raster.** There is no DALL-E path —
-  image generation was retired (ADR-0014) and CLAUDE.md #4 forbids pixel models.
-  To supply art by hand, overwrite `output/posts/images/<slug>-hero.svg` (the
-  `.image_prompt.md` sidecar is the brief) and re-run.
+- **The pipeline draws nothing (B-042, ADR-0019).** Every image is the owner's:
+  drop the hero at `output/posts/images/<slug>-hero.svg` (the `.image_prompt.md`
+  sidecar and the review packet carry the brief). There is no DALL-E path either
+  — raster generation was retired (ADR-0014) and CLAUDE.md #4 forbids pixel
+  models. **Art presence is enforced at deploy, not by the validator**, so a
+  green run says nothing about whether the art exists.
 - **Topic is manual on this route.** `pipeline.py` takes the topic as an argument.
   This used to be forced: `EconomistContentFlow`'s Stage-1 discovery required
   `ANTHROPIC_API_KEY` (BUG-046). **That is fixed as of 2026-07-31** —

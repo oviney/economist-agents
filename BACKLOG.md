@@ -26,7 +26,29 @@ _(none)_
 
 ## Todo
 
-### B-044 · Finish the B-042 acceptance — the two steps only the owner can take
+### B-044 · Finish the B-042 acceptance — **DONE 2026-08-02**
+
+**The article is published:** <https://www.viney.ca/2026/08/02/migration-deadline-testing-trap/>
+
+The B-042 hand-off has now run end to end, live, for the first time: pipeline → packet →
+owner's hero → `make art` → `--mode review` → owner approval → `make publish`. **Four defects
+were found doing it** — BUG-070, BUG-071, BUG-072 and the range-endpoint proposal — none of
+which 2,747 passing tests could see. All fixed with regression tests.
+
+**One editorial correction the review stage caught, which is the whole argument for having
+one.** The draft rested its subtitle and a section title on the IBM Systems Sciences
+Institute's 1:15:60-100 defect-cost ratio, propped up by the sentence "they have since been
+corroborated by every serious study that followed" — which is the *reverse* of the truth.
+The Institute was a staff training programme, not a research body; the figure traces to
+Pressman (1987) citing "[IBM81]" course notes with no data behind it. The published version
+says so, and argues the case is stronger without it. **Neither the validator nor the
+evaluator can catch a claim like that** — only a human reading the rendered page.
+
+The remaining owner round-trip, unchanged: **re-sourcing an HTML artifact via Claude.ai is
+still unexercised**, since this run used `claude_web`. That is the only part of B-038's
+path the acceptance did not cover.
+
+<details><summary>Original item, as opened</summary>
 
 **Opened 2026-08-02** from the first live run of the hand-off. Full record:
 `docs/reviews/b042-live-acceptance-2026-08-02.md`.
@@ -67,6 +89,8 @@ own URL. Removed by hand on 2026-08-02. Worth a cleanup step before the review p
 used often.
 
 **Nothing else here is code.** The item is blocked on the owner reading the review page.
+
+</details>
 
 > **Opened 2026-07-29 from the article-two run.** **B-025** was withdrawn the same
 > day (see below); **B-026** and **B-027** landed the same day (see Done). Ids are

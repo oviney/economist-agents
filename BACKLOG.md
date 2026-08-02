@@ -56,7 +56,17 @@ provenance quote snaps to word boundaries. The live spec went 19 rows → 17; th
 are exactly those endpoints. Both packet branches now name what was left out, so nothing is
 excluded silently.
 
-**Nothing else here is code.** The item is blocked on the hero and nothing more.
+**A fourth defect, BUG-072**, found the same way: `make art` crashed with
+`UnicodeDecodeError` on a real PNG hero, because `_hero_description` read every hero as
+text to harvest an SVG `<desc>`. The suite's PNG heroes are `write_text("stub")` — text
+files wearing a `.png` name. Fixed, PR #470.
+
+**Small, unfixed:** `deploy_review` mints a fresh `<slug>-<token>` on every run and never
+retires the previous draft, so redeploying a review leaves the superseded copy live at its
+own URL. Removed by hand on 2026-08-02. Worth a cleanup step before the review path gets
+used often.
+
+**Nothing else here is code.** The item is blocked on the owner reading the review page.
 
 > **Opened 2026-07-29 from the article-two run.** **B-025** was withdrawn the same
 > day (see below); **B-026** and **B-027** landed the same day (see Done). Ids are

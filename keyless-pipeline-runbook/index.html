@@ -2705,11 +2705,14 @@ on PATH; credentials in <code>~/.claude/</code>).</p>
   mode (arXiv + Semantic Scholar) is heavily rate-limited from most environments
   and frequently aborts the run with empty research (BUG-050); <code>claude_web</code>
   avoids those APIs entirely and is the reliable keyless default.</li>
-<li>There are no image modes any more (B-021). The run goes end to end: Stage 3
-  draws the hero SVG itself (B-016b) alongside the chart, and writes
+<li>There are no image modes any more (B-021). The run goes end to end and writes
   <code>output/posts/&lt;slug&gt;.md</code>.</li>
+<li><strong>It produces no images (B-042).</strong> The owner draws every hero and makes every
+  chart. The run ends with a review packet at <code>output/posts/&lt;slug&gt;.review.md</code>
+  and a desktop banner; finish the art, then <code>make art SLUG=&lt;slug&gt;</code>.</li>
 </ul>
-<p>Exit <code>0</code> = publication validator passed (publish-ready); <code>1</code> = validator issues;
+<p>Exit <code>0</code> = every gate passed — <strong>the prose is ready, the post is not complete</strong>;
+<code>1</code> = validator issues;
 <code>2</code> = research failed (retry, or you are on <code>deterministic</code> — switch to
 <code>claude_web</code>).</p>
 <h3 id="opt-in-brief-for-flagship-posts-b-012">Opt-in: <code>--brief</code> for flagship posts (B-012)<a class="headerlink" href="#opt-in-brief-for-flagship-posts-b-012" title="Permanent link">&para;</a></h3>
@@ -2815,19 +2818,24 @@ token needs only <code>Contents</code> + <code>Pull requests</code> write on <co
 <td>none (subscription)</td>
 </tr>
 <tr>
-<td>Writer + Graphics</td>
+<td>Writer</td>
 <td>Stage 3 <code>query()</code></td>
 <td>none (subscription)</td>
 </tr>
 <tr>
-<td>Hero image</td>
-<td>Stage 3 draws it as SVG itself (B-016b)</td>
-<td>none (subscription)</td>
+<td>Chart figures</td>
+<td><code>propose_chart_spec</code> — regex extraction from the brief, <strong>no LLM</strong></td>
+<td>none</td>
 </tr>
 <tr>
-<td>Vision alt/caption</td>
-<td>Stage 3 <code>query()</code> over the drawn hero</td>
-<td>none (subscription)</td>
+<td>Chart render</td>
+<td><code>make art</code> → <code>chart_renderer.py</code> (matplotlib), from a spec you framed</td>
+<td>none</td>
+</tr>
+<tr>
+<td>Hero image</td>
+<td><strong>you draw it</strong> (B-042)</td>
+<td>none</td>
 </tr>
 <tr>
 <td>Quality gates + validator</td>
@@ -2842,10 +2850,12 @@ token needs only <code>Contents</code> + <code>Pull requests</code> write on <co
   path — a deliberate, opt-in departure from the LLM-free default (ADR-0013).
   Source quality depends on the model's search behaviour; the
   <code>citation_verifier</code> / <code>publication_validator</code> citation gates still apply.</li>
-<li><strong>The hero is Claude-drawn SVG, never raster.</strong> There is no DALL-E path —
-  image generation was retired (ADR-0014) and CLAUDE.md #4 forbids pixel models.
-  To supply art by hand, overwrite <code>output/posts/images/&lt;slug&gt;-hero.svg</code> (the
-  <code>.image_prompt.md</code> sidecar is the brief) and re-run.</li>
+<li><strong>The pipeline draws nothing (B-042, ADR-0019).</strong> Every image is the owner's:
+  drop the hero at <code>output/posts/images/&lt;slug&gt;-hero.svg</code> (the <code>.image_prompt.md</code>
+  sidecar and the review packet carry the brief). There is no DALL-E path either
+  — raster generation was retired (ADR-0014) and CLAUDE.md #4 forbids pixel
+  models. <strong>Art presence is enforced at deploy, not by the validator</strong>, so a
+  green run says nothing about whether the art exists.</li>
 <li><strong>Topic is manual on this route.</strong> <code>pipeline.py</code> takes the topic as an argument.
   This used to be forced: <code>EconomistContentFlow</code>'s Stage-1 discovery required
   <code>ANTHROPIC_API_KEY</code> (BUG-046). <strong>That is fixed as of 2026-07-31</strong> —

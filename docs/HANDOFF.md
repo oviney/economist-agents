@@ -1,6 +1,33 @@
 # Hand-off — 2026-08-02
 
-## The B-042 hand-off has now run live. It broke twice. Both are fixed.
+## The hand-off ran end to end and the article is published
+
+<https://www.viney.ca/2026/08/02/migration-deadline-testing-trap/> — pipeline → packet →
+owner's hero → `make art` → `--mode review` → owner approval → `make publish`, all live.
+**B-044 is DONE.** Blog CI green on every workflow, including the `Quality Tests` job that
+B-015 says needs an admin bypass; it passed unaided here.
+
+**Four defects were found by running it. None was visible to 2,747 passing tests.**
+BUG-070 (`make art` left the comment deploy refuses on), BUG-071 (`## References` rendered as
+literal text), BUG-072 (`make art` crashed on a real PNG hero), and the chart proposal
+offering range endpoints as measurements. Three of the four share one root cause: **the test
+fixture was not what the pipeline actually produces** — `write_text("stub")` for a PNG,
+articles with no hero comment, articles with a chart embed papering over a missing blank line.
+If you write a fixture by hand, check it against real output first.
+
+**The one thing no gate could have caught.** The draft's subtitle and a section title rested
+on the IBM Systems Sciences Institute 1:15:60-100 defect-cost ratio, propped up by "they have
+since been corroborated by every serious study that followed" — the reverse of the truth. The
+Institute was a staff training programme; the figure traces to Pressman (1987) citing course
+notes with no data. The validator passed it, the evaluator scored it 86. **A human reading the
+rendered page is the only sensor that finds that class of defect**, which is the argument for
+the review stage stated as a measurement rather than a principle.
+
+Also worth knowing: `deploy_review` mints a fresh token every run and never retires the
+previous draft, so a redeploy leaves the superseded copy live. Removed by hand three times on
+2026-08-02.
+
+## What the acceptance found before publication (the earlier record)
 
 **Read `docs/reviews/b042-live-acceptance-2026-08-02.md` before touching this flow.**
 PR #466 merged; `make ci-local` green on `main` at **2,759 passed, 9 skipped**.

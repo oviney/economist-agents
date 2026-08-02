@@ -1184,10 +1184,27 @@
       "prevention_test_added": false,
       "introduced_in_commit": "95c838ce",
       "introduced_date": "2026-08-01"
+    },
+    {
+      "id": "BUG-071",
+      "severity": "critical",
+      "discovered_in": "acceptance",
+      "discovered_date": "2026-08-02T00:00:00",
+      "description": "`## References` rendered as literal text on generated articles. The stat audit collapses the blank line before it; kramdown will not start a block element on the line after a paragraph. The CRITICAL inline_heading_marker check could not see it, because the same edit leaves a trailing space and the check's regex allowed only one whitespace character.",
+      "component": "stage3_runner",
+      "status": "fixed",
+      "fixed_date": "2026-08-02T00:00:00",
+      "is_production_escape": false,
+      "root_cause": "validation_gap",
+      "root_cause_notes": "audit_article_stats splits on (?<=[.!?])\\s+ and rejoins with ' ', swallowing the newline before '## References'. This has happened on every article; Stage 4's unconditional chart embed sat in the gap and supplied the blank line by accident. B-042 deleted that embed, so the first chart-less article is the first one to break. Verified by running kramdown directly, and by the '. \\n![Chart]...\\n\\n## References' shape still on disk in both pre-B-042 articles.",
+      "prevention_test_added": true,
+      "prevention_test_file": "tests/test_normalize_paragraphs.py",
+      "introduced_in_commit": "95c838ce",
+      "introduced_date": "2026-08-01"
     }
   ],
   "summary": {
-    "total_bugs": 53,
+    "total_bugs": 54,
     "fixed_bugs": 7,
     "production_bugs": 6,
     "defect_escape_rate": 42.9,
@@ -1225,6 +1242,6 @@
     "avg_time_to_resolve_days": 2.0,
     "avg_critical_ttd_days": 3.7,
     "last_updated": "2026-08-02T00:00:00",
-    "total": 53
+    "total": 54
   }
 }

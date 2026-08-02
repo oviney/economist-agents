@@ -379,6 +379,52 @@ class TestPublicationValidatorBlogContract:
         assert len(heading_issues) == 1
 
 
+class TestAHeadingNeedsABlankLineBeforeIt:
+    """BUG-071. The blog renders with kramdown, which is stricter than CommonMark.
+
+    kramdown will not start a block element on the line after a paragraph, so
+    ``...deadline.\\n## References`` renders as the literal text
+    ``## References`` inside the paragraph — verified by running kramdown
+    itself on 2026-08-02, not inferred.
+
+    ``inline_heading_marker`` was written for exactly this and missed the real
+    article, because its regex ``[^\\s]\\s##\\s`` allows a *single* whitespace
+    character between the sentence and the marker. The generated article ended
+    ``deadline. `` with a trailing space, so the separator was two characters
+    and a CRITICAL gate went quiet.
+    """
+
+    def test_a_trailing_space_does_not_hide_the_defect(self) -> None:
+        """The measured case: one space is all it took to silence the gate."""
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(body=f"{VALID_BODY} \n## References")
+        is_valid, issues = validator.validate(article)
+        assert not is_valid
+        assert [i for i in issues if i["check"] == "inline_heading_marker"]
+
+    def test_a_heading_directly_after_a_paragraph_is_rejected(self) -> None:
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(body=f"{VALID_BODY}\n## References")
+        is_valid, issues = validator.validate(article)
+        assert not is_valid
+        assert [i for i in issues if i["check"] == "inline_heading_marker"]
+
+    def test_a_properly_separated_heading_is_accepted(self) -> None:
+        """Scope guard: the normal shape must stay clean."""
+        validator = PublicationValidator(expected_date="2026-04-03")
+        article = _make_article(body=f"{VALID_BODY}\n\n## References\n\n1. A")
+        _, issues = validator.validate(article)
+        assert not [i for i in issues if i["check"] == "inline_heading_marker"]
+
+    def test_a_hash_inside_a_fenced_code_block_is_not_a_heading(self) -> None:
+        """A shell comment is not markdown. Flagging it would be a false alarm."""
+        validator = PublicationValidator(expected_date="2026-04-03")
+        body = f"{VALID_BODY}\n\n```bash\nmake art SLUG=x\n# a comment\n```"
+        article = _make_article(body=body)
+        _, issues = validator.validate(article)
+        assert not [i for i in issues if i["check"] == "inline_heading_marker"]
+
+
 class TestChartIsNotTheValidatorsDecision:
     """B-042: the validator no longer rules on whether an article needs a chart.
 

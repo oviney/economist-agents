@@ -49,9 +49,14 @@ contested IBM 60-to-1 ratio carrying an uncited "corroborated by every serious s
 sentence, a reference list that is mostly secondary sources, and 8 quantified claims without
 inline attribution.
 
-**Two small, non-blocking improvements to the chart proposal**, both observed on the real
-packet: range endpoints are extracted as point values ("15–20%" proposes a row reading
-`20 %`), and the ±60-character context window cuts mid-word.
+**The two chart-proposal items are DONE** (PR #468, 2026-08-02). A range bound is no longer
+proposed at all — "15–20%" offering a row reading `20 %` states an endpoint as a
+measurement, which is B-042's complaint arriving through a different door — and the
+provenance quote snaps to word boundaries. The live spec went 19 rows → 17; the two dropped
+are exactly those endpoints. Both packet branches now name what was left out, so nothing is
+excluded silently.
+
+**Nothing else here is code.** The item is blocked on the hero and nothing more.
 
 > **Opened 2026-07-29 from the article-two run.** **B-025** was withdrawn the same
 > day (see below); **B-026** and **B-027** landed the same day (see Done). Ids are

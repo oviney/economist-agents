@@ -1,0 +1,13 @@
+id: g2-predictor-not-in-the-cited-ranking
+gate: G2
+expected: fail
+source: review-queue-throughput-tax
+passage: >-
+  PR size, author seniority, and lines changed all trail behind review presence as predictors
+  of cycle time.
+why: >-
+  "Author seniority" is attributed to a ranking of predictors that does not contain it. The
+  cited source ranks the other factors; this one was added to the list. The claim is
+  plausible, unquantified, and reads as a summary of the source rather than an addition to
+  it, which is what makes it a G2 rather than a G4 — nothing here is invented wholesale, it
+  is a real ranking with an extra member inserted.

@@ -1,0 +1,16 @@
+id: g3-percentage-breakdown-sums
+gate: G3
+expected: pass
+source: green-light-red-ledger-flaky-tests-invisible-tax
+passage: >-
+  Flaky tests consumed at least 2.5% of productive developer time: 1.1% investigating false
+  failures, 1.3% repairing them, and the remainder maintaining detection tooling. Across the
+  study period, that amounted to roughly 6,600 developer-hours: 3.75 full developer-years.
+why: >-
+  A NEGATIVE case, and a harder G3 pass than the arithmetic alone suggests, because it has
+  two independent checks and both hold. The breakdown is internally consistent — 1.1 + 1.3 =
+  2.4, with "the remainder" accounting for the balance to 2.5, and "at least" correctly
+  signals the components are a floor rather than an exhaustive partition. The conversion also
+  reproduces: 6,600 / 3.75 = 1,760 hours, a standard developer-year. A gate that flags this
+  is most likely objecting to "the remainder" being unquantified, which is honest hedging
+  rather than an arithmetic defect — and that distinction is what this case is here to test.

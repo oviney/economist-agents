@@ -1,0 +1,14 @@
+id: g3-cost-ratio-recomputes
+gate: G3
+expected: pass
+source: green-light-red-ledger-flaky-tests-invisible-tax
+passage: >-
+  Manual investigation of a flaky pipeline failure costs $5.67 in developer time, versus $0.02
+  for an automatic rerun, a 280-fold gap.
+why: >-
+  A NEGATIVE case. The derived figure recomputes: 5.67 / 0.02 = 283.5, and "280-fold" is a
+  correct rounding of it — rounded down, against the article's own rhetorical interest rather
+  than for it. This is the cleanest possible G3 pass because correctness is checkable from the
+  passage alone, with no source fetch: a gate that flags it has failed at arithmetic, not at
+  judgement. The first G3 case in the set; before 2026-08-05 the gate had none in either
+  direction.

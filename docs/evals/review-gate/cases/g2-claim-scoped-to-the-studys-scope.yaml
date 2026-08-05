@@ -1,0 +1,17 @@
+id: g2-claim-scoped-to-the-studys-scope
+gate: G2
+expected: pass
+source: the-ai-testing-paradox
+passage: >-
+  GitHub reported that developers in a controlled experiment completed a JavaScript task
+  faster with Copilot, and large survey cohorts said the tool helped them stay in flow and
+  reduce repetitive effort. Those gains are real. They also describe only one slice of the
+  software lifecycle.
+why: >-
+  A NEGATIVE case, and the deliberate inverse of the review-queue defect where a study's
+  finding was inflated into an organisation-level conclusion it never reported. Here the scope
+  is preserved at every step: a controlled experiment, one language, one task, with the
+  self-reported survey cohort named separately from the experiment rather than merged into a
+  single claim — and the inference is then explicitly bounded. This is the strongest form of
+  G2 compliance, because the article had an obvious rhetorical incentive to overstate and did
+  not. If the gate cannot pass this, it cannot pass careful writing at all.

@@ -1,0 +1,15 @@
+id: g4-argument-carries-no-invented-quantity
+gate: G4
+expected: pass
+source: green-light-red-ledger-flaky-tests-invisible-tax
+passage: >-
+  Auto-retry is an anaesthetic, not a cure; it masks the systemic rot while the cost
+  accumulates elsewhere. It is a deal struck with short-term incentives: it makes the
+  dashboard green, the standup short, and the quarterly metrics tidy.
+why: >-
+  A NEGATIVE case. This is interpretation resting on figures established and sourced earlier
+  in the article; it introduces no quantity, no named company, no internal metric and no
+  quote. G4 asks whether something appears invented, and there is nothing here to invent.
+  The case matters because editorial prose is the bulk of any article, and a gate that reads
+  confident unquantified argument as fabrication would fire on most paragraphs of a
+  well-written post — the failure mode that makes a blocking gate unusable.

@@ -1,0 +1,17 @@
+id: g2-chart-referenced-shows-neither-figure
+gate: G2
+expected: fail
+source: review-queue-throughput-tax
+passage: >-
+  The chart below makes clear, however, that those same squads absorbed a 91 per cent
+  increase in PR review time and a 154 per cent surge in average PR size, with no measurable
+  improvement in the DORA metrics of deployment frequency, lead time, or change failure rate
+  at the organisational level.
+why: >-
+  The chart contains neither of the two figures the prose says it shows, and it sits three
+  sections below this reference — the reader reaches it after two intervening headings, by
+  which point "below" no longer identifies anything. The defect required a rendered page to
+  see, which is why the B-013 live review stage caught it and markdown review would not have.
+  Worth keeping for a second reason: the deterministic evaluator awarded this article 10/10
+  on visual_engagement for "image: yes, chart embedded: yes". A counting check cannot
+  distinguish a chart that supports the prose from one that does not.

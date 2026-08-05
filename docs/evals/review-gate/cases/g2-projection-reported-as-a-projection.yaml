@@ -1,0 +1,17 @@
+id: g2-projection-reported-as-a-projection
+gate: G2
+expected: pass
+source: the-ai-testing-paradox
+passage: >-
+  The best public warning sign so far comes from GitClear's analysis of roughly 153 million
+  changed lines of code. Its 2024 report argues that code churn is on pace to double relative
+  to a 2021 pre-AI baseline, while copy-pasted additions rise and refactoring activity
+  weakens.
+why: >-
+  A NEGATIVE case. A projection is reported as a projection — "argues", "on pace to double",
+  against a named baseline year — rather than as a measured doubling, which is the single
+  most common way a forecast becomes a fabricated statistic. The sample is given with an
+  honest approximation ("roughly 153 million"), the publisher is named, and the direction of
+  the other two findings is stated without inventing magnitudes for them. A gate that flags
+  this is flagging correct epistemic hedging, and the article that would satisfy it instead
+  would be the one that dropped the hedge.

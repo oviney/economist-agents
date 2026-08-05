@@ -1,0 +1,14 @@
+id: g2-offsetting-clause-deleted
+gate: G2
+expected: fail
+source: review-queue-throughput-tax
+passage: >-
+  According to LinearB's 2026 Software Engineering Benchmarks Report, which analysed 8.1
+  million pull requests across more than 4,800 organisations, AI-assisted PRs wait 4.6 times
+  longer for a reviewer to pick them up than manually written code.
+why: >-
+  The source's finding is "AI PRs wait 4.6x longer before review, but are reviewed 2x faster
+  once picked up." The offsetting second clause is deleted, so the quantity survives intact
+  while the source's net position is inverted. This is the hardest sub-class of G2 to catch,
+  because every number in the sentence is correct and recomputes — G3 is clean. Fidelity here
+  is about what was omitted, not what was stated.

@@ -1,0 +1,16 @@
+id: g2-baseline-measures-something-else
+gate: G2
+expected: fail
+source: review-queue-throughput-tax
+passage: >-
+  A median pull request requiring a review takes 14 hours to merge, according to Graphite
+  Research, against nine hours for one merged without review: a 55 per cent penalty for the
+  privilege of a second opinion.
+why: >-
+  The nine-hour baseline is described as measuring something the source does not measure, so
+  the 55 per cent "penalty" is a comparison between two different quantities. Note the
+  pairing with g2-publishers-own-headline-figure: the 14-hour figure in this same sentence is
+  correct and is the publisher's own headline number. A well-calibrated gate must fail the
+  baseline clause while passing the median clause. A gate that fails the whole sentence is
+  right for the wrong reason, and one that passes the whole sentence misses a real defect —
+  which is why both halves are in the set as separate cases.

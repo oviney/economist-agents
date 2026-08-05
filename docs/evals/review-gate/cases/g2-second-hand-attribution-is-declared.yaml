@@ -1,0 +1,16 @@
+id: g2-second-hand-attribution-is-declared
+gate: G2
+expected: pass
+source: green-light-red-ledger-flaky-tests-invisible-tax
+passage: >-
+  Microsoft researchers found that flaky test failures could be reproduced in only 25–43% of
+  cases even after 500 individual test runs under controlled conditions, per analysis reported
+  by CloudBees.
+why: >-
+  A NEGATIVE case testing the attribution chain specifically. The finding originates with
+  Microsoft, but the article reached it through CloudBees and says so — "per analysis reported
+  by CloudBees" — rather than citing Microsoft directly as though it had read the primary
+  source. That is the correct handling of a second-hand figure and the reference list matches
+  it. A gate that flags this for "not citing the primary source" is punishing the disclosure
+  and would reward an article that quietly claimed the primary instead. The range is also
+  reported as a range, not collapsed to its most favourable endpoint.

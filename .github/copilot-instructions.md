@@ -834,3 +834,10 @@ See [SCRUM_MASTER_PROTOCOL.md](../docs/SCRUM_MASTER_PROTOCOL.md) for complete wo
 - [JEKYLL_EXPERTISE.md](../docs/JEKYLL_EXPERTISE.md): Jekyll integration patterns
 - [SKILLS_LEARNING.md](../docs/SKILLS_LEARNING.md): Skills manager documentation
 - [CHANGELOG.md](../docs/CHANGELOG.md): Version history and migration notes
+
+<!-- mermaid-ai-skills:start -->
+## Mermaid Diagrams
+
+When the user asks to create, edit, or visualize a diagram, follow the
+instructions in `.github/instructions/mermaid.instructions.md`.
+<!-- mermaid-ai-skills:end -->

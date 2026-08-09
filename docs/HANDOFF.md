@@ -1,4 +1,67 @@
-# Hand-off — 2026-08-02
+# Hand-off — 2026-08-09
+
+## Resume here: B-040 Phase 1 is done and waiting on one owner action
+
+**Machine change.** Work stopped on this laptop mid-item, deliberately, with everything
+pushed. Nothing is in progress locally; there is no uncommitted work to recover.
+
+**State.** `docs/specs/review-gate-calibration.md` was **LGTM'd 2026-08-05** with both open
+questions answered in the affirmative (the agent drafts negative cases with provenance and
+the owner spot-checks a sample; `unverified` is a third outcome with its own `n`, never
+folded into either error rate). The plan is in `BACKLOG.md` under B-040 — two phases, and
+Phase 1 is complete.
+
+**Open PR: [#473](https://github.com/oviney/economist-agents/pull/473)** — the calibration
+set goes from 8 cases / 25% negatives to **23 cases / 52% negatives across 4 source
+articles**, clearing the spec's ≥20 and ≥40% criteria. `make ci-local` green at 2,768 passed,
+9 skipped. Not merged, because it is gated on the action below.
+
+**The one thing needed to resume: the owner spot-check.** This is the control the answered
+open question 1 requires — the agent drafted the negatives and is the same model family as
+the judge under test, so the cases need an independent read. Four, highest-risk first:
+
+| Case | Why it is the risky one |
+|---|---|
+| `g2-publishers-own-headline-figure` | The labelled near-false-positive. If this verdict is wrong, the number ADR-0018 Decision 3 blocks on is wrong. |
+| `g2-baseline-measures-something-else` | Its paired opposite, from the same sentence. The pair tests whether the gate can split a sentence rather than condemn it. |
+| `g2-claim-scoped-to-the-studys-scope` | "Correct" here is a judgement call, not checkable arithmetic. |
+| `g2-second-hand-attribution-is-declared` | Same — it turns on whether declaring a second-hand source is a virtue or a defect. |
+
+**Then Phase 2** (the runner, TDD, judge stubbed, no model calls in the suite) — Tasks 3–6
+in `BACKLOG.md`. One question is queued for that checkpoint and is the owner's to settle:
+the spec gates the build on n≈5 real reviews and the repo has 2, but the runner grades
+**cases**, not review runs. The 5 reviews inform how to interpret the result (threshold
+tuning vs anchor revision), not the harness design.
+
+### Three things recorded in PR #473 rather than fixed, because fixing them meant inventing
+
+1. **Only 6 of ADR-0018's 10 findings were reconstructible. The review report was never
+   persisted** — only `docs/reviews/review-queue-throughput-tax-42d2fbb4.html` (the rendered
+   draft page, not the verdict) and the ADR's prose survive. A mislabelled ground-truth case
+   is worse than a missing one. **Operating consequence: every future review run must append
+   its verdict block**, per ADR-0018 Decision 4's observability row. This is the second time
+   an unread-or-unwritten instrument has cost this repo real work (see B-041's cost ledger).
+2. **G3 has no positive case and one must not be invented.** No arithmetic defect has ever
+   been recorded here — ADR-0018 found G3 clean, and B-042's fabricated chart figures were a
+   G4 fabrication, not a computation that failed to reproduce. So **G3's false-negative rate
+   is unmeasurable in v1**: the set can show G3 does not over-fire, not that it fires at all.
+   Same class as B-031 and B-043 — a sensor with no proof it can fail.
+3. **6 of the 12 negatives come from one article**, so the register is narrower than 52%
+   suggests. An argument for the set growing as reviews accrue, not for treating it as done.
+
+### Also open, and not mine to decide
+
+**[PR #474](https://github.com/oviney/economist-agents/pull/474) — Mermaid VS Code extension
+artifacts.** A `.github/instructions/mermaid.instructions.md` file and a 7-line block appended
+to `.github/copilot-instructions.md` appeared in the working tree during the 2026-08-09
+session. **Neither was authored by the agent or requested by the owner** — they are written by
+the Mermaid VS Code extension. They are committed on their own branch rather than merged or
+deleted, so the machine change loses nothing, and kept out of #473 so a tooling artifact does
+not ride into a calibration PR. `.github/copilot-instructions.md` is one of the six documents
+B-028 Task 2 corrected, so a tool appending to it unprompted is worth an owner decision:
+keep, or close the PR and gitignore the path.
+
+## Hand-off — 2026-08-02
 
 ## The hand-off ran end to end and the article is published
 

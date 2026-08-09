@@ -735,7 +735,10 @@ monitoring, not an eval set. The guide's instruction — *"20-50 simple tasks dr
 failures"* — is satisfiable today at **finding** granularity: ADR-0018 enumerates 10 labelled
 fidelity defects plus the 1 labelled near-false-positive.
 
-- [ ] ~25 cases, ≥40% negatives, each traceable to a real article or a real finding
+- [x] ~25 cases, ≥40% negatives, each traceable to a real article or a real finding
+      *(23 cases at 52% negatives, 2026-08-05 — pending the owner spot-check. Known gap:
+      **G3 has no positive case** and one must not be invented, so G3's false-negative rate
+      is unmeasurable in v1.)*
 - [ ] Report false-positive and false-negative rates **separately, with `n`** — never averaged
 - [ ] Keyless judge via the Agent SDK; case selection and arithmetic deterministic
 - [ ] Sufficient for the owner to answer ADR-0018 Decision 3
@@ -756,13 +759,18 @@ a criterion of ≥20 cases and ≥40% negatives. All 8 carry
 `source: testing-shortcuts-migration-deadline`; the README claims two sources but
 `review-queue-throughput-tax` has contributed **zero**.
 
-- [ ] **Task 1 — convert the ADR-0018 findings into cases (S).** The 10 labelled fidelity
+**Phase 1 DONE 2026-08-05 — PR #473, open, gated on the owner spot-check.** The set is
+**23 cases / 12 negatives (52%) / 4 source articles**; `make ci-local` green at 2,768 passed,
+9 skipped. Resume instructions and the four cases to spot-check are in `docs/HANDOFF.md`.
+
+- [x] **Task 1 — convert the ADR-0018 findings into cases (S).** The 10 labelled fidelity
       defects plus the **near-false-positive** (the summarised Graphite fetch that would have
       reported a false G2 failure on Graphite's own published figure). The spec calls that one
       case worth more than all ten positives, because false positives are what block
       promotion — and it is the case the set does not have. Correct the README's provenance
       claim in the same change. **Files:** `docs/evals/review-gate/cases/*.yaml`, README.
-- [ ] **Task 2 — mine ~15 negatives from the 26 published articles (M).** Source of truth is
+- [x] **Task 2 — mine ~15 negatives from the 26 published articles (M).** *(12 mined, from 3
+      articles; the criterion was the 40% ratio, which 12 clears at 52%.)* Source of truth is
       the `oviney/blog` clone at `/Users/ouray.viney/code/economist-blog-v5/_posts` (26 posts,
       current to 2026-08-02). Every case carries `source:` provenance. **Owner spot-checks a
       sample** — per the answered open question, this is the control on the agent drafting

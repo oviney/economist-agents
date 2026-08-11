@@ -361,7 +361,8 @@ def _render_svg(tag: Tag) -> str:
     loose = [
         _one_line(str(string))
         for string in tag.strings
-        if not isinstance(string, _NON_CONTENT_STRINGS)
+        if isinstance(string, PageElement)
+        and not isinstance(string, _NON_CONTENT_STRINGS)
         and string.find_parent("text") is None
     ]
     parts = [part for part in labels + loose if part]

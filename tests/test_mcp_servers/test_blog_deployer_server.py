@@ -16,6 +16,16 @@ def _clear_env(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("GITHUB_TOKEN", raising=False)
 
 
+@pytest.fixture(autouse=True)
+def _sandbox_root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Point B-045's deployable root at the test's own `output/` directory.
+
+    The root is deliberately *not* a tool argument — an agent must not be able to
+    widen its own sandbox — so tests move it via the environment instead.
+    """
+    monkeypatch.setenv("BLOG_DEPLOY_OUTPUT_ROOT", str(tmp_path / "output"))
+
+
 @pytest.fixture
 def sample_article(tmp_path: Path) -> Path:
     """Create a sample article for deployment tests."""
@@ -137,11 +147,18 @@ class TestDeployArticle:
         assert result["success"] is False
         assert "GITHUB_TOKEN" in result["error"]
 
-    def test_article_not_found(self, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_article_not_found(
+        self,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
         from mcp_servers.blog_deployer_server import deploy_article
 
         monkeypatch.setenv("GITHUB_TOKEN", "ghp_test123")
-        result = deploy_article("/nonexistent/article.md", "oviney/blog")
+        # Inside the deployable root (B-045) but absent, so this still exercises
+        # the missing-file branch rather than the sandbox refusal.
+        missing = tmp_path / "output" / "article.md"
+        result = deploy_article(str(missing), "oviney/blog")
         assert result["success"] is False
         assert "not found" in result["error"].lower()
 
@@ -260,6 +277,90 @@ class TestDeployArticle:
 
         assert result["success"] is True
         assert any(call.args[0] == chart for call in mock_copy.call_args_list)
+
+
+class TestDeployArticlePathSandbox:
+    """B-045: `article_path` is agent-supplied, so it must not escape `output/`.
+
+    `deploy_article` copies the named file into a **public** blog PR using
+    `GITHUB_TOKEN`. An agent steered by injected text in fetched research could
+    otherwise name any readable file and have it published.
+    """
+
+    @patch("mcp_servers.blog_deployer_server._run_command")
+    def test_rejects_article_outside_the_output_root(
+        self,
+        mock_run: MagicMock,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        from mcp_servers.blog_deployer_server import deploy_article
+
+        monkeypatch.setenv("GITHUB_TOKEN", "ghp_test123")
+        secret = tmp_path / "secrets.md"
+        secret.write_text("ANTHROPIC_API_KEY=sk-should-never-be-published\n")
+
+        result = deploy_article(str(secret), "oviney/blog")
+
+        assert result["success"] is False
+        assert "outside" in result["error"].lower()
+        # The refusal must happen before anything clones or pushes.
+        mock_run.assert_not_called()
+
+    @patch("mcp_servers.blog_deployer_server._run_command")
+    def test_rejects_traversal_out_of_the_output_root(
+        self,
+        mock_run: MagicMock,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        from mcp_servers.blog_deployer_server import deploy_article
+
+        monkeypatch.setenv("GITHUB_TOKEN", "ghp_test123")
+        secret = tmp_path / "secrets.md"
+        secret.write_text("token\n")
+        traversal = tmp_path / "output" / ".." / "secrets.md"
+
+        result = deploy_article(str(traversal), "oviney/blog")
+
+        assert result["success"] is False
+        assert "outside" in result["error"].lower()
+        mock_run.assert_not_called()
+
+    @patch("mcp_servers.blog_deployer_server._run_command")
+    def test_rejects_symlink_pointing_out_of_the_output_root(
+        self,
+        mock_run: MagicMock,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        from mcp_servers.blog_deployer_server import deploy_article
+
+        monkeypatch.setenv("GITHUB_TOKEN", "ghp_test123")
+        secret = tmp_path / "secrets.md"
+        secret.write_text("token\n")
+        link = tmp_path / "output" / "innocent.md"
+        link.parent.mkdir(parents=True, exist_ok=True)
+        link.symlink_to(secret)
+
+        result = deploy_article(str(link), "oviney/blog")
+
+        assert result["success"] is False
+        assert "outside" in result["error"].lower()
+        mock_run.assert_not_called()
+
+    def test_accepts_an_article_inside_the_output_root(
+        self,
+        sample_article: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """The guard must not reject the legitimate path (no false positive)."""
+        from mcp_servers.blog_deployer_server import _resolve_article_path
+
+        resolved, error = _resolve_article_path(str(sample_article))
+
+        assert error is None
+        assert resolved == sample_article.resolve()
 
 
 class TestMcpServerRegistration:

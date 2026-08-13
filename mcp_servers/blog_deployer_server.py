@@ -85,6 +85,58 @@ def list_deployable_articles(output_dir: str = "output") -> list[str]:
     return [str(a) for a in articles]
 
 
+_OUTPUT_ROOT_ENV = "BLOG_DEPLOY_OUTPUT_ROOT"
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+
+
+def _deployable_root() -> Path:
+    """The only directory `deploy_article` may read an article from.
+
+    Deliberately **not** a tool argument. `article_path` is chosen by an agent,
+    and an agent that can widen its own sandbox does not have one.
+
+    Returns:
+        Absolute, symlink-resolved path to the deployable root.
+
+    """
+    override = os.environ.get(_OUTPUT_ROOT_ENV)
+    root = Path(override) if override else _REPO_ROOT / "output"
+    return root.resolve()
+
+
+def _resolve_article_path(article_path: str) -> tuple[Path | None, str | None]:
+    """Resolve an agent-supplied article path, refusing anything outside `output/`.
+
+    `deploy_article` copies the named file into a **public** blog PR using
+    `GITHUB_TOKEN`, so an unconstrained path is an exfiltration route: text
+    injected into fetched research could name any readable file. `resolve()`
+    collapses `..` and follows symlinks before the check, so neither traversal
+    nor a symlink planted inside `output/` escapes.
+
+    Args:
+        article_path: Caller-supplied path to the article markdown file.
+
+    Returns:
+        `(resolved_path, None)` when the path is inside the deployable root and
+        exists, otherwise `(None, error_message)`. The sandbox check runs first
+        so an out-of-root path cannot be used to probe which files exist.
+
+    """
+    root = _deployable_root()
+    try:
+        candidate = Path(article_path).resolve()
+    except OSError as exc:  # pragma: no cover - platform-dependent
+        return None, f"Article path could not be resolved: {exc}"
+
+    if not candidate.is_relative_to(root):
+        return None, (
+            f"Article path is outside the deployable root {root}: {article_path}"
+        )
+    if not candidate.exists():
+        return None, f"Article not found: {article_path}"
+    return candidate, None
+
+
 @mcp.tool()
 def deploy_article(
     article_path: str,
@@ -113,11 +165,11 @@ def deploy_article(
             "article": None,
         }
 
-    article = Path(article_path)
-    if not article.exists():
+    article, path_error = _resolve_article_path(article_path)
+    if article is None:
         return {
             "success": False,
-            "error": f"Article not found: {article_path}",
+            "error": path_error,
             "pr_url": None,
             "article": None,
         }

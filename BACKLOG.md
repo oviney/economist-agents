@@ -8,13 +8,14 @@
 
 ## Sprint Goal (2026-08-12)
 
-**Both remaining items are gated on the owner, not on code.** B-040 needs a spot-check
-of the calibration negatives; B-012 needs a live deep-research acceptance run. Nothing
-else is open — the 2026-06-14 goal (B-003 → B-002 → B-001) landed, and everything
-opened since has shipped.
+**What is left is owner judgement plus one open PR.** B-040 needs a spot-check of the
+calibration negatives (the sheet for it is built — PR #480); B-012 needs a live
+deep-research acceptance run; B-045 is built and awaiting merge (PR #479). The
+2026-06-14 goal (B-003 → B-002 → B-001) landed, and everything opened since has shipped.
 
-- **Ordering:** neither item blocks the other. B-040 is the cheaper of the two and
+- **Ordering:** B-045 first — it is a security fix and merge-ready. Then B-040, which
   unblocks ADR-0018 Decision 3 (promoting `blog-post-review` from advisory to blocking).
+  B-012 blocks nothing and is the most expensive; it can wait.
 - **Cadence:** spec → **human LGTM** → build/TDD → PR → merge. Stop for LGTM after each
   slice's spec.
 - **Session discipline:** one slice per session. On merge, mark Done here, then `/clear`
@@ -116,6 +117,63 @@ checkpoint; Phase 1 does not depend on it either way.
       card. Every review until now silently dropped the result of the gate that exists
       *because* a reversed DORA statistic passed the other four.
 - [x] **Runbook cost/duration figures replaced with the recorded range** (see B-041).
+
+**Phase 2 is the owner's, and the cost of it is now removed — PR #480, 2026-08-12.**
+`scripts/render_calibration_review_sheet.py` collapses the 23 case files into
+`docs/evals/review-gate/SPOT-CHECK.md`: passage, labelled verdict and stated reasoning
+side by side, negatives first, with an agree/disagree control per case. It does **not**
+perform the check — an agent adjudicating negatives it drafted, for a judge of its own
+model family, is the loop the control exists to break. Its header counts are computed
+from the loaded cases rather than restated, so the sheet independently reproduces
+23 / 12 negatives (52%) / 4 sources instead of trusting Phase 1's numbers.
+
+**Still open:** the owner reads the sheet; disagreements are findings, not failures.
+Then the false-positive and false-negative rates can be reported separately with `n`,
+which is what ADR-0018 Decision 3 is blocked on.
+
+### B-045 · `deploy_article` could publish any readable file — **PR #479, 2026-08-12**
+
+`deploy_article` (`mcp_servers/blog_deployer_server.py`) took an agent-supplied
+`article_path`, wrapped it in `Path()` and checked only `.exists()`. Nothing constrained
+it to `output/`, and the function copies the named file into a **public** blog PR using
+`GITHUB_TOKEN`. This pipeline ingests untrusted web research and owner HTML artifacts, so
+injected text steering an agent could name any readable file — OWASP LLM01 → LLM06.
+
+**Not theoretical.** The symlink reproduction test failed with `assert True is False`
+before the fix: a symlink planted inside `output/` pointing at a file outside it deployed
+successfully.
+
+`_resolve_article_path` resolves first — collapsing `..`, following symlinks — then refuses
+anything not under the deployable root, *before* the existence check so an out-of-root path
+cannot be used to probe which files exist. The root is **not a tool argument**: an agent that
+can widen its own sandbox does not have one.
+
+**Provenance, and the half worth recording as closed.** Found triaging PR #475, unsolicited
+scanner outreach from Trustabl.ai. Its payload was a GitHub Actions workflow — which reverses
+**B-011** (Actions CI retired; `make ci-local` is the verification source of truth) and adds a
+third-party service against Operating Constraint #2 — so **#475 itself is declined**. One of
+its two findings was real and is fixed here.
+
+**Its other finding is a measured false positive: do not re-raise it.** "Session permission
+mode bypasses approvals" is true of the flag and false of the configuration. All five
+`permission_mode="bypassPermissions"` sites pair it with an explicit allowlist, all with
+`mcp_servers={}`:
+
+| Site | `allowed_tools` |
+|---|---|
+| `src/agent_sdk/research/_llm.py:55` | `[]` |
+| `scripts/llm_client.py:198` | `[]` |
+| `src/agent_sdk/_shared.py:1062` | `["Read"]` |
+| `src/agent_sdk/research/claude_web.py:109` | `["WebSearch", "WebFetch"]` |
+| `src/agent_sdk/stage3_runner.py:536` | caller-supplied, defaults `[]` |
+
+Bypassing approval for an empty tool set grants nothing. Recorded here so the next scanner —
+or the next session — settles it by reading this table rather than re-deriving it.
+
+**Known hotspot, deliberately not fixed here.** `deploy_article` was already at 13/13/61
+against the complexity sensor's 10/12/50 before this change; folding the existence check into
+the resolver keeps it at 13/13/61, net zero. No override recorded — the debt is pre-existing
+and unclaimed, and it is a genuine target if B-032 wants one.
 
 ## Todo
 

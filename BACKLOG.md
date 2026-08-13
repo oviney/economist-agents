@@ -6,14 +6,15 @@
 >
 > See `docs/specs/local-backlog-migration.md` for why this file exists.
 
-## Sprint Goal (2026-06-14)
+## Sprint Goal (2026-08-12)
 
-**Clear the backlog: land B-003 → B-002 → B-001 to `main`, one self-contained slice
-per session, clearing context between each to prevent session bloat.**
+**Both remaining items are gated on the owner, not on code.** B-040 needs a spot-check
+of the calibration negatives; B-012 needs a live deep-research acceptance run. Nothing
+else is open — the 2026-06-14 goal (B-003 → B-002 → B-001) landed, and everything
+opened since has shipped.
 
-- **Ordering (dependency-driven):** `B-003` (unblocks ADR gate) → `B-002` (test-only,
-  independent) → `B-001` (largest; requires routing `import anthropic` out of
-  `_shared.py` via `AgentRegistry` to clear the ADR-002 gate before wiring `BLOG_AUTHOR`).
+- **Ordering:** neither item blocks the other. B-040 is the cheaper of the two and
+  unblocks ADR-0018 Decision 3 (promoting `blog-post-review` from advisory to blocking).
 - **Cadence:** spec → **human LGTM** → build/TDD → PR → merge. Stop for LGTM after each
   slice's spec.
 - **Session discipline:** one slice per session. On merge, mark Done here, then `/clear`
@@ -22,11 +23,125 @@ per session, clearing context between each to prevent session bloat.**
 
 ## In Progress
 
-_(none)_
+### B-040 · Calibrate the editorial review gate so it can be promoted
+
+**Opened 2026-08-01.** Spec: `docs/specs/review-gate-calibration.md` — **LGTM'd 2026-08-05**,
+with both open questions answered in the affirmative (agent drafts negatives + owner
+spot-checks a sample; `unverified` is a third outcome with its own `n`). Task breakdown below.
+
+ADR-0018 Decision 3 keeps `blog-post-review` advisory and says "promote to blocking once a
+false-positive rate is known." **Nothing has ever produced that number.** The gate has run
+exactly once, by hand, on one article — and that run contained a near-false-positive (a
+summarised Graphite fetch would have reported a false G2 failure on a correct figure). So the
+only instrument that catches fidelity defects the deterministic evaluator provably cannot
+(88% PASS vs 51 BLOCK on the same article) is frozen by a missing measurement.
+
+Reviewed against Anthropic's [Demystifying evals for AI
+agents](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents), the eval
+surface is lopsided in one specific way: **code-based graders are strong** (`article_evaluator`
+at 841 records, `publication_validator`, `_shared.py`, `skill_eval`), and the one model-based
+grader **has no ground truth to be checked against**. `logs/article_evals.json` is production
+monitoring, not an eval set. The guide's instruction — *"20-50 simple tasks drawn from real
+failures"* — is satisfiable today at **finding** granularity: ADR-0018 enumerates 10 labelled
+fidelity defects plus the 1 labelled near-false-positive.
+
+- [x] ~25 cases, ≥40% negatives, each traceable to a real article or a real finding
+      *(23 cases at 52% negatives, 2026-08-05 — pending the owner spot-check. Known gap:
+      **G3 has no positive case** and one must not be invented, so G3's false-negative rate
+      is unmeasurable in v1.)*
+- [ ] Report false-positive and false-negative rates **separately, with `n`** — never averaged
+- [ ] Keyless judge via the Agent SDK; case selection and arithmetic deterministic
+- [ ] Sufficient for the owner to answer ADR-0018 Decision 3
+
+**Build after n≈5 real reviews**, which accrue free from the B-013 review stage the owner
+already performs — the only added cost is recording, per gate, whether he agreed. The harness
+design depends on what those runs show: a gate that blocks everything needs threshold tuning,
+one that passes everything needs anchor revision (ADR-0018's own warning: "scores clustering
+above 85 would mean the rubric is broken rather than the pipeline"). Different tools.
+
+**Scope:** M. **Files:** `scripts/calibrate_review_gate.py`, `docs/evals/review-gate/`,
+`tests/test_calibrate_review_gate.py`.
+
+#### Plan — 2026-08-05, post-LGTM
+
+**Phase 1 · the case set — unblocked now.** The set is 8 cases, **2 negatives (25%)**, against
+a criterion of ≥20 cases and ≥40% negatives. All 8 carry
+`source: testing-shortcuts-migration-deadline`; the README claims two sources but
+`review-queue-throughput-tax` has contributed **zero**.
+
+**Phase 1 DONE 2026-08-05 — PR #473, open, gated on the owner spot-check.** The set is
+**23 cases / 12 negatives (52%) / 4 source articles**; `make ci-local` green at 2,768 passed,
+9 skipped. Resume instructions and the four cases to spot-check are in `docs/HANDOFF.md`.
+
+- [x] **Task 1 — convert the ADR-0018 findings into cases (S).** The 10 labelled fidelity
+      defects plus the **near-false-positive** (the summarised Graphite fetch that would have
+      reported a false G2 failure on Graphite's own published figure). The spec calls that one
+      case worth more than all ten positives, because false positives are what block
+      promotion — and it is the case the set does not have. Correct the README's provenance
+      claim in the same change. **Files:** `docs/evals/review-gate/cases/*.yaml`, README.
+- [x] **Task 2 — mine ~15 negatives from the 26 published articles (M).** *(12 mined, from 3
+      articles; the criterion was the 40% ratio, which 12 clears at 52%.)* Source of truth is
+      the `oviney/blog` clone at `/Users/ouray.viney/code/economist-blog-v5/_posts` (26 posts,
+      current to 2026-08-02). Every case carries `source:` provenance. **Owner spot-checks a
+      sample** — per the answered open question, this is the control on the agent drafting
+      cases for a judge of its own model family, so it is not optional.
+
+**Checkpoint (owner):** ≥20 cases, ≥40% negatives, spot-check passed. Phase 2 opens here.
+
+**Phase 2 · the runner — TDD, judge stubbed in tests, no model calls in the suite.**
+
+- [ ] **Task 3 — case loader + schema validation + balance report (S).** A file missing
+      `expected` or `why` is rejected loudly, never skipped. Balance reported every run.
+- [ ] **Task 4 — agreement arithmetic (S).** False-positive, false-negative and `unverified`
+      as **three separate counts with three denominators**; `n` beside every rate; a rate from
+      <20 cases labelled provisional in the output itself. Degenerate cases (all-pass,
+      all-fail, empty) covered.
+- [ ] **Task 5 — keyless judge via the Agent SDK + `--gate` / `--report` (M).** Runs the gate
+      **as accepted 2026-07-31** — v1 does not touch `rubric.md` or `REVIEW_PROMPT.md`.
+- [ ] **Task 6 — report to `logs/review_gate_calibration.json`, append-only (S).** Decide
+      *against* wiring into `make ci-local`: the runner makes model calls, and `ci-local` must
+      stay keyless and offline.
+
+**Sequencing note, flagged rather than acted on.** The spec gates the build on "n≈5 real
+reviews"; the repo has 2. That gate is worth re-examining at the Phase 2 checkpoint, because
+the runner grades **cases**, not review runs — the 5 reviews inform how to *interpret* the
+result (threshold tuning vs anchor revision), not the harness design. Owner's call at the
+checkpoint; Phase 1 does not depend on it either way.
+
+**Shipped 2026-08-01 alongside the spec, because waiting corrupts the baseline:**
+
+- [x] **G5 added to the machine-readable verdict block.** ADR-0018 Decision 2 says G5 was
+      amended "into the machine-readable verdict block". It reached `SKILL.md:165` but **not**
+      `REVIEW_PROMPT.md:85` — the file actually pasted into a review session — nor the rubric
+      card. Every review until now silently dropped the result of the gate that exists
+      *because* a reversed DORA statistic passed the other four.
+- [x] **Runbook cost/duration figures replaced with the recorded range** (see B-041).
 
 ## Todo
 
-### B-044 · Finish the B-042 acceptance — **DONE 2026-08-02**
+### B-012 · Opt-in `deep-brief` research mode (BUILT — live acceptance run pending)
+
+> **✅ CODE DONE.** `--brief <file>` wired end-to-end (`pipeline.load_brief_file`
+> strips refuted claims → `run_pipeline`/`run_stage3` `brief_override` skips the
+> research step); documented opt-in/heavy in the runbook; `claude_web` stays
+> default. Tested (`tests/test_deep_brief.py`) + `make ci-local` green. The one
+> remaining acceptance criterion — a real deep-research → article run — is a
+> token-heavy owner-run step (deep-research ~2M tokens), left opt-in by design.
+
+
+
+Wire the `deep-research` harness as an **opt-in** research path for flagship
+posts; `claude_web` stays the everyday default. **Prototype (2026-07-22) settled
+it:** dramatically better sourcing — 19 claims each surviving a 3-0 verification
+vote, and it *refuted the walked-back Accenture Copilot numbers* a single-pass
+researcher would ship — but one topic cost ~102 agents / ~2M tokens / ~15 min and
+**hit the session limit**. So: opt-in, not default. Spec:
+`docs/specs/B-012-deep-brief-research-mode.md`. Prototype output (a real verified
+brief) lives at `docs/research/ai-productivity-brief.md`.
+
+## Done
+
+### B-044 · Finish the B-042 acceptance — 2026-08-02
 
 **The article is published:** <https://www.viney.ca/2026/08/02/migration-deadline-testing-trap/>
 
@@ -102,7 +217,290 @@ used often.
 > B-029: a guide the default ignores, and a sensor that cannot fail. See the
 > "Harness engineering" section below.
 
-### B-028 · The unreviewed publish path must stop being the default
+### B-039 · The merge gate runs whatever toolchain the machine happens to have — 2026-08-01
+
+**Opened 2026-08-01**, found by `make ci-local` failing on a file the session never touched.
+
+ADR-0015 makes `make ci-local` *the* merge gate — there is no GitHub Actions, and `main` is
+unprotected. So the gate has to mean the same thing on every machine and in every shell. It
+does not. Every recipe resolves its tools from ambient `PATH`, not from the venv this repo
+pins, and line 51 (`.venv/bin/python scripts/mypy_baseline.py`) shows someone already hit
+this and patched the one line instead of the class.
+
+Three symptoms, all measured on 2026-08-01, not inferred:
+
+| Symptom | Measured |
+|---|---|
+| **The gate lints with an unpinned ruff.** `requirements-dev.txt` pins `ruff==0.14.10` *exactly*; the gate ran homebrew's **0.15.9** and demanded a reformat of `tests/test_mypy_baseline.py`, which no one had edited. | `ruff --version` → 0.15.9 ambient vs 0.14.10 in `.venv` |
+| **The gate cannot run in a clean shell at all.** Line 49 calls bare `python`, which does not exist on macOS outside an activated venv. | `make ci-local` → `/bin/sh: python: command not found`, Error 127 |
+| **The advisory mypy step reports a missing tool as a pass.** `(mypy scripts/ \|\| echo "advisory")` swallows exit 127 exactly like exit 1, so "mypy found 187 errors" and "mypy was never installed" print the same line. `mypy` and `bandit` are both absent from ambient `PATH` here. | `sh -c '(mypy scripts/ \|\| echo advisory)'` → `mypy: command not found` then the advisory text, exit 0 |
+
+The third is the serious one, and it is **B-031's complaint exactly**: a sensor that cannot
+distinguish "I ran and found problems" from "I never ran". The first is B-037's sibling — that
+item found four declarations of the Python version disagreeing with the interpreter actually
+running the suite; this is the same drift one level down, in the *tool* versions.
+
+**Fix:** put `.venv/bin` first on `PATH` for the whole Makefile, guard every tool-running
+target behind a `require-venv` check that fails loudly rather than falling through to ambient
+binaries, and split the mypy advisory into its own target that distinguishes exit >1 (did not
+run — fail the gate) from exit 1 (type errors — advisory, as intended).
+
+- [x] `make ci-local` resolves ruff, mypy, pytest, bandit and coverage from `.venv/bin`
+- [x] A missing venv fails with an instruction, instead of silently using ambient tools
+- [x] The mypy advisory step fails the gate when mypy did not run
+- [x] Regression tests that *execute* the Makefile against stub tools, not greps of its text
+
+**Scope:** S. **Files:** `Makefile`, `tests/test_ci_gate_is_reproducible.py`.
+
+**DONE 2026-08-01. The obvious fix did not work, and only a running test caught it.**
+
+`export PATH := $(CURDIR)/.venv/bin:$(PATH)` is the one-line fix everyone reaches for, it
+reads correctly, and `make showpath` confirms the exported value. It still left `ruff check .`
+running the ambient ruff. **GNU make 3.81 — what macOS ships — direct-execs any recipe line
+containing no shell metacharacters, and resolves the binary against make's own startup PATH
+rather than the exported one.** So `mypy ...; status=$$?` used the venv (it has a `;`, so a
+shell runs it) while `ruff check .` did not. The fix is to name `$(VENV_BIN)/<tool>`
+explicitly in every recipe; the `export PATH` stays, but only for what *child* processes
+look up.
+
+A grep-the-Makefile test would have passed the moment the plausible-looking line was
+written. The test that executes `make lint` against a stub `ruff` failed, which is the whole
+argument for behavioural sensors — and the **fourth** instance of the pattern in
+`skills/defect-prevention/SKILL.md`: asserting from a plausible reading instead of measuring.
+
+Verified from a bare shell (`env -i PATH=/usr/bin:/bin:/opt/homebrew/bin make ci-local`,
+no activated venv, no PATH prefix): green, 2,680 tests. Before this change that invocation
+died at step 3 with `python: command not found`.
+
+Mutation-checked, so the new sensor is not decorative: the old
+`(mypy … || echo "advisory")` form exits **0** against a `mypy` stub that exits 127; the new
+form exits non-zero. `make install` now creates the venv if it is absent, so require-venv's
+instruction points at a target that actually works from nothing.
+
+### B-041 · The hero draw's worst case is 3× the longest run ever recorded, and nothing attributes it — 2026-08-01
+
+**Opened 2026-08-01**, found by the owner asking whether "~35 minutes" was ludicrous. It was
+— but not in the direction either of us assumed.
+
+`logs/agent_sdk_costs.jsonl` has recorded `wall_seconds` and per-stage cost **since
+2026-04-26**, and no recorded run exceeds **15.4 minutes**; four of the five are under 5. The
+"~$1 and ~35 minutes" in `docs/HANDOFF.md` and the runbook was folklore contradicted by the
+repo's own data. **The instrument existed and went unread** while its contradiction was
+repeated in two documents — and this session quoted it back to the owner and defended it
+before checking. That is the `defect-prevention` surface-reading class again, in a session
+that had just added an entry to it.
+
+The real finding is underneath. A run started 2026-08-01 blew past every recorded figure, and
+the log says why:
+
+```
+WARNING src.agent_sdk.hero_author: Hero attempt 1/2 timed out after 600s
+```
+
+`hero_author.py`: `_DRAW_TIMEOUT_S = 600`, `_MAX_STRUCTURAL_ATTEMPTS = 2`,
+`_MAX_CRITIQUE_RETRIES = 1` → **2 redraws × 2 attempts × 600s = 40 minutes of hero drawing
+alone**, before critique (2 × 180s). A *successful* draw is measured at 454s. So the pipeline
+has two utterly different durations — ~4 minutes when the hero lands first try, up to ~46
+when it does not — and the ledger cannot distinguish them, because the hero sits inside
+`stage3_seconds` with no sub-timing.
+
+The constants are not arbitrary; the comments record that 240s and $0.40 were "each
+independently fatal". The problem is not the ceiling, it is that **a 10× duration swing is
+invisible in the only place anyone would look for it.**
+
+- [x] Record hero draw seconds, attempt count and timeout count as their own ledger fields
+- [x] Decide whether a timed-out first attempt should retry at all
+- [x] Bound the aggregate, not just each call
+- [x] ~~State the honest range in the runbook once several runs carry `hero_*` fields~~ —
+      **overtaken by B-042.** No run will ever carry them again.
+
+**CLOSED 2026-08-01 as MOOTED by B-042.** The owner now draws every hero by hand, so
+`hero_author.py` is deleted and the pipeline contains no draw to time. The 10× duration swing
+this item existed to make visible cannot recur, and the `hero_*` ledger fields were removed
+with it rather than left recording a permanent zero — which would have been this item's own
+complaint (a reading that looks authoritative and measures nothing).
+
+**The lesson outlives the item, and is worth keeping:** the ledger recorded only runs where
+the hero landed, so it could not see the timeout path at all. A log that is written on
+success and not on failure is not a partial instrument, it is a misleading one. See ADR-0019.
+
+**Scope:** S. **Files:** ~~`src/agent_sdk/hero_author.py`~~ (deleted),
+`src/agent_sdk/stage3_runner.py`, `src/agent_sdk/pipeline.py`.
+
+**FIXED 2026-08-01, and the run that prompted it settled the design question.**
+
+The run finished while this item was being written, and it is the whole argument:
+
+| | |
+|---|---|
+| Wall clock | **31.8 min** — twice the previous record |
+| Cost | $1.01, of which $0.18 graphics |
+| Hero attempt 1 | timed out at 600s |
+| Hero attempt 2 | **also timed out at 600s**, carrying the "return a simpler drawing with fewer, larger shapes" instruction |
+| Hero produced | **none** |
+
+So **20 of the 31.8 minutes bought nothing**, and the article is unpublishable — the blog
+requires a resolvable `image:`. It also retires the open question: the shrink-the-ask retry
+does not work. One timeout is a diagnosis, not a transient.
+
+That reframed the fix. An aggregate budget of 1200s would have changed this run by **zero
+seconds** (2 × 600 = 1200 exactly). The ceiling has to make the second full-price attempt
+*impossible*, not merely capped:
+
+- `_HERO_TOTAL_BUDGET_S = 900` — one measured successful draw (454s) plus its critique (180s)
+  plus slack, and equal to the longest *complete* pipeline run ever recorded.
+- `_MIN_USEFUL_DRAW_S = 450` — no observed successful draw has finished faster than 454s.
+
+Those two numbers separate the retry cases by arithmetic rather than by a special case, which
+is why the fix is small. A **rejected** attempt returns in seconds and leaves the budget
+almost intact, so it retries exactly as before. A **timed-out** attempt has consumed 600s by
+definition, leaving 300s — under the floor — so it stops. Cheap signal, retry; expensive
+silence, stop.
+
+Worst case: **46 min → 15 min.** This run's failure mode: **20 min → 10 min.**
+
+**And the folklore was not baseless after all.** The earlier correction — "no recorded run
+exceeds 15.4 minutes" — was true of the ledger, and the ledger was the wrong instrument: it
+had only ever recorded runs where the hero landed. "~35 minutes" was a real memory of the
+timeout path that nothing had ever written down. Both halves were right, which is exactly the
+case for the `hero_*` fields: the ledger now distinguishes the two populations it was
+silently averaging.
+
+**Found in passing, and it may explain the thin ledger.** A value orjson cannot serialise
+does not fail the write loudly — `pipeline.py` catches it and logs "cost log write failed
+(non-fatal)", so the entire row disappears. Five rows across four months of runs is suspicious
+on its own. `_numeric()` now coerces at the boundary; whether earlier rows were lost this way
+is unverified and worth a look before anyone trends this data.
+
+### B-042 · The mandatory-chart gate manufactures the fabrication it should prevent — 2026-08-01
+
+**Opened 2026-08-01**, found by the owner asking "if we don't need a chart, why build one?"
+He is right, and the repo currently disagrees with him — in a way that produced two of the
+eight calibration cases logged the same day.
+
+`publication_validator.py:1031` makes a chart **mandatory at CRITICAL severity**:
+
+```python
+if not chart_refs:
+    "check": "missing_chart",
+    "severity": "CRITICAL",
+    "message": "Article missing required chart — every article must include at least one data chart"
+```
+
+So when the research carries no quantitative data, the pipeline is *required* to produce a
+chart regardless. On the 2026-08-01 run it did exactly that: a brief containing one number
+yielded a chart carrying four invented percentages (62/46/28/12%), presented with an axis and
+a measured-sounding subtitle. **That was compliance, not a rogue writer.**
+
+The next check compounds it. `orphaned_chart` (HIGH) fires unless the prose contains "chart",
+"figure", "shows" or "illustrates" near the embed — pushing the writer to add a sentence
+describing the chart, with nothing verifying the description is true. That is how "As the
+chart below illustrates, undetected defects do not flow linearly into rework" came to be
+written about a static four-bar comparison, reproducing ADR-0018's chart finding exactly.
+
+**Two gates, combined, manufactured two defects.** A rule meant to enforce evidence produced
+fabricated evidence, and the deterministic evaluator then scored the result 76 and passed it.
+
+- [x] Decide the editorial policy — **the owner owns every image, charts included** (stated
+      2026-08-01). Not "mandatory when the research supports one" but "his call, always"
+- [x] Make the requirement conditional — **superseded by deletion.** `missing_chart` is gone.
+      The setpoint was not mistuned, it was held by the wrong party: whether an article
+      warrants a chart is judged against the research, which the validator never sees
+- [x] `orphaned_chart` must not be satisfiable by a describing sentence — **deleted.** It
+      could never fire at all (`missing_chart` returns early unless a `/assets/charts/….png`
+      ref exists, so the content always contained "chart"), and a *working* one would have
+      pushed the writer to describe the chart, which is what wrote case `g2`
+- [x] Regression case: a brief with no quantitative data produces an article with no chart
+      that passes — `tests/test_publication_validator.py::TestChartIsNotTheValidatorsDecision`
+
+**DONE 2026-08-01.** Spec: `docs/specs/mandatory-chart-setpoint.md`. Decision: **ADR-0019** —
+a setpoint is a decision about who decides. The pipeline no longer draws a hero or generates
+chart data; it *extracts* candidate figures from the brief with provenance and hands off a
+review packet (`output/posts/<slug>.review.md`). Art presence is gated at deploy (ADR-0017),
+which is now the only thing enforcing it. Operating Constraint #4 amended — this reverses
+B-016b. **B-041 is mooted** and closed with it.
+
+**Scope:** M. **Files:** `scripts/publication_validator.py`, `src/agent_sdk/_shared.py`
+(`_auto_embed_chart`), `src/agent_sdk/stage3_runner.py`.
+
+### B-043 · No sensor ships without a proof it can fail — 2026-08-01
+
+**Opened 2026-08-01. DONE 2026-08-01.** Spec: `docs/specs/sensor-proof-of-teeth.md`.
+**Absorbs B-040** as its inferential-sensor arm.
+
+**Shipped:** `scripts/check_sensor_proofs.py` runs as a `make ci-local` step,
+`docs/sensors/register.yaml` holds 20 entries (**19 proved, 0 unproved, 1 report-only**), and
+`tests/test_check_sensor_proofs.py` carries the checker's own proof of teeth. Two sensors that
+had **zero** tests now have 26 between them.
+
+The 2026-07-29 SE Radio 730 assessment graded this repo *guide-maximal, sensor-disconnected*;
+B-030 … B-035 fixed the wiring. **The next failure mode is that nothing validates the sensors
+themselves**, and 2026-08-01 produced four independent proofs in one day:
+
+| Finding | Kind of sensor failure |
+|---|---|
+| **B-039** | A **fifth** inert sensor — `(mypy \|\| echo advisory)` returned exit 0 against a stub exiting 127 — found *after* B-031 fixed four |
+| **B-040** | A sensor that **never runs**, with no ground truth |
+| **B-041** | A **biased** sensor: the ledger recorded only runs where the hero succeeded, hiding a 10x duration swing |
+| **B-042** | A sensor whose **setpoint manufactured the defect** it exists to prevent |
+
+**B-031 fixed four named sensors; it did not fix the class.** That is the argument for a
+standing check rather than another audit.
+
+The technique already exists — used three times on 2026-08-01, at a terminal, unrecorded.
+Mutate something, check whether the sensor notices. The third instance is the one that matters:
+`export PATH := .venv/bin:$(PATH)` looked right, `make showpath` confirmed it, and running
+`make lint` against a stub `ruff` showed the ambient ruff still won. **A grep of the Makefile
+would have passed on a fix that fixed nothing.**
+
+Measured baseline: 13 sensor scripts; `lint_adrs.py` and `check_bare_name_imports.py` have
+**zero tests**; the rest have unit tests (does the code work) not efficacy tests (does it fire).
+
+**The design constraint that decides everything: the fix must be a sensor, not a guide.**
+Writing the rule into a `SKILL.md` reproduces exactly what this repo was graded down for —
+constraint #1 ("NO new API keys. Ever.") had zero computational backing until B-030, and B-028
+was a review stage that existed as prose while the tool default bypassed it. A rule nothing
+enforces gets skipped.
+
+- [x] `scripts/check_sensor_proofs.py` in `make ci-local`, failing on an unregistered sensor
+- [x] `docs/sensors/register.yaml` covering all of them, `proof: none` allowed as a recorded
+      baseline — **not needed in the end**, every discovered sensor got a real proof
+- [x] `lint_adrs` and `check_bare_name_imports` proved first — the two real gaps
+- [x] The three hand-run mutation proofs exist as tests, not shell history
+- [x] The checker has its own proof of teeth
+
+**Scope:** M. **Files:** `scripts/check_sensor_proofs.py`, `docs/sensors/register.yaml`,
+`tests/test_check_sensor_proofs.py`.
+
+**Discovery reads the wiring, not filenames.** The checker parses the `Makefile`,
+`.pre-commit-config.yaml`, `.claude/settings.json` and the publish entrypoints, and demands a
+register entry for every in-repo script they invoke. A `scripts/*_guard.py` glob would have been
+gameable by renaming and blind to anything added under another name — and the whole complaint
+about B-031 is that fixing four sensors *by name* left a fifth to be found.
+
+**Verified in situ, because a fixture passing is not the claim.** Adding a recipe invoking a new
+script to the real `Makefile` made the real gate exit 1 naming it; reverting restored green. This
+is B-039's third lesson applied to its own successor — `export PATH :=` looked right, `make
+showpath` confirmed it, and only running a recipe against a stub binary showed it did nothing.
+
+**The limit is stated, not papered over.** The checker verifies a proof *exists and runs*; it
+cannot verify a proof is *genuine* — `assert True` under an honest-sounding test name would pass.
+Mutation-testing the mutation tests is where the value curve goes flat, so the `mutation:` field
+exists instead, to make genuineness a one-glance review-time check.
+
+**Open question ANSWERED — what counts as a sensor.** The proposal was right in substance and
+wrong in one word: "non-zero exit" is the wrong test, because **every harness hook exits 0 by
+design** and refuses via JSON. Measured, `guard_constraints` denies a tool call and `session_gate`
+blocks a turn, while `post_edit_sensor` and `session_context` return only `additionalContext`.
+Adopted: *a sensor is anything a gate site invokes that can **refuse** — deny a tool call, block a
+turn, or exit non-zero.* Both named cases resolve as proposed and both were checked, not assumed:
+`publication_validator` is **in** (imported by both publish entrypoints, its verdict stops a
+publish); `article_evaluator` is **out** (zero gate-site references anywhere — it scored the
+fabricated article 76 while the validator passed it, which is precisely a score and not a gate).
+Note it *is* on `destructive_change_guard`'s `CRITICAL_FILES`: being protected from being gutted
+is not the same as being a sensor. Full reasoning in the spec's open-questions section.
+
+### B-028 · The unreviewed publish path must stop being the default — 2026-07-31
 
 **RCA finding, 2026-07-29.** Article two was deployed with
 `deploy_to_blog --mode post` — a PR straight into `_posts/` — skipping the B-013
@@ -201,7 +599,7 @@ for PR scope), so it needs a spec and an owner decision — not a quiet deletion
 
 </details>
 
-### B-029 · The acceptance oracle renames its input, so it does not test the deploy path
+### B-029 · The acceptance oracle renames its input, so it does not test the deploy path — 2026-07-31
 
 **Found while fixing BUG-069, 2026-07-29.** `scripts/acceptance_blog_frontmatter.sh`
 is documented as *the* oracle — "a green local suite says nothing about what the
@@ -254,7 +652,7 @@ same defect *class* as B-031 — a check that could not fail the thing it existe
 
 ---
 
-## Harness engineering (B-030 … B-034) — opened 2026-07-29
+### Harness engineering (B-030 … B-034) — opened 2026-07-29, shipped 2026-07-31
 
 > **Source:** an audit of this repo against *SE Radio 730 — Birgitta Boeckeler on
 > Harness Engineering for AI Agents*. Full findings in
@@ -479,7 +877,7 @@ already retired the workflow.
 **Files:** `.mcp.json`, `.claude/settings.local.json`, `tests/test_harness_config.py`.
 **Scope:** XS — smallest diff in the set, and it deletes a live contradiction.
 
-### B-035 · Close the three harness decisions B-030…B-034 deliberately left open
+### B-035 · Close the three harness decisions B-030…B-034 deliberately left open — 2026-07-31
 
 **Opened 2026-07-30. DONE 2026-07-31.** B-030…B-034 shipped with three questions routed to
 the owner rather than guessed at. All three were then **measured** (2026-07-30) and each had
@@ -593,7 +991,7 @@ site question.
 
 ---
 
-### B-038 · Ingest Claude HTML artifacts as research briefs
+### B-038 · Ingest Claude HTML artifacts as research briefs — 2026-07-31
 
 **Opened 2026-07-31. Built 2026-07-31 — LGTM'd, implemented, all boxes ticked.** Spec:
 `docs/specs/html-research-ingestion.md`.
@@ -653,384 +1051,7 @@ clone is green *and* honest about not having seen a real artifact.
 but not its text. Inferring headings from class names would be guessing at whatever CSS a
 given conversation emitted; promoting one is a one-character edit in the brief.
 
-### B-039 · The merge gate runs whatever toolchain the machine happens to have
-
-**Opened 2026-08-01**, found by `make ci-local` failing on a file the session never touched.
-
-ADR-0015 makes `make ci-local` *the* merge gate — there is no GitHub Actions, and `main` is
-unprotected. So the gate has to mean the same thing on every machine and in every shell. It
-does not. Every recipe resolves its tools from ambient `PATH`, not from the venv this repo
-pins, and line 51 (`.venv/bin/python scripts/mypy_baseline.py`) shows someone already hit
-this and patched the one line instead of the class.
-
-Three symptoms, all measured on 2026-08-01, not inferred:
-
-| Symptom | Measured |
-|---|---|
-| **The gate lints with an unpinned ruff.** `requirements-dev.txt` pins `ruff==0.14.10` *exactly*; the gate ran homebrew's **0.15.9** and demanded a reformat of `tests/test_mypy_baseline.py`, which no one had edited. | `ruff --version` → 0.15.9 ambient vs 0.14.10 in `.venv` |
-| **The gate cannot run in a clean shell at all.** Line 49 calls bare `python`, which does not exist on macOS outside an activated venv. | `make ci-local` → `/bin/sh: python: command not found`, Error 127 |
-| **The advisory mypy step reports a missing tool as a pass.** `(mypy scripts/ \|\| echo "advisory")` swallows exit 127 exactly like exit 1, so "mypy found 187 errors" and "mypy was never installed" print the same line. `mypy` and `bandit` are both absent from ambient `PATH` here. | `sh -c '(mypy scripts/ \|\| echo advisory)'` → `mypy: command not found` then the advisory text, exit 0 |
-
-The third is the serious one, and it is **B-031's complaint exactly**: a sensor that cannot
-distinguish "I ran and found problems" from "I never ran". The first is B-037's sibling — that
-item found four declarations of the Python version disagreeing with the interpreter actually
-running the suite; this is the same drift one level down, in the *tool* versions.
-
-**Fix:** put `.venv/bin` first on `PATH` for the whole Makefile, guard every tool-running
-target behind a `require-venv` check that fails loudly rather than falling through to ambient
-binaries, and split the mypy advisory into its own target that distinguishes exit >1 (did not
-run — fail the gate) from exit 1 (type errors — advisory, as intended).
-
-- [x] `make ci-local` resolves ruff, mypy, pytest, bandit and coverage from `.venv/bin`
-- [x] A missing venv fails with an instruction, instead of silently using ambient tools
-- [x] The mypy advisory step fails the gate when mypy did not run
-- [x] Regression tests that *execute* the Makefile against stub tools, not greps of its text
-
-**Scope:** S. **Files:** `Makefile`, `tests/test_ci_gate_is_reproducible.py`.
-
-**DONE 2026-08-01. The obvious fix did not work, and only a running test caught it.**
-
-`export PATH := $(CURDIR)/.venv/bin:$(PATH)` is the one-line fix everyone reaches for, it
-reads correctly, and `make showpath` confirms the exported value. It still left `ruff check .`
-running the ambient ruff. **GNU make 3.81 — what macOS ships — direct-execs any recipe line
-containing no shell metacharacters, and resolves the binary against make's own startup PATH
-rather than the exported one.** So `mypy ...; status=$$?` used the venv (it has a `;`, so a
-shell runs it) while `ruff check .` did not. The fix is to name `$(VENV_BIN)/<tool>`
-explicitly in every recipe; the `export PATH` stays, but only for what *child* processes
-look up.
-
-A grep-the-Makefile test would have passed the moment the plausible-looking line was
-written. The test that executes `make lint` against a stub `ruff` failed, which is the whole
-argument for behavioural sensors — and the **fourth** instance of the pattern in
-`skills/defect-prevention/SKILL.md`: asserting from a plausible reading instead of measuring.
-
-Verified from a bare shell (`env -i PATH=/usr/bin:/bin:/opt/homebrew/bin make ci-local`,
-no activated venv, no PATH prefix): green, 2,680 tests. Before this change that invocation
-died at step 3 with `python: command not found`.
-
-Mutation-checked, so the new sensor is not decorative: the old
-`(mypy … || echo "advisory")` form exits **0** against a `mypy` stub that exits 127; the new
-form exits non-zero. `make install` now creates the venv if it is absent, so require-venv's
-instruction points at a target that actually works from nothing.
-
-### B-040 · Calibrate the editorial review gate so it can be promoted
-
-**Opened 2026-08-01.** Spec: `docs/specs/review-gate-calibration.md` — **LGTM'd 2026-08-05**,
-with both open questions answered in the affirmative (agent drafts negatives + owner
-spot-checks a sample; `unverified` is a third outcome with its own `n`). Task breakdown below.
-
-ADR-0018 Decision 3 keeps `blog-post-review` advisory and says "promote to blocking once a
-false-positive rate is known." **Nothing has ever produced that number.** The gate has run
-exactly once, by hand, on one article — and that run contained a near-false-positive (a
-summarised Graphite fetch would have reported a false G2 failure on a correct figure). So the
-only instrument that catches fidelity defects the deterministic evaluator provably cannot
-(88% PASS vs 51 BLOCK on the same article) is frozen by a missing measurement.
-
-Reviewed against Anthropic's [Demystifying evals for AI
-agents](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents), the eval
-surface is lopsided in one specific way: **code-based graders are strong** (`article_evaluator`
-at 841 records, `publication_validator`, `_shared.py`, `skill_eval`), and the one model-based
-grader **has no ground truth to be checked against**. `logs/article_evals.json` is production
-monitoring, not an eval set. The guide's instruction — *"20-50 simple tasks drawn from real
-failures"* — is satisfiable today at **finding** granularity: ADR-0018 enumerates 10 labelled
-fidelity defects plus the 1 labelled near-false-positive.
-
-- [x] ~25 cases, ≥40% negatives, each traceable to a real article or a real finding
-      *(23 cases at 52% negatives, 2026-08-05 — pending the owner spot-check. Known gap:
-      **G3 has no positive case** and one must not be invented, so G3's false-negative rate
-      is unmeasurable in v1.)*
-- [ ] Report false-positive and false-negative rates **separately, with `n`** — never averaged
-- [ ] Keyless judge via the Agent SDK; case selection and arithmetic deterministic
-- [ ] Sufficient for the owner to answer ADR-0018 Decision 3
-
-**Build after n≈5 real reviews**, which accrue free from the B-013 review stage the owner
-already performs — the only added cost is recording, per gate, whether he agreed. The harness
-design depends on what those runs show: a gate that blocks everything needs threshold tuning,
-one that passes everything needs anchor revision (ADR-0018's own warning: "scores clustering
-above 85 would mean the rubric is broken rather than the pipeline"). Different tools.
-
-**Scope:** M. **Files:** `scripts/calibrate_review_gate.py`, `docs/evals/review-gate/`,
-`tests/test_calibrate_review_gate.py`.
-
-#### Plan — 2026-08-05, post-LGTM
-
-**Phase 1 · the case set — unblocked now.** The set is 8 cases, **2 negatives (25%)**, against
-a criterion of ≥20 cases and ≥40% negatives. All 8 carry
-`source: testing-shortcuts-migration-deadline`; the README claims two sources but
-`review-queue-throughput-tax` has contributed **zero**.
-
-**Phase 1 DONE 2026-08-05 — PR #473, open, gated on the owner spot-check.** The set is
-**23 cases / 12 negatives (52%) / 4 source articles**; `make ci-local` green at 2,768 passed,
-9 skipped. Resume instructions and the four cases to spot-check are in `docs/HANDOFF.md`.
-
-- [x] **Task 1 — convert the ADR-0018 findings into cases (S).** The 10 labelled fidelity
-      defects plus the **near-false-positive** (the summarised Graphite fetch that would have
-      reported a false G2 failure on Graphite's own published figure). The spec calls that one
-      case worth more than all ten positives, because false positives are what block
-      promotion — and it is the case the set does not have. Correct the README's provenance
-      claim in the same change. **Files:** `docs/evals/review-gate/cases/*.yaml`, README.
-- [x] **Task 2 — mine ~15 negatives from the 26 published articles (M).** *(12 mined, from 3
-      articles; the criterion was the 40% ratio, which 12 clears at 52%.)* Source of truth is
-      the `oviney/blog` clone at `/Users/ouray.viney/code/economist-blog-v5/_posts` (26 posts,
-      current to 2026-08-02). Every case carries `source:` provenance. **Owner spot-checks a
-      sample** — per the answered open question, this is the control on the agent drafting
-      cases for a judge of its own model family, so it is not optional.
-
-**Checkpoint (owner):** ≥20 cases, ≥40% negatives, spot-check passed. Phase 2 opens here.
-
-**Phase 2 · the runner — TDD, judge stubbed in tests, no model calls in the suite.**
-
-- [ ] **Task 3 — case loader + schema validation + balance report (S).** A file missing
-      `expected` or `why` is rejected loudly, never skipped. Balance reported every run.
-- [ ] **Task 4 — agreement arithmetic (S).** False-positive, false-negative and `unverified`
-      as **three separate counts with three denominators**; `n` beside every rate; a rate from
-      <20 cases labelled provisional in the output itself. Degenerate cases (all-pass,
-      all-fail, empty) covered.
-- [ ] **Task 5 — keyless judge via the Agent SDK + `--gate` / `--report` (M).** Runs the gate
-      **as accepted 2026-07-31** — v1 does not touch `rubric.md` or `REVIEW_PROMPT.md`.
-- [ ] **Task 6 — report to `logs/review_gate_calibration.json`, append-only (S).** Decide
-      *against* wiring into `make ci-local`: the runner makes model calls, and `ci-local` must
-      stay keyless and offline.
-
-**Sequencing note, flagged rather than acted on.** The spec gates the build on "n≈5 real
-reviews"; the repo has 2. That gate is worth re-examining at the Phase 2 checkpoint, because
-the runner grades **cases**, not review runs — the 5 reviews inform how to *interpret* the
-result (threshold tuning vs anchor revision), not the harness design. Owner's call at the
-checkpoint; Phase 1 does not depend on it either way.
-
-**Shipped 2026-08-01 alongside the spec, because waiting corrupts the baseline:**
-
-- [x] **G5 added to the machine-readable verdict block.** ADR-0018 Decision 2 says G5 was
-      amended "into the machine-readable verdict block". It reached `SKILL.md:165` but **not**
-      `REVIEW_PROMPT.md:85` — the file actually pasted into a review session — nor the rubric
-      card. Every review until now silently dropped the result of the gate that exists
-      *because* a reversed DORA statistic passed the other four.
-- [x] **Runbook cost/duration figures replaced with the recorded range** (see B-041).
-
-### B-041 · The hero draw's worst case is 3× the longest run ever recorded, and nothing attributes it
-
-**Opened 2026-08-01**, found by the owner asking whether "~35 minutes" was ludicrous. It was
-— but not in the direction either of us assumed.
-
-`logs/agent_sdk_costs.jsonl` has recorded `wall_seconds` and per-stage cost **since
-2026-04-26**, and no recorded run exceeds **15.4 minutes**; four of the five are under 5. The
-"~$1 and ~35 minutes" in `docs/HANDOFF.md` and the runbook was folklore contradicted by the
-repo's own data. **The instrument existed and went unread** while its contradiction was
-repeated in two documents — and this session quoted it back to the owner and defended it
-before checking. That is the `defect-prevention` surface-reading class again, in a session
-that had just added an entry to it.
-
-The real finding is underneath. A run started 2026-08-01 blew past every recorded figure, and
-the log says why:
-
-```
-WARNING src.agent_sdk.hero_author: Hero attempt 1/2 timed out after 600s
-```
-
-`hero_author.py`: `_DRAW_TIMEOUT_S = 600`, `_MAX_STRUCTURAL_ATTEMPTS = 2`,
-`_MAX_CRITIQUE_RETRIES = 1` → **2 redraws × 2 attempts × 600s = 40 minutes of hero drawing
-alone**, before critique (2 × 180s). A *successful* draw is measured at 454s. So the pipeline
-has two utterly different durations — ~4 minutes when the hero lands first try, up to ~46
-when it does not — and the ledger cannot distinguish them, because the hero sits inside
-`stage3_seconds` with no sub-timing.
-
-The constants are not arbitrary; the comments record that 240s and $0.40 were "each
-independently fatal". The problem is not the ceiling, it is that **a 10× duration swing is
-invisible in the only place anyone would look for it.**
-
-- [x] Record hero draw seconds, attempt count and timeout count as their own ledger fields
-- [x] Decide whether a timed-out first attempt should retry at all
-- [x] Bound the aggregate, not just each call
-- [x] ~~State the honest range in the runbook once several runs carry `hero_*` fields~~ —
-      **overtaken by B-042.** No run will ever carry them again.
-
-**CLOSED 2026-08-01 as MOOTED by B-042.** The owner now draws every hero by hand, so
-`hero_author.py` is deleted and the pipeline contains no draw to time. The 10× duration swing
-this item existed to make visible cannot recur, and the `hero_*` ledger fields were removed
-with it rather than left recording a permanent zero — which would have been this item's own
-complaint (a reading that looks authoritative and measures nothing).
-
-**The lesson outlives the item, and is worth keeping:** the ledger recorded only runs where
-the hero landed, so it could not see the timeout path at all. A log that is written on
-success and not on failure is not a partial instrument, it is a misleading one. See ADR-0019.
-
-**Scope:** S. **Files:** ~~`src/agent_sdk/hero_author.py`~~ (deleted),
-`src/agent_sdk/stage3_runner.py`, `src/agent_sdk/pipeline.py`.
-
-**FIXED 2026-08-01, and the run that prompted it settled the design question.**
-
-The run finished while this item was being written, and it is the whole argument:
-
-| | |
-|---|---|
-| Wall clock | **31.8 min** — twice the previous record |
-| Cost | $1.01, of which $0.18 graphics |
-| Hero attempt 1 | timed out at 600s |
-| Hero attempt 2 | **also timed out at 600s**, carrying the "return a simpler drawing with fewer, larger shapes" instruction |
-| Hero produced | **none** |
-
-So **20 of the 31.8 minutes bought nothing**, and the article is unpublishable — the blog
-requires a resolvable `image:`. It also retires the open question: the shrink-the-ask retry
-does not work. One timeout is a diagnosis, not a transient.
-
-That reframed the fix. An aggregate budget of 1200s would have changed this run by **zero
-seconds** (2 × 600 = 1200 exactly). The ceiling has to make the second full-price attempt
-*impossible*, not merely capped:
-
-- `_HERO_TOTAL_BUDGET_S = 900` — one measured successful draw (454s) plus its critique (180s)
-  plus slack, and equal to the longest *complete* pipeline run ever recorded.
-- `_MIN_USEFUL_DRAW_S = 450` — no observed successful draw has finished faster than 454s.
-
-Those two numbers separate the retry cases by arithmetic rather than by a special case, which
-is why the fix is small. A **rejected** attempt returns in seconds and leaves the budget
-almost intact, so it retries exactly as before. A **timed-out** attempt has consumed 600s by
-definition, leaving 300s — under the floor — so it stops. Cheap signal, retry; expensive
-silence, stop.
-
-Worst case: **46 min → 15 min.** This run's failure mode: **20 min → 10 min.**
-
-**And the folklore was not baseless after all.** The earlier correction — "no recorded run
-exceeds 15.4 minutes" — was true of the ledger, and the ledger was the wrong instrument: it
-had only ever recorded runs where the hero landed. "~35 minutes" was a real memory of the
-timeout path that nothing had ever written down. Both halves were right, which is exactly the
-case for the `hero_*` fields: the ledger now distinguishes the two populations it was
-silently averaging.
-
-**Found in passing, and it may explain the thin ledger.** A value orjson cannot serialise
-does not fail the write loudly — `pipeline.py` catches it and logs "cost log write failed
-(non-fatal)", so the entire row disappears. Five rows across four months of runs is suspicious
-on its own. `_numeric()` now coerces at the boundary; whether earlier rows were lost this way
-is unverified and worth a look before anyone trends this data.
-
-### B-042 · The mandatory-chart gate manufactures the fabrication it should prevent
-
-**Opened 2026-08-01**, found by the owner asking "if we don't need a chart, why build one?"
-He is right, and the repo currently disagrees with him — in a way that produced two of the
-eight calibration cases logged the same day.
-
-`publication_validator.py:1031` makes a chart **mandatory at CRITICAL severity**:
-
-```python
-if not chart_refs:
-    "check": "missing_chart",
-    "severity": "CRITICAL",
-    "message": "Article missing required chart — every article must include at least one data chart"
-```
-
-So when the research carries no quantitative data, the pipeline is *required* to produce a
-chart regardless. On the 2026-08-01 run it did exactly that: a brief containing one number
-yielded a chart carrying four invented percentages (62/46/28/12%), presented with an axis and
-a measured-sounding subtitle. **That was compliance, not a rogue writer.**
-
-The next check compounds it. `orphaned_chart` (HIGH) fires unless the prose contains "chart",
-"figure", "shows" or "illustrates" near the embed — pushing the writer to add a sentence
-describing the chart, with nothing verifying the description is true. That is how "As the
-chart below illustrates, undetected defects do not flow linearly into rework" came to be
-written about a static four-bar comparison, reproducing ADR-0018's chart finding exactly.
-
-**Two gates, combined, manufactured two defects.** A rule meant to enforce evidence produced
-fabricated evidence, and the deterministic evaluator then scored the result 76 and passed it.
-
-- [x] Decide the editorial policy — **the owner owns every image, charts included** (stated
-      2026-08-01). Not "mandatory when the research supports one" but "his call, always"
-- [x] Make the requirement conditional — **superseded by deletion.** `missing_chart` is gone.
-      The setpoint was not mistuned, it was held by the wrong party: whether an article
-      warrants a chart is judged against the research, which the validator never sees
-- [x] `orphaned_chart` must not be satisfiable by a describing sentence — **deleted.** It
-      could never fire at all (`missing_chart` returns early unless a `/assets/charts/….png`
-      ref exists, so the content always contained "chart"), and a *working* one would have
-      pushed the writer to describe the chart, which is what wrote case `g2`
-- [x] Regression case: a brief with no quantitative data produces an article with no chart
-      that passes — `tests/test_publication_validator.py::TestChartIsNotTheValidatorsDecision`
-
-**DONE 2026-08-01.** Spec: `docs/specs/mandatory-chart-setpoint.md`. Decision: **ADR-0019** —
-a setpoint is a decision about who decides. The pipeline no longer draws a hero or generates
-chart data; it *extracts* candidate figures from the brief with provenance and hands off a
-review packet (`output/posts/<slug>.review.md`). Art presence is gated at deploy (ADR-0017),
-which is now the only thing enforcing it. Operating Constraint #4 amended — this reverses
-B-016b. **B-041 is mooted** and closed with it.
-
-**Scope:** M. **Files:** `scripts/publication_validator.py`, `src/agent_sdk/_shared.py`
-(`_auto_embed_chart`), `src/agent_sdk/stage3_runner.py`.
-
-### B-043 · No sensor ships without a proof it can fail
-
-**Opened 2026-08-01. DONE 2026-08-01.** Spec: `docs/specs/sensor-proof-of-teeth.md`.
-**Absorbs B-040** as its inferential-sensor arm.
-
-**Shipped:** `scripts/check_sensor_proofs.py` runs as a `make ci-local` step,
-`docs/sensors/register.yaml` holds 20 entries (**19 proved, 0 unproved, 1 report-only**), and
-`tests/test_check_sensor_proofs.py` carries the checker's own proof of teeth. Two sensors that
-had **zero** tests now have 26 between them.
-
-The 2026-07-29 SE Radio 730 assessment graded this repo *guide-maximal, sensor-disconnected*;
-B-030 … B-035 fixed the wiring. **The next failure mode is that nothing validates the sensors
-themselves**, and 2026-08-01 produced four independent proofs in one day:
-
-| Finding | Kind of sensor failure |
-|---|---|
-| **B-039** | A **fifth** inert sensor — `(mypy \|\| echo advisory)` returned exit 0 against a stub exiting 127 — found *after* B-031 fixed four |
-| **B-040** | A sensor that **never runs**, with no ground truth |
-| **B-041** | A **biased** sensor: the ledger recorded only runs where the hero succeeded, hiding a 10x duration swing |
-| **B-042** | A sensor whose **setpoint manufactured the defect** it exists to prevent |
-
-**B-031 fixed four named sensors; it did not fix the class.** That is the argument for a
-standing check rather than another audit.
-
-The technique already exists — used three times on 2026-08-01, at a terminal, unrecorded.
-Mutate something, check whether the sensor notices. The third instance is the one that matters:
-`export PATH := .venv/bin:$(PATH)` looked right, `make showpath` confirmed it, and running
-`make lint` against a stub `ruff` showed the ambient ruff still won. **A grep of the Makefile
-would have passed on a fix that fixed nothing.**
-
-Measured baseline: 13 sensor scripts; `lint_adrs.py` and `check_bare_name_imports.py` have
-**zero tests**; the rest have unit tests (does the code work) not efficacy tests (does it fire).
-
-**The design constraint that decides everything: the fix must be a sensor, not a guide.**
-Writing the rule into a `SKILL.md` reproduces exactly what this repo was graded down for —
-constraint #1 ("NO new API keys. Ever.") had zero computational backing until B-030, and B-028
-was a review stage that existed as prose while the tool default bypassed it. A rule nothing
-enforces gets skipped.
-
-- [x] `scripts/check_sensor_proofs.py` in `make ci-local`, failing on an unregistered sensor
-- [x] `docs/sensors/register.yaml` covering all of them, `proof: none` allowed as a recorded
-      baseline — **not needed in the end**, every discovered sensor got a real proof
-- [x] `lint_adrs` and `check_bare_name_imports` proved first — the two real gaps
-- [x] The three hand-run mutation proofs exist as tests, not shell history
-- [x] The checker has its own proof of teeth
-
-**Scope:** M. **Files:** `scripts/check_sensor_proofs.py`, `docs/sensors/register.yaml`,
-`tests/test_check_sensor_proofs.py`.
-
-**Discovery reads the wiring, not filenames.** The checker parses the `Makefile`,
-`.pre-commit-config.yaml`, `.claude/settings.json` and the publish entrypoints, and demands a
-register entry for every in-repo script they invoke. A `scripts/*_guard.py` glob would have been
-gameable by renaming and blind to anything added under another name — and the whole complaint
-about B-031 is that fixing four sensors *by name* left a fifth to be found.
-
-**Verified in situ, because a fixture passing is not the claim.** Adding a recipe invoking a new
-script to the real `Makefile` made the real gate exit 1 naming it; reverting restored green. This
-is B-039's third lesson applied to its own successor — `export PATH :=` looked right, `make
-showpath` confirmed it, and only running a recipe against a stub binary showed it did nothing.
-
-**The limit is stated, not papered over.** The checker verifies a proof *exists and runs*; it
-cannot verify a proof is *genuine* — `assert True` under an honest-sounding test name would pass.
-Mutation-testing the mutation tests is where the value curve goes flat, so the `mutation:` field
-exists instead, to make genuineness a one-glance review-time check.
-
-**Open question ANSWERED — what counts as a sensor.** The proposal was right in substance and
-wrong in one word: "non-zero exit" is the wrong test, because **every harness hook exits 0 by
-design** and refuses via JSON. Measured, `guard_constraints` denies a tool call and `session_gate`
-blocks a turn, while `post_edit_sensor` and `session_context` return only `additionalContext`.
-Adopted: *a sensor is anything a gate site invokes that can **refuse** — deny a tool call, block a
-turn, or exit non-zero.* Both named cases resolve as proposed and both were checked, not assumed:
-`publication_validator` is **in** (imported by both publish entrypoints, its verdict stops a
-publish); `article_evaluator` is **out** (zero gate-site references anywhere — it scored the
-fabricated article 76 while the validator passed it, which is precisely a score and not a gate).
-Note it *is* on `destructive_change_guard`'s `CRITICAL_FILES`: being protected from being gutted
-is not the same as being a sensor. Full reasoning in the spec's open-questions section.
-
-### B-036 · Badge validation has no implementation — decide whether to restore it
+### B-036 · Badge validation has no implementation — decide whether to restore it — 2026-07-31
 
 **Opened 2026-07-31**, found by B-031 doing its job.
 
@@ -1082,7 +1103,7 @@ bug that made the archived copy look for `scripts/README.md`.
 
 **Scope:** S. **Follow-up:** see B-037 — the pin and the interpreter disagree.
 
-### B-037 · `.python-version` pins 3.12 but the venv runs 3.13.14
+### B-037 · `.python-version` pins 3.12 but the venv runs 3.13.14 — 2026-07-31
 
 **Opened 2026-07-31**, found while fixing B-036's Python badge.
 
@@ -1135,9 +1156,7 @@ is unchanged at 30 errors across 11 files under `python_version = 3.13`.
 
 **Scope:** XS to decide, S to enforce. **Owner-gated** on which version is wanted.
 
-### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
-
-### B-023 · Decide the fate of `llm_client.py`'s Anthropic auth path
+### B-023 · Decide the fate of `llm_client.py`'s Anthropic auth path — 2026-07-31
 
 Surfaced 2026-07-28 while reconciling `backup/integration-test-20260728`, a
 Mac-only branch that was never pushed. Almost everything on it had already
@@ -1213,7 +1232,7 @@ to remedy and that ~~B-025~~ was recorded for: **asserting from a surface readin
 measuring.** Third instance. Recorded here rather than quietly fixed, because the pattern is
 the finding.
 
-### ~~B-025~~ · WITHDRAWN 2026-07-29 — the defect record was never at risk
+### ~~B-025~~ · WITHDRAWN — the defect record was never at risk — 2026-07-29
 
 Opened on the claim that `.gitignore`'s `data/*` left
 `data/skills_state/defect_tracker.json` untracked, so BUG-066/067/068 existed only
@@ -1233,68 +1252,6 @@ Recorded rather than deleted because it is the second instance in one session of
 asserting a defect from a surface reading instead of measuring — the first being
 the hero "clipping" that a four-line pixel check disproved. That pattern is the
 actual finding here, and **B-027** is its concrete remedy.
-
-### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates
-
-**`check-agent-scope` RESOLVED 2026-07-24** (see B-015a in Done). **Gate matrix
-now measured** on blog PR #1159 (run 30135701462/30135701497):
-
-| Check | Result | Note |
-|---|---|---|
-| `build` | **pass** | only after the BUG-055 empty-`image:` fix (B-018) |
-| `check-agent-scope` | **pass** | unlabelled ⇒ Rule 4 skipped (B-015a) |
-| `📝 Content Validation` | **pass** | |
-| `validate-editorial` | **pass** | |
-| Playwright shards 1–3 | **pass** | |
-| `🎯 Accessibility, Visual & Lighthouse` | **pass** | |
-| `📊 Quality Report` | **pass** | |
-| `🔒 Security Audit` | **fail** | **pre-existing, blog-side**: npm CVEs in the blog's deps (`body-parser` high). Not content-related |
-| `🖼️ Visual Regression` | **fail** | **pre-existing, blog-side**: stale committed baselines on `about`/`blog-index`/`homepage` (expected 3274px, got 3501px). Same 3 pages failed on #1157 |
-
-**So every check we can influence passes.** The two failures are blog-repo
-maintenance debt, and both are *required* checks — meaning **every**
-economist-agents PR needs an owner bypass until the blog bumps its npm deps and
-refreshes its visual baselines. Worth two issues in `oviney/blog` (not here).
-Also unavoidable regardless: the **1-review requirement** — the token user is the
-owner and GitHub forbids self-approval. Full findings:
-`docs/blog-integration-constraints.md`.
-
-**MEASURED ON A REAL ARTICLE 2026-07-25 — and it failed.** Publishing the
-flaky-tests post tripped `validate-editorial`: the blog's
-`scripts/validate-posts.sh` requires a **`tags`** field (≥2, inline
-`[foo, bar]`, **all lowercase-hyphen**) and the pipeline had never emitted one, so
-*every* article would have failed. Fixed generator-side (`_derive_tags`, BUG-057)
-and verified by running the blog's own script → `PASSED`. Lesson: the gate matrix
-above was measured on a *layout* PR; only a real article exercises the gates that
-govern articles.
-
-**RESOLVED 2026-07-26 (B-019).** Measured with
-`scripts/acceptance_blog_frontmatter.sh`: **both** blog scripts require `image:`,
-and `validate-post-quality.sh` check 1 errors with "hero image not set". So the
-answer is the first option — **always author a hero**; chart-only is simply not a
-publishable mode. Tracked as a blocker in **B-016b**.
-
-### B-012 · Opt-in `deep-brief` research mode (BUILT — live acceptance run pending)
-
-> **✅ CODE DONE.** `--brief <file>` wired end-to-end (`pipeline.load_brief_file`
-> strips refuted claims → `run_pipeline`/`run_stage3` `brief_override` skips the
-> research step); documented opt-in/heavy in the runbook; `claude_web` stays
-> default. Tested (`tests/test_deep_brief.py`) + `make ci-local` green. The one
-> remaining acceptance criterion — a real deep-research → article run — is a
-> token-heavy owner-run step (deep-research ~2M tokens), left opt-in by design.
-
-
-
-Wire the `deep-research` harness as an **opt-in** research path for flagship
-posts; `claude_web` stays the everyday default. **Prototype (2026-07-22) settled
-it:** dramatically better sourcing — 19 claims each surviving a 3-0 verification
-vote, and it *refuted the walked-back Accenture Copilot numbers* a single-pass
-researcher would ship — but one topic cost ~102 agents / ~2M tokens / ~15 min and
-**hit the session limit**. So: opt-in, not default. Spec:
-`docs/specs/B-012-deep-brief-research-mode.md`. Prototype output (a real verified
-brief) lives at `docs/research/ai-productivity-brief.md`.
-
-## Done
 
 ### B-027 · Hero framing is measured — but it cannot be adjudicated — 2026-07-29
 
@@ -1510,6 +1467,46 @@ diagnostic. The hero's own calls are bounded here as a local mitigation.
 
 Still open: **multiple figures per post**, deliberately out of scope (see spec).
 
+
+### B-015 · economist-agents PRs must satisfy oviney/blog's governance gates — 2026-07-26
+
+**`check-agent-scope` RESOLVED 2026-07-24** (see B-015a in Done). **Gate matrix
+now measured** on blog PR #1159 (run 30135701462/30135701497):
+
+| Check | Result | Note |
+|---|---|---|
+| `build` | **pass** | only after the BUG-055 empty-`image:` fix (B-018) |
+| `check-agent-scope` | **pass** | unlabelled ⇒ Rule 4 skipped (B-015a) |
+| `📝 Content Validation` | **pass** | |
+| `validate-editorial` | **pass** | |
+| Playwright shards 1–3 | **pass** | |
+| `🎯 Accessibility, Visual & Lighthouse` | **pass** | |
+| `📊 Quality Report` | **pass** | |
+| `🔒 Security Audit` | **fail** | **pre-existing, blog-side**: npm CVEs in the blog's deps (`body-parser` high). Not content-related |
+| `🖼️ Visual Regression` | **fail** | **pre-existing, blog-side**: stale committed baselines on `about`/`blog-index`/`homepage` (expected 3274px, got 3501px). Same 3 pages failed on #1157 |
+
+**So every check we can influence passes.** The two failures are blog-repo
+maintenance debt, and both are *required* checks — meaning **every**
+economist-agents PR needs an owner bypass until the blog bumps its npm deps and
+refreshes its visual baselines. Worth two issues in `oviney/blog` (not here).
+Also unavoidable regardless: the **1-review requirement** — the token user is the
+owner and GitHub forbids self-approval. Full findings:
+`docs/blog-integration-constraints.md`.
+
+**MEASURED ON A REAL ARTICLE 2026-07-25 — and it failed.** Publishing the
+flaky-tests post tripped `validate-editorial`: the blog's
+`scripts/validate-posts.sh` requires a **`tags`** field (≥2, inline
+`[foo, bar]`, **all lowercase-hyphen**) and the pipeline had never emitted one, so
+*every* article would have failed. Fixed generator-side (`_derive_tags`, BUG-057)
+and verified by running the blog's own script → `PASSED`. Lesson: the gate matrix
+above was measured on a *layout* PR; only a real article exercises the gates that
+govern articles.
+
+**RESOLVED 2026-07-26 (B-019).** Measured with
+`scripts/acceptance_blog_frontmatter.sh`: **both** blog scripts require `image:`,
+and `validate-post-quality.sh` check 1 errors with "hero image not set". So the
+answer is the first option — **always author a hero**; chart-only is simply not a
+publishable mode. Tracked as a blocker in **B-016b**.
 
 ### B-019 · Generated front matter now clears the blog's gate — 2026-07-26
 
@@ -1880,3 +1877,4 @@ Slice 1 of the sprint. PR #431 (squash-merged to `main`). Restored
 changes); ADR-0010 status `Implemented` → `Accepted`; landed ADR-0011 (Opt-In
 Recursive Deep Research); added both to `mkdocs.yml` nav. Gate verified on `main`
 (11 ADRs validated). Spec: `docs/specs/B-003-adr-lint-governance.md`.
+

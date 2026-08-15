@@ -25,8 +25,20 @@ Constraint #3.
 
 from __future__ import annotations
 
+import logging
+import re
 from collections import Counter
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
+from typing import Any
+
+import orjson
+
+logger = logging.getLogger(__name__)
+
+#: A judge takes a gate definition and a passage, and returns one verdict.
+#: Injected so the test suite can exercise the harness without a model call.
+Judge = Callable[[str, str], str]
 
 #: Below this many cases a rate is labelled provisional in the output itself.
 #: The spec's reasoning: 25 cases distinguishes "fires on nothing" from "fires
@@ -37,6 +49,167 @@ PROVISIONAL_BELOW_N = 20
 PASS = "pass"
 FAIL = "fail"
 UNVERIFIED = "unverified"
+
+
+#: Matches one gate bullet in REVIEW_PROMPT.md, stopping at the next gate or the
+#: next heading so a definition cannot bleed into its neighbour.
+_GATE_BULLET = re.compile(
+    r"^- \*\*(?P<gate>G\d)\b(?P<body>.*?)(?=^- \*\*G\d|^#|\Z)",
+    re.MULTILINE | re.DOTALL,
+)
+
+_VERDICTS = frozenset({PASS, FAIL, UNVERIFIED})
+
+
+def parse_gate_definitions(prompt_text: str) -> dict[str, str]:
+    """Read the gate definitions out of the review prompt.
+
+    The gates are extracted rather than restated so that this harness measures
+    the instrument as shipped. The spec's Boundaries forbid the harness editing
+    the rubric it measures; reading the text at run time is the other half of
+    that guarantee.
+
+    Args:
+        prompt_text: Contents of `skills/blog-post-review/REVIEW_PROMPT.md`.
+
+    Returns:
+        Gate id (``G1``..``G5``) to its full bullet text, in document order.
+
+    Raises:
+        ValueError: If the prompt contains no gate definitions. Returning an
+            empty mapping would let a run report a flawless score over zero
+            cases, which is the failure this whole harness exists to prevent.
+
+    """
+    definitions = {
+        match.group("gate"): f"- **{match.group('gate')}{match.group('body')}".strip()
+        for match in _GATE_BULLET.finditer(prompt_text)
+    }
+    if not definitions:
+        raise ValueError("no gate definitions found in the review prompt")
+    return definitions
+
+
+def build_judge_prompt(gate_definition: str, passage: str) -> str:
+    """Ask the judge to apply one gate to one passage.
+
+    Args:
+        gate_definition: The gate's text, as shipped in the review prompt.
+        passage: The case's passage.
+
+    Returns:
+        The prompt. ``unverified`` is offered explicitly: without it the judge
+        is forced into a pass/fail it cannot support, and the resulting rate
+        stops meaning anything.
+
+    """
+    return (
+        "You are applying a single publication gate to a single passage from a "
+        "draft article. Apply only this gate; ignore every other quality "
+        "consideration.\n\n"
+        f"{gate_definition}\n\n"
+        "Passage under review:\n"
+        f"---\n{passage}\n---\n\n"
+        "Do the verification work yourself. Return JSON only, no prose:\n"
+        '{"verdict": "pass" | "fail" | "unverified", '
+        '"why": "<one sentence>"}\n\n'
+        'Use "pass" if the passage satisfies the gate, "fail" if it violates '
+        'the gate, and "unverified" if you cannot reach a source needed to '
+        "decide."
+    )
+
+
+def parse_verdict(raw: str) -> str:
+    """Extract the verdict from the judge's reply.
+
+    Args:
+        raw: The judge's raw text, which may wrap the JSON in prose or a fence.
+
+    Returns:
+        One of ``pass``, ``fail`` or ``unverified``.
+
+    Raises:
+        ValueError: If no verdict can be read. A broken judge is deliberately
+            *not* folded into ``unverified`` — that would report a harness
+            failure as though it were a property of the gate under test.
+
+    """
+    match = re.search(r"\{.*\}", raw, re.DOTALL)
+    if not match:
+        raise ValueError(f"no JSON object in judge output: {raw[:120]!r}")
+    try:
+        payload = orjson.loads(match.group(0))
+    except orjson.JSONDecodeError as exc:
+        raise ValueError(f"judge output is not valid JSON: {exc}") from exc
+
+    verdict = str(payload.get("verdict", "")).strip().lower()
+    if verdict not in _VERDICTS:
+        raise ValueError(f"unrecognised verdict: {verdict!r}")
+    return verdict
+
+
+def select_cases(
+    cases: Sequence[dict[str, Any]], gate: str | None = None
+) -> list[dict[str, Any]]:
+    """Filter cases to one gate, for re-running while iterating on the rubric.
+
+    Args:
+        cases: Loaded cases.
+        gate: Gate id to keep, case-insensitive. ``None`` keeps everything.
+
+    Returns:
+        The selected cases, in their original order.
+
+    Raises:
+        ValueError: If the filter matches nothing — an empty selection would
+            otherwise be summarised as a flawless zero-out-of-zero.
+
+    """
+    if gate is None:
+        return list(cases)
+
+    wanted = gate.upper()
+    selected = [c for c in cases if str(c["gate"]).upper() == wanted]
+    if not selected:
+        raise ValueError(f"no calibration cases for gate {gate}")
+    return selected
+
+
+def run_cases(
+    cases: Sequence[dict[str, Any]],
+    gate_definitions: dict[str, str],
+    judge: Judge,
+) -> list[CaseResult]:
+    """Run the judge over each case, preserving the owner's labels.
+
+    Args:
+        cases: Loaded cases.
+        gate_definitions: As returned by :func:`parse_gate_definitions`.
+        judge: Callable invoked once per case.
+
+    Returns:
+        One result per case, in input order.
+
+    Raises:
+        ValueError: If a case names a gate the prompt does not define — a sign
+            the case set and the rubric have drifted apart.
+
+    """
+    results: list[CaseResult] = []
+    for case in cases:
+        gate = str(case["gate"])
+        definition = gate_definitions.get(gate)
+        if definition is None:
+            raise ValueError(f"case {case['id']!r} names unknown gate {gate}")
+        results.append(
+            CaseResult(
+                case_id=str(case["id"]),
+                gate=gate,
+                expected=str(case["expected"]),
+                judged=judge(definition, str(case["passage"])),
+            )
+        )
+    return results
 
 
 @dataclass(frozen=True)

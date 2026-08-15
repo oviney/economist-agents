@@ -9,7 +9,15 @@ from __future__ import annotations
 
 import pytest
 
-from scripts.calibrate_review_gate import CaseResult, summarise
+from scripts.calibrate_review_gate import (
+    CaseResult,
+    build_judge_prompt,
+    parse_gate_definitions,
+    parse_verdict,
+    run_cases,
+    select_cases,
+    summarise,
+)
 
 
 def _result(expected: str, judged: str, gate: str = "G2") -> CaseResult:
@@ -247,3 +255,195 @@ class TestDeterminism:
         ]
 
         assert summarise(results) == summarise(list(reversed(results)))
+
+
+REVIEW_PROMPT_EXCERPT = """\
+## Step 1: Gates (five binary checks, any failure blocks publication)
+
+- **G1 Source resolvability.** Every statistic resolves to a real locatable
+  document. If you cannot reach a source, mark the claim UNVERIFIED.
+- **G2 Citation fidelity.** Each cited source actually supports the specific claim
+  attached to it, without overstating its sample, scope, or confidence.
+- **G3 Arithmetic integrity.** Recompute every calculation.
+
+## Step 2: Score six dimensions, 0 to 5
+"""
+
+
+class TestParseGateDefinitions:
+    """Gate text is read out of the instrument, never restated in the harness.
+
+    The spec's Boundaries forbid the harness editing the rubric it measures;
+    reading the definitions at run time is the other half of that — a rubric
+    change must not leave this file measuring a stale copy.
+    """
+
+    def test_finds_every_gate_in_the_prompt(self) -> None:
+        gates = parse_gate_definitions(REVIEW_PROMPT_EXCERPT)
+
+        assert list(gates) == ["G1", "G2", "G3"]
+
+    def test_definition_carries_the_gate_name_and_body(self) -> None:
+        gates = parse_gate_definitions(REVIEW_PROMPT_EXCERPT)
+
+        assert "Citation fidelity" in gates["G2"]
+        assert "without overstating its sample" in gates["G2"]
+
+    def test_a_definition_does_not_bleed_into_the_next_gate(self) -> None:
+        gates = parse_gate_definitions(REVIEW_PROMPT_EXCERPT)
+
+        assert "Arithmetic integrity" not in gates["G2"]
+
+    def test_the_last_gate_stops_at_the_next_heading(self) -> None:
+        gates = parse_gate_definitions(REVIEW_PROMPT_EXCERPT)
+
+        assert "Score six dimensions" not in gates["G3"]
+
+    def test_a_prompt_with_no_gates_is_rejected_loudly(self) -> None:
+        """Silently returning {} would report a perfect score over zero cases."""
+        with pytest.raises(ValueError, match="no gate definitions"):
+            parse_gate_definitions("# A prompt that has lost its gates\n")
+
+    def test_reads_the_real_review_prompt(self) -> None:
+        """Guards against the shipped prompt drifting out of the parsed shape."""
+        from pathlib import Path
+
+        text = Path("skills/blog-post-review/REVIEW_PROMPT.md").read_text(
+            encoding="utf-8"
+        )
+
+        gates = parse_gate_definitions(text)
+
+        assert list(gates) == ["G1", "G2", "G3", "G4", "G5"]
+
+
+class TestBuildJudgePrompt:
+    """The judge sees one gate and one passage — not the whole 99-line rubric."""
+
+    def test_includes_the_gate_definition_and_the_passage(self) -> None:
+        prompt = build_judge_prompt(
+            "**G2 Citation fidelity.** Sources support claims.",
+            "The nine-hour baseline.",
+        )
+
+        assert "Citation fidelity" in prompt
+        assert "The nine-hour baseline." in prompt
+
+    def test_offers_all_three_verdicts(self) -> None:
+        """`unverified` must be available, or the judge is forced into a
+        pass/fail it cannot support and the rate becomes uninterpretable."""
+        prompt = build_judge_prompt("**G1 Source resolvability.**", "A passage.")
+
+        assert "unverified" in prompt
+        assert "pass" in prompt
+        assert "fail" in prompt
+
+
+class TestParseVerdict:
+    """The judge answers in JSON; anything else is an error, not an `unverified`."""
+
+    @pytest.mark.parametrize("verdict", ["pass", "fail", "unverified"])
+    def test_reads_each_verdict(self, verdict: str) -> None:
+        raw = f'{{"verdict": "{verdict}", "why": "x"}}'
+
+        assert parse_verdict(raw) == verdict
+
+    def test_tolerates_a_code_fence_and_surrounding_prose(self) -> None:
+        raw = 'Here is my answer:\n```json\n{"verdict": "fail"}\n```\nHope that helps.'
+
+        assert parse_verdict(raw) == "fail"
+
+    def test_is_case_insensitive(self) -> None:
+        assert parse_verdict('{"verdict": "FAIL"}') == "fail"
+
+    def test_unparseable_output_raises_rather_than_counting_as_unverified(self) -> None:
+        """Folding a broken judge into `unverified` would inflate a reported
+        rate with what is actually a harness failure."""
+        with pytest.raises(ValueError):
+            parse_verdict("I could not determine a verdict.")
+
+    def test_an_unknown_verdict_word_raises(self) -> None:
+        with pytest.raises(ValueError, match="maybe"):
+            parse_verdict('{"verdict": "maybe"}')
+
+
+class TestSelectCases:
+    """`--gate` re-runs one gate's cases while iterating."""
+
+    CASES = [
+        {"id": "a", "gate": "G1", "expected": "pass"},
+        {"id": "b", "gate": "G2", "expected": "fail"},
+        {"id": "c", "gate": "G2", "expected": "pass"},
+    ]
+
+    def test_no_filter_returns_everything(self) -> None:
+        assert len(select_cases(self.CASES, gate=None)) == 3
+
+    def test_filters_to_one_gate(self) -> None:
+        assert [c["id"] for c in select_cases(self.CASES, gate="G2")] == ["b", "c"]
+
+    def test_is_case_insensitive_about_the_gate_name(self) -> None:
+        assert len(select_cases(self.CASES, gate="g2")) == 2
+
+    def test_a_gate_with_no_cases_is_rejected_loudly(self) -> None:
+        """An empty selection would otherwise report a flawless 0/0."""
+        with pytest.raises(ValueError, match="G9"):
+            select_cases(self.CASES, gate="G9")
+
+
+class TestRunCases:
+    """The judge is injected, so the suite never makes a model call."""
+
+    CASES = [
+        {
+            "id": "case-a",
+            "gate": "G2",
+            "expected": "fail",
+            "passage": "p1",
+            "why": "w",
+        },
+        {
+            "id": "case-b",
+            "gate": "G1",
+            "expected": "pass",
+            "passage": "p2",
+            "why": "w",
+        },
+    ]
+    GATES = {"G1": "**G1 def**", "G2": "**G2 def**"}
+
+    def test_returns_one_result_per_case_preserving_labels(self) -> None:
+        results = run_cases(self.CASES, self.GATES, judge=lambda _g, _p: "fail")
+
+        assert [(r.case_id, r.expected, r.judged) for r in results] == [
+            ("case-a", "fail", "fail"),
+            ("case-b", "pass", "fail"),
+        ]
+
+    def test_passes_the_matching_gate_definition_to_the_judge(self) -> None:
+        seen: list[tuple[str, str]] = []
+
+        def judge(gate_definition: str, passage: str) -> str:
+            seen.append((gate_definition, passage))
+            return "pass"
+
+        run_cases(self.CASES, self.GATES, judge=judge)
+
+        assert seen == [("**G2 def**", "p1"), ("**G1 def**", "p2")]
+
+    def test_a_case_naming_an_unknown_gate_is_rejected_loudly(self) -> None:
+        cases = [{"id": "x", "gate": "G7", "expected": "pass", "passage": "p"}]
+
+        with pytest.raises(ValueError, match="G7"):
+            run_cases(cases, self.GATES, judge=lambda _g, _p: "pass")
+
+    def test_a_fixed_stub_reproduces_identical_arithmetic(self) -> None:
+        """The spec's determinism criterion, end to end through the runner."""
+        first = summarise(
+            run_cases(self.CASES, self.GATES, judge=lambda _g, _p: "pass")
+        )
+        second = summarise(
+            run_cases(self.CASES, self.GATES, judge=lambda _g, _p: "pass")
+        )
+
+        assert first == second

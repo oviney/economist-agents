@@ -1,0 +1,17 @@
+id: g1-references-carry-full-locators
+gate: G1
+expected: pass
+source: green-light-red-ledger-flaky-tests-invisible-tax
+passage: >-
+  1. Parry, J. et al. "Cost of Flaky Tests in CI: An Industrial Case Study." *ICST 2024
+  Industry Track*, April 2024.
+  https://conf.researchr.org/details/icst-2024/icst-2024-industry/1/Cost-of-Flaky-Tests-in-CI-An-Industrial-Case-Study
+  3. Micco, J. "Flaky Tests at Google and How We Mitigate Them." *Google Testing Blog*, May
+  2016. https://testing.googleblog.com/2016/05/flaky-tests-at-google-and-how-we.html
+why: >-
+  A NEGATIVE case, and the deliberate mirror of g1-references-carry-no-locators. Each entry
+  resolves to one specific document: named author, exact title, venue, date, and a direct URL
+  to the item rather than to a publisher's landing page. This is what G1 satisfaction looks
+  like, and the set needs it — a gate evaluated only on missing locators learns to fire on
+  reference lists generally. Scoped to G1 only: whether a 2016 source remains current is a G5
+  question and this case does not adjudicate it.

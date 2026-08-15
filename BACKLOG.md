@@ -715,7 +715,9 @@ instruction points at a target that actually works from nothing.
 
 ### B-040 · Calibrate the editorial review gate so it can be promoted
 
-**Opened 2026-08-01.** Spec: `docs/specs/review-gate-calibration.md` — **awaiting LGTM.**
+**Opened 2026-08-01.** Spec: `docs/specs/review-gate-calibration.md` — **LGTM'd 2026-08-05**,
+with both open questions answered in the affirmative (agent drafts negatives + owner
+spot-checks a sample; `unverified` is a third outcome with its own `n`). Task breakdown below.
 
 ADR-0018 Decision 3 keeps `blog-post-review` advisory and says "promote to blocking once a
 false-positive rate is known." **Nothing has ever produced that number.** The gate has run
@@ -733,7 +735,10 @@ monitoring, not an eval set. The guide's instruction — *"20-50 simple tasks dr
 failures"* — is satisfiable today at **finding** granularity: ADR-0018 enumerates 10 labelled
 fidelity defects plus the 1 labelled near-false-positive.
 
-- [ ] ~25 cases, ≥40% negatives, each traceable to a real article or a real finding
+- [x] ~25 cases, ≥40% negatives, each traceable to a real article or a real finding
+      *(23 cases at 52% negatives, 2026-08-05 — pending the owner spot-check. Known gap:
+      **G3 has no positive case** and one must not be invented, so G3's false-negative rate
+      is unmeasurable in v1.)*
 - [ ] Report false-positive and false-negative rates **separately, with `n`** — never averaged
 - [ ] Keyless judge via the Agent SDK; case selection and arithmetic deterministic
 - [ ] Sufficient for the owner to answer ADR-0018 Decision 3
@@ -746,6 +751,52 @@ above 85 would mean the rubric is broken rather than the pipeline"). Different t
 
 **Scope:** M. **Files:** `scripts/calibrate_review_gate.py`, `docs/evals/review-gate/`,
 `tests/test_calibrate_review_gate.py`.
+
+#### Plan — 2026-08-05, post-LGTM
+
+**Phase 1 · the case set — unblocked now.** The set is 8 cases, **2 negatives (25%)**, against
+a criterion of ≥20 cases and ≥40% negatives. All 8 carry
+`source: testing-shortcuts-migration-deadline`; the README claims two sources but
+`review-queue-throughput-tax` has contributed **zero**.
+
+**Phase 1 DONE 2026-08-05 — PR #473, open, gated on the owner spot-check.** The set is
+**23 cases / 12 negatives (52%) / 4 source articles**; `make ci-local` green at 2,768 passed,
+9 skipped. Resume instructions and the four cases to spot-check are in `docs/HANDOFF.md`.
+
+- [x] **Task 1 — convert the ADR-0018 findings into cases (S).** The 10 labelled fidelity
+      defects plus the **near-false-positive** (the summarised Graphite fetch that would have
+      reported a false G2 failure on Graphite's own published figure). The spec calls that one
+      case worth more than all ten positives, because false positives are what block
+      promotion — and it is the case the set does not have. Correct the README's provenance
+      claim in the same change. **Files:** `docs/evals/review-gate/cases/*.yaml`, README.
+- [x] **Task 2 — mine ~15 negatives from the 26 published articles (M).** *(12 mined, from 3
+      articles; the criterion was the 40% ratio, which 12 clears at 52%.)* Source of truth is
+      the `oviney/blog` clone at `/Users/ouray.viney/code/economist-blog-v5/_posts` (26 posts,
+      current to 2026-08-02). Every case carries `source:` provenance. **Owner spot-checks a
+      sample** — per the answered open question, this is the control on the agent drafting
+      cases for a judge of its own model family, so it is not optional.
+
+**Checkpoint (owner):** ≥20 cases, ≥40% negatives, spot-check passed. Phase 2 opens here.
+
+**Phase 2 · the runner — TDD, judge stubbed in tests, no model calls in the suite.**
+
+- [ ] **Task 3 — case loader + schema validation + balance report (S).** A file missing
+      `expected` or `why` is rejected loudly, never skipped. Balance reported every run.
+- [ ] **Task 4 — agreement arithmetic (S).** False-positive, false-negative and `unverified`
+      as **three separate counts with three denominators**; `n` beside every rate; a rate from
+      <20 cases labelled provisional in the output itself. Degenerate cases (all-pass,
+      all-fail, empty) covered.
+- [ ] **Task 5 — keyless judge via the Agent SDK + `--gate` / `--report` (M).** Runs the gate
+      **as accepted 2026-07-31** — v1 does not touch `rubric.md` or `REVIEW_PROMPT.md`.
+- [ ] **Task 6 — report to `logs/review_gate_calibration.json`, append-only (S).** Decide
+      *against* wiring into `make ci-local`: the runner makes model calls, and `ci-local` must
+      stay keyless and offline.
+
+**Sequencing note, flagged rather than acted on.** The spec gates the build on "n≈5 real
+reviews"; the repo has 2. That gate is worth re-examining at the Phase 2 checkpoint, because
+the runner grades **cases**, not review runs — the 5 reviews inform how to *interpret* the
+result (threshold tuning vs anchor revision), not the harness design. Owner's call at the
+checkpoint; Phase 1 does not depend on it either way.
 
 **Shipped 2026-08-01 alongside the spec, because waiting corrupts the baseline:**
 

@@ -1,0 +1,17 @@
+id: g2-publishers-own-headline-figure
+gate: G2
+expected: pass
+source: review-queue-throughput-tax
+passage: >-
+  A median pull request requiring a review takes 14 hours to merge, according to Graphite
+  Research.
+why: >-
+  A NEGATIVE case, and the highest-value one in the set — this is the labelled
+  near-false-positive from the 2026-07-29 review that produced ADR-0018. During that review a
+  summarised fetch of the Graphite page returned an incomplete answer, and had it been
+  trusted the gate would have reported a G2 failure here. Only re-reading the raw page text
+  corrected it. The figure is correct and is Graphite's own published number: the cited
+  document is titled "The Median Developer's PRs Take 14 Hours to Merge". A gate that fails
+  this case is failing an article on its source's own headline finding, which is precisely
+  the false positive that would train the owner to override the gate and so destroy it.
+  ADR-0018 Decision 3 is blocked on the rate this case measures.

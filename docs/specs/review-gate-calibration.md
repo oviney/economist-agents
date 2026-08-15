@@ -1,6 +1,6 @@
 # Spec — Calibrating the editorial review gate (B-040)
 
-**Status:** DRAFT — awaiting owner LGTM · **Opened:** 2026-08-01
+**Status:** APPROVED — owner LGTM 2026-08-05 · **Opened:** 2026-08-01
 **Blocks:** ADR-0018 Decision 3 (advisory → blocking)
 **Reference:** [Demystifying evals for AI agents](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents) (Anthropic, engineering blog)
 
@@ -231,13 +231,24 @@ waiting on them corrupts the data the baseline is made of.
    `wall_seconds` per run since April and no run has exceeded **15.4 minutes**. The instrument
    existed and went unread while its folklore contradiction got repeated in two documents.
 
-## Open questions
+## Open questions — both ANSWERED at LGTM, 2026-08-05
 
 1. **Who writes the negative cases?** Mining ~15 correct passages from the 26 published
    articles is mechanical but needs judgement about what "correct" means. Proposed: the agent
    drafts them with provenance, the owner spot-checks a sample rather than all fifteen.
+
+   **ANSWERED — proposal accepted.** The agent drafts with `source:` provenance; the owner
+   spot-checks a sample. Note the residual risk this accepts: the agent both drafts the
+   negative cases *and* is the same model family as the judge under test, so a case the agent
+   finds obviously-correct may be one the judge also finds obviously-correct for the same
+   wrong reason. The spot-check is the control on that, which is why it cannot be skipped.
+
 2. **Does a G1 UNVERIFIED count as a false positive** when the source is real but unreachable
    at review time? The rubric says "unverified is not false, but this blog cannot ship an
    unverified number" — defensible as policy, but it will inflate the false-positive rate
    against a human who would fetch the source a second time. Proposed: count it as a distinct
    third outcome, `unverified`, and report it separately rather than folding it either way.
+
+   **ANSWERED — proposal accepted.** `unverified` is a third outcome, reported with its own
+   `n`, never folded into either error rate. The Boundaries rule "never average the two error
+   rates" extends to it: three counts, three denominators.

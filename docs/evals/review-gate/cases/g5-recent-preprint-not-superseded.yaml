@@ -1,0 +1,17 @@
+id: g5-recent-preprint-not-superseded
+gate: G5
+expected: pass
+source: green-light-red-ledger-flaky-tests-invisible-tax
+passage: >-
+  A 2025 empirical study of 22 Java projects, published on arXiv, found that 75% of flaky
+  tests cluster into co-failing groups rather than failing in isolation, which means failures
+  are correlated and not random. More usefully, nearly half of all flakiness (45%) traces to a
+  single root cause: asynchronous wait errors.
+why: >-
+  A NEGATIVE case, and the deliberate mirror of g5-dora-2024-reversed-by-the-2025-edition.
+  G5 asks one question: has the same publisher issued a later edition that revises, reverses
+  or narrows this finding. A 2025 arXiv preprint cited in a 2026 article has no such
+  successor — arXiv versions supersede within an identifier, and no revision of this one
+  changes the reported figures. G5 must not degrade into "this citation is a year old", which
+  is the corpus-freshness heuristic it was explicitly created to be distinct from. Without
+  this case the gate is measured only where it should fire.

@@ -1,0 +1,19 @@
+id: g5-dora-2024-reversed-by-the-2025-edition
+gate: G5
+expected: fail
+source: review-queue-throughput-tax
+passage: >-
+  Google's 2024 DORA State of DevOps report, analysed by RedMonk's Rachel Stephens, sharpens
+  the indictment further. A 25-percentage-point rise in AI tool adoption correlates with an
+  estimated 1.5 per cent decrease in software delivery throughput and a 7.2 per cent decrease
+  in stability.
+why: >-
+  The load-bearing statistic of the article's central argument, and it had been reversed by
+  DORA 2025 — published 2025-12-18, analysed by the same author at the same publication,
+  seven months before the article was written. The post does not acknowledge the revision.
+  ADR-0018 calls this the single most damaging defect of the run and it is the reason G5
+  exists: it passed all four other gates cleanly. G1 resolves, G2 is faithful to the 2024
+  source, G3 and G4 are clean. It also survives the corpus-level freshness heuristic in
+  research-sourcing, because the article cites two 2026 arXiv papers and a 2026 vendor report
+  alongside it — one superseded load-bearing citation hiding among fresh companions.
+  Freshness is per-corpus; supersession is per-claim.

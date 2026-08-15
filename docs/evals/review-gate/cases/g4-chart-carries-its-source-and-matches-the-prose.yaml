@@ -1,0 +1,20 @@
+id: g4-chart-carries-its-source-and-matches-the-prose
+gate: G4
+expected: pass
+source: the-ai-testing-paradox
+passage: >-
+  <figure class="article-chart">
+    <img src="/assets/charts/ai-testing-paradox.svg" alt="GitClear analysis shows code churn
+    in 2024 projected at roughly twice the 2021 pre-AI baseline">
+    <figcaption><strong>Source:</strong> GitClear, <em>Coding on Copilot</em>,
+    2024</figcaption>
+  </figure>
+why: >-
+  A NEGATIVE case, and the one the repo has the most expensive history with. The chart names
+  its publisher and edition in the caption, and the figure it plots is the same figure the
+  prose cites from the same source, stated with the same hedge ("projected at roughly twice").
+  It is the direct inverse of two failures already in this set — the chart plotting neither
+  cited figure (review-queue-throughput-tax) and the chart carrying four invented percentages
+  (B-042, the incident behind the amended Operating Constraint #4). Without this case the gate
+  is calibrated only against bad charts, and would learn that charts are suspicious rather
+  than that unsourced charts are.

@@ -740,8 +740,13 @@ fidelity defects plus the 1 labelled near-false-positive.
       **G3 has no positive case** and one must not be invented, so G3's false-negative rate
       is unmeasurable in v1.)*
 - [ ] Report false-positive and false-negative rates **separately, with `n`** — never averaged
-- [ ] Keyless judge via the Agent SDK; case selection and arithmetic deterministic
+      *(the harness does this and is tested for it; **no real run has produced the numbers**,
+      which is what remains open — see the spot-check gate below)*
+- [x] Keyless judge via the Agent SDK; case selection and arithmetic deterministic
+      *(2026-08-15 — arithmetic is pure Python, the judge is injected, and a fixed stub
+      reproduces identical reports)*
 - [ ] Sufficient for the owner to answer ADR-0018 Decision 3
+      *(blocked on the run, not on the code)*
 
 **Build after n≈5 real reviews**, which accrue free from the B-013 review stage the owner
 already performs — the only added cost is recording, per gate, whether he agreed. The harness
@@ -780,23 +785,40 @@ a criterion of ≥20 cases and ≥40% negatives. All 8 carry
 
 **Phase 2 · the runner — TDD, judge stubbed in tests, no model calls in the suite.**
 
-- [ ] **Task 3 — case loader + schema validation + balance report (S).** A file missing
+**Phase 2 BUILT 2026-08-15 — PR pending, `scripts/calibrate_review_gate.py` + 65 tests.**
+`make ci-local` green at 2,825 passed / 10 skipped; 93% coverage on the new module, the
+only uncovered lines being the SDK adapter, which cannot run without the model calls the
+spec bans from the suite. **The harness is built; the number is not measured** — running
+it for real is gated on the spot-check below, because rates computed from labels the owner
+has not confirmed would be a measurement of the case set, not of the gate.
+
+- [x] **Task 3 — case loader + schema validation + balance report (S).** A file missing
       `expected` or `why` is rejected loudly, never skipped. Balance reported every run.
-- [ ] **Task 4 — agreement arithmetic (S).** False-positive, false-negative and `unverified`
+      *(Loader shared with `render_calibration_review_sheet.py` rather than reimplemented —
+      it already enforces exactly this contract.)*
+- [x] **Task 4 — agreement arithmetic (S).** False-positive, false-negative and `unverified`
       as **three separate counts with three denominators**; `n` beside every rate; a rate from
       <20 cases labelled provisional in the output itself. Degenerate cases (all-pass,
-      all-fail, empty) covered.
-- [ ] **Task 5 — keyless judge via the Agent SDK + `--gate` / `--report` (M).** Runs the gate
+      all-fail, empty) covered. *(A rate over a zero denominator is `None`, not `0.0`.)*
+- [x] **Task 5 — keyless judge via the Agent SDK + `--gate` / `--report` (M).** Runs the gate
       **as accepted 2026-07-31** — v1 does not touch `rubric.md` or `REVIEW_PROMPT.md`.
-- [ ] **Task 6 — report to `logs/review_gate_calibration.json`, append-only (S).** Decide
+      *(Gate text is **read out of** `REVIEW_PROMPT.md` at run time rather than restated, so
+      a rubric edit cannot leave the harness measuring a stale copy.)*
+- [x] **Task 6 — report to `logs/review_gate_calibration.json`, append-only (S).** Decided
       *against* wiring into `make ci-local`: the runner makes model calls, and `ci-local` must
-      stay keyless and offline.
+      stay keyless and offline. *(Refuses to write over a history it cannot parse.)*
 
-**Sequencing note, flagged rather than acted on.** The spec gates the build on "n≈5 real
-reviews"; the repo has 2. That gate is worth re-examining at the Phase 2 checkpoint, because
-the runner grades **cases**, not review runs — the 5 reviews inform how to *interpret* the
-result (threshold tuning vs anchor revision), not the harness design. Owner's call at the
-checkpoint; Phase 1 does not depend on it either way.
+**Sequencing note — resolved 2026-08-15, in favour of building.** The spec gates the build on
+"n≈5 real reviews"; the repo has 2. Phase 2 was built anyway, on the reasoning already
+recorded here: the runner grades **cases**, not review runs, so the 5 reviews inform how to
+*interpret* a result (threshold tuning vs anchor revision), not how to construct the harness.
+What the reviews gate is reading the output, not writing the code. Owner may still overturn
+this at the checkpoint; nothing built here depends on the answer.
+
+**Known limitation, not a defect.** At 23 cases split 12/11, **both** error rates come out
+`provisional` — the harness says so in its own output, and a test asserts it. ADR-0018
+Decision 3 can therefore be answered as "promote / do not promote / fix the rubric first",
+but not with a confidence interval. Widening the set is v2.
 
 **Shipped 2026-08-01 alongside the spec, because waiting corrupts the baseline:**
 

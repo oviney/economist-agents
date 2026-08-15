@@ -7,11 +7,17 @@ the spec's testing strategy — `docs/specs/review-gate-calibration.md`.
 
 from __future__ import annotations
 
+import orjson
 import pytest
 
 from scripts.calibrate_review_gate import (
     CaseResult,
+    append_run,
     build_judge_prompt,
+    format_report,
+    judge_options,
+    load_last_run,
+    main,
     parse_gate_definitions,
     parse_verdict,
     run_cases,
@@ -447,3 +453,246 @@ class TestRunCases:
         )
 
         assert first == second
+
+
+class TestAppendRun:
+    """`logs/review_gate_calibration.json` is append-only: one row per run."""
+
+    def test_creates_the_file_and_its_parent_directory(self, tmp_path) -> None:
+        path = tmp_path / "logs" / "review_gate_calibration.json"
+
+        append_run(path, {"n_cases": 3}, recorded_at="2026-08-15T00:00:00Z")
+
+        assert orjson.loads(path.read_bytes()) == [
+            {"recorded_at": "2026-08-15T00:00:00Z", "report": {"n_cases": 3}}
+        ]
+
+    def test_a_second_run_is_appended_not_overwritten(self, tmp_path) -> None:
+        """Append-only is the point: a re-run must never erase the baseline it
+        is being compared against."""
+        path = tmp_path / "calibration.json"
+        append_run(path, {"n_cases": 3}, recorded_at="2026-08-15T00:00:00Z")
+
+        append_run(path, {"n_cases": 4}, recorded_at="2026-08-16T00:00:00Z")
+
+        rows = orjson.loads(path.read_bytes())
+        assert [r["report"]["n_cases"] for r in rows] == [3, 4]
+
+    def test_refuses_to_append_to_a_file_it_cannot_parse(self, tmp_path) -> None:
+        """Overwriting an unreadable history would silently destroy prior runs."""
+        path = tmp_path / "calibration.json"
+        path.write_text("not json at all", encoding="utf-8")
+
+        with pytest.raises(ValueError, match="could not be read"):
+            append_run(path, {"n_cases": 1}, recorded_at="2026-08-15T00:00:00Z")
+
+
+class TestLoadLastRun:
+    """`--report` re-reads the last run without making a model call."""
+
+    def test_returns_the_most_recent_report(self, tmp_path) -> None:
+        path = tmp_path / "calibration.json"
+        append_run(path, {"n_cases": 3}, recorded_at="2026-08-15T00:00:00Z")
+        append_run(path, {"n_cases": 4}, recorded_at="2026-08-16T00:00:00Z")
+
+        assert load_last_run(path)["n_cases"] == 4
+
+    def test_a_missing_history_is_an_error_not_an_empty_report(self, tmp_path) -> None:
+        with pytest.raises(ValueError, match="no calibration runs"):
+            load_last_run(tmp_path / "nothing.json")
+
+
+class TestFormatReport:
+    """The output must let the owner answer ADR-0018 Decision 3 by reading it."""
+
+    REPORT = {
+        "n_cases": 23,
+        "balance": {"negatives": 12, "positives": 11, "negative_pct": 52.2},
+        "false_positive": {"count": 1, "n": 12, "rate_pct": 8.3, "provisional": True},
+        "false_negative": {"count": 2, "n": 11, "rate_pct": 18.2, "provisional": True},
+        "unverified": {"count": 0, "n": 23, "rate_pct": 0.0, "provisional": False},
+        "per_gate": {
+            "G1": {"agreed": 2, "n": 2, "agreement_pct": 100.0, "provisional": True}
+        },
+    }
+
+    def test_states_both_rates_with_their_denominators(self) -> None:
+        text = format_report(self.REPORT)
+
+        assert "8.3%" in text
+        assert "n=12" in text
+        assert "18.2%" in text
+        assert "n=11" in text
+
+    def test_marks_provisional_rates_in_the_output_itself(self) -> None:
+        text = format_report(self.REPORT)
+
+        assert "provisional" in text.lower()
+
+    def test_reports_the_balance_of_the_set(self) -> None:
+        text = format_report(self.REPORT)
+
+        assert "12" in text and "52.2%" in text
+
+    def test_shows_per_gate_agreement(self) -> None:
+        text = format_report(self.REPORT)
+
+        assert "G1" in text
+
+    def test_never_presents_a_combined_accuracy(self) -> None:
+        text = format_report(self.REPORT).lower()
+
+        assert "accuracy" not in text
+        assert "f1" not in text
+
+
+class TestJudgeOptionsAreKeyless:
+    """Operating Constraint #3: the only LLM auth is the Claude subscription."""
+
+    def test_declares_no_mcp_servers_and_only_source_fetching_tools(self) -> None:
+        options = judge_options()
+
+        assert options.mcp_servers == {}
+        assert set(options.allowed_tools) == {"WebSearch", "WebFetch"}
+
+
+class TestAgainstTheRealCaseSet:
+    """The harness must fit the shipped case set and the shipped rubric.
+
+    These run keyless: the judge is a stub, so what is exercised is whether the
+    23 case files and REVIEW_PROMPT.md still agree about which gates exist.
+    """
+
+    def test_every_case_names_a_gate_the_review_prompt_defines(self) -> None:
+        """Catches the case set and the rubric drifting apart."""
+        from pathlib import Path
+
+        from scripts.render_calibration_review_sheet import load_cases
+
+        cases = load_cases(Path("docs/evals/review-gate/cases"))
+        gates = parse_gate_definitions(
+            Path("skills/blog-post-review/REVIEW_PROMPT.md").read_text(encoding="utf-8")
+        )
+
+        run_cases(cases, gates, judge=lambda _g, _p: "pass")  # raises on drift
+
+    def test_the_shipped_set_reports_its_known_balance(self) -> None:
+        """23 cases at 52.2% negatives — recomputed here, not restated."""
+        from pathlib import Path
+
+        from scripts.render_calibration_review_sheet import load_cases
+
+        cases = load_cases(Path("docs/evals/review-gate/cases"))
+        gates = parse_gate_definitions(
+            Path("skills/blog-post-review/REVIEW_PROMPT.md").read_text(encoding="utf-8")
+        )
+
+        report = summarise(run_cases(cases, gates, judge=lambda _g, _p: "pass"))
+
+        assert report["n_cases"] == 23
+        assert report["balance"]["negatives"] == 12
+        assert report["balance"]["negative_pct"] == 52.2
+
+    def test_a_judge_that_passes_everything_shows_a_total_false_negative_rate(
+        self,
+    ) -> None:
+        """The end-to-end shape of the result the owner will read: a gate that
+        never fires has a 0% false-positive rate and misses every defect."""
+        from pathlib import Path
+
+        from scripts.render_calibration_review_sheet import load_cases
+
+        cases = load_cases(Path("docs/evals/review-gate/cases"))
+        gates = parse_gate_definitions(
+            Path("skills/blog-post-review/REVIEW_PROMPT.md").read_text(encoding="utf-8")
+        )
+
+        report = summarise(run_cases(cases, gates, judge=lambda _g, _p: "pass"))
+
+        assert report["false_positive"]["rate_pct"] == 0.0
+        assert report["false_negative"]["rate_pct"] == 100.0
+
+
+class TestCliReportRoundTrip:
+    """`--report` prints the last run and makes no model call."""
+
+    def test_report_flag_reads_back_the_recorded_run(self, tmp_path, caplog) -> None:
+        import logging as _logging
+
+        path = tmp_path / "calibration.json"
+        report = summarise([_result("pass", "fail"), _result("fail", "fail")])
+        append_run(path, report, recorded_at="2026-08-15T00:00:00Z")
+
+        with caplog.at_level(_logging.INFO):
+            exit_code = main(["--report", "--out", str(path)])
+
+        assert exit_code == 0
+        assert "False positives" in caplog.text
+
+
+class TestCliFullRun:
+    """Success criterion 1: the command runs the set and writes a report.
+
+    The judge factory is monkeypatched, so this exercises the whole wiring —
+    load, select, parse gates, run, summarise, append — with no model call.
+    """
+
+    def test_writes_a_report_for_the_whole_set(self, tmp_path, monkeypatch) -> None:
+        import scripts.calibrate_review_gate as mod
+
+        monkeypatch.setattr(mod, "make_sdk_judge", lambda: lambda _g, _p: "pass")
+        out = tmp_path / "calibration.json"
+
+        exit_code = main(["--out", str(out)])
+
+        assert exit_code == 0
+        rows = orjson.loads(out.read_bytes())
+        assert len(rows) == 1
+        assert rows[0]["report"]["n_cases"] == 23
+
+    def test_gate_filter_narrows_the_run(self, tmp_path, monkeypatch) -> None:
+        import scripts.calibrate_review_gate as mod
+
+        monkeypatch.setattr(mod, "make_sdk_judge", lambda: lambda _g, _p: "fail")
+        out = tmp_path / "calibration.json"
+
+        main(["--out", str(out), "--gate", "G3"])
+
+        rows = orjson.loads(out.read_bytes())
+        assert rows[0]["report"]["n_cases"] == 2
+        assert list(rows[0]["report"]["per_gate"]) == ["G3"]
+
+    def test_a_second_run_appends_rather_than_replacing(
+        self, tmp_path, monkeypatch
+    ) -> None:
+        import scripts.calibrate_review_gate as mod
+
+        monkeypatch.setattr(mod, "make_sdk_judge", lambda: lambda _g, _p: "pass")
+        out = tmp_path / "calibration.json"
+
+        main(["--out", str(out)])
+        main(["--out", str(out)])
+
+        assert len(orjson.loads(out.read_bytes())) == 2
+
+
+class TestRefusalPaths:
+    """The three ways this harness declines to invent a number."""
+
+    def test_braces_that_are_not_valid_json_raise(self) -> None:
+        with pytest.raises(ValueError, match="not valid JSON"):
+            parse_verdict("{verdict: fail, unquoted: yes}")
+
+    def test_history_that_parses_but_is_not_a_list_is_refused(self, tmp_path) -> None:
+        path = tmp_path / "calibration.json"
+        path.write_bytes(orjson.dumps({"not": "a list of runs"}))
+
+        with pytest.raises(ValueError, match="could not be read as a list"):
+            append_run(path, {"n_cases": 1}, recorded_at="2026-08-15T00:00:00Z")
+
+    def test_an_empty_history_is_not_an_empty_report(self, tmp_path) -> None:
+        path = tmp_path / "calibration.json"
+        path.write_bytes(orjson.dumps([]))
+
+        with pytest.raises(ValueError, match="no calibration runs"):
+            load_last_run(path)

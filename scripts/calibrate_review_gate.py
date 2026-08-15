@@ -25,14 +25,23 @@ Constraint #3.
 
 from __future__ import annotations
 
+import argparse
+import asyncio
 import logging
 import re
 from collections import Counter
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
+from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
 import orjson
+
+# The sibling renderer already validates the case schema the way this harness
+# needs — a missing field is rejected loudly rather than skipped — so the loader
+# is shared rather than reimplemented.
+from scripts.render_calibration_review_sheet import load_cases
 
 logger = logging.getLogger(__name__)
 
@@ -300,3 +309,216 @@ def summarise(results: list[CaseResult]) -> dict[str, object]:
         "unverified": _rate_block(unverified, len(results)),
         "per_gate": _per_gate(results),
     }
+
+
+#: The instrument under test. Read, never written, per the spec's Boundaries.
+REVIEW_PROMPT_PATH = Path("skills/blog-post-review/REVIEW_PROMPT.md")
+
+#: Append-only history: one row per calibration run.
+DEFAULT_OUT = Path("logs/review_gate_calibration.json")
+
+DEFAULT_CASES = Path("docs/evals/review-gate/cases")
+
+
+def judge_options() -> Any:
+    """Build keyless Agent SDK options for the judge.
+
+    Returns:
+        Options granting only the two tools the judge needs to resolve a
+        source, and no MCP servers. Operating Constraint #3: the only LLM auth
+        is the Claude subscription, so there is no API key path here.
+
+    """
+    from claude_agent_sdk import ClaudeAgentOptions
+
+    return ClaudeAgentOptions(
+        max_turns=6,
+        permission_mode="bypassPermissions",
+        allowed_tools=["WebSearch", "WebFetch"],
+        mcp_servers={},
+        stderr=lambda line: logger.warning("judge stderr: %s", line),
+    )
+
+
+async def _ask_judge(prompt: str) -> str:
+    """Run one judge turn and return its raw text."""
+    from claude_agent_sdk import AssistantMessage, TextBlock, query
+
+    parts: list[str] = []
+    async for message in query(prompt=prompt, options=judge_options()):
+        if isinstance(message, AssistantMessage):
+            parts.extend(
+                block.text for block in message.content if isinstance(block, TextBlock)
+            )
+    return "".join(parts)
+
+
+def make_sdk_judge() -> Judge:
+    """Build the real, keyless judge.
+
+    Returns:
+        A :data:`Judge` that runs the gate on the Claude subscription. Kept
+        behind a factory so every test can inject a stub instead — the suite
+        must never make a model call.
+
+    """
+
+    def judge(gate_definition: str, passage: str) -> str:
+        raw = asyncio.run(_ask_judge(build_judge_prompt(gate_definition, passage)))
+        return parse_verdict(raw)
+
+    return judge
+
+
+def append_run(path: Path, report: dict[str, Any], *, recorded_at: str) -> None:
+    """Append one run to the calibration history.
+
+    Args:
+        path: History file.
+        report: As returned by :func:`summarise`.
+        recorded_at: ISO-8601 timestamp, passed in so runs are reproducible.
+
+    Raises:
+        ValueError: If an existing history cannot be parsed. Overwriting it
+            would destroy the baseline a re-run is meant to be compared with,
+            so the harness refuses rather than silently starting over.
+
+    """
+    rows: list[dict[str, Any]] = []
+    if path.exists():
+        try:
+            parsed = orjson.loads(path.read_bytes())
+        except orjson.JSONDecodeError as exc:
+            raise ValueError(
+                f"{path} could not be read as JSON; refusing to overwrite prior runs"
+            ) from exc
+        if not isinstance(parsed, list):
+            raise ValueError(
+                f"{path} could not be read as a list of runs; "
+                "refusing to overwrite prior runs"
+            )
+        rows = parsed
+
+    rows.append({"recorded_at": recorded_at, "report": report})
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(orjson.dumps(rows, option=orjson.OPT_INDENT_2))
+
+
+def load_last_run(path: Path) -> dict[str, Any]:
+    """Return the most recent report, for `--report`.
+
+    Raises:
+        ValueError: If no run has been recorded. An empty report would read as
+            a calibration result rather than the absence of one.
+
+    """
+    if not path.exists():
+        raise ValueError(f"no calibration runs recorded at {path}")
+    rows = orjson.loads(path.read_bytes())
+    if not rows:
+        raise ValueError(f"no calibration runs recorded at {path}")
+    return dict(rows[-1]["report"])
+
+
+def _rate_line(label: str, block: dict[str, Any], gloss: str) -> str:
+    """Format one rate with its denominator, provisional marker and meaning."""
+    rate = block["rate_pct"]
+    shown = "—" if rate is None else f"{rate}%"
+    flag = ", provisional" if block["provisional"] else ""
+    return (
+        f"  {label:<16} {block['count']}/{block['n']} = {shown:<7} "
+        f"(n={block['n']}{flag})   {gloss}"
+    )
+
+
+def format_report(report: dict[str, Any]) -> str:
+    """Render a report for a human deciding ADR-0018 Decision 3.
+
+    Args:
+        report: As returned by :func:`summarise`.
+
+    Returns:
+        Plain text. Deliberately carries no combined score: the promotion
+        decision turns on the false-positive rate alone, and a single headline
+        number would hide which direction the gate errs in.
+
+    """
+    balance = report["balance"]
+    lines = [
+        f"Review-gate calibration — {report['n_cases']} cases",
+        "",
+        f"  Set balance      {balance['negatives']} negatives / "
+        f"{balance['positives']} positives ({balance['negative_pct']}% negative)",
+        "",
+        _rate_line(
+            "False positives",
+            report["false_positive"],
+            "gate blocked a passage the owner passed",
+        ),
+        _rate_line(
+            "False negatives",
+            report["false_negative"],
+            "gate missed a defect the owner caught",
+        ),
+        _rate_line(
+            "Unverified",
+            report["unverified"],
+            "gate could not reach a source",
+        ),
+        "",
+        "  Per-gate agreement",
+    ]
+    for gate, block in report["per_gate"].items():
+        flag = ", provisional" if block["provisional"] else ""
+        lines.append(
+            f"    {gate}   {block['agreed']}/{block['n']} = "
+            f"{block['agreement_pct']}%  (n={block['n']}{flag})"
+        )
+    return "\n".join(lines)
+
+
+def _build_parser() -> argparse.ArgumentParser:
+    """Build the CLI. `--report` re-reads the last run and makes no model call."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--cases", type=Path, default=DEFAULT_CASES)
+    parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
+    parser.add_argument("--gate", default=None, help="Re-run one gate, e.g. G5.")
+    parser.add_argument(
+        "--report",
+        action="store_true",
+        help="Print the last recorded run and exit. Makes no model calls.",
+    )
+    return parser
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    """Run the calibration set, or re-print the last run.
+
+    Returns:
+        Process exit code.
+
+    """
+    args = _build_parser().parse_args(argv)
+
+    if args.report:
+        logger.info("%s", format_report(load_last_run(args.out)))
+        return 0
+
+    cases = select_cases(load_cases(args.cases), gate=args.gate)
+    gates = parse_gate_definitions(REVIEW_PROMPT_PATH.read_text(encoding="utf-8"))
+    logger.info("running %d cases against %d gates", len(cases), len(gates))
+
+    report = summarise(run_cases(cases, gates, judge=make_sdk_judge()))
+    append_run(
+        args.out,
+        report,
+        recorded_at=datetime.now(UTC).isoformat(),
+    )
+    logger.info("%s", format_report(report))
+    logger.info("appended run to %s", args.out)
+    return 0
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    raise SystemExit(main())

@@ -69,6 +69,11 @@ _GATE_BULLET = re.compile(
 
 _VERDICTS = frozenset({PASS, FAIL, UNVERIFIED})
 
+#: Last-resort read of the one field that matters, for replies whose `why`
+#: string is not valid JSON. Deliberately anchored to the key name so prose
+#: mentioning a verdict cannot be mistaken for one.
+_VERDICT_FIELD = re.compile(r'"verdict"\s*:\s*"([A-Za-z]+)"')
+
 
 def parse_gate_definitions(prompt_text: str) -> dict[str, str]:
     """Read the gate definitions out of the review prompt.
@@ -124,7 +129,9 @@ def build_judge_prompt(gate_definition: str, passage: str) -> str:
         '"why": "<one sentence>"}\n\n'
         'Use "pass" if the passage satisfies the gate, "fail" if it violates '
         'the gate, and "unverified" if you cannot reach a source needed to '
-        "decide."
+        "decide.\n\n"
+        "Keep `why` to one sentence and do not use double quotes inside it — "
+        "quote the passage with single quotes if you need to."
     )
 
 
@@ -175,10 +182,19 @@ def parse_verdict(raw: str) -> str:
 
     """
     payload = _first_parsable_object(raw)
-    if payload is None:
-        raise ValueError(f"no JSON object in judge output: {raw[:120]!r}")
-
-    verdict = str(payload.get("verdict", "")).strip().lower()
+    if payload is not None:
+        verdict = str(payload.get("verdict", "")).strip().lower()
+    else:
+        # The object did not parse. Observed cause, live on the first real run:
+        # the judge quoted the passage inside its own `why` string without
+        # escaping the quotes. Quoting the text under review is the normal
+        # thing for a judge to do, and `why` is not a field this function
+        # returns — so read the verdict directly rather than failing a run over
+        # a field nothing consumes.
+        match = _VERDICT_FIELD.search(raw)
+        if match is None:
+            raise ValueError(f"no JSON object in judge output: {raw[:120]!r}")
+        verdict = match.group(1).strip().lower()
     if verdict not in _VERDICTS:
         raise ValueError(f"unrecognised verdict: {verdict!r}")
     return verdict

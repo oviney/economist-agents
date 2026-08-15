@@ -733,3 +733,40 @@ class TestVerdictParsingIsRobustToProse:
         indexing backwards."""
         with pytest.raises(ValueError, match="no JSON object"):
             parse_verdict("{malformed} and then a stray {")
+
+
+class TestVerdictSurvivesAnUnescapedQuoteInWhy:
+    """Observed live on the first real judge call, 2026-08-15.
+
+    The judge quoted the passage inside its own `why` string without escaping
+    the quotes, producing invalid JSON. Quoting the text under review is the
+    normal thing for a judge to do, so strictness about a field this function
+    does not even return would have failed a large share of real runs.
+    """
+
+    #: Verbatim output from the first live G3 call.
+    LIVE_OUTPUT = (
+        '{"verdict": "pass", "why": "$5.67 / $0.02 = 283.5, which the passage '
+        'rounds down to "280-fold" — units are consistent (dollars per failure '
+        "on both sides) and the 1.2% rounding error understates rather than "
+        'inflates the claimed gap."}'
+    )
+
+    def test_the_verdict_is_still_read(self) -> None:
+        assert parse_verdict(self.LIVE_OUTPUT) == "pass"
+
+    def test_a_fail_verdict_survives_the_same_damage(self) -> None:
+        raw = '{"verdict": "fail", "why": "the "9-hour" baseline differs"}'
+
+        assert parse_verdict(raw) == "fail"
+
+    def test_an_unknown_verdict_still_raises_through_the_lenient_path(self) -> None:
+        """Leniency about `why` must not become leniency about the verdict."""
+        with pytest.raises(ValueError, match="perhaps"):
+            parse_verdict('{"verdict": "perhaps", "why": "a "quoted" thing"}')
+
+    def test_valid_json_carrying_no_verdict_raises_on_the_missing_field(self) -> None:
+        """Distinguished from unparseable output: this one read fine and simply
+        had no verdict in it, and the error says so."""
+        with pytest.raises(ValueError, match="unrecognised verdict"):
+            parse_verdict('{"reasoning": "I considered it", "score": 5}')

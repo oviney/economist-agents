@@ -103,3 +103,12 @@ docs/research/samples/*.html
 # docs/research/ are committed normally; only ones derived from a local-only artifact
 # are ignored, one line each.
 docs/research/sre-quality-governance.md
+
+# The Mermaid VS Code extension writes this unprompted (PR #474, rejected). Nothing in
+# the repo asked for Mermaid tooling, and the extension also appends to
+# .github/copilot-instructions.md — one of the six governed docs B-028 Task 2 corrected
+# after the unreviewed-publish RCA. Ignoring the file stops it being re-offered.
+#
+# Deliberately NOT the whole .github/instructions/ directory: scripts.instructions.md is
+# tracked there and is referenced by docs/RESEARCH_AGENT_EXTRACTION.md.
+.github/instructions/mermaid.instructions.md

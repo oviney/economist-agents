@@ -766,14 +766,16 @@ fidelity defects plus the 1 labelled near-false-positive.
       *(23 cases at 52% negatives, 2026-08-05 — pending the owner spot-check. Known gap:
       **G3 has no positive case** and one must not be invented, so G3's false-negative rate
       is unmeasurable in v1.)*
-- [ ] Report false-positive and false-negative rates **separately, with `n`** — never averaged
-      *(the harness does this and is tested for it; **no real run has produced the numbers**,
-      which is what remains open — see the spot-check gate below)*
+- [x] Report false-positive and false-negative rates **separately, with `n`** — never averaged
+      *(2026-08-15 — two live runs recorded in `logs/review_gate_calibration.json`)*
 - [x] Keyless judge via the Agent SDK; case selection and arithmetic deterministic
       *(2026-08-15 — arithmetic is pure Python, the judge is injected, and a fixed stub
       reproduces identical reports)*
 - [ ] Sufficient for the owner to answer ADR-0018 Decision 3
-      *(blocked on the run, not on the code)*
+      *(the evidence now exists and points one way — **do not promote**, on a 25–33%
+      false-positive rate and a reproduced near-false-positive. The decision itself stays
+      the owner's, and should be taken after the nine traced disagreements are checked,
+      because a mislabelled case would change the number.)*
 
 **Build after n≈5 real reviews**, which accrue free from the B-013 review stage the owner
 already performs — the only added cost is recording, per gate, whether he agreed. The harness
@@ -812,7 +814,49 @@ a criterion of ≥20 cases and ≥40% negatives. All 8 carry
 
 **Phase 2 · the runner — TDD, judge stubbed in tests, no model calls in the suite.**
 
-**Phase 2 BUILT 2026-08-15 — PR pending, `scripts/calibrate_review_gate.py` + 65 tests.**
+#### RESULT — two live runs, 2026-08-15. **Recommendation: do not promote.**
+
+The harness has been **run**, twice, over all 23 cases. `logs/review_gate_calibration.json`
+holds both. Same cases, same rubric, no code change between them:
+
+| | Run 1 | Run 2 |
+|---|---|---|
+| False positives | 4/12 = **33.3%** | 3/12 = **25.0%** |
+| False negatives | 2/11 = **18.2%** | 5/11 = **45.5%** |
+| Unverified | 0/23 | 1/23 |
+| Errors | 0/23 | 0/23 |
+
+**The variance is the headline, not the rates.** The false-negative rate moved 27 points
+between two identical runs. At n=11 and n=12 a single run cannot answer Decision 3, and
+neither can these two — what they establish is that **no single run should be trusted to**,
+which is a stronger conclusion than either number alone. Both rates print `provisional`
+and the harness says so itself.
+
+Three findings from run 2's traced disagreements, worth more than the aggregates:
+
+1. **G1 scored 0/2, wrong in both directions.** `g1-references-carry-full-locators`
+   (labelled `pass`) was failed, and `g1-references-carry-no-locators` (labelled `fail`)
+   was passed. An inversion on both cases is not noise. Either G1's wording or those two
+   cases are backwards, and **it is cheap to find out** — two passages.
+2. **The gate reproduced the exact false positive ADR-0018 predicted.**
+   `g2-publishers-own-headline-figure` was flagged. That is the near-false-positive the
+   spec called "worth more than the ten positives" — a figure that is correct and is the
+   publisher's own headline number. The failure mode that blocks promotion is not
+   hypothetical; it is measured.
+3. **G3, G4 agreed 100% in both runs** (n=2 and n=4). The instability is concentrated in
+   G1, G2 and G5 — the gates that require reaching a source.
+
+**Against promotion, on the evidence:** ADR-0018's own reasoning is that a blocking gate
+with false positives stops good articles and trains the owner to override it, which
+destroys the gate. A false-positive rate between 25% and 33% would block roughly one good
+passage in three.
+
+**Still owner-gated, and the run makes it cheaper rather than replacing it.** The
+spot-check now has a target: the nine named disagreements, not all 23 cases. Each is
+either a real gate defect or a mislabelled case, and the rates cannot be trusted until
+that is settled — a mislabelled case is worse than a missing one (README rule 3).
+
+**Phase 2 BUILT 2026-08-15 — PR pending, `scripts/calibrate_review_gate.py` + 86 tests.**
 `make ci-local` green at 2,825 passed / 10 skipped; 93% coverage on the new module, the
 only uncovered lines being the SDK adapter, which cannot run without the model calls the
 spec bans from the suite. **The harness is built; the number is not measured** — running

@@ -59,6 +59,11 @@ PASS = "pass"
 FAIL = "fail"
 UNVERIFIED = "unverified"
 
+#: A fourth outcome, and deliberately not a verdict. The judge failed and said
+#: nothing, so the case is counted and reported but excluded from every rate —
+#: a crash must never read as the gate having reached a conclusion.
+ERROR = "error"
+
 
 #: Matches one gate bullet in REVIEW_PROMPT.md, stopping at the next gate or the
 #: next heading so a definition cannot bleed into its neighbour.
@@ -253,12 +258,21 @@ def run_cases(
         definition = gate_definitions.get(gate)
         if definition is None:
             raise ValueError(f"case {case['id']!r} names unknown gate {gate}")
+        try:
+            judged = judge(definition, str(case["passage"]))
+        except Exception as exc:
+            # A judge failure is loud but not fatal: it is counted, reported and
+            # excluded from every rate. Re-raising would discard the model calls
+            # already spent on preceding cases, which is exactly what happened
+            # on the first real run — 14 of 23 completed, all lost.
+            logger.warning("case %s failed: %s", case["id"], exc)
+            judged = ERROR
         results.append(
             CaseResult(
                 case_id=str(case["id"]),
                 gate=gate,
                 expected=str(case["expected"]),
-                judged=judge(definition, str(case["passage"])),
+                judged=judged,
             )
         )
     return results
@@ -331,12 +345,19 @@ def summarise(results: list[CaseResult]) -> dict[str, object]:
         promotion decision in ADR-0018 turns on the false-positive rate alone.
 
     """
-    negatives = [r for r in results if r.expected == PASS]
-    positives = [r for r in results if r.expected == FAIL]
+    # Errored cases are excluded from every denominator. Counting a crash as a
+    # case the gate "got right" would understate the rates; counting it as one
+    # the gate got wrong would overstate them. It reached no verdict, so it
+    # belongs in neither — and the `errors` block below makes the exclusion
+    # visible rather than silent.
+    judged_results = [r for r in results if r.judged != ERROR]
+    negatives = [r for r in judged_results if r.expected == PASS]
+    positives = [r for r in judged_results if r.expected == FAIL]
 
     false_positives = sum(1 for r in negatives if r.judged == FAIL)
     false_negatives = sum(1 for r in positives if r.judged == PASS)
-    unverified = sum(1 for r in results if r.judged == UNVERIFIED)
+    unverified = sum(1 for r in judged_results if r.judged == UNVERIFIED)
+    errors = sum(1 for r in results if r.judged == ERROR)
 
     return {
         "n_cases": len(results),
@@ -349,8 +370,9 @@ def summarise(results: list[CaseResult]) -> dict[str, object]:
         },
         "false_positive": _rate_block(false_positives, len(negatives)),
         "false_negative": _rate_block(false_negatives, len(positives)),
-        "unverified": _rate_block(unverified, len(results)),
-        "per_gate": _per_gate(results),
+        "unverified": _rate_block(unverified, len(judged_results)),
+        "errors": _rate_block(errors, len(results)),
+        "per_gate": _per_gate(judged_results),
     }
 
 
@@ -375,7 +397,10 @@ def judge_options() -> Any:
     from claude_agent_sdk import ClaudeAgentOptions
 
     return ClaudeAgentOptions(
-        max_turns=6,
+        # G1 and G5 require reaching a source, which takes a search and one or
+        # more fetches before the judge can answer. Six turns was not enough:
+        # the first full run died on "Reached maximum number of turns (6)".
+        max_turns=20,
         permission_mode="bypassPermissions",
         allowed_tools=["WebSearch", "WebFetch"],
         mcp_servers={},
@@ -507,6 +532,11 @@ def format_report(report: dict[str, Any]) -> str:
             "Unverified",
             report["unverified"],
             "gate could not reach a source",
+        ),
+        _rate_line(
+            "Errors",
+            report["errors"],
+            "judge failed; excluded from the rates above",
         ),
         "",
         "  Per-gate agreement",

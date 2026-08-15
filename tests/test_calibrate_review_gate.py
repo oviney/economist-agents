@@ -511,6 +511,7 @@ class TestFormatReport:
         "false_positive": {"count": 1, "n": 12, "rate_pct": 8.3, "provisional": True},
         "false_negative": {"count": 2, "n": 11, "rate_pct": 18.2, "provisional": True},
         "unverified": {"count": 0, "n": 23, "rate_pct": 0.0, "provisional": False},
+        "errors": {"count": 0, "n": 23, "rate_pct": 0.0, "provisional": False},
         "per_gate": {
             "G1": {"agreed": 2, "n": 2, "agreement_pct": 100.0, "provisional": True}
         },
@@ -770,3 +771,98 @@ class TestVerdictSurvivesAnUnescapedQuoteInWhy:
         had no verdict in it, and the error says so."""
         with pytest.raises(ValueError, match="unrecognised verdict"):
             parse_verdict('{"reasoning": "I considered it", "score": 5}')
+
+
+class TestOneFailedCaseDoesNotDiscardTheRun:
+    """Learned by running it: 14 of 23 cases completed, then the 15th blew
+    through `max_turns` and the whole run was lost with nothing written.
+
+    A verdict the harness cannot read must stay loud — but "loud" means counted
+    and reported, not "throw away every model call already spent". Errors are a
+    fourth outcome with their own count; they are never folded into pass, fail
+    or unverified, and they are excluded from the rate denominators so a
+    crashed case cannot quietly dilute a rate.
+    """
+
+    CASES = [
+        {"id": "ok", "gate": "G2", "expected": "fail", "passage": "p1"},
+        {"id": "boom", "gate": "G2", "expected": "pass", "passage": "p2"},
+    ]
+    GATES = {"G2": "**G2 def**"}
+
+    @staticmethod
+    def _judge(_gate: str, passage: str) -> str:
+        if passage == "p2":
+            raise RuntimeError("Reached maximum number of turns (6)")
+        return "fail"
+
+    def test_the_surviving_case_is_still_recorded(self) -> None:
+        results = run_cases(self.CASES, self.GATES, judge=self._judge)
+
+        assert [r.case_id for r in results] == ["ok", "boom"]
+        assert results[0].judged == "fail"
+
+    def test_the_failed_case_is_marked_error_not_guessed(self) -> None:
+        results = run_cases(self.CASES, self.GATES, judge=self._judge)
+
+        assert results[1].judged == "error"
+
+    def test_errors_are_counted_and_reported(self) -> None:
+        report = summarise(run_cases(self.CASES, self.GATES, judge=self._judge))
+
+        assert report["errors"]["count"] == 1
+        assert report["errors"]["n"] == 2
+
+    def test_an_errored_negative_is_not_a_false_positive(self) -> None:
+        """The whole point: a crash must not read as the gate blocking a
+        passage. `boom` is the only negative, and it errored."""
+        report = summarise(run_cases(self.CASES, self.GATES, judge=self._judge))
+
+        assert report["false_positive"]["count"] == 0
+        assert report["false_positive"]["n"] == 0
+        assert report["false_positive"]["rate_pct"] is None
+
+    def test_an_errored_case_is_excluded_from_the_denominator(self) -> None:
+        """Counting it would understate the rate by inflating the denominator."""
+        cases = [
+            {"id": "a", "gate": "G2", "expected": "pass", "passage": "p1"},
+            {"id": "b", "gate": "G2", "expected": "pass", "passage": "p2"},
+        ]
+
+        def judge(_g: str, passage: str) -> str:
+            if passage == "p2":
+                raise RuntimeError("boom")
+            return "fail"
+
+        report = summarise(run_cases(cases, self.GATES, judge=judge))
+
+        # One negative judged, and it was flagged: 100%, not 50% of two.
+        assert report["false_positive"]["n"] == 1
+        assert report["false_positive"]["rate_pct"] == 100.0
+
+    def test_a_configuration_error_still_raises_rather_than_being_swallowed(
+        self,
+    ) -> None:
+        """A case naming a gate the rubric lacks is drift, not a flaky judge —
+        it is deterministic, costs nothing to detect, and must stay fatal."""
+        cases = [{"id": "x", "gate": "G7", "expected": "pass", "passage": "p"}]
+
+        with pytest.raises(ValueError, match="G7"):
+            run_cases(cases, self.GATES, judge=lambda _g, _p: "pass")
+
+
+class TestFormatReportShowsExclusions:
+    """A dropped case must be visible, or the shrunken denominators lie."""
+
+    def test_the_error_count_appears_with_its_exclusion_stated(self) -> None:
+        report = summarise(
+            [
+                _result("pass", "fail"),
+                CaseResult(case_id="boom", gate="G2", expected="pass", judged="error"),
+            ]
+        )
+
+        text = format_report(report)
+
+        assert "Errors" in text
+        assert "excluded" in text

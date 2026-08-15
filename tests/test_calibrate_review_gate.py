@@ -866,3 +866,65 @@ class TestFormatReportShowsExclusions:
 
         assert "Errors" in text
         assert "excluded" in text
+
+
+class TestDisagreementsAreTraceable:
+    """A rate the owner cannot trace back to passages is not actionable.
+
+    The first real run reported 4 false positives out of 12 negatives without
+    naming them, which is exactly the number that decides promotion — and the
+    four cases worth spot-checking first.
+    """
+
+    RESULTS = [
+        CaseResult(case_id="neg-flagged", gate="G2", expected="pass", judged="fail"),
+        CaseResult(case_id="pos-missed", gate="G1", expected="fail", judged="pass"),
+        CaseResult(case_id="agreed", gate="G4", expected="fail", judged="fail"),
+    ]
+
+    def test_only_disagreements_are_listed(self) -> None:
+        report = summarise(self.RESULTS)
+
+        assert [d["case_id"] for d in report["disagreements"]] == [
+            "neg-flagged",
+            "pos-missed",
+        ]
+
+    def test_each_disagreement_names_its_kind_and_both_verdicts(self) -> None:
+        report = summarise(self.RESULTS)
+        first = report["disagreements"][0]
+
+        assert first["kind"] == "false_positive"
+        assert first["expected"] == "pass"
+        assert first["judged"] == "fail"
+        assert first["gate"] == "G2"
+
+    def test_a_missed_defect_is_labelled_a_false_negative(self) -> None:
+        report = summarise(self.RESULTS)
+
+        assert report["disagreements"][1]["kind"] == "false_negative"
+
+    def test_errors_and_unverified_are_listed_as_their_own_kinds(self) -> None:
+        """They are not agreement failures, but the owner still needs to see
+        which cases produced no usable verdict."""
+        results = [
+            CaseResult(case_id="e", gate="G2", expected="pass", judged="error"),
+            CaseResult(case_id="u", gate="G2", expected="fail", judged="unverified"),
+        ]
+
+        kinds = {d["case_id"]: d["kind"] for d in summarise(results)["disagreements"]}
+
+        assert kinds == {"e": "error", "u": "unverified"}
+
+    def test_a_run_with_full_agreement_lists_nothing(self) -> None:
+        report = summarise([_result("pass", "pass"), _result("fail", "fail")])
+
+        assert report["disagreements"] == []
+
+    def test_ordering_is_stable_so_runs_diff_cleanly(self) -> None:
+        report = summarise(list(reversed(self.RESULTS)))
+
+        assert [d["case_id"] for d in report["disagreements"]] == [
+            "neg-flagged",
+            "pos-missed",
+        ]

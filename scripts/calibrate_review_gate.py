@@ -333,6 +333,48 @@ def _per_gate(results: list[CaseResult]) -> dict[str, dict[str, object]]:
     }
 
 
+def _kind(result: CaseResult) -> str | None:
+    """Classify a result, or return ``None`` when judge and label agreed."""
+    if result.judged == ERROR:
+        return ERROR
+    if result.judged == UNVERIFIED:
+        return UNVERIFIED
+    if result.expected == PASS and result.judged == FAIL:
+        return "false_positive"
+    if result.expected == FAIL and result.judged == PASS:
+        return "false_negative"
+    return None
+
+
+def _disagreements(results: list[CaseResult]) -> list[dict[str, str]]:
+    """List every case that did not agree, so a rate can be traced to passages.
+
+    A false-positive rate the owner cannot follow back to specific passages
+    cannot be checked, and checking it is the whole point — these are also the
+    cases worth spot-checking first, because a disagreement is either a real
+    gate defect or a mislabelled case.
+
+    Args:
+        results: One entry per case run.
+
+    Returns:
+        One row per disagreement, ordered by case id so runs diff cleanly.
+
+    """
+    rows = [
+        {
+            "case_id": r.case_id,
+            "gate": r.gate,
+            "expected": r.expected,
+            "judged": r.judged,
+            "kind": kind,
+        }
+        for r in results
+        if (kind := _kind(r)) is not None
+    ]
+    return sorted(rows, key=lambda row: row["case_id"])
+
+
 def summarise(results: list[CaseResult]) -> dict[str, object]:
     """Compute the calibration report from judged cases.
 
@@ -373,6 +415,7 @@ def summarise(results: list[CaseResult]) -> dict[str, object]:
         "unverified": _rate_block(unverified, len(judged_results)),
         "errors": _rate_block(errors, len(results)),
         "per_gate": _per_gate(judged_results),
+        "disagreements": _disagreements(results),
     }
 
 
@@ -546,6 +589,26 @@ def format_report(report: dict[str, Any]) -> str:
         lines.append(
             f"    {gate}   {block['agreed']}/{block['n']} = "
             f"{block['agreement_pct']}%  (n={block['n']}{flag})"
+        )
+
+    # `.get` rather than `[]`: the append-only history already holds runs
+    # recorded before this field existed, and `--report` must still render them.
+    disagreements = report.get("disagreements") or []
+    if disagreements:
+        lines.extend(
+            [
+                "",
+                "  Disagreements — spot-check these first. Each is either a real "
+                "gate defect",
+                "  or a mislabelled case, and the rates above cannot be trusted "
+                "until you know which.",
+                "",
+            ]
+        )
+        lines.extend(
+            f"    {row['kind']:<15} {row['gate']}  {row['case_id']}  "
+            f"(labelled {row['expected']}, judged {row['judged']})"
+            for row in disagreements
         )
     return "\n".join(lines)
 

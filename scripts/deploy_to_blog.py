@@ -655,6 +655,11 @@ def deploy_review(
     review_dir.mkdir(parents=True, exist_ok=True)
     assets_dir.mkdir(parents=True, exist_ok=True)
 
+    # Remove superseded review drafts for the same slug so stale drafts do not accumulate
+    for stale in review_dir.glob(f"{slug}-*.md"):
+        stale.unlink()
+        logger.info("Removed superseded review draft: _review/%s", stale.name)
+
     content = _to_review_content(article_path.read_text())
     (review_dir / review_name).write_text(content)
     logger.info("Wrote unlisted draft: _review/%s", review_name)

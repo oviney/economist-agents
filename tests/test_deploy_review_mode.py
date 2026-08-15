@@ -157,7 +157,6 @@ class TestDeployReview:
         def fake_run_command(cmd: str, cwd=None) -> str:
             if cmd.startswith("git clone"):
                 self._prepare_clone()
-            return ""
 
         with (
             patch.object(dtb, "run_command", side_effect=fake_run_command),
@@ -169,6 +168,35 @@ class TestDeployReview:
                 blog_repo="test-blog",
                 token="t",
             )
+
+    def test_superseded_review_drafts_are_removed(self, article_file: Path) -> None:
+        # Redeploying review must purge old drafts for the same slug so
+        # promote_review does not fail on multiple matching drafts.
+        captured_drafts: list[str] = []
+
+        def fake_run_command(cmd: str, cwd=None) -> str:
+            if cmd.startswith("git clone"):
+                self._prepare_clone()
+                # Pre-populate a stale draft for this slug
+                (Path("temp_blog_repo/_review") / "my-draft-11112222.md").write_text(
+                    "old"
+                )
+            if cmd.startswith("git add"):
+                drafts = list(Path("temp_blog_repo/_review").glob("my-draft-*.md"))
+                captured_drafts.extend([d.name for d in drafts])
+            return ""
+
+        with patch.object(dtb, "run_command", side_effect=fake_run_command):
+            dtb.deploy_review(
+                article_path=article_file,
+                blog_owner="test-owner",
+                blog_repo="test-blog",
+                token="t",
+            )
+
+        # Only one draft remains for my-draft in _review/
+        assert len(captured_drafts) == 1
+        assert captured_drafts[0] != "my-draft-11112222.md"
 
 
 # ── CLI dispatch: --mode review calls deploy_review ──────────────────

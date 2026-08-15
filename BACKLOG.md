@@ -26,6 +26,33 @@ _(none)_
 
 ## Todo
 
+### B-046 · `refine_image_metadata` outlived the path that called it
+
+**Found 2026-08-15 during the B-040 Phase 2 self-review, not by looking for it.**
+
+`src/agent_sdk/_shared.py:1006` still defines `refine_image_metadata`, the vision pass that
+rewrote a hero's alt text and caption. It has **no production caller** — `grep` across
+`src/` and `scripts/` finds only the definition. Its callers went with `image_mode="hero"`
+(B-022) and with the pipeline's graphics path (B-042, Constraint #4 as amended: the
+pipeline draws nothing). The 14 remaining references are in `tests/` — which call it
+directly — plus three specs describing the flow that was removed.
+
+So the tests currently prove that a function nothing calls still works, and the specs
+describe it as live. Both are misleading to the next reader.
+
+Two smaller things travel with it, neither urgent:
+
+- It carries the same greedy `\{.*\}` JSON extraction that B-040 had to fix
+  (`_shared.py:1089`). Here it is caught by a broad `except Exception` that falls back to
+  the writer's drafts with a warning, so the failure mode is a silent quality
+  degradation rather than a crash — which is why nobody would notice it.
+- The broad `except Exception` itself is what makes the degradation silent.
+
+**Not deleted unilaterally.** Dead code hygiene says list it and ask, and this sits close
+enough to Constraint #4 that removing it should be a deliberate call, not a side effect of
+someone else's PR. **Scope:** S. **Decision needed:** delete the function and its tests, or
+keep it and correct the three specs that describe it as reachable.
+
 ### B-044 · Finish the B-042 acceptance — **DONE 2026-08-02**
 
 **The article is published:** <https://www.viney.ca/2026/08/02/migration-deadline-testing-trap/>

@@ -680,7 +680,8 @@ class TestRefusalPaths:
     """The three ways this harness declines to invent a number."""
 
     def test_braces_that_are_not_valid_json_raise(self) -> None:
-        with pytest.raises(ValueError, match="not valid JSON"):
+        """Braces alone are not a verdict — unquoted keys still refuse."""
+        with pytest.raises(ValueError, match="no JSON object"):
             parse_verdict("{verdict: fail, unquoted: yes}")
 
     def test_history_that_parses_but_is_not_a_list_is_refused(self, tmp_path) -> None:
@@ -696,3 +697,39 @@ class TestRefusalPaths:
 
         with pytest.raises(ValueError, match="no calibration runs"):
             load_last_run(path)
+
+
+class TestVerdictParsingIsRobustToProse:
+    """A judge that reasons in prose before answering must not abort the run.
+
+    `run_cases` has no per-case tolerance by design — a verdict it cannot read
+    is loud rather than laundered — so a parser that trips over ordinary prose
+    would discard every model call already spent on the preceding cases.
+    """
+
+    def test_braces_in_prose_before_the_json_do_not_break_parsing(self) -> None:
+        raw = 'Looking at {the passage} I conclude:\n{"verdict": "pass"}'
+
+        assert parse_verdict(raw) == "pass"
+
+    def test_a_worked_example_before_the_answer_does_not_break_parsing(self) -> None:
+        raw = (
+            "Recomputing: the set {9, 14} gives a 55% delta.\n"
+            'Final answer:\n```json\n{"verdict": "fail", "why": "baseline differs"}\n```'
+        )
+
+        assert parse_verdict(raw) == "fail"
+
+    def test_still_raises_when_there_is_no_verdict_at_all(self) -> None:
+        """Robustness must not become permissiveness."""
+        with pytest.raises(ValueError):
+            parse_verdict("I considered {a}, {b} and {c} but reached no conclusion.")
+
+    def test_a_trailing_unmatched_brace_does_not_loop_past_the_last_object(
+        self,
+    ) -> None:
+        """Guards the scan's upper bound: an opening brace after the final
+        closing one has no span to parse, so the search stops rather than
+        indexing backwards."""
+        with pytest.raises(ValueError, match="no JSON object"):
+            parse_verdict("{malformed} and then a stray {")

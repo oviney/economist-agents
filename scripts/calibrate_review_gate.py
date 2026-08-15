@@ -128,6 +128,37 @@ def build_judge_prompt(gate_definition: str, passage: str) -> str:
     )
 
 
+def _first_parsable_object(raw: str) -> dict[str, Any] | None:
+    """Return the first JSON object in ``raw``, tolerating surrounding prose.
+
+    Judges reason before they answer, and that reasoning can contain braces —
+    a set, an interval, a quoted snippet. Matching greedily from the first
+    brace to the last then fails on text that plainly contains a verdict. So
+    each opening brace is tried in turn, widest span first.
+
+    Args:
+        raw: The judge's reply.
+
+    Returns:
+        The first span that parses as a JSON object, or ``None`` if none does.
+
+    """
+    end = raw.rfind("}")
+    if end == -1:
+        return None
+
+    for match in re.finditer(r"\{", raw):
+        if match.start() > end:
+            break
+        try:
+            candidate = orjson.loads(raw[match.start() : end + 1])
+        except orjson.JSONDecodeError:
+            continue
+        if isinstance(candidate, dict):
+            return candidate
+    return None
+
+
 def parse_verdict(raw: str) -> str:
     """Extract the verdict from the judge's reply.
 
@@ -143,13 +174,9 @@ def parse_verdict(raw: str) -> str:
             failure as though it were a property of the gate under test.
 
     """
-    match = re.search(r"\{.*\}", raw, re.DOTALL)
-    if not match:
+    payload = _first_parsable_object(raw)
+    if payload is None:
         raise ValueError(f"no JSON object in judge output: {raw[:120]!r}")
-    try:
-        payload = orjson.loads(match.group(0))
-    except orjson.JSONDecodeError as exc:
-        raise ValueError(f"judge output is not valid JSON: {exc}") from exc
 
     verdict = str(payload.get("verdict", "")).strip().lower()
     if verdict not in _VERDICTS:

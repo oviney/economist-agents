@@ -24,7 +24,7 @@ Usage:
 import base64
 import os
 from pathlib import Path
-from typing import Literal
+from typing import Literal, cast
 
 # ═══════════════════════════════════════════════════════════════════════════
 # TYPE ALIASES
@@ -304,7 +304,7 @@ def test_generate_sample_images() -> None:
             topic=test["topic"],
             article_summary=test["summary"],
             contrarian_angle=test["contrarian"],
-            mood=test["mood"],
+            mood=cast(ImageMood, test["mood"]),
             output_path=output_path,
         )
 

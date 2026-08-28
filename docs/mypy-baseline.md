@@ -51,30 +51,15 @@ the file is grandfathered at.
 
 ## Baseline
 
-Measured 2026-07-31 with:
+Measured 2026-08-27 with:
 
 ```bash
 .venv/bin/python -m mypy --config-file=mypy.ini --follow-imports=silent \
   --no-error-summary scripts/*.py
 ```
 
-- `scripts/economist_agent.py` — 8
-- `scripts/editorial_board.py` — 6
-- `scripts/publication_validator.py` — 5
-- `scripts/arxiv_search.py` — 2
-- `scripts/destructive_change_guard.py` — 2
-- `scripts/github_issue_claim.py` — 2
-- `scripts/agent_loader.py` — 1
-- `scripts/blog_quality_audit.py` — 1
-- `scripts/featured_image_agent.py` — 1
-- `scripts/gsc_etl.py` — 1
-- `scripts/semantic_scholar_search.py` — 1
-
-**11 files, 30 errors.** The audit measured 12 files; `sync_copilot_context.py` was the
-twelfth and was fixed rather than grandfathered while landing B-035 Task 3(b) — four
-annotations were cheaper than an entry here.
+*(No grandfathered errors — all 48 scripts/ files are mypy-clean).*
 
 ## Read this as the owner's review queue
 
-Every line is debt with a name on it. The list is short enough to pay down deliberately,
-which is the whole point of recording it instead of muting it.
+Every line is debt with a name on it. The list is currently empty because all grandfathered errors have been resolved.

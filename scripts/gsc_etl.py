@@ -19,7 +19,7 @@ from typing import Any
 import orjson
 from dotenv import load_dotenv
 from google.oauth2.service_account import Credentials
-from googleapiclient.discovery import build
+from googleapiclient.discovery import build  # type: ignore[import-untyped]
 
 load_dotenv()
 

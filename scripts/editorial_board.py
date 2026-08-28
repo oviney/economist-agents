@@ -44,6 +44,7 @@ import os
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
+from typing import Any
 
 # ═══════════════════════════════════════════════════════════════════════════
 # BOARD MEMBER PERSONAS
@@ -297,7 +298,7 @@ def get_performance_analyst_vote(
         )
         underperformers = []
 
-    votes = []
+    votes: list[dict[str, Any]] = []
     for i, topic in enumerate(topics):
         score, rationale = _score_topic_against_underperformers(
             topic,
@@ -314,7 +315,7 @@ def get_performance_analyst_vote(
     # "top pick" for this persona is the proposal with the highest score —
     # i.e. the one least like a known underperformer.
     if votes:
-        best = max(votes, key=lambda v: v["score"])
+        best = max(votes, key=lambda v: float(v["score"]))
         top_pick = best["topic_index"]
         top_pick_reason = "Least resemblance to recent underperforming articles."
     else:
@@ -497,8 +498,8 @@ def run_editorial_board(
             print(f"   ✗ {PERFORMANCE_ANALYST_ID} failed: {e}")
 
     # Calculate weighted scores
-    topic_scores = {
-        i: {"weighted_sum": 0, "total_weight": 0, "votes": []}
+    topic_scores: dict[int, dict[str, Any]] = {
+        i: {"weighted_sum": 0.0, "total_weight": 0.0, "votes": []}
         for i in range(len(topics))
     }
 

@@ -79,7 +79,7 @@ def _load_schema() -> dict[str, Any] | None:
     try:
         import json
 
-        import jsonschema  # noqa: F401 — just checking availability
+        import jsonschema  # type: ignore[import-untyped]  # noqa: F401 — just checking availability
 
         if not SCHEMA_PATH.exists():
             logger.warning(

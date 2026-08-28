@@ -30,7 +30,7 @@ except ModuleNotFoundError:  # pragma: no cover - fallback for minimal test envs
 
         JSONDecodeError = json.JSONDecodeError
 
-    orjson = _OrjsonCompat()
+    orjson = _OrjsonCompat()  # type: ignore[assignment]
 
 DEFAULT_REPO = "oviney/economist-agents"
 DEFAULT_TTL_HOURS = 24
@@ -135,7 +135,8 @@ class GitHubIssueClaimer:
 
     def fetch_issue(self, issue_number: int) -> dict[str, Any]:
         """Fetch issue metadata."""
-        return self.gh_api(f"repos/{self.repo}/issues/{issue_number}")
+        response = self.gh_api(f"repos/{self.repo}/issues/{issue_number}")
+        return response if isinstance(response, dict) else {}
 
     def fetch_issue_comments(self, issue_number: int) -> list[dict[str, Any]]:
         """Fetch all comments for an issue."""

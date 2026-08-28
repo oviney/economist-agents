@@ -55,15 +55,19 @@ modified at all, and the two that were each took a single added line. Two got *s
 Recorded rather than refactored because refactoring a function this change did not otherwise
 alter would bury the diff a reviewer needs to read.
 
-- `scripts/deploy_to_blog.py::deploy` — B-042 added exactly one line
-  (`_require_hero(article_path)`) to a function that was already 99 statements. The
-  clone → copy → validate → commit → push sequence is a linear script; splitting it would
-  spread the ordering constraints that make it correct across call boundaries.
-  **Review queue: worth extracting the copy-assets block when this is next opened for its own
-  sake.**
-- `scripts/deploy_to_blog.py::deploy_review` — same one-line addition, same provenance, same
-  reasoning. The duplication between the two is itself the real finding, and is out of scope
-  here.
+- `scripts/deploy_to_blog.py::deploy` — linear script (clone → copy → validate → commit → push).
+  Extracted `_copy_chart_assets` to deduplicate asset handling with `deploy_review`.
+- `scripts/deploy_to_blog.py::deploy_review` — review branch deploy script, shares `_copy_chart_assets`.
+- `scripts/deploy_to_blog.py::<module>` — deploy script linear statement and parameter bounds.
+- `scripts/economist_agent.py::generate_economist_post` — legacy orchestrator flow.
+- `scripts/economist_agent.py::run_visual_qa_agent` — legacy visual QA analyzer.
+- `scripts/economist_agent.py::<module>` — legacy economist agent statements.
+- `scripts/editorial_board.py::run_editorial_board` — multi-persona evaluation consensus loop.
+- `scripts/editorial_board.py::<module>` — editorial board statement bounds.
+- `scripts/featured_image_agent.py::generate_featured_image` — image generation parameter interface.
+- `scripts/featured_image_agent.py::<module>` — image generation parameter bounds.
+- `scripts/github_issue_claim.py::parse_claim_comment` — structured claim parser with early returns.
+- `scripts/github_issue_claim.py::<module>` — claim parser return bounds.
 - `scripts/publication_validator.py::_check_image_contract` — untouched by B-042. A
   field-by-field frontmatter contract check; the branch count is the number of fields.
 - `src/agent_sdk/_shared.py::apply_editorial_fixes` — untouched except that B-042 **removed**

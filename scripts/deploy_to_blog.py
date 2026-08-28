@@ -358,19 +358,7 @@ def deploy(
     # Copy each referenced chart PNG. An embedded chart without a source
     # asset would ship a broken <img>, so fail before validation instead
     # of silently skipping the copy.
-    chart_refs = sorted(set(re.findall(r"/assets/charts/([^)\s]+\.png)", content)))
-    chart_files = [charts_dir / Path(ref).name for ref in chart_refs]
-    if not chart_files:
-        fallback_chart = charts_dir / f"{slug}.png"
-        if fallback_chart.exists():
-            chart_files.append(fallback_chart)
-
-    for chart_file in chart_files:
-        if not chart_file.exists():
-            raise DeployError(f"Chart asset not found: {chart_file}")
-        target_chart = assets_dir / chart_file.name
-        logger.info("Copying chart: %s → %s", chart_file, target_chart)
-        shutil.copy2(chart_file, target_chart)
+    chart_files = _copy_chart_assets(content, slug, charts_dir, assets_dir)
 
     # Hero referenced by the frontmatter (B-016) — an SVG hero lives at a
     # ``<slug>-hero.svg`` name the slug-guess below never matches.
@@ -541,6 +529,32 @@ def _hero_asset_ref(content: str) -> str | None:
     return Path(match.group(1)).name or None
 
 
+def _copy_chart_assets(
+    content: str, slug: str, charts_dir: Path, target_assets_dir: Path
+) -> list[Path]:
+    """Copy referenced chart PNGs into the blog clone assets directory.
+
+    An embedded chart without a source asset would ship a broken <img>, so fail
+    before validation instead of silently skipping the copy.
+    """
+    chart_refs = sorted(set(re.findall(r"/assets/charts/([^)\s]+\.png)", content)))
+    chart_files = [charts_dir / Path(ref).name for ref in chart_refs]
+    if not chart_files:
+        fallback_chart = charts_dir / f"{slug}.png"
+        if fallback_chart.exists():
+            chart_files.append(fallback_chart)
+
+    target_assets_dir.mkdir(parents=True, exist_ok=True)
+    for chart_file in chart_files:
+        if not chart_file.exists():
+            raise DeployError(f"Chart asset not found: {chart_file}")
+        target_chart = target_assets_dir / chart_file.name
+        logger.info("Copying chart: %s → %s", chart_file, target_chart)
+        shutil.copy2(chart_file, target_chart)
+
+    return chart_files
+
+
 def _copy_hero_asset(content: str, images_dir: Path) -> None:
     """Copy the frontmatter-referenced hero into the blog clone (B-016).
 
@@ -666,16 +680,7 @@ def deploy_review(
 
     # Copy referenced chart PNGs (fallback to <slug>.png) so the rendered draft
     # isn't a broken <img>.
-    chart_refs = sorted(set(re.findall(r"/assets/charts/([^)\s]+\.png)", content)))
-    chart_files = [charts_dir / Path(ref).name for ref in chart_refs]
-    if not chart_files:
-        fallback_chart = charts_dir / f"{slug}.png"
-        if fallback_chart.exists():
-            chart_files.append(fallback_chart)
-    for chart_file in chart_files:
-        if not chart_file.exists():
-            raise DeployError(f"Chart asset not found: {chart_file}")
-        shutil.copy2(chart_file, assets_dir / chart_file.name)
+    _copy_chart_assets(content, slug, charts_dir, assets_dir)
 
     # Ship the hero too (B-016) — a review draft is meant to be reviewed as the
     # finished post, so it must render the illustration, not a broken <img>.

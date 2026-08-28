@@ -1,0 +1,8 @@
+id: g4-conventional-wisdom-repackaged
+gate: G4
+expected: fail
+source: editorial-board-evals
+passage: >-
+  Developers should write unit tests because testing early prevents bugs from reaching production, saving time and money.
+why: >-
+  Lacks contrarian insight or analytical rigour; merely restates elementary conventional wisdom without data, mechanism, or trade-offs.

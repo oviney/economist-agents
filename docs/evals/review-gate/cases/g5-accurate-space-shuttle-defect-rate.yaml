@@ -1,0 +1,8 @@
+id: g5-accurate-space-shuttle-defect-rate
+gate: G5
+expected: pass
+source: published-defect-economics
+passage: >-
+  NASA's Primary Avionics Software System achieved fewer than 0.1 defects per thousand lines of code through formal inspections and independent verification teams.
+why: >-
+  Historical factually verified NASA space shuttle software defect density rate.

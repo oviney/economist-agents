@@ -1,0 +1,8 @@
+id: g1-cited-gartner-survey
+gate: G1
+expected: pass
+source: published-test-automation-economics
+passage: >-
+  According to Gartner's 2024 enterprise survey, organisations spending over 15% of engineering hours on manual regression report a 2.4-fold increase in escaped defects.
+why: >-
+  Properly attributed quantified statistic citing Gartner's 2024 survey with specific bounds.

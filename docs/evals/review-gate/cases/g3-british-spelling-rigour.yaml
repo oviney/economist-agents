@@ -1,0 +1,8 @@
+id: g3-british-spelling-rigour
+gate: G3
+expected: pass
+source: published-test-automation-economics
+passage: >-
+  Engineering leaders must recognise that specialised test harnesses prioritise behavioural consistency over raw coverage metres.
+why: >-
+  Complies rigorously with British spelling conventions ('recognise', 'specialised', 'prioritise', 'behavioural', 'metres').

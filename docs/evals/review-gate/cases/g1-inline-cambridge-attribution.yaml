@@ -1,0 +1,8 @@
+id: g1-inline-cambridge-attribution
+gate: G1
+expected: pass
+source: published-code-review-latency
+passage: >-
+  A Cambridge study by Britton et al. (2013) found software developers spend an average of 13 hours per week triaging failures.
+why: >-
+  Explicit academic attribution with authors, institution, year, and concrete metric.

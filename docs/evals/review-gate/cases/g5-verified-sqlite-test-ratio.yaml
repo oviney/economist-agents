@@ -1,0 +1,8 @@
+id: g5-verified-sqlite-test-ratio
+gate: G5
+expected: pass
+source: published-test-engineering
+passage: >-
+  SQLite maintains over 590 times as much test code and test scripts as source code to maintain 100% branch test coverage.
+why: >-
+  Accurately cites SQLite's public test suite architecture documentation and ratio.

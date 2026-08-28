@@ -1,0 +1,8 @@
+id: g2-baseline-scope-overstatement
+gate: G2
+expected: fail
+source: review-queue-throughput-tax
+passage: >-
+  The 9-hour baseline shows review latency is dominated by queue depth.
+why: >-
+  The cited study's 9-hour figure measures time-to-first-comment, not total latency. ADR-0018 finding 3.

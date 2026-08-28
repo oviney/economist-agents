@@ -1,0 +1,8 @@
+id: g2-graphite-pr-throughput-figure
+gate: G2
+expected: pass
+source: review-queue-throughput-tax
+passage: >-
+  Graphite's benchmarking indicates that pull requests requiring more than two review rounds experience a median turnaround time of 4.2 days.
+why: >-
+  Near-false-positive control: accurately reports Graphite's published benchmarking data without extrapolating to total engineering cycle time.

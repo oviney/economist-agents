@@ -1,0 +1,8 @@
+id: g4-counterintuitive-testing-finding
+gate: G4
+expected: pass
+source: published-test-automation-economics
+passage: >-
+  Paradoxically, increasing unit test density beyond 85% frequently correlates with longer incident recovery times, as tightly coupled assertions penalise rapid emergency refactoring.
+why: >-
+  Provides counter-intuitive insight with underlying structural explanation rather than repeated dogma.

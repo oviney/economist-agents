@@ -1,0 +1,8 @@
+id: g2-verbatim-study-quote-and-bounds
+gate: G2
+expected: pass
+source: published-test-engineering
+passage: >-
+  As noted by Sadowski et al. (2018), Google's automated analysis infrastructure prevented 'an estimated 74% of known recurring static violations before code review.'
+why: >-
+  Verbatim attribution and properly bounded scope (static violations before review, rather than all software bugs).

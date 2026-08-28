@@ -1,0 +1,8 @@
+id: g3-data-first-lead-paragraph
+gate: G3
+expected: pass
+source: published-review-latency
+passage: >-
+  Ten minutes of review latency costs an engineering organisation forty thousand dollars a year per team of eight, according to internal telemetry across 140 enterprise repositories.
+why: >-
+  Lead sentence begins directly with concrete figures and immediate economic stakes without throat-clearing.

@@ -1,0 +1,8 @@
+id: g3-economist-dry-witty-prose
+gate: G3
+expected: pass
+source: published-qe-governance
+passage: >-
+  Throwing compute at disorderly codebases is an expensive form of optimism. Without rigorous gate discipline, automated testing merely accelerates the production of confusion.
+why: >-
+  Dry, analytical Economist voice with sharp metaphor, devoid of clichés, throat-clearing, or filler.

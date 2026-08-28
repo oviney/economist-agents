@@ -1,0 +1,8 @@
+id: g2-faithful-dora-deploy-cadence
+gate: G2
+expected: pass
+source: published-dora-metrics
+passage: >-
+  The 2023 DORA report classifies high-performing engineering cohorts by multiple on-demand deployments per day with a change lead time under one day.
+why: >-
+  Faithful summary of DORA classification tiers and boundaries without scope creep.

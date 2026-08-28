@@ -1,0 +1,8 @@
+id: g1-attributed-academic-paper
+gate: G1
+expected: pass
+source: published-flaky-tests
+passage: >-
+  Research by Google engineers published at ICSE 2021 revealed that 1.5% of test runs exhibit non-deterministic failure patterns.
+why: >-
+  Grounded publication context, conference venue, and specific measurable statistic.

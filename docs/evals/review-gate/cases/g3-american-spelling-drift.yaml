@@ -1,0 +1,8 @@
+id: g3-american-spelling-drift
+gate: G3
+expected: fail
+source: writer-evals
+passage: >-
+  To optimize delivery pipelines, engineering organizations must prioritize behavioral analyze and customize their staging environments.
+why: >-
+  Violates Economist British spelling conventions (uses 'optimize', 'organizations', 'prioritize', 'analyze', 'customize' instead of -ise / -yse).

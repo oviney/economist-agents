@@ -43,6 +43,24 @@ _MIN_PRIMITIVES = 12
 #: Guards a pathological path-data dump. The shipped hero is 5.7 KB.
 _MAX_BYTES = 100_000
 
+#: Words that mean the ``<desc>`` is a drawing *brief* rather than a description
+#: of what was drawn. Mirrored term-for-term from ``PROMPT_ALT_PATTERN`` in
+#: ``oviney/blog``'s ``scripts/validate-post-quality.sh`` — that gate is the
+#: authority, and any term it rejects must be rejected here too.
+#:
+#: This matters because ``pipeline._hero_description`` harvests ``<desc>`` into
+#: the published ``image_alt``. A brief that survives this gate is laundered
+#: through the SVG into the blog's front matter and reddens ``main`` (five
+#: occurrences: oviney/blog#1289). Failing here costs one redraw; failing there
+#: costs a blocked publication queue.
+_PROMPT_LANGUAGE = re.compile(
+    r"editorial illustration|editorial photomontage|photorealistic"
+    r"|technical diagram|infographic|blueprint|cartoon|risograph|duotone"
+    r"|monochrome|palette|lighting|texture|crosshatching|newspaper engraving"
+    r"|block-print|rendered|style",
+    re.IGNORECASE,
+)
+
 #: Elements that paint words. `title`/`desc` are accessibility metadata and are
 #: never rendered, so they are required rather than banned.
 _TEXT_ELEMENTS = frozenset({"text", "tspan", "textPath"})
@@ -171,6 +189,15 @@ def check_hero_svg(source: str) -> None:
     if len(descs) != 1 or not descs[0]:
         raise HeroSvgError(
             f"hero SVG must have exactly one non-empty <desc> (found {len(descs)})"
+        )
+
+    brief = _PROMPT_LANGUAGE.search(descs[0])
+    if brief:
+        raise HeroSvgError(
+            f"hero <desc> reads as a drawing prompt, not alt text (found "
+            f"{brief.group(0)!r}); it is published verbatim as image_alt, so "
+            f"describe what the drawing shows — a screen-reader user needs the "
+            f"subject, not the medium or the art direction"
         )
     if primitives < _MIN_PRIMITIVES:
         raise HeroSvgError(

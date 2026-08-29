@@ -121,6 +121,52 @@ class TestAccessibilityElements:
         with pytest.raises(HeroSvgError, match="desc"):
             check_hero_svg(svg)
 
+    def test_desc_written_as_a_drawing_brief_is_rejected(self) -> None:
+        """The exact string that reddened ``oviney/blog``'s ``main`` five times.
+
+        ``pipeline._hero_description`` harvests ``<desc>`` into the published
+        ``image_alt``, and the blog's ``PROMPT_ALT_PATTERN`` rejects prompt
+        language there. A brief that survives this gate becomes a red ``main``
+        downstream, so it has to fail here instead.
+        """
+        svg = _svg().replace(
+            "<desc>An engineer presses a green button while coins pour into a drain.</desc>",
+            "<desc>An Economist-style editorial illustration of a quality inspector "
+            "stamping approved on a crumbling tower of software containers.</desc>",
+        )
+        with pytest.raises(HeroSvgError, match="prompt"):
+            check_hero_svg(svg)
+
+    @pytest.mark.parametrize(
+        "brief",
+        [
+            "A photorealistic server room at dusk.",
+            "A duotone chart bleeding red ink across a ledger.",
+            "A technical diagram of a pipeline with three broken stages.",
+            "An infographic of rising costs beside a falling headcount.",
+            "A cartoon auditor asleep at a desk of alarms.",
+        ],
+    )
+    def test_every_prompt_term_the_blog_rejects_is_rejected_here(
+        self, brief: str
+    ) -> None:
+        """Mirrors the blog's pattern term for term; divergence is the bug."""
+        svg = _svg().replace(
+            "<desc>An engineer presses a green button while coins pour into a drain.</desc>",
+            f"<desc>{brief}</desc>",
+        )
+        with pytest.raises(HeroSvgError, match="prompt"):
+            check_hero_svg(svg)
+
+    def test_a_plain_description_of_the_drawing_still_passes(self) -> None:
+        """The guard must not reject alt text that describes what was drawn."""
+        svg = _svg().replace(
+            "<desc>An engineer presses a green button while coins pour into a drain.</desc>",
+            "<desc>A quality inspector stamps approved on a crumbling tower of "
+            "software containers while engineering squads look on below.</desc>",
+        )
+        check_hero_svg(svg)
+
     def test_duplicate_title_is_rejected(self) -> None:
         svg = _svg().replace("<title>", "<title>x</title><title>", 1)
         with pytest.raises(HeroSvgError, match="title"):

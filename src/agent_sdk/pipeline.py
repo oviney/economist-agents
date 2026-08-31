@@ -47,8 +47,10 @@ COST_LOG_PATH = Path("logs/agent_sdk_costs.jsonl")
 # 3  = SearchProvidersEmptyError (topic too narrow)
 #
 # 10 (handshake pending) and 11 (image-gate failure) were retired with the
-# human-image handshake in B-021: Stage 3 draws its own hero, so nothing pauses
-# and there is no dropped PNG to gate. Do not reuse the numbers — old scripts
+# human-image handshake in B-021, because nothing pauses mid-run and there is no
+# dropped PNG to gate. The reason B-021 gave — "Stage 3 draws its own hero" — no
+# longer holds: B-042 removed the hero author, and the owner makes every image.
+# The exit codes stay retired either way. Do not reuse the numbers — old scripts
 # and notes still mention them.
 
 # Slug-keyed canonical artefacts. logs/spike/* stays as telemetry only

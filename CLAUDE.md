@@ -163,7 +163,7 @@ When dispatching agents via the `Agent` tool (orchestrating the fleet), the brie
 
 ## Architecture
 
-- **LLM**: Claude (Anthropic) via the Agent SDK on the Claude subscription. No DALL-E / `OPENAI_API_KEY` — raster image generation was retired (ADR-0014). **Stage 3 draws the hero itself, as SVG** (B-016b) — constraint #4 as amended, not the pre-2026-07 "human-supplied hero" reading.
+- **LLM**: Claude (Anthropic) via the Agent SDK on the Claude subscription. No DALL-E / `OPENAI_API_KEY` — raster image generation was retired (ADR-0014). **Stage 3 draws nothing** — no hero, no chart (B-042). The graphics call and the hero author were deleted, not disabled; the owner makes every image. See constraint #4.
 - **Pipeline shape**: ONE path (ADR-0016). `python -m src.agent_sdk.pipeline "<topic>"` runs Stage 3 → Stage 4 and exits 0 when publish-ready. The #403 image handshake (`--image-mode`, `--resume`, `--no-image`, exit codes 10/11) was deleted by B-021 — those exit codes are retired, not reused.
 - **Research**: two paths. `claude_web` (ADR-0013) is the **default in practice** and the reliable one — Claude's own WebSearch/WebFetch on the subscription, which deliberately puts an LLM in the research path. `deterministic` (arXiv + Semantic Scholar, no LLM) is rate-limited from most environments and frequently aborts (BUG-050). Neither uses a pay-per-use API.
 - **Writing**: Claude via Anthropic Agent SDK (`src/agent_sdk/stage3_runner.py`).

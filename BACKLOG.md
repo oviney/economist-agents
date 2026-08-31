@@ -26,19 +26,31 @@ _(none)_
 
 ## Todo
 
-### BUG-073 · `main` is red — `html_to_brief.py` breaks the mypy baseline gate (BLOCKER)
+### BUG-073 · WITHDRAWN — `main` was never red; the venv was stale
 
-`make ci-local` fails on `origin/main` (`344d109`) with no local changes;
-reproduced in a clean worktree, so it is not a working-copy artefact:
+**Retracted 2026-08-31.** I reported `main` as red on the strength of a
+`ci-local` run and a clean-worktree reproduction. Both were run against a venv
+that was missing declared dependencies, so the reproduction proved nothing —
+it inherited the same bad environment.
 
-```
-── mypy baseline gate ──
-  scripts/html_to_brief.py: 2 errors > 0 allowed (2 new)
-```
+The two "new type errors" in `scripts/html_to_brief.py` were
+`Cannot find implementation or library stub for module named "bs4"`.
+`beautifulsoup4` (`requirements.txt:25`) and `types-beautifulsoup4`
+(`requirements-dev.txt:17`) are both declared and were simply not installed —
+they arrived upstream in `5fa205c` (#476) and this venv predates it. After
+`pip install -r requirements.txt -r requirements-dev.txt`, mypy passes.
 
-**Do not raise `docs/mypy-baseline.md`** — the gate says a test enforces that
-the baseline only shrinks, so raising it fails the suite instead of the commit.
-Nothing else can land a green gate until this is fixed.
+`make ci-local` then reaches **2750 passed / 9 skipped / 83.63%** with one
+remaining failure, also environmental:
+`test_python_version_consistency` — the venv runs Python 3.12 while
+`.python-version` pins **3.13** (B-037). Only `/usr/bin/python3.12` exists on
+this machine, so the venv cannot be rebuilt on 3.13 without installing it
+first. The test's own message is the instruction: *"Rebuild .venv on 3.13, or
+bump the pin deliberately."*
+
+**Nothing is wrong with the repository.** The real lesson is the same one that
+cost this session already: I trusted a local signal without checking what
+produced it. A clean worktree is not a clean environment.
 
 ### B-045 · Docs-truth gate — fail `ci-local` on a broken doc reference
 

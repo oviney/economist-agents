@@ -1,22 +1,27 @@
 # Hand-off — 2026-08-31
 
-## `main` is RED. Fix it before anything else.
+## `main` is green. My earlier "main is RED" was wrong — retracted.
 
-`make ci-local` fails on `origin/main` (`344d109`) with **no local changes**.
-Reproduced in a clean worktree, so this is not a working-copy artefact:
+I reported BUG-073 as a blocker: `scripts/html_to_brief.py`, 2 mypy errors
+beyond the baseline. **That was an environment fault, not a repo fault**, and
+the clean-worktree "reproduction" I offered as proof shared the same broken venv,
+so it proved nothing.
 
+The errors were missing `bs4` stubs. `beautifulsoup4` and `types-beautifulsoup4`
+are both declared (`requirements.txt:25`, `requirements-dev.txt:17`); they came
+upstream in `5fa205c` (#476) and this venv predated them.
+
+```bash
+.venv/bin/pip install -r requirements.txt -r requirements-dev.txt
 ```
-── mypy baseline gate ──
-mypy: new type errors beyond the recorded baseline
-  scripts/html_to_brief.py: 2 errors > 0 allowed (2 new)
-```
 
-**Do not raise `docs/mypy-baseline.md`** — the gate's own message says a test
-enforces that the baseline only shrinks, so raising it fails the suite instead
-of the commit. Fix the two errors. Filed as **BUG-073**.
+After that: **2750 passed / 9 skipped / 83.63%**, mypy clean.
 
-Every other branch is blocked behind this: nothing can land a green gate until
-`main` is green.
+**One real environment blocker remains.** `test_python_version_consistency`
+fails: the venv is Python 3.12, `.python-version` pins **3.13** (B-037), and
+only `/usr/bin/python3.12` exists on this machine. Install 3.13 and rebuild the
+venv, or bump the pin deliberately — the test says so itself. This is machine
+setup; do not "fix" it in the repo.
 
 ## A whole session was built on a stale base — read this before trusting `git status`
 

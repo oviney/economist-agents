@@ -26,6 +26,55 @@ _(none)_
 
 ## Todo
 
+### BUG-073 · `main` is red — `html_to_brief.py` breaks the mypy baseline gate (BLOCKER)
+
+`make ci-local` fails on `origin/main` (`344d109`) with no local changes;
+reproduced in a clean worktree, so it is not a working-copy artefact:
+
+```
+── mypy baseline gate ──
+  scripts/html_to_brief.py: 2 errors > 0 allowed (2 new)
+```
+
+**Do not raise `docs/mypy-baseline.md`** — the gate says a test enforces that
+the baseline only shrinks, so raising it fails the suite instead of the commit.
+Nothing else can land a green gate until this is fixed.
+
+### B-045 · Docs-truth gate — fail `ci-local` on a broken doc reference
+
+A gate that checks every repo-relative path referenced by an *instruction*
+document actually exists. Measured on this base in a worktree: **13 real
+breaks**, including four in `CONTRIBUTING.md` pointing at
+`src/crews/stage3_crew.py`, a file that has never existed in this repo.
+
+A prior implementation is on `b024-retire-paid-path-STALE-BASE`
+(`scripts/check_docs_references.py`, `tests/test_docs_references.py`).
+**Re-derive rather than cherry-pick** — it was written against a base 70 commits
+stale, and both `CONTRIBUTING.md` and `.github/copilot-instructions.md` moved.
+
+Two things it already knows, worth keeping:
+- **Known bug:** `_normalise` does not strip GitHub line anchors, so
+  `scripts/economist_agent.py#L28-L65` reports as broken.
+- **Known limit, belongs in the spec:** it checks path *existence*, not whether
+  prose is true. It would not have caught either fix on
+  `fix/claude-md-hero-contradiction` — both name files that exist. A doc can
+  still lie about behaviour and pass.
+
+Blocked by BUG-073.
+
+### BUG-074 · Six MCP servers are configured, enabled, and dead (MEDIUM)
+
+Every Python MCP server in `.mcp.json` fails `CONNECTION_CLOSED`. Root cause
+verified both ways: `.mcp.json` runs them with `python3`, and
+`/usr/bin/python3 -c "import mcp"` raises `ModuleNotFoundError` while
+`.venv/bin/python` imports it fine.
+
+Fix is `python3` → `.venv/bin/python`, but decide first: `web-researcher`
+(Serper) and `image-generator` (DALL-E) are dormant paid surfaces, and a blanket
+fix revives them. Recommend fixing the four keyless servers and dropping those
+two from `enabledMcpjsonServers`.
+
+
 ### B-044 · Finish the B-042 acceptance — **DONE 2026-08-02**
 
 **The article is published:** <https://www.viney.ca/2026/08/02/migration-deadline-testing-trap/>

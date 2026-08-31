@@ -1,3 +1,89 @@
+# Hand-off — 2026-08-31
+
+## `main` is RED. Fix it before anything else.
+
+`make ci-local` fails on `origin/main` (`344d109`) with **no local changes**.
+Reproduced in a clean worktree, so this is not a working-copy artefact:
+
+```
+── mypy baseline gate ──
+mypy: new type errors beyond the recorded baseline
+  scripts/html_to_brief.py: 2 errors > 0 allowed (2 new)
+```
+
+**Do not raise `docs/mypy-baseline.md`** — the gate's own message says a test
+enforces that the baseline only shrinks, so raising it fails the suite instead
+of the commit. Fix the two errors. Filed as **BUG-073**.
+
+Every other branch is blocked behind this: nothing can land a green gate until
+`main` is green.
+
+## A whole session was built on a stale base — read this before trusting `git status`
+
+On 2026-08-30 a session opened, ran `git status`, saw `## main...origin/main`
+with no divergence, and reported the repo "clean, synced, idle ~1 month". **The
+remote ref was stale and had not been fetched.** `origin/main` was in fact 70
+commits ahead, branching at `ad14c38` on 2026-07-29.
+
+Sixteen commits were then written against that base before the first `git push`
+revealed it. They are preserved on **`b024-retire-paid-path-STALE-BASE`** and
+must not be merged as-is:
+
+- Their premise is dead. They "close" **BUG-046** by deleting the paid path,
+  but `72b8ed9` (2026-07-31) already closed it the opposite way, by making
+  `scripts/llm_client.py` keyless with 129 lines of tests.
+- Every id collides: `ADR-0018`, `B-026`, `B-027`, `B-028`, `BUG-066`,
+  `BUG-067` all mean different things upstream.
+- They assume constraint #4 as it read before **B-042** reversed it, and a
+  `skills/` directory that **B-035** deleted.
+
+**Rule this earns: `git fetch` before reading `git status`.** "ahead N" is a
+claim about a cached ref, not about the remote. The whole failure is one
+unrun command.
+
+## What is worth salvaging from that branch — B-045
+
+One thing only: `scripts/check_docs_references.py` + `tests/test_docs_references.py`,
+a gate that fails `ci-local` when an instruction doc references a path that does
+not exist. **Re-derive it; do not cherry-pick** — `CONTRIBUTING.md` and
+`.github/copilot-instructions.md` both moved upstream.
+
+Measured on *this* base, in a worktree, it finds **13 real breaks**:
+`CONTRIBUTING.md` ×4 → `src/crews/stage3_crew.py` (never existed), → the
+retired `.github/workflows/ci.yml`, → `blog_qa_agent.py` and
+`architecture_review.py` (both actually in `scripts/archived/`), and
+`.github/copilot-instructions.md` → `scripts/defect_tracker.py` (actually
+`src/quality/`).
+
+**Known bug in it:** `_normalise` does not strip GitHub line anchors, so
+`scripts/economist_agent.py#L28-L65` is reported broken. Fix before trusting it.
+
+**Known limit, worth writing into its spec:** it checks *path existence*, not
+whether prose is true. It would not have caught either bug fixed on
+`fix/claude-md-hero-contradiction` — both name files that exist.
+
+## Ready to merge: `fix/claude-md-hero-contradiction`
+
+Two commits. `CLAUDE.md:166` claimed "Stage 3 draws the hero itself, as SVG"
+while constraint #4 says the pipeline draws nothing; `pipeline.py:50` carried
+the same claim, contradicting its own docstring twelve lines below. Verified
+against code before picking a side: `hero_svg.py` exposes `check_hero_svg`,
+`report_edge_contact`, `render_to_png` — validator and renderer, **no author**.
+Constraint #4 was right.
+
+`ci-local` on this branch fails **only** on BUG-073 above, which it did not
+cause.
+
+## Also open
+
+- **BUG-074** — six MCP servers are configured, enabled, and dead. `.mcp.json`
+  runs them with `python3`; the system interpreter has no `mcp` module, the venv
+  does. Fixing all six also revives `web-researcher` (Serper) and
+  `image-generator` (DALL-E), so fix the four keyless ones and drop those two
+  from `enabledMcpjsonServers`.
+
+---
+
 # Hand-off — 2026-08-02
 
 ## The hand-off ran end to end and the article is published

@@ -94,6 +94,7 @@ ci-local: require-venv
 	@echo "── ruff format ──"        && $(VENV_BIN)/ruff format --check .
 	@echo "── ruff lint ──"          && $(VENV_BIN)/ruff check .
 	@echo "── bare-name imports ──"  && $(PY) scripts/check_bare_name_imports.py
+	@echo "── docs-truth gate ──"    && $(PY) scripts/check_docs_references.py
 	@echo "── mypy (advisory) ──"    && $(MAKE) --no-print-directory mypy-advisory
 	@echo "── mypy baseline gate ──" && $(PY) scripts/mypy_baseline.py --all
 	@echo "── tests + coverage ──"   && $(VENV_BIN)/pytest tests/ \

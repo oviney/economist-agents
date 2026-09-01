@@ -149,7 +149,7 @@ def new_function():
 - ✅ **Type hints on all functions** (`mypy scripts/` passes)
 - ✅ **Docstrings for all public functions** (Google style)
 - ✅ **>70% aggregate test coverage** (CI gate: `--cov-fail-under=70` across `src/` + `scripts/`)
-- ✅ **>90% coverage on `src/quality/*`** (CI gate: per-module floor; see `.github/workflows/ci.yml` step "Enforce src/quality/ per-module coverage gate (#393)")
+- ✅ **>90% coverage on `src/quality/*`** (per-module floor, enforced by the `src/quality per-module coverage` step of `make ci-local` — there is no GitHub Actions CI, see ADR-0015)
 - ✅ **>80% target on new code** (100% for refactored code)
 - ✅ **Zero linting violations** (`ruff check .` passes)
 - ✅ **Proper error handling** with specific exceptions
@@ -339,14 +339,18 @@ Agent prompt constants (e.g., `RESEARCH_AGENT_PROMPT`, `WRITER_AGENT_PROMPT`) ar
 
 ### Finding the Right Prompt
 
-| Agent | File | Notes |
-|-------|------|-------|
-| Research | `src/crews/stage3_crew.py` | Deterministic web search (arXiv + Google) — no LLM agent |
-| Writer Agent | `src/crews/stage3_crew.py` | Backstory + task description define style rules |
-| Graphics Agent | `src/crews/stage3_crew.py` | Chart data generation |
-| Editor Agent | `src/crews/stage3_crew.py` | Quality gate review |
-| Topic Scout | `scripts/topic_scout.py` | `SCOUT_AGENT_PROMPT` |
+| Concern | File | Notes |
+|---------|------|-------|
+| Writer | `src/agent_sdk/stage3_runner.py` | `WRITER_SYSTEM_PROMPT` plus `_build_writer_prompt` — the style rules live here |
+| Research | `src/agent_sdk/tools/research_tools.py` | Two modes, neither an LLM persona: `claude_web` delegates to Claude's own WebSearch/WebFetch (ADR-0013, the default in practice), `deterministic` queries arXiv + Semantic Scholar with no LLM at all |
+| Hero brief | `src/agent_sdk/image_prompt_synth.py` | `compose_prompt` writes the brief the owner draws from. It does **not** draw — see constraint #4 |
+| Chart spec | `src/agent_sdk/_shared.py` | `propose_chart_spec` extracts candidate figures from the research brief by regex, with provenance, leaving title and metric labels empty. No prompt, no LLM |
+| Quality gates | `src/agent_sdk/stage4_runner.py`, `scripts/publication_validator.py` | Deterministic post-processing and validation — there is no LLM editor agent |
+| Topic Scout | `scripts/topic_scout.py` | `SCOUT_AGENT_PROMPT`, `TREND_RESEARCH_PROMPT` |
 | Editorial Board | `scripts/editorial_board.py` | Per-persona prompt strings |
+
+> There is no `Graphics Agent`. Stage 3 draws nothing — the graphics call and
+> the hero author were deleted, not disabled (B-042, constraint #4).
 
 ### Workflow for Agent Changes
 
@@ -674,8 +678,8 @@ pre-commit run --all-files  # Manual hook run
 pre-commit install          # Enable hooks
 
 # Skills / Architecture
-python3 scripts/architecture_review.py --full-review --export-docs
-python3 scripts/blog_qa_agent.py --blog-dir /path/to/blog --show-skills
+python3 scripts/archived/architecture_review.py --full-review --export-docs
+python3 scripts/archived/blog_qa_agent.py --blog-dir /path/to/blog --show-skills
 python3 scripts/sync_copilot_context.py  # Sync patterns to Copilot
 ```
 
@@ -704,14 +708,14 @@ Skills are structured knowledge patterns stored in JSON files under `skills/`. E
 
 ### Self-Learning Validation
 
-`scripts/blog_qa_agent.py` automatically learns from each validation run:
+`scripts/archived/blog_qa_agent.py` automatically learns from each validation run:
 
 ```bash
 # Run with learning enabled (default)
-python3 scripts/blog_qa_agent.py --blog-dir /path/to/blog
+python3 scripts/archived/blog_qa_agent.py --blog-dir /path/to/blog
 
 # View all learned patterns
-python3 scripts/blog_qa_agent.py --blog-dir /path/to/blog --show-skills
+python3 scripts/archived/blog_qa_agent.py --blog-dir /path/to/blog --show-skills
 ```
 
 Each run:
@@ -738,14 +742,14 @@ manager.learn_pattern(
 
 ### Architecture Review
 
-`scripts/architecture_review.py` analyses the codebase and updates `docs/ARCHITECTURE_PATTERNS.md`:
+`scripts/archived/architecture_review.py` analyses the codebase and updates `docs/ARCHITECTURE_PATTERNS.md`:
 
 ```bash
 # Full review — learns 12+ architectural patterns and exports docs
-python3 scripts/architecture_review.py --full-review --export-docs
+python3 scripts/archived/architecture_review.py --full-review --export-docs
 
 # View currently learned patterns
-python3 scripts/architecture_review.py --show-skills
+python3 scripts/archived/architecture_review.py --show-skills
 ```
 
 See [`docs/SKILLS_LEARNING.md`](docs/SKILLS_LEARNING.md) for complete documentation on the learning system.

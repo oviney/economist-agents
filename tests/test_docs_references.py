@@ -243,3 +243,20 @@ def test_main_returns_one_when_a_reference_is_broken(
     monkeypatch.setattr(cdr, "INSTRUCTION_DOCS", ("CLAUDE.md",))
 
     assert cdr.main() == 1
+
+
+# ── the regression guard (B-045 S2) ─────────────────────────────────────────
+
+
+def test_the_real_repository_has_no_broken_references() -> None:
+    """The gate itself, run against this repo. This is the one that matters.
+
+    It reported 10 breaks when S1 landed: four in `CONTRIBUTING.md` naming a
+    `src/crews/stage3_crew.py` that has never existed here, and one claiming a
+    `.github/workflows/ci.yml` that ADR-0015 retired. S2 fixed all ten.
+    """
+    from scripts.check_docs_references import REPO_ROOT, check_all
+
+    breaks = check_all(REPO_ROOT)
+
+    assert breaks == [], "Broken references:\n" + "\n".join(str(b) for b in breaks)

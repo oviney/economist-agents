@@ -85,7 +85,7 @@ When writing prompts or editing agent behavior, preserve these constraints. Brit
 
 ## Skills Learning System
 
-[blog_qa_agent.py](../scripts/blog_qa_agent.py) + [skills_manager.py](../scripts/skills_manager.py) implement continuous improvement:
+[blog_qa_agent.py](../scripts/archived/blog_qa_agent.py) + [skills_manager.py](../scripts/skills_manager.py) implement continuous improvement:
 - Validation errors are stored as "learned patterns" in `data/skills_state/blog_qa_skills.json`
 - `SkillsManager.learn_pattern()` records issue category, severity, check, and example
 - Future runs use accumulated patterns for smarter validation
@@ -170,7 +170,7 @@ Alternatively, configure in code (see [economist_agent.py](../scripts/economist_
 - No `[UNVERIFIED]` claims in final output
 - Chart referenced naturally ("As the chart shows...")
 
-**Blog QA checks** (see [blog_qa_agent.py](../scripts/blog_qa_agent.py)):
+**Blog QA checks** (see [blog_qa_agent.py](../scripts/archived/blog_qa_agent.py)):
 - YAML frontmatter validation (title, date, layout fields)
 - Jekyll layout file existence
 - Broken internal link detection
@@ -219,10 +219,10 @@ This project uses a **Claude-style skills approach** for continuous improvement:
 **Running Architecture Review:**
 ```bash
 # Full review - learns 12+ architectural patterns
-python3 scripts/architecture_review.py --full-review --export-docs
+python3 scripts/archived/architecture_review.py --full-review --export-docs
 
 # View learned patterns
-python3 scripts/architecture_review.py --show-skills
+python3 scripts/archived/architecture_review.py --show-skills
 
 # Generates docs/ARCHITECTURE_PATTERNS.md automatically
 ```
@@ -245,7 +245,7 @@ The architecture review agent automatically updates its knowledge base and expor
 
 ## Defect Tracking & Quality Metrics
 
-[defect_tracker.py](../scripts/defect_tracker.py) implements comprehensive bug tracking with Root Cause Analysis (v2.0):
+[defect_tracker.py](../src/quality/defect_tracker.py) implements comprehensive bug tracking with Root Cause Analysis (v2.0):
 
 **Enhanced Schema:**
 - **Root Cause**: `root_cause` (enum), `root_cause_notes`, `introduced_in_commit`, `introduced_date`
@@ -275,7 +275,7 @@ tracker.log_bug("BUG-021", "high", "production", "Description",
 tracker.fix_bug("BUG-021", "abc1234", prevention_test_added=True)
 ```
 
-Run `python3 scripts/defect_tracker.py` to see full report with RCA insights.
+Run `python3 -m scripts.quality_dashboard --no-save` to see the full report with RCA insights — it reads `DefectTracker.get_metrics()`. Do **not** run the module directly: `src/quality/defect_tracker.py`'s `main()` ignores argv and mutates tracker state rather than printing anything.
 
 ## Scrum Master Process Discipline
 

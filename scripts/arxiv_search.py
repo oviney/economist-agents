@@ -21,7 +21,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 try:
-    import arxiv
+    import arxiv  # type: ignore[import-untyped]
 except ImportError:
     arxiv = None  # type: ignore[assignment]
 
@@ -319,9 +319,11 @@ class ArxivSearcher:
             # inside "heroism" (BUG-049). Replacement is passed as a function so
             # the expansion text is treated literally (no backref surprises).
             pattern = rf"\b{re.escape(business_term.lower())}\b"
-            # Bind the expansion via default arg (not the loop var) — satisfies
-            # B023 and keeps the text literal (no backref interpretation).
-            optimized = re.sub(pattern, lambda _m, _r=academic_terms: _r, optimized)
+
+            def _repl(_m: re.Match[str], _r: str = academic_terms) -> str:
+                return _r
+
+            optimized = re.sub(pattern, _repl, optimized)
 
         return optimized
 

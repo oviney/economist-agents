@@ -198,6 +198,66 @@ class TestDeployReview:
         assert len(captured_drafts) == 1
         assert captured_drafts[0] != "my-draft-11112222.md"
 
+    def test_multiple_superseded_review_drafts_are_removed(
+        self, article_file: Path
+    ) -> None:
+        # If multiple stale drafts accumulated (e.g. from repeated runs), all must be purged.
+        captured_drafts: list[str] = []
+
+        def fake_run_command(cmd: str, cwd=None) -> str:
+            if cmd.startswith("git clone"):
+                self._prepare_clone()
+                (Path("temp_blog_repo/_review") / "my-draft-aaaa1111.md").write_text(
+                    "old1"
+                )
+                (Path("temp_blog_repo/_review") / "my-draft-bbbb2222.md").write_text(
+                    "old2"
+                )
+            if cmd.startswith("git add"):
+                drafts = list(Path("temp_blog_repo/_review").glob("my-draft-*.md"))
+                captured_drafts.extend([d.name for d in drafts])
+            return ""
+
+        with patch.object(dtb, "run_command", side_effect=fake_run_command):
+            dtb.deploy_review(
+                article_path=article_file,
+                blog_owner="test-owner",
+                blog_repo="test-blog",
+                token="t",
+            )
+
+        assert len(captured_drafts) == 1
+        assert captured_drafts[0] not in (
+            "my-draft-aaaa1111.md",
+            "my-draft-bbbb2222.md",
+        )
+
+    def test_drafts_for_other_slugs_are_preserved(self, article_file: Path) -> None:
+        # Drafts for different articles must not be removed when deploying a review for my-draft.
+        captured_drafts: list[str] = []
+
+        def fake_run_command(cmd: str, cwd=None) -> str:
+            if cmd.startswith("git clone"):
+                self._prepare_clone()
+                (
+                    Path("temp_blog_repo/_review") / "other-article-cccc3333.md"
+                ).write_text("other")
+            if cmd.startswith("git add"):
+                drafts = list(Path("temp_blog_repo/_review").glob("*.md"))
+                captured_drafts.extend([d.name for d in drafts])
+            return ""
+
+        with patch.object(dtb, "run_command", side_effect=fake_run_command):
+            dtb.deploy_review(
+                article_path=article_file,
+                blog_owner="test-owner",
+                blog_repo="test-blog",
+                token="t",
+            )
+
+        assert any(name == "other-article-cccc3333.md" for name in captured_drafts)
+        assert any(name.startswith("my-draft-") for name in captured_drafts)
+
 
 # ── CLI dispatch: --mode review calls deploy_review ──────────────────
 

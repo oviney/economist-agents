@@ -1,0 +1,8 @@
+id: g5-fabricated-ibm-defect-ratio
+gate: G5
+expected: fail
+source: b042-live-acceptance
+passage: >-
+  The IBM Systems Sciences Institute's 1:15:60:100 defect-cost ratio has been corroborated by every serious empirical study in the software engineering literature.
+why: >-
+  Factually false claim propping up a fabricated ratio: the Institute was an internal training arm, not a research body, and the ratio is uncorroborated. B-044 finding.

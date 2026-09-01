@@ -22,6 +22,7 @@ import os
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 import orjson
 import requests
@@ -63,16 +64,20 @@ def _gh_get(url: str) -> dict | list:
     return resp.json()
 
 
-def fetch_posts() -> list[dict]:
+def fetch_posts() -> list[dict[str, Any]]:
     """Return list of {filename, path, content} dicts for all _posts/ files."""
     url = f"https://api.github.com/repos/{BLOG_REPO}/contents/_posts"
     items = _gh_get(url)
-    posts = []
+    if not isinstance(items, list):
+        return []
+    posts: list[dict[str, Any]] = []
     for item in items:
-        if not item["name"].endswith(".md"):
+        if not isinstance(item, dict) or not str(item.get("name", "")).endswith(".md"):
             continue
         logger.info("Fetching %s …", item["name"])
         file_data = _gh_get(item["url"])
+        if not isinstance(file_data, dict):
+            continue
         raw = base64.b64decode(file_data["content"]).decode("utf-8")
         posts.append({"filename": item["name"], "path": item["path"], "content": raw})
     return posts
@@ -213,7 +218,7 @@ def run_audit(dry_run: bool = False) -> None:
 
         if eval_result.percentage < QUALITY_THRESHOLD:
             fm = ArticleEvaluator._parse_frontmatter(post["content"])
-            post_title = fm.get("title", post["filename"])
+            post_title: str = str(fm.get("title") or post["filename"])
 
             if dry_run:
                 logger.info(

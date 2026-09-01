@@ -1,0 +1,8 @@
+id: g1-vague-study-claim
+gate: G1
+expected: fail
+source: adr-0018-evals
+passage: >-
+  Studies show that test suite maintenance accounts for a third of total software lifecycle expenditure.
+why: >-
+  Uses vague 'Studies show' hand-waving instead of naming the specific institution or paper.

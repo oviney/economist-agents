@@ -1,0 +1,8 @@
+id: g4-tradeoff-analysis-of-automation
+gate: G4
+expected: pass
+source: published-test-engineering
+passage: >-
+  The economic case for end-to-end browser automation breaks down in high-churn user interfaces, where test triage labour exceeds the rework cost of manual spot-checks.
+why: >-
+  Analyzes realistic economic trade-offs instead of advocating one-size-fits-all automation dogmatism.

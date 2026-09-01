@@ -1,0 +1,8 @@
+id: g1-unattributed-percentage
+gate: G1
+expected: fail
+source: flaky-tests-productivity-sink
+passage: >-
+  More than 45% of engineers report that intermittent build failures waste over four hours weekly.
+why: >-
+  Quantified statistic (45%, 4 hours) without attribution to any named study, survey, or paper.

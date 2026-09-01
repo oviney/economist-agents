@@ -779,14 +779,15 @@
       "discovered_date": "2026-07-21T00:00:00",
       "description": "EconomistContentFlow.kickoff() is not keyless: Stage 1 topic discovery (flow.py:176 discover_topics -> create_llm_client) requires ANTHROPIC_API_KEY or OPENAI_API_KEY and raises ValueError '[LLM_CLIENT] No API key found' with no key set. So `python -m src.economist_agents.flow` cannot run keyless end-to-end, contradicting ADR-0013 / CLAUDE.md #3 and the assumption in the B-009 spec. The keyless generator is src.agent_sdk.pipeline (manual topic, no discovery); flow.py's discovery stage never moved to the subscription Agent SDK.",
       "component": "economist_agents.flow.discover_topics / scripts.llm_client.create_llm_client",
-      "status": "open",
+      "status": "fixed",
       "github_issue": null,
       "is_production_escape": false,
       "root_cause": "integration_error",
       "root_cause_notes": "Keyless migration (B-006/ADR-0013) moved writer/graphics/research to the subscription SDK but left topic discovery on the paid create_llm_client path.",
       "discovered_by": "B-009 T1 fail-fast keyless run",
-      "prevention_test_added": false,
-      "fix_notes": "Resolved-by-workaround: the canonical keyless path is the two-step pipeline.py <topic> --research-mode claude_web (generate) + deploy_to_blog (publish), which skips flow.py's paid topic discovery. Making EconomistContentFlow discovery keyless remains a future enhancement, not required for keyless generate+publish."
+      "fixed_date": "2026-07-31T00:00:00",
+      "prevention_test_added": true,
+      "fix_notes": "Fixed in 2026-07-31: create_llm_client now defaults to a keyless agent_sdk provider that runs on the Claude subscription, so EconomistContentFlow Stage 1 and Stage 2 require no API key."
     },
     {
       "id": "BUG-047",
@@ -1177,11 +1178,14 @@
       "discovered_date": "2026-08-02T00:00:00",
       "description": "`make art` sets `image:` but never removes the `<!-- HERO IMAGE` prompt comment, so the documented B-042 sequence (draw hero -> make art -> deploy --mode review) is refused by _reject_unrendered_hero_prompt. The happy path cannot complete without an undocumented manual edit.",
       "component": "finalise_art",
-      "status": "open",
+      "status": "fixed",
       "is_production_escape": false,
       "root_cause": "validation_gap",
       "root_cause_notes": "scripts/finalise_art.py calls pipeline._link_hero_asset, which edits only the frontmatter (image:, image_alt:). The body comment injected by pipeline._inject_hero_prompt_comment is left in place. Two gates written in different items (BUG-065's comment refusal, B-042's art hand-off) were never run against each other end to end; every unit test covers one or the other. Reproduced live 2026-08-02 with four deploy probes.",
-      "prevention_test_added": false,
+      "fixed_date": "2026-08-02T00:00:00",
+      "prevention_test_added": true,
+      "prevention_test_file": "tests/test_finalise_art.py",
+      "fix_notes": "Fixed in 2026-08-02: finalise_art now removes the <!-- HERO IMAGE prompt comment when linking the hero asset.",
       "introduced_in_commit": "95c838ce",
       "introduced_date": "2026-08-01"
     },
@@ -1222,7 +1226,7 @@
   ],
   "summary": {
     "total_bugs": 55,
-    "fixed_bugs": 7,
+    "fixed_bugs": 9,
     "production_bugs": 6,
     "defect_escape_rate": 42.9,
     "by_severity": {

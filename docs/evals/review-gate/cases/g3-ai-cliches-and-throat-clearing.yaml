@@ -1,0 +1,8 @@
+id: g3-ai-cliches-and-throat-clearing
+gate: G3
+expected: fail
+source: writer-evals
+passage: >-
+  In today's rapidly evolving technological landscape, it is important to remember that automated testing represents a true game-changer and a profound paradigm shift.
+why: >-
+  Carries multiple banned AI tropes ('In today's rapidly evolving...', 'game-changer', 'paradigm shift') and empty throat-clearing.

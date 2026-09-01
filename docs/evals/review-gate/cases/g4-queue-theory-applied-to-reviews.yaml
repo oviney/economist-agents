@@ -1,0 +1,8 @@
+id: g4-queue-theory-applied-to-reviews
+gate: G4
+expected: pass
+source: review-queue-throughput-tax
+passage: >-
+  Under Kingman's formula for queuing systems, code review throughput degrades non-linearly once reviewer utilisation passes 80%, regardless of reviewer seniority.
+why: >-
+  Grounds engineering management recommendations in mathematical queuing theory.

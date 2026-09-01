@@ -1,0 +1,8 @@
+id: g2-offsetting-clause-deleted
+gate: G2
+expected: fail
+source: adr-0018-evals
+passage: >-
+  According to DORA (2023), adopting automated test gates yields an immediate 40% reduction in production escapes.
+why: >-
+  The source explicitly conditioned this gain on mature test data pipelines; deleting the conditioning clause misstates the finding. ADR-0018 finding 7.

@@ -59,7 +59,7 @@ def get_diff_stats(base: str) -> list[dict[str, int | str]]:
     if result.returncode != 0:
         return []
 
-    stats = []
+    stats: list[dict[str, int | str]] = []
     for line in result.stdout.strip().split("\n"):
         if not line:
             continue
@@ -142,14 +142,14 @@ def check_destructive_changes() -> list[str]:
     violations = []
 
     for stat in stats:
-        filepath = stat["file"]
+        filepath = str(stat["file"])
         if filepath not in CRITICAL_FILES:
             continue
         if filepath in allowlist:
             print(f"  ⏩ Allowed (intentional rewrite): {filepath}")
             continue
 
-        deleted = stat["deleted"]
+        deleted = int(stat["deleted"])
         base_lines = get_file_line_count(base, filepath)
 
         if base_lines == 0:

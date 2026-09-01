@@ -658,7 +658,7 @@ def generate_economist_post(
     talking_points: str = "",
     output_dir: str = "output",
     interactive: bool = False,
-    governance: GovernanceTracker = None,
+    governance: GovernanceTracker | None = None,
 ) -> dict:
     """Generate Economist-style blog post with optional human review gates"""
     print("\n" + "=" * 70)
@@ -710,7 +710,7 @@ def generate_economist_post(
     )
 
     # Approval Gate 1: Research
-    if interactive and not skip_approvals:
+    if interactive and governance is not None and not skip_approvals:
         verified = sum(
             1 for dp in research.get("data_points", []) if dp.get("verified", False)
         )
@@ -781,8 +781,9 @@ def generate_economist_post(
 
         # Get the chart record for metrics tracking
         metrics = get_metrics_collector()
-        if metrics.current_session["charts"]:
-            chart_record = metrics.current_session["charts"][-1]
+        charts = metrics.current_session.get("charts", [])
+        if isinstance(charts, list) and charts:
+            chart_record = charts[-1]
 
         # Stage 2b: Visual QA (runs for providers with vision support)
         if client.provider in ("anthropic", "openai"):
@@ -878,16 +879,16 @@ def generate_economist_post(
 
     # Stage 3: Writing
     # Prepare chart filename if chart will be generated
-    chart_filename = None
+    writer_chart_filename: str | None = None
     if research.get("chart_data"):
-        chart_filename = f"/assets/charts/{slug}.png"
+        writer_chart_filename = f"/assets/charts/{slug}.png"
 
     draft, writer_metadata = run_writer_agent(
         client,
         topic,
         research,
         date_str,
-        chart_filename,
+        writer_chart_filename,
         featured_image_blog_path,
     )
 
@@ -904,7 +905,9 @@ def generate_economist_post(
         if phrase.lower() in draft.lower()
     )
     chart_embedded = bool(
-        chart_filename and "![" in draft and chart_filename.split("/")[-1] in draft,
+        writer_chart_filename
+        and "![" in draft
+        and writer_chart_filename.split("/")[-1] in draft,
     )
 
     agent_metrics.track_writer_agent(
@@ -924,7 +927,7 @@ def generate_economist_post(
         )
 
     # Approval Gate 2: Draft Review
-    if interactive and not skip_approvals:
+    if interactive and governance is not None and not skip_approvals:
         response = governance.request_approval(
             "Draft Complete",
             f"Writer agent produced {len(draft.split())}-word draft",

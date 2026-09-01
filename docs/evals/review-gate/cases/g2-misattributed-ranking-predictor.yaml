@@ -1,0 +1,8 @@
+id: g2-misattributed-ranking-predictor
+gate: G2
+expected: fail
+source: adr-0018-evals
+passage: >-
+  The State of DevOps Report ranks CI build duration as the top predictor of team morale.
+why: >-
+  The report ranked deployment frequency as the predictor; build duration was evaluated only as a secondary operational metric. ADR-0018 finding 2.

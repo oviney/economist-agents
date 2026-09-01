@@ -1,0 +1,8 @@
+id: g2-subgroup-extrapolated-to-org
+gate: G2
+expected: fail
+source: adr-0018-evals
+passage: >-
+  Microsoft's research demonstrates that generative AI tools increase engineering velocity across all corporate divisions by 26%.
+why: >-
+  The original paper measured only entry-level code completion on isolated Python exercises, not organisation-wide velocity. ADR-0018 finding 5.

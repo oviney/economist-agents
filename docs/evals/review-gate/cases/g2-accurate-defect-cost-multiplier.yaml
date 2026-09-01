@@ -1,0 +1,8 @@
+id: g2-accurate-defect-cost-multiplier
+gate: G2
+expected: pass
+source: published-defect-economics
+passage: >-
+  Boehm's empirical data from TRW projects indicates a non-linear cost progression for requirements defects discovered during post-release operations.
+why: >-
+  Accurately identifies Boehm's TRW study as historical empirical findings without over-generalising to modern cloud microservices.

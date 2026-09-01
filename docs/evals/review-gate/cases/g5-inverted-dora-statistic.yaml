@@ -1,0 +1,8 @@
+id: g5-inverted-dora-statistic
+gate: G5
+expected: fail
+source: adr-0018-evals
+passage: >-
+  Elite engineering teams experience 7× higher change failure rates as a direct consequence of shipping daily.
+why: >-
+  Fact inversion: DORA reports elite performers experience substantially lower change failure rates, not higher. ADR-0018 finding 1.

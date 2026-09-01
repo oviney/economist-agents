@@ -19,6 +19,7 @@ import os
 import re
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -118,7 +119,7 @@ class PublicationValidator:
         "Security",
     ]
 
-    CRITICAL_FAILURES = {
+    CRITICAL_FAILURES: dict[str, dict[str, Any]] = {
         "VERIFICATION_FLAGS": {
             "severity": "CRITICAL",
             "message": "Article contains unverified claims",
@@ -173,9 +174,10 @@ class PublicationValidator:
         """
         self.expected_date = expected_date or datetime.now().strftime("%Y-%m-%d")
         self.require_image_file = require_image_file
-        self.issues = []
+        self.issues: list[dict[str, str]] = []
 
         # Initialize defect prevention checker
+        self.defect_checker: DefectPrevention | None
         if DEFECT_PREVENTION_AVAILABLE:
             self.defect_checker = DefectPrevention()
         else:

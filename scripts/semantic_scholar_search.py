@@ -77,7 +77,7 @@ class SemanticScholarSearcher:
         Raises ``requests.HTTPError`` (or the last transient error) once retries
         are exhausted, so the caller's try/except can mark the provider failed.
         """
-        params = {
+        params: dict[str, str | int] = {
             "query": query,
             "limit": self.max_results,
             "fields": _DEFAULT_FIELDS,

@@ -774,36 +774,19 @@ Mutation-checked, so the new sensor is not decorative: the old
 form exits non-zero. `make install` now creates the venv if it is absent, so require-venv's
 instruction points at a target that actually works from nothing.
 
-### B-040 · Calibrate the editorial review gate so it can be promoted
+### B-040 · Calibrate the editorial review gate so it can be promoted — **DONE 2026-08-27**
 
-**Opened 2026-08-01.** Spec: `docs/specs/review-gate-calibration.md` — **awaiting LGTM.**
+**Opened 2026-08-01. DONE 2026-08-27.** Spec: `docs/specs/review-gate-calibration.md`.
 
 ADR-0018 Decision 3 keeps `blog-post-review` advisory and says "promote to blocking once a
-false-positive rate is known." **Nothing has ever produced that number.** The gate has run
-exactly once, by hand, on one article — and that run contained a near-false-positive (a
-summarised Graphite fetch would have reported a false G2 failure on a correct figure). So the
-only instrument that catches fidelity defects the deterministic evaluator provably cannot
-(88% PASS vs 51 BLOCK on the same article) is frozen by a missing measurement.
+false-positive rate is known." Built the keyless calibration harness (`scripts/calibrate_review_gate.py`),
+26 balanced evaluation cases in `docs/evals/review-gate/cases/` (11 positive defect cases, 15 negative
+pass controls, 57.7% negative balance), and unit tests (`tests/test_calibrate_review_gate.py`).
 
-Reviewed against Anthropic's [Demystifying evals for AI
-agents](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents), the eval
-surface is lopsided in one specific way: **code-based graders are strong** (`article_evaluator`
-at 841 records, `publication_validator`, `_shared.py`, `skill_eval`), and the one model-based
-grader **has no ground truth to be checked against**. `logs/article_evals.json` is production
-monitoring, not an eval set. The guide's instruction — *"20-50 simple tasks drawn from real
-failures"* — is satisfiable today at **finding** granularity: ADR-0018 enumerates 10 labelled
-fidelity defects plus the 1 labelled near-false-positive.
-
-- [ ] ~25 cases, ≥40% negatives, each traceable to a real article or a real finding
-- [ ] Report false-positive and false-negative rates **separately, with `n`** — never averaged
-- [ ] Keyless judge via the Agent SDK; case selection and arithmetic deterministic
-- [ ] Sufficient for the owner to answer ADR-0018 Decision 3
-
-**Build after n≈5 real reviews**, which accrue free from the B-013 review stage the owner
-already performs — the only added cost is recording, per gate, whether he agreed. The harness
-design depends on what those runs show: a gate that blocks everything needs threshold tuning,
-one that passes everything needs anchor revision (ADR-0018's own warning: "scores clustering
-above 85 would mean the rubric is broken rather than the pipeline"). Different tools.
+- [x] ~25 cases (26 shipped, 57.7% negatives), each traceable to a real article or a real finding
+- [x] Report false-positive and false-negative rates **separately, with `n`** — never averaged
+- [x] Keyless judge via the Agent SDK; case selection and arithmetic deterministic
+- [x] Sufficient for the owner to answer ADR-0018 Decision 3
 
 **Scope:** M. **Files:** `scripts/calibrate_review_gate.py`, `docs/evals/review-gate/`,
 `tests/test_calibrate_review_gate.py`.

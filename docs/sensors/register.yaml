@@ -46,6 +46,23 @@ sensors:
       scripts/llm_client.py, run the guard, assert exit 1 — with the
       fully-qualified form as the control.
 
+  - id: docs_truth_gate
+    script: scripts/check_docs_references.py
+    regulates: >-
+      An instruction document naming a repo path that does not exist. These
+      documents are how a human or an agent learns to operate the repo, so a
+      dangling path is an instruction to open a file that was deleted, moved, or
+      never existed. Measured at 10 on 2026-09-01, four of them naming a
+      `src/crews/stage3_crew.py` that has never existed here (B-045).
+    proof: tests/test_docs_references.py::TestItFiresOnTheDefectItExistsFor::test_a_dangling_reference_makes_the_gate_exit_one
+    mutation: >-
+      Point an instruction doc in a fixture tree at `scripts/gone.py`, run
+      main(), assert exit 1 — with a resolving reference as the control, so the
+      proof cannot pass on a gate that always fails.
+      LIMIT: this sensor checks path *existence*, not whether the prose is true.
+      A doc that names a real file while describing behaviour that was deleted
+      passes cleanly, and B-045 found exactly one such case by hand.
+
   - id: destructive_change_guard
     script: scripts/destructive_change_guard.py
     regulates: >-

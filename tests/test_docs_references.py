@@ -219,30 +219,37 @@ def test_breaks_from_several_documents_are_all_reported(tmp_path: Path) -> None:
     assert {x.path for x in breaks} == {"scripts/gone_a.py", "src/gone_b.py"}
 
 
-def test_main_returns_zero_when_every_reference_resolves(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """The process exit code is what `ci-local` will gate on."""
-    import scripts.check_docs_references as cdr
+class TestItFiresOnTheDefectItExistsFor:
+    """The sensor's proof of teeth (B-043, `docs/sensors/register.yaml`).
 
-    _write(tmp_path, "scripts/real.py", "x = 1\n")
-    _write(tmp_path, "CLAUDE.md", "Run `scripts/real.py`.\n")
-    monkeypatch.setattr(cdr, "REPO_ROOT", tmp_path)
-    monkeypatch.setattr(cdr, "INSTRUCTION_DOCS", ("CLAUDE.md",))
+    A sensor that cannot fail is decoration. These two assert the process exit
+    code — the thing `make ci-local` actually gates on — in both directions,
+    with the resolving reference as the control.
+    """
 
-    assert cdr.main() == 0
+    def test_a_dangling_reference_makes_the_gate_exit_one(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        import scripts.check_docs_references as cdr
 
+        _write(tmp_path, "CLAUDE.md", "Run `scripts/gone.py`.\n")
+        monkeypatch.setattr(cdr, "REPO_ROOT", tmp_path)
+        monkeypatch.setattr(cdr, "INSTRUCTION_DOCS", ("CLAUDE.md",))
 
-def test_main_returns_one_when_a_reference_is_broken(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    import scripts.check_docs_references as cdr
+        assert cdr.main() == 1
 
-    _write(tmp_path, "CLAUDE.md", "Run `scripts/gone.py`.\n")
-    monkeypatch.setattr(cdr, "REPO_ROOT", tmp_path)
-    monkeypatch.setattr(cdr, "INSTRUCTION_DOCS", ("CLAUDE.md",))
+    def test_the_control_a_resolving_reference_exits_zero(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Without this the test above would pass on a gate that always fails."""
+        import scripts.check_docs_references as cdr
 
-    assert cdr.main() == 1
+        _write(tmp_path, "scripts/real.py", "x = 1\n")
+        _write(tmp_path, "CLAUDE.md", "Run `scripts/real.py`.\n")
+        monkeypatch.setattr(cdr, "REPO_ROOT", tmp_path)
+        monkeypatch.setattr(cdr, "INSTRUCTION_DOCS", ("CLAUDE.md",))
+
+        assert cdr.main() == 0
 
 
 # ── the regression guard (B-045 S2) ─────────────────────────────────────────

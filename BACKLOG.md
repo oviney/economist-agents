@@ -52,27 +52,52 @@ bump the pin deliberately."*
 cost this session already: I trusted a local signal without checking what
 produced it. A clean worktree is not a clean environment.
 
-### B-045 · Docs-truth gate — fail `ci-local` on a broken doc reference
+### B-045 · Docs-truth gate — fail `ci-local` on a broken doc reference — **DONE 2026-09-01**
 
-A gate that checks every repo-relative path referenced by an *instruction*
-document actually exists. Measured on this base in a worktree: **13 real
-breaks**, including four in `CONTRIBUTING.md` pointing at
-`src/crews/stage3_crew.py`, a file that has never existed in this repo.
+`scripts/check_docs_references.py` checks that every repo-relative path
+referenced by an *instruction* document exists, and runs as the fourth step of
+`make ci-local`. Six documents are scanned: `CLAUDE.md`, `README.md`,
+`CONTRIBUTING.md`, both copilot instruction files, and the keyless runbook.
+Spec: `docs/specs/B-045-docs-truth-gate.md`.
 
-A prior implementation is on `b024-retire-paid-path-STALE-BASE`
-(`scripts/check_docs_references.py`, `tests/test_docs_references.py`).
-**Re-derive rather than cherry-pick** — it was written against a base 70 commits
-stale, and both `CONTRIBUTING.md` and `.github/copilot-instructions.md` moved.
+**It was 10 real breaks, not 13.** This entry recorded 13. Three of those were
+the checker's own unstripped-anchor bug reporting files that exist — the bug
+this same entry documented was inflating its own findings. All ten are fixed:
 
-Two things it already knows, worth keeping:
-- **Known bug:** `_normalise` does not strip GitHub line anchors, so
-  `scripts/economist_agent.py#L28-L65` reports as broken.
-- **Known limit, belongs in the spec:** it checks path *existence*, not whether
-  prose is true. It would not have caught either fix on
-  `fix/claude-md-hero-contradiction` — both name files that exist. A doc can
-  still lie about behaviour and pass.
+- `CONTRIBUTING.md:152` named a `.github/workflows/ci.yml` that ADR-0015
+  retired and that never came back.
+- `CONTRIBUTING.md:344-347` — the "Finding the Right Prompt" table named
+  `src/crews/stage3_crew.py` four times, a file that has never existed here.
+  Rewritten against the real modules rather than redirected, and its
+  "Graphics Agent — chart data generation" row deleted: Stage 3 draws nothing
+  (B-042, constraint #4). A contributor following that row would have gone
+  hunting for the capability the owner deliberately removed.
+- Four references to `scripts/blog_qa_agent.py` / `architecture_review.py`,
+  both moved to `scripts/archived/`, plus `scripts/defect_tracker.py`, which
+  is `src/quality/defect_tracker.py`.
 
-Blocked by BUG-073.
+Two things the gate found only because a human was reading, both prose it
+passes cleanly:
+
+- Nine runnable `python3 scripts/...` commands still named pre-move paths.
+- `.github/copilot-instructions.md:278` told you to run the defect tracker
+  module for a report. Its `main()` ignores argv and calls `fix_bug()` — it
+  mutates tracker state and prints nothing. Now points at
+  `python3 -m scripts.quality_dashboard --no-save`.
+
+**The limit, restated because it is easy to forget once a gate is green:** this
+checks path *existence*, not whether prose is true. It would not have caught
+either fix on `fix/claude-md-hero-contradiction` — both named files that exist
+while describing behaviour that had been deleted. The second bullet above is
+exactly that failure, and only a person caught it.
+
+`ALLOWED_MISSING` ships empty and every addition is owner-gated. The prior
+stale-base implementation shipped one entry excusing `scripts/economist_agent.py`
+as deleted by B-024; B-024 was abandoned and the file is still here at 49KB, so
+that entry would have suppressed a live check.
+
+38 tests in `tests/test_docs_references.py`, including a real-repo guard so
+`pytest` alone catches a regression, and five parametrised anchor cases.
 
 ### BUG-074 · Six MCP servers are configured, enabled, and dead (MEDIUM)
 

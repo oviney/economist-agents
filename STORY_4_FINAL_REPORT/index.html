@@ -3121,36 +3121,36 @@
 </ol>
 <h3 id="test-code-structure">Test Code Structure<a class="headerlink" href="#test-code-structure" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_issue_16_prevention</span><span class="p">():</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that missing chart embedding is caught by self-validation&quot;&quot;&quot;</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="sd">"""Test that missing chart embedding is caught by self-validation"""</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="c1"># TEST CASE 1: Missing chart (should FAIL)</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">article_no_chart</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;...&quot;&quot;&quot;</span>  <span class="c1"># No chart markdown</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">article_no_chart</span> <span class="o">=</span> <span class="s2">"""..."""</span>  <span class="c1"># No chart markdown</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">is_valid</span><span class="p">,</span> <span class="n">issues</span> <span class="o">=</span> <span class="n">review_agent_output</span><span class="p">(</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>        <span class="s2">&quot;writer_agent&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>        <span class="s2">"writer_agent"</span><span class="p">,</span>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="n">article_no_chart</span><span class="p">,</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;chart_filename&quot;</span><span class="p">:</span> <span class="s2">&quot;/assets/charts/testing-gap.png&quot;</span><span class="p">}</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">"chart_filename"</span><span class="p">:</span> <span class="s2">"/assets/charts/testing-gap.png"</span><span class="p">}</span>
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="p">)</span>
 <a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="n">is_valid</span><span class="p">,</span> <span class="s2">&quot;Should catch missing chart&quot;</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="k">assert</span> <span class="nb">any</span><span class="p">(</span><span class="s2">&quot;chart not embedded&quot;</span> <span class="ow">in</span> <span class="n">i</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">issues</span><span class="p">)</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="k">assert</span> <span class="ow">not</span> <span class="n">is_valid</span><span class="p">,</span> <span class="s2">"Should catch missing chart"</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="k">assert</span> <span class="nb">any</span><span class="p">(</span><span class="s2">"chart not embedded"</span> <span class="ow">in</span> <span class="n">i</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">issues</span><span class="p">)</span>
 <a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
 <a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    <span class="c1"># TEST CASE 2: Properly embedded (should PASS)</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="n">article_with_chart</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;...</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="n">article_with_chart</span> <span class="o">=</span> <span class="s2">"""...</span>
 <a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="s2">    ![The Maintenance Gap](/assets/charts/testing-gap.png)</span>
 <a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>
 <a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="s2">    As the chart shows, AI adoption has surged...</span>
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="s2">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="s2">    """</span>
 <a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>
 <a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>    <span class="n">is_valid_chart</span><span class="p">,</span> <span class="n">issues_chart</span> <span class="o">=</span> <span class="n">review_agent_output</span><span class="p">(</span>
-<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>        <span class="s2">&quot;writer_agent&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>        <span class="s2">"writer_agent"</span><span class="p">,</span>
 <a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>        <span class="n">article_with_chart</span><span class="p">,</span>
-<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>        <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;chart_filename&quot;</span><span class="p">:</span> <span class="s2">&quot;/assets/charts/testing-gap.png&quot;</span><span class="p">}</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>        <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">"chart_filename"</span><span class="p">:</span> <span class="s2">"/assets/charts/testing-gap.png"</span><span class="p">}</span>
 <a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>    <span class="p">)</span>
 <a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>
 <a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>    <span class="c1"># Verify chart embedding recognized</span>
-<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>    <span class="n">chart_issues</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">issues_chart</span> <span class="k">if</span> <span class="s2">&quot;chart not embedded&quot;</span> <span class="ow">in</span> <span class="n">i</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span>
-<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">chart_issues</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Should accept proper embedding&quot;</span>
+<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>    <span class="n">chart_issues</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">issues_chart</span> <span class="k">if</span> <span class="s2">"chart not embedded"</span> <span class="ow">in</span> <span class="n">i</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span>
+<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">chart_issues</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"Should accept proper embedding"</span>
 </code></pre></div>
 <h3 id="validation-layers-tested">Validation Layers Tested<a class="headerlink" href="#validation-layers-tested" title="Permanent link">&para;</a></h3>
 <p>The test validates the <strong>REVIEWS</strong> layer (Agent Reviewer):
@@ -3186,7 +3186,7 @@
 <a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>Issues Found: 3
 <a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>
 <a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>ISSUES:
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>  [CRITICAL] CRITICAL: Chart not embedded (expected &#39;/assets/charts/testing-gap.png&#39;)
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>  [CRITICAL] CRITICAL: Chart not embedded (expected '/assets/charts/testing-gap.png')
 <a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>  [WARNING] WARNING: Chart embedded but not referenced in text
 <a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>  [WARNING] WARNING: Article too short (26 words, ≥800 expected)
 <a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>============================================================
@@ -3216,7 +3216,7 @@
 <h3 id="pytest-warning-fixes">Pytest Warning Fixes<a class="headerlink" href="#pytest-warning-fixes" title="Permanent link">&para;</a></h3>
 <p><strong>Problem</strong>: All test functions had <code>return True</code> statements causing pytest warnings:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>PytestReturnNotNoneWarning: Test functions should return None,
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>but test_function returned &lt;class &#39;bool&#39;&gt;
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>but test_function returned &lt;class 'bool'&gt;
 </code></pre></div></p>
 <p><strong>Fix</strong>: Removed all <code>return True</code> statements from 6 test functions:
 - test_issue_15_prevention

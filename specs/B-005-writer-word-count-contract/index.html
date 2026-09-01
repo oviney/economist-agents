@@ -2759,15 +2759,15 @@ constant/contract/unit level.</p>
 </code></pre></div>
 <p><code>_check_word_count</code> reads the constant; the helper is pure and importable:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">word_count_shortfall</span><span class="p">(</span><span class="n">article</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return specific expansion feedback if the body is under WORD_COUNT_MIN,</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="sd">    else None. Pure — used by the validator message and as revision feedback.&quot;&quot;&quot;</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="sd">"""Return specific expansion feedback if the body is under WORD_COUNT_MIN,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="sd">    else None. Pure — used by the validator message and as revision feedback."""</span>
 </code></pre></div>
 <p>Prompt builder imports and interpolates — no bare literals:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scripts.publication_validator</span><span class="w"> </span><span class="kn">import</span> <span class="n">WORD_COUNT_MIN</span><span class="p">,</span> <span class="n">WORD_COUNT_TARGET</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="o">...</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="sa">f</span><span class="s2">&quot;Target ~</span><span class="si">{</span><span class="n">WORD_COUNT_TARGET</span><span class="si">}</span><span class="s2"> words across 4–5 body sections of ~180–220 words &quot;</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="sa">f</span><span class="s2">&quot;each. The publication validator rejects anything under </span><span class="si">{</span><span class="n">WORD_COUNT_MIN</span><span class="si">}</span><span class="s2">, so &quot;</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="sa">f</span><span class="s2">&quot;never come in short.</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="sa">f</span><span class="s2">"Target ~</span><span class="si">{</span><span class="n">WORD_COUNT_TARGET</span><span class="si">}</span><span class="s2"> words across 4–5 body sections of ~180–220 words "</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="sa">f</span><span class="s2">"each. The publication validator rejects anything under </span><span class="si">{</span><span class="n">WORD_COUNT_MIN</span><span class="si">}</span><span class="s2">, so "</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="sa">f</span><span class="s2">"never come in short.</span><span class="se">\n\n</span><span class="s2">"</span>
 </code></pre></div>
 <h2 id="testing-strategy-all-no-api">Testing Strategy (all no-API)<a class="headerlink" href="#testing-strategy-all-no-api" title="Permanent link">&para;</a></h2>
 <p><code>tests/test_word_count_contract.py</code>:

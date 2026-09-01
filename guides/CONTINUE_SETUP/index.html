@@ -2885,7 +2885,7 @@ Then select:
 Should show: <code>sk-proj--Q</code></p>
 <h3 id="2-test-continue-chat">2. Test Continue Chat<a class="headerlink" href="#2-test-continue-chat" title="Permanent link">&para;</a></h3>
 <p>Open Continue (<code>Cmd+L</code>) and paste:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>What model are you? Please identify yourself and confirm you&#39;re using OpenAI&#39;s API.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>What model are you? Please identify yourself and confirm you're using OpenAI's API.
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>@codebase What are the Sprint 9 Stories and their point values?
 </code></pre></div></p>
@@ -2896,7 +2896,7 @@ Should show: <code>sk-proj--Q</code></p>
 <h3 id="3-test-tab-autocomplete">3. Test Tab Autocomplete<a class="headerlink" href="#3-test-tab-autocomplete" title="Permanent link">&para;</a></h3>
 <p>Open any Python file and type:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">calculate_quality_score</span><span class="p">():</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="s2">&quot;&quot;&quot;Calculate project quality</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="s2">"""Calculate project quality</span>
 </code></pre></div></p>
 <p>Autocomplete should suggest the rest of the docstring and function body.</p>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
@@ -2911,7 +2911,7 @@ Should show: <code>sk-proj--Q</code></p>
 <h3 id="model-not-available">"Model not available"<a class="headerlink" href="#model-not-available" title="Permanent link">&para;</a></h3>
 <p>Check your OpenAI account has API access:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>curl<span class="w"> </span>https://api.openai.com/v1/models<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$OPENAI_API_KEY</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.data[].id&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>gpt-4o
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Authorization: Bearer </span><span class="nv">$OPENAI_API_KEY</span><span class="s2">"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'.data[].id'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>gpt-4o
 </code></pre></div></p>
 <h3 id="copilot-still-active">"Copilot still active"<a class="headerlink" href="#copilot-still-active" title="Permanent link">&para;</a></h3>
 <ol>
@@ -2970,14 +2970,14 @@ https://platform.openai.com/usage</p>
 <li>
 <p><strong>Enable Copilot Chat</strong>:
    Edit <code>.vscode/settings.json</code>:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">&quot;github.copilot.enable&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="nt">&quot;*&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">"github.copilot.enable"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="nt">"*"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="p">}</span>
 </code></pre></div></p>
 </li>
 <li>
 <p><strong>Disable Continue</strong>:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">&quot;continue.enableTabAutocomplete&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">"continue.enableTabAutocomplete"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 </code></pre></div></p>
 </li>
 <li>

@@ -9508,7 +9508,7 @@ have caught it, because both were gaps in what was being checked at all.</p>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># AFTER (SECURE):</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;git&quot;</span><span class="p">,</span> <span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="n">file</span><span class="p">],</span> <span class="n">shell</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">"git"</span><span class="p">,</span> <span class="s2">"add"</span><span class="p">,</span> <span class="n">file</span><span class="p">],</span> <span class="n">shell</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </code></pre></div></p>
 <p><strong>Prevention Strategy</strong>:
 - Add Bandit security scan to CI/CD pipeline
@@ -9609,7 +9609,7 @@ have caught it, because both were gaps in what was being checked at all.</p>
 - <strong>Missing</strong>: Git workflow with pre-commit hooks integration test
 - <strong>Coverage</strong>: 42.9% integration test gap (Sprint 7 finding)</p>
 <h3 id="workaround-manual">Workaround (Manual)<a class="headerlink" href="#workaround-manual" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>git<span class="w"> </span>add<span class="w"> </span>-A<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;message&quot;</span><span class="w"> </span>--no-verify<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>push
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>git<span class="w"> </span>add<span class="w"> </span>-A<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"message"</span><span class="w"> </span>--no-verify<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>push
 </code></pre></div>
 <p><strong>Note</strong>: <code>--no-verify</code> bypasses pre-commit hooks (not recommended for production)</p>
 <h3 id="fix-required">Fix Required<a class="headerlink" href="#fix-required" title="Permanent link">&para;</a></h3>
@@ -9982,10 +9982,10 @@ Re-validate with REAL content from <code>economist_agent.py</code> full pipeline
 - Type hints and comprehensive docstrings</p>
 <p><strong>Regex Pattern Evolution</strong>:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Sprint 8 Documentation (Original)</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="sa">r</span><span class="s2">&quot;\*\*GATE 1: OPENING\*\*\s*-\s*\[(PASS|FAIL)\]&quot;</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="sa">r</span><span class="s2">"\*\*GATE 1: OPENING\*\*\s*-\s*\[(PASS|FAIL)\]"</span>
 <a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
 <a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># Sprint 9 Implementation (Flexible)</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="sa">r</span><span class="s2">&quot;\*\*GATE 1: OPENING\*\*\s*[-:]\s*\[?(PASS|FAIL)\]?&quot;</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="sa">r</span><span class="s2">"\*\*GATE 1: OPENING\*\*\s*[-:]\s*\[?(PASS|FAIL)\]?"</span>
 </code></pre></div></p>
 <p><strong>Why Change?</strong>: LLM outputs "<strong>GATE 1: OPENING</strong> - PASS" (no brackets) instead of expected "[PASS]" format. Flexible patterns handle both formats.</p>
 <p><strong>docs/SPRINT_9_STORY_1_COMPLETE.md</strong> (NEW - comprehensive report):
@@ -10077,11 +10077,11 @@ Re-validate with REAL content from <code>economist_agent.py</code> full pipeline
 <p><strong>Technical Implementation</strong>:</p>
 <p><strong>Fix #1: Regex-Based Gate Counting</strong> (28 lines)
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">GATE_PATTERNS</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="sa">r</span><span class="s2">&quot;\*\*GATE 1: OPENING\*\*\s*-\s*\[(PASS|FAIL)\]&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    <span class="sa">r</span><span class="s2">&quot;\*\*GATE 2: EVIDENCE\*\*\s*-\s*\[(PASS|FAIL)\]&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="sa">r</span><span class="s2">&quot;\*\*GATE 3: VOICE\*\*\s*-\s*\[(PASS|FAIL)\]&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    <span class="sa">r</span><span class="s2">&quot;\*\*GATE 4: STRUCTURE\*\*\s*-\s*\[(PASS|FAIL)\]&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>    <span class="sa">r</span><span class="s2">&quot;\*\*GATE 5: CHART INTEGRATION\*\*\s*-\s*\[(PASS|FAIL)\]&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="sa">r</span><span class="s2">"\*\*GATE 1: OPENING\*\*\s*-\s*\[(PASS|FAIL)\]"</span><span class="p">,</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    <span class="sa">r</span><span class="s2">"\*\*GATE 2: EVIDENCE\*\*\s*-\s*\[(PASS|FAIL)\]"</span><span class="p">,</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="sa">r</span><span class="s2">"\*\*GATE 3: VOICE\*\*\s*-\s*\[(PASS|FAIL)\]"</span><span class="p">,</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    <span class="sa">r</span><span class="s2">"\*\*GATE 4: STRUCTURE\*\*\s*-\s*\[(PASS|FAIL)\]"</span><span class="p">,</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>    <span class="sa">r</span><span class="s2">"\*\*GATE 5: CHART INTEGRATION\*\*\s*-\s*\[(PASS|FAIL)\]"</span><span class="p">,</span>
 <a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="p">]</span>
 <a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>
 <a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="k">def</span><span class="w"> </span><span class="nf">_parse_gate_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
@@ -10091,8 +10091,8 @@ Re-validate with REAL content from <code>economist_agent.py</code> full pipeline
 <a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
 <a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>        <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
 <a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>            <span class="n">result</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>            <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="s2">&quot;PASS&quot;</span><span class="p">:</span> <span class="n">gates_passed</span> <span class="o">+=</span> <span class="mi">1</span>
-<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>            <span class="k">elif</span> <span class="n">result</span> <span class="o">==</span> <span class="s2">&quot;FAIL&quot;</span><span class="p">:</span> <span class="n">gates_failed</span> <span class="o">+=</span> <span class="mi">1</span>
+<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>            <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="s2">"PASS"</span><span class="p">:</span> <span class="n">gates_passed</span> <span class="o">+=</span> <span class="mi">1</span>
+<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>            <span class="k">elif</span> <span class="n">result</span> <span class="o">==</span> <span class="s2">"FAIL"</span><span class="p">:</span> <span class="n">gates_failed</span> <span class="o">+=</span> <span class="mi">1</span>
 <a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a>    <span class="k">return</span> <span class="n">gates_passed</span><span class="p">,</span> <span class="n">gates_failed</span>
 </code></pre></div></p>
 <p><strong>Fix #2: Deterministic Evaluation</strong> (1 line change)
@@ -10103,21 +10103,21 @@ Re-validate with REAL content from <code>economist_agent.py</code> full pipeline
 <p><strong>Fix #3: Output Format Validation</strong> (19 lines)
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">_validate_editor_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    <span class="n">required_sections</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>        <span class="s2">&quot;## Quality Gate Results&quot;</span><span class="p">,</span>
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>        <span class="s2">&quot;**OVERALL GATES PASSED**:&quot;</span><span class="p">,</span>
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>        <span class="s2">&quot;**PUBLICATION DECISION**:&quot;</span><span class="p">,</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>        <span class="s2">"## Quality Gate Results"</span><span class="p">,</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>        <span class="s2">"**OVERALL GATES PASSED**:"</span><span class="p">,</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>        <span class="s2">"**PUBLICATION DECISION**:"</span><span class="p">,</span>
 <a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>    <span class="p">]</span>
 <a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>
 <a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>    <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">required_sections</span><span class="p">:</span>
 <a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>        <span class="k">if</span> <span class="n">section</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
-<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;⚠️  Missing required section: </span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"⚠️  Missing required section: </span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>            <span class="k">return</span> <span class="kc">False</span>
 <a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>
 <a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>    <span class="c1"># Validate at least 3 of 5 gates present</span>
 <a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a>    <span class="n">gate_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">GATE_PATTERNS</span>
 <a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a>                     <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">))</span>
 <a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a>    <span class="k">if</span> <span class="n">gate_count</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
-<a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;⚠️  Only </span><span class="si">{</span><span class="n">gate_count</span><span class="si">}</span><span class="s2">/5 gates found in response&quot;</span><span class="p">)</span>
+<a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"⚠️  Only </span><span class="si">{</span><span class="n">gate_count</span><span class="si">}</span><span class="s2">/5 gates found in response"</span><span class="p">)</span>
 <a id="__codelineno-13-18" name="__codelineno-13-18" href="#__codelineno-13-18"></a>        <span class="k">return</span> <span class="kc">False</span>
 <a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a>
 <a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a>    <span class="k">return</span> <span class="kc">True</span>
@@ -10438,13 +10438,13 @@ Re-validate with REAL content from <code>economist_agent.py</code> full pipeline
 - [x] Quality: 9/9 test cases passing ✅</p>
 <p><strong>CLI Usage</strong>:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># Generate story from user request</span>
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>python3<span class="w"> </span>scripts/po_agent.py<span class="w"> </span>--request<span class="w"> </span><span class="s2">&quot;Improve chart quality&quot;</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>python3<span class="w"> </span>scripts/po_agent.py<span class="w"> </span>--request<span class="w"> </span><span class="s2">"Improve chart quality"</span>
 <a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
 <a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="c1"># Show backlog summary</span>
 <a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>python3<span class="w"> </span>scripts/po_agent.py<span class="w"> </span>--summary
 <a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>
 <a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="c1"># Custom backlog file</span>
-<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>python3<span class="w"> </span>scripts/po_agent.py<span class="w"> </span>--backlog<span class="w"> </span>custom_backlog.json<span class="w"> </span>--request<span class="w"> </span><span class="s2">&quot;...&quot;</span>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>python3<span class="w"> </span>scripts/po_agent.py<span class="w"> </span>--backlog<span class="w"> </span>custom_backlog.json<span class="w"> </span>--request<span class="w"> </span><span class="s2">"..."</span>
 </code></pre></div></p>
 <p><strong>Schema Files</strong>:</p>
 <p><strong>skills/backlog.json</strong>:
@@ -10921,10 +10921,10 @@ As a system operator, I need agents to process multiple articles in parallel so 
 <a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="n">zones_valid</span><span class="p">,</span> <span class="n">zone_issues</span> <span class="o">=</span> <span class="n">zone_validator</span><span class="o">.</span><span class="n">validate_chart</span><span class="p">(</span><span class="n">image_path</span><span class="p">)</span>
 <a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>
 <a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="c1"># Combine with LLM results</span>
-<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="n">result</span><span class="p">[</span><span class="s2">&quot;zone_validation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;pass&quot;</span><span class="p">:</span> <span class="n">zones_valid</span><span class="p">,</span> <span class="s2">&quot;issues&quot;</span><span class="p">:</span> <span class="n">zone_issues</span><span class="p">}</span>
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="n">result</span><span class="p">[</span><span class="s2">"zone_validation"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"pass"</span><span class="p">:</span> <span class="n">zones_valid</span><span class="p">,</span> <span class="s2">"issues"</span><span class="p">:</span> <span class="n">zone_issues</span><span class="p">}</span>
 <a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="k">if</span> <span class="ow">not</span> <span class="n">zones_valid</span><span class="p">:</span>
-<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;overall_pass&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a>    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;critical_issues&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">zone_issues</span><span class="p">)</span>
+<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>    <span class="n">result</span><span class="p">[</span><span class="s2">"overall_pass"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a>    <span class="n">result</span><span class="p">[</span><span class="s2">"critical_issues"</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">zone_issues</span><span class="p">)</span>
 </code></pre></div>
 - <strong>Graceful fallback</strong>: If validator unavailable, continues with LLM-only
 - <strong>Enhanced output</strong>: Console shows "Zone boundaries: ✓ PASS / ✗ FAIL"</p>
@@ -11911,11 +11911,11 @@ This is identical to defect prevention system:
 <h3 id="testing-validation_2">Testing &amp; Validation<a class="headerlink" href="#testing-validation_2" title="Permanent link">&para;</a></h3>
 <p><strong>Test Case 1: BUG-016 Pattern (Chart Not Embedded)</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>Input: Article with chart_data but no markdown embed
-<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>Result: ✅ CAUGHT - &quot;Chart generated but not embedded&quot;
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>Result: ✅ CAUGHT - "Chart generated but not embedded"
 </code></pre></div></p>
 <p><strong>Test Case 2: BUG-015 Pattern (Missing Category)</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>Input: Article without category field in frontmatter
-<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>Result: ✅ CAUGHT - &quot;Missing category field&quot;
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>Result: ✅ CAUGHT - "Missing category field"
 </code></pre></div></p>
 <p><strong>Test Case 3: Properly Formed Article</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>Input: Article with chart, category, all requirements

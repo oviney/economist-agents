@@ -2757,8 +2757,8 @@ script</strong> (see next section).</p>
 <h2 id="resolved-2026-07-24-do-not-label-our-prs-with-agent">RESOLVED (2026-07-24): do <strong>not</strong> label our PRs with <code>agent:*</code><a class="headerlink" href="#resolved-2026-07-24-do-not-label-our-prs-with-agent" title="Permanent link">&para;</a></h2>
 <p>Read <code>check-pr-scope.sh</code> rather than inferring from the docs. Rule 4 is
 <strong>opt-in by label</strong>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$AGENT_LABEL</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;check-pr-scope: no agent label found in PR_LABELS — skipping agent-scope check (human PR).&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">"</span><span class="nv">$AGENT_LABEL</span><span class="s2">"</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"check-pr-scope: no agent label found in PR_LABELS — skipping agent-scope check (human PR)."</span>
 </code></pre></div>
 <p>An <strong>unlabelled PR skips Rule 4 entirely</strong> as a "human PR". Adding
 <code>agent:editorial-chief</code> would therefore <em>add</em> restrictions, never remove them —
@@ -2924,7 +2924,7 @@ is therefore a blocker for the next article, not an enhancement.</strong></p>
 </ul>
 <p><strong>Verify any change by running the blog's own scripts</strong>, not by reading them:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>bash<span class="w"> </span>scripts/validate-posts.sh
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>bash<span class="w"> </span>scripts/validate-post-quality.sh<span class="w"> </span>--all<span class="w">   </span><span class="c1"># exit 2 = warnings only, that&#39;s a pass</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>bash<span class="w"> </span>scripts/validate-post-quality.sh<span class="w"> </span>--all<span class="w">   </span><span class="c1"># exit 2 = warnings only, that's a pass</span>
 </code></pre></div>
 <blockquote>
 <p><strong>No redirects.</strong> The blog has <strong>no <code>jekyll-redirect-from</code></strong> and <code>_config.yml</code> is

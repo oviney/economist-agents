@@ -2700,7 +2700,7 @@ recurs.</p>
 writer path already consumes.</strong> No change to the pipeline.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python<span class="w"> </span>scripts/html_to_brief.py<span class="w"> </span>~/Downloads/conversation.html<span class="w"> </span>--slug<span class="w"> </span>ai-code-review
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1"># writes docs/research/ai-code-review.md</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nv">IS_SANDBOX</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">&quot;&lt;topic&gt;&quot;</span><span class="w"> </span>--brief<span class="w"> </span>docs/research/ai-code-review.md
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nv">IS_SANDBOX</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">"&lt;topic&gt;"</span><span class="w"> </span>--brief<span class="w"> </span>docs/research/ai-code-review.md
 </code></pre></div>
 <h2 id="what-the-contract-actually-requires-this-decides-the-whole-design">What the contract actually requires — this decides the whole design<a class="headerlink" href="#what-the-contract-actually-requires-this-decides-the-whole-design" title="Permanent link">&para;</a></h2>
 <p>Measured, not assumed. <code>--brief</code> is loaded by <code>load_brief_file</code>, which does exactly two

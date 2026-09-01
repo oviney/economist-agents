@@ -2696,7 +2696,7 @@ on PATH; credentials in <code>~/.claude/</code>).</p>
 <h2 id="1-generate-keyless">1. Generate (keyless)<a class="headerlink" href="#1-generate-keyless" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># IS_SANDBOX=1 is required ONLY when running as root — the SDK otherwise refuses</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c1"># --dangerously-skip-permissions. Drop it if you run as a normal user.</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nv">IS_SANDBOX</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">&quot;your topic here&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nv">IS_SANDBOX</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">"your topic here"</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span>--research-mode<span class="w"> </span>claude_web
 </code></pre></div>
 <ul>
@@ -2719,7 +2719,7 @@ on PATH; credentials in <code>~/.claude/</code>).</p>
 <p>For a cornerstone post where sourcing quality matters most, run the
 <code>deep-research</code> harness first to produce a verified, cited brief
 (<code>docs/research/&lt;slug&gt;.md</code>), then hand it to the writer:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">IS_SANDBOX</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">&quot;&lt;topic&gt;&quot;</span><span class="w"> </span><span class="se">\</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">IS_SANDBOX</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">"&lt;topic&gt;"</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span>--brief<span class="w"> </span>docs/research/&lt;slug&gt;.md
 </code></pre></div>
 <p><code>--brief</code> skips the research step and uses that file (refuted claims are
@@ -2745,8 +2745,8 @@ counting checks can see "chart embedded: yes" and "3 references cited" and nothi
 That is the 88%-vs-51 gap of ADR-0018, live.</p>
 <p><strong>The tool did what it was asked.</strong> The defect is upstream: an artifact with no evidence is
 not a research brief, it is an argument. Before running <code>--brief</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>grep<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;href=&#39;</span><span class="w"> </span>&lt;artifact&gt;.html<span class="w">      </span><span class="c1"># zero links is the warning sign</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>grep<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;](http&#39;</span><span class="w"> </span>docs/research/&lt;slug&gt;.md<span class="w">   </span><span class="c1"># and in the converted brief</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>grep<span class="w"> </span>-c<span class="w"> </span><span class="s1">'href='</span><span class="w"> </span>&lt;artifact&gt;.html<span class="w">      </span><span class="c1"># zero links is the warning sign</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>grep<span class="w"> </span>-c<span class="w"> </span><span class="s1">'](http'</span><span class="w"> </span>docs/research/&lt;slug&gt;.md<span class="w">   </span><span class="c1"># and in the converted brief</span>
 </code></pre></div>
 <p>If that returns 0, either add sources to the artifact first — <code>docs/research/artifact-sourcing-prompt.md</code>
 is a prompt to paste back into the conversation that produced it — or expect to review the
@@ -2786,7 +2786,7 @@ every run, and has since 2026-04-26. Across the five recorded runs:</p>
 </tr>
 </tbody>
 </table>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>.venv/bin/python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import json;[print(r[&#39;timestamp&#39;][:10], round(r[&#39;wall_seconds&#39;]/60,1),&#39;min&#39;, &#39;\$&#39;+str(round(r[&#39;total_cost_usd&#39;],2))) for r in map(json.loads, open(&#39;logs/agent_sdk_costs.jsonl&#39;))]&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>.venv/bin/python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import json;[print(r['timestamp'][:10], round(r['wall_seconds']/60,1),'min', '\$'+str(round(r['total_cost_usd'],2))) for r in map(json.loads, open('logs/agent_sdk_costs.jsonl'))]"</span>
 </code></pre></div>
 <p><code>docs/HANDOFF.md</code> and this runbook used to say "~$1 and ~35 minutes". No recorded run has
 ever come close to 35 minutes. A 2026-08-01 session quoted that number back to the owner and

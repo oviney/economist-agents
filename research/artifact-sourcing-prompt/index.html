@@ -2672,16 +2672,16 @@ them; I would rather know the argument rests on them.</p>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>python<span class="w"> </span>scripts/html_to_brief.py<span class="w"> </span>docs/research/samples/&lt;topic&gt;.html<span class="w"> </span>--slug<span class="w"> </span>&lt;slug&gt;<span class="w"> </span>--force
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># 3. Check it actually has sources now — this is the whole point</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>grep<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;](http&#39;</span><span class="w"> </span>docs/research/&lt;slug&gt;.md<span class="w">      </span><span class="c1"># expect &gt; 0</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>grep<span class="w"> </span>-c<span class="w"> </span><span class="s1">'](http'</span><span class="w"> </span>docs/research/&lt;slug&gt;.md<span class="w">      </span><span class="c1"># expect &gt; 0</span>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># 4. Move the &quot;Unsourced&quot; section under the brief&#39;s own `## Refuted / unverified`</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># 4. Move the "Unsourced" section under the brief's own `## Refuted / unverified`</span>
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="c1">#    heading. load_brief_file strips everything from that heading to EOF, so those</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="c1">#    claims are excluded by construction rather than by the writer&#39;s discretion.</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="c1">#    The converter demotes source headings by one level, so the artifact&#39;s own</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="c1">#    claims are excluded by construction rather than by the writer's discretion.</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="c1">#    The converter demotes source headings by one level, so the artifact's own</span>
 <a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="c1">#    heading will NOT be stripped automatically — this move is manual and deliberate.</span>
 <a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
 <a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="c1"># 5. Generate</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">&quot;&lt;topic&gt;&quot;</span><span class="w"> </span>--brief<span class="w"> </span>docs/research/&lt;slug&gt;.md
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>python<span class="w"> </span>-m<span class="w"> </span>src.agent_sdk.pipeline<span class="w"> </span><span class="s2">"&lt;topic&gt;"</span><span class="w"> </span>--brief<span class="w"> </span>docs/research/&lt;slug&gt;.md
 </code></pre></div>
 <p>Then deploy to review — never straight to <code>_posts/</code> — per the publishing workflow in
 <code>CLAUDE.md</code>.</p>

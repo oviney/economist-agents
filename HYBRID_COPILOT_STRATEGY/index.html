@@ -3107,17 +3107,17 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scripts.skills_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">SkillsManager</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># Initialize role-aware manager</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">manager</span> <span class="o">=</span> <span class="n">SkillsManager</span><span class="p">(</span><span class="n">role_name</span><span class="o">=</span><span class="s2">&quot;blog_qa&quot;</span><span class="p">)</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">manager</span> <span class="o">=</span> <span class="n">SkillsManager</span><span class="p">(</span><span class="n">role_name</span><span class="o">=</span><span class="s2">"blog_qa"</span><span class="p">)</span>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="c1"># Learn from validation run</span>
 <a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">manager</span><span class="o">.</span><span class="n">learn_pattern</span><span class="p">(</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">category</span><span class="o">=</span><span class="s2">&quot;content_quality&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">pattern_id</span><span class="o">=</span><span class="s2">&quot;missing_frontmatter&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">category</span><span class="o">=</span><span class="s2">"content_quality"</span><span class="p">,</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">pattern_id</span><span class="o">=</span><span class="s2">"missing_frontmatter"</span><span class="p">,</span>
 <a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="n">pattern_data</span><span class="o">=</span><span class="p">{</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>        <span class="s2">&quot;severity&quot;</span><span class="p">:</span> <span class="s2">&quot;critical&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>        <span class="s2">&quot;pattern&quot;</span><span class="p">:</span> <span class="s2">&quot;Post missing YAML front matter&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>        <span class="s2">&quot;check&quot;</span><span class="p">:</span> <span class="s2">&quot;Verify file starts with ---&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>        <span class="s2">&quot;learned_from&quot;</span><span class="p">:</span> <span class="s2">&quot;BUG-015&quot;</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>        <span class="s2">"severity"</span><span class="p">:</span> <span class="s2">"critical"</span><span class="p">,</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>        <span class="s2">"pattern"</span><span class="p">:</span> <span class="s2">"Post missing YAML front matter"</span><span class="p">,</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>        <span class="s2">"check"</span><span class="p">:</span> <span class="s2">"Verify file starts with ---"</span><span class="p">,</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>        <span class="s2">"learned_from"</span><span class="p">:</span> <span class="s2">"BUG-015"</span>
 <a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>    <span class="p">}</span>
 <a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="p">)</span>
 <a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>
@@ -3215,15 +3215,15 @@ Copilot instructions include the <strong>most recent 50 entries</strong> from CH
 <h2 id="usage-patterns">Usage Patterns<a class="headerlink" href="#usage-patterns" title="Permanent link">&para;</a></h2>
 <h3 id="for-developers">For Developers<a class="headerlink" href="#for-developers" title="Permanent link">&para;</a></h3>
 <p><strong>Query Copilot with Context</strong>:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>&quot;Check CHANGELOG.md for similar bugs before fixing&quot;
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>&quot;Use skills/blog_qa_skills.json patterns for validation&quot;
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>&quot;Follow CHART_DESIGN_SPEC.md zone rules&quot;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>"Check CHANGELOG.md for similar bugs before fixing"
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>"Use skills/blog_qa_skills.json patterns for validation"
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>"Follow CHART_DESIGN_SPEC.md zone rules"
 </code></pre></div></p>
 <p>Copilot automatically has these files in context.</p>
 <p><strong>Learn from Code</strong>:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Copilot sees new patterns immediately after commit</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>git<span class="w"> </span>add<span class="w"> </span>skills/blog_qa_skills.json
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Learn pattern: missing category field&quot;</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Learn pattern: missing category field"</span>
 <a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>git<span class="w"> </span>push
 </code></pre></div></p>
 <h3 id="for-quality-automation">For Quality Automation<a class="headerlink" href="#for-quality-automation" title="Permanent link">&para;</a></h3>
@@ -3247,7 +3247,7 @@ Copilot instructions include the <strong>most recent 50 entries</strong> from CH
 </code></pre></div></p>
 <p><strong>Backlog Refinement</strong>:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># PO Agent learns from past stories</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>python3<span class="w"> </span>scripts/po_agent.py<span class="w"> </span>--request<span class="w"> </span><span class="s2">&quot;Add references section&quot;</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>python3<span class="w"> </span>scripts/po_agent.py<span class="w"> </span>--request<span class="w"> </span><span class="s2">"Add references section"</span>
 <a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="c1"># Applies patterns from skills/po_agent_skills.json</span>
 </code></pre></div></p>
 <h2 id="implementation-guide">Implementation Guide<a class="headerlink" href="#implementation-guide" title="Permanent link">&para;</a></h2>
@@ -3256,12 +3256,12 @@ Copilot instructions include the <strong>most recent 50 entries</strong> from CH
 <a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>skills/
 <a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
 <a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="c1"># Initialize with SkillsManager</span>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">"</span>
 <a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="s2">from scripts.skills_manager import SkillsManager</span>
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="s2">for role in [&#39;blog_qa&#39;, &#39;po_agent&#39;, &#39;sm_agent&#39;, &#39;qe_agent&#39;]:</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="s2">for role in ['blog_qa', 'po_agent', 'sm_agent', 'qe_agent']:</span>
 <a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="s2">    mgr = SkillsManager(role_name=role)</span>
 <a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="s2">    mgr.save()</span>
-<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="s2">&quot;</span>
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="s2">"</span>
 </code></pre></div>
 <h3 id="step-2-update-copilot-instructions">Step 2: Update Copilot Instructions<a class="headerlink" href="#step-2-update-copilot-instructions" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Regenerate from CHANGELOG.md</span>
@@ -3269,7 +3269,7 @@ Copilot instructions include the <strong>most recent 50 entries</strong> from CH
 <a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
 <a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="c1"># Verify auto-loaded by Copilot</span>
 <a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>git<span class="w"> </span>add<span class="w"> </span>.github/copilot-instructions.md
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Update Copilot context with latest patterns&quot;</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Update Copilot context with latest patterns"</span>
 </code></pre></div>
 <h3 id="step-3-enable-pre-commit-validation">Step 3: Enable Pre-commit Validation<a class="headerlink" href="#step-3-enable-pre-commit-validation" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># Install hooks</span>
@@ -3277,7 +3277,7 @@ Copilot instructions include the <strong>most recent 50 entries</strong> from CH
 <a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>chmod<span class="w"> </span>+x<span class="w"> </span>.git/hooks/pre-commit
 <a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>
 <a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="c1"># Add pattern checks</span>
-<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;python3 scripts/defect_prevention_rules.py --check&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>.git/hooks/pre-commit
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">"python3 scripts/defect_prevention_rules.py --check"</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>.git/hooks/pre-commit
 </code></pre></div>
 <h3 id="step-4-integrate-with-cicd">Step 4: Integrate with CI/CD<a class="headerlink" href="#step-4-integrate-with-cicd" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># .github/workflows/quality-gates.yml</span>
@@ -3333,7 +3333,7 @@ Copilot instructions include the <strong>most recent 50 entries</strong> from CH
 <h3 id="3-github-copilot-workspace-integration">3. GitHub Copilot Workspace Integration<a class="headerlink" href="#3-github-copilot-workspace-integration" title="Permanent link">&para;</a></h3>
 <p>Use Copilot Workspace to query skills databases directly:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>@workspace What patterns do we have for missing category fields?
-<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>@workspace Show me bugs with root cause &quot;validation_gap&quot;
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>@workspace Show me bugs with root cause "validation_gap"
 </code></pre></div></p>
 <h3 id="4-real-time-pattern-dashboard">4. Real-Time Pattern Dashboard<a class="headerlink" href="#4-real-time-pattern-dashboard" title="Permanent link">&para;</a></h3>
 <p>Visualize pattern effectiveness and learning rate:

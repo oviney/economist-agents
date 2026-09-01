@@ -2994,7 +2994,7 @@
 9. Internationalization (new market)
 10. Technical Debt (version upgrade)</p>
 <h3 id="execution">Execution<a class="headerlink" href="#execution" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python3<span class="w"> </span>scripts/po_agent.py<span class="w"> </span>--request<span class="w"> </span><span class="s2">&quot;[text]&quot;</span><span class="w"> </span>--backlog<span class="w"> </span>skills/test_backlog_story3.json
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python3<span class="w"> </span>scripts/po_agent.py<span class="w"> </span>--request<span class="w"> </span><span class="s2">"[text]"</span><span class="w"> </span>--backlog<span class="w"> </span>skills/test_backlog_story3.json
 </code></pre></div>
 <p>Run for each of 10 requests. LLM Provider: OpenAI GPT-4o.</p>
 <hr />
@@ -3008,11 +3008,11 @@ All 60 acceptance criteria across 10 stories follow proper Given/When/Then forma
 - When: Action/trigger
 - Then: Expected outcome</p>
 <p><strong>Examples of Correct Format</strong>:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>✅ Story 1: &quot;Given a collaborative article, When multiple agents are editing simultaneously, Then changes are reflected in real-time&quot;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>✅ Story 1: "Given a collaborative article, When multiple agents are editing simultaneously, Then changes are reflected in real-time"
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>✅ Story 2: &quot;Given a generated chart, When viewed on any supported device, Then labels do not overlap with data lines&quot;
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>✅ Story 2: "Given a generated chart, When viewed on any supported device, Then labels do not overlap with data lines"
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>✅ Story 5: &quot;Given the CI/CD pipeline configuration, When Bandit is integrated, Then automated security scans are triggered&quot;
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>✅ Story 5: "Given the CI/CD pipeline configuration, When Bandit is integrated, Then automated security scans are triggered"
 </code></pre></div></p>
 <p><strong>Quality Gates Included</strong>:
 - All stories include "Quality:" prefixed AC for non-functional requirements
@@ -3026,13 +3026,13 @@ All 60 acceptance criteria across 10 stories follow proper Given/When/Then forma
 <p><strong>Analysis</strong>:
 Every acceptance criterion can be validated through automated tests, manual verification, or performance measurements:</p>
 <p><strong>Testable Examples</strong>:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>✅ Automated Test: &quot;Given a request for a line chart, When processed by the graphics agent, Then it should be generated using the factory pattern&quot;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>✅ Automated Test: "Given a request for a line chart, When processed by the graphics agent, Then it should be generated using the factory pattern"
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>   → Unit test with factory pattern assertion
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>✅ Performance Test: &quot;Quality: The caching mechanism should retrieve responses in under 50 milliseconds&quot;
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>✅ Performance Test: "Quality: The caching mechanism should retrieve responses in under 50 milliseconds"
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>   → Performance benchmark test
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>✅ Manual Verification: &quot;Given the updated documentation, When it is accessed by team members, Then it should include diagrams and examples&quot;
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>✅ Manual Verification: "Given the updated documentation, When it is accessed by team members, Then it should include diagrams and examples"
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>   → Documentation review checklist
 </code></pre></div></p>
 <p><strong>Non-Testable Criteria</strong>: 0 found

@@ -3123,7 +3123,7 @@
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">context_manager</span><span class="p">:</span> <span class="n">ContextManager</span><span class="p">,</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="o">**</span><span class="n">additional_context</span><span class="p">:</span> <span class="n">Any</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="sd">"""</span>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="sd">    Combines ContextManager data with runtime task parameters.</span>
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="sd">    Args:</span>
@@ -3132,22 +3132,22 @@
 <a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
 <a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="sd">        Dict suitable for Task(context=...) parameter</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="sd">    """</span>
 </code></pre></div></p>
 <p><strong>Usage Pattern:</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Load shared context once</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">&quot;docs/STORY_2_CONTEXT.md&quot;</span><span class="p">)</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">"docs/STORY_2_CONTEXT.md"</span><span class="p">)</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Developer agent task</span>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">dev_context</span> <span class="o">=</span> <span class="n">create_task_context</span><span class="p">(</span>
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">ctx</span><span class="p">,</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">task_id</span><span class="o">=</span><span class="s2">&quot;DEV-implement-feature&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">assigned_to</span><span class="o">=</span><span class="s2">&quot;Developer Agent&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">task_id</span><span class="o">=</span><span class="s2">"DEV-implement-feature"</span><span class="p">,</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">assigned_to</span><span class="o">=</span><span class="s2">"Developer Agent"</span><span class="p">,</span>
 <a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">previous_task_output</span><span class="o">=</span><span class="kc">None</span>
 <a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="p">)</span>
 <a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>
 <a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="n">dev_task</span> <span class="o">=</span> <span class="n">Task</span><span class="p">(</span>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Implement feature X&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">"Implement feature X"</span><span class="p">,</span>
 <a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>    <span class="n">agent</span><span class="o">=</span><span class="n">developer_agent</span><span class="p">,</span>
 <a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>    <span class="n">context</span><span class="o">=</span><span class="n">dev_context</span>  <span class="c1"># CrewAI 1.7.2 task-level context</span>
 <a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="p">)</span>
@@ -3155,13 +3155,13 @@
 <a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="c1"># QE agent task - inherits story context + adds QE-specific params</span>
 <a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="n">qe_context</span> <span class="o">=</span> <span class="n">create_task_context</span><span class="p">(</span>
 <a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>    <span class="n">ctx</span><span class="p">,</span>
-<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>    <span class="n">task_id</span><span class="o">=</span><span class="s2">&quot;QE-validate-feature&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>    <span class="n">assigned_to</span><span class="o">=</span><span class="s2">&quot;QE Agent&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>    <span class="n">task_id</span><span class="o">=</span><span class="s2">"QE-validate-feature"</span><span class="p">,</span>
+<a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>    <span class="n">assigned_to</span><span class="o">=</span><span class="s2">"QE Agent"</span><span class="p">,</span>
 <a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>    <span class="n">previous_task_output</span><span class="o">=</span><span class="n">dev_task</span><span class="o">.</span><span class="n">output</span>
 <a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a><span class="p">)</span>
 <a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a>
 <a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a><span class="n">qe_task</span> <span class="o">=</span> <span class="n">Task</span><span class="p">(</span>
-<a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Validate implementation&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">"Validate implementation"</span><span class="p">,</span>
 <a id="__codelineno-3-28" name="__codelineno-3-28" href="#__codelineno-3-28"></a>    <span class="n">agent</span><span class="o">=</span><span class="n">qe_agent</span><span class="p">,</span>
 <a id="__codelineno-3-29" name="__codelineno-3-29" href="#__codelineno-3-29"></a>    <span class="n">context</span><span class="o">=</span><span class="n">qe_context</span>  <span class="c1"># Automatically includes story context</span>
 <a id="__codelineno-3-30" name="__codelineno-3-30" href="#__codelineno-3-30"></a><span class="p">)</span>
@@ -3173,28 +3173,28 @@
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>ContextManager._parse_context()
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    ↓ (validate size &lt; 10MB)
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>ContextManager._context = {
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    &#39;story_id&#39;: &#39;Story 2&#39;,
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    &#39;goal&#39;: &#39;Shared context via crew.context...&#39;,
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    &#39;acceptance_criteria&#39;: [...],
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    'story_id': 'Story 2',
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    'goal': 'Shared context via crew.context...',
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    'acceptance_criteria': [...],
 <a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>    ...
 <a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>}
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>    ↓ (audit log entry: &#39;loaded&#39;)
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>    ↓ (audit log entry: 'loaded')
 <a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>Ready for agent access
 </code></pre></div>
 <h3 id="stage-2-agent-task-creation-per-agent">Stage 2: Agent Task Creation (Per Agent)<a class="headerlink" href="#stage-2-agent-task-creation-per-agent" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Agent needs task context
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    ↓
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>create_task_context(ctx, task_id=&#39;QE-001&#39;, priority=&#39;P0&#39;)
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>create_task_context(ctx, task_id='QE-001', priority='P0')
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    ↓
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>base_context = ctx.to_dict()  # Deep copy of story context
 <a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    ↓
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>base_context.update({&#39;task_id&#39;: &#39;QE-001&#39;, &#39;priority&#39;: &#39;P0&#39;})
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>base_context.update({'task_id': 'QE-001', 'priority': 'P0'})
 <a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    ↓
 <a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>return {
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    &#39;story_id&#39;: &#39;Story 2&#39;,      # From ContextManager
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    &#39;goal&#39;: &#39;...&#39;,              # From ContextManager
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    &#39;task_id&#39;: &#39;QE-001&#39;,        # From additional_context
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>    &#39;priority&#39;: &#39;P0&#39;            # From additional_context
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    'story_id': 'Story 2',      # From ContextManager
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    'goal': '...',              # From ContextManager
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    'task_id': 'QE-001',        # From additional_context
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>    'priority': 'P0'            # From additional_context
 <a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>}
 <a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>    ↓
 <a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>Task(context=merged_dict)
@@ -3202,15 +3202,15 @@
 <h3 id="stage-3-agent-updates-during-execution">Stage 3: Agent Updates (During Execution)<a class="headerlink" href="#stage-3-agent-updates-during-execution" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Agent completes work
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    ↓
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>ctx.set(&#39;implementation_status&#39;, &#39;complete&#39;)
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>ctx.set('implementation_status', 'complete')
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    ↓ (thread lock acquired)
 <a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>ContextManager validates JSON serializable
 <a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    ↓
 <a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>ContextManager checks total size &lt; 10MB
 <a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    ↓
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>ctx._context[&#39;implementation_status&#39;] = &#39;complete&#39;
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>ctx._context['implementation_status'] = 'complete'
 <a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>    ↓
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>Audit log entry: {&#39;action&#39;: &#39;updated&#39;, &#39;key&#39;: &#39;implementation_status&#39;, ...}
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>Audit log entry: {'action': 'updated', 'key': 'implementation_status', ...}
 <a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>    ↓ (lock released)
 <a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>Next agent sees updated context automatically
 </code></pre></div>
@@ -3239,9 +3239,9 @@
 <a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>
 <a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>            <span class="c1"># Log modification</span>
 <a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_audit_log</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
-<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a>                <span class="s1">&#39;timestamp&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
-<a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>                <span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;updated&#39;</span><span class="p">,</span>
-<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a>                <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="n">key</span>
+<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a>                <span class="s1">'timestamp'</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+<a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>                <span class="s1">'action'</span><span class="p">:</span> <span class="s1">'updated'</span><span class="p">,</span>
+<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a>                <span class="s1">'key'</span><span class="p">:</span> <span class="n">key</span>
 <a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a>            <span class="p">})</span>
 <a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a>        <span class="c1"># Lock automatically released</span>
 </code></pre></div>
@@ -3308,24 +3308,24 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">crewai</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span><span class="p">,</span> <span class="n">Task</span><span class="p">,</span> <span class="n">Crew</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="c1"># Create agents</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="n">developer</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">&quot;Developer&quot;</span><span class="p">,</span> <span class="n">goal</span><span class="o">=</span><span class="s2">&quot;Implement features&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">qe</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">&quot;QE Lead&quot;</span><span class="p">,</span> <span class="n">goal</span><span class="o">=</span><span class="s2">&quot;Validate quality&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="n">developer</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">"Developer"</span><span class="p">,</span> <span class="n">goal</span><span class="o">=</span><span class="s2">"Implement features"</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">qe</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">"QE Lead"</span><span class="p">,</span> <span class="n">goal</span><span class="o">=</span><span class="s2">"Validate quality"</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
 <a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
 <a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="c1"># Load shared context ONCE</span>
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">&quot;docs/STORY_2_CONTEXT.md&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">"docs/STORY_2_CONTEXT.md"</span><span class="p">)</span>
 <a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
 <a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="c1"># Task 1: Developer implements</span>
-<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="n">dev_context</span> <span class="o">=</span> <span class="n">create_task_context</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">task_id</span><span class="o">=</span><span class="s2">&quot;DEV-001&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="n">dev_context</span> <span class="o">=</span> <span class="n">create_task_context</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">task_id</span><span class="o">=</span><span class="s2">"DEV-001"</span><span class="p">)</span>
 <a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="n">dev_task</span> <span class="o">=</span> <span class="n">Task</span><span class="p">(</span>
-<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Implement feature&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">"Implement feature"</span><span class="p">,</span>
 <a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>    <span class="n">agent</span><span class="o">=</span><span class="n">developer</span><span class="p">,</span>
 <a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>    <span class="n">context</span><span class="o">=</span><span class="n">dev_context</span>  <span class="c1"># Story context + task params</span>
 <a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="p">)</span>
 <a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>
 <a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="c1"># Task 2: QE validates - automatically sees story context</span>
-<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="n">qe_context</span> <span class="o">=</span> <span class="n">create_task_context</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">task_id</span><span class="o">=</span><span class="s2">&quot;QE-001&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="n">qe_context</span> <span class="o">=</span> <span class="n">create_task_context</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">task_id</span><span class="o">=</span><span class="s2">"QE-001"</span><span class="p">)</span>
 <a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="n">qe_task</span> <span class="o">=</span> <span class="n">Task</span><span class="p">(</span>
-<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Validate implementation&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">"Validate implementation"</span><span class="p">,</span>
 <a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a>    <span class="n">agent</span><span class="o">=</span><span class="n">qe</span><span class="p">,</span>
 <a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a>    <span class="n">context</span><span class="o">=</span><span class="n">qe_context</span>  <span class="c1"># Same story context + different task params</span>
 <a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a><span class="p">)</span>
@@ -3334,7 +3334,7 @@
 <a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a><span class="n">crew</span> <span class="o">=</span> <span class="n">Crew</span><span class="p">(</span>
 <a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a>    <span class="n">agents</span><span class="o">=</span><span class="p">[</span><span class="n">developer</span><span class="p">,</span> <span class="n">qe</span><span class="p">],</span>
 <a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a>    <span class="n">tasks</span><span class="o">=</span><span class="p">[</span><span class="n">dev_task</span><span class="p">,</span> <span class="n">qe_task</span><span class="p">],</span>
-<a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a>    <span class="n">process</span><span class="o">=</span><span class="s2">&quot;sequential&quot;</span>  <span class="c1"># QE waits for Developer</span>
+<a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a>    <span class="n">process</span><span class="o">=</span><span class="s2">"sequential"</span>  <span class="c1"># QE waits for Developer</span>
 <a id="__codelineno-8-31" name="__codelineno-8-31" href="#__codelineno-8-31"></a><span class="p">)</span>
 <a id="__codelineno-8-32" name="__codelineno-8-32" href="#__codelineno-8-32"></a>
 <a id="__codelineno-8-33" name="__codelineno-8-33" href="#__codelineno-8-33"></a><span class="c1"># Execute - context automatically shared</span>
@@ -3343,35 +3343,35 @@
 <h3 id="context-updates-during-execution">Context Updates During Execution<a class="headerlink" href="#context-updates-during-execution" title="Permanent link">&para;</a></h3>
 <p>Agents can update shared context during execution:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Developer agent updates context after implementation</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;implementation_status&#39;</span><span class="p">,</span> <span class="s1">&#39;complete&#39;</span><span class="p">)</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;code_location&#39;</span><span class="p">,</span> <span class="s1">&#39;src/feature.py&#39;</span><span class="p">)</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'implementation_status'</span><span class="p">,</span> <span class="s1">'complete'</span><span class="p">)</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'code_location'</span><span class="p">,</span> <span class="s1">'src/feature.py'</span><span class="p">)</span>
 <a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>
 <a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="c1"># QE agent reads updated context</span>
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="n">impl_status</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;implementation_status&#39;</span><span class="p">)</span>  <span class="c1"># Returns: &#39;complete&#39;</span>
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="n">code_path</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;code_location&#39;</span><span class="p">)</span>  <span class="c1"># Returns: &#39;src/feature.py&#39;</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="n">impl_status</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'implementation_status'</span><span class="p">)</span>  <span class="c1"># Returns: 'complete'</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="n">code_path</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'code_location'</span><span class="p">)</span>  <span class="c1"># Returns: 'src/feature.py'</span>
 <a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>
 <a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="c1"># QE agent adds test results</span>
-<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;test_results&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;passed&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">,</span> <span class="s1">&#39;failed&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'test_results'</span><span class="p">,</span> <span class="p">{</span><span class="s1">'passed'</span><span class="p">:</span> <span class="mi">42</span><span class="p">,</span> <span class="s1">'failed'</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
 <a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>
 <a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="c1"># Scrum Master agent sees all updates</span>
 <a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="n">all_context</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
 <a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="c1"># Returns: {</span>
-<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="c1">#     &#39;story_id&#39;: &#39;Story 2&#39;,</span>
-<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="c1">#     &#39;implementation_status&#39;: &#39;complete&#39;,</span>
-<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="c1">#     &#39;code_location&#39;: &#39;src/feature.py&#39;,</span>
-<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="c1">#     &#39;test_results&#39;: {&#39;passed&#39;: 42, &#39;failed&#39;: 0}</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="c1">#     'story_id': 'Story 2',</span>
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="c1">#     'implementation_status': 'complete',</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="c1">#     'code_location': 'src/feature.py',</span>
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="c1">#     'test_results': {'passed': 42, 'failed': 0}</span>
 <a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="c1"># }</span>
 </code></pre></div>
 <h2 id="security-auditability">Security &amp; Auditability<a class="headerlink" href="#security-auditability" title="Permanent link">&para;</a></h2>
 <h3 id="audit-log">Audit Log<a class="headerlink" href="#audit-log" title="Permanent link">&para;</a></h3>
 <p>All context modifications are logged with timestamps:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'key'</span><span class="p">,</span> <span class="s1">'value'</span><span class="p">)</span>
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
 <a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="c1"># Audit log entry created:</span>
 <a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="p">{</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    <span class="s1">&#39;timestamp&#39;</span><span class="p">:</span> <span class="s1">&#39;2026-01-02T10:30:45.123456&#39;</span><span class="p">,</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>    <span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;updated&#39;</span><span class="p">,</span>
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>    <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="s1">&#39;key&#39;</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    <span class="s1">'timestamp'</span><span class="p">:</span> <span class="s1">'2026-01-02T10:30:45.123456'</span><span class="p">,</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>    <span class="s1">'action'</span><span class="p">:</span> <span class="s1">'updated'</span><span class="p">,</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>    <span class="s1">'key'</span><span class="p">:</span> <span class="s1">'key'</span>
 <a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="p">}</span>
 <a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>
 <a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="c1"># Retrieve audit log</span>
@@ -3379,7 +3379,7 @@
 <a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="c1"># Returns list of all modifications</span>
 <a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>
 <a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="c1"># Save audit log to file</span>
-<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="n">ctx</span><span class="o">.</span><span class="n">save_audit_log</span><span class="p">(</span><span class="s1">&#39;logs/story_2_audit.json&#39;</span><span class="p">)</span>
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="n">ctx</span><span class="o">.</span><span class="n">save_audit_log</span><span class="p">(</span><span class="s1">'logs/story_2_audit.json'</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="use-cases">Use Cases:<a class="headerlink" href="#use-cases" title="Permanent link">&para;</a></h3>
 <ul>
@@ -3391,38 +3391,38 @@
 <h2 id="error-handling">Error Handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h2>
 <h3 id="custom-exceptions">Custom Exceptions<a class="headerlink" href="#custom-exceptions" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">&quot;missing_file.md&quot;</span><span class="p">)</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">"missing_file.md"</span><span class="p">)</span>
 <a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="k">except</span> <span class="n">ContextFileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="c1"># File doesn&#39;t exist - helpful error with file path</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="c1"># File doesn't exist - helpful error with file path</span>
 <a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
 <a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>    <span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">&quot;malformed.md&quot;</span><span class="p">)</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>    <span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">"malformed.md"</span><span class="p">)</span>
 <a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="k">except</span> <span class="n">ContextParseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
 <a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>    <span class="c1"># Markdown parsing failed - shows expected format</span>
 <a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>
 <a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>    <span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="n">unserializable_object</span><span class="p">)</span>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>    <span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'key'</span><span class="p">,</span> <span class="n">unserializable_object</span><span class="p">)</span>
 <a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="k">except</span> <span class="n">ContextUpdateError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
 <a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>    <span class="c1"># Value not JSON serializable - shows valid example</span>
 <a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>
 <a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>    <span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;huge_key&#39;</span><span class="p">,</span> <span class="mi">20_000_000</span> <span class="o">*</span> <span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>    <span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'huge_key'</span><span class="p">,</span> <span class="mi">20_000_000</span> <span class="o">*</span> <span class="s1">'x'</span><span class="p">)</span>
 <a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a><span class="k">except</span> <span class="n">ContextSizeExceededError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
 <a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a>    <span class="c1"># Context would exceed 10MB limit</span>
 </code></pre></div>
 <h3 id="graceful-degradation">Graceful Degradation<a class="headerlink" href="#graceful-degradation" title="Permanent link">&para;</a></h3>
 <p>Agents should handle missing context gracefully:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Always provide defaults for optional keys</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">priority</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;priority&#39;</span><span class="p">,</span> <span class="s1">&#39;P2&#39;</span><span class="p">)</span>  <span class="c1"># Default to P2 if missing</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">priority</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'priority'</span><span class="p">,</span> <span class="s1">'P2'</span><span class="p">)</span>  <span class="c1"># Default to P2 if missing</span>
 <a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
 <a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="c1"># Check for required keys before using</span>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="k">if</span> <span class="s1">&#39;story_id&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ctx</span><span class="o">.</span><span class="n">to_dict</span><span class="p">():</span>
-<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Story ID missing from context&quot;</span><span class="p">)</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="k">if</span> <span class="s1">'story_id'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ctx</span><span class="o">.</span><span class="n">to_dict</span><span class="p">():</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Story ID missing from context"</span><span class="p">)</span>
 <a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>    <span class="c1"># Proceed with degraded functionality</span>
 <a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>
 <a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="c1"># Use try/except for critical operations</span>
 <a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>    <span class="n">previous_output</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;previous_task_output&#39;</span><span class="p">)</span>
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>    <span class="n">previous_output</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'previous_task_output'</span><span class="p">)</span>
 <a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>    <span class="n">process</span><span class="p">(</span><span class="n">previous_output</span><span class="p">)</span>
 <a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
 <a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a>    <span class="c1"># Previous task output not available - skip processing</span>
@@ -3431,44 +3431,44 @@
 <h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
 <h3 id="1-load-context-once">1. Load Context Once<a class="headerlink" href="#1-load-context-once" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># ✅ GOOD - Load once, reuse across all agents</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">&quot;docs/STORY_2_CONTEXT.md&quot;</span><span class="p">)</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">"docs/STORY_2_CONTEXT.md"</span><span class="p">)</span>
 <a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
 <a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="n">dev_task</span> <span class="o">=</span> <span class="n">Task</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">create_task_context</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="o">...</span><span class="p">))</span>
 <a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="n">qe_task</span> <span class="o">=</span> <span class="n">Task</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">create_task_context</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="o">...</span><span class="p">))</span>
 <a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>
 <a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="c1"># ❌ BAD - Loading multiple times wastes memory and time</span>
-<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="n">dev_ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">&quot;docs/STORY_2_CONTEXT.md&quot;</span><span class="p">)</span>
-<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="n">qe_ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">&quot;docs/STORY_2_CONTEXT.md&quot;</span><span class="p">)</span>  <span class="c1"># Duplicate!</span>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="n">dev_ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">"docs/STORY_2_CONTEXT.md"</span><span class="p">)</span>
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="n">qe_ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">"docs/STORY_2_CONTEXT.md"</span><span class="p">)</span>  <span class="c1"># Duplicate!</span>
 </code></pre></div>
 <h3 id="2-use-immutable-copies">2. Use Immutable Copies<a class="headerlink" href="#2-use-immutable-copies" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># ✅ GOOD - to_dict() returns deep copy (safe to modify)</span>
 <a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">my_copy</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">my_copy</span><span class="p">[</span><span class="s1">&#39;temporary_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;value&#39;</span>  <span class="c1"># Doesn&#39;t affect shared context</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">my_copy</span><span class="p">[</span><span class="s1">'temporary_key'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'value'</span>  <span class="c1"># Doesn't affect shared context</span>
 <a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>
 <a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="c1"># ❌ BAD - Directly accessing _context (breaks encapsulation)</span>
-<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="n">ctx</span><span class="o">.</span><span class="n">_context</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;value&#39;</span>  <span class="c1"># Bypasses validation and audit log</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="n">ctx</span><span class="o">.</span><span class="n">_context</span><span class="p">[</span><span class="s1">'key'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'value'</span>  <span class="c1"># Bypasses validation and audit log</span>
 </code></pre></div>
 <h3 id="3-provide-task-specific-params">3. Provide Task-Specific Params<a class="headerlink" href="#3-provide-task-specific-params" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># ✅ GOOD - Task params are additional to story context</span>
 <a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">task_context</span> <span class="o">=</span> <span class="n">create_task_context</span><span class="p">(</span>
 <a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>    <span class="n">ctx</span><span class="p">,</span>
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    <span class="n">task_id</span><span class="o">=</span><span class="s1">&#39;QE-001&#39;</span><span class="p">,</span>
-<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    <span class="n">assigned_to</span><span class="o">=</span><span class="s1">&#39;QE Agent&#39;</span><span class="p">,</span>
-<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>    <span class="n">priority</span><span class="o">=</span><span class="s1">&#39;P0&#39;</span><span class="p">,</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    <span class="n">task_id</span><span class="o">=</span><span class="s1">'QE-001'</span><span class="p">,</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    <span class="n">assigned_to</span><span class="o">=</span><span class="s1">'QE Agent'</span><span class="p">,</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>    <span class="n">priority</span><span class="o">=</span><span class="s1">'P0'</span><span class="p">,</span>
 <a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    <span class="n">previous_task_output</span><span class="o">=</span><span class="n">dev_task</span><span class="o">.</span><span class="n">output</span>
 <a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="p">)</span>
 <a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>
 <a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="c1"># ❌ BAD - Mixing story and task concerns</span>
-<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;task_id&#39;</span><span class="p">,</span> <span class="s1">&#39;QE-001&#39;</span><span class="p">)</span>  <span class="c1"># Pollutes shared context with task data</span>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'task_id'</span><span class="p">,</span> <span class="s1">'QE-001'</span><span class="p">)</span>  <span class="c1"># Pollutes shared context with task data</span>
 </code></pre></div>
 <h3 id="4-update-shared-context-sparingly">4. Update Shared Context Sparingly<a class="headerlink" href="#4-update-shared-context-sparingly" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># ✅ GOOD - Update only truly shared data</span>
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;implementation_status&#39;</span><span class="p">,</span> <span class="s1">&#39;complete&#39;</span><span class="p">)</span>  <span class="c1"># All agents need this</span>
-<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;test_results&#39;</span><span class="p">,</span> <span class="n">results_dict</span><span class="p">)</span>  <span class="c1"># QE → Scrum Master</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'implementation_status'</span><span class="p">,</span> <span class="s1">'complete'</span><span class="p">)</span>  <span class="c1"># All agents need this</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'test_results'</span><span class="p">,</span> <span class="n">results_dict</span><span class="p">)</span>  <span class="c1"># QE → Scrum Master</span>
 <a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>
 <a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="c1"># ❌ BAD - Updating with agent-specific temporary data</span>
-<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;current_agent_thinking&#39;</span><span class="p">,</span> <span class="s1">&#39;...&#39;</span><span class="p">)</span>  <span class="c1"># Not useful to other agents</span>
-<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;debug_timestamp&#39;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>  <span class="c1"># Temporary, not shared</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'current_agent_thinking'</span><span class="p">,</span> <span class="s1">'...'</span><span class="p">)</span>  <span class="c1"># Not useful to other agents</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'debug_timestamp'</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>  <span class="c1"># Temporary, not shared</span>
 </code></pre></div>
 <h2 id="migration-guide">Migration Guide<a class="headerlink" href="#migration-guide" title="Permanent link">&para;</a></h2>
 <h3 id="from-manual-briefing-to-shared-context">From Manual Briefing to Shared Context<a class="headerlink" href="#from-manual-briefing-to-shared-context" title="Permanent link">&para;</a></h3>
@@ -3484,10 +3484,10 @@
 </code></pre></div></p>
 <p><strong>After:</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># Automatic context sharing (fast, DRY)</span>
-<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">&quot;docs/STORY_2_CONTEXT.md&quot;</span><span class="p">)</span>  <span class="c1"># 143ms</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">"docs/STORY_2_CONTEXT.md"</span><span class="p">)</span>  <span class="c1"># 143ms</span>
 <a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>
-<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="n">dev_context</span> <span class="o">=</span> <span class="n">create_task_context</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">task_id</span><span class="o">=</span><span class="s1">&#39;DEV-001&#39;</span><span class="p">)</span>  <span class="c1"># &lt;1ms</span>
-<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="n">qe_context</span> <span class="o">=</span> <span class="n">create_task_context</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">task_id</span><span class="o">=</span><span class="s1">&#39;QE-001&#39;</span><span class="p">)</span>  <span class="c1"># &lt;1ms</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="n">dev_context</span> <span class="o">=</span> <span class="n">create_task_context</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">task_id</span><span class="o">=</span><span class="s1">'DEV-001'</span><span class="p">)</span>  <span class="c1"># &lt;1ms</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="n">qe_context</span> <span class="o">=</span> <span class="n">create_task_context</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">task_id</span><span class="o">=</span><span class="s1">'QE-001'</span><span class="p">)</span>  <span class="c1"># &lt;1ms</span>
 </code></pre></div></p>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
 <h3 id="issue-contextfilenotfounderror">Issue: "ContextFileNotFoundError"<a class="headerlink" href="#issue-contextfilenotfounderror" title="Permanent link">&para;</a></h3>
@@ -3497,8 +3497,8 @@
 <a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>ls<span class="w"> </span>docs/STORY_2_CONTEXT.md
 <a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
 <a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="c1"># Verify path is correct (absolute or relative to script location)</span>
-<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="nv">ctx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>ContextManager<span class="o">(</span><span class="s2">&quot;docs/STORY_2_CONTEXT.md&quot;</span><span class="o">)</span><span class="w">  </span><span class="c1"># Relative</span>
-<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="nv">ctx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>ContextManager<span class="o">(</span><span class="s2">&quot;/full/path/to/STORY_2_CONTEXT.md&quot;</span><span class="o">)</span><span class="w">  </span><span class="c1"># Absolute</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="nv">ctx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>ContextManager<span class="o">(</span><span class="s2">"docs/STORY_2_CONTEXT.md"</span><span class="o">)</span><span class="w">  </span><span class="c1"># Relative</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="nv">ctx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>ContextManager<span class="o">(</span><span class="s2">"/full/path/to/STORY_2_CONTEXT.md"</span><span class="o">)</span><span class="w">  </span><span class="c1"># Absolute</span>
 </code></pre></div></p>
 <h3 id="issue-contextparseerror">Issue: "ContextParseError"<a class="headerlink" href="#issue-contextparseerror" title="Permanent link">&para;</a></h3>
 <p><strong>Cause:</strong> Markdown file doesn't match expected format</p>
@@ -3525,10 +3525,10 @@
 <p><strong>Cause:</strong> Multiple threads modifying context without proper locking</p>
 <p><strong>Solution:</strong> Always use ContextManager methods (never access <code>_context</code> directly):
 <div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># ✅ GOOD - Thread-safe</span>
-<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'key'</span><span class="p">,</span> <span class="s1">'value'</span><span class="p">)</span>
 <a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>
 <a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="c1"># ❌ BAD - Not thread-safe</span>
-<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="n">ctx</span><span class="o">.</span><span class="n">_context</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;value&#39;</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="n">ctx</span><span class="o">.</span><span class="n">_context</span><span class="p">[</span><span class="s1">'key'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'value'</span>
 </code></pre></div></p>
 <h2 id="future-enhancements">Future Enhancements<a class="headerlink" href="#future-enhancements" title="Permanent link">&para;</a></h2>
 <h3 id="planned-features-sprint-8">Planned Features (Sprint 8+)<a class="headerlink" href="#planned-features-sprint-8" title="Permanent link">&para;</a></h3>

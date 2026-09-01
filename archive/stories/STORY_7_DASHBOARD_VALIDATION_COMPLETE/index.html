@@ -3218,10 +3218,10 @@
 <p><strong>Changes to <code>scripts/quality_dashboard.py</code></strong>:</p>
 <h4 id="1-removed-fake-baselines">1. Removed Fake Baselines<a class="headerlink" href="#1-removed-fake-baselines" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># BEFORE (WRONG):</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">writer_validation</span> <span class="o">=</span> <span class="n">agent_metrics</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;writer_agent&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;avg_validation_pass_rate&quot;</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">writer_validation</span> <span class="o">=</span> <span class="n">agent_metrics</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"writer_agent"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"avg_validation_pass_rate"</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">)</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># AFTER (CORRECT):</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">writer_validation</span> <span class="o">=</span> <span class="n">agent_metrics</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;writer_agent&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;avg_validation_pass_rate&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">writer_validation</span> <span class="o">=</span> <span class="n">agent_metrics</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"writer_agent"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"avg_validation_pass_rate"</span><span class="p">)</span>
 </code></pre></div>
 <p>Applied to all 4 agents:
 - Writer Agent: validation_pass_rate
@@ -3229,10 +3229,10 @@
 - Editor Agent: gate_pass_rate
 - Graphics Agent: visual_qa_pass_rate</p>
 <h4 id="2-added-no-data-handling">2. Added NO DATA Handling<a class="headerlink" href="#2-added-no-data-handling" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">_safe_format</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">format_str</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{:.1f}</span><span class="s2">%&quot;</span><span class="p">):</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Format metric or return NO DATA if None/0&quot;&quot;&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">_safe_format</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">format_str</span><span class="o">=</span><span class="s2">"</span><span class="si">{:.1f}</span><span class="s2">%"</span><span class="p">):</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="sd">"""Format metric or return NO DATA if None/0"""</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>        <span class="k">return</span> <span class="s2">&quot;NO DATA&quot;</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>        <span class="k">return</span> <span class="s2">"NO DATA"</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="k">return</span> <span class="n">format_str</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="3-enhanced-display-logic">3. Enhanced Display Logic<a class="headerlink" href="#3-enhanced-display-logic" title="Permanent link">&para;</a></h4>
@@ -3247,9 +3247,9 @@
 <p><strong>New Feature</strong>: 3-sprint comparison table with key metrics</p>
 <h4 id="implementation">Implementation<a class="headerlink" href="#implementation" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">_render_sprint_trends</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Render 3-sprint trends comparison&quot;&quot;&quot;</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="sd">"""Render 3-sprint trends comparison"""</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="c1"># Get last 3 sprint summaries</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">tracker</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;skills/sprint_tracker.json&quot;</span><span class="p">)</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">tracker</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"skills/sprint_tracker.json"</span><span class="p">)</span>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">sprints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_sprint_summaries</span><span class="p">(</span><span class="n">tracker</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
 <a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="c1"># Build comparison table</span>

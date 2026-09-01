@@ -2665,7 +2665,7 @@ Belt-and-braces — the leak test confirms all of it.</p>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nt">defaults</span><span class="p">:</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="c1"># unlisted review drafts: own layout, keep out of the sitemap, noindex</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">scope</span><span class="p">:</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">      </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">      </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">""</span>
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">review</span>
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="nt">values</span><span class="p">:</span>
 <a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">      </span><span class="nt">layout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">review</span>
@@ -2695,7 +2695,7 @@ rendered the draft <strong>bare</strong> (no head, no theme, no noindex). No
 </code></pre></div>
 <p>The <code>noindex</code> comes from the collection default (<code>noindex: true</code> in <code>_config.yml</code>,
 §1) flowing to <code>_layouts/default.html</code>'s existing:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{%</span><span class="nt">-</span><span class="w"> </span>if<span class="w"> </span>page.noindex<span class="w"> </span>-<span class="p">%}</span>&lt;meta name=&quot;robots&quot; content=&quot;noindex, nofollow&quot;&gt;<span class="p">{%</span><span class="nt">-</span><span class="w"> </span>endif<span class="w"> </span>-<span class="p">%}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{%</span><span class="nt">-</span><span class="w"> </span>if<span class="w"> </span>page.noindex<span class="w"> </span>-<span class="p">%}</span>&lt;meta name="robots" content="noindex, nofollow"&gt;<span class="p">{%</span><span class="nt">-</span><span class="w"> </span>endif<span class="w"> </span>-<span class="p">%}</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="p">{%</span><span class="w"> </span><span class="kr">endif</span><span class="w"> </span><span class="p">%}</span>
 </code></pre></div>
 <blockquote>

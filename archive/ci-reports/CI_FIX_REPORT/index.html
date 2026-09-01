@@ -2932,8 +2932,8 @@
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">llm_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">call_llm</span>  <span class="c1"># Binds to writer_agent namespace</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># In test</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">patch</span><span class="p">(</span><span class="s2">&quot;scripts.llm_client.call_llm&quot;</span><span class="p">)</span>  <span class="c1"># ❌ WRONG - patches source</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">patch</span><span class="p">(</span><span class="s2">&quot;agents.writer_agent.call_llm&quot;</span><span class="p">)</span>  <span class="c1"># ✅ CORRECT - patches reference</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">patch</span><span class="p">(</span><span class="s2">"scripts.llm_client.call_llm"</span><span class="p">)</span>  <span class="c1"># ❌ WRONG - patches source</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">patch</span><span class="p">(</span><span class="s2">"agents.writer_agent.call_llm"</span><span class="p">)</span>  <span class="c1"># ✅ CORRECT - patches reference</span>
 </code></pre></div></p>
 <h3 id="3-agent-refactoring-impact">3. Agent Refactoring Impact<a class="headerlink" href="#3-agent-refactoring-impact" title="Permanent link">&para;</a></h3>
 <p><strong>Scope:</strong> Moving code from monolithic scripts/economist_agent.py to modular agents/ broke all 34 tests
@@ -2942,7 +2942,7 @@
 <h2 id="commits-ready">Commits Ready<a class="headerlink" href="#commits-ready" title="Permanent link">&para;</a></h2>
 <h3 id="commit-1-fix-pytest-collection-failure">Commit 1: Fix pytest collection failure<a class="headerlink" href="#commit-1-fix-pytest-collection-failure" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git<span class="w"> </span>add<span class="w"> </span>scripts/crewai_agents.py
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Fix: Prevent sys.exit during pytest collection</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Fix: Prevent sys.exit during pytest collection</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="s2">- Change CrewAI import to delay check until AgentFactory init</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="s2">- Use Agent = None pattern instead of sys.exit(1)</span>
@@ -2950,11 +2950,11 @@
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="s2">Root cause: sys.exit() at module level breaks pytest collection</span>
 <a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="s2">Impact: Unblocks 377 tests from running</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="s2">Test status: 334/377 passing after full fix chain&quot;</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="s2">Test status: 334/377 passing after full fix chain"</span>
 </code></pre></div>
 <h3 id="commit-2-fix-test-mocks-for-agent-refactoring">Commit 2: Fix test mocks for agent refactoring<a class="headerlink" href="#commit-2-fix-test-mocks-for-agent-refactoring" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>git<span class="w"> </span>add<span class="w"> </span>tests/test_economist_agent.py<span class="w"> </span>tests/test_economist_agent.py.bak
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Fix: Update test mocks for agent extraction refactoring</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Fix: Update test mocks for agent extraction refactoring</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="s2">- Research agent: patch agents.research_agent.call_llm (7/7 tests passing)</span>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="s2">- Writer agent: patch agents.writer_agent.call_llm (7/7 tests passing)</span>
@@ -2966,7 +2966,7 @@
 <a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="s2">Progress: 23/34 tests in test_economist_agent.py, 334/377 overall</span>
 <a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>
 <a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="s2">Remaining work: Editor mock format fixes, Graphics subprocess mocks,</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="s2">Main argparse mocks, Integration multi-agent mocks&quot;</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="s2">Main argparse mocks, Integration multi-agent mocks"</span>
 </code></pre></div>
 <h2 id="recommendations">Recommendations<a class="headerlink" href="#recommendations" title="Permanent link">&para;</a></h2>
 <h3 id="immediate-p0-unblock-ci">Immediate (P0 - Unblock CI)<a class="headerlink" href="#immediate-p0-unblock-ci" title="Permanent link">&para;</a></h3>

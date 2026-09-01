@@ -2953,10 +2953,10 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scripts.context_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContextManager</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1"># Relative path</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">&quot;docs/STORY_2_CONTEXT.md&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">"docs/STORY_2_CONTEXT.md"</span><span class="p">)</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="c1"># Absolute path</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">&quot;/full/path/to/STORY_2_CONTEXT.md&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">"/full/path/to/STORY_2_CONTEXT.md"</span><span class="p">)</span>
 </code></pre></div></p>
 <p><strong>Markdown Format Requirements:</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="gu">## Story Info</span>
@@ -2983,14 +2983,14 @@
 <p><strong>Thread Safety:</strong> Yes (uses <code>threading.Lock</code>)</p>
 <p><strong>Example:</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Get existing key</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">story_id</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;story_id&#39;</span><span class="p">)</span>  <span class="c1"># Returns: &quot;Story 2&quot;</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">story_id</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'story_id'</span><span class="p">)</span>  <span class="c1"># Returns: "Story 2"</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Get missing key with default</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">priority</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;priority&#39;</span><span class="p">,</span> <span class="s1">&#39;P2&#39;</span><span class="p">)</span>  <span class="c1"># Returns: &quot;P2&quot; (default)</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">priority</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'priority'</span><span class="p">,</span> <span class="s1">'P2'</span><span class="p">)</span>  <span class="c1"># Returns: "P2" (default)</span>
 <a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
 <a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Check for required keys</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="k">if</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;story_id&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Story ID missing from context&quot;</span><span class="p">)</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="k">if</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'story_id'</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Story ID missing from context"</span><span class="p">)</span>
 </code></pre></div></p>
 <hr />
 <h3 id="set">set()<a class="headerlink" href="#set" title="Permanent link">&para;</a></h3>
@@ -3010,19 +3010,19 @@
 <p><strong>Thread Safety:</strong> Yes (uses <code>threading.Lock</code>)</p>
 <p><strong>Example:</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Set simple value</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;implementation_status&#39;</span><span class="p">,</span> <span class="s1">&#39;complete&#39;</span><span class="p">)</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'implementation_status'</span><span class="p">,</span> <span class="s1">'complete'</span><span class="p">)</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Set complex value (must be JSON serializable)</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;test_results&#39;</span><span class="p">,</span> <span class="p">{</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="s1">&#39;passed&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">,</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="s1">&#39;failed&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="s1">&#39;skipped&#39;</span><span class="p">:</span> <span class="mi">3</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'test_results'</span><span class="p">,</span> <span class="p">{</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="s1">'passed'</span><span class="p">:</span> <span class="mi">42</span><span class="p">,</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="s1">'failed'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="s1">'skipped'</span><span class="p">:</span> <span class="mi">3</span>
 <a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="p">})</span>
 <a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>
 <a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="c1"># ❌ This will raise ContextUpdateError (not JSON serializable)</span>
 <a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="k">class</span><span class="w"> </span><span class="nc">CustomObject</span><span class="p">:</span>
 <a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>    <span class="k">pass</span>
-<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;obj&#39;</span><span class="p">,</span> <span class="n">CustomObject</span><span class="p">())</span>  <span class="c1"># Raises ContextUpdateError</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'obj'</span><span class="p">,</span> <span class="n">CustomObject</span><span class="p">())</span>  <span class="c1"># Raises ContextUpdateError</span>
 </code></pre></div></p>
 <hr />
 <h3 id="update">update()<a class="headerlink" href="#update" title="Permanent link">&para;</a></h3>
@@ -3042,9 +3042,9 @@
 <p><strong>Example:</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Bulk update multiple keys</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">ctx</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="s1">&#39;implementation_status&#39;</span><span class="p">:</span> <span class="s1">&#39;complete&#39;</span><span class="p">,</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="s1">&#39;test_results&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;passed&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">,</span> <span class="s1">&#39;failed&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    <span class="s1">&#39;code_location&#39;</span><span class="p">:</span> <span class="s1">&#39;src/feature.py&#39;</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="s1">'implementation_status'</span><span class="p">:</span> <span class="s1">'complete'</span><span class="p">,</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="s1">'test_results'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'passed'</span><span class="p">:</span> <span class="mi">42</span><span class="p">,</span> <span class="s1">'failed'</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    <span class="s1">'code_location'</span><span class="p">:</span> <span class="s1">'src/feature.py'</span>
 <a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="p">})</span>
 <a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
 <a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="c1"># All 3 keys updated together - no intermediate state visible</span>
@@ -3065,16 +3065,16 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Get immutable copy</span>
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">context_copy</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
 <a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># Safe to modify copy - doesn&#39;t affect shared context</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="n">context_copy</span><span class="p">[</span><span class="s1">&#39;temporary_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;value&#39;</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># Safe to modify copy - doesn't affect shared context</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="n">context_copy</span><span class="p">[</span><span class="s1">'temporary_key'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'value'</span>
 <a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
 <a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="c1"># Check all available keys</span>
 <a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="n">all_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">context_copy</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Context has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">all_keys</span><span class="p">)</span><span class="si">}</span><span class="s2"> keys&quot;</span><span class="p">)</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Context has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">all_keys</span><span class="p">)</span><span class="si">}</span><span class="s2"> keys"</span><span class="p">)</span>
 <a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>
 <a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="c1"># Export for debugging</span>
 <a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
-<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;debug_context.json&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'debug_context.json'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
 <a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>    <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">context_copy</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </code></pre></div></p>
 <hr />
@@ -3099,16 +3099,16 @@
 <a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="c1"># Find recent updates</span>
 <a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="n">recent_updates</span> <span class="o">=</span> <span class="p">[</span>
 <a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>    <span class="n">entry</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">audit</span>
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>    <span class="k">if</span> <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;action&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;updated&#39;</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>    <span class="k">if</span> <span class="n">entry</span><span class="p">[</span><span class="s1">'action'</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'updated'</span>
 <a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="p">][</span><span class="o">-</span><span class="mi">5</span><span class="p">:]</span>  <span class="c1"># Last 5 updates</span>
 <a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>
 <a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="c1"># Check who modified a specific key</span>
 <a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="n">implementation_updates</span> <span class="o">=</span> <span class="p">[</span>
 <a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>    <span class="n">entry</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">audit</span>
-<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>    <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;key&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;implementation_status&#39;</span>
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>    <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'key'</span><span class="p">)</span> <span class="o">==</span> <span class="s1">'implementation_status'</span>
 <a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="p">]</span>
 <a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a>
-<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;implementation_status&#39; updated </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">implementation_updates</span><span class="p">)</span><span class="si">}</span><span class="s2"> times&quot;</span><span class="p">)</span>
+<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"'implementation_status' updated </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">implementation_updates</span><span class="p">)</span><span class="si">}</span><span class="s2"> times"</span><span class="p">)</span>
 </code></pre></div></p>
 <hr />
 <h3 id="save_audit_log">save_audit_log()<a class="headerlink" href="#save_audit_log" title="Permanent link">&para;</a></h3>
@@ -3121,32 +3121,32 @@
 - <code>IOError</code>: If file cannot be written</p>
 <p><strong>Format:</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="p">{</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="nt">&quot;context_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;docs/STORY_2_CONTEXT.md&quot;</span><span class="p">,</span>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span><span class="nt">&quot;generated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-01-02T10:30:45.123456&quot;</span><span class="p">,</span>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">  </span><span class="nt">&quot;total_operations&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span>
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">  </span><span class="nt">&quot;log&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="nt">"context_file"</span><span class="p">:</span><span class="w"> </span><span class="s2">"docs/STORY_2_CONTEXT.md"</span><span class="p">,</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span><span class="nt">"generated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-02T10:30:45.123456"</span><span class="p">,</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">  </span><span class="nt">"total_operations"</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">  </span><span class="nt">"log"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="w">      </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-01-02T10:00:00.000000&quot;</span><span class="p">,</span>
-<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="w">      </span><span class="nt">&quot;action&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;loaded&quot;</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="w">      </span><span class="nt">"timestamp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-02T10:00:00.000000"</span><span class="p">,</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="w">      </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"loaded"</span>
 <a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="w">    </span><span class="p">},</span>
 <a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="w">      </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-01-02T10:05:30.123456&quot;</span><span class="p">,</span>
-<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="w">      </span><span class="nt">&quot;action&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;updated&quot;</span><span class="p">,</span>
-<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="w">      </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;implementation_status&quot;</span>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="w">      </span><span class="nt">"timestamp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-02T10:05:30.123456"</span><span class="p">,</span>
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="w">      </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"updated"</span><span class="p">,</span>
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="w">      </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"implementation_status"</span>
 <a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="w">    </span><span class="p">}</span>
 <a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="w">  </span><span class="p">]</span>
 <a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><strong>Example:</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># Save audit log for Story 2</span>
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">ctx</span><span class="o">.</span><span class="n">save_audit_log</span><span class="p">(</span><span class="s1">&#39;logs/story_2_audit.json&#39;</span><span class="p">)</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">ctx</span><span class="o">.</span><span class="n">save_audit_log</span><span class="p">(</span><span class="s1">'logs/story_2_audit.json'</span><span class="p">)</span>
 <a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
 <a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="c1"># Load and analyze audit log later</span>
 <a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
-<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;logs/story_2_audit.json&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'logs/story_2_audit.json'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
 <a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    <span class="n">audit_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 <a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>
-<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total operations: </span><span class="si">{</span><span class="n">audit_data</span><span class="p">[</span><span class="s1">&#39;total_operations&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total operations: </span><span class="si">{</span><span class="n">audit_data</span><span class="p">[</span><span class="s1">'total_operations'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div></p>
 <hr />
 <h2 id="helper-functions">Helper Functions<a class="headerlink" href="#helper-functions" title="Permanent link">&para;</a></h2>
@@ -3173,31 +3173,31 @@
 <a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">crewai</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span><span class="p">,</span> <span class="n">Task</span>
 <a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
 <a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="c1"># Load shared context once</span>
-<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">&quot;docs/STORY_2_CONTEXT.md&quot;</span><span class="p">)</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">"docs/STORY_2_CONTEXT.md"</span><span class="p">)</span>
 <a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>
 <a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="c1"># Create Developer task with story context + task params</span>
 <a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="n">dev_context</span> <span class="o">=</span> <span class="n">create_task_context</span><span class="p">(</span>
 <a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>    <span class="n">ctx</span><span class="p">,</span>
-<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a>    <span class="n">task_id</span><span class="o">=</span><span class="s1">&#39;DEV-001&#39;</span><span class="p">,</span>
-<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a>    <span class="n">assigned_to</span><span class="o">=</span><span class="s1">&#39;Developer Agent&#39;</span><span class="p">,</span>
-<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>    <span class="n">priority</span><span class="o">=</span><span class="s1">&#39;P0&#39;</span><span class="p">,</span>
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a>    <span class="n">task_id</span><span class="o">=</span><span class="s1">'DEV-001'</span><span class="p">,</span>
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a>    <span class="n">assigned_to</span><span class="o">=</span><span class="s1">'Developer Agent'</span><span class="p">,</span>
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>    <span class="n">priority</span><span class="o">=</span><span class="s1">'P0'</span><span class="p">,</span>
 <a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a>    <span class="n">previous_task_output</span><span class="o">=</span><span class="kc">None</span>
 <a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a><span class="p">)</span>
 <a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a>
 <a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a><span class="c1"># dev_context contains:</span>
 <a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a><span class="c1"># {</span>
-<a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a><span class="c1">#     &#39;story_id&#39;: &#39;Story 2&#39;,              # From ContextManager</span>
-<a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a><span class="c1">#     &#39;goal&#39;: &#39;Shared context...&#39;,        # From ContextManager</span>
-<a id="__codelineno-17-20" name="__codelineno-17-20" href="#__codelineno-17-20"></a><span class="c1">#     &#39;acceptance_criteria&#39;: [...],       # From ContextManager</span>
-<a id="__codelineno-17-21" name="__codelineno-17-21" href="#__codelineno-17-21"></a><span class="c1">#     &#39;task_id&#39;: &#39;DEV-001&#39;,               # From additional_context</span>
-<a id="__codelineno-17-22" name="__codelineno-17-22" href="#__codelineno-17-22"></a><span class="c1">#     &#39;assigned_to&#39;: &#39;Developer Agent&#39;,   # From additional_context</span>
-<a id="__codelineno-17-23" name="__codelineno-17-23" href="#__codelineno-17-23"></a><span class="c1">#     &#39;priority&#39;: &#39;P0&#39;,                   # From additional_context</span>
-<a id="__codelineno-17-24" name="__codelineno-17-24" href="#__codelineno-17-24"></a><span class="c1">#     &#39;previous_task_output&#39;: None        # From additional_context</span>
+<a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a><span class="c1">#     'story_id': 'Story 2',              # From ContextManager</span>
+<a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a><span class="c1">#     'goal': 'Shared context...',        # From ContextManager</span>
+<a id="__codelineno-17-20" name="__codelineno-17-20" href="#__codelineno-17-20"></a><span class="c1">#     'acceptance_criteria': [...],       # From ContextManager</span>
+<a id="__codelineno-17-21" name="__codelineno-17-21" href="#__codelineno-17-21"></a><span class="c1">#     'task_id': 'DEV-001',               # From additional_context</span>
+<a id="__codelineno-17-22" name="__codelineno-17-22" href="#__codelineno-17-22"></a><span class="c1">#     'assigned_to': 'Developer Agent',   # From additional_context</span>
+<a id="__codelineno-17-23" name="__codelineno-17-23" href="#__codelineno-17-23"></a><span class="c1">#     'priority': 'P0',                   # From additional_context</span>
+<a id="__codelineno-17-24" name="__codelineno-17-24" href="#__codelineno-17-24"></a><span class="c1">#     'previous_task_output': None        # From additional_context</span>
 <a id="__codelineno-17-25" name="__codelineno-17-25" href="#__codelineno-17-25"></a><span class="c1"># }</span>
 <a id="__codelineno-17-26" name="__codelineno-17-26" href="#__codelineno-17-26"></a>
 <a id="__codelineno-17-27" name="__codelineno-17-27" href="#__codelineno-17-27"></a><span class="c1"># Use with CrewAI Task</span>
 <a id="__codelineno-17-28" name="__codelineno-17-28" href="#__codelineno-17-28"></a><span class="n">dev_task</span> <span class="o">=</span> <span class="n">Task</span><span class="p">(</span>
-<a id="__codelineno-17-29" name="__codelineno-17-29" href="#__codelineno-17-29"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Implement feature X&quot;</span><span class="p">,</span>
+<a id="__codelineno-17-29" name="__codelineno-17-29" href="#__codelineno-17-29"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">"Implement feature X"</span><span class="p">,</span>
 <a id="__codelineno-17-30" name="__codelineno-17-30" href="#__codelineno-17-30"></a>    <span class="n">agent</span><span class="o">=</span><span class="n">developer_agent</span><span class="p">,</span>
 <a id="__codelineno-17-31" name="__codelineno-17-31" href="#__codelineno-17-31"></a>    <span class="n">context</span><span class="o">=</span><span class="n">dev_context</span>  <span class="c1"># Pass merged context</span>
 <a id="__codelineno-17-32" name="__codelineno-17-32" href="#__codelineno-17-32"></a><span class="p">)</span>
@@ -3205,13 +3205,13 @@
 <a id="__codelineno-17-34" name="__codelineno-17-34" href="#__codelineno-17-34"></a><span class="c1"># QE task automatically inherits story context</span>
 <a id="__codelineno-17-35" name="__codelineno-17-35" href="#__codelineno-17-35"></a><span class="n">qe_context</span> <span class="o">=</span> <span class="n">create_task_context</span><span class="p">(</span>
 <a id="__codelineno-17-36" name="__codelineno-17-36" href="#__codelineno-17-36"></a>    <span class="n">ctx</span><span class="p">,</span>
-<a id="__codelineno-17-37" name="__codelineno-17-37" href="#__codelineno-17-37"></a>    <span class="n">task_id</span><span class="o">=</span><span class="s1">&#39;QE-001&#39;</span><span class="p">,</span>
-<a id="__codelineno-17-38" name="__codelineno-17-38" href="#__codelineno-17-38"></a>    <span class="n">assigned_to</span><span class="o">=</span><span class="s1">&#39;QE Agent&#39;</span><span class="p">,</span>
+<a id="__codelineno-17-37" name="__codelineno-17-37" href="#__codelineno-17-37"></a>    <span class="n">task_id</span><span class="o">=</span><span class="s1">'QE-001'</span><span class="p">,</span>
+<a id="__codelineno-17-38" name="__codelineno-17-38" href="#__codelineno-17-38"></a>    <span class="n">assigned_to</span><span class="o">=</span><span class="s1">'QE Agent'</span><span class="p">,</span>
 <a id="__codelineno-17-39" name="__codelineno-17-39" href="#__codelineno-17-39"></a>    <span class="n">previous_task_output</span><span class="o">=</span><span class="n">dev_task</span><span class="o">.</span><span class="n">output</span>  <span class="c1"># Reference previous task</span>
 <a id="__codelineno-17-40" name="__codelineno-17-40" href="#__codelineno-17-40"></a><span class="p">)</span>
 <a id="__codelineno-17-41" name="__codelineno-17-41" href="#__codelineno-17-41"></a>
 <a id="__codelineno-17-42" name="__codelineno-17-42" href="#__codelineno-17-42"></a><span class="n">qe_task</span> <span class="o">=</span> <span class="n">Task</span><span class="p">(</span>
-<a id="__codelineno-17-43" name="__codelineno-17-43" href="#__codelineno-17-43"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Validate implementation&quot;</span><span class="p">,</span>
+<a id="__codelineno-17-43" name="__codelineno-17-43" href="#__codelineno-17-43"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">"Validate implementation"</span><span class="p">,</span>
 <a id="__codelineno-17-44" name="__codelineno-17-44" href="#__codelineno-17-44"></a>    <span class="n">agent</span><span class="o">=</span><span class="n">qe_agent</span><span class="p">,</span>
 <a id="__codelineno-17-45" name="__codelineno-17-45" href="#__codelineno-17-45"></a>    <span class="n">context</span><span class="o">=</span><span class="n">qe_context</span>  <span class="c1"># Same story context, different task params</span>
 <a id="__codelineno-17-46" name="__codelineno-17-46" href="#__codelineno-17-46"></a><span class="p">)</span>
@@ -3220,30 +3220,30 @@
 <h2 id="custom-exceptions">Custom Exceptions<a class="headerlink" href="#custom-exceptions" title="Permanent link">&para;</a></h2>
 <h3 id="contextfilenotfounderror">ContextFileNotFoundError<a class="headerlink" href="#contextfilenotfounderror" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">ContextFileNotFoundError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when context file doesn&#39;t exist.&quot;&quot;&quot;</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">    </span><span class="sd">"""Raised when context file doesn't exist."""</span>
 </code></pre></div>
 <p><strong>Raised By:</strong> <code>ContextManager.__init__()</code></p>
 <p><strong>Cause:</strong> File path doesn't exist or is inaccessible</p>
 <p><strong>Example:</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>    <span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">&quot;missing_file.md&quot;</span><span class="p">)</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>    <span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">"missing_file.md"</span><span class="p">)</span>
 <a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="k">except</span> <span class="n">ContextFileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>    <span class="c1"># Error: Context file not found: missing_file.md</span>
 <a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>    <span class="c1"># Please ensure the file exists and path is correct.</span>
 </code></pre></div></p>
 <hr />
 <h3 id="contextparseerror">ContextParseError<a class="headerlink" href="#contextparseerror" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">ContextParseError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when context file format is invalid.&quot;&quot;&quot;</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">    </span><span class="sd">"""Raised when context file format is invalid."""</span>
 </code></pre></div>
 <p><strong>Raised By:</strong> <code>ContextManager._parse_context()</code></p>
 <p><strong>Cause:</strong> Markdown file missing required sections (Story Info, User Story, Acceptance Criteria)</p>
 <p><strong>Example:</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    <span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">&quot;malformed.md&quot;</span><span class="p">)</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    <span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">"malformed.md"</span><span class="p">)</span>
 <a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="k">except</span> <span class="n">ContextParseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>    <span class="c1"># Error: Failed to parse context file. Expected format:</span>
 <a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>    <span class="c1"># ## Story Info</span>
 <a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>    <span class="c1"># story_id: Story N</span>
@@ -3255,7 +3255,7 @@
 <hr />
 <h3 id="contextupdateerror">ContextUpdateError<a class="headerlink" href="#contextupdateerror" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">ContextUpdateError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when context update fails (e.g., not JSON serializable).&quot;&quot;&quot;</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">    </span><span class="sd">"""Raised when context update fails (e.g., not JSON serializable)."""</span>
 </code></pre></div>
 <p><strong>Raised By:</strong> <code>ContextManager.set()</code>, <code>ContextManager.update()</code></p>
 <p><strong>Cause:</strong> Value is not JSON serializable (e.g., custom objects, functions)</p>
@@ -3263,9 +3263,9 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="k">try</span><span class="p">:</span>
 <a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>    <span class="k">class</span><span class="w"> </span><span class="nc">MyClass</span><span class="p">:</span>
 <a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>        <span class="k">pass</span>
-<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>    <span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;obj&#39;</span><span class="p">,</span> <span class="n">MyClass</span><span class="p">())</span>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>    <span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'obj'</span><span class="p">,</span> <span class="n">MyClass</span><span class="p">())</span>
 <a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="k">except</span> <span class="n">ContextUpdateError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a>    <span class="c1"># Error: Context update failed: Value must be JSON serializable</span>
 <a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a>    <span class="c1"># Key: obj</span>
 <a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a>    <span class="c1"># Valid types: str, int, float, bool, list, dict, None</span>
@@ -3273,16 +3273,16 @@
 <hr />
 <h3 id="contextsizeexceedederror">ContextSizeExceededError<a class="headerlink" href="#contextsizeexceedederror" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">ContextSizeExceededError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when context size exceeds 10MB limit.&quot;&quot;&quot;</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">    </span><span class="sd">"""Raised when context size exceeds 10MB limit."""</span>
 </code></pre></div>
 <p><strong>Raised By:</strong> <code>ContextManager.__init__()</code>, <code>ContextManager.set()</code>, <code>ContextManager.update()</code></p>
 <p><strong>Cause:</strong> Total context size exceeds 10MB limit (prevents memory issues)</p>
 <p><strong>Example:</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>    <span class="n">huge_value</span> <span class="o">=</span> <span class="mi">20_000_000</span> <span class="o">*</span> <span class="s1">&#39;x&#39;</span>  <span class="c1"># 20MB string</span>
-<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>    <span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;huge_key&#39;</span><span class="p">,</span> <span class="n">huge_value</span><span class="p">)</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>    <span class="n">huge_value</span> <span class="o">=</span> <span class="mi">20_000_000</span> <span class="o">*</span> <span class="s1">'x'</span>  <span class="c1"># 20MB string</span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>    <span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'huge_key'</span><span class="p">,</span> <span class="n">huge_value</span><span class="p">)</span>
 <a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="k">except</span> <span class="n">ContextSizeExceededError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>    <span class="c1"># Error: Context size exceeds 10MB limit</span>
 <a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a>    <span class="c1"># Current size: 0.5 MB</span>
 <a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a>    <span class="c1"># Attempted addition: 20.0 MB</span>
@@ -3294,13 +3294,13 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scripts.context_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContextManager</span>
 <a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>
 <a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="c1"># Load context from Story 2</span>
-<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">&quot;docs/STORY_2_CONTEXT.md&quot;</span><span class="p">)</span>
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">"docs/STORY_2_CONTEXT.md"</span><span class="p">)</span>
 <a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a>
 <a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="c1"># Read context values</span>
-<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="n">story_id</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;story_id&#39;</span><span class="p">)</span>
-<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="n">goal</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;goal&#39;</span><span class="p">)</span>
+<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="n">story_id</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'story_id'</span><span class="p">)</span>
+<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="n">goal</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'goal'</span><span class="p">)</span>
 <a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a>
-<a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Working on </span><span class="si">{</span><span class="n">story_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">goal</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Working on </span><span class="si">{</span><span class="n">story_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">goal</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="c1"># Output: Working on Story 2: Shared context via crew.context...</span>
 </code></pre></div>
 <h3 id="example-2-multi-agent-context-sharing">Example 2: Multi-Agent Context Sharing<a class="headerlink" href="#example-2-multi-agent-context-sharing" title="Permanent link">&para;</a></h3>
@@ -3308,75 +3308,75 @@
 <a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">crewai</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span><span class="p">,</span> <span class="n">Task</span><span class="p">,</span> <span class="n">Crew</span>
 <a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>
 <a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="c1"># Load shared context ONCE</span>
-<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">&quot;docs/STORY_2_CONTEXT.md&quot;</span><span class="p">)</span>
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">"docs/STORY_2_CONTEXT.md"</span><span class="p">)</span>
 <a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a>
 <a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="c1"># Agent 1: Developer</span>
 <a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a><span class="n">developer</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span>
-<a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;Developer&quot;</span><span class="p">,</span>
-<a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a>    <span class="n">goal</span><span class="o">=</span><span class="s2">&quot;Implement features&quot;</span><span class="p">,</span>
-<a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a>    <span class="n">backstory</span><span class="o">=</span><span class="s2">&quot;Senior Python developer&quot;</span>
+<a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">"Developer"</span><span class="p">,</span>
+<a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a>    <span class="n">goal</span><span class="o">=</span><span class="s2">"Implement features"</span><span class="p">,</span>
+<a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a>    <span class="n">backstory</span><span class="o">=</span><span class="s2">"Senior Python developer"</span>
 <a id="__codelineno-27-12" name="__codelineno-27-12" href="#__codelineno-27-12"></a><span class="p">)</span>
 <a id="__codelineno-27-13" name="__codelineno-27-13" href="#__codelineno-27-13"></a>
 <a id="__codelineno-27-14" name="__codelineno-27-14" href="#__codelineno-27-14"></a><span class="n">dev_context</span> <span class="o">=</span> <span class="n">create_task_context</span><span class="p">(</span>
 <a id="__codelineno-27-15" name="__codelineno-27-15" href="#__codelineno-27-15"></a>    <span class="n">ctx</span><span class="p">,</span>
-<a id="__codelineno-27-16" name="__codelineno-27-16" href="#__codelineno-27-16"></a>    <span class="n">task_id</span><span class="o">=</span><span class="s1">&#39;DEV-implement&#39;</span><span class="p">,</span>
-<a id="__codelineno-27-17" name="__codelineno-27-17" href="#__codelineno-27-17"></a>    <span class="n">assigned_to</span><span class="o">=</span><span class="s1">&#39;Developer&#39;</span>
+<a id="__codelineno-27-16" name="__codelineno-27-16" href="#__codelineno-27-16"></a>    <span class="n">task_id</span><span class="o">=</span><span class="s1">'DEV-implement'</span><span class="p">,</span>
+<a id="__codelineno-27-17" name="__codelineno-27-17" href="#__codelineno-27-17"></a>    <span class="n">assigned_to</span><span class="o">=</span><span class="s1">'Developer'</span>
 <a id="__codelineno-27-18" name="__codelineno-27-18" href="#__codelineno-27-18"></a><span class="p">)</span>
 <a id="__codelineno-27-19" name="__codelineno-27-19" href="#__codelineno-27-19"></a>
 <a id="__codelineno-27-20" name="__codelineno-27-20" href="#__codelineno-27-20"></a><span class="n">dev_task</span> <span class="o">=</span> <span class="n">Task</span><span class="p">(</span>
-<a id="__codelineno-27-21" name="__codelineno-27-21" href="#__codelineno-27-21"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Implement shared context system&quot;</span><span class="p">,</span>
+<a id="__codelineno-27-21" name="__codelineno-27-21" href="#__codelineno-27-21"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">"Implement shared context system"</span><span class="p">,</span>
 <a id="__codelineno-27-22" name="__codelineno-27-22" href="#__codelineno-27-22"></a>    <span class="n">agent</span><span class="o">=</span><span class="n">developer</span><span class="p">,</span>
 <a id="__codelineno-27-23" name="__codelineno-27-23" href="#__codelineno-27-23"></a>    <span class="n">context</span><span class="o">=</span><span class="n">dev_context</span><span class="p">,</span>
-<a id="__codelineno-27-24" name="__codelineno-27-24" href="#__codelineno-27-24"></a>    <span class="n">expected_output</span><span class="o">=</span><span class="s2">&quot;Implementation complete with tests&quot;</span>
+<a id="__codelineno-27-24" name="__codelineno-27-24" href="#__codelineno-27-24"></a>    <span class="n">expected_output</span><span class="o">=</span><span class="s2">"Implementation complete with tests"</span>
 <a id="__codelineno-27-25" name="__codelineno-27-25" href="#__codelineno-27-25"></a><span class="p">)</span>
 <a id="__codelineno-27-26" name="__codelineno-27-26" href="#__codelineno-27-26"></a>
 <a id="__codelineno-27-27" name="__codelineno-27-27" href="#__codelineno-27-27"></a><span class="c1"># Agent 2: QE (automatically inherits story context)</span>
 <a id="__codelineno-27-28" name="__codelineno-27-28" href="#__codelineno-27-28"></a><span class="n">qe</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span>
-<a id="__codelineno-27-29" name="__codelineno-27-29" href="#__codelineno-27-29"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;QE Lead&quot;</span><span class="p">,</span>
-<a id="__codelineno-27-30" name="__codelineno-27-30" href="#__codelineno-27-30"></a>    <span class="n">goal</span><span class="o">=</span><span class="s2">&quot;Validate quality&quot;</span><span class="p">,</span>
-<a id="__codelineno-27-31" name="__codelineno-27-31" href="#__codelineno-27-31"></a>    <span class="n">backstory</span><span class="o">=</span><span class="s2">&quot;QE with 10+ years experience&quot;</span>
+<a id="__codelineno-27-29" name="__codelineno-27-29" href="#__codelineno-27-29"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">"QE Lead"</span><span class="p">,</span>
+<a id="__codelineno-27-30" name="__codelineno-27-30" href="#__codelineno-27-30"></a>    <span class="n">goal</span><span class="o">=</span><span class="s2">"Validate quality"</span><span class="p">,</span>
+<a id="__codelineno-27-31" name="__codelineno-27-31" href="#__codelineno-27-31"></a>    <span class="n">backstory</span><span class="o">=</span><span class="s2">"QE with 10+ years experience"</span>
 <a id="__codelineno-27-32" name="__codelineno-27-32" href="#__codelineno-27-32"></a><span class="p">)</span>
 <a id="__codelineno-27-33" name="__codelineno-27-33" href="#__codelineno-27-33"></a>
 <a id="__codelineno-27-34" name="__codelineno-27-34" href="#__codelineno-27-34"></a><span class="n">qe_context</span> <span class="o">=</span> <span class="n">create_task_context</span><span class="p">(</span>
 <a id="__codelineno-27-35" name="__codelineno-27-35" href="#__codelineno-27-35"></a>    <span class="n">ctx</span><span class="p">,</span>
-<a id="__codelineno-27-36" name="__codelineno-27-36" href="#__codelineno-27-36"></a>    <span class="n">task_id</span><span class="o">=</span><span class="s1">&#39;QE-validate&#39;</span><span class="p">,</span>
-<a id="__codelineno-27-37" name="__codelineno-27-37" href="#__codelineno-27-37"></a>    <span class="n">assigned_to</span><span class="o">=</span><span class="s1">&#39;QE Lead&#39;</span><span class="p">,</span>
+<a id="__codelineno-27-36" name="__codelineno-27-36" href="#__codelineno-27-36"></a>    <span class="n">task_id</span><span class="o">=</span><span class="s1">'QE-validate'</span><span class="p">,</span>
+<a id="__codelineno-27-37" name="__codelineno-27-37" href="#__codelineno-27-37"></a>    <span class="n">assigned_to</span><span class="o">=</span><span class="s1">'QE Lead'</span><span class="p">,</span>
 <a id="__codelineno-27-38" name="__codelineno-27-38" href="#__codelineno-27-38"></a>    <span class="n">previous_task_output</span><span class="o">=</span><span class="n">dev_task</span><span class="o">.</span><span class="n">output</span>
 <a id="__codelineno-27-39" name="__codelineno-27-39" href="#__codelineno-27-39"></a><span class="p">)</span>
 <a id="__codelineno-27-40" name="__codelineno-27-40" href="#__codelineno-27-40"></a>
 <a id="__codelineno-27-41" name="__codelineno-27-41" href="#__codelineno-27-41"></a><span class="n">qe_task</span> <span class="o">=</span> <span class="n">Task</span><span class="p">(</span>
-<a id="__codelineno-27-42" name="__codelineno-27-42" href="#__codelineno-27-42"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Validate implementation meets acceptance criteria&quot;</span><span class="p">,</span>
+<a id="__codelineno-27-42" name="__codelineno-27-42" href="#__codelineno-27-42"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">"Validate implementation meets acceptance criteria"</span><span class="p">,</span>
 <a id="__codelineno-27-43" name="__codelineno-27-43" href="#__codelineno-27-43"></a>    <span class="n">agent</span><span class="o">=</span><span class="n">qe</span><span class="p">,</span>
 <a id="__codelineno-27-44" name="__codelineno-27-44" href="#__codelineno-27-44"></a>    <span class="n">context</span><span class="o">=</span><span class="n">qe_context</span><span class="p">,</span>
-<a id="__codelineno-27-45" name="__codelineno-27-45" href="#__codelineno-27-45"></a>    <span class="n">expected_output</span><span class="o">=</span><span class="s2">&quot;Validation report&quot;</span>
+<a id="__codelineno-27-45" name="__codelineno-27-45" href="#__codelineno-27-45"></a>    <span class="n">expected_output</span><span class="o">=</span><span class="s2">"Validation report"</span>
 <a id="__codelineno-27-46" name="__codelineno-27-46" href="#__codelineno-27-46"></a><span class="p">)</span>
 <a id="__codelineno-27-47" name="__codelineno-27-47" href="#__codelineno-27-47"></a>
 <a id="__codelineno-27-48" name="__codelineno-27-48" href="#__codelineno-27-48"></a><span class="c1"># Agent 3: Scrum Master (sees all context updates)</span>
 <a id="__codelineno-27-49" name="__codelineno-27-49" href="#__codelineno-27-49"></a><span class="n">scrum_master</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span>
-<a id="__codelineno-27-50" name="__codelineno-27-50" href="#__codelineno-27-50"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;Scrum Master&quot;</span><span class="p">,</span>
-<a id="__codelineno-27-51" name="__codelineno-27-51" href="#__codelineno-27-51"></a>    <span class="n">goal</span><span class="o">=</span><span class="s2">&quot;Track progress&quot;</span><span class="p">,</span>
-<a id="__codelineno-27-52" name="__codelineno-27-52" href="#__codelineno-27-52"></a>    <span class="n">backstory</span><span class="o">=</span><span class="s2">&quot;Certified Scrum Master&quot;</span>
+<a id="__codelineno-27-50" name="__codelineno-27-50" href="#__codelineno-27-50"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">"Scrum Master"</span><span class="p">,</span>
+<a id="__codelineno-27-51" name="__codelineno-27-51" href="#__codelineno-27-51"></a>    <span class="n">goal</span><span class="o">=</span><span class="s2">"Track progress"</span><span class="p">,</span>
+<a id="__codelineno-27-52" name="__codelineno-27-52" href="#__codelineno-27-52"></a>    <span class="n">backstory</span><span class="o">=</span><span class="s2">"Certified Scrum Master"</span>
 <a id="__codelineno-27-53" name="__codelineno-27-53" href="#__codelineno-27-53"></a><span class="p">)</span>
 <a id="__codelineno-27-54" name="__codelineno-27-54" href="#__codelineno-27-54"></a>
 <a id="__codelineno-27-55" name="__codelineno-27-55" href="#__codelineno-27-55"></a><span class="n">sm_context</span> <span class="o">=</span> <span class="n">create_task_context</span><span class="p">(</span>
 <a id="__codelineno-27-56" name="__codelineno-27-56" href="#__codelineno-27-56"></a>    <span class="n">ctx</span><span class="p">,</span>
-<a id="__codelineno-27-57" name="__codelineno-27-57" href="#__codelineno-27-57"></a>    <span class="n">task_id</span><span class="o">=</span><span class="s1">&#39;SM-report&#39;</span><span class="p">,</span>
-<a id="__codelineno-27-58" name="__codelineno-27-58" href="#__codelineno-27-58"></a>    <span class="n">assigned_to</span><span class="o">=</span><span class="s1">&#39;Scrum Master&#39;</span><span class="p">,</span>
+<a id="__codelineno-27-57" name="__codelineno-27-57" href="#__codelineno-27-57"></a>    <span class="n">task_id</span><span class="o">=</span><span class="s1">'SM-report'</span><span class="p">,</span>
+<a id="__codelineno-27-58" name="__codelineno-27-58" href="#__codelineno-27-58"></a>    <span class="n">assigned_to</span><span class="o">=</span><span class="s1">'Scrum Master'</span><span class="p">,</span>
 <a id="__codelineno-27-59" name="__codelineno-27-59" href="#__codelineno-27-59"></a>    <span class="n">previous_task_output</span><span class="o">=</span><span class="n">qe_task</span><span class="o">.</span><span class="n">output</span>
 <a id="__codelineno-27-60" name="__codelineno-27-60" href="#__codelineno-27-60"></a><span class="p">)</span>
 <a id="__codelineno-27-61" name="__codelineno-27-61" href="#__codelineno-27-61"></a>
 <a id="__codelineno-27-62" name="__codelineno-27-62" href="#__codelineno-27-62"></a><span class="n">sm_task</span> <span class="o">=</span> <span class="n">Task</span><span class="p">(</span>
-<a id="__codelineno-27-63" name="__codelineno-27-63" href="#__codelineno-27-63"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Generate sprint summary&quot;</span><span class="p">,</span>
+<a id="__codelineno-27-63" name="__codelineno-27-63" href="#__codelineno-27-63"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">"Generate sprint summary"</span><span class="p">,</span>
 <a id="__codelineno-27-64" name="__codelineno-27-64" href="#__codelineno-27-64"></a>    <span class="n">agent</span><span class="o">=</span><span class="n">scrum_master</span><span class="p">,</span>
 <a id="__codelineno-27-65" name="__codelineno-27-65" href="#__codelineno-27-65"></a>    <span class="n">context</span><span class="o">=</span><span class="n">sm_context</span><span class="p">,</span>
-<a id="__codelineno-27-66" name="__codelineno-27-66" href="#__codelineno-27-66"></a>    <span class="n">expected_output</span><span class="o">=</span><span class="s2">&quot;Sprint summary document&quot;</span>
+<a id="__codelineno-27-66" name="__codelineno-27-66" href="#__codelineno-27-66"></a>    <span class="n">expected_output</span><span class="o">=</span><span class="s2">"Sprint summary document"</span>
 <a id="__codelineno-27-67" name="__codelineno-27-67" href="#__codelineno-27-67"></a><span class="p">)</span>
 <a id="__codelineno-27-68" name="__codelineno-27-68" href="#__codelineno-27-68"></a>
 <a id="__codelineno-27-69" name="__codelineno-27-69" href="#__codelineno-27-69"></a><span class="c1"># Create and execute crew</span>
 <a id="__codelineno-27-70" name="__codelineno-27-70" href="#__codelineno-27-70"></a><span class="n">crew</span> <span class="o">=</span> <span class="n">Crew</span><span class="p">(</span>
 <a id="__codelineno-27-71" name="__codelineno-27-71" href="#__codelineno-27-71"></a>    <span class="n">agents</span><span class="o">=</span><span class="p">[</span><span class="n">developer</span><span class="p">,</span> <span class="n">qe</span><span class="p">,</span> <span class="n">scrum_master</span><span class="p">],</span>
 <a id="__codelineno-27-72" name="__codelineno-27-72" href="#__codelineno-27-72"></a>    <span class="n">tasks</span><span class="o">=</span><span class="p">[</span><span class="n">dev_task</span><span class="p">,</span> <span class="n">qe_task</span><span class="p">,</span> <span class="n">sm_task</span><span class="p">],</span>
-<a id="__codelineno-27-73" name="__codelineno-27-73" href="#__codelineno-27-73"></a>    <span class="n">process</span><span class="o">=</span><span class="s2">&quot;sequential&quot;</span>
+<a id="__codelineno-27-73" name="__codelineno-27-73" href="#__codelineno-27-73"></a>    <span class="n">process</span><span class="o">=</span><span class="s2">"sequential"</span>
 <a id="__codelineno-27-74" name="__codelineno-27-74" href="#__codelineno-27-74"></a><span class="p">)</span>
 <a id="__codelineno-27-75" name="__codelineno-27-75" href="#__codelineno-27-75"></a>
 <a id="__codelineno-27-76" name="__codelineno-27-76" href="#__codelineno-27-76"></a><span class="n">result</span> <span class="o">=</span> <span class="n">crew</span><span class="o">.</span><span class="n">kickoff</span><span class="p">()</span>
@@ -3384,49 +3384,49 @@
 <h3 id="example-3-updating-context-during-execution">Example 3: Updating Context During Execution<a class="headerlink" href="#example-3-updating-context-during-execution" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scripts.context_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContextManager</span>
 <a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>
-<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">&quot;docs/STORY_2_CONTEXT.md&quot;</span><span class="p">)</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">"docs/STORY_2_CONTEXT.md"</span><span class="p">)</span>
 <a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>
 <a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="c1"># Developer updates context after implementation</span>
-<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;implementation_status&#39;</span><span class="p">,</span> <span class="s1">&#39;complete&#39;</span><span class="p">)</span>
-<a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;code_location&#39;</span><span class="p">,</span> <span class="s1">&#39;scripts/context_manager.py&#39;</span><span class="p">)</span>
-<a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;test_location&#39;</span><span class="p">,</span> <span class="s1">&#39;tests/test_context_manager.py&#39;</span><span class="p">)</span>
+<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'implementation_status'</span><span class="p">,</span> <span class="s1">'complete'</span><span class="p">)</span>
+<a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'code_location'</span><span class="p">,</span> <span class="s1">'scripts/context_manager.py'</span><span class="p">)</span>
+<a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'test_location'</span><span class="p">,</span> <span class="s1">'tests/test_context_manager.py'</span><span class="p">)</span>
 <a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a>
 <a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a><span class="c1"># QE reads updated context</span>
-<a id="__codelineno-28-11" name="__codelineno-28-11" href="#__codelineno-28-11"></a><span class="n">impl_status</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;implementation_status&#39;</span><span class="p">)</span>
-<a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a><span class="k">if</span> <span class="n">impl_status</span> <span class="o">==</span> <span class="s1">&#39;complete&#39;</span><span class="p">:</span>
+<a id="__codelineno-28-11" name="__codelineno-28-11" href="#__codelineno-28-11"></a><span class="n">impl_status</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'implementation_status'</span><span class="p">)</span>
+<a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a><span class="k">if</span> <span class="n">impl_status</span> <span class="o">==</span> <span class="s1">'complete'</span><span class="p">:</span>
 <a id="__codelineno-28-13" name="__codelineno-28-13" href="#__codelineno-28-13"></a>    <span class="c1"># Run validation on code location</span>
-<a id="__codelineno-28-14" name="__codelineno-28-14" href="#__codelineno-28-14"></a>    <span class="n">code_path</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;code_location&#39;</span><span class="p">)</span>
-<a id="__codelineno-28-15" name="__codelineno-28-15" href="#__codelineno-28-15"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validating </span><span class="si">{</span><span class="n">code_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-28-14" name="__codelineno-28-14" href="#__codelineno-28-14"></a>    <span class="n">code_path</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'code_location'</span><span class="p">)</span>
+<a id="__codelineno-28-15" name="__codelineno-28-15" href="#__codelineno-28-15"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Validating </span><span class="si">{</span><span class="n">code_path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <a id="__codelineno-28-16" name="__codelineno-28-16" href="#__codelineno-28-16"></a>
 <a id="__codelineno-28-17" name="__codelineno-28-17" href="#__codelineno-28-17"></a>    <span class="c1"># Add test results</span>
-<a id="__codelineno-28-18" name="__codelineno-28-18" href="#__codelineno-28-18"></a>    <span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;test_results&#39;</span><span class="p">,</span> <span class="p">{</span>
-<a id="__codelineno-28-19" name="__codelineno-28-19" href="#__codelineno-28-19"></a>        <span class="s1">&#39;passed&#39;</span><span class="p">:</span> <span class="mi">28</span><span class="p">,</span>
-<a id="__codelineno-28-20" name="__codelineno-28-20" href="#__codelineno-28-20"></a>        <span class="s1">&#39;failed&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-<a id="__codelineno-28-21" name="__codelineno-28-21" href="#__codelineno-28-21"></a>        <span class="s1">&#39;coverage&#39;</span><span class="p">:</span> <span class="mi">89</span>
+<a id="__codelineno-28-18" name="__codelineno-28-18" href="#__codelineno-28-18"></a>    <span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'test_results'</span><span class="p">,</span> <span class="p">{</span>
+<a id="__codelineno-28-19" name="__codelineno-28-19" href="#__codelineno-28-19"></a>        <span class="s1">'passed'</span><span class="p">:</span> <span class="mi">28</span><span class="p">,</span>
+<a id="__codelineno-28-20" name="__codelineno-28-20" href="#__codelineno-28-20"></a>        <span class="s1">'failed'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-28-21" name="__codelineno-28-21" href="#__codelineno-28-21"></a>        <span class="s1">'coverage'</span><span class="p">:</span> <span class="mi">89</span>
 <a id="__codelineno-28-22" name="__codelineno-28-22" href="#__codelineno-28-22"></a>    <span class="p">})</span>
 <a id="__codelineno-28-23" name="__codelineno-28-23" href="#__codelineno-28-23"></a>
 <a id="__codelineno-28-24" name="__codelineno-28-24" href="#__codelineno-28-24"></a><span class="c1"># Scrum Master sees all updates</span>
 <a id="__codelineno-28-25" name="__codelineno-28-25" href="#__codelineno-28-25"></a><span class="n">all_context</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
-<a id="__codelineno-28-26" name="__codelineno-28-26" href="#__codelineno-28-26"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Context keys: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">all_context</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-28-27" name="__codelineno-28-27" href="#__codelineno-28-27"></a><span class="c1"># Output: [&#39;story_id&#39;, &#39;goal&#39;, &#39;implementation_status&#39;,</span>
-<a id="__codelineno-28-28" name="__codelineno-28-28" href="#__codelineno-28-28"></a><span class="c1">#          &#39;code_location&#39;, &#39;test_results&#39;, ...]</span>
+<a id="__codelineno-28-26" name="__codelineno-28-26" href="#__codelineno-28-26"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Context keys: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">all_context</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<a id="__codelineno-28-27" name="__codelineno-28-27" href="#__codelineno-28-27"></a><span class="c1"># Output: ['story_id', 'goal', 'implementation_status',</span>
+<a id="__codelineno-28-28" name="__codelineno-28-28" href="#__codelineno-28-28"></a><span class="c1">#          'code_location', 'test_results', ...]</span>
 </code></pre></div>
 <h3 id="example-4-audit-logging">Example 4: Audit Logging<a class="headerlink" href="#example-4-audit-logging" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scripts.context_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContextManager</span>
 <a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>
-<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">&quot;docs/STORY_2_CONTEXT.md&quot;</span><span class="p">)</span>
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">"docs/STORY_2_CONTEXT.md"</span><span class="p">)</span>
 <a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>
 <a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="c1"># Make several updates</span>
-<a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="s1">&#39;in_progress&#39;</span><span class="p">)</span>
-<a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;assignee&#39;</span><span class="p">,</span> <span class="s1">&#39;Developer Agent&#39;</span><span class="p">)</span>
-<a id="__codelineno-29-8" name="__codelineno-29-8" href="#__codelineno-29-8"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="s1">&#39;complete&#39;</span><span class="p">)</span>  <span class="c1"># Update again</span>
+<a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'status'</span><span class="p">,</span> <span class="s1">'in_progress'</span><span class="p">)</span>
+<a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'assignee'</span><span class="p">,</span> <span class="s1">'Developer Agent'</span><span class="p">)</span>
+<a id="__codelineno-29-8" name="__codelineno-29-8" href="#__codelineno-29-8"></a><span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'status'</span><span class="p">,</span> <span class="s1">'complete'</span><span class="p">)</span>  <span class="c1"># Update again</span>
 <a id="__codelineno-29-9" name="__codelineno-29-9" href="#__codelineno-29-9"></a>
 <a id="__codelineno-29-10" name="__codelineno-29-10" href="#__codelineno-29-10"></a><span class="c1"># Review audit log</span>
 <a id="__codelineno-29-11" name="__codelineno-29-11" href="#__codelineno-29-11"></a><span class="n">audit</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">get_audit_log</span><span class="p">()</span>
 <a id="__codelineno-29-12" name="__codelineno-29-12" href="#__codelineno-29-12"></a>
 <a id="__codelineno-29-13" name="__codelineno-29-13" href="#__codelineno-29-13"></a><span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">audit</span><span class="p">:</span>
-<a id="__codelineno-29-14" name="__codelineno-29-14" href="#__codelineno-29-14"></a>    <span class="k">if</span> <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;action&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;updated&#39;</span><span class="p">:</span>
-<a id="__codelineno-29-15" name="__codelineno-29-15" href="#__codelineno-29-15"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: Updated </span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-29-14" name="__codelineno-29-14" href="#__codelineno-29-14"></a>    <span class="k">if</span> <span class="n">entry</span><span class="p">[</span><span class="s1">'action'</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'updated'</span><span class="p">:</span>
+<a id="__codelineno-29-15" name="__codelineno-29-15" href="#__codelineno-29-15"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">'timestamp'</span><span class="p">]</span><span class="si">}</span><span class="s2">: Updated </span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">'key'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <a id="__codelineno-29-16" name="__codelineno-29-16" href="#__codelineno-29-16"></a>
 <a id="__codelineno-29-17" name="__codelineno-29-17" href="#__codelineno-29-17"></a><span class="c1"># Output:</span>
 <a id="__codelineno-29-18" name="__codelineno-29-18" href="#__codelineno-29-18"></a><span class="c1"># 2026-01-02T10:00:00.000000: Updated status</span>
@@ -3434,7 +3434,7 @@
 <a id="__codelineno-29-20" name="__codelineno-29-20" href="#__codelineno-29-20"></a><span class="c1"># 2026-01-02T10:10:00.000000: Updated status</span>
 <a id="__codelineno-29-21" name="__codelineno-29-21" href="#__codelineno-29-21"></a>
 <a id="__codelineno-29-22" name="__codelineno-29-22" href="#__codelineno-29-22"></a><span class="c1"># Save audit log for compliance</span>
-<a id="__codelineno-29-23" name="__codelineno-29-23" href="#__codelineno-29-23"></a><span class="n">ctx</span><span class="o">.</span><span class="n">save_audit_log</span><span class="p">(</span><span class="s1">&#39;logs/story_2_audit.json&#39;</span><span class="p">)</span>
+<a id="__codelineno-29-23" name="__codelineno-29-23" href="#__codelineno-29-23"></a><span class="n">ctx</span><span class="o">.</span><span class="n">save_audit_log</span><span class="p">(</span><span class="s1">'logs/story_2_audit.json'</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="example-5-error-handling">Example 5: Error Handling<a class="headerlink" href="#example-5-error-handling" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scripts.context_manager</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -3447,30 +3447,30 @@
 <a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a>
 <a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a><span class="c1"># Handle file not found</span>
 <a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a><span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-30-11" name="__codelineno-30-11" href="#__codelineno-30-11"></a>    <span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">&quot;missing.md&quot;</span><span class="p">)</span>
+<a id="__codelineno-30-11" name="__codelineno-30-11" href="#__codelineno-30-11"></a>    <span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">"missing.md"</span><span class="p">)</span>
 <a id="__codelineno-30-12" name="__codelineno-30-12" href="#__codelineno-30-12"></a><span class="k">except</span> <span class="n">ContextFileNotFoundError</span><span class="p">:</span>
-<a id="__codelineno-30-13" name="__codelineno-30-13" href="#__codelineno-30-13"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Context file missing - check path&quot;</span><span class="p">)</span>
+<a id="__codelineno-30-13" name="__codelineno-30-13" href="#__codelineno-30-13"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">"Context file missing - check path"</span><span class="p">)</span>
 <a id="__codelineno-30-14" name="__codelineno-30-14" href="#__codelineno-30-14"></a>    <span class="n">ctx</span> <span class="o">=</span> <span class="kc">None</span>
 <a id="__codelineno-30-15" name="__codelineno-30-15" href="#__codelineno-30-15"></a>
 <a id="__codelineno-30-16" name="__codelineno-30-16" href="#__codelineno-30-16"></a><span class="k">if</span> <span class="n">ctx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-30-17" name="__codelineno-30-17" href="#__codelineno-30-17"></a>    <span class="c1"># Fallback: create minimal context</span>
-<a id="__codelineno-30-18" name="__codelineno-30-18" href="#__codelineno-30-18"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using default context&quot;</span><span class="p">)</span>
+<a id="__codelineno-30-18" name="__codelineno-30-18" href="#__codelineno-30-18"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">"Using default context"</span><span class="p">)</span>
 <a id="__codelineno-30-19" name="__codelineno-30-19" href="#__codelineno-30-19"></a>
 <a id="__codelineno-30-20" name="__codelineno-30-20" href="#__codelineno-30-20"></a><span class="c1"># Handle parse errors</span>
 <a id="__codelineno-30-21" name="__codelineno-30-21" href="#__codelineno-30-21"></a><span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-30-22" name="__codelineno-30-22" href="#__codelineno-30-22"></a>    <span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">&quot;malformed.md&quot;</span><span class="p">)</span>
+<a id="__codelineno-30-22" name="__codelineno-30-22" href="#__codelineno-30-22"></a>    <span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">"malformed.md"</span><span class="p">)</span>
 <a id="__codelineno-30-23" name="__codelineno-30-23" href="#__codelineno-30-23"></a><span class="k">except</span> <span class="n">ContextParseError</span><span class="p">:</span>
-<a id="__codelineno-30-24" name="__codelineno-30-24" href="#__codelineno-30-24"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Context file format invalid - check markdown structure&quot;</span><span class="p">)</span>
+<a id="__codelineno-30-24" name="__codelineno-30-24" href="#__codelineno-30-24"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">"Context file format invalid - check markdown structure"</span><span class="p">)</span>
 <a id="__codelineno-30-25" name="__codelineno-30-25" href="#__codelineno-30-25"></a>
 <a id="__codelineno-30-26" name="__codelineno-30-26" href="#__codelineno-30-26"></a><span class="c1"># Handle update errors</span>
 <a id="__codelineno-30-27" name="__codelineno-30-27" href="#__codelineno-30-27"></a><span class="k">try</span><span class="p">:</span>
 <a id="__codelineno-30-28" name="__codelineno-30-28" href="#__codelineno-30-28"></a>    <span class="k">class</span><span class="w"> </span><span class="nc">NonSerializable</span><span class="p">:</span>
 <a id="__codelineno-30-29" name="__codelineno-30-29" href="#__codelineno-30-29"></a>        <span class="k">pass</span>
-<a id="__codelineno-30-30" name="__codelineno-30-30" href="#__codelineno-30-30"></a>    <span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;bad_key&#39;</span><span class="p">,</span> <span class="n">NonSerializable</span><span class="p">())</span>
+<a id="__codelineno-30-30" name="__codelineno-30-30" href="#__codelineno-30-30"></a>    <span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'bad_key'</span><span class="p">,</span> <span class="n">NonSerializable</span><span class="p">())</span>
 <a id="__codelineno-30-31" name="__codelineno-30-31" href="#__codelineno-30-31"></a><span class="k">except</span> <span class="n">ContextUpdateError</span><span class="p">:</span>
-<a id="__codelineno-30-32" name="__codelineno-30-32" href="#__codelineno-30-32"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Value must be JSON serializable&quot;</span><span class="p">)</span>
+<a id="__codelineno-30-32" name="__codelineno-30-32" href="#__codelineno-30-32"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">"Value must be JSON serializable"</span><span class="p">)</span>
 <a id="__codelineno-30-33" name="__codelineno-30-33" href="#__codelineno-30-33"></a>    <span class="c1"># Use serializable alternative</span>
-<a id="__codelineno-30-34" name="__codelineno-30-34" href="#__codelineno-30-34"></a>    <span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;good_key&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;NonSerializable&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">123</span><span class="p">})</span>
+<a id="__codelineno-30-34" name="__codelineno-30-34" href="#__codelineno-30-34"></a>    <span class="n">ctx</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">'good_key'</span><span class="p">,</span> <span class="p">{</span><span class="s1">'type'</span><span class="p">:</span> <span class="s1">'NonSerializable'</span><span class="p">,</span> <span class="s1">'id'</span><span class="p">:</span> <span class="mi">123</span><span class="p">})</span>
 </code></pre></div>
 <hr />
 <h2 id="performance-notes">Performance Notes<a class="headerlink" href="#performance-notes" title="Permanent link">&para;</a></h2>
@@ -3523,20 +3523,20 @@
 <h2 id="migration-from-manual-context">Migration from Manual Context<a class="headerlink" href="#migration-from-manual-context" title="Permanent link">&para;</a></h2>
 <h3 id="before-manual-briefing">Before (Manual Briefing)<a class="headerlink" href="#before-manual-briefing" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">brief_developer</span><span class="p">(</span><span class="n">story_id</span><span class="p">,</span> <span class="n">goal</span><span class="p">,</span> <span class="n">acceptance_criteria</span><span class="p">):</span>
-<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Manual briefing - 10 minutes per agent&quot;&quot;&quot;</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="w">    </span><span class="sd">"""Manual briefing - 10 minutes per agent"""</span>
 <a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>    <span class="n">developer</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a>        <span class="s1">&#39;story_id&#39;</span><span class="p">:</span> <span class="n">story_id</span><span class="p">,</span>
-<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a>        <span class="s1">&#39;goal&#39;</span><span class="p">:</span> <span class="n">goal</span><span class="p">,</span>
-<a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a>        <span class="s1">&#39;acceptance_criteria&#39;</span><span class="p">:</span> <span class="n">acceptance_criteria</span>
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a>        <span class="s1">'story_id'</span><span class="p">:</span> <span class="n">story_id</span><span class="p">,</span>
+<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a>        <span class="s1">'goal'</span><span class="p">:</span> <span class="n">goal</span><span class="p">,</span>
+<a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a>        <span class="s1">'acceptance_criteria'</span><span class="p">:</span> <span class="n">acceptance_criteria</span>
 <a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a>    <span class="p">}</span>
 </code></pre></div>
 <h3 id="after-shared-context">After (Shared Context)<a class="headerlink" href="#after-shared-context" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="c1"># Load once - 143ms total</span>
-<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">&quot;docs/STORY_2_CONTEXT.md&quot;</span><span class="p">)</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="n">ctx</span> <span class="o">=</span> <span class="n">ContextManager</span><span class="p">(</span><span class="s2">"docs/STORY_2_CONTEXT.md"</span><span class="p">)</span>
 <a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>
 <a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="c1"># All agents use shared context - &lt;1ms per agent</span>
-<a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="n">dev_context</span> <span class="o">=</span> <span class="n">create_task_context</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">task_id</span><span class="o">=</span><span class="s1">&#39;DEV-001&#39;</span><span class="p">)</span>
-<a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a><span class="n">qe_context</span> <span class="o">=</span> <span class="n">create_task_context</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">task_id</span><span class="o">=</span><span class="s1">&#39;QE-001&#39;</span><span class="p">)</span>
+<a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="n">dev_context</span> <span class="o">=</span> <span class="n">create_task_context</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">task_id</span><span class="o">=</span><span class="s1">'DEV-001'</span><span class="p">)</span>
+<a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a><span class="n">qe_context</span> <span class="o">=</span> <span class="n">create_task_context</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">task_id</span><span class="o">=</span><span class="s1">'QE-001'</span><span class="p">)</span>
 </code></pre></div>
 <p><strong>Benefits:</strong>
 - 99.7% faster (10min → 48ms per agent)

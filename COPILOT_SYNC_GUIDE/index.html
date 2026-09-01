@@ -2957,7 +2957,7 @@
 </code></pre></div></p>
 <p><strong>After Sync (with BUG-028 pattern):</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Copilot knows to add YAML delimiter</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">article</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;---</span><span class="se">\n</span><span class="s2">title: </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="se">\n</span><span class="s2">date: </span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="se">\n</span><span class="s2">---</span><span class="se">\n\n</span><span class="si">{</span><span class="n">content</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">article</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"---</span><span class="se">\n</span><span class="s2">title: </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="se">\n</span><span class="s2">date: </span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="se">\n</span><span class="s2">---</span><span class="se">\n\n</span><span class="si">{</span><span class="n">content</span><span class="si">}</span><span class="s2">"</span>
 </code></pre></div></p>
 <h2 id="pattern-format">Pattern Format<a class="headerlink" href="#pattern-format" title="Permanent link">&para;</a></h2>
 <h3 id="defect-prevention-patterns">Defect Prevention Patterns<a class="headerlink" href="#defect-prevention-patterns" title="Permanent link">&para;</a></h3>
@@ -2982,7 +2982,7 @@
 </code></pre></div>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
 <h3 id="missing-dependency">Missing Dependency<a class="headerlink" href="#missing-dependency" title="Permanent link">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>ModuleNotFoundError:<span class="w"> </span>No<span class="w"> </span>module<span class="w"> </span>named<span class="w"> </span><span class="s1">&#39;orjson&#39;</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>ModuleNotFoundError:<span class="w"> </span>No<span class="w"> </span>module<span class="w"> </span>named<span class="w"> </span><span class="s1">'orjson'</span>
 </code></pre></div>
 <strong>Solution:</strong> Install dependencies
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
@@ -3003,9 +3003,9 @@
 <h3 id="adding-new-pattern-sources">Adding New Pattern Sources<a class="headerlink" href="#adding-new-pattern-sources" title="Permanent link">&para;</a></h3>
 <p>To sync from additional JSON files, edit <code>sync_copilot_context.py</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">extract_custom_patterns</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract patterns from custom source.&quot;&quot;&quot;</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">    </span><span class="sd">"""Extract patterns from custom source."""</span>
 <a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    <span class="n">patterns</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>    <span class="n">custom_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">skills_dir</span> <span class="o">/</span> <span class="s2">&quot;custom_patterns.json&quot;</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>    <span class="n">custom_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">skills_dir</span> <span class="o">/</span> <span class="s2">"custom_patterns.json"</span>
 <a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>
 <a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>    <span class="c1"># Add extraction logic</span>
 <a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>

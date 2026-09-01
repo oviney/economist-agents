@@ -2675,7 +2675,7 @@ confusing downstream symptom.</p>
 needs a decision rather than a patch. <code>build_claude_web_brief</code>
 (<code>src/agent_sdk/research/claude_web.py</code>):</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 — soft-degrade, never crash Stage 3</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;claude_web research failed (</span><span class="si">%s</span><span class="s2">) — returning empty brief&quot;</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"claude_web research failed (</span><span class="si">%s</span><span class="s2">) — returning empty brief"</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
 </code></pre></div>
 <p>and its docstring: <em>"On any SDK failure the brief still returns with its
 guardrail header (an empty findings block) so the pipeline degrades softly

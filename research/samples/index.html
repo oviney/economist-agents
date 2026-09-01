@@ -2631,7 +2631,7 @@ what the conversation was about:</p>
 fabricated chart, an unsupportable attribution to a named executive, and three reference
 entries carrying no URLs — because <code>--brief</code> skips research, so the writer had no evidence and
 supplied its own. The deterministic evaluator scored it 76 and passed it.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>grep<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;href=&#39;</span><span class="w"> </span>docs/research/samples/&lt;file&gt;.html<span class="w">   </span><span class="c1"># zero is the warning sign</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>grep<span class="w"> </span>-c<span class="w"> </span><span class="s1">'href='</span><span class="w"> </span>docs/research/samples/&lt;file&gt;.html<span class="w">   </span><span class="c1"># zero is the warning sign</span>
 </code></pre></div>
 <p>If it returns 0, paste <code>docs/research/artifact-sourcing-prompt.md</code> back into the conversation
 that produced the artifact and re-export. An artifact with no evidence is an argument, not a

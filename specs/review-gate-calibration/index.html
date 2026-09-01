@@ -2889,7 +2889,7 @@ property that decides whether it gets run twice.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Run the whole calibration set and write a report</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>python<span class="w"> </span>scripts/calibrate_review_gate.py<span class="w"> </span>--cases<span class="w"> </span>docs/evals/review-gate/<span class="w"> </span>--out<span class="w"> </span>logs/review_gate_calibration.json
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Re-run a single gate&#39;s cases while iterating on the rubric</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Re-run a single gate's cases while iterating on the rubric</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>python<span class="w"> </span>scripts/calibrate_review_gate.py<span class="w"> </span>--gate<span class="w"> </span>G5
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Report only, from the last run (no model calls)</span>
@@ -2910,8 +2910,8 @@ property that decides whether it gets run twice.</p>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nt">passage</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;-</span>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="no">The 9-hour baseline shows review latency is dominated by queue depth.</span>
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="nt">why</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;-</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="no">The cited study&#39;s 9-hour figure measures time-to-first-comment, not total latency.</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="no">The claim overstates the source&#39;s scope. ADR-0018 finding 3.</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="no">The cited study's 9-hour figure measures time-to-first-comment, not total latency.</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="no">The claim overstates the source's scope. ADR-0018 finding 3.</span>
 </code></pre></div>
 <h2 id="testing-strategy">Testing strategy<a class="headerlink" href="#testing-strategy" title="Permanent link">&para;</a></h2>
 <p>TDD per <code>agent-skills:test-driven-development</code>. <code>tests/test_calibrate_review_gate.py</code>,

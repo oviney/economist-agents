@@ -3174,7 +3174,7 @@
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="no">cd blog-repo</span>
 <a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="no">git checkout main</span>
 <a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="no"># ... copy files ...</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="no">git commit -m &quot;content: Add article&quot;</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="no">git commit -m "content: Add article"</span>
 <a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span><span class="no">git push origin main</span>
 </code></pre></div>
 <p>⚠️ <strong>Warning</strong>: Direct push bypasses review. Only use if you trust the validation completely.</p>
@@ -3193,15 +3193,15 @@
 <h3 id="change-pr-titlebody">Change PR Title/Body<a class="headerlink" href="#change-pr-titlebody" title="Permanent link">&para;</a></h3>
 <p>Customize in workflow:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="l l-Scalar l-Scalar-Plain">gh pr create \</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">--title &quot;📝 [Economics] New Analysis</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$(date +%Y-%m-%d)&quot; \</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">--body &quot;$(cat ../output/*.md | head -20)...&quot;</span><span class="w">  </span><span class="c1"># First 20 lines as preview</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">--title "📝 [Economics] New Analysis</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$(date +%Y-%m-%d)" \</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">--body "$(cat ../output/*.md | head -20)..."</span><span class="w">  </span><span class="c1"># First 20 lines as preview</span>
 </code></pre></div>
 <h2 id="workflow-options-manual-trigger">Workflow Options (Manual Trigger)<a class="headerlink" href="#workflow-options-manual-trigger" title="Permanent link">&para;</a></h2>
 <p>The workflow is configured to run automatically:
 - <strong>Every Monday at 9am UTC</strong> - Topic scout discovers new topics
 - You can modify the schedule in <code>.github/workflows/content-pipeline.yml</code></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">schedule</span><span class="p">:</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">cron</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0</span><span class="nv"> </span><span class="s">9</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">1&#39;</span><span class="w">  </span><span class="c1"># Change as needed</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">cron</span><span class="p">:</span><span class="w"> </span><span class="s">'0</span><span class="nv"> </span><span class="s">9</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">1'</span><span class="w">  </span><span class="c1"># Change as needed</span>
 </code></pre></div>
 <p>Cron format: <code>minute hour day-of-month month day-of-week</code></p>
 <p>Examples:

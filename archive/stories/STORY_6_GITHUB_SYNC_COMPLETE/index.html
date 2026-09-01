@@ -2967,14 +2967,14 @@
 - <code>in-progress</code> - Story active</p>
 <h3 id="sprint-tracker-updated">✅ Sprint Tracker Updated<a class="headerlink" href="#sprint-tracker-updated" title="Permanent link">&para;</a></h3>
 <p><code>skills/sprint_tracker.json</code> now contains:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">&quot;github_issues&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;synced_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-01-03T12:40:23.126444&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">&quot;issues&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">"github_issues"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">"synced_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-03T12:40:23.126444"</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">"issues"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">      </span><span class="nt">&quot;story_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">      </span><span class="nt">&quot;issue_number&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;50&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">      </span><span class="nt">&quot;issue_url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://github.com/oviney/economist-agents/issues/50&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Story 0: Fix CI/CD Infrastructure Crisis&quot;</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">      </span><span class="nt">"story_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">      </span><span class="nt">"issue_number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"50"</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">      </span><span class="nt">"issue_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://github.com/oviney/economist-agents/issues/50"</span><span class="p">,</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">      </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Story 0: Fix CI/CD Infrastructure Crisis"</span>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="p">},</span>
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="err">...</span>
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">  </span><span class="p">]</span>
@@ -3044,19 +3044,19 @@
 <p><strong>Solution</strong>: Simplified to issues-only approach, documented Project Board upgrade path</p>
 <h3 id="challenge-2-label-creation">Challenge 2: Label Creation<a class="headerlink" href="#challenge-2-label-creation" title="Permanent link">&para;</a></h3>
 <p><strong>Problem</strong>: Issue creation failed with:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>could not add label: &#39;completed&#39; not found
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>could not add label: 'completed' not found
 </code></pre></div></p>
 <p><strong>Root Cause</strong>: Labels must exist before assignment</p>
 <p><strong>Solution</strong>: Created all labels first:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">for</span><span class="w"> </span>label<span class="w"> </span><span class="k">in</span><span class="w"> </span>completed<span class="w"> </span><span class="k">in</span>-progress<span class="w"> </span>p0<span class="w"> </span>p1<span class="w"> </span>p2<span class="w"> </span><span class="m">1</span>-points<span class="w"> </span><span class="m">2</span>-points<span class="w"> </span>...<span class="p">;</span><span class="w"> </span><span class="k">do</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span>gh<span class="w"> </span>label<span class="w"> </span>create<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$label</span><span class="s2">&quot;</span><span class="w"> </span>--color<span class="w"> </span>0E8A16
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">for</span><span class="w"> </span>label<span class="w"> </span><span class="k">in</span><span class="w"> </span>completed<span class="w"> </span>in-progress<span class="w"> </span>p0<span class="w"> </span>p1<span class="w"> </span>p2<span class="w"> </span><span class="m">1</span>-points<span class="w"> </span><span class="m">2</span>-points<span class="w"> </span>...<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span>gh<span class="w"> </span>label<span class="w"> </span>create<span class="w"> </span><span class="s2">"</span><span class="nv">$label</span><span class="s2">"</span><span class="w"> </span>--color<span class="w"> </span>0E8A16
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">done</span>
 </code></pre></div></p>
 <h3 id="challenge-3-silent-failures">Challenge 3: Silent Failures<a class="headerlink" href="#challenge-3-silent-failures" title="Permanent link">&para;</a></h3>
 <p><strong>Problem</strong>: Script showed empty error messages</p>
 <p><strong>Solution</strong>: Enhanced <code>_run_gh()</code> with debug output:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   DEBUG: stderr=</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">stderr</span><span class="p">[:</span><span class="mi">300</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   DEBUG: stderr=</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">stderr</span><span class="p">[:</span><span class="mi">300</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div></p>
 <h2 id="future-enhancements">Future Enhancements<a class="headerlink" href="#future-enhancements" title="Permanent link">&para;</a></h2>
 <h3 id="sprint-10-or-later">Sprint 10 or Later<a class="headerlink" href="#sprint-10-or-later" title="Permanent link">&para;</a></h3>

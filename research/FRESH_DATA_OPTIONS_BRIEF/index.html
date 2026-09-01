@@ -2702,9 +2702,9 @@
 <h3 id="option-1-custom-crewai-tools-current-approach">Option 1: Custom CrewAI Tools (Current Approach)<a class="headerlink" href="#option-1-custom-crewai-tools-current-approach" title="Permanent link">&para;</a></h3>
 <p><strong>What it is</strong>: Build Python functions with <code>@tool</code> decorators for each data source.</p>
 <p><strong>Example</strong> (our current arXiv integration):
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nd">@tool</span><span class="p">(</span><span class="s2">&quot;arXiv Search&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nd">@tool</span><span class="p">(</span><span class="s2">"arXiv Search"</span><span class="p">)</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">arxiv_search</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_papers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Search arXiv for recent academic papers.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="sd">"""Search arXiv for recent academic papers."""</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="k">return</span> <span class="n">search_arxiv_for_topic</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">max_papers</span><span class="p">)</span>
 </code></pre></div></p>
 <p><strong>Pros</strong>:
@@ -2730,8 +2730,8 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">crewai</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">research_agent</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;Research Analyst&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">mcps</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;fetch&quot;</span><span class="p">,</span> <span class="s2">&quot;brave-search&quot;</span><span class="p">,</span> <span class="s2">&quot;arxiv&quot;</span><span class="p">]</span>  <span class="c1"># Simple DSL syntax</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">"Research Analyst"</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">mcps</span><span class="o">=</span><span class="p">[</span><span class="s2">"fetch"</span><span class="p">,</span> <span class="s2">"brave-search"</span><span class="p">,</span> <span class="s2">"arxiv"</span><span class="p">]</span>  <span class="c1"># Simple DSL syntax</span>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">)</span>
 </code></pre></div></p>
 <p><strong>Available MCP Servers</strong> (pre-built):
@@ -2767,8 +2767,8 @@
 <p><strong>What it is</strong>: Use MCP for common integrations, custom tools for specialized needs.</p>
 <p><strong>Implementation</strong>:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">research_agent</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">&quot;Research Analyst&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">mcps</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;brave-search&quot;</span><span class="p">,</span> <span class="s2">&quot;fetch&quot;</span><span class="p">],</span>  <span class="c1"># MCP for web/URLs</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">role</span><span class="o">=</span><span class="s2">"Research Analyst"</span><span class="p">,</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">mcps</span><span class="o">=</span><span class="p">[</span><span class="s2">"brave-search"</span><span class="p">,</span> <span class="s2">"fetch"</span><span class="p">],</span>  <span class="c1"># MCP for web/URLs</span>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">arxiv_search_tool</span><span class="p">,</span> <span class="n">proprietary_data_tool</span><span class="p">]</span>  <span class="c1"># Custom for specialized</span>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">)</span>
 </code></pre></div></p>

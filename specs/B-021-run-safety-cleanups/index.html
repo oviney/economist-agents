@@ -2813,7 +2813,7 @@ that is never run is a route that is never right. Hand-supply survives as
 <h2 id="commands">Commands<a class="headerlink" href="#commands" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Test:   .venv/bin/python -m pytest tests/ -q
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Gate:   make ci-local          # ruff, mypy, tests + coverage, bandit — the merge gate (ADR-0015)
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Run:    IS_SANDBOX=1 python -m src.agent_sdk.pipeline &quot;&lt;topic&gt;&quot; --research-mode claude_web
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Run:    IS_SANDBOX=1 python -m src.agent_sdk.pipeline "&lt;topic&gt;" --research-mode claude_web
 </code></pre></div>
 <h2 id="testing-strategy">Testing Strategy<a class="headerlink" href="#testing-strategy" title="Permanent link">&para;</a></h2>
 <p>pytest, <code>tests/</code>, mocked model calls only — <strong>no test may reach a third party</strong>

@@ -3026,15 +3026,15 @@
 <h3 id="18-failed-tests-all-from-test_sm_effectiveness_benchmarkpy">18 Failed Tests (All from test_sm_effectiveness_benchmark.py)<a class="headerlink" href="#18-failed-tests-all-from-test_sm_effectiveness_benchmarkpy" title="Permanent link">&para;</a></h3>
 <p><strong>Root Cause</strong>: Tests require LLM API keys to initialize <code>SMEffectivenessBenchmark</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># scripts/benchmarks/measure_sm_effectiveness.py:40</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="bp">self</span><span class="o">.</span><span class="n">sm_agent</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="n">get_agent</span><span class="p">(</span><span class="s2">&quot;scrum-master&quot;</span><span class="p">)</span>  <span class="c1"># v3.0 with over-escalation fix</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="bp">self</span><span class="o">.</span><span class="n">sm_agent</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="n">get_agent</span><span class="p">(</span><span class="s2">"scrum-master"</span><span class="p">)</span>  <span class="c1"># v3.0 with over-escalation fix</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="err">↓</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># scripts/agent_registry.py:272</span>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">llm_client</span> <span class="o">=</span> <span class="n">create_llm_client</span><span class="p">(</span><span class="n">provider</span><span class="o">=</span><span class="n">provider</span><span class="p">)</span>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="err">↓</span>
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># scripts/llm_client.py:78</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;[LLM_CLIENT] No API key found. Set either:</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>  <span class="n">export</span> <span class="n">ANTHROPIC_API_KEY</span><span class="o">=</span><span class="s1">&#39;sk-ant-...&#39;</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>  <span class="n">export</span> <span class="n">OPENAI_API_KEY</span><span class="o">=</span><span class="s1">&#39;sk-...&#39;</span><span class="s2">&quot;)</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"[LLM_CLIENT] No API key found. Set either:</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>  <span class="n">export</span> <span class="n">ANTHROPIC_API_KEY</span><span class="o">=</span><span class="s1">'sk-ant-...'</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>  <span class="n">export</span> <span class="n">OPENAI_API_KEY</span><span class="o">=</span><span class="s1">'sk-...'</span><span class="s2">")</span>
 </code></pre></div>
 <h3 id="failed-test-list">Failed Test List<a class="headerlink" href="#failed-test-list" title="Permanent link">&para;</a></h3>
 <ol>
@@ -3074,7 +3074,7 @@
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">mock_llm_client</span><span class="p">(</span><span class="n">monkeypatch</span><span class="p">):</span>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">mock_client</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setattr</span><span class="p">(</span><span class="s1">&#39;scripts.llm_client.create_llm_client&#39;</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">mock_client</span><span class="p">)</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setattr</span><span class="p">(</span><span class="s1">'scripts.llm_client.create_llm_client'</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">mock_client</span><span class="p">)</span>
 <a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="k">return</span> <span class="n">mock_client</span>
 </code></pre></div>
 <p><strong>Pros</strong>: No API keys needed, free CI/CD
@@ -3085,8 +3085,8 @@
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">skipif</span><span class="p">(</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ANTHROPIC_API_KEY&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;OPENAI_API_KEY&#39;</span><span class="p">),</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Requires LLM API key&quot;</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'ANTHROPIC_API_KEY'</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'OPENAI_API_KEY'</span><span class="p">),</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="n">reason</span><span class="o">=</span><span class="s2">"Requires LLM API key"</span>
 <a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="p">)</span>
 <a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="k">class</span><span class="w"> </span><span class="nc">TestSMEffectivenessBenchmark</span><span class="p">:</span>
 <a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    <span class="o">...</span>
@@ -3183,7 +3183,7 @@
 <li>
 <p><strong>Verify Formatting Commit Pushed</strong> (1 minute)
    <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>git<span class="w"> </span>log<span class="w"> </span>--oneline<span class="w"> </span>-1
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="c1"># Should show: &quot;fix: Format 11 files to pass ruff CI checks&quot;</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="c1"># Should show: "fix: Format 11 files to pass ruff CI checks"</span>
 </code></pre></div></p>
 </li>
 </ol>
@@ -3276,7 +3276,7 @@
 <a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>gh<span class="w"> </span>run<span class="w"> </span>view<span class="w"> </span>&lt;run-id&gt;<span class="w"> </span>--log-failed<span class="w">  </span><span class="c1"># Should show failure logs</span>
 <a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>
 <a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="c1"># After fixes, trigger new CI/CD run</span>
-<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;ci: Add API key env var to ci.yml&quot;</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"ci: Add API key env var to ci.yml"</span>
 <a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>main
 <a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>gh<span class="w"> </span>run<span class="w"> </span>watch<span class="w">                   </span><span class="c1"># Watch build progress</span>
 </code></pre></div>

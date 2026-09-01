@@ -2733,7 +2733,7 @@ The regression test now imports the real gate rather than asserting on a substri
 <h3 id="bug-071-references-did-not-render-as-a-heading">BUG-071 — <code>## References</code> did not render as a heading<a class="headerlink" href="#bug-071-references-did-not-render-as-a-heading" title="Permanent link">&para;</a></h3>
 <p>The blog renders with <strong>kramdown</strong>, which unlike CommonMark will not start a block element on
 the line after a paragraph. Verified by running kramdown directly:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>input:   &quot;para text.\n## References\n\n1. A\n&quot;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>input:   "para text.\n## References\n\n1. A\n"
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>output:  &lt;p&gt;para text.
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>         ## References&lt;/p&gt;
 </code></pre></div>

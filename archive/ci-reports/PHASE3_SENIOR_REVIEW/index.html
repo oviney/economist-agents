@@ -2925,12 +2925,12 @@
 <strong>Recommendation</strong>: Implement proper SQL sanitization using parameterized queries or escaping.</p>
 <h4 id="2-path-sanitization-gaps">2. <strong>Path Sanitization Gaps</strong><a class="headerlink" href="#2-path-sanitization-gaps" title="Permanent link">&para;</a></h4>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># ISSUE: Basic regex replacement is insufficient</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">clean_path</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;../&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>  <span class="c1"># ❌ Can be bypassed</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">clean_path</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'../'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>  <span class="c1"># ❌ Can be bypassed</span>
 </code></pre></div>
 <strong>Recommendation</strong>: Use <code>pathlib.Path.resolve()</code> with restricted base directory.</p>
 <h4 id="3-email-validation">3. <strong>Email Validation</strong><a class="headerlink" href="#3-email-validation" title="Permanent link">&para;</a></h4>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># ISSUE: Regex is too permissive</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">email_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$&#39;</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">email_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'</span>
 </code></pre></div>
 <strong>Recommendation</strong>: Consider using <code>email-validator</code> library for production use.</p>
 <h2 id="security-analysis">🛡️ <strong>Security Analysis</strong><a class="headerlink" href="#security-analysis" title="Permanent link">&para;</a></h2>

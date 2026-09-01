@@ -2785,7 +2785,7 @@ is green.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Test (suite):  pytest -q
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Test (research): pytest tests/test_empty_research_guard.py tests/test_stage3_hybrid_research.py -q
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Lint:          ruff check src/agent_sdk/_shared.py src/agent_sdk/tools/research_tools.py scripts/topic_trend_grounding.py
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Grep gate:     ! grep -rn &quot;SERPER_API_KEY\|BRAVE_API_KEY\|TAVILY_API_KEY&quot; src/ scripts/ --include=&#39;*.py&#39;  # expect no hits (archived/ excluded)
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Grep gate:     ! grep -rn "SERPER_API_KEY\|BRAVE_API_KEY\|TAVILY_API_KEY" src/ scripts/ --include='*.py'  # expect no hits (archived/ excluded)
 </code></pre></div>
 <h2 id="project-structure">Project Structure<a class="headerlink" href="#project-structure" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>src/agent_sdk/_shared.py            → deterministic research fan-out (edit)
@@ -2798,8 +2798,8 @@ is green.</p>
 </code></pre></div>
 <h2 id="code-style">Code Style<a class="headerlink" href="#code-style" title="Permanent link">&para;</a></h2>
 <p><code>_run_web_searches</code> after the change keeps only the two free branches:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">source_counts</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;arxiv&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;semantic_scholar&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">provider_failed</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;arxiv&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;semantic_scholar&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">source_counts</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"arxiv"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"semantic_scholar"</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">provider_failed</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"arxiv"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"semantic_scholar"</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1"># arXiv branch … Semantic Scholar branch … (google/brave/tavily branches deleted)</span>
 </code></pre></div>
 <p>Type hints + docstrings mandatory; <code>logger</code> not <code>print()</code>; <code>orjson</code> per repo standards.</p>

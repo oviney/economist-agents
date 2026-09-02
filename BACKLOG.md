@@ -335,7 +335,7 @@ for PR scope), so it needs a spec and an owner decision — not a quiet deletion
 
 </details>
 
-### B-029 · The acceptance oracle renames its input, so it does not test the deploy path
+### B-029 · The acceptance oracle renames its input, so it does not test the deploy path — **DONE 2026-07-31**
 
 **Found while fixing BUG-069, 2026-07-29.** `scripts/acceptance_blog_frontmatter.sh`
 is documented as *the* oracle — "a green local suite says nothing about what the
@@ -787,7 +787,7 @@ clone is green *and* honest about not having seen a real artifact.
 but not its text. Inferring headings from class names would be guessing at whatever CSS a
 given conversation emitted; promoting one is a one-character edit in the brief.
 
-### B-039 · The merge gate runs whatever toolchain the machine happens to have
+### B-039 · The merge gate runs whatever toolchain the machine happens to have — **DONE 2026-08-01**
 
 **Opened 2026-08-01**, found by `make ci-local` failing on a file the session never touched.
 
@@ -846,6 +846,20 @@ Mutation-checked, so the new sensor is not decorative: the old
 `(mypy … || echo "advisory")` form exits **0** against a `mypy` stub that exits 127; the new
 form exits non-zero. `make install` now creates the venv if it is absent, so require-venv's
 instruction points at a target that actually works from nothing.
+
+**Re-verified 2026-09-01 on Linux / GNU Make 4.3**, a different make than the 3.81 whose
+direct-exec behaviour motivated the fix — so the explicit `$(VENV_BIN)/<tool>` form is
+confirmed to be portable, not a macOS workaround. `env -i PATH=/usr/bin:/bin:/usr/sbin:/sbin
+make ci-local` runs the gate end to end; `make -n` shows every step — including the four
+after the test suite (`coverage`, `bandit`, `destructive_change_guard`, `check_sensor_proofs`)
+that the earlier run never reached — resolving to absolute `.venv/bin/` paths with nothing on
+ambient `PATH`. The 10 tests in `tests/test_ci_gate_is_reproducible.py` pass, and the venv
+ruff is 0.14.10, matching `requirements-dev.txt` exactly.
+
+That run is red on one test, and it is **not** this item: `test_python_version_consistency`
+fails because `.python-version` pins 3.13 (B-037) while only `/usr/bin/python3.12` exists on
+this machine. BUG-073's retraction (2026-08-31) already records that as environmental.
+Otherwise 2,790 passed / 9 skipped / 83.74% coverage.
 
 ### B-040 · Calibrate the editorial review gate so it can be promoted
 
@@ -985,7 +999,7 @@ does not fail the write loudly — `pipeline.py` catches it and logs "cost log w
 on its own. `_numeric()` now coerces at the boundary; whether earlier rows were lost this way
 is unverified and worth a look before anyone trends this data.
 
-### B-042 · The mandatory-chart gate manufactures the fabrication it should prevent
+### B-042 · The mandatory-chart gate manufactures the fabrication it should prevent — **DONE 2026-08-01**
 
 **Opened 2026-08-01**, found by the owner asking "if we don't need a chart, why build one?"
 He is right, and the repo currently disagrees with him — in a way that produced two of the
@@ -1113,7 +1127,7 @@ fabricated article 76 while the validator passed it, which is precisely a score 
 Note it *is* on `destructive_change_guard`'s `CRITICAL_FILES`: being protected from being gutted
 is not the same as being a sensor. Full reasoning in the spec's open-questions section.
 
-### B-036 · Badge validation has no implementation — decide whether to restore it
+### B-036 · Badge validation has no implementation — decide whether to restore it — **DONE 2026-07-31**
 
 **Opened 2026-07-31**, found by B-031 doing its job.
 
@@ -1165,7 +1179,7 @@ bug that made the archived copy look for `scripts/README.md`.
 
 **Scope:** S. **Follow-up:** see B-037 — the pin and the interpreter disagree.
 
-### B-037 · `.python-version` pins 3.12 but the venv runs 3.13.14
+### B-037 · `.python-version` pins 3.12 but the venv runs 3.13.14 — **DONE 2026-07-31**
 
 **Opened 2026-07-31**, found while fixing B-036's Python badge.
 
@@ -1376,6 +1390,54 @@ researcher would ship — but one topic cost ~102 agents / ~2M tokens / ~15 min 
 **hit the session limit**. So: opt-in, not default. Spec:
 `docs/specs/B-012-deep-brief-research-mode.md`. Prototype output (a real verified
 brief) lives at `docs/research/ai-productivity-brief.md`.
+
+### B-046 · "Open backlog items" is a third completed work, and it crowds out the real ones
+
+**Opened 2026-09-01**, found while verifying B-039 — which the session-start hook had just
+advertised as open, and which had in fact been finished on 2026-08-01.
+
+`open_backlog_items()` in `scripts/hooks/session_context.py:81` lists the first `limit=12`
+`B-NNN` headings under `## Todo` and filters nothing. Completion is recorded by a
+`**DONE <date>**` marker, and nothing enforces where that marker goes, so the hook only sees
+it when it happens to sit in the heading.
+
+Measured 2026-09-01, before any change:
+
+| Measure | Count |
+|---|---|
+| Items under `## Todo` | 26 |
+| Of those, marked done/withdrawn somewhere in the entry | 9 |
+| Marked done in the **body only**, so the hook called them open | **5** — B-029, B-036, B-037, B-039, B-042 |
+| Slots the hook spent on finished work (of 12) | 2 before the marker fix, **4** after |
+
+The marker fix landed with this item: the five headings now carry `— **DONE <date>**`, so a
+fresh session can no longer be *misdirected* the way this one was. It does not fix the
+second half. The list is still capped at 12 and still counts done items against the cap, so
+**B-040, B-041, B-043, B-012, B-023 and B-015 do not appear at all** — six genuinely open
+items invisible at session start, displaced by four finished ones.
+
+A block titled "Open backlog items" that is a third completed work is B-031's complaint in
+the harness's own reporting layer: the sensor cannot distinguish the state it names. B-030
+built this hook to put repo state in the agent's loop; this is that state arriving wrong.
+
+**Fix:** skip an item when `**DONE`/`**WITHDRAWN`/`**RETRACTED` appears anywhere in its
+entry, not just its heading — then the marker's position stops mattering and the convention
+does not have to be remembered. Prefer that over a backlog-truth gate in `ci-local` (the
+`check_docs_references.py` shape, B-045): a gate would police where the marker goes, while
+this makes the location irrelevant. Both is redundant; this one is the smaller change.
+
+- [ ] `open_backlog_items()` skips entries marked done/withdrawn anywhere in the body
+- [ ] The 12 slots show 12 *open* items — B-040, B-041, B-043, B-012, B-023, B-015 reappear
+- [ ] A test that **executes the hook** against a fixture backlog holding a body-only marker
+      and asserts the item is absent — mutation-checked, per B-043: it must fail against the
+      current filter-nothing implementation
+- [ ] The filter does not fire on a *quoted* marker. **This entry is the proof case:** the
+      prose above contains the literal `**DONE <date>**`, and a naive substring scan counts
+      B-046 itself as done — measured, not hypothesised. Anchor the match to the start of a
+      line, and use this item as the fixture.
+
+**Scope:** XS. **Files:** `scripts/hooks/session_context.py`, a new test beside the existing
+hook tests.
 
 ## Done
 

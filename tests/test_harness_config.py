@@ -156,6 +156,51 @@ class TestNoForbiddenKeys:
         assert with_env == [], f"MCP servers requiring env: {with_env}"
 
 
+class TestMcpServersCanActuallyStart:
+    """BUG-074: a configured server that cannot start is worse than none.
+
+    It is listed, enabled, and advertised in the session, so the agent believes
+    it has a validator it does not have.
+    """
+
+    def test_no_python_server_is_launched_with_the_system_interpreter(self) -> None:
+        """`python3` is the system 3.12, which has no `mcp` module installed.
+
+        All five Python servers died on `import mcp` at every session start —
+        `CONNECTION_CLOSED` — while `.venv/bin/python` imports it fine. The
+        pipeline never noticed because it builds its research tools in-process
+        with `create_sdk_mcp_server` and imports style memory directly; only the
+        interactive session lost its tools.
+        """
+        config = orjson.loads((REPO_ROOT / ".mcp.json").read_bytes())
+
+        bare = [
+            name
+            for name, server in config["mcpServers"].items()
+            if server.get("command", "").rsplit("/", 1)[-1].startswith("python")
+            and server["command"] != ".venv/bin/python"
+        ]
+
+        assert bare == [], (
+            f"MCP servers launched with an interpreter that lacks `mcp`: {bare}. "
+            "Use `.venv/bin/python` — relative, so it survives a machine change."
+        )
+
+    def test_every_python_server_script_exists(self) -> None:
+        """A correct interpreter pointed at a missing script fails identically."""
+        config = orjson.loads((REPO_ROOT / ".mcp.json").read_bytes())
+
+        missing = [
+            arg
+            for server in config["mcpServers"].values()
+            if server.get("command") == ".venv/bin/python"
+            for arg in server.get("args", [])
+            if arg.endswith(".py") and not (REPO_ROOT / arg).is_file()
+        ]
+
+        assert missing == [], f"MCP server scripts that do not exist: {missing}"
+
+
 class TestHooksAreWired:
     """B-030: the hooks must exist, be committed, and point at real scripts."""
 

@@ -9,35 +9,35 @@
       "description": "Browser automation for navigating web UIs, taking screenshots, and interacting with pages"
     },
     "article-evaluator": {
-      "command": "python3",
+      "command": ".venv/bin/python",
       "args": [
         "mcp_servers/article_evaluator_server.py"
       ],
       "description": "Scores article drafts across 5 quality dimensions and returns a pass/fail verdict before publishing"
     },
     "style-memory": {
-      "command": "python3",
+      "command": ".venv/bin/python",
       "args": [
         "mcp_servers/style_memory_server.py"
       ],
       "description": "Query and update the ChromaDB-backed style memory store for Economist voice consistency"
     },
     "publication-validator": {
-      "command": "python3",
+      "command": ".venv/bin/python",
       "args": [
         "mcp_servers/publication_validator_server.py"
       ],
       "description": "Publication validation \u2014 checks front-matter fields (layout, title, date, author, categories, image) and image-path existence before a post is published"
     },
     "web-researcher": {
-      "command": "python3",
+      "command": ".venv/bin/python",
       "args": [
         "mcp_servers/web_researcher_server.py"
       ],
       "description": "Keyless arXiv academic search and page fetching. The paid search leg was removed by #438; its stale env requirement was removed by B-034 (CLAUDE.md constraints #1-#3)"
     },
     "published-topics": {
-      "command": "python3",
+      "command": ".venv/bin/python",
       "args": [
         "mcp_servers/published_topics_server.py"
       ],

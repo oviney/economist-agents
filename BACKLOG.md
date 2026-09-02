@@ -99,18 +99,66 @@ that entry would have suppressed a live check.
 38 tests in `tests/test_docs_references.py`, including a real-repo guard so
 `pytest` alone catches a regression, and five parametrised anchor cases.
 
-### BUG-074 · Six MCP servers are configured, enabled, and dead (MEDIUM)
+### BUG-074 · Five MCP servers were configured, enabled, and dead — **DONE 2026-09-01**
 
-Every Python MCP server in `.mcp.json` fails `CONNECTION_CLOSED`. Root cause
-verified both ways: `.mcp.json` runs them with `python3`, and
-`/usr/bin/python3 -c "import mcp"` raises `ModuleNotFoundError` while
-`.venv/bin/python` imports it fine.
+Every Python MCP server in `.mcp.json` failed `CONNECTION_CLOSED` at session
+start. Cause verified both directions: they were launched with `python3`, the
+system 3.12, which has no `mcp` module; `.venv/bin/python` imports it fine.
+Fixed by changing the interpreter — relative, not absolute, so it survives a
+machine change. Spec: `docs/specs/BUG-074-dead-mcp-servers.md`.
 
-Fix is `python3` → `.venv/bin/python`, but decide first: `web-researcher`
-(Serper) and `image-generator` (DALL-E) are dormant paid surfaces, and a blanket
-fix revives them. Recommend fixing the four keyless servers and dropping those
-two from `enabledMcpjsonServers`.
+Verified past the spec's own bar: all five complete a real MCP `initialize`
+handshake and return their `serverInfo.name`, not merely import.
 
+**This entry was wrong on three counts, all from inference rather than reading:**
+
+1. It called `web-researcher` a "dormant paid surface (Serper)" and recommended
+   dropping it. It is keyless — `search_arxiv` plus `fetch_page`, and its own
+   `.mcp.json` description already said the paid leg was removed by #438 and its
+   stale env requirement by B-034.
+2. It named `image-generator` (DALL-E) as a second paid surface a blanket fix
+   would revive. That server is not in `.mcp.json` at all — on disk, never
+   configured, never started.
+3. Therefore the "decide first" fork it raised did not exist. All five are
+   keyless and the fix was uniform.
+
+**It also conflated three different failures under one count of six.** The other
+two are separate items below.
+
+Guarded by `tests/test_harness_config.py::TestMcpServersCanActuallyStart` — no
+Python server may be launched with a bare `python3`, and every configured script
+must exist.
+
+**Worth less than it looks, stated so nobody re-litigates it.** These are not
+pipeline infrastructure. `src/agent_sdk/stage3_runner.py` builds research tools
+in-process via `create_sdk_mcp_server` and imports style memory directly, which
+is why the pipeline ran correctly for weeks with all five dead. The fix restores
+the *interactive session's* toolset, nothing more.
+
+### BUG-075 · The playwright MCP server fails on the Node version (LOW)
+
+`.mcp.json` runs `npx @playwright/mcp@latest --extension`; npm refuses it:
+
+    EBADENGINE required: { node: '>=20' }, current: { node: 'v18.19.1' }
+
+Not the BUG-074 cause — that was Python. Fix is a Node upgrade (needs root) or
+pinning an older `@playwright/mcp`. Found while verifying BUG-074.
+
+### BUG-076 · The github plugin's credential is malformed (LOW)
+
+`plugin:github:github` fails with `400 Authorization header is badly formatted`.
+A plugin credential problem, not a `.mcp.json` entry. Note that the `github` MCP
+*server* was deliberately removed as a token drain
+(`docs/specs/local-backlog-migration.md`) and `gh` remains the sanctioned route,
+so decide whether this plugin should be enabled at all before fixing it.
+
+### BUG-077 · `scripts/quality_dashboard.py` cannot be run as a script (LOW)
+
+`python3 scripts/quality_dashboard.py` raises
+`ModuleNotFoundError: No module named 'src'`; only
+`python3 -m scripts.quality_dashboard` works. Found while fixing a doc that told
+the reader to run it the broken way (B-045). Either add the sys.path shim the
+other scripts use, or document the module form everywhere.
 
 ### B-044 · Finish the B-042 acceptance — **DONE 2026-08-02**
 

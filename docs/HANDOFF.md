@@ -1,3 +1,72 @@
+# Hand-off — 2026-09-01
+
+`main` is `cf44614`, pushed, tree clean. Two items closed today, both
+spec-first with an owner LGTM: **B-045** (docs-truth gate) and **BUG-074**
+(five dead MCP servers).
+
+## Resume with one prompt
+
+```
+/goal B-NNN, using agent-skills.
+```
+
+`/goal` is a repo-local command (`.claude/commands/goal.md`), not a Claude Code
+built-in. It runs an item to completion through the lifecycle — spec, LGTM
+gate, slice-by-slice build, `ci-local` per slice, backlog close-out — instead of
+stopping after one phase the way `/spec` or `/build` do.
+
+Open and ready, in the order I would take them:
+
+- **B-039** — the merge gate runs whatever toolchain the machine happens to
+  have. Directly related to the standing failure below.
+- **BUG-075 / BUG-076 / BUG-077** — all LOW, all filed 2026-09-01, all small.
+- **B-028** — the unreviewed publish path must stop being the default. Task 3
+  is owner-gated; do not decide it unasked.
+
+## Verify BUG-074 first — it is the one thing that needs a session restart
+
+The five Python MCP servers should now connect. `.mcp.json` was launching them
+with `python3` (system 3.12, no `mcp` module); it now uses `.venv/bin/python`,
+relative so it survives a machine change. Each was proven by a real MCP
+`initialize` handshake returning its `serverInfo.name`, but no session can
+observe its own MCP startup — so the check is simply whether
+`article-evaluator`, `style-memory`, `publication-validator`, `web-researcher`
+and `published-topics` are absent from the `CONNECTION_CLOSED` list at startup.
+
+`playwright` and `plugin:github:github` will still fail. Those are BUG-075
+(node v18.19.1, `@playwright/mcp` needs >=20) and BUG-076 (malformed
+Authorization header) — different causes, deliberately not fixed.
+
+## The standing environment blocker — machine setup, not a repo defect
+
+`make ci-local` ends **2790 passed / 9 skipped / 1 failed**. The failure is
+`test_python_version_consistency`: the venv is Python 3.12, `.python-version`
+pins **3.13** (B-037), and only `/usr/bin/python3.12` exists here. Install 3.13
+and rebuild the venv, or bump the pin deliberately — the test says so itself.
+**Do not "fix" this in the repo.** It predates today's work and is unrelated to
+it. Treat 1-failed/2790-passed as the baseline; anything more is a regression.
+
+## Two lessons from today, worth more than the two items
+
+**A backlog entry is a claim, not evidence.** BUG-074's entry said
+`web-researcher` was a dormant paid Serper surface and advised dropping it, and
+named `image-generator` as a second paid surface a fix would revive. Both false:
+`web-researcher` is keyless arXiv search, and `image-generator` is not in
+`.mcp.json` at all. B-045's entry recorded 13 real broken doc references; it was
+10 — the other three were the checker's own unstripped-anchor bug, so the entry
+was inflating its findings using the bug it documented. **Read the file before
+acting on what an entry says about it.** I repeated the Serper claim to the
+owner before checking, and had to retract it.
+
+**The docs-truth gate cannot catch a lying document, by construction.** It now
+runs in `ci-local` and verifies that every path an instruction document names
+exists. It does not verify the prose is true. On the day it shipped it passed
+`.github/copilot-instructions.md:278`, which told you to run the defect tracker
+module for a report — its `main()` ignores argv, calls `fix_bug()`, mutates
+state and prints nothing. A resolving path attached to a false claim. Only
+reading caught it. The limit is written into the sensor's own register entry
+(`docs/sensors/register.yaml`) so it is read at review time, not just spec time.
+
 # Hand-off — 2026-08-31
 
 ## `main` is green. My earlier "main is RED" was wrong — retracted.

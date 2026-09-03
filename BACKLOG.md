@@ -26,6 +26,94 @@ _(none)_
 
 ## Todo
 
+### BUG-079 · B-029's oracle test proves a copy of the guard, not the guard (LOW)
+
+**Opened 2026-09-02**, found by the same cross-examination that produced BUG-078.
+
+B-029 is complete and its marker stands — `scripts/acceptance_blog_frontmatter.sh:133`
+really does import `_dated_post_name` / `is_publishable_post_name` from the deploy module,
+and line 150 really does stage under the derived name. But its headline criterion, *"given a
+deploy path that emits an undated filename, the oracle fails"*, is not proven by running the
+oracle:
+
+- `TestGuardFailsOnARegressedDeployPath` (`tests/test_acceptance_oracle_filename.py:127,143`)
+  runs `sys.executable -c stub + self.GUARD` — a `GUARD` string **re-typed inside the test
+  file**. If the shell script's heredoc lost its `sys.exit`, this test stays green.
+- The two supporting tests are substring greps: `assert "_dated_post_name" in oracle_text`,
+  `assert "is_publishable_post_name" in oracle_text`.
+
+Nothing executes `scripts/acceptance_blog_frontmatter.sh`. That is the anti-pattern B-039's
+own post-mortem names — *"a grep-the-Makefile test would have passed the moment the
+plausible-looking line was written"* — and the next instance of the `skills/defect-prevention`
+pattern of asserting from a plausible reading instead of measuring. B-039 fixed it by
+executing `make` against stub tools; the same shape applies here.
+
+Low severity because the oracle and the copy agree **today** (verified by hand 2026-09-02).
+The defect is that nothing would catch them diverging.
+
+- [ ] A test that invokes `scripts/acceptance_blog_frontmatter.sh` itself against a stub
+      deploy module emitting an undated name, and asserts non-zero exit
+- [ ] Mutation-checked per B-043: it must fail if the guard is removed from the shell script
+- [ ] The re-typed `GUARD` constant deleted once the real invocation covers it
+
+**Blocked on:** the oracle needs a blog clone (`../blog`, `~/blog` — neither exists here), so
+the stub must stand in for one. **Scope:** S.
+
+### BUG-078 · The merge gate is red, and after ce111de nothing open says so
+
+**Opened 2026-09-02**, found by a cross-examination of ce111de's own DONE markers.
+
+`make ci-local` exits 2 on this machine. One test fails:
+
+```
+FAILED tests/test_python_version_consistency.py::TestEverythingAgreesWithThePin::test_running_interpreter_matches
+AssertionError: tests are running on Python 3.12 but .python-version pins 3.13.
+1 failed, 2790 passed, 9 skipped
+```
+
+`.python-version` pins 3.13 (B-037, owner-chosen). `.venv/bin/python` is 3.12.3, because
+`/usr/bin/python3.12` is the only interpreter installed here — so the venv cannot be rebuilt
+on 3.13 without installing 3.13 first.
+
+**The item is not "the test is wrong."** The test is the only sensor in the repo pointed at
+the *running interpreter* rather than at another declaration; B-036's badge validator compares
+README against `.python-version` and reports `✅ README badges are current` while the badge
+advertises an interpreter this machine does not have. The failing test is the one telling the
+truth.
+
+**Why this needs its own open item.** The state was recorded twice, and both records are
+invisible to a fresh session:
+
+| Record | Why it cannot be seen |
+|---|---|
+| BUG-073's retraction (2026-08-31) | the entry is **WITHDRAWN** — a closed item |
+| B-037's entry | marked **DONE** by ce111de |
+
+So the gate is red and every record of it sits inside something marked finished. B-046 would
+make that strictly worse: it teaches the session hook to skip done items, which is right in
+general and would have hidden this. A red merge gate must be an open item in its own right.
+
+ADR-0015 makes `make ci-local` the merge gate and `main` unprotected, so "the gate is red for
+an environmental reason" is not a neutral state — it is the merge gate not functioning, and
+whoever merges next is the one who finds out.
+
+**Decision required — owner-gated, because B-037's pin was an owner decision:**
+
+- **Install Python 3.13 and rebuild `.venv` on it.** Honours the pin; the declarations already
+  all say 3.13 and would stay true. Cost: a toolchain install on this machine.
+- **Bump `.python-version` to 3.12** and let the four declarations follow. Cost: reverses
+  B-037's decision, and 3.12 is what this machine has rather than what was chosen.
+
+The test's own message states both: *"Rebuild .venv on 3.13, or bump the pin deliberately."*
+
+- [ ] Owner picks one
+- [ ] `make ci-local` exits 0 on this machine
+- [ ] Whichever is chosen, `tests/test_python_version_consistency.py` passes **without editing
+      the test** — it checks every declaration against the pin, so a deliberate bump is a
+      one-line change and a rebuild is none
+
+**Scope:** XS once decided. **Blocks:** merging anything, per ADR-0015.
+
 ### BUG-073 · WITHDRAWN — `main` was never red; the venv was stale
 
 **Retracted 2026-08-31.** I reported `main` as red on the strength of a
@@ -1168,7 +1256,10 @@ bug that made the archived copy look for `scripts/README.md`.
 
 - [x] Decide: restore badge validation (the badges were stale, so the answer was clear)
 - [x] A validator that resolves paths from the repo root and exits non-zero on failure
-- [x] A test proving it *can* fail — `TestTheRealReadme` runs it against the real README, and
+- [x] A test proving it *can* fail — `TestExitCodes::test_stale_badge_exits_non_zero` runs it
+      against a synthetic repo with a stale badge (corrected 2026-09-02: this line previously
+      credited `TestTheRealReadme`, which only asserts the badges are *current* and so cannot
+      be the can-fail proof). `TestTheRealReadme` runs it against the real README, and
       `TestExitCodes` asserts a stale badge exits 1
 - [x] `scripts/archived/validate_badges.py` deleted — it was a trap
 - [x] Hook re-wired with `.venv/bin/python`, not `python3`: the old entry used system python,
@@ -1397,7 +1488,9 @@ brief) lives at `docs/research/ai-productivity-brief.md`.
 advertised as open, and which had in fact been finished on 2026-08-01.
 
 `open_backlog_items()` in `scripts/hooks/session_context.py:81` lists the first `limit=12`
-`B-NNN` headings under `## Todo` and filters nothing. Completion is recorded by a
+`B-NNN` headings in the span from `## Todo` to `## Done` — note that is a *span*, not a
+section: `## Harness engineering` sits inside it, so B-036/B-037/B-039/B-042 are read from
+there even though only B-029 is literally under `## Todo`. It filters nothing. Completion is recorded by a
 `**DONE <date>**` marker, and nothing enforces where that marker goes, so the hook only sees
 it when it happens to sit in the heading.
 
@@ -1405,7 +1498,7 @@ Measured 2026-09-01, before any change:
 
 | Measure | Count |
 |---|---|
-| Items under `## Todo` | 26 |
+| Items in the span the hook reads | 26 |
 | Of those, marked done/withdrawn somewhere in the entry | 9 |
 | Marked done in the **body only**, so the hook called them open | **5** — B-029, B-036, B-037, B-039, B-042 |
 | Slots the hook spent on finished work (of 12) | 2 before the marker fix, **4** after |
@@ -1435,6 +1528,12 @@ this makes the location irrelevant. Both is redundant; this one is the smaller c
       prose above contains the literal `**DONE <date>**`, and a naive substring scan counts
       B-046 itself as done — measured, not hypothesised. Anchor the match to the start of a
       line, and use this item as the fixture.
+
+**Hazard — read BUG-078 before implementing this.** Teaching the hook to skip done items is
+right, and it would have hidden a red merge gate: B-037 is marked DONE and its test is the one
+failing `make ci-local`. The lesson is not to weaken this filter but to keep a red gate as its
+own open item, which is what BUG-078 now is. A done item may still be the reason the gate is
+red, and the hook will not say so.
 
 **Scope:** XS. **Files:** `scripts/hooks/session_context.py`, a new test beside the existing
 hook tests.

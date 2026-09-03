@@ -50,6 +50,20 @@ one of these, and never re-litigate them.
 5. **No github.com-only workflows for running the pipeline.** It must run
    locally / in the session on the subscription.
 
+**Scoped exception — OpenRouter, development-time review only (added 2026-09-02
+by the owner).** The owner already holds an OpenRouter key. It may be used for one
+thing: the cross-model second opinion in `agent-skills:doubt-driven-development`,
+run against work that is already done. Constraint #1's stated reason — new keys
+expire and need setup the owner will not do — does not apply to a key he already
+maintains, and #1 forbids keys *as a requirement*, which this is not.
+
+It is **not** a loosening of #1–#3 for the pipeline. Nothing under `src/` or
+`scripts/` may import it, require it, read `OPENROUTER_API_KEY`, or fall back to
+it; the runtime stays keyless and the only LLM auth in the pipeline is still the
+Claude subscription. If the key is unset or the call fails, the answer is
+"single-model, and say so" — never "add a key". Invoking it is per-invocation
+authorised: ask before each run, because each run spends the owner's money.
+
 If a task *seems* to need a key or a paid service, the answer is "do it keyless
 or say it cannot be done keyless" — not "add a key". Encode any new constraint
 the owner gives into this section immediately.
@@ -202,7 +216,7 @@ See `skills/python-quality/SKILL.md` for complete standards.
 4. **Heading limit** (`_shared.py`): merges sections when >4 headings
 5. **Hedging removal** (`_shared.py`): strips "One suspects", "it is worth noting", etc.
 6. **Ending validation** (`publication_validator.py`): flags summary endings (HIGH severity)
-7. **Chart auto-embed** (`_shared.py`): inserts chart before References if missing
+7. **Chart auto-embed** (`_shared.py`): inserts chart before References if missing — note this runs from `make art` (`scripts/finalise_art.py`), *not* in Stage 4; the pipeline draws nothing (B-042, constraint #4)
 8. **British spelling** (`_shared.py`): American → British replacements
 9. **Publication validator** (`publication_validator.py`): frontmatter, categories, word count, author, image metadata, placeholders
 

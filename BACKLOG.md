@@ -26,6 +26,44 @@ _(none)_
 
 ## Todo
 
+### B-047 · Try Python 3.14, deliberately and on its own
+
+**Opened 2026-09-03.** BUG-078 set the pin to 3.12 because that is the interpreter this
+machine has. That unbroke the build; it is not an argument that 3.12 is where we want to
+stay. 3.12 is two releases behind, and the gap only gets more expensive to close.
+
+Kept separate from BUG-078 on purpose: setting the pin to 3.12 was a config edit that cannot
+fail, and this is a dependency upgrade that can. Bundling them would have left the merge gate
+red while someone debugged a compiler toolchain.
+
+**The risk is wheels, not syntax.** Nothing in `src/` uses version-specific language features
+(no PEP 695 generics; the suite ran green on 3.12 while the pin still said 3.13). The exposure
+is the 21 runtime dependencies, and specifically the ones with compiled extensions:
+
+| Dependency | Why it is the risk |
+|---|---|
+| `chromadb` | drags in onnxruntime and tokenizers — historically the slowest to ship wheels for a new interpreter |
+| `google-analytics-data`, `google-api-python-client` | drag in grpcio, the other habitual laggard |
+| `matplotlib`, `numpy`, `orjson` | compiled, but usually current within weeks of a release |
+
+If any lacks a 3.14 wheel, pip builds from source and the task becomes a C toolchain problem.
+Unknown until tried — do not assume either way.
+
+- [ ] Install 3.14 alongside 3.12 (do **not** replace it — 3.12 is the working fallback)
+- [ ] Build a throwaway venv on 3.14 and `pip install -r requirements.txt -r requirements-dev.txt`;
+      record which packages, if any, have no wheel
+- [ ] Full `make ci-local` against that venv
+- [ ] Only if green: rebuild `.venv`, bump the pin — the same five declarations as BUG-078
+      (`.python-version`, `ruff.toml`, `mypy.ini`, `CONTRIBUTING.md`, README badge) plus
+      `GEMINI.md`. `tests/test_python_version_consistency.py` needs no edit; it reads the pin.
+- [ ] If not green: record which dependency blocked it and stay on 3.12
+
+**Abort condition:** if this is not green in one sitting, stop and stay on 3.12. There is no
+feature we need from 3.14 — this is debt reduction, not a blocker.
+
+**Scope:** S if the wheels exist, unbounded if they do not. **Not urgent:** 3.12 has security
+support into late 2028.
+
 ### BUG-079 · B-029's oracle test proves a copy of the guard, not the guard (LOW)
 
 **Opened 2026-09-02**, found by the same cross-examination that produced BUG-078.
@@ -59,7 +97,7 @@ The defect is that nothing would catch them diverging.
 **Blocked on:** the oracle needs a blog clone (`../blog`, `~/blog` — neither exists here), so
 the stub must stand in for one. **Scope:** S.
 
-### BUG-078 · The merge gate is red, and after ce111de nothing open says so
+### BUG-078 · The merge gate is red, and after ce111de nothing open says so — **DONE 2026-09-03**
 
 **Opened 2026-09-02**, found by a cross-examination of ce111de's own DONE markers.
 
@@ -106,13 +144,44 @@ whoever merges next is the one who finds out.
 
 The test's own message states both: *"Rebuild .venv on 3.13, or bump the pin deliberately."*
 
-- [ ] Owner picks one
+- [x] Owner picks one — **bump the pin to 3.12** (2026-09-03)
 - [ ] `make ci-local` exits 0 on this machine
 - [ ] Whichever is chosen, `tests/test_python_version_consistency.py` passes **without editing
       the test** — it checks every declaration against the pin, so a deliberate bump is a
       one-line change and a rebuild is none
 
-**Scope:** XS once decided. **Blocks:** merging anything, per ADR-0015.
+**DONE 2026-09-03. The pin is 3.12; the gate is green.**
+
+The owner's question settled it: *why is it pinned at all, and isn't that a CrewAI leftover?*
+Half right, and the half that is right is the half that mattered. **3.13 as the number** was
+chosen for CrewAI 1.7.2, which had no 3.14 wheels — ADR-0004, whose own header now reads
+"Superseded … the compatibility constraint that motivated this ADR is moot", and whose
+2026-04-05 note said to revisit the version if the framework was replaced. It was; nobody
+revisited it. `crewai` appears in no requirements file, and the 116 matches in `.py` files are
+all historical comments.
+
+**Pinning at all** is not CrewAI legacy and stays: ADR-0015 pins a single version because this
+is a solo, locally-run project where `make ci-local` is the only gate, and an unpinned gate
+means whatever interpreter the machine has — B-039's defect one level up. `ruff` and `mypy`
+also need a concrete target. So the policy is unchanged; only the number moved.
+
+3.13 was never load-bearing: no version-specific syntax anywhere, and 2,790 tests already
+passed on 3.12 while the pin still claimed 3.13. The single failure was the declaration, not
+the code.
+
+Changed in five places plus `GEMINI.md`: `.python-version`, `ruff.toml` (`py313`→`py312`),
+`mypy.ini`, `CONTRIBUTING.md`, the README badge and its `python3.13 -m venv` line.
+**`tests/test_python_version_consistency.py` was not edited** — B-037 built it to check every
+declaration against the pin rather than against a literal, and this is the first time that
+design was exercised. It went 6-passed/1-failed to 7-passed on the pin change alone.
+
+**Cost, stated plainly:** `ruff` now lints against py312, so one release of modernisation
+checks is forgone. That is a smaller loss than running 3.12 while declaring 3.13, which is the
+drift B-037 existed to kill.
+
+**Not** an argument for staying on 3.12 — see **B-047**, which tries 3.14 as its own task.
+
+**Scope:** XS once decided. **Blocked:** merging, per ADR-0015 — now unblocked.
 
 ### BUG-073 · WITHDRAWN — `main` was never red; the venv was stale
 
@@ -1290,7 +1359,17 @@ the declaration is not what is being verified.
 This is not urgent — 2,595 tests pass on 3.13 — but it means "pinned to one version" is
 currently untrue, and nothing detects that.
 
-**DONE 2026-07-31. Owner chose 3.13.**
+**DONE 2026-07-31. Owner chose 3.13.** — **superseded 2026-09-03: the pin is now 3.12** (BUG-078).
+The 3.13 choice was sound on the evidence available then: the documentation majority and the
+interpreter running the suite both said 3.13. What that survey did not ask is *why* 3.13 —
+the answer was CrewAI 1.7.2's wheel ceiling (ADR-0004), and CrewAI had already been removed.
+So 3.13 won a vote among declarations that were all descended from a dead constraint. The
+machine-reality argument then reversed on a new machine that has only 3.12.
+
+**This item's real deliverable survived the reversal intact**, which is the point worth
+keeping: because the tests check every declaration *against the pin* rather than against a
+literal, changing the pin to 3.12 took no test edits at all and the suite went straight from
+1 failing to 7 passing. A test hardcoding 3.13 would have had to be rewritten.
 
 The drift was worse than this item recorded. Surveying every declaration turned up **four**
 different versions, not two:

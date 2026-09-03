@@ -27,7 +27,7 @@ this file only points at it.
 - **Pipeline**: `src/economist_agents/flow.py` orchestrates `src.agent_sdk.pipeline.run_pipeline`
   (Stage 3 content generation → Stage 4 deterministic quality gates).
 - **Research** is deterministic (arXiv + Google Scholar via Serper) — no LLM in that path.
-- **Python**: 3.13.x (3.14+ untested — see ADR-0004).
+- **Python**: 3.12.x (3.13/3.14 untested here — see B-047).
 - **Backlog**: `BACKLOG.md` is the source of record (`B-NNN`); PRs go through the `gh` CLI.
 
 ## Gemini-specific notes

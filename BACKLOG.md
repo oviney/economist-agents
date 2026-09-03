@@ -26,7 +26,7 @@ _(none)_
 
 ## Todo
 
-### B-047 · Try Python 3.14, deliberately and on its own
+### B-047 · Try Python 3.14, deliberately and on its own — **ATTEMPTED 2026-09-03, staying on 3.12**
 
 **Opened 2026-09-03.** BUG-078 set the pin to 3.12 because that is the interpreter this
 machine has. That unbroke the build; it is not an argument that 3.12 is where we want to
@@ -63,6 +63,118 @@ feature we need from 3.14 — this is debt reduction, not a blocker.
 
 **Scope:** S if the wheels exist, unbounded if they do not. **Not urgent:** 3.12 has security
 support into late 2028.
+
+---
+
+**ATTEMPTED 2026-09-03. Abort condition triggered — staying on 3.12. Python 3.14 is not the
+problem; two other things are.**
+
+Method: `uv` (installed with `pip install --target` into a scratch dir, so the project venv was
+never modified) fetched a standalone CPython **3.14.7**, and built throwaway venvs outside the
+repo. `.venv` and the system Python were untouched throughout; verified afterwards
+(`.venv` still 3.12.3 / chromadb 0.6.3, `git status` clean).
+
+**Finding 1 — the wheel blocker is real, and it is `chromadb`, not Python.**
+
+`uv pip install --only-binary :all:` (wheels only, so a missing wheel fails loudly instead of
+silently compiling) on 3.14:
+
+| Set | Result |
+|---|---|
+| All 21 runtime deps + dev deps | **fails** — `chroma-hnswlib` has no 3.14 wheel at *any* version satisfying `chromadb>=0.4.0,<1.0.0` |
+| Same, minus `chromadb` | **installs clean** — including `grpcio 1.83.1`, the other predicted laggard |
+| `chromadb>=1.0.0` | **installs clean** — 1.x dropped `chroma-hnswlib` |
+
+So the blocker is the `<1.0.0` pin in `requirements.txt`, not the interpreter. `chromadb` 1.x
+supports 3.14; 0.x cannot. Note `chromadb` is already an **optional** import
+(`src/tools/style_memory_tool.py:29` — `CHROMADB_AVAILABLE`, with graceful degradation), so
+the dependency is softer than the pin implies.
+
+**Finding 2 — a latent test-isolation bug that 3.14 exposes and 3.12 hides.**
+
+With `chromadb 1.5.9` on 3.14, the full suite is **22 failed / 2769 passed**. 21 of those are
+`tests/test_topic_scout.py`, all `sqlite3.OperationalError: no such table: article_performance`;
+the 22nd is the pin test, which is expected when running an interpreter that is not the pin.
+
+Measured, from a clean state each time:
+
+| Run | Result | `data/performance.db` created? |
+|---|---|---|
+| Full suite, 3.12 | 2791 passed | **no** |
+| Full suite, 3.14 | 22 failed | **yes** (0 bytes) |
+| Full suite, 3.14, `--ignore=tests/test_topic_scout.py` | 2712 passed + pin | **yes** |
+| `test_topic_scout.py` alone, 3.12 **and** 3.14 | 78 passed each | no |
+
+`data/performance.db` is untracked and normally absent. `_connect()`
+(`scripts/content_intelligence.py:75`) correctly returns `None` when the file does not exist,
+so the degradation path is sound — but once a **zero-byte** file exists, `.exists()` is true,
+the connection succeeds, and the query dies on the missing table. Something in the 3.14 run
+creates that empty file; on 3.12 nothing does. It is **not** reproducible from any single test
+file (`test_ab_topic_scout_comparison`, `test_topic_scout_reproducibility`,
+`test_ga4_etl`, `test_content_intelligence`, `test_audit_composite_scores`, `test_gsc_etl`,
+`test_metrics_dashboard`, `test_semantic_scholar_search` were each run in isolation on both
+interpreters and all are clean) — it is an interaction that only appears in a full run.
+The culprit was not identified; that hunt is BUG-081.
+
+**A caution about this entry's own evidence.** The first 3.14 result looked like "3.14 breaks
+21 tests". It was contamination: an earlier experiment had left the zero-byte DB behind, and
+the *current* 3.12 venv failed those same 21 tests while it was present. The file's mtime is
+what settled it. Two variables — the interpreter and chromadb's major version — were also
+changed in one step and had to be separated afterwards. Both are the same mistake in different
+clothes, and the same one BUG-073 recorded: a local signal trusted without checking what
+produced it.
+
+**Conclusion.** 3.14 is viable on dependencies alone, and is blocked on two pieces of work that
+are worth doing on their own merits, independent of any upgrade:
+
+1. **BUG-081** — find and fix whatever creates the empty `data/performance.db`, and make
+   `_connect()` treat a table-less database the same as a missing one.
+2. **A `chromadb` 0.x → 1.x major bump**, with its own API-break review.
+
+Neither is urgent. 3.12 is green, supported into late 2028, and nothing needs 3.14.
+
+### BUG-081 · An empty `data/performance.db` silently breaks 21 tests
+
+**Opened 2026-09-03**, found while trying Python 3.14 (B-047).
+
+`data/performance.db` is untracked and normally absent. `_connect()`
+(`scripts/content_intelligence.py:75`) guards on `db_path.exists()` and returns `None` when it
+is missing, so `get_performance_context()` degrades cleanly and `tests/test_topic_scout.py`
+passes. But the guard tests only for **presence, not usability**: a zero-byte file passes
+`.exists()`, `sqlite3.connect()` happily opens it, and the first query fails with
+`sqlite3.OperationalError: no such table: article_performance`. 21 tests then fail.
+
+This is not hypothetical — it happened during B-047 and made a *current, green* 3.12 venv fail
+21 tests, which was briefly mistaken for a Python 3.14 regression.
+
+Two defects, one of which is reproducible today:
+
+**(a) The guard is too weak — reproducible on 3.12 right now:**
+```
+$ touch data/performance.db
+$ .venv/bin/python -m pytest tests/test_topic_scout.py -q
+21 failed, 57 passed
+$ rm data/performance.db
+$ .venv/bin/python -m pytest tests/test_topic_scout.py -q
+78 passed
+```
+
+**(b) Something creates that file during a full run on 3.14, but not on 3.12.** Not
+reproducible from any single test file — eight candidates were run in isolation on both
+interpreters and all are clean. It only appears in a full run. Culprit unidentified.
+
+- [ ] `_connect()` treats an unusable database (no `article_performance` table) the same as a
+      missing one — degrade, do not raise
+- [ ] A regression test that `touch`es the file and asserts the degradation path still holds.
+      Mutation-check it per B-043: it must fail against the current `.exists()` guard
+- [ ] Find what creates the file on 3.14 and stop it writing into `data/` — tests should not
+      touch the real data directory
+- [ ] Consider a repo-wide guard: no test may write to `data/`
+
+**Why it matters beyond the upgrade:** the failure is invisible and misattributed. A stray
+zero-byte file — from an interrupted run, a `touch`, a half-finished ETL — silently breaks a
+fifth of a test file, and the error names sqlite rather than the real cause. **Scope:** S for
+(a), unknown for (b).
 
 ### BUG-079 · B-029's oracle test proves a copy of the guard, not the guard (LOW)
 

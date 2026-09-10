@@ -1,5 +1,22 @@
 # State of the repo — 2026-09-10
 
+> **CORRECTED 2026-09-10** after an adversarial review (Fable 5.1) refuted two figures below.
+> Both corrections were re-verified independently. See
+> `docs/reviews/2026-09-10-fable-complexity-review.md` §0.
+>
+> 1. **The production line count was an 11% undercount.** The walk covered only `src/` and
+>    `scripts/`; `agents/` (2,483 lines) and `mcp_servers/` (1,568) are production Python too.
+>    Non-archived total is **~39,800**, not 35,505.
+> 2. **"Zero orphans" was wrong**, and wrong in the direction that flattered the repo. It
+>    conflated *named in a config* with *named in a doc*. Adding every genuinely wired entry
+>    point still leaves **47 modules / 17,554 lines** that no `Makefile`, `.pre-commit-config.yaml`,
+>    `.claude/settings.json` or `.mcp.json` references. They are orphans with documentation, and
+>    a large deletion **is** available — roughly 19,200 lines of code at low risk.
+>
+> The rest of the document stands as measured. It is left uncorrected in place so the error is
+> visible: the first walk stopped at two directories and the classifier accepted a doc mention
+> as a live caller.
+
 A handoff snapshot for a fresh session. Every number here was measured on 2026-09-10 by
 running something, not by reading a previous document. Commands are given so each figure can
 be re-taken rather than trusted.

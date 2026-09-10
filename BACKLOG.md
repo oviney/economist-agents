@@ -26,6 +26,79 @@ _(none)_
 
 ## Todo
 
+### BUG-082 · The test suite mutates the real blog clone — a fixture is sitting in `_posts/`
+
+**Opened 2026-09-10**, found by the Fable 5.1 complexity review.
+
+`tests/test_deploy_to_blog.py:153` uses `Path("temp_blog_repo")` — the **real gitignored clone
+of `oviney/blog`**, not a tmp dir. Current state of that clone, measured:
+
+```
+$ git -C temp_blog_repo branch --show-current
+content/2026-07-28-a-post-20260830-201155      <- a branch a test created
+$ git -C temp_blog_repo status --porcelain
+?? _posts/2026-08-30-a-post.md                 <- a test fixture, title: t
+```
+
+**If the owner ever commits from that clone, a test fixture ships to the live blog.** The
+publishing workflow is built on three gates — review mode, the hero refusal, the promote step —
+and this walks around all of them, because the file is already in `_posts/`.
+
+It also corrupted a measurement: the state doc counted 30 published posts. There are 29. The
+30th is this fixture.
+
+`logs/execution_roi.json`, `logs/article_evals.json` and `output/quarantine/` (eight
+`*-specific-test-title.md`) are also rewritten at test time.
+
+- [ ] No test writes outside `tmp_path`. Point the deploy tests at a fixture clone they create
+- [ ] Delete the stray `_posts/` fixture and return the clone to its default branch
+- [ ] A guard that fails the suite if `temp_blog_repo` is dirty or off its default branch after
+      a run — mutation-checked per B-043
+- [ ] Consider making the whole of `logs/` and `output/` test-writable only under `tmp_path`
+
+**Scope:** S. **Severity: HIGH** — the failure mode is publishing junk to a live blog.
+
+### BUG-083 · The pipeline's default research mode contradicts the documentation
+
+**Opened 2026-09-10**, found by the Fable 5.1 complexity review.
+
+`src/agent_sdk/pipeline.py:139` — `research_mode: Literal[...] = "deterministic"`.
+
+CLAUDE.md says `claude_web` is "the **default in practice** and the reliable one", and that
+`deterministic` "is rate-limited from most environments and frequently aborts (BUG-050)". So a
+bare `python -m src.agent_sdk.pipeline "<topic>"` takes the path the documentation warns
+against; every documented invocation passes `--research-mode claude_web` explicitly, which is
+why nobody noticed.
+
+Worse, the CLI help at `pipeline.py:345` still reads
+`"'deterministic' (default, Serper) | 'deep' (recursive, Serper)"`. **Serper was removed by
+#438** — the help advertises a paid search API that constraint #1 forbids and that no longer
+exists in the tree.
+
+- [ ] Default `research_mode` to `claude_web`
+- [ ] Delete the Serper references from the CLI help
+- [ ] A test asserting the default equals what CLAUDE.md names — so the two cannot drift again
+
+**Scope:** XS.
+
+### BUG-084 · `.coveragerc` excludes the one gate that decides publication
+
+**Opened 2026-09-10**, found by the Fable 5.1 complexity review.
+
+`.coveragerc:74` omits `scripts/publication_validator.py` from coverage. It is the 1,497-line
+gate that decides whether an article may be published — the single most consequential module in
+the repo — and it is excluded from the measurement, while `make ci-local` enforces **90%** on
+`src/quality`, a package imported only by two modules that nothing reaches.
+
+Measured: **35 of 47 omit entries name files that no longer exist.** The file is mostly a
+record of a directory layout from an earlier architecture.
+
+- [ ] Remove the `publication_validator.py` omit and record its real coverage
+- [ ] Delete the 35 stale entries
+- [ ] Re-point the 90% per-module gate at something on the publish path, or drop it
+
+**Scope:** XS to fix the omit; the coverage number it reveals may not be.
+
 ### B-047 · Try Python 3.14, deliberately and on its own — **ATTEMPTED 2026-09-03, staying on 3.12**
 
 **Opened 2026-09-03.** BUG-078 set the pin to 3.12 because that is the interpreter this

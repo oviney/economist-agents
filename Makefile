@@ -67,22 +67,7 @@ format: require-venv
 	$(VENV_BIN)/ruff format .
 
 type-check: require-venv
-	$(VENV_BIN)/mypy scripts/
-
-# B-039: mypy exits 0 (clean), 1 (type errors found), and >1 for everything else — 2 for a
-# usage or internal error, 127 for "command not found". Only exit 1 is the known-red
-# backlog this step is allowed to wave through. The old form,
-# `(mypy scripts/ || echo "advisory")`, printed the same reassuring line for all of them,
-# so a mypy that never ran passed the gate. That is B-031's complaint exactly: a sensor
-# that cannot tell "I ran and found problems" from "I never ran".
-mypy-advisory: require-venv
-	@$(VENV_BIN)/mypy scripts/; status=$$?; \
-	if [ $$status -gt 1 ]; then \
-		echo "✗ mypy did not run (exit $$status) — a missing or broken tool must fail the gate, not pass it quietly (B-039)"; \
-		exit 1; \
-	elif [ $$status -eq 1 ]; then \
-		echo "⚠️  mypy advisory — repo-wide backlog is known-red (611 errors); NEW type errors are blocked per-commit by the baselined mypy hook (B-031, B-035 Task 2 — see docs/mypy-baseline.md)"; \
-	fi
+	$(VENV_BIN)/mypy src/ scripts/ mcp_servers/
 
 quality: format lint type-check test
 	@echo "✅ All quality checks passed!"
@@ -93,10 +78,8 @@ quality: format lint type-check test
 ci-local: require-venv
 	@echo "── ruff format ──"        && $(VENV_BIN)/ruff format --check .
 	@echo "── ruff lint ──"          && $(VENV_BIN)/ruff check .
-	@echo "── bare-name imports ──"  && $(PY) scripts/check_bare_name_imports.py
-	@echo "── docs-truth gate ──"    && $(PY) scripts/check_docs_references.py
-	@echo "── mypy (advisory) ──"    && $(MAKE) --no-print-directory mypy-advisory
-	@echo "── mypy baseline gate ──" && $(PY) scripts/mypy_baseline.py --all
+	@echo "── docs-truth ──"         && $(PY) scripts/check_docs_references.py
+	@echo "── mypy ──"               && $(MAKE) --no-print-directory type-check
 	@echo "── tests + coverage ──"   && $(VENV_BIN)/pytest tests/ \
 		--cov=src --cov=scripts \
 		--cov-report=term-missing \
@@ -104,8 +87,6 @@ ci-local: require-venv
 	@echo "── security scan (bandit) ──" && $(VENV_BIN)/bandit -r scripts/ \
 		--exclude '*/.venv/*,*/__pycache__/*,scripts/archived' \
 		--severity-level medium -q
-	@echo "── destructive-change guard ──" && $(PY) scripts/destructive_change_guard.py
-	@echo "── sensor proofs ──"           && $(PY) scripts/check_sensor_proofs.py
 	@echo "✅ ci-local passed — you are the merge gate (main is unprotected)."
 
 art: require-venv

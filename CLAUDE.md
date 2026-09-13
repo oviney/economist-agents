@@ -95,8 +95,9 @@ Type hints mandatory, docstrings required; `orjson` not `json`; `logger` not `pr
 network boundary in tests (the suite blocks sockets). Python is pinned by `.python-version`.
 
 **Verification is local-first (ADR-0015).** No CI, `main` unprotected: run `make ci-local`
-before merging — ruff, bare-name imports, docs-truth, mypy baseline, pytest + coverage 70%,
-bandit, destructive-change guard, sensor proofs. You are the merge gate.
+before merging — ruff, docs-truth, mypy (hard, over live code), pytest + coverage 70%,
+bandit. You are the merge gate. The sensors programme (register, proofs, complexity and
+post-edit sensors, mypy baseline, destructive-change guard) was retired by B-048 slice 4.
 
 | Variable | Purpose |
 |---|---|

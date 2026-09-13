@@ -13,7 +13,6 @@ Usage (HTTP transport):
 """
 
 import logging
-import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -102,5 +101,4 @@ def evaluate_article(content: str, title: str = "") -> dict[str, Any]:
 
 
 if __name__ == "__main__":
-    transport = os.getenv("MCP_TRANSPORT", "stdio")
-    mcp.run(transport=transport)
+    mcp.run(transport="stdio")

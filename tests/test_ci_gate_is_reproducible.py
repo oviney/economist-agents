@@ -116,9 +116,11 @@ class TestAMissingVenvFailsLoudly:
         assert "/.venv/bin/pip install" in result.stdout
 
 
-class TestTheMypyAdvisoryCannotMaskAMissingTool:
-    """B-031's complaint: a sensor that cannot tell "I ran and found problems" from
-    "I never ran". `(mypy ... || echo advisory)` swallowed exit 127 exactly like exit 1."""
+class TestMypyIsAHardGate:
+    """B-048 slice 4 retired the advisory-plus-baseline arrangement: mypy over live code
+    is clean, so any non-zero exit — errors, a crash, or a missing tool — fails the gate.
+    B-031's complaint (a sensor that cannot tell "found problems" from "never ran") is
+    answered by having no excused exit code at all."""
 
     @pytest.fixture
     def sandbox_with_python(self, sandbox: Path) -> Path:
@@ -128,33 +130,16 @@ class TestTheMypyAdvisoryCannotMaskAMissingTool:
     def test_clean_mypy_passes(self, sandbox_with_python: Path) -> None:
         write_stub(sandbox_with_python / ".venv" / "bin" / "mypy", exit_code=0)
 
-        result = run_make("mypy-advisory", sandbox_with_python)
+        result = run_make("type-check", sandbox_with_python)
 
         assert result.returncode == 0, result.stderr
 
-    def test_type_errors_stay_advisory(self, sandbox_with_python: Path) -> None:
-        write_stub(sandbox_with_python / ".venv" / "bin" / "mypy", exit_code=1)
-
-        result = run_make("mypy-advisory", sandbox_with_python)
-
-        assert result.returncode == 0, result.stderr
-        assert "advisory" in result.stdout
-
-    def test_a_mypy_that_could_not_run_fails_the_gate(
-        self, sandbox_with_python: Path
+    @pytest.mark.parametrize("exit_code", [1, 2, 127])
+    def test_any_non_zero_mypy_exit_fails_the_gate(
+        self, sandbox_with_python: Path, exit_code: int
     ) -> None:
-        # 127 is "command not found"; 2 is a mypy usage/internal error. Neither is
-        # "the codebase is known-red", which is the only thing the advisory excuses.
-        write_stub(sandbox_with_python / ".venv" / "bin" / "mypy", exit_code=127)
+        write_stub(sandbox_with_python / ".venv" / "bin" / "mypy", exit_code=exit_code)
 
-        result = run_make("mypy-advisory", sandbox_with_python)
-
-        assert result.returncode != 0
-        assert "advisory" not in result.stdout.replace("mypy (advisory)", "")
-
-    def test_a_mypy_crash_fails_the_gate_too(self, sandbox_with_python: Path) -> None:
-        write_stub(sandbox_with_python / ".venv" / "bin" / "mypy", exit_code=2)
-
-        result = run_make("mypy-advisory", sandbox_with_python)
+        result = run_make("type-check", sandbox_with_python)
 
         assert result.returncode != 0

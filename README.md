@@ -9,9 +9,8 @@
 > **No CI badge, by design.** [ADR-0015](docs/adr/0015-local-first-verification.md) retired
 > GitHub Actions CI: `make ci-local` is the merge gate and `main` is unprotected. The `CI`
 > and `Quality Tests` badges that used to sit here pointed at workflows deleted with it —
-> stale for months, because the hook meant to catch that (BUG-023) had no implementation.
-> See B-036; `scripts/validate_badges.py` now fails on a badge that references a workflow
-> which does not exist, or a Python version that disagrees with `.python-version`.
+> stale for months. `tests/test_python_version_consistency.py` keeps the Python badge in
+> step with `.python-version`; there is no workflow badge left to go stale.
 
 A pipeline of specialised AI agents that discovers topics, votes on them editorially,
 researches them against verifiable sources, writes them in *The Economist*'s house

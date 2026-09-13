@@ -34,7 +34,6 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from scripts.complexity_sensor import changed_python_paths
 from scripts.hooks._io import run
 
 logger = logging.getLogger(__name__)
@@ -43,6 +42,37 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 #: Where the one-block-per-session sentinels live (gitignored runtime state).
 STATE_DIR = REPO_ROOT / "logs" / ".session_gate"
+
+
+def changed_python_paths() -> list[Path]:
+    """Return ``*.py`` files that differ from HEAD, plus untracked ones.
+
+    Empty when git is unavailable — abstain rather than crash. Inlined from the
+    retired complexity sensor (B-048 slice 4).
+    """
+    try:
+        tracked = subprocess.run(  # noqa: S603 — fixed argv, no shell
+            ["git", "diff", "HEAD", "--name-only"],  # noqa: S607
+            capture_output=True,
+            text=True,
+            cwd=REPO_ROOT,
+            timeout=30,
+            check=False,
+        )
+        untracked = subprocess.run(  # noqa: S603 — fixed argv, no shell
+            ["git", "ls-files", "--others", "--exclude-standard"],  # noqa: S607
+            capture_output=True,
+            text=True,
+            cwd=REPO_ROOT,
+            timeout=30,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        logger.warning("session gate could not consult git: %s", exc)
+        return []
+    names = f"{tracked.stdout}\n{untracked.stdout}".split()
+    return [REPO_ROOT / name for name in names if name.endswith(".py")]
+
 
 _RUFF_TIMEOUT_SECONDS = 90
 

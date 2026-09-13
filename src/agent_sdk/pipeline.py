@@ -15,7 +15,7 @@ import sys
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Literal
+from typing import Literal, cast
 
 import orjson
 
@@ -34,6 +34,8 @@ from src.agent_sdk.stage3_runner import (
 from src.agent_sdk.stage4_runner import run_stage4
 
 logger = logging.getLogger(__name__)
+
+ResearchMode = Literal["deterministic", "deep", "claude_web"]
 
 COST_LOG_PATH = Path("logs/agent_sdk_costs.jsonl")
 
@@ -135,7 +137,7 @@ async def run_pipeline(
     topic: str,
     writer_budget_usd: float | None = DEFAULT_WRITER_BUDGET_USD,
     writer_model: str = DEFAULT_WRITER_MODEL,
-    research_mode: Literal["deterministic", "deep", "claude_web"] = "deterministic",
+    research_mode: ResearchMode = "deterministic",
     brief_override: str | None = None,
 ) -> PipelineResult:
     """Generate one article through the Agent SDK pipeline — Stage 3 then Stage 4.
@@ -348,7 +350,7 @@ def main(argv: list[str] | None = None) -> None:
         topic,
         writer_budget=args.writer_budget,
         writer_model=args.writer_model,
-        research_mode=args.research_mode,
+        research_mode=cast(ResearchMode, args.research_mode),
         brief_override=load_brief_file(args.brief) if args.brief else None,
     )
 
@@ -445,7 +447,7 @@ def _run_end_to_end(
     *,
     writer_budget: float | None,
     writer_model: str,
-    research_mode: str,
+    research_mode: ResearchMode,
     brief_override: str | None = None,
 ) -> None:
     """Run the pipeline end to end, write the article, and hand off the art.

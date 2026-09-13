@@ -154,9 +154,9 @@ class StyleMemoryTool:
                 logger.warning("Failed to index %s: %s", md_file.name, e)
                 continue
 
-        if documents:
+        if documents and self.collection is not None:
             try:
-                self.collection.add(documents=documents, metadatas=metadatas, ids=ids)
+                self.collection.add(documents=documents, metadatas=metadatas, ids=ids)  # type: ignore[arg-type]
                 self.indexed_count = len(documents)
                 logger.info(
                     "Indexed %d style patterns from %d articles",
@@ -210,9 +210,9 @@ class StyleMemoryTool:
             formatted_results = []
             if results and results["documents"] and results["documents"][0]:
                 documents = results["documents"][0]
-                metadatas = results["metadatas"][0]
+                metadatas = (results["metadatas"] or [[]])[0]
                 distances = (
-                    results["distances"][0]
+                    (results["distances"] or [[]])[0]
                     if "distances" in results
                     else [0] * len(documents)
                 )

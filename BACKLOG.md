@@ -61,11 +61,20 @@ D7 (hero optional), D8 (archive all but three living docs). Recommendation on al
   `BACKLOG.md` at 119 (open items only). Markdown outside the archive: 376 → 51.
   Gate: 1277 passed / 1 skipped / 88.51% in 69 s.
 
-**Next:** slice 4 — retire the sensors programme (D6): register + proofs, complexity and
-post-edit sensors, mypy baseline, destructive-change guard, ADR/skill/badge linters, the
-arch-review hook, bare-name-import check; `ci-local` becomes ruff + docs-truth + mypy (hard,
-over live code, 18 errors fixed) + pytest/coverage + bandit. The constraint guard, session
-context and stop gate stay.
+- Slice 4 — DONE 2026-09-13 (D6). Retired: the sensor register and proofs, the complexity
+  and post-edit sensors, the mypy baseline, the destructive-change guard, the ADR / skill /
+  badge linters, the arch-review hook, the bare-name-import check, `mkdocs.yml`; ten test
+  files and the sensor halves of two more. `ci-local` is now ruff + docs-truth + mypy (hard,
+  over `src/ scripts/ mcp_servers/`, archived excluded, the 18 live errors fixed) + pytest
+  with coverage + bandit. Kept: the `PreToolUse` constraint guard, session context, the stop
+  gate (which inlined the one helper it borrowed), and `check_docs_references.py` as a plain
+  check. Gate: 1046 passed / 1 skipped / 87.68% in 94 s.
+
+**Next:** slice 5 — the owner brief becomes the input (D1/D2, BUG-083): `briefs/<slug>.md`
+via `--brief`, research in service of the take, the writer as a practitioner's editor with
+first person expected, the old research-brief input renamed `--research-brief`, default
+research mode `claude_web`. Live acceptance (a real article from a real owner brief to a
+review URL) needs the owner to write the first brief.
 
 ## Todo
 

@@ -212,7 +212,7 @@ class TestHooksAreWired:
 
     @pytest.mark.parametrize(
         "event",
-        ["PostToolUse", "PreToolUse", "Stop", "SessionStart"],
+        ["PreToolUse", "Stop", "SessionStart"],
     )
     def test_event_is_wired(self, settings: dict, event: str) -> None:
         assert settings["hooks"].get(event), f"{event} has no hook"
@@ -248,23 +248,3 @@ class TestHooksAreWired:
         gitignore = (REPO_ROOT / ".gitignore").read_text(encoding="utf-8")
 
         assert "!.claude/settings.json" in gitignore
-
-    def test_sensor_history_is_gitignored(self) -> None:
-        """Runtime snapshots are data, not source."""
-        gitignore = (REPO_ROOT / ".gitignore").read_text(encoding="utf-8")
-
-        assert "logs/sensor_history.jsonl" in gitignore
-
-
-class TestComplexityThreshold:
-    """B-032: one threshold, in one place."""
-
-    def test_ruff_toml_owns_the_threshold(self) -> None:
-        ruff_toml = (REPO_ROOT / "ruff.toml").read_text(encoding="utf-8")
-
-        assert "[lint.mccabe]" in ruff_toml
-        assert re.search(r"max-complexity\s*=\s*\d+", ruff_toml)
-
-    def test_override_register_exists(self) -> None:
-        """The escape hatch the sensor's message promises must actually be there."""
-        assert (REPO_ROOT / "docs" / "harness-overrides.md").is_file()

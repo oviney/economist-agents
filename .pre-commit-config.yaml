@@ -1,52 +1,23 @@
 # Pre-commit hooks for economist-agents
 # Install: pre-commit install --install-hooks
 # Run manually: pre-commit run --all-files
+#
+# B-048 slice 4 retired the sensor hooks (mypy baseline, badge validation, ADR lint,
+# skill anatomy, arch review). `make ci-local` is the merge gate; these are the cheap
+# per-commit checks that stay useful without a register to maintain.
 
 repos:
-  # Ruff - Python linter and formatter
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.14.10
     hooks:
-      # Format code (auto-fixes)
       - id: ruff-format
         name: ruff format
         description: Format Python code with ruff
-
-      # Lint code (check only, no auto-fix)
       - id: ruff
         name: ruff check
         description: Lint Python code with ruff (check only)
         args: []
 
-  # Mypy - Static type checking, gated on a per-file baseline
-  #
-  # B-031: this was `stages: [manual]`, so it never ran — an inert sensor next to a
-  # CLAUDE.md that says "Type hints mandatory". It is now a real pre-commit hook.
-  #
-  # `--follow-imports=silent` is what makes that survivable. pre-commit passes the staged
-  # files, but mypy follows their imports, so without the flag a commit touching one clean
-  # file inherits errors from the 611-error repo-wide backlog — and the gate would be back
-  # on `manual` within a day. Scoped this way it reports only errors in the files being
-  # committed. Repo-wide mypy stays advisory in `make ci-local` for that reason.
-  #
-  # B-035 Task 2: even scoped, raw mypy blocked 12 of 48 `scripts/` files (25%) on errors
-  # the commit did not introduce — the noise-overload failure mode that gets a gate
-  # reverted to `manual`. `mypy_baseline.py` wraps the same mypy invocation and compares
-  # per-file error counts against `docs/mypy-baseline.md`, so pre-existing debt is
-  # grandfathered but a NEW error still blocks. The baseline is a count, not a mute, and
-  # `tests/test_mypy_baseline.py` fails if any number grows — raising it to unblock a
-  # commit fails the suite instead. Same mechanism B-032 used for complexity.
-  - repo: local
-    hooks:
-      - id: mypy-baseline
-        name: mypy type check (baselined)
-        description: Block new type errors; grandfather those in docs/mypy-baseline.md
-        entry: .venv/bin/python scripts/mypy_baseline.py
-        language: system
-        files: ^scripts/.*\.py$
-        verbose: true
-
-  # Pytest - Run test suite on push (not commit for speed)
   - repo: local
     hooks:
       - id: pytest
@@ -57,71 +28,7 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
-        stages: [pre-push]  # Only run on git push, not git commit
-
-      # Badge validation — REBUILT 2026-07-31 (BUG-023, B-036).
-      #
-      # The previous hook ran `python3 scripts/validate_badges.py`, a script
-      # archived to scripts/archived/ in #327/#343. Its entry was
-      # `bash -c '... || true'`, which swallowed both the stale-badge failures it
-      # existed to catch AND the "no such file" error proving it had no
-      # implementation — inert twice over. B-031 removed the `|| true` and the
-      # next push failed, which is how any of this surfaced.
-      #
-      # The badges had in fact gone stale: two pointed at GitHub Actions
-      # workflows ADR-0015 retired, and the Python badge disagreed with
-      # .python-version. Rewritten rather than resurrected — the archived copy
-      # resolved paths relative to scripts/ (it looked for scripts/README.md) and
-      # exited 0 while printing failures, so it could not have gated anything.
-      #
-      # Note `.venv/bin/python`, not `python3`: the old entry used system python,
-      # which here is 3.14 and has none of the project's dependencies.
-      - id: badge-validation
-        name: validate README badges
-        description: Fail when a badge outlives what it describes (BUG-023)
-        entry: .venv/bin/python scripts/validate_badges.py
-        language: system
-        pass_filenames: false
-        files: ^(README\.md|\.python-version|\.github/workflows/.*)$
-        always_run: false
-
-      # ADR governance lint (skills/adr-governance/SKILL.md)
-      - id: adr-lint
-        name: lint ADRs
-        description: Enforce ADR numbering, status, supersession, and location rules
-        entry: .venv/bin/python scripts/lint_adrs.py
-        language: system
-        pass_filenames: false
-        files: ^(docs/adr/|mkdocs\.yml$|docs/ADR-.*\.md$|docs/architecture/ADR.*\.md$)
-        always_run: false
-
-      # Skill anatomy validation (issues #293 #294 — docs/skill-anatomy.md)
-      - id: validate-skills
-        name: validate SKILL.md anatomy
-        description: Enforce skills/*/SKILL.md frontmatter and required sections
-        entry: .venv/bin/python scripts/validate_skills.py
-        language: system
-        pass_filenames: false
-        files: ^skills/.+/SKILL\.md$
-        always_run: false
-
-
-      # B-031: a second `validate-skills` registration lived here — same hook id as
-      # the one above, and with `always_run: false` duplicated as a YAML key so the
-      # later mapping silently won. Removed; the registration above is the only one.
-
-      # Architecture review - catches anti-patterns before CI (issue: pre-commit-arch-review)
-      - id: arch-review
-        name: architecture review
-        description: >
-          Check staged Python files for architectural anti-patterns:
-          ADR-002 (direct LLM imports), unprotected json.loads, hardcoded
-          secrets, and print() used for error reporting.
-          Fails commit if error-level violations are found.
-        entry: .venv/bin/python scripts/pre_commit_arch_check.py
-        language: system
-        types: [python]
-        pass_filenames: true
+        stages: [pre-push]
 
   # Basic file checks (check-only, no auto-fix)
   - repo: https://github.com/pre-commit/pre-commit-hooks

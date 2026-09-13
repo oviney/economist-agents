@@ -25,28 +25,15 @@ import orjson
 import pytest
 
 from scripts.hooks import guard_constraints, session_context, session_gate
-from scripts.hooks import post_edit_sensor as post_edit
 from scripts.hooks._io import emit_payload, read_payload
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 HOOK_MODULES = (
-    "scripts.hooks.post_edit_sensor",
     "scripts.hooks.guard_constraints",
     "scripts.hooks.session_gate",
     "scripts.hooks.session_context",
 )
-
-
-@pytest.fixture(autouse=True)
-def isolate_sensor_history(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Keep tests out of the repo's real sensor history.
-
-    `post_edit.handle` records a snapshot on every call. Without this, running the suite
-    appends test noise to `logs/sensor_history.jsonl` — the file whose whole purpose is to
-    be a truthful record of what the sensors saw during real sessions.
-    """
-    monkeypatch.setattr(post_edit, "HISTORY_PATH", tmp_path / "sensor_history.jsonl")
 
 
 def run_hook_process(module: str, payload: object) -> tuple[int, dict]:
@@ -299,111 +286,6 @@ class TestConfigWriteGuard:
 def injected_context(result: dict) -> str:
     """Extract additionalContext from a hook payload, or '' when absent."""
     return str(result.get("hookSpecificOutput", {}).get("additionalContext", ""))
-
-
-class TestPostEditSensor:
-    """Lint and complexity feedback must reach the agent, not wait for the owner."""
-
-    def test_ignores_non_python_files(self, tmp_path: Path) -> None:
-        note = tmp_path / "note.md"
-        note.write_text("# hi\n", encoding="utf-8")
-
-        result = post_edit.handle(
-            {"tool_name": "Write", "tool_input": {"file_path": str(note)}},
-        )
-
-        assert result == {}
-
-    def test_reports_complexity_back_to_the_agent(self, tmp_path: Path) -> None:
-        tangled = tmp_path / "tangled.py"
-        body = "\n".join(
-            f'    if value > {n}:\n        out += "{n}"' for n in range(1, 13)
-        )
-        tangled.write_text(
-            f'"""Fixture."""\n\n\ndef tangled(value: int) -> str:\n'
-            f'    """Branchy."""\n    out = ""\n{body}\n    return out\n',
-            encoding="utf-8",
-        )
-
-        result = post_edit.handle(
-            {"tool_name": "Edit", "tool_input": {"file_path": str(tangled)}},
-        )
-
-        assert "COMPLEXITY SENSOR" in injected_context(result)
-
-    def test_clean_file_produces_no_feedback(self, tmp_path: Path) -> None:
-        """Silence on success — otherwise the hook becomes the noise nobody reads."""
-        tidy = tmp_path / "tidy.py"
-        tidy.write_text('"""Fixture."""\n\n\nX = 1\n', encoding="utf-8")
-
-        result = post_edit.handle(
-            {"tool_name": "Write", "tool_input": {"file_path": str(tidy)}},
-        )
-
-        assert injected_context(result) == ""
-
-    def test_reads_the_path_from_tool_response_when_input_lacks_it(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        tidy = tmp_path / "tidy.py"
-        tidy.write_text('"""Fixture."""\n\n\nX = 1\n', encoding="utf-8")
-
-        result = post_edit.handle(
-            {"tool_name": "Write", "tool_response": {"filePath": str(tidy)}},
-        )
-
-        assert result == {} or injected_context(result) == ""
-
-    def test_missing_file_is_ignored(self, tmp_path: Path) -> None:
-        result = post_edit.handle(
-            {
-                "tool_name": "Edit",
-                "tool_input": {"file_path": str(tmp_path / "gone.py")},
-            },
-        )
-
-        assert result == {}
-
-
-class TestSensorHistory:
-    """Boeckeler's sidecar: sensor state recorded over a session, not just per-check."""
-
-    def test_snapshot_appends_one_jsonl_line(self, tmp_path: Path) -> None:
-        history = tmp_path / "sensor_history.jsonl"
-
-        post_edit.record_snapshot(
-            session_id="sess-1",
-            path="scripts/foo.py",
-            finding_count=2,
-            history_path=history,
-        )
-        post_edit.record_snapshot(
-            session_id="sess-1",
-            path="scripts/bar.py",
-            finding_count=0,
-            history_path=history,
-        )
-
-        lines = history.read_text(encoding="utf-8").strip().splitlines()
-        assert len(lines) == 2
-        first = orjson.loads(lines[0])
-        assert first["outputs"]["finding_count"] == 2
-        assert first["schema_version"], "must carry the trace logger's schema version"
-
-    def test_snapshot_failure_is_swallowed(self, tmp_path: Path) -> None:
-        """Observability must never be able to break an edit."""
-        unwritable = tmp_path / "no-such-dir" / "deep" / "history.jsonl"
-
-        post_edit.record_snapshot(
-            session_id="s",
-            path="x.py",
-            finding_count=0,
-            history_path=unwritable,
-        )  # must not raise
-
-
-# ── Stop: the bounded session gate ──────────────────────────────────────────────
 
 
 class TestSessionGate:

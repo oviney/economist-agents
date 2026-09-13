@@ -176,7 +176,7 @@ def add_to_style_memory(article_text: str, metadata: dict[str, Any]) -> dict[str
     ]
 
     try:
-        tool.collection.upsert(documents=paragraphs, metadatas=meta_list, ids=ids)
+        tool.collection.upsert(documents=paragraphs, metadatas=meta_list, ids=ids)  # type: ignore[arg-type]
         # Keep indexed_count in sync
         tool.indexed_count = tool.collection.count()
         logger.info(

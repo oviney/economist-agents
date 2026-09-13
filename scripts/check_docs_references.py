@@ -230,7 +230,7 @@ def main() -> int:
         logger.error("   %s", item)
     logger.error(
         "\nFix the reference, or add the path to ALLOWED_MISSING in %s with a "
-        "reason (owner-gated — see docs/specs/B-045-docs-truth-gate.md).",
+        "reason (owner-gated).",
         Path(__file__).name,
     )
     return 1

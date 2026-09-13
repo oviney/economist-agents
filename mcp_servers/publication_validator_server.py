@@ -7,6 +7,7 @@ agent in the content pipeline can validate articles before publication.
 Transport: stdio (default FastMCP behaviour)
 """
 
+import datetime as _dt
 import logging
 import re
 import sys
@@ -220,7 +221,7 @@ def validate_post(post_path: str) -> dict:
     date_val = frontmatter.get("date")
     date_str = (
         date_val.strftime("%Y-%m-%d")
-        if hasattr(date_val, "strftime")
+        if isinstance(date_val, _dt.date)
         else str(date_val)
     )
     if not _DATE_RE.match(date_str):

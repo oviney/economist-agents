@@ -26,6 +26,34 @@ _(none)_
 
 ## Todo
 
+### B-048 · Redesign: the owner's voice is the input, not the gate — **SPEC APPROVED 2026-09-13**
+
+**Spec:** `docs/specs/redesign-owner-voice-first.md`. Written at the owner's request
+("tell me what's wrong with my thinking, what I'm missing, then redesign the whole thing").
+
+**The finding one level above the 2026-09-10 complexity review:** the product is defined as
+a *style* ("Economist-style") and that style forbids the only input the blog owns — the
+owner's twenty years of experience. 20 of 29 published posts contain zero first-person
+words; none cites an owner experience. The owner's judgment enters only at the end, as an
+approve/reject of 1,000 finished words. Quality is operationalised as regex compliance (25
+validator checks, a 5-dimension scorer) and no reader signal is captured. Since July: 173
+commits, 5 articles.
+
+**Ten decisions (D1–D10), each with reasoning, trade-off and reversibility, in the spec.**
+The spine: the pipeline starts from an owner brief (thesis, experiences, disagreements)
+instead of a topic string; Stage 1/2 and the second system are deleted; gates split into
+blocking (reader-protecting) and advisory (style); the owner's own post-publish verdict
+closes the quality loop, keyless.
+
+**Owner-gated before slice 2:** D3 (delete Stage 1/2), D6 (retire sensors incl. docs-truth),
+D7 (hero optional), D8 (archive all but three living docs). Recommendation on all four: yes.
+
+**Absorbs:** B-032 (complexity), B-033 (guide layer), B-046 (session-start list), B-047
+(3.14 unblocks once ChromaDB goes), BUG-082/083/084 (slice 0/1), and resolves the 09-10
+review's item-9 fork.
+
+**Next:** owner LGTM → `/goal B-048` runs slices 0–9 per §5 of the spec.
+
 ### BUG-082 · The test suite mutates the real blog clone — a fixture is sitting in `_posts/`
 
 **Opened 2026-09-10**, found by the Fable 5.1 complexity review.

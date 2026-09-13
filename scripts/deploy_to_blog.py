@@ -37,8 +37,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
-# Allow importing from scripts/ when run directly or via subprocess
-sys.path.insert(0, str(Path(__file__).parent))
+# Allow importing the scripts package when run directly or via subprocess
+sys.path.insert(0, str(Path(__file__).parent.parent))
 from scripts.publication_validator import validate_file  # noqa: E402
 
 logger = logging.getLogger(__name__)

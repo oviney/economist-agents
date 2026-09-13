@@ -52,9 +52,14 @@ D7 (hero optional), D8 (archive all but three living docs). Recommendation on al
 (3.14 unblocks once ChromaDB goes), BUG-082/083/084 (slice 0/1), and resolves the 09-10
 review's item-9 fork.
 
-**Next:** owner LGTM → `/goal B-048` runs slices 0–9 per §5 of the spec.
+**Progress:**
+- Slice 0 — DONE 2026-09-13. Tag `pre-redesign-2026-09` at 3798fdd. BUG-082 closed (guard + 13
+  culprits fixed). Baseline before: 2791 passed / 9 skipped / 83.74%.
 
-### BUG-082 · The test suite mutates the real blog clone — a fixture is sitting in `_posts/`
+**Next:** slice 1 — delete cut items 1–7 (43 production files, 44 test files; two pipeline
+call sites edited; five instruction-doc references fixed).
+
+### BUG-082 · The test suite mutates the real blog clone — a fixture is sitting in `_posts/` — **DONE 2026-09-13 (B-048 slice 0)**
 
 **Opened 2026-09-10**, found by the Fable 5.1 complexity review.
 
@@ -78,11 +83,15 @@ It also corrupted a measurement: the state doc counted 30 published posts. There
 `logs/execution_roi.json`, `logs/article_evals.json` and `output/quarantine/` (eight
 `*-specific-test-title.md`) are also rewritten at test time.
 
-- [ ] No test writes outside `tmp_path`. Point the deploy tests at a fixture clone they create
-- [ ] Delete the stray `_posts/` fixture and return the clone to its default branch
-- [ ] A guard that fails the suite if `temp_blog_repo` is dirty or off its default branch after
-      a run — mutation-checked per B-043
-- [ ] Consider making the whole of `logs/` and `output/` test-writable only under `tmp_path`
+- [x] No test writes outside `tmp_path`. The deploy tests already ran in `tmp_path`; the 13 live
+      culprits were in `test_pipeline`, `test_flow_agent_sdk`, `test_malformed_article_guard` and
+      `test_stage3_style_memory_wiring` (cwd-relative `logs/` and `output/` writes). Each class now
+      has an autouse `_cwd` fixture
+- [x] Stray fixture deleted, test branch (no commits of its own) deleted, clone back on `main`
+- [x] `tests/conftest.py::_no_real_state_mutation` — autouse, per test, mtime snapshot of the
+      clone's `_posts/`, `_review/`, `assets/`, `.git/HEAD`, plus `logs/`, `output/posts`,
+      `output/quarantine`. Proven: it named all 13 culprits on its first run
+- [x] Covered by the guard above — any future write there fails the test that made it
 
 **Scope:** S. **Severity: HIGH** — the failure mode is publishing junk to a live blog.
 

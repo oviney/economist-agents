@@ -247,6 +247,11 @@ class TestQualityGate:
 
 
 class TestPublishArticle:
+    @pytest.fixture(autouse=True)
+    def _cwd(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """BUG-082: the code under test writes cwd-relative paths; keep them in tmp_path."""
+        monkeypatch.chdir(tmp_path)
+
     def test_publishes_and_indexes(self, monkeypatch: pytest.MonkeyPatch) -> None:
         # Isolate from any developer .env / ambient creds: this test asserts the
         # no-credentials path, so BLOG_REPO_* / token must be absent regardless
@@ -355,6 +360,11 @@ class TestPublishArticle:
 
 
 class TestRequestRevision:
+    @pytest.fixture(autouse=True)
+    def _cwd(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """BUG-082: the code under test writes cwd-relative paths; keep them in tmp_path."""
+        monkeypatch.chdir(tmp_path)
+
     @patch("src.economist_agents.flow.run_pipeline", new_callable=AsyncMock)
     def test_succeeds_on_retry(self, mock_run_pipeline: AsyncMock) -> None:
         mock_run_pipeline.return_value = _passing_pipeline_result()
@@ -771,6 +781,11 @@ class TestQualityGateImageMetadataGates:
 
 class TestKickoffResultFile:
     """kickoff() must write output/pipeline_result.json with real metrics."""
+
+    @pytest.fixture(autouse=True)
+    def _cwd(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """BUG-082: the code under test writes cwd-relative paths; keep them in tmp_path."""
+        monkeypatch.chdir(tmp_path)
 
     def _run_kickoff(
         self,

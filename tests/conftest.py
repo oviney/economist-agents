@@ -145,3 +145,58 @@ def sample_research_data() -> dict:
             "data": [{"year": 2023, "value": 60}, {"year": 2024, "value": 80}],
         },
     }
+
+
+# ---------------------------------------------------------------------------
+# BUG-082: no test may mutate the real repo's runtime state.
+# ---------------------------------------------------------------------------
+
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+
+#: Real, gitignored runtime state that a test must never touch. The first entry
+#: is the live clone of ``oviney/blog``: a fixture written there once sat in
+#: ``_posts/`` on a test-created branch, one commit away from the live site.
+_GUARDED_PATHS = (
+    "temp_blog_repo/_posts",
+    "temp_blog_repo/_review",
+    "temp_blog_repo/assets",
+    "temp_blog_repo/.git/HEAD",
+    "logs",
+    "output/posts",
+    "output/quarantine",
+)
+
+
+def _state_snapshot() -> dict[str, int]:
+    """Map every guarded file (one level deep) to its mtime, for paths that exist."""
+    snap: dict[str, int] = {}
+    for rel in _GUARDED_PATHS:
+        p = _REPO_ROOT / rel
+        if p.is_file():
+            snap[rel] = p.stat().st_mtime_ns
+        elif p.is_dir():
+            for child in p.iterdir():
+                snap[f"{rel}/{child.name}"] = child.stat().st_mtime_ns
+    return snap
+
+
+@pytest.fixture(autouse=True)
+def _no_real_state_mutation(request: pytest.FixtureRequest) -> None:
+    """Fail the test that writes into the real clone, ``logs/`` or ``output/`` (BUG-082).
+
+    Every test that needs a filesystem gets one under ``tmp_path``. This guard
+    is the sensor: it compares a cheap mtime snapshot of the real state before
+    and after each test, so the culprit is named rather than discovered months
+    later as an untracked file in the blog's ``_posts/``.
+    """
+    before = _state_snapshot()
+    yield
+    after = _state_snapshot()
+    if before != after:
+        changed = sorted(
+            k for k in before.keys() | after.keys() if before.get(k) != after.get(k)
+        )
+        pytest.fail(
+            "BUG-082: this test mutated real repo state outside tmp_path: "
+            + ", ".join(changed)
+        )

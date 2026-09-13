@@ -10,6 +10,7 @@ Verifies that:
 from __future__ import annotations
 
 import asyncio
+from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -19,6 +20,11 @@ import pytest
 
 class TestMalformedArticleError:
     """MalformedArticleError must exist and be a ValueError subclass."""
+
+    @pytest.fixture(autouse=True)
+    def _cwd(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """BUG-082: the code under test writes cwd-relative paths; keep them in tmp_path."""
+        monkeypatch.chdir(tmp_path)
 
     def test_error_class_exists(self) -> None:
         from src.agent_sdk.stage3_runner import MalformedArticleError

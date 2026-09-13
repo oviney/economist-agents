@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import asyncio
 import re
+from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -93,6 +94,11 @@ def stub_pipeline(captured_prompts):
 
 class TestStyleMemoryWiring:
     """``run_stage3`` injects style-memory exemplars when available."""
+
+    @pytest.fixture(autouse=True)
+    def _cwd(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """BUG-082: the code under test writes cwd-relative paths; keep them in tmp_path."""
+        monkeypatch.chdir(tmp_path)
 
     def test_style_section_present_when_chromadb_returns_results(
         self, stub_pipeline, captured_prompts

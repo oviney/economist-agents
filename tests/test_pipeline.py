@@ -47,6 +47,11 @@ def _fake_stage4(article: str):
 
 
 class TestRunPipeline:
+    @pytest.fixture(autouse=True)
+    def _cwd(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """BUG-082: the code under test writes cwd-relative paths; keep them in tmp_path."""
+        monkeypatch.chdir(tmp_path)
+
     def test_returns_pipeline_result_with_correct_field_types(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:

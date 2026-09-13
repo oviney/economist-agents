@@ -169,15 +169,6 @@ sensors:
       Write a SKILL.md whose frontmatter name disagrees with its directory and
       assert a non-zero exit; a well-formed skill is the control.
 
-  - id: agent_yaml_validation
-    script: scripts/agent_loader.py
-    regulates: >-
-      Agent YAML configs drifting from agents/schema.json (ADR-0001), which would
-      surface as a runtime failure mid-pipeline rather than at commit time.
-    proof: tests/test_agent_loader.py::test_schema_validation_rejects_invalid
-    mutation: >-
-      Load an agent YAML missing a schema-required field and assert it is
-      rejected; the valid config is the control.
 
   # ── the agent's own loop (.claude/settings.json, B-030) ───────────────────
 

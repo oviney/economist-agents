@@ -346,8 +346,6 @@ Agent prompt constants (e.g., `RESEARCH_AGENT_PROMPT`, `WRITER_AGENT_PROMPT`) ar
 | Hero brief | `src/agent_sdk/image_prompt_synth.py` | `compose_prompt` writes the brief the owner draws from. It does **not** draw — see constraint #4 |
 | Chart spec | `src/agent_sdk/_shared.py` | `propose_chart_spec` extracts candidate figures from the research brief by regex, with provenance, leaving title and metric labels empty. No prompt, no LLM |
 | Quality gates | `src/agent_sdk/stage4_runner.py`, `scripts/publication_validator.py` | Deterministic post-processing and validation — there is no LLM editor agent |
-| Topic Scout | `scripts/topic_scout.py` | `SCOUT_AGENT_PROMPT`, `TREND_RESEARCH_PROMPT` |
-| Editorial Board | `scripts/editorial_board.py` | Per-persona prompt strings |
 
 > There is no `Graphics Agent`. Stage 3 draws nothing — the graphics call and
 > the hero author were deleted, not disabled (B-042, constraint #4).
@@ -380,115 +378,6 @@ The `WRITER_AGENT_PROMPT` enforces strict Economist voice rules. When contributi
 See [`docs/ARCHITECTURE_PATTERNS.md`](docs/ARCHITECTURE_PATTERNS.md) for the full list of architectural patterns enforced across agents.
 
 ---
-
-## 📚 Contributing to the Public Skills Library
-
-The `agents/skills_configs/` directory is an open, community-maintained library of generic
-agent definitions.  Contributing a new agent or improving an existing one is one of
-the most impactful ways to help the wider agentic-AI community.
-
-### What belongs in `agents/skills_configs/`
-
-A public skills library agent should be:
-
-- **Generic** — usable outside this repository without modification.
-- **Documented** — includes `metadata.use_cases` and `metadata.customisation_notes`.
-- **Self-contained** — the `system_message` encodes all necessary instructions.
-- **Prompt-only** — no hard-coded references to internal URLs, API keys, or secrets.
-
-### Step-by-step: adding a new public agent
-
-1. **Create your YAML file** in `agents/skills_configs/<agent-name>.yaml`.
-   Follow the schema defined in `agents/schema.json`.
-
-2. **Include all required fields** (example for a "Fact Checker" agent):
-   ```yaml
-   name: "Fact Checker"
-   role: "Fact Checker"
-   goal: "Verify factual claims in draft content against authoritative sources"
-   backstory: |
-     A Fact Checker who verifies every claim in a draft before publication.
-     Traces statistics to primary sources, flags unverifiable assertions,
-     and corrects errors without changing the author's voice.
-   system_message: |
-     You are a Fact Checker. For each claim in the draft, locate the primary
-     source, confirm the figure is accurate, and flag anything unverifiable.
-     Output a JSON report with fields: claim, verdict, source, notes.
-   tools:
-     - web_search
-     - file_search
-   metadata:
-     version: "1.0"
-     created: "YYYY-MM-DD"
-     author: "your-github-username"
-     category: "content_generation"   # discovery | editorial_board | content_generation
-     visibility: "public"
-     use_cases:
-       - "Pre-publication fact verification for articles"
-       - "Compliance checking against regulatory statements"
-     customisation_notes: |
-       To adapt for a specific domain, add domain-specific authoritative sources
-       to the system_message and adjust the output schema to match your workflow.
-   ```
-
-3. **Validate** your YAML against the schema:
-   ```bash
-   python3 -c "
-   import yaml, json, jsonschema
-   schema = json.load(open('agents/schema.json'))
-   agent  = yaml.safe_load(open('agents/skills_configs/fact-checker.yaml'))
-   jsonschema.validate(agent, schema)
-   print('Valid')
-   "
-   ```
-
-4. **Update `skills/README.md`** — add a row to the *Available Agents* table.
-
-5. **Open a Pull Request** using the label `skills-library`.
-   Use the PR template below.
-
-### Skills Library PR template
-
-```markdown
-## Summary
-Adding [Agent Name] to agents/skills_configs/.
-
-## Agent Overview
-- **Role**: Short description
-- **Use cases**: Bullet list of 2–4 use cases
-- **Customisation tips**: How to adapt it
-
-## Checklist
-- [ ] YAML validates against agents/schema.json
-- [ ] metadata.visibility = "public"
-- [ ] metadata.customisation_notes is present
-- [ ] skills/README.md updated (Available Agents table)
-- [ ] No secrets, API keys, or internal URLs in system_message
-- [ ] Tested manually with at least one LLM
-```
-
-### Improving an existing public agent
-
-- Increment `metadata.version` (patch, minor, or major — see `skills/README.md`).
-- Describe the change in your PR body.
-- If the output format changes (major bump), note any migration steps.
-
-### Adding or modifying a SKILL.md
-
-Every `skills/*/SKILL.md` must follow the canonical anatomy in
-[`docs/skill-anatomy.md`](docs/skill-anatomy.md): two-field frontmatter
-(`name` matches directory, `description` ends with terminal punctuation)
-and the six required `##` body sections (Overview, When to Use, Core
-Process, Common Rationalizations, Red Flags, Verification).
-
-Run the validator locally before committing:
-
-```bash
-python scripts/validate_skills.py
-```
-
-The same script runs in pre-commit (`validate-skills` hook) and in the
-Quality Gates CI workflow, so a non-compliant skill blocks the merge.
 
 ---
 
@@ -680,7 +569,6 @@ pre-commit install          # Enable hooks
 # Skills / Architecture
 python3 scripts/archived/architecture_review.py --full-review --export-docs
 python3 scripts/archived/blog_qa_agent.py --blog-dir /path/to/blog --show-skills
-python3 scripts/sync_copilot_context.py  # Sync patterns to Copilot
 ```
 
 ## 🔄 Skills Learning System

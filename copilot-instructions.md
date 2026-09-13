@@ -15,26 +15,20 @@ and chart generation.
 
 ## Architecture & data flow
 
-Orchestrated by `src/economist_agents/flow.py` over `src.agent_sdk.pipeline.run_pipeline`:
+One path: `python -m src.agent_sdk.pipeline "<topic>" --research-mode claude_web`
+(B-048 deleted the Stage 1/2 topic scout and editorial board):
 
-1. **Discovery** — `scripts/topic_scout.py` surfaces candidate topics.
-2. **Editorial board** — `scripts/editorial_board.py` runs a weighted vote across seven
-   personas to select topics.
-3. **Stage 3 — content generation** (`src/agent_sdk/stage3_runner.py`): research → write →
-   charts → edit. Research is deterministic (arXiv + Google Scholar via Serper); writing
-   and editing run on Claude via the Anthropic Agent SDK.
-4. **Stage 4 — editorial review** (`src/agent_sdk/stage4_runner.py`): deterministic quality
-   gates, then `scripts/publication_validator.py`.
-5. **Output** — articles are written to `output/` (via `OUTPUT_DIR`). Nothing auto-publishes;
-   deploy with `scripts/deploy_to_blog.py`.
-
-> The earlier CrewAI runtime is gone; the pipeline runs through `src/agent_sdk/`.
+1. **Research** — `claude_web`, Claude's own WebSearch on the subscription; no search API.
+2. **Write** (`src/agent_sdk/stage3_runner.py`) — one Claude call via the Agent SDK from the
+   brief; a stat audit strips unsourced numbers. The pipeline draws no images (constraint #4).
+3. **Review gates** (`src/agent_sdk/stage4_runner.py`) — deterministic post-processing, then
+   `scripts/publication_validator.py`.
+4. **Publish** — the owner adds art (`make art`), deploys with `deploy_to_blog --mode review`,
+   reads the live page, then `make publish SLUG=<slug>`. Nothing auto-publishes.
 
 ## Key files
 
 - `src/agent_sdk/stage3_runner.py`, `stage4_runner.py`, `pipeline.py`, `_shared.py`
-- `src/economist_agents/flow.py` — orchestration (`run_flow`)
-- `scripts/editorial_board.py` — voting swarm (`BOARD_MEMBERS`)
 - `src/agent_sdk/chart_renderer.py` — renders an owner-approved chart spec (`make art`)
 - `scripts/publication_validator.py` — final publication gate
 

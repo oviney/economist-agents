@@ -183,7 +183,8 @@ When dispatching agents via the `Agent` tool (orchestrating the fleet), the brie
 - **Research**: two paths. `claude_web` (ADR-0013) is the **default in practice** and the reliable one — Claude's own WebSearch/WebFetch on the subscription, which deliberately puts an LLM in the research path. `deterministic` (arXiv + Semantic Scholar, no LLM) is rate-limited from most environments and frequently aborts (BUG-050). Neither uses a pay-per-use API.
 - **Writing**: Claude via Anthropic Agent SDK (`src/agent_sdk/stage3_runner.py`).
 - **Quality gates**: Deterministic post-processing in `src/agent_sdk/stage4_runner.py`, then `scripts/publication_validator.py`.
-- **Orchestration**: `src/economist_agents/flow.py` — sequential pipeline over `src.agent_sdk.pipeline.run_pipeline`.
+- **Orchestration**: none. `python -m src.agent_sdk.pipeline` is the whole run; the Stage 1/2
+  topic scout and editorial board were deleted by B-048 (the owner is the editorial board).
 
 ## Directory Structure
 
@@ -193,7 +194,6 @@ data/skills_state/        # Runtime state JSON (sprint tracker, metrics, defect 
 skills/*/SKILL.md         # Domain skill definitions (18 — see Key Skills below).
                           # Lifecycle skills live in the agent-skills plugin, not here.
 src/agent_sdk/            # Anthropic Agent SDK runners (stage3, stage4, pipeline, _shared)
-src/economist_agents/     # Flow orchestration, adapters
 scripts/                  # Standalone scripts (publication_validator, citation_verifier, etc.)
 ```
 

@@ -24,26 +24,23 @@ path is deterministic (no LLM); the quality gates are plain Python.
 
 ## How it works
 
-The pipeline runs in stages, orchestrated by `src/economist_agents/flow.py` over
-`src.agent_sdk.pipeline.run_pipeline`:
+One command, one path (ADR-0016; B-048 deleted the Stage 1/2 topic scout and editorial
+board — the owner chooses what to write):
 
-1. **Discovery** — `scripts/topic_scout.py` surfaces candidate topics.
-2. **Editorial board** — `scripts/editorial_board.py` runs a weighted vote across
-   seven personas (VP Engineering, Senior QE Lead, Data Skeptic, Career Climber,
-   Economist Editor, Busy Reader, Performance Analyst) to pick what is worth writing.
-3. **Stage 3 — content generation** (`src/agent_sdk/stage3_runner.py`): research →
-   write → charts → edit.
-   - **Research** is deterministic academic search over free, keyless providers
-     (arXiv + Semantic Scholar). There is **no LLM in the research path**, so
-     sources are reproducible, and **no paid search API** (Serper/Google, Brave,
-     Tavily were removed by #438).
-   - **Writer → Graphics → Editor** all run on Claude via the Anthropic Agent SDK.
-   - A **stat audit** strips any sentence whose statistics are not present in the
-     research brief.
-4. **Stage 4 — editorial review** (`src/agent_sdk/stage4_runner.py`): deterministic
-   post-processing quality gates (see below), then `scripts/publication_validator.py`.
-5. **Publish or revise** — articles are written to `output/` (configurable via
-   `OUTPUT_DIR`). Nothing auto-publishes. A human deploys to an unlisted review URL with
+```bash
+python -m src.agent_sdk.pipeline "<topic>" --research-mode claude_web
+```
+
+1. **Research** — `claude_web` (ADR-0013): Claude's own WebSearch/WebFetch on the
+   subscription, no search API key. A `deterministic` arXiv + Semantic Scholar mode exists
+   but is rate-limited from most environments (BUG-050).
+2. **Write** (`src/agent_sdk/stage3_runner.py`) — one Claude call via the Agent SDK, from
+   the research brief only. A **stat audit** strips any sentence whose statistics are not in
+   the brief. The pipeline draws nothing (constraint #4): it extracts candidate chart
+   figures with provenance and writes the hero *brief* the owner draws from.
+3. **Review gates** (`src/agent_sdk/stage4_runner.py`) — deterministic post-processing, then
+   `scripts/publication_validator.py`. A review packet lands beside the article.
+4. **Publish** — the owner adds art (`make art`), deploys to an unlisted review URL with
    `deploy_to_blog --mode review`, reads the live page, then runs `make publish SLUG=<slug>`.
    `--mode` is required — there is no default, because the old default skipped review
    (B-028).
@@ -187,10 +184,9 @@ for why the GitHub-issues MCP was retired.
 
 ## Agents & skills
 
-- **Content-pipeline agents** — YAML configs under `agents/` (topic scout, the
-  seven-persona editorial board, and the researcher / writer / editor / graphics
-  quartet). Reusable public templates live in `agents/skills_configs/`. See
-  [`agents/README.md`](agents/README.md).
+- **Agents** — there is one: the Stage 3 writer, prompted in
+  `src/agent_sdk/stage3_runner.py`. The YAML agent library and the topic-scout /
+  editorial-board personas were deleted by B-048 slice 2.
 - **Skills** — 39 `SKILL.md` workflow definitions under `skills/`. The six
   lifecycle skills (`spec-driven-development`, `planning-and-task-breakdown`,
   `incremental-implementation`, `test-driven-development`, `code-review-and-quality`,
@@ -222,7 +218,6 @@ economist-agents/
 ├── scripts/                  # Standalone tools (validators, search, ETL, orchestration)
 ├── skills/*/SKILL.md         # 39 skill workflow definitions
 ├── src/agent_sdk/            # Anthropic Agent SDK runners (stage3, stage4, pipeline, _shared)
-├── src/economist_agents/     # Flow orchestration and adapters
 ├── src/quality/              # Quality gates, governance, validators, metrics
 ├── src/telemetry/, src/tools/, src/utils/
 ├── tests/                    # pytest suite (2,400+ tests)

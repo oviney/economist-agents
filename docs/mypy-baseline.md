@@ -58,13 +58,9 @@ Measured 2026-07-31 with:
   --no-error-summary scripts/*.py
 ```
 
-- `scripts/editorial_board.py` — 6
 - `scripts/publication_validator.py` — 5
 - `scripts/arxiv_search.py` — 2
 - `scripts/destructive_change_guard.py` — 2
-- `scripts/agent_loader.py` — 1
-- `scripts/featured_image_agent.py` — 1
-- `scripts/gsc_etl.py` — 1
 - `scripts/semantic_scholar_search.py` — 1
 
 **11 files, 30 errors.** The audit measured 12 files; `sync_copilot_context.py` was the

@@ -1,7 +1,7 @@
 """Prove-it tests for #323: malformed writer output guard.
 
 Verifies that:
-1. run_stage3 raises MalformedArticleError when the LLM returns prose
+run_stage3 raises MalformedArticleError when the LLM returns prose
    instead of a well-formed article (unit level).
 2. EconomistContentFlow.generate_content catches MalformedArticleError and
    returns a dict that quality_gate routes to revision (integration level).
@@ -95,64 +95,3 @@ class TestMalformedArticleError:
         ):
             result = asyncio.run(run_stage3("AI Testing"))
             assert result.article.startswith("---")
-
-
-# ── Integration: generate_content routes to revision ─────────────────────────
-
-
-class TestGenerateContentMalformedRouting:
-    """generate_content must not crash on MalformedArticleError."""
-
-    def test_generate_content_returns_revision_dict_on_malformed_output(self) -> None:
-        """When run_pipeline raises MalformedArticleError, generate_content
-        returns a dict with editorial_score=0 and publication_validator_passed=False
-        so quality_gate routes to revision."""
-        from src.agent_sdk.stage3_runner import MalformedArticleError
-        from src.economist_agents.flow import EconomistContentFlow
-
-        flow = EconomistContentFlow()
-
-        with patch(
-            "src.economist_agents.flow.asyncio.run",
-            side_effect=MalformedArticleError("Writer returned prose"),
-        ):
-            result = flow.generate_content({"topic": "AI Testing"})
-
-        assert result["publication_validator_passed"] is False
-        assert result["editorial_score"] == 0
-
-    def test_quality_gate_routes_to_revision_after_malformed(self) -> None:
-        """The dict returned on MalformedArticleError must cause quality_gate
-        to return 'revision'."""
-        from src.agent_sdk.stage3_runner import MalformedArticleError
-        from src.economist_agents.flow import EconomistContentFlow
-
-        flow = EconomistContentFlow()
-
-        with patch(
-            "src.economist_agents.flow.asyncio.run",
-            side_effect=MalformedArticleError("Writer returned prose"),
-        ):
-            draft = flow.generate_content({"topic": "AI Testing"})
-
-        decision = flow.quality_gate(draft)
-        assert decision == "revision"
-
-    def test_request_revision_returns_needs_revision_on_malformed_output(self) -> None:
-        """MalformedArticleError in the retry path must also be handled gracefully."""
-        from src.agent_sdk.stage3_runner import MalformedArticleError
-        from src.economist_agents.flow import EconomistContentFlow
-
-        flow = EconomistContentFlow()
-        flow.state["selected_topic"] = {"topic": "AI Testing"}
-        flow.state["revision_feedback"] = ["fix the frontmatter"]
-        flow.state["article_draft"] = {"featured_image": ""}
-
-        with patch(
-            "src.economist_agents.flow.asyncio.run",
-            side_effect=MalformedArticleError("Prose output on retry"),
-        ):
-            result = flow.request_revision()
-
-        assert result["status"] == "needs_revision"
-        assert result["editorial_score"] == 0

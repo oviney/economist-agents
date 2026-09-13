@@ -105,14 +105,6 @@ repos:
         files: ^skills/.+/SKILL\.md$
         always_run: false
 
-      # Agent YAML validation (ADR-0001)
-      - id: validate-agent-yaml
-        name: validate agent YAML configs
-        description: Validate agent YAML files against agents/schema.json
-        entry: .venv/bin/python scripts/agent_loader.py --validate
-        language: system
-        pass_filenames: false
-        files: ^agents/.*\.yaml$
 
       # B-031: a second `validate-skills` registration lived here — same hook id as
       # the one above, and with `always_run: false` duplicated as a YAML key so the

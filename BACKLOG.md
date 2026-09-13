@@ -65,10 +65,21 @@ review's item-9 fork.
   Production Python 39,800 → 20,881; tests 48,554 → 29,204; suite 154 s → 82 s.
   Gate: 1675 passed / 5 skipped / 87.88% (from 2791 / 9 / 83.71%).
 
-**Next:** slice 2 — delete Stage 1/2 and feeders (16 production files, `agents/` YAML, 20 test
-files; pre-commit hook, sensor register and guard list edited; README/Copilot/CLAUDE.md
-architecture prose rewritten to the one path). Note for slice 3: `scripts/sync_copilot_context.py`
-regenerates the archived Copilot file and goes with it.
+- Slice 2 — DONE 2026-09-13 (D3). Stage 1/2 and feeders: `flow.py`, editorial board, topic
+  scout + trend grounding, `llm_client`, `agent_loader` + the `agents/` YAML library, GA4/GSC
+  ETL, content intelligence, the ChromaDB topic deduplicator and its backfill, the Copilot
+  sync script, the featured-image agent, the OpenAI token logger; 21 test files. The
+  architecture-compliance test lost its allow-list: with `llm_client` gone the rule is
+  absolute (no `anthropic`/`openai` import anywhere in production code). Pre-commit hook,
+  sensor register and guard list edited; README / Copilot / CLAUDE.md architecture prose
+  rewritten to the one path. Gate: 1278 passed / 1 skipped / 88.53% in 76 s.
+
+**Next:** slice 3 — archive every doc but the living three (+ README, ADRs, `docs/research/`
+as the brief input dir, and the four sensor-read docs until slice 4); rewrite `CLAUDE.md`
+(≤120 lines) and `BACKLOG.md` (open items only; the full file is archived verbatim); keep
+`skills/{economist-writing,python-quality,using-agent-skills,adr-governance}` and archive the
+other fourteen; delete the mkdocs deploy workflow and the audit workflow that calls a deleted
+script; trim `mkdocs.yml` to the ADR nav the ADR linter needs until slice 4.
 
 ### BUG-082 · The test suite mutates the real blog clone — a fixture is sitting in `_posts/` — **DONE 2026-09-13 (B-048 slice 0)**
 

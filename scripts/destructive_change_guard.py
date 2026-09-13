@@ -22,11 +22,9 @@ logger = logging.getLogger(__name__)
 
 # Files that must never be gutted — core pipeline infrastructure
 CRITICAL_FILES = [
-    "src/economist_agents/flow.py",
     "src/agent_sdk/stage3_runner.py",
     "src/agent_sdk/stage4_runner.py",
     "scripts/publication_validator.py",
-    "scripts/frontmatter_schema.py",
     "scripts/article_evaluator.py",
     # NB: the CI workflow files were removed from this list when GitHub Actions
     # was retired (content-pipeline.yml in B-009, ci.yml in B-011). The guard

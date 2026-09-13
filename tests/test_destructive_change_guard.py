@@ -42,8 +42,9 @@ class TestConfiguration:
     def test_critical_files_list_not_empty(self) -> None:
         assert len(CRITICAL_FILES) > 0
 
-    def test_flow_py_is_critical(self) -> None:
-        assert "src/economist_agents/flow.py" in CRITICAL_FILES
+    def test_deleted_flow_is_not_critical(self) -> None:
+        # B-048 slice 2 deleted Stage 1/2; the guard must not protect a ghost.
+        assert "src/economist_agents/flow.py" not in CRITICAL_FILES
 
     def test_stage3_agent_sdk_runner_is_critical(self) -> None:
         assert "src/agent_sdk/stage3_runner.py" in CRITICAL_FILES

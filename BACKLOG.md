@@ -94,6 +94,14 @@ D7 (hero optional), D8 (archive all but three living docs). Recommendation on al
   the last five into the writer prompt. Gate: 904 passed / 2 skipped / 87.38% in 37 s.
 - Slice 9 — DONE 2026-09-13. ADR-0020 records the decision; README rewritten at 80 lines;
   CLAUDE.md and the spec point at both. Markdown outside `docs/archive/`: 51.
+- Review pass — DONE 2026-09-13. A fresh-context reviewer on slices 5–6 found three real
+  defects, all fixed with regression tests: the brief parser ended a section at a `#` inside
+  a code block or at a `###` subsection (a take silently truncated); a copied template's
+  `<placeholder>` verdict would have been injected as an editorial note; and the "never
+  invent experiences" rule vanished exactly when the brief had no experiences. Also fixed:
+  placeholder-only sections count as empty, operator errors exit 1 not the transient code 2,
+  non-UTF-8 briefs cannot crash Stage 3, the packet protocol declares the brief fields, three
+  vacuous test assertions, and stale prose that still promised a rejection or a scorer.
 
 **Open, in the order to take them:**
 1. **Slice 5 live acceptance — needs the owner.** Write `briefs/<slug>.md` from

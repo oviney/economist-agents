@@ -353,13 +353,16 @@ def main(argv: list[str] | None = None) -> None:
         try:
             owner_brief = load_owner_brief(args.brief)
         except OwnerBriefError as exc:
-            parser.error(str(exc))
+            # Exit 1: an operator error, not the transient-provider code 2.
+            parser.exit(1, f"{parser.prog}: error: {exc}\n")
     if args.topic:
         topic = " ".join(args.topic)
     elif owner_brief is not None:
         topic = owner_brief.title
     else:
-        parser.error("give a --brief (briefs/<slug>.md) or a topic")
+        parser.exit(
+            1, f"{parser.prog}: error: give a --brief (briefs/<slug>.md) or a topic\n"
+        )
 
     # --research-only path (Stage 0 only) — unchanged
     if args.research_only:

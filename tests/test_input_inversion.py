@@ -44,10 +44,16 @@ class TestDefaultResearchMode:
             == "claude_web"
         )
 
-    def test_the_cli_default_matches(self) -> None:
-        source = inspect.getsource(pipeline.main)
-        assert 'default="claude_web"' in source
-        assert "Serper" not in source
+    def test_the_cli_default_matches(self, monkeypatch) -> None:
+        seen: dict = {}
+        monkeypatch.setattr(
+            pipeline, "_run_end_to_end", lambda topic, **kw: seen.update(kw)
+        )
+
+        pipeline.main(["some topic"])
+
+        assert seen["research_mode"] == "claude_web"
+        assert "Serper" not in inspect.getsource(pipeline.main)
 
     def test_claude_md_names_the_same_default(self) -> None:
         text = (REPO_ROOT / "CLAUDE.md").read_text(encoding="utf-8")
@@ -88,8 +94,7 @@ class TestResearchServesTheTake:
     def test_claude_web_prompt_without_focus_is_the_plain_topic_prompt(self) -> None:
         prompt = claude_web._research_prompt("Flaky tests", focus=None)
 
-        assert "Flaky tests" in prompt
-        assert "FOCUS" not in prompt
+        assert prompt == claude_web._research_prompt("Flaky tests", focus="")
 
 
 class TestTheTemplateExists:

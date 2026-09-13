@@ -39,6 +39,11 @@ It will find three open things, in this order:
 
 ## Two things to know
 
+(Plus one: a fresh-context review of slices 5–6 found the brief parser truncating a take at
+a fenced block, a copied template leaking its placeholder verdict into the prompt, and the
+no-invented-experiences rule going missing when the brief had no experiences. All three
+are fixed with regression tests in `tests/test_owner_brief.py`; `BACKLOG.md` has the list.)
+
 - **The default research mode is now `claude_web`** (BUG-083). Any test that drives
   Stage 3 without patching `build_claude_web_brief` now degrades to its patched fallback
   instead of stalling, because `tests/_netguard.py` blocks the research modules' own SDK

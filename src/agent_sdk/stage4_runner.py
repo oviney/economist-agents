@@ -4,11 +4,11 @@ Replaces ``src/crews/stage4_crew.py`` for the Phase 2 migration
 (ADR-0006, epic #308, story #310). The CrewAI Stage 4 LLM Reviewer is
 deliberately omitted here — it adds no value (50% JSON parse failure
 on Claude per the 2026-04-21 sprint memo) and the deterministic
-``ArticleEvaluator`` already produces a usable score with no LLM call.
+B-048 D4: there is no editorial score; the validator is the only ruling.
 
 This module is the cheapest possible Stage 4: apply the same
 deterministic editorial fixes the existing pipeline uses, then score
-the result with ``ArticleEvaluator``.
+the result with the publication validator.
 """
 
 from __future__ import annotations

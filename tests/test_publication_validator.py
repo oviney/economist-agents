@@ -222,7 +222,10 @@ class TestPublicationValidatorWordCount:
 
     def test_short_article_is_flagged_not_blocked(self) -> None:
         """B-048 D4: length is a style opinion for the owner, not a reader-harm."""
-        validator = PublicationValidator(expected_date="2026-04-03")
+        # The fixture's hero is not on disk; that check is unrelated to length.
+        validator = PublicationValidator(
+            expected_date="2026-04-03", require_image_file=False
+        )
         short_body = " ".join(["word"] * 200)
         # Use empty references to isolate word count to just body
         article = _make_article(
@@ -233,9 +236,7 @@ class TestPublicationValidatorWordCount:
         wc_issues = [i for i in issues if i["check"] == "word_count"]
         assert len(wc_issues) == 1
         assert wc_issues[0]["severity"] == "HIGH"
-        assert is_valid or any(
-            i["severity"] == "CRITICAL" and i["check"] != "word_count" for i in issues
-        )
+        assert is_valid is True
 
     def test_borderline_words_rejected(self) -> None:
         # Gate is 700 (BUG-029). 650 words must still be rejected.

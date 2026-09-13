@@ -33,7 +33,11 @@ _SECTIONS: tuple[tuple[str, str], ...] = (
     ("verdict", "verdict"),
 )
 
-_HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$", re.MULTILINE)
+_HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$")
+_FENCE_RE = re.compile(r"^\s*(```|~~~)")
+#: A section whose whole body is one or more ``<…>`` placeholders is empty: the
+#: owner copied the template and has not written that part yet.
+_PLACEHOLDER_RE = re.compile(r"^\s*(<[^<>]*>\s*)+$", re.DOTALL)
 
 
 class OwnerBriefError(ValueError):
@@ -55,11 +59,6 @@ class OwnerBrief:
     #: Optional sections the brief did not fill, by template name.
     missing: list[str] = field(default_factory=list)
 
-    @property
-    def slug(self) -> str:
-        """The file stem — the owner chose it, and it becomes the URL."""
-        return self.path.stem
-
     def writer_block(self) -> str:
         """The brief as the writer sees it: the spine of the article."""
         parts = [
@@ -72,9 +71,15 @@ class OwnerBrief:
             parts += [
                 "",
                 "WHAT THE AUTHOR HAS SEEN (use in the first person, keep the "
-                "specifics, never invent additional experiences):",
+                "specifics):",
                 self.seen,
             ]
+        parts += [
+            "",
+            "The only experiences you may use are the ones quoted above. Never "
+            "invent, extend or embellish an experience, a client, a date or a number "
+            "on the author's behalf; if none is quoted, write without one.",
+        ]
         if self.disagree:
             parts += [
                 "",
@@ -108,16 +113,37 @@ class OwnerBrief:
 
 
 def _sections(text: str) -> tuple[str, dict[str, str]]:
-    """Split markdown into (title, {field: body}) by the template's headings."""
-    matches = list(_HEADING_RE.finditer(text))
+    """Split markdown into (title, {field: body}) by the template's headings.
+
+    Fence-aware (a ``#`` inside a code block is not a heading) and level-aware
+    (a ``###`` subsection stays inside the ``##`` section it belongs to). A body
+    that is nothing but ``<…>`` template placeholders counts as empty.
+    """
+    headings: list[tuple[int, int, str]] = []  # (line index, level, text)
+    lines = text.splitlines()
+    in_fence = False
+    for n, line in enumerate(lines):
+        if _FENCE_RE.match(line):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        m = _HEADING_RE.match(line)
+        if m:
+            headings.append((n, len(m.group(1)), m.group(2).strip()))
     title = ""
     found: dict[str, str] = {}
-    for idx, m in enumerate(matches):
-        level, heading = len(m.group(1)), m.group(2).strip()
-        end = matches[idx + 1].start() if idx + 1 < len(matches) else len(text)
-        body = text[m.end() : end].strip()
+    for idx, (start, level, heading) in enumerate(headings):
+        end = len(lines)
+        for later_start, later_level, _ in headings[idx + 1 :]:
+            if later_level <= level:
+                end = later_start
+                break
+        body = "\n".join(lines[start + 1 : end]).strip()
+        if _PLACEHOLDER_RE.match(body):
+            body = ""
         if level == 1 and not title:
-            title = heading
+            title = "" if _PLACEHOLDER_RE.match(heading) else heading
             continue
         lowered = heading.lower()
         for keyword, name in _SECTIONS:
@@ -142,7 +168,10 @@ def recent_verdicts(briefs_dir: str | Path = "briefs", limit: int = 5) -> str:
     for p in d.glob("*.md"):
         if p.name.upper() == "TEMPLATE.MD":
             continue
-        _, found = _sections(p.read_text(encoding="utf-8"))
+        try:
+            _, found = _sections(p.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError):
+            continue
         verdict = found.get("verdict", "").strip()
         if verdict:
             entries.append((p.stat().st_mtime, p.stem, verdict))
@@ -158,7 +187,10 @@ def load_owner_brief(path: str | Path) -> OwnerBrief:
     p = Path(path)
     if not p.is_file():
         raise OwnerBriefError(f"No brief at {p}")
-    title, found = _sections(p.read_text(encoding="utf-8"))
+    try:
+        title, found = _sections(p.read_text(encoding="utf-8"))
+    except UnicodeDecodeError as exc:
+        raise OwnerBriefError(f"{p} is not UTF-8 text: {exc}") from exc
     take = found.get("take", "")
     if not take:
         raise OwnerBriefError(

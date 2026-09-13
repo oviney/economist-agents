@@ -60,11 +60,6 @@ class TestParsing:
         assert brief.verdict == ""
         assert brief.missing == []
 
-    def test_slug_is_the_file_stem(self, tmp_path: Path) -> None:
-        assert (
-            load_owner_brief(_write(tmp_path, FULL)).slug == "coverage-comfort-blanket"
-        )
-
     def test_headings_match_by_keyword_and_case(self, tmp_path: Path) -> None:
         text = "# T\n\n## The Take\n\nX.\n\n## Things I have SEEN\n\nY.\n"
         brief = load_owner_brief(_write(tmp_path, text))
@@ -78,6 +73,50 @@ class TestParsing:
         )
 
         assert brief.title == "flaky tests"
+
+
+class TestParsingIsFenceAndLevelAware:
+    def test_a_hash_inside_a_code_block_does_not_end_the_take(
+        self, tmp_path: Path
+    ) -> None:
+        text = (
+            "# T\n\n## My take\n\nBefore.\n\n```yaml\n# not a heading\nkey: v\n```\n\n"
+            "After.\n\n## What I've seen\n\nY.\n"
+        )
+        brief = load_owner_brief(_write(tmp_path, text))
+
+        assert brief.take.startswith("Before.") and brief.take.endswith("After.")
+        assert "# not a heading" in brief.take
+        assert brief.seen == "Y."
+
+    def test_a_subsection_stays_inside_its_section(self, tmp_path: Path) -> None:
+        text = (
+            "# T\n\n## My take\n\nPart one.\n\n### Background\n\nPart two.\n\n"
+            "## What I've seen\n\nY.\n"
+        )
+        brief = load_owner_brief(_write(tmp_path, text))
+
+        assert "Part one." in brief.take and "Part two." in brief.take
+        assert brief.seen == "Y."
+
+    def test_crlf_line_endings_parse(self, tmp_path: Path) -> None:
+        brief = load_owner_brief(_write(tmp_path, FULL.replace("\n", "\r\n")))
+
+        assert brief.take.startswith("Coverage targets measure visitation")
+        assert "bank in 2019" in brief.seen
+
+    def test_a_verbatim_template_copy_has_no_take(self, tmp_path: Path) -> None:
+        template = Path("briefs/TEMPLATE.md").read_text(encoding="utf-8")
+
+        with pytest.raises(OwnerBriefError, match="My take"):
+            load_owner_brief(_write(tmp_path, template, "my-post.md"))
+
+    def test_placeholder_sections_count_as_missing(self, tmp_path: Path) -> None:
+        text = "# T\n\n## My take\n\nX.\n\n## What I've seen\n\n<Two or three experiences.>\n"
+        brief = load_owner_brief(_write(tmp_path, text))
+
+        assert brief.seen == ""
+        assert "seen" in brief.missing
 
 
 class TestTheOneHardRequirement:
@@ -108,7 +147,7 @@ class TestWhatTheMachinesAreHanded:
         assert "AUTHOR'S BRIEF" in block
         assert "THESIS" in block and "Coverage targets measure visitation" in block
         assert "first person" in block and "bank in 2019" in block
-        assert "never invent additional experiences" in block
+        assert "Never invent" in block
         assert "counterpoint" in block and "mutation kill rate" in block
 
     def test_writer_block_omits_sections_the_owner_left_empty(
@@ -119,7 +158,9 @@ class TestWhatTheMachinesAreHanded:
         ).writer_block()
 
         assert "WHAT THE AUTHOR HAS SEEN" not in block
-        assert "COUNTERPOINT" not in block.upper() or "WHAT WOULD CHANGE" not in block
+        assert "WHAT WOULD CHANGE" not in block
+        # The prohibition is unconditional: it matters most when there is nothing to quote.
+        assert "Never invent" in block
 
     def test_research_focus_asks_for_evidence_both_ways(self, tmp_path: Path) -> None:
         focus = load_owner_brief(_write(tmp_path, FULL)).research_focus()
@@ -167,7 +208,7 @@ class TestVerdictsCloseTheLoop:
         assert len(block.splitlines()) == 5
         assert "post-0" not in block and "post-1" not in block
 
-    def test_author_context_reaches_the_writer_prompt(
+    def test_author_context_is_the_verdict_block(
         self, tmp_path: Path, monkeypatch
     ) -> None:
         from src.agent_sdk import stage3_runner
@@ -177,11 +218,14 @@ class TestVerdictsCloseTheLoop:
             "# T\n\n## My take\n\nX.\n\n## Verdict\n\n4/5 — cut the opening anecdote\n",
             "post.md",
         )
-        monkeypatch.chdir(tmp_path.parent)
         monkeypatch.setattr(
             stage3_runner, "recent_verdicts", lambda: recent_verdicts(tmp_path)
         )
 
-        assert "cut the opening anecdote" in stage3_runner._fetch_author_context(
-            "anything"
-        )
+        assert "cut the opening anecdote" in stage3_runner._fetch_author_context("x")
+
+    def test_a_copied_template_is_not_a_verdict(self, tmp_path: Path) -> None:
+        template = Path("briefs/TEMPLATE.md").read_text(encoding="utf-8")
+        _write(tmp_path, template, "my-post.md")
+
+        assert recent_verdicts(tmp_path) == ""

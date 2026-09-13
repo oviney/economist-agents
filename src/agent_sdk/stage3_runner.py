@@ -81,7 +81,7 @@ def _fetch_author_context(topic: str) -> str:
     del topic
     try:
         return recent_verdicts()
-    except OSError as exc:  # a missing or unreadable briefs/ is not an error
+    except (OSError, UnicodeDecodeError) as exc:  # unreadable briefs/ is not an error
         logger.warning("Could not read briefs/ for verdicts: %s", exc)
         return ""
 
@@ -171,7 +171,8 @@ VOICE (British spelling, confident, plain):
 - British spelling throughout: organisation, analyse, colour, favour
 - Active voice: "Companies are racing" not "it is being observed that"
 - Reads like a senior colleague talking straight, not a textbook and not a newspaper
-- First person is allowed and expected where it carries the author's experience; it is
+- First person only where an AUTHOR'S BRIEF supplies the experience; with no brief, or a
+  brief with no experience in it, there is no "I" and no remembered client, ever. It is
   not a hedge ("I think") and not a hook ("Let me tell you")
 
 FORMATTING:
@@ -313,7 +314,7 @@ def _build_writer_prompt(
         f"across 3-4 body sections of roughly 220-280 words each (matching the "
         f"3-4 heading maximum above) — enough for a thesis, two or three "
         f"evidenced arguments, a counterpoint, and a decisive close. The "
-        f"publication validator rejects anything under {WORD_COUNT_MIN} words, "
+        f"publication validator flags anything under {WORD_COUNT_MIN} words for the author, "
         f"so never come in short; if a section feels thin, deepen it with a "
         f"concrete example or data point from the brief rather than adding "
         f"another heading or filler. End with a `## References` section "

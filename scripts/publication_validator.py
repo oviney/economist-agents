@@ -35,7 +35,9 @@ BLOG_AUTHOR = "Ouray Viney"
 # Word-count contract — single source of truth (B-005). The writer prompt in
 # ``src/agent_sdk/stage3_runner.py`` imports these so the target can never drift
 # below the floor the validator enforces here.
-WORD_COUNT_MIN = 700  # hard floor: a body under this is a CRITICAL rejection
+WORD_COUNT_MIN = (
+    700  # floor: a body under this is flagged HIGH for the author (B-048 D4)
+)
 WORD_COUNT_TARGET = 850  # writer aim — above the floor for a safety margin
 WORD_COUNT_MAX = 1200  # editorial upper guidance (advisory; not enforced here)
 

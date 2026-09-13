@@ -49,6 +49,8 @@ class _PacketSource(Protocol):
     publication_validator_issues: list[dict[str, str]]
     total_cost_usd: float
     article_chars: int
+    owner_brief_path: Path | None
+    owner_brief_missing: list[str]
 
 
 def _format_brief(result: _PacketSource) -> str:

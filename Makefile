@@ -101,7 +101,6 @@ ci-local: require-venv
 		--cov=src --cov=scripts \
 		--cov-report=term-missing \
 		--cov-fail-under=70
-	@echo "── src/quality per-module coverage ──" && $(VENV_BIN)/coverage report --include='src/quality/*' --fail-under=90
 	@echo "── security scan (bandit) ──" && $(VENV_BIN)/bandit -r scripts/ \
 		--exclude '*/.venv/*,*/__pycache__/*,scripts/archived' \
 		--severity-level medium -q

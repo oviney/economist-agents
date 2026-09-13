@@ -246,7 +246,8 @@ class TestMain:
         assert mypy_baseline.main(["--all"]) == 0
         assert len(seen) == 1
         assert "scripts/mypy_baseline.py" in seen[0]
-        assert len(seen[0]) > 40
+        # Every script, not a magic number: B-048 deletes scripts by the dozen.
+        assert len(seen[0]) == len(list(Path("scripts").glob("*.py")))
 
 
 class TestHookIsWired:

@@ -26,8 +26,6 @@ CRITICAL_FILES = [
     "src/agent_sdk/stage3_runner.py",
     "src/agent_sdk/stage4_runner.py",
     "scripts/publication_validator.py",
-    "scripts/editorial_judge.py",
-    "src/quality/agent_reviewer.py",
     "scripts/frontmatter_schema.py",
     "scripts/article_evaluator.py",
     # NB: the CI workflow files were removed from this list when GitHub Actions

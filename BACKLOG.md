@@ -56,8 +56,19 @@ review's item-9 fork.
 - Slice 0 — DONE 2026-09-13. Tag `pre-redesign-2026-09` at 3798fdd. BUG-082 closed (guard + 13
   culprits fixed). Baseline before: 2791 passed / 9 skipped / 83.74%.
 
-**Next:** slice 1 — delete cut items 1–7 (43 production files, 44 test files; two pipeline
-call sites edited; five instruction-doc references fixed).
+- Slice 1 — DONE 2026-09-13. Cut items 1–7 of the 09-10 review: 105 files, −38,700 lines
+  (43 production modules incl. `agents/*.py`, `src/quality`, `src/telemetry`, `src/utils`; 47
+  test files incl. the CrewAI-skipped integration test). `hero_svg`'s one live constant moved
+  into `pipeline.py`; the ROI tracker call left with its module. Makefile 90% line, guard
+  list, `.coveragerc` (BUG-084 closed), mypy baseline and five instruction docs edited; the
+  836-line CrewAI-era `.github/copilot-instructions.md` archived rather than patched.
+  Production Python 39,800 → 20,881; tests 48,554 → 29,204; suite 154 s → 82 s.
+  Gate: 1675 passed / 5 skipped / 87.88% (from 2791 / 9 / 83.71%).
+
+**Next:** slice 2 — delete Stage 1/2 and feeders (16 production files, `agents/` YAML, 20 test
+files; pre-commit hook, sensor register and guard list edited; README/Copilot/CLAUDE.md
+architecture prose rewritten to the one path). Note for slice 3: `scripts/sync_copilot_context.py`
+regenerates the archived Copilot file and goes with it.
 
 ### BUG-082 · The test suite mutates the real blog clone — a fixture is sitting in `_posts/` — **DONE 2026-09-13 (B-048 slice 0)**
 
@@ -118,7 +129,7 @@ exists in the tree.
 
 **Scope:** XS.
 
-### BUG-084 · `.coveragerc` excludes the one gate that decides publication
+### BUG-084 · `.coveragerc` excludes the one gate that decides publication — **DONE 2026-09-13 (B-048 slice 1)**
 
 **Opened 2026-09-10**, found by the Fable 5.1 complexity review.
 
@@ -130,9 +141,9 @@ the repo — and it is excluded from the measurement, while `make ci-local` enfo
 Measured: **35 of 47 omit entries name files that no longer exist.** The file is mostly a
 record of a directory layout from an earlier architecture.
 
-- [ ] Remove the `publication_validator.py` omit and record its real coverage
-- [ ] Delete the 35 stale entries
-- [ ] Re-point the 90% per-module gate at something on the publish path, or drop it
+- [x] Omit removed. Measured: **89%** (509 statements, 56 missed)
+- [x] 43 entries dropped — every omit that matched no file after slice 1, plus the validator's
+- [x] Dropped: `src/quality` was deleted with the second system, so the gate had no target
 
 **Scope:** XS to fix the omit; the coverage number it reveals may not be.
 

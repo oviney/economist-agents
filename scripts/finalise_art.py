@@ -31,8 +31,7 @@ from pathlib import Path
 
 from src.agent_sdk._shared import _auto_embed_chart
 from src.agent_sdk.chart_renderer import ChartRenderError, render_chart
-from src.agent_sdk.hero_svg import HERO_IMAGES_DIR
-from src.agent_sdk.pipeline import _link_hero_asset
+from src.agent_sdk.pipeline import HERO_IMAGES_DIR, _link_hero_asset
 
 logger = logging.getLogger(__name__)
 

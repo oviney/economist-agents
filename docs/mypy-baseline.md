@@ -58,14 +58,11 @@ Measured 2026-07-31 with:
   --no-error-summary scripts/*.py
 ```
 
-- `scripts/economist_agent.py` — 8
 - `scripts/editorial_board.py` — 6
 - `scripts/publication_validator.py` — 5
 - `scripts/arxiv_search.py` — 2
 - `scripts/destructive_change_guard.py` — 2
-- `scripts/github_issue_claim.py` — 2
 - `scripts/agent_loader.py` — 1
-- `scripts/blog_quality_audit.py` — 1
 - `scripts/featured_image_agent.py` — 1
 - `scripts/gsc_etl.py` — 1
 - `scripts/semantic_scholar_search.py` — 1

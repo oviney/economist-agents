@@ -162,7 +162,3 @@ token needs only `Contents` + `Pull requests` write on `oviney/blog` — no AI k
   discovery and editorial-review stages run on the subscription too. This single
   command remains the simplest route, not the only one.
 
-## Deprecated path
-
-`scripts/economist_agent.py` still requires a paid key and will exit with a
-pointer here if run keyless. Use `python -m src.agent_sdk.pipeline` instead.

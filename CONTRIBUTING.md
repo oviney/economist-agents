@@ -356,7 +356,7 @@ Agent prompt constants (e.g., `RESEARCH_AGENT_PROMPT`, `WRITER_AGENT_PROMPT`) ar
 
 ```bash
 # 1. Identify the prompt constant that controls the behaviour
-grep -n "PROMPT\|system_message" scripts/economist_agent.py
+grep -n "PROMPT" src/agent_sdk/stage3_runner.py
 
 # 2. Edit the prompt in the source file
 # e.g., add a new constraint to WRITER_AGENT_PROMPT

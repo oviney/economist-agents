@@ -25,7 +25,6 @@ from src.agent_sdk._shared import (
     canonical_slug,
     describe_slug,
 )
-from src.agent_sdk.hero_svg import HERO_IMAGES_DIR
 from src.agent_sdk.review_packet import notify, write_packet
 from src.agent_sdk.stage3_runner import (
     DEFAULT_WRITER_BUDGET_USD,
@@ -33,7 +32,6 @@ from src.agent_sdk.stage3_runner import (
     run_stage3,
 )
 from src.agent_sdk.stage4_runner import run_stage4
-from src.telemetry.roi_tracker import ROITracker, get_tracker
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +58,8 @@ STATE_DIR = Path("output/state")
 
 
 # Logical agent name used when recording pipeline runs in the ROI tracker.
-ROI_PIPELINE_AGENT = "pipeline"
+#: Where the owner's hand-made hero lives (B-042: the pipeline draws nothing).
+HERO_IMAGES_DIR = Path("output/posts/images")
 
 
 @dataclass
@@ -192,35 +191,7 @@ async def run_pipeline(
         await asyncio.to_thread(_append_cost_log, result, wall_seconds)
     except Exception as exc:
         logger.warning("Cost log write failed (non-fatal): %s", exc)
-    try:
-        await asyncio.to_thread(_record_roi, result)
-    except Exception as exc:
-        logger.warning("ROI telemetry write failed (non-fatal): %s", exc)
     return result
-
-
-def _record_roi(result: PipelineResult) -> None:
-    """Record this pipeline run in the ROI telemetry log.
-
-    Uses the SDK-reported ``total_cost_usd`` rather than the local pricing
-    table so the recorded cost matches the actual API charge.
-
-    B-042 removed the graphics entry: there is no graphics call. A stage that
-    can only ever log $0.00 is the kind of always-zero reading B-041 objected
-    to, so it is gone rather than left recording nothing.
-    """
-    tracker: ROITracker = get_tracker()
-    execution_id = tracker.start_execution(ROI_PIPELINE_AGENT)
-    tracker.log_llm_call(
-        execution_id=execution_id,
-        agent=ROI_PIPELINE_AGENT,
-        model=result.writer_model,
-        input_tokens=0,
-        output_tokens=0,
-        cost_usd=result.writer_cost_usd,
-        metadata={"stage": "writer", "topic": result.topic},
-    )
-    tracker.end_execution(execution_id)
 
 
 _FRONTMATTER_IMAGE_LINE = re.compile(r"^image(?:_alt|_caption)?:[^\n]*\n", re.MULTILINE)

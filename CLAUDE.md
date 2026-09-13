@@ -102,7 +102,7 @@ Task arrives
   ├── Have a spec, need tasks? → agent-skills:planning-and-task-breakdown (dependency graph → human review)
   ├── Implementing?            → agent-skills:incremental-implementation (thin slices, each tested + committed)
   ├── Deploying?               → agent-skills:shipping-and-launch (pre-launch checklist, staged rollout)
-  └── Bug / defect?            → log in defect_tracker → spec → fix → regression test
+  └── Bug / defect?            → log it in BACKLOG.md as BUG-NNN → spec → fix → regression test
 ```
 
 **No implementation starts without a spec. No sprint planning starts without a dependency-ordered task list.**
@@ -118,8 +118,9 @@ token drain); see `docs/specs/local-backlog-migration.md`.
   directly; do **not** open GitHub issues for new backlog items.
 - **PRs + code review → GitHub via the `gh` CLI** (authenticated, near-zero context
   cost). `gh pr create / view / list` etc. remain the standard PR workflow.
-- **Bugs / defects** still log in `data/skills_state/defect_tracker.json` per the
-  flowchart above, then graduate to a `BACKLOG.md` item if they need scheduling.
+- **Bugs / defects → `BACKLOG.md`** as `BUG-NNN` entries. The JSON defect tracker was
+  deleted by B-048 slice 1: its last entry was BUG-072, and every bug since had gone to
+  `BACKLOG.md` anyway.
 - `data/skills_state/backlog.json` is **machine state for autonomous sprint scripts**
   (keyed by `STORY-NNN`) — not the human backlog. Don't conflate the two.
 
@@ -203,7 +204,7 @@ Type hints mandatory. Docstrings required. Use `orjson` not `json`.
 
 **Verification is local-first (ADR-0015).** There is no GitHub Actions CI and
 `main` is not branch-protected — run `make ci-local` before merging (ruff, mypy,
-tests + coverage 70% / `src/quality` 90%, bandit, destructive-change guard). You
+tests + coverage 70%, bandit, destructive-change guard). You
 are the merge gate. Python is pinned to one version via `.python-version`.
 
 See `skills/python-quality/SKILL.md` for complete standards.

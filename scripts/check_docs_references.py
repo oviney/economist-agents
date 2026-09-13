@@ -37,7 +37,6 @@ INSTRUCTION_DOCS: tuple[str, ...] = (
     "README.md",
     "CONTRIBUTING.md",
     "copilot-instructions.md",
-    ".github/copilot-instructions.md",
     "docs/keyless-pipeline-runbook.md",
 )
 

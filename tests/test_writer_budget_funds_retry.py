@@ -56,7 +56,7 @@ def _wire_metered(monkeypatch, writer_outputs: list[str]) -> list[float | None]:
         return next(drafts), cost
 
     monkeypatch.setattr(s3, "_collect_text", fake_collect)
-    monkeypatch.setattr(s3, "_fetch_style_context", lambda topic: "")
+    monkeypatch.setattr(s3, "_fetch_author_context", lambda topic: "")
     monkeypatch.setattr(s3, "build_research_brief", lambda topic: "# Brief")
     return caps_seen
 

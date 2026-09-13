@@ -47,11 +47,12 @@ class TestValidatorUsesTheConstant:
         v.validate(_article(WORD_COUNT_MIN))
         assert not any(i["check"] == "word_count" for i in v.issues)
 
-    def test_one_under_min_is_critical(self) -> None:
+    def test_one_under_min_is_flagged_as_advisory(self) -> None:
+        """B-048 D4: length is the owner's call; the check reports, it does not block."""
         v = PublicationValidator(expected_date=_TODAY)
         v.validate(_article(WORD_COUNT_MIN - 1))
         wc = [i for i in v.issues if i["check"] == "word_count"]
-        assert wc and wc[0]["severity"] == "CRITICAL"
+        assert wc and wc[0]["severity"] == "HIGH"
 
     def test_message_quotes_the_constant(self) -> None:
         v = PublicationValidator(expected_date=_TODAY)

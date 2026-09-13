@@ -45,8 +45,6 @@ class _PacketSource(Protocol):
     image_prompt: str
     chart_proposal: dict[str, Any] | None
     chart_spec_path: Path | None
-    editorial_score: int
-    gates_passed: int
     publication_validator_passed: bool
     publication_validator_issues: list[dict[str, str]]
     total_cost_usd: float
@@ -90,28 +88,37 @@ def _format_brief(result: _PacketSource) -> str:
 
 
 def _format_verdict(result: _PacketSource) -> str:
+    """Blocking findings are invariants a reader would be harmed by; advisory
+    findings are style opinions for the owner to weigh (B-048 D4)."""
+    issues = list(result.publication_validator_issues or [])
+    blocking = [i for i in issues if i.get("severity") == "CRITICAL"]
+    advisory = [i for i in issues if i.get("severity") != "CRITICAL"]
     lines = [
         "## 1. Verdict",
         "",
         f"- Publication validator: "
         f"{'PASSED' if result.publication_validator_passed else 'FAILED'}",
-        f"- Editorial score: {result.editorial_score}",
-        f"- Gates passed: {result.gates_passed}",
         f"- Cost: ${result.total_cost_usd:.4f}",
         f"- Length: {result.article_chars} chars",
     ]
-    if result.publication_validator_issues:
-        lines += ["", "Outstanding issues:"]
+    if blocking:
+        lines += ["", "**Blocking** — fix before deploy:"]
+        lines += [f"  - {i.get('check')}: {i.get('message')}" for i in blocking]
+    if advisory:
+        lines += ["", "**Advisory** — your call, the machine only noticed:"]
         lines += [
             f"  - [{i.get('severity')}] {i.get('check')}: {i.get('message')}"
-            for i in result.publication_validator_issues
+            for i in advisory
         ]
+    if not issues:
+        lines += ["", "No findings."]
     lines += [
         "",
-        "Art is **not** part of this verdict. The validator no longer rules on "
-        "whether an article needs a chart (B-042), and hero presence is checked "
-        "at the deploy boundary (ADR-0017) — so a PASS here means *the prose is "
-        "ready*, not that the post is complete.",
+        "There is no editorial score (B-048 D4): style is your judgment, and the "
+        "machine rules only on truth-shaped things. Art is not part of this "
+        "verdict either — hero presence is checked at the deploy boundary "
+        "(ADR-0017) — so a PASS means *the prose is ready*, not that the post is "
+        "complete.",
     ]
     return "\n".join(lines)
 

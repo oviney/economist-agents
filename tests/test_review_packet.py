@@ -28,8 +28,6 @@ class _Result:
     image_prompt: str = "An editorial illustration of a deadline."
     chart_proposal: dict[str, Any] | None = None
     chart_spec_path: Path | None = None
-    editorial_score: int = 82
-    gates_passed: int = 5
     publication_validator_passed: bool = True
     publication_validator_issues: list[dict[str, str]] = field(default_factory=list)
     total_cost_usd: float = 0.42

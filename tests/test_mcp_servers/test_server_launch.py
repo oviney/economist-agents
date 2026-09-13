@@ -40,18 +40,12 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 # stdio servers that import local packages (scripts.* / src.*) and need no
 # external API keys to complete an initialize handshake.
 _LOCAL_SERVERS = [
-    "published_topics_server",
-    "style_memory_server",
-    "article_evaluator_server",
     "publication_validator_server",
 ]
 
 # A representative, side-effect-light tool call per server that constructs the
 # server's lazily-initialised backing object (the path where stray prints hide).
-_TOOL_CALLS = {
-    "published_topics_server": ("get_archive_stats", {}),
-    "style_memory_server": ("query_style_memory", {"query": "test"}),
-}
+_TOOL_CALLS: dict[str, tuple[str, dict[str, object]]] = {}
 
 _INITIALIZE = {
     "jsonrpc": "2.0",

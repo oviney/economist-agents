@@ -127,6 +127,32 @@ def _sections(text: str) -> tuple[str, dict[str, str]]:
     return title, found
 
 
+def recent_verdicts(briefs_dir: str | Path = "briefs", limit: int = 5) -> str:
+    """The owner's last ``limit`` post-publish verdicts, newest first, as a block
+    for the writer prompt — or ``""`` when none has been written yet (D5).
+
+    This replaces the ChromaDB style memory, whose collection held zero
+    documents for its entire life. Five honest sentences from the author about
+    recent drafts beat four hundred regex scores.
+    """
+    d = Path(briefs_dir)
+    if not d.is_dir():
+        return ""
+    entries: list[tuple[float, str, str]] = []
+    for p in d.glob("*.md"):
+        if p.name.upper() == "TEMPLATE.MD":
+            continue
+        _, found = _sections(p.read_text(encoding="utf-8"))
+        verdict = found.get("verdict", "").strip()
+        if verdict:
+            entries.append((p.stat().st_mtime, p.stem, verdict))
+    if not entries:
+        return ""
+    entries.sort(reverse=True)
+    lines = [f"- {slug}: {verdict}" for _, slug, verdict in entries[:limit]]
+    return "\n".join(lines)
+
+
 def load_owner_brief(path: str | Path) -> OwnerBrief:
     """Parse the owner's brief. Raises ``OwnerBriefError`` when there is no take."""
     p = Path(path)

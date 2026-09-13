@@ -31,7 +31,7 @@ def _wire(monkeypatch, writer_outputs: list[str]) -> None:
         return next(calls)
 
     monkeypatch.setattr(s3, "_collect_text", fake_collect)
-    monkeypatch.setattr(s3, "_fetch_style_context", lambda topic: "")
+    monkeypatch.setattr(s3, "_fetch_author_context", lambda topic: "")
     monkeypatch.setattr(s3, "build_research_brief", lambda topic: "# Brief")
 
 

@@ -142,11 +142,8 @@ def _stage4(article: str):
 
     return SimpleNamespace(
         article=article,
-        editorial_score=80,
-        gates_passed=4,
         publication_ready=True,
         publication_validator_passed=True,
         publication_validator_issues=[],
-        score_details={},
         wall_seconds=0.0,
     )

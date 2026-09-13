@@ -84,9 +84,14 @@ D7 (hero optional), D8 (archive all but three living docs). Recommendation on al
   **Live acceptance still open:** a real article from a real owner brief to a review URL
   needs the owner to write `briefs/<slug>.md` first; nothing else can supply the take.
 
-**Next:** slice 6 — gates split blocking/advisory (D4: weak-ending, word-count and
-heading-count checks stop blocking), the evaluator scorer and ChromaDB deleted, the owner's
-`## Verdict` steers the next draft (D5). Three MCP servers go with ChromaDB.
+- Slice 6 — DONE 2026-09-13 (D4, D5). No editorial score: the 5-dimension evaluator, its
+  MCP server and `logs/article_evals.json` are gone; Stage 4 is polish + validator. The
+  validator's CRITICAL findings block, everything else is advisory in the packet (word count
+  and weak endings demoted; heading structure kept blocking because a literal `##` in a
+  paragraph is reader-visible). ChromaDB is out — style memory (collection count 0 for its
+  whole life), the topic archive and their two MCP servers — so B-047 is unblocked. The
+  owner's `## Verdict` in each brief now steers the next draft: `recent_verdicts()` feeds
+  the last five into the writer prompt. Gate: 904 passed / 2 skipped / 87.38% in 37 s.
 
 ## Todo
 

@@ -32,7 +32,7 @@ def _wire_writer(monkeypatch) -> None:
         return next(call_results)
 
     monkeypatch.setattr(s3, "_collect_text", fake_collect)
-    monkeypatch.setattr(s3, "_fetch_style_context", lambda topic: "")
+    monkeypatch.setattr(s3, "_fetch_author_context", lambda topic: "")
 
 
 def test_default_mode_uses_claude_web_research(tmp_path: Path, monkeypatch) -> None:

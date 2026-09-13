@@ -139,7 +139,7 @@ def test_run_stage3_appends_supplement_and_records_search_calls(
     monkeypatch.setattr(
         s3, "build_research_brief", lambda topic: "# Brief\n\nseed source"
     )
-    monkeypatch.setattr(s3, "_fetch_style_context", lambda topic: "")
+    monkeypatch.setattr(s3, "_fetch_author_context", lambda topic: "")
 
     result = asyncio.run(s3.run_stage3("test topic"))
 

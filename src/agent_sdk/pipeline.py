@@ -74,8 +74,6 @@ class PipelineResult:
     #: B-042: figures extracted from the brief for the owner to frame, or None
     #: when the brief carries no numeric claim.
     chart_proposal: dict | None
-    editorial_score: int
-    gates_passed: int
     publication_ready: bool
     publication_validator_passed: bool
     publication_validator_issues: list[dict[str, str]]
@@ -179,8 +177,6 @@ async def run_pipeline(
         topic=topic,
         article=final_article,
         chart_proposal=getattr(stage3, "chart_proposal", None),
-        editorial_score=stage4.editorial_score,
-        gates_passed=stage4.gates_passed,
         publication_ready=stage4.publication_ready,
         publication_validator_passed=stage4.publication_validator_passed,
         publication_validator_issues=stage4.publication_validator_issues,
@@ -280,8 +276,6 @@ def _append_cost_log(result: PipelineResult, total_wall_seconds: float) -> None:
         "chart_figures_proposed": (
             len(result.chart_proposal["data"]) if result.chart_proposal else 0
         ),
-        "editorial_score": result.editorial_score,
-        "gates_passed": result.gates_passed,
         "publication_validator_passed": result.publication_validator_passed,
         "article_chars": result.article_chars,
     }

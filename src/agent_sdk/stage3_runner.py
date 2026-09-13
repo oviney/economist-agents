@@ -55,7 +55,7 @@ from src.agent_sdk._shared import (
 from src.agent_sdk._shared import (
     audit_article_stats as _audit_article_stats,
 )
-from src.agent_sdk.brief import OwnerBrief
+from src.agent_sdk.brief import OwnerBrief, recent_verdicts
 from src.agent_sdk.image_prompt_synth import PromptSynthError, compose_prompt
 from src.agent_sdk.research.claude_web import (
     brief_has_findings,
@@ -70,29 +70,19 @@ from src.agent_sdk.tools.research_tools import SourceFetchSession, build_search_
 logger = logging.getLogger(__name__)
 
 
-def _fetch_style_context(topic: str) -> str:
-    """Fetch a style-memory exemplar block for the writer prompt.
+def _fetch_author_context(topic: str) -> str:
+    """What the author said about recent drafts (B-048 D5).
 
-    Isolated from ``run_stage3`` so the StyleMemoryTool import (which
-    transitively pulls in ChromaDB) is paid only when the runtime needs
-    it, and so tests can monkeypatch this function without touching the
-    tool itself.
-
-    Returns an empty string when the tool is unavailable, errors out, or
-    returns no exemplars above the relevance threshold — callers must
-    omit the ``## Style Memory`` section entirely in that case.
+    Reads the ``## Verdict`` sections of ``briefs/*.md`` — the owner's own
+    post-publish judgment — so each draft is steered by the last five. Empty
+    when no verdict exists yet; callers omit the section entirely then. The
+    ``topic`` argument is kept so tests that stub this function keep working.
     """
+    del topic
     try:
-        from src.tools.style_memory_tool import StyleMemoryTool
-    except ImportError as exc:
-        logger.info("StyleMemoryTool unavailable (%s); skipping style context", exc)
-        return ""
-
-    try:
-        tool = StyleMemoryTool()
-        return tool.get_style_context(topic)
-    except Exception as exc:  # noqa: BLE001 — style memory is best-effort
-        logger.warning("StyleMemoryTool.get_style_context failed: %s", exc)
+        return recent_verdicts()
+    except OSError as exc:  # a missing or unreadable briefs/ is not an error
+        logger.warning("Could not read briefs/ for verdicts: %s", exc)
         return ""
 
 
@@ -662,10 +652,16 @@ async def run_stage3(
     )
     logger.info("Research brief: %d chars", len(research_brief))
 
-    style_context = _fetch_style_context(topic)
-    if style_context:
-        logger.info("Style memory: %d chars of exemplars", len(style_context))
-        style_section = f"\n\n## Style Memory\n\n{style_context}"
+    author_context = _fetch_author_context(topic)
+    if author_context:
+        logger.info("Author verdicts: %d chars", len(author_context))
+        style_section = (
+            "\n\n## What the author said about recent drafts\n\n"
+            "Each line is the author's own verdict on a published post: a score "
+            "out of 5 and what they would change. Treat them as standing "
+            "editorial notes.\n\n"
+            f"{author_context}"
+        )
     else:
         style_section = ""
 

@@ -8,26 +8,12 @@
       ],
       "description": "Browser automation for navigating web UIs, taking screenshots, and interacting with pages"
     },
-    "article-evaluator": {
-      "command": ".venv/bin/python",
-      "args": [
-        "mcp_servers/article_evaluator_server.py"
-      ],
-      "description": "Scores article drafts across 5 quality dimensions and returns a pass/fail verdict before publishing"
-    },
-    "style-memory": {
-      "command": ".venv/bin/python",
-      "args": [
-        "mcp_servers/style_memory_server.py"
-      ],
-      "description": "Query and update the ChromaDB-backed style memory store for Economist voice consistency"
-    },
     "publication-validator": {
       "command": ".venv/bin/python",
       "args": [
         "mcp_servers/publication_validator_server.py"
       ],
-      "description": "Publication validation \u2014 checks front-matter fields (layout, title, date, author, categories, image) and image-path existence before a post is published"
+      "description": "Publication validation — checks front-matter fields (layout, title, date, author, categories, image) and image-path existence before a post is published"
     },
     "web-researcher": {
       "command": ".venv/bin/python",
@@ -35,13 +21,6 @@
         "mcp_servers/web_researcher_server.py"
       ],
       "description": "Keyless arXiv academic search and page fetching. The paid search leg was removed by #438; its stale env requirement was removed by B-034 (CLAUDE.md constraints #1-#3)"
-    },
-    "published-topics": {
-      "command": ".venv/bin/python",
-      "args": [
-        "mcp_servers/published_topics_server.py"
-      ],
-      "description": "Query the published article archive for topic similarity and duplicate detection before commissioning new content"
     }
   }
 }

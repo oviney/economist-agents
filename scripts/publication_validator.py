@@ -215,7 +215,7 @@ class PublicationValidator:
         # Check 5: Placeholder text
         self._check_placeholders(article_content)
 
-        # Check 6: Weak endings (CRITICAL - blocks publication)
+        # Check 6: Weak endings (HIGH — advisory since B-048 D4)
         self._check_weak_endings(article_content)
 
         # Check 7 was the chart gate. Deleted by B-042: whether an article
@@ -668,7 +668,7 @@ class PublicationValidator:
             self.issues.append(
                 {
                     "check": "weak_endings",
-                    "severity": "CRITICAL",
+                    "severity": "HIGH",
                     "message": f"Weak/hedging ending detected ({len(violations)} violations)",
                     "details": details,
                     "fix": "Rewrite ending with definitive statement or clear prediction",
@@ -686,7 +686,7 @@ class PublicationValidator:
             self.issues.append(
                 {
                     "check": "word_count",
-                    "severity": "CRITICAL",
+                    "severity": "HIGH",
                     "message": (
                         f"Article too short: {word_count} words "
                         f"(minimum {WORD_COUNT_MIN} required)"

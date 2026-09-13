@@ -59,8 +59,8 @@ Post-processing in `src/agent_sdk/_shared.py` and `scripts/publication_validator
    image metadata, and placeholders.
 
 > These nine deterministic checks are separate from the article's `gates_passed/N`
-> **quality score**, which Stage 4 derives from the 5-dimension `ArticleEvaluator`
-> (`scripts/article_evaluator.py`).
+> **quality score**. B-048 D4 deleted the 5-dimension evaluator: style is the owner's
+> judgment, and the validator rules only on reader-protecting invariants.
 
 ---
 

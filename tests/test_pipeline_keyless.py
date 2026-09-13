@@ -87,7 +87,7 @@ def _wire_writer_full(monkeypatch) -> None:
         return next(call_results)
 
     monkeypatch.setattr(s3, "_collect_text", fake_collect)
-    monkeypatch.setattr(s3, "_fetch_style_context", lambda topic: "")
+    monkeypatch.setattr(s3, "_fetch_author_context", lambda topic: "")
 
 
 def _wire_writer(monkeypatch) -> None:
@@ -97,7 +97,7 @@ def _wire_writer(monkeypatch) -> None:
         return next(call_results)
 
     monkeypatch.setattr(s3, "_collect_text", fake_collect)
-    monkeypatch.setattr(s3, "_fetch_style_context", lambda topic: "")
+    monkeypatch.setattr(s3, "_fetch_author_context", lambda topic: "")
 
 
 def _unset_all_keys(monkeypatch) -> None:
@@ -205,8 +205,6 @@ def test_end_to_end_cli_writes_article_and_exits_zero(
             topic=topic,
             article='---\nlayout: post\ntitle: "A Good Title"\n---\n\nBody.\n',
             chart_proposal=None,
-            editorial_score=1.0,
-            gates_passed=True,
             publication_ready=True,
             publication_validator_passed=True,
             publication_validator_issues=[],

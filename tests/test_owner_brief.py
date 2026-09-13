@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from src.agent_sdk.brief import OwnerBriefError, load_owner_brief
+from src.agent_sdk.brief import OwnerBriefError, load_owner_brief, recent_verdicts
 
 FULL = """# Coverage mandates are a board-level comfort blanket
 
@@ -127,3 +127,61 @@ class TestWhatTheMachinesAreHanded:
         assert "thesis" in focus.lower()
         assert "counter-evidence" in focus
         assert "arxiv.org" in focus
+
+
+class TestVerdictsCloseTheLoop:
+    """B-048 D5: the owner's post-publish verdicts steer the next draft."""
+
+    def test_no_briefs_dir_means_no_context(self, tmp_path: Path) -> None:
+        assert recent_verdicts(tmp_path / "nowhere") == ""
+
+    def test_briefs_without_verdicts_mean_no_context(self, tmp_path: Path) -> None:
+        _write(tmp_path, FULL)
+        _write(tmp_path, "# T\n\n## My take\n\nX.\n", "TEMPLATE.md")
+
+        assert recent_verdicts(tmp_path) == ""
+
+    def test_the_template_is_never_a_verdict(self, tmp_path: Path) -> None:
+        _write(
+            tmp_path,
+            "# T\n\n## My take\n\nX.\n\n## Verdict\n\n<Leave empty>\n",
+            "TEMPLATE.md",
+        )
+
+        assert recent_verdicts(tmp_path) == ""
+
+    def test_newest_five_verdicts_newest_first(self, tmp_path: Path) -> None:
+        import os
+
+        for n in range(7):
+            p = _write(
+                tmp_path,
+                f"# T{n}\n\n## My take\n\nX.\n\n## Verdict\n\n{n}/5 — note {n}\n",
+                f"post-{n}.md",
+            )
+            os.utime(p, (1_700_000_000 + n, 1_700_000_000 + n))
+
+        block = recent_verdicts(tmp_path, limit=5)
+
+        assert block.splitlines()[0] == "- post-6: 6/5 — note 6"
+        assert len(block.splitlines()) == 5
+        assert "post-0" not in block and "post-1" not in block
+
+    def test_author_context_reaches_the_writer_prompt(
+        self, tmp_path: Path, monkeypatch
+    ) -> None:
+        from src.agent_sdk import stage3_runner
+
+        _write(
+            tmp_path,
+            "# T\n\n## My take\n\nX.\n\n## Verdict\n\n4/5 — cut the opening anecdote\n",
+            "post.md",
+        )
+        monkeypatch.chdir(tmp_path.parent)
+        monkeypatch.setattr(
+            stage3_runner, "recent_verdicts", lambda: recent_verdicts(tmp_path)
+        )
+
+        assert "cut the opening anecdote" in stage3_runner._fetch_author_context(
+            "anything"
+        )

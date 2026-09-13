@@ -34,8 +34,6 @@ def _fake_stage3():
 def _fake_stage4(article: str):
     m = MagicMock()
     m.article = article
-    m.editorial_score = 82
-    m.gates_passed = 4
     m.publication_ready = True
     m.publication_validator_passed = True
     m.publication_validator_issues = []
@@ -72,7 +70,6 @@ class TestRunPipeline:
         assert isinstance(result, PipelineResult)
         assert isinstance(result.total_cost_usd, float)
         assert isinstance(result.article, str)
-        assert isinstance(result.gates_passed, int)
         assert isinstance(result.publication_validator_passed, bool)
 
     def test_appends_valid_jsonl_entry_to_cost_log(
@@ -95,7 +92,12 @@ class TestRunPipeline:
         lines = log_path.read_bytes().splitlines()
         assert len(lines) == 1, f"Expected 1 log entry, got {len(lines)}"
         entry = orjson.loads(lines[0])
-        for key in ("timestamp", "total_cost_usd", "topic", "gates_passed"):
+        for key in (
+            "timestamp",
+            "total_cost_usd",
+            "topic",
+            "publication_validator_passed",
+        ):
             assert key in entry, f"Missing key '{key}' in log entry"
         assert entry["topic"] == "AI Testing"
         assert entry["total_cost_usd"] == pytest.approx(0.05)

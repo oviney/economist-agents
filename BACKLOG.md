@@ -26,6 +26,33 @@ _(none)_
 
 ## Todo
 
+### B-046 · `refine_image_metadata` outlived the path that called it
+
+**Found 2026-08-15 during the B-040 Phase 2 self-review, not by looking for it.**
+
+`src/agent_sdk/_shared.py:1006` still defines `refine_image_metadata`, the vision pass that
+rewrote a hero's alt text and caption. It has **no production caller** — `grep` across
+`src/` and `scripts/` finds only the definition. Its callers went with `image_mode="hero"`
+(B-022) and with the pipeline's graphics path (B-042, Constraint #4 as amended: the
+pipeline draws nothing). The 14 remaining references are in `tests/` — which call it
+directly — plus three specs describing the flow that was removed.
+
+So the tests currently prove that a function nothing calls still works, and the specs
+describe it as live. Both are misleading to the next reader.
+
+Two smaller things travel with it, neither urgent:
+
+- It carries the same greedy `\{.*\}` JSON extraction that B-040 had to fix
+  (`_shared.py:1089`). Here it is caught by a broad `except Exception` that falls back to
+  the writer's drafts with a warning, so the failure mode is a silent quality
+  degradation rather than a crash — which is why nobody would notice it.
+- The broad `except Exception` itself is what makes the degradation silent.
+
+**Not deleted unilaterally.** Dead code hygiene says list it and ask, and this sits close
+enough to Constraint #4 that removing it should be a deliberate call, not a side effect of
+someone else's PR. **Scope:** S. **Decision needed:** delete the function and its tests, or
+keep it and correct the three specs that describe it as reachable.
+
 ### B-044 · Finish the B-042 acceptance — **DONE 2026-08-02**
 
 **The article is published:** <https://www.viney.ca/2026/08/02/migration-deadline-testing-trap/>
@@ -739,9 +766,16 @@ fidelity defects plus the 1 labelled near-false-positive.
       *(23 cases at 52% negatives, 2026-08-05 — pending the owner spot-check. Known gap:
       **G3 has no positive case** and one must not be invented, so G3's false-negative rate
       is unmeasurable in v1.)*
-- [ ] Report false-positive and false-negative rates **separately, with `n`** — never averaged
-- [ ] Keyless judge via the Agent SDK; case selection and arithmetic deterministic
+- [x] Report false-positive and false-negative rates **separately, with `n`** — never averaged
+      *(2026-08-15 — two live runs recorded in `logs/review_gate_calibration.json`)*
+- [x] Keyless judge via the Agent SDK; case selection and arithmetic deterministic
+      *(2026-08-15 — arithmetic is pure Python, the judge is injected, and a fixed stub
+      reproduces identical reports)*
 - [ ] Sufficient for the owner to answer ADR-0018 Decision 3
+      *(the evidence now exists and points one way — **do not promote**, on a 25–33%
+      false-positive rate and a reproduced near-false-positive. The decision itself stays
+      the owner's, and should be taken after the nine traced disagreements are checked,
+      because a mislabelled case would change the number.)*
 
 **Build after n≈5 real reviews**, which accrue free from the B-013 review stage the owner
 already performs — the only added cost is recording, per gate, whether he agreed. The harness
@@ -780,23 +814,82 @@ a criterion of ≥20 cases and ≥40% negatives. All 8 carry
 
 **Phase 2 · the runner — TDD, judge stubbed in tests, no model calls in the suite.**
 
-- [ ] **Task 3 — case loader + schema validation + balance report (S).** A file missing
+#### RESULT — two live runs, 2026-08-15. **Recommendation: do not promote.**
+
+The harness has been **run**, twice, over all 23 cases. `logs/review_gate_calibration.json`
+holds both. Same cases, same rubric, no code change between them:
+
+| | Run 1 | Run 2 |
+|---|---|---|
+| False positives | 4/12 = **33.3%** | 3/12 = **25.0%** |
+| False negatives | 2/11 = **18.2%** | 5/11 = **45.5%** |
+| Unverified | 0/23 | 1/23 |
+| Errors | 0/23 | 0/23 |
+
+**The variance is the headline, not the rates.** The false-negative rate moved 27 points
+between two identical runs. At n=11 and n=12 a single run cannot answer Decision 3, and
+neither can these two — what they establish is that **no single run should be trusted to**,
+which is a stronger conclusion than either number alone. Both rates print `provisional`
+and the harness says so itself.
+
+Three findings from run 2's traced disagreements, worth more than the aggregates:
+
+1. **G1 scored 0/2, wrong in both directions.** `g1-references-carry-full-locators`
+   (labelled `pass`) was failed, and `g1-references-carry-no-locators` (labelled `fail`)
+   was passed. An inversion on both cases is not noise. Either G1's wording or those two
+   cases are backwards, and **it is cheap to find out** — two passages.
+2. **The gate reproduced the exact false positive ADR-0018 predicted.**
+   `g2-publishers-own-headline-figure` was flagged. That is the near-false-positive the
+   spec called "worth more than the ten positives" — a figure that is correct and is the
+   publisher's own headline number. The failure mode that blocks promotion is not
+   hypothetical; it is measured.
+3. **G3, G4 agreed 100% in both runs** (n=2 and n=4). The instability is concentrated in
+   G1, G2 and G5 — the gates that require reaching a source.
+
+**Against promotion, on the evidence:** ADR-0018's own reasoning is that a blocking gate
+with false positives stops good articles and trains the owner to override it, which
+destroys the gate. A false-positive rate between 25% and 33% would block roughly one good
+passage in three.
+
+**Still owner-gated, and the run makes it cheaper rather than replacing it.** The
+spot-check now has a target: the nine named disagreements, not all 23 cases. Each is
+either a real gate defect or a mislabelled case, and the rates cannot be trusted until
+that is settled — a mislabelled case is worse than a missing one (README rule 3).
+
+**Phase 2 BUILT 2026-08-15 — PR pending, `scripts/calibrate_review_gate.py` + 86 tests.**
+`make ci-local` green at 2,825 passed / 10 skipped; 93% coverage on the new module, the
+only uncovered lines being the SDK adapter, which cannot run without the model calls the
+spec bans from the suite. **The harness is built; the number is not measured** — running
+it for real is gated on the spot-check below, because rates computed from labels the owner
+has not confirmed would be a measurement of the case set, not of the gate.
+
+- [x] **Task 3 — case loader + schema validation + balance report (S).** A file missing
       `expected` or `why` is rejected loudly, never skipped. Balance reported every run.
-- [ ] **Task 4 — agreement arithmetic (S).** False-positive, false-negative and `unverified`
+      *(Loader shared with `render_calibration_review_sheet.py` rather than reimplemented —
+      it already enforces exactly this contract.)*
+- [x] **Task 4 — agreement arithmetic (S).** False-positive, false-negative and `unverified`
       as **three separate counts with three denominators**; `n` beside every rate; a rate from
       <20 cases labelled provisional in the output itself. Degenerate cases (all-pass,
-      all-fail, empty) covered.
-- [ ] **Task 5 — keyless judge via the Agent SDK + `--gate` / `--report` (M).** Runs the gate
+      all-fail, empty) covered. *(A rate over a zero denominator is `None`, not `0.0`.)*
+- [x] **Task 5 — keyless judge via the Agent SDK + `--gate` / `--report` (M).** Runs the gate
       **as accepted 2026-07-31** — v1 does not touch `rubric.md` or `REVIEW_PROMPT.md`.
-- [ ] **Task 6 — report to `logs/review_gate_calibration.json`, append-only (S).** Decide
+      *(Gate text is **read out of** `REVIEW_PROMPT.md` at run time rather than restated, so
+      a rubric edit cannot leave the harness measuring a stale copy.)*
+- [x] **Task 6 — report to `logs/review_gate_calibration.json`, append-only (S).** Decided
       *against* wiring into `make ci-local`: the runner makes model calls, and `ci-local` must
-      stay keyless and offline.
+      stay keyless and offline. *(Refuses to write over a history it cannot parse.)*
 
-**Sequencing note, flagged rather than acted on.** The spec gates the build on "n≈5 real
-reviews"; the repo has 2. That gate is worth re-examining at the Phase 2 checkpoint, because
-the runner grades **cases**, not review runs — the 5 reviews inform how to *interpret* the
-result (threshold tuning vs anchor revision), not the harness design. Owner's call at the
-checkpoint; Phase 1 does not depend on it either way.
+**Sequencing note — resolved 2026-08-15, in favour of building.** The spec gates the build on
+"n≈5 real reviews"; the repo has 2. Phase 2 was built anyway, on the reasoning already
+recorded here: the runner grades **cases**, not review runs, so the 5 reviews inform how to
+*interpret* a result (threshold tuning vs anchor revision), not how to construct the harness.
+What the reviews gate is reading the output, not writing the code. Owner may still overturn
+this at the checkpoint; nothing built here depends on the answer.
+
+**Known limitation, not a defect.** At 23 cases split 12/11, **both** error rates come out
+`provisional` — the harness says so in its own output, and a test asserts it. ADR-0018
+Decision 3 can therefore be answered as "promote / do not promote / fix the rubric first",
+but not with a confidence interval. Widening the set is v2.
 
 **Shipped 2026-08-01 alongside the spec, because waiting corrupts the baseline:**
 

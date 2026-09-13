@@ -117,7 +117,7 @@ property that decides whether it gets run twice.
 
 ```bash
 # Run the whole calibration set and write a report
-python scripts/calibrate_review_gate.py --cases docs/evals/review-gate/ --out logs/review_gate_calibration.json
+python scripts/calibrate_review_gate.py --cases docs/evals/review-gate/cases --out logs/review_gate_calibration.json
 
 # Re-run a single gate's cases while iterating on the rubric
 python scripts/calibrate_review_gate.py --gate G5

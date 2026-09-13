@@ -1,0 +1,201 @@
+[
+  {
+    "recorded_at": "2026-08-15T22:28:19.300012+00:00",
+    "report": {
+      "n_cases": 23,
+      "balance": {
+        "negatives": 12,
+        "positives": 11,
+        "negative_pct": 52.2
+      },
+      "false_positive": {
+        "count": 4,
+        "n": 12,
+        "rate_pct": 33.3,
+        "provisional": true
+      },
+      "false_negative": {
+        "count": 2,
+        "n": 11,
+        "rate_pct": 18.2,
+        "provisional": true
+      },
+      "unverified": {
+        "count": 0,
+        "n": 23,
+        "rate_pct": 0.0,
+        "provisional": false
+      },
+      "errors": {
+        "count": 0,
+        "n": 23,
+        "rate_pct": 0.0,
+        "provisional": false
+      },
+      "per_gate": {
+        "G1": {
+          "agreed": 1,
+          "n": 2,
+          "agreement_pct": 50.0,
+          "provisional": true
+        },
+        "G2": {
+          "agreed": 8,
+          "n": 12,
+          "agreement_pct": 66.7,
+          "provisional": true
+        },
+        "G3": {
+          "agreed": 2,
+          "n": 2,
+          "agreement_pct": 100.0,
+          "provisional": true
+        },
+        "G4": {
+          "agreed": 4,
+          "n": 4,
+          "agreement_pct": 100.0,
+          "provisional": true
+        },
+        "G5": {
+          "agreed": 2,
+          "n": 3,
+          "agreement_pct": 66.7,
+          "provisional": true
+        }
+      }
+    }
+  },
+  {
+    "recorded_at": "2026-08-15T22:43:03.381669+00:00",
+    "report": {
+      "n_cases": 23,
+      "balance": {
+        "negatives": 12,
+        "positives": 11,
+        "negative_pct": 52.2
+      },
+      "false_positive": {
+        "count": 3,
+        "n": 12,
+        "rate_pct": 25.0,
+        "provisional": true
+      },
+      "false_negative": {
+        "count": 5,
+        "n": 11,
+        "rate_pct": 45.5,
+        "provisional": true
+      },
+      "unverified": {
+        "count": 1,
+        "n": 23,
+        "rate_pct": 4.3,
+        "provisional": false
+      },
+      "errors": {
+        "count": 0,
+        "n": 23,
+        "rate_pct": 0.0,
+        "provisional": false
+      },
+      "per_gate": {
+        "G1": {
+          "agreed": 0,
+          "n": 2,
+          "agreement_pct": 0.0,
+          "provisional": true
+        },
+        "G2": {
+          "agreed": 6,
+          "n": 12,
+          "agreement_pct": 50.0,
+          "provisional": true
+        },
+        "G3": {
+          "agreed": 2,
+          "n": 2,
+          "agreement_pct": 100.0,
+          "provisional": true
+        },
+        "G4": {
+          "agreed": 4,
+          "n": 4,
+          "agreement_pct": 100.0,
+          "provisional": true
+        },
+        "G5": {
+          "agreed": 2,
+          "n": 3,
+          "agreement_pct": 66.7,
+          "provisional": true
+        }
+      },
+      "disagreements": [
+        {
+          "case_id": "g1-references-carry-full-locators",
+          "gate": "G1",
+          "expected": "pass",
+          "judged": "fail",
+          "kind": "false_positive"
+        },
+        {
+          "case_id": "g1-references-carry-no-locators",
+          "gate": "G1",
+          "expected": "fail",
+          "judged": "pass",
+          "kind": "false_negative"
+        },
+        {
+          "case_id": "g2-chart-shows-something-other-than-claimed",
+          "gate": "G2",
+          "expected": "fail",
+          "judged": "unverified",
+          "kind": "unverified"
+        },
+        {
+          "case_id": "g2-invented-programme-scale",
+          "gate": "G2",
+          "expected": "fail",
+          "judged": "pass",
+          "kind": "false_negative"
+        },
+        {
+          "case_id": "g2-motive-attributed-to-a-named-executive",
+          "gate": "G2",
+          "expected": "fail",
+          "judged": "pass",
+          "kind": "false_negative"
+        },
+        {
+          "case_id": "g2-offsetting-clause-deleted",
+          "gate": "G2",
+          "expected": "fail",
+          "judged": "pass",
+          "kind": "false_negative"
+        },
+        {
+          "case_id": "g2-predictor-not-in-the-cited-ranking",
+          "gate": "G2",
+          "expected": "fail",
+          "judged": "pass",
+          "kind": "false_negative"
+        },
+        {
+          "case_id": "g2-publishers-own-headline-figure",
+          "gate": "G2",
+          "expected": "pass",
+          "judged": "fail",
+          "kind": "false_positive"
+        },
+        {
+          "case_id": "g5-recent-preprint-not-superseded",
+          "gate": "G5",
+          "expected": "pass",
+          "judged": "fail",
+          "kind": "false_positive"
+        }
+      ]
+    }
+  }
+]

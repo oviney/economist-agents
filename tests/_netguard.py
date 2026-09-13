@@ -73,11 +73,13 @@ def install_model_guard(monkeypatch: Any) -> None:
     ``make ci-local`` began making real model calls and writing generated SVGs
     into ``output/``.
 
-    ``stage3_runner.query`` is the single chokepoint: every model call in the
-    pipeline funnels through ``_collect_text``, which uses it. Tests that
+    ``stage3_runner.query`` is the writer's chokepoint (``_collect_text``);
+    ``claude_web.query`` and ``research._llm.query`` are the research legs'. Tests that
     legitimately exercise ``_collect_text`` internals patch it themselves, and
     their patch is applied after this one, so it wins.
     """
+    import src.agent_sdk.research._llm as research_llm
+    import src.agent_sdk.research.claude_web as claude_web
     import src.agent_sdk.stage3_runner as stage3_runner
 
     def blocked(*args: Any, **kwargs: Any) -> Any:
@@ -89,3 +91,9 @@ def install_model_guard(monkeypatch: Any) -> None:
         )
 
     monkeypatch.setattr(stage3_runner, "query", blocked)
+    # B-048 slice 5 made claude_web the default research mode, and both research
+    # modules hold their OWN reference to ``query`` — the first full gate after
+    # the change stalled for minutes on a real ``claude`` subprocess. Blocked
+    # here, the research legs soft-degrade to their patched fallbacks instead.
+    monkeypatch.setattr(claude_web, "query", blocked)
+    monkeypatch.setattr(research_llm, "query", blocked)

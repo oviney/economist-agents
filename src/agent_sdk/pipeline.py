@@ -12,7 +12,7 @@ import asyncio
 import logging
 import re
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal, cast
@@ -25,6 +25,7 @@ from src.agent_sdk._shared import (
     canonical_slug,
     describe_slug,
 )
+from src.agent_sdk.brief import OwnerBrief, OwnerBriefError, load_owner_brief
 from src.agent_sdk.review_packet import notify, write_packet
 from src.agent_sdk.stage3_runner import (
     DEFAULT_WRITER_BUDGET_USD,
@@ -89,6 +90,10 @@ class PipelineResult:
     slug: str = ""
     image_prompt: str = ""
     chart_spec_path: Path | None = None
+    #: B-048 D1: the owner's brief the run started from, and which optional
+    #: sections it left empty — the packet reports both.
+    owner_brief_path: Path | None = None
+    owner_brief_missing: list[str] = field(default_factory=list)
 
 
 def _numeric(source: object, name: str) -> float:
@@ -137,8 +142,9 @@ async def run_pipeline(
     topic: str,
     writer_budget_usd: float | None = DEFAULT_WRITER_BUDGET_USD,
     writer_model: str = DEFAULT_WRITER_MODEL,
-    research_mode: ResearchMode = "deterministic",
+    research_mode: ResearchMode = "claude_web",
     brief_override: str | None = None,
+    owner_brief: OwnerBrief | None = None,
 ) -> PipelineResult:
     """Generate one article through the Agent SDK pipeline — Stage 3 then Stage 4.
 
@@ -154,6 +160,7 @@ async def run_pipeline(
         writer_model=writer_model,
         research_mode=research_mode,
         brief_override=brief_override,
+        owner_brief=owner_brief,
     )
     article_for_stage4 = _prepare_for_stage4(stage3.article)
     stage4 = run_stage4(article_for_stage4)
@@ -187,6 +194,10 @@ async def run_pipeline(
         slug=getattr(stage3, "slug", "") or canonical_slug(final_article, topic),
         image_prompt=image_prompt,
         chart_spec_path=getattr(stage3, "chart_spec_path", None),
+        owner_brief_path=owner_brief.path if owner_brief is not None else None,
+        owner_brief_missing=list(owner_brief.missing)
+        if owner_brief is not None
+        else [],
     )
     wall_seconds = result.stage3_seconds + result.stage4_seconds
     try:
@@ -313,11 +324,12 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument(
         "--research-mode",
         choices=("deterministic", "deep", "claude_web"),
-        default="deterministic",
+        default="claude_web",
         help=(
-            "Research path: 'deterministic' (default, Serper) | 'deep' (recursive, "
-            "Serper) | 'claude_web' (keyless — Claude's own WebSearch/WebFetch on "
-            "the subscription, no SERPER_API_KEY). See ADR-0013."
+            "Research path: 'claude_web' (default — Claude's own WebSearch/WebFetch "
+            "on the subscription, no key; ADR-0013) | 'deep' (recursive, heavy) | "
+            "'deterministic' (arXiv + Semantic Scholar, no LLM; rate-limited from "
+            "most environments, BUG-050)."
         ),
     )
     parser.add_argument(
@@ -325,18 +337,35 @@ def main(argv: list[str] | None = None) -> None:
         default=None,
         metavar="PATH",
         help=(
-            "Opt-in (B-012): use a pre-built deep-research brief file "
-            "(docs/research/<slug>.md) as the writer's research instead of "
-            "running --research-mode. Refuted claims are stripped. For flagship "
-            "posts — the deep-research harness is heavy; claude_web is the default."
+            "The owner's brief (briefs/<slug>.md — see briefs/TEMPLATE.md): the "
+            "take, the experiences, the disagreement. Research runs in service of "
+            "it and the writer argues it. The topic defaults to the brief's title."
+        ),
+    )
+    parser.add_argument(
+        "--research-brief",
+        default=None,
+        metavar="PATH",
+        help=(
+            "Opt-in (B-012 / B-038): a pre-built research brief (docs/research/"
+            "<slug>.md, e.g. from scripts/html_to_brief.py) used verbatim instead "
+            "of running --research-mode. Refuted claims are stripped. Combines "
+            "with --brief."
         ),
     )
     args = parser.parse_args(argv)
-    topic = (
-        " ".join(args.topic)
-        if args.topic
-        else "the productivity paradox of AI coding assistants"
-    )
+    owner_brief: OwnerBrief | None = None
+    if args.brief:
+        try:
+            owner_brief = load_owner_brief(args.brief)
+        except OwnerBriefError as exc:
+            parser.error(str(exc))
+    if args.topic:
+        topic = " ".join(args.topic)
+    elif owner_brief is not None:
+        topic = owner_brief.title
+    else:
+        parser.error("give a --brief (briefs/<slug>.md) or a topic")
 
     # --research-only path (Stage 0 only) — unchanged
     if args.research_only:
@@ -351,7 +380,10 @@ def main(argv: list[str] | None = None) -> None:
         writer_budget=args.writer_budget,
         writer_model=args.writer_model,
         research_mode=cast(ResearchMode, args.research_mode),
-        brief_override=load_brief_file(args.brief) if args.brief else None,
+        brief_override=(
+            load_brief_file(args.research_brief) if args.research_brief else None
+        ),
+        owner_brief=owner_brief,
     )
 
 
@@ -449,6 +481,7 @@ def _run_end_to_end(
     writer_model: str,
     research_mode: ResearchMode,
     brief_override: str | None = None,
+    owner_brief: OwnerBrief | None = None,
 ) -> None:
     """Run the pipeline end to end, write the article, and hand off the art.
 
@@ -457,6 +490,17 @@ def _run_end_to_end(
     ANTHROPIC/OPENAI/SERPER key is used.
     """
     print(f"Running Agent SDK pipeline on: {topic}")
+    if owner_brief is not None:
+        gaps = (
+            f"; empty sections: {', '.join(owner_brief.missing)}"
+            if owner_brief.missing
+            else ""
+        )
+        print(f"  Owner brief: {owner_brief.path}{gaps}")
+    else:
+        print(
+            "  No owner brief — topic-only run; the article will be a research synthesis"
+        )
     print(f"  Research mode: {research_mode}; models: writer={writer_model}")
     try:
         result = asyncio.run(
@@ -466,6 +510,7 @@ def _run_end_to_end(
                 writer_model=writer_model,
                 research_mode=research_mode,
                 brief_override=brief_override,
+                owner_brief=owner_brief,
             )
         )
     except SearchProvidersFailedError as exc:

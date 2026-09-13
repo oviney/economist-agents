@@ -70,11 +70,23 @@ D7 (hero optional), D8 (archive all but three living docs). Recommendation on al
   gate (which inlined the one helper it borrowed), and `check_docs_references.py` as a plain
   check. Gate: 1046 passed / 1 skipped / 87.68% in 94 s.
 
-**Next:** slice 5 — the owner brief becomes the input (D1/D2, BUG-083): `briefs/<slug>.md`
-via `--brief`, research in service of the take, the writer as a practitioner's editor with
-first person expected, the old research-brief input renamed `--research-brief`, default
-research mode `claude_web`. Live acceptance (a real article from a real owner brief to a
-review URL) needs the owner to write the first brief.
+- Slice 5 — DONE 2026-09-13 (D1, D2, BUG-083). `src/agent_sdk/brief.py` parses
+  `briefs/<slug>.md` (template at `briefs/TEMPLATE.md`; the take is the one hard
+  requirement, empty optional sections are reported); `--brief` is the owner's take and the
+  topic defaults to its title; `--research-brief` is the old verbatim research input;
+  `claude_web` research takes a focus (evidence for the thesis, the best counter-evidence,
+  named cases); the writer prompt leads with the AUTHOR'S BRIEF and the system prompt is a
+  practitioner's editor with first person expected; the packet's new §0 says what the run
+  started from. Default research mode is `claude_web` everywhere, with a test that the CLI,
+  both signatures and CLAUDE.md agree. The test netguard now blocks the research modules'
+  own SDK references too — the first gate after the default changed stalled on a real
+  `claude` subprocess. Gate: 1071 passed / 1 skipped / 87.86% in 61 s.
+  **Live acceptance still open:** a real article from a real owner brief to a review URL
+  needs the owner to write `briefs/<slug>.md` first; nothing else can supply the take.
+
+**Next:** slice 6 — gates split blocking/advisory (D4: weak-ending, word-count and
+heading-count checks stop blocking), the evaluator scorer and ChromaDB deleted, the owner's
+`## Verdict` steers the next draft (D5). Three MCP servers go with ChromaDB.
 
 ## Todo
 

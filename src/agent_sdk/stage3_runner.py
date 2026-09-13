@@ -55,6 +55,7 @@ from src.agent_sdk._shared import (
 from src.agent_sdk._shared import (
     audit_article_stats as _audit_article_stats,
 )
+from src.agent_sdk.brief import OwnerBrief
 from src.agent_sdk.image_prompt_synth import PromptSynthError, compose_prompt
 from src.agent_sdk.research.claude_web import (
     brief_has_findings,
@@ -133,7 +134,11 @@ DEFAULT_CALL_TIMEOUT_S = 900.0
 #: drift apart again.
 DEFAULT_WRITER_BUDGET_USD = _WRITER_ATTEMPT_COST_USD * _WRITER_MAX_ATTEMPTS
 
-WRITER_SYSTEM_PROMPT = """You are an Economist-style Writer renowned for sharp, witty prose with British flair.
+WRITER_SYSTEM_PROMPT = """You are the editor and ghost-writer of a senior quality-engineering practitioner's
+column. The author has twenty years of running quality functions; the reader comes for that judgment,
+not for a survey. When the prompt carries an AUTHOR'S BRIEF, its thesis is the spine of the article and
+its experiences appear in the first person ("I", "a client of mine") — kept specific, never embellished,
+never added to. Where the author has said nothing, do not invent a memory for them.
 Every article must satisfy the 10 rules below before submission. Do not read files. Write primarily
 from the brief. You MAY call the `search_for_source` tool sparingly (at most 3 times per article)
 to find a source for a specific claim the brief does not cover — for example to strengthen a weak
@@ -172,10 +177,12 @@ BANNED CLOSINGS:
 - "Only time will tell", "remains to be seen"
 - Any sentence that restates the thesis without adding new insight
 
-VOICE (British, confident, witty):
+VOICE (British spelling, confident, plain):
 - British spelling throughout: organisation, analyse, colour, favour
 - Active voice: "Companies are racing" not "it is being observed that"
-- Reads like a brilliant dinner companion, not a textbook
+- Reads like a senior colleague talking straight, not a textbook and not a newspaper
+- First person is allowed and expected where it carries the author's experience; it is
+  not a hedge ("I think") and not a hook ("Let me tell you")
 
 FORMATTING:
 - Separate paragraphs with a blank line
@@ -212,6 +219,7 @@ async def _acquire_research_brief(
     topic: str,
     research_mode: str,
     brief_override: str | None,
+    focus: str | None = None,
 ) -> tuple[str, float, bool]:
     """Produce the research brief the writer will use.
 
@@ -219,12 +227,12 @@ async def _acquire_research_brief(
     the requested mode yielded nothing and the keyless deterministic providers
     supplied the brief instead.
 
-    Research path is deterministic by default; "deep" (#390) opts into the
-    recursive multi-hop loop; "claude_web" (B-006) is the keyless path — Claude
-    does its own web research via the Agent SDK (no Serper key). RESEARCH_MODE
-    env overrides the argument. An unrecognised value fails closed to
-    deterministic (a typo must not silently disable the expensive deep path or
-    the keyless path) and is logged so operators can confirm.
+    "claude_web" (B-006, the default since BUG-083) is the keyless path — Claude
+    does its own web research via the Agent SDK; "deep" (#390) opts into the
+    recursive multi-hop loop; "deterministic" is arXiv + Semantic Scholar with no
+    LLM. RESEARCH_MODE env overrides the argument. An unrecognised value fails
+    closed to claude_web and is logged so operators can confirm. ``focus`` is the
+    owner's take (B-048 D1); only claude_web can act on it.
 
     B-024/BUG-067 — the failure policy. ``build_claude_web_brief`` degrades softly
     to a findings-free brief on any SDK failure, which used to reach the writer
@@ -248,10 +256,10 @@ async def _acquire_research_brief(
     resolved_research_mode = os.environ.get("RESEARCH_MODE", research_mode)
     if resolved_research_mode not in ("deterministic", "deep", "claude_web"):
         logger.warning(
-            "Unrecognised research mode %r; using deterministic",
+            "Unrecognised research mode %r; using claude_web",
             resolved_research_mode,
         )
-        resolved_research_mode = "deterministic"
+        resolved_research_mode = "claude_web"
     logger.info("Research mode: %s", resolved_research_mode)
 
     if resolved_research_mode == "deep":
@@ -262,21 +270,33 @@ async def _acquire_research_brief(
     if resolved_research_mode != "claude_web":
         return build_research_brief(topic), 0.0, False
 
-    brief, cost = await build_claude_web_brief(topic)
+    brief, cost = await build_claude_web_brief(topic, focus=focus)
     if brief_has_findings(brief, topic):
         return brief, cost, False
     return _fallback_to_deterministic(topic, "claude_web", cost)
 
 
-def _build_writer_prompt(topic: str, research_brief: str, style_section: str) -> str:
+def _build_writer_prompt(
+    topic: str,
+    research_brief: str,
+    style_section: str,
+    owner_brief: OwnerBrief | None = None,
+) -> str:
     """Build the Stage 3 writer user-prompt.
+
+    With an owner brief (B-048 D1) the author's take leads and the research
+    follows: the writer argues the thesis in the author's terms and uses the
+    author's experiences in the first person. Without one, the prompt is the
+    topic-only shape it always was.
 
     The author is pinned to ``BLOG_AUTHOR`` (the single source of truth shared
     with the publication validator) so the model does not invent an author name
     that Stage 4's author contract would then reject (issue #401).
     """
+    lead = f"{owner_brief.writer_block()}\n\n" if owner_brief is not None else ""
     return (
-        f"Write the complete Economist-style article on this topic: {topic}\n\n"
+        f"{lead}"
+        f"Write the complete article on this topic: {topic}\n\n"
         f"Output the entire article text with YAML frontmatter at the top. "
         f"Start directly with `---` — no preamble, no commentary.\n\n"
         f"Frontmatter must include: layout, title, date, author (set exactly "
@@ -602,8 +622,9 @@ async def run_stage3(
     topic: str,
     writer_budget_usd: float | None = DEFAULT_WRITER_BUDGET_USD,
     writer_model: str = DEFAULT_WRITER_MODEL,
-    research_mode: str = "deterministic",
+    research_mode: str = "claude_web",
     brief_override: str | None = None,
+    owner_brief: OwnerBrief | None = None,
 ) -> Stage3Result:
     """Generate one article via the Agent SDK and return captured metrics.
 
@@ -635,8 +656,9 @@ async def run_stage3(
     # env overrides the argument. An unrecognised value fails closed to
     # deterministic (a typo must not silently disable the expensive deep path or
     # the keyless path) and is logged so operators can confirm.
+    focus = owner_brief.research_focus() if owner_brief is not None else None
     research_brief, research_cost, research_downgraded = await _acquire_research_brief(
-        topic, research_mode, brief_override
+        topic, research_mode, brief_override, focus
     )
     logger.info("Research brief: %d chars", len(research_brief))
 
@@ -647,7 +669,9 @@ async def run_stage3(
     else:
         style_section = ""
 
-    writer_prompt = _build_writer_prompt(topic, research_brief, style_section)
+    writer_prompt = _build_writer_prompt(
+        topic, research_brief, style_section, owner_brief
+    )
     # #389 hybrid research: expose a budget-capped source-search tool the writer
     # can call mid-draft. A fresh session per article isolates budget/dedupe.
     # max_turns must exceed 1 so the SDK can drive the tool-use loop.

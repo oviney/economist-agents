@@ -53,6 +53,42 @@ class _PacketSource(Protocol):
     article_chars: int
 
 
+def _format_brief(result: _PacketSource) -> str:
+    """B-048 D1: say what the run started from, and what the brief left empty."""
+    path = getattr(result, "owner_brief_path", None)
+    if path is None:
+        return "\n".join(
+            [
+                "## 0. The brief",
+                "",
+                "**No owner brief — this was a topic-only run.** The article is a "
+                "research synthesis; nothing in it is yours. Write "
+                "`briefs/<slug>.md` (see `briefs/TEMPLATE.md`) and re-run if you "
+                "want the post to carry your experience.",
+            ]
+        )
+    missing = list(getattr(result, "owner_brief_missing", []) or [])
+    lines = ["## 0. The brief", "", f"**From:** `{path}`"]
+    if missing:
+        names = {
+            "seen": "What I've seen",
+            "disagree": "Where I disagree",
+            "change_mind": "What would change my mind",
+        }
+        lines += [
+            "",
+            "**Left empty:** " + ", ".join(names.get(m, m) for m in missing) + ".",
+            "If the draft reads like anyone could have written it, that is why.",
+        ]
+    lines += [
+        "",
+        "After publishing, fill in `## Verdict` in the brief: a score 1–5, one line on "
+        "what you would change, one on what the machine got right, and the minutes "
+        "you spent. The next run reads the last five verdicts.",
+    ]
+    return "\n".join(lines)
+
+
 def _format_verdict(result: _PacketSource) -> str:
     lines = [
         "## 1. Verdict",
@@ -199,6 +235,7 @@ def build_packet(result: _PacketSource, article_path: Path) -> str:
         "\n\n".join(
             [
                 header,
+                _format_brief(result),
                 _format_verdict(result),
                 _format_hero(result),
                 _format_chart(result),

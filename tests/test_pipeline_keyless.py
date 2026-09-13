@@ -122,7 +122,7 @@ def test_claude_web_mode_routes_to_keyless_researcher(
 
     result = asyncio.run(run_stage3("topic", research_mode="claude_web"))
 
-    web.assert_awaited_once_with("topic")
+    web.assert_awaited_once_with("topic", focus=None)
     det.assert_not_called()  # Serper path never touched
     deep.assert_not_called()
     assert result.research_cost_usd == 0.2

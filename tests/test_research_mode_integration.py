@@ -35,20 +35,24 @@ def _wire_writer(monkeypatch) -> None:
     monkeypatch.setattr(s3, "_fetch_style_context", lambda topic: "")
 
 
-def test_default_mode_uses_deterministic_research(tmp_path: Path, monkeypatch) -> None:
+def test_default_mode_uses_claude_web_research(tmp_path: Path, monkeypatch) -> None:
+    """BUG-083: the default is the keyless path the documentation names."""
     monkeypatch.chdir(tmp_path)
     monkeypatch.delenv("RESEARCH_MODE", raising=False)
     _wire_writer(monkeypatch)
     det = Mock(return_value="# Brief\n\nseed source")
-    deep = AsyncMock(return_value=("# Deep brief", 0.5))
+    web = AsyncMock(
+        return_value=("# Research Brief: topic\n\nweb finding. Source: u", 0.4)
+    )
     monkeypatch.setattr(s3, "build_research_brief", det)
-    monkeypatch.setattr(s3, "build_deep_research_brief", deep)
+    monkeypatch.setattr(s3, "build_claude_web_brief", web)
+    monkeypatch.setattr(s3, "brief_has_findings", lambda brief, topic: True)
 
     result = asyncio.run(run_stage3("topic"))
 
-    det.assert_called_once_with("topic")
-    deep.assert_not_called()
-    assert result.research_cost_usd == 0.0
+    web.assert_awaited_once()
+    det.assert_not_called()
+    assert result.research_cost_usd == 0.4
 
 
 def test_deep_mode_uses_deep_research_and_records_cost(

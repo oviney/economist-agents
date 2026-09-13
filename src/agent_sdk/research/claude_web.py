@@ -83,10 +83,30 @@ def brief_has_findings(brief: str, topic: str) -> bool:
     return brief.strip() != _format_brief(topic, "").strip()
 
 
+def _research_prompt(topic: str, focus: str | None) -> str:
+    """The research ask. With an owner brief (B-048 D1) the research serves the
+    take: evidence for it, the strongest case against it, and named cases."""
+    if not focus:
+        return (
+            f"Research this topic for a practitioner's column: {topic}\n\n"
+            "Find 4-6 strong, recent, quantified findings, each with a named source "
+            "and URL. Return only the grouped sourced findings."
+        )
+    return (
+        f"Research this topic for a practitioner's column: {topic}\n\n"
+        f"{focus}\n\n"
+        "Find 4-6 strong, recent, quantified findings, each with a named source "
+        "and URL — evidence for the thesis, the best counter-evidence, and named "
+        "cases. Return only the grouped sourced findings."
+    )
+
+
 async def build_claude_web_brief(
     topic: str,
     max_budget_usd: float | None = None,
     timeout_s: float | None = None,
+    *,
+    focus: str | None = None,
 ) -> tuple[str, float]:
     """Research ``topic`` with Claude's own web tools; return ``(brief, cost)``.
 
@@ -97,6 +117,8 @@ async def build_claude_web_brief(
 
     Args:
         topic: The article topic to research.
+        focus: The owner's take, as ``OwnerBrief.research_focus()`` renders it;
+            research then looks for evidence both for and against it (B-048 D1).
         max_budget_usd: Optional cumulative SDK budget ceiling for this call.
         timeout_s: Wall-clock bound (BUG-059); defaults to
             ``DEFAULT_WEB_RESEARCH_TIMEOUT_S``. A stall degrades exactly like any
@@ -116,11 +138,7 @@ async def build_claude_web_brief(
         stderr=lambda line: logger.warning("claude_web stderr: %s", line),
         max_budget_usd=max_budget_usd,
     )
-    prompt = (
-        f"Research this topic for an Economist-style article: {topic}\n\n"
-        "Find 4-6 strong, recent, quantified findings, each with a named source "
-        "and URL. Return only the grouped sourced findings."
-    )
+    prompt = _research_prompt(topic, focus)
 
     text_parts: list[str] = []
     cost = 0.0

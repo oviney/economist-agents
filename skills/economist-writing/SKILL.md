@@ -7,7 +7,7 @@ description: Define the writing standard for every article in the content pipeli
 
 ## Overview
 
-The definitive reference for the Stage 3 Writer Agent, Stage 4 Editorial Reviewer, and Article Evaluator. Every article must meet these standards before publication. The gold standard is editorial prose combining data-driven reporting with sharp, opinionated analysis in a confident, conversational tone.
+The definitive reference for the Stage 3 writer and the deterministic polish. Every article must meet these standards before publication. The standard is a senior practitioner's column: data-driven, opinionated, and grounded in what the author has actually seen. **B-048 (2026-09-13) retired the "Economist" identity**: the craft rules below stay, the institutional voice does not. The author's brief (`briefs/<slug>.md`) is the spine of every article, and the author's experience appears in the first person.
 
 ## When to Use
 
@@ -66,7 +66,7 @@ Use a colon to add a surprising twist. **Banned:** starting with "Why"/"How", st
 
 ### Voice Reference
 
-The Economist voice is: **confident** (states opinions as observations), **witty** (dry humour, understated irony), **British** (organisation, analyse, colour), **active** ("Companies are racing" not "it is being observed"), **conversational** (brilliant dinner companion, not textbook), **precise** (every word chosen deliberately).
+The voice is: **confident** (states opinions as observations), **first-person where it carries experience** ("At a bank in 2019 the mandate arrived by memo" — specific, never embellished, never invented; if the brief has no experience, the article has none), **British-spelled** (organisation, analyse, colour), **active** ("Companies are racing" not "it is being observed"), **plain** (a senior colleague talking straight, not a textbook and not a newspaper), **precise** (every word chosen deliberately). Wit is welcome and not required.
 
 ## Common Rationalizations
 

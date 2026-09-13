@@ -61,13 +61,16 @@ briefs / topic ──► research (claude_web) ──► write (Stage 3) ──�
                                                                     publication_validator.py
 ```
 
-- `python -m src.agent_sdk.pipeline "<topic>" --research-mode claude_web` is the whole run.
-  It exits 0 when publish-ready and leaves `output/posts/<slug>.md`, the review packet, the
-  hero brief (`<slug>.image_prompt.md`) and, if the brief carried figures,
-  `output/charts/<slug>.spec.json` for the owner to frame.
+- `python -m src.agent_sdk.pipeline --brief briefs/<slug>.md` is the whole run. The brief
+  is the owner's take (`briefs/TEMPLATE.md`: thesis, experiences, disagreement, what would
+  change his mind); research runs in service of it and the writer argues it in the first
+  person. A bare topic still works but produces a research synthesis with none of the owner
+  in it, and the packet says so. The run exits 0 when publish-ready and leaves
+  `output/posts/<slug>.md`, the review packet, the hero brief (`<slug>.image_prompt.md`)
+  and, if the research carried figures, `output/charts/<slug>.spec.json` to frame.
 - Stage 1/2 (topic scout, editorial board) were deleted by B-048: the owner is the
-  editorial board. `--brief docs/research/<slug>.md` feeds a hand-made brief;
-  `scripts/html_to_brief.py` converts a Claude HTML artifact into one (B-038).
+  editorial board. `--research-brief docs/research/<slug>.md` feeds a pre-built research
+  brief verbatim; `scripts/html_to_brief.py` converts a Claude HTML artifact into one (B-038).
 - Deterministic gates in `_shared.py` and `stage4_runner.py`: stat audit (no number that is
   not in the brief), category normalisation, description cap, heading merge, hedging
   removal, British spelling; then `scripts/publication_validator.py`.
@@ -75,7 +78,7 @@ briefs / topic ──► research (claude_web) ──► write (Stage 3) ──�
 ## Publishing workflow (NON-NEGOTIABLE — nothing reaches `_posts/` without live review)
 
 ```bash
-python -m src.agent_sdk.pipeline "<topic>" --research-mode claude_web   # 1. generate
+python -m src.agent_sdk.pipeline --brief briefs/<slug>.md                 # 1. generate
 #   read output/posts/<slug>.review.md; draw output/posts/images/<slug>-hero.svg;
 #   edit output/charts/<slug>.spec.json (title + labels) or delete the rows
 make art SLUG=<slug>                                                     # 2. fold art in

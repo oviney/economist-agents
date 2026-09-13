@@ -1,6 +1,8 @@
 # Spec — Redesign: the owner's voice is the input, not the gate
 
-**Status:** APPROVED — owner LGTM 2026-09-13, no notes; D3, D6, D7, D8 stand. Written 2026-09-12 by Fable 5.1 at the
+**Status:** APPROVED — owner LGTM 2026-09-13, no notes; D3, D6, D7, D8 stand.
+Recorded as ADR-0020. Slices 0–6 and 9 landed 2026-09-13; see `BACKLOG.md` B-048 for what is
+open (slice 5's live acceptance, D7 blocked on a blog-side rule, D10). Written 2026-09-12 by Fable 5.1 at the
 owner's request: *"tell me what's wrong with my thinking, what I'm missing, then refactor or
 redesign the whole thing, explaining the reasoning at each decision point."*
 

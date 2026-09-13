@@ -7,7 +7,7 @@ the commit that made it. The session-start hook lists the `### B-NNN ·` heading
 
 ## In Progress
 
-### B-048 · Redesign: the owner's voice is the input, not the gate — **SPEC APPROVED 2026-09-13**
+### B-048 · Redesign: the owner's voice is the input, not the gate — **SLICES 0–6, 9 LANDED 2026-09-13; three things open**
 
 **Spec:** `docs/specs/redesign-owner-voice-first.md`. Written at the owner's request
 ("tell me what's wrong with my thinking, what I'm missing, then redesign the whole thing").
@@ -92,6 +92,22 @@ D7 (hero optional), D8 (archive all but three living docs). Recommendation on al
   whole life), the topic archive and their two MCP servers — so B-047 is unblocked. The
   owner's `## Verdict` in each brief now steers the next draft: `recent_verdicts()` feeds
   the last five into the writer prompt. Gate: 904 passed / 2 skipped / 87.38% in 37 s.
+- Slice 9 — DONE 2026-09-13. ADR-0020 records the decision; README rewritten at 80 lines;
+  CLAUDE.md and the spec point at both. Markdown outside `docs/archive/`: 51.
+
+**Open, in the order to take them:**
+1. **Slice 5 live acceptance — needs the owner.** Write `briefs/<slug>.md` from
+   `briefs/TEMPLATE.md` and run `python -m src.agent_sdk.pipeline --brief briefs/<slug>.md`
+   to a review URL. Nothing else can supply the take.
+2. **D7 (hero optional) — BLOCKED by evidence, not implemented.** The spec said it was one
+   condition in the deploy step. It is not: `oviney/blog/scripts/validate-post-quality.sh:110`
+   errors "hero image not set" and the blog's `test-build.yml` runs it. The change is on the
+   blog side and is the owner's to make; the deploy refusal here stays until then.
+3. **D10 / slice 8 (stage-per-file rewrite) — not attempted.** Its gate is three real runs
+   to a review URL. A rewrite of the one path that works, proven only by the unit suite, is
+   the regression the spec's own mitigation forbids. B-012 (deep research: keep or delete) is
+   decided there.
+
 
 ## Todo
 

@@ -2,7 +2,8 @@
 
 A keyless pipeline that turns the owner's take on a quality-engineering topic into a
 published post on www.viney.ca. One writer, one prompt, one owner. The redesign that made
-it so is `docs/specs/redesign-owner-voice-first.md` (B-048, approved 2026-09-13).
+it so is ADR-0020 (`docs/adr/`), specified in `docs/specs/redesign-owner-voice-first.md`
+(B-048, approved 2026-09-13).
 
 ## Operating Constraints (NON-NEGOTIABLE — never propose against these, never re-litigate)
 
@@ -109,6 +110,7 @@ post-edit sensors, mypy baseline, destructive-change guard) was retired by B-048
 ## Key files
 
 - `docs/specs/redesign-owner-voice-first.md` — the current redesign; its §5 slices are the plan.
+  `briefs/TEMPLATE.md` — what a run starts from.
 - `docs/HANDOFF.md` — cross-session memory; `docs/adr/` — decisions; `docs/archive/` — history.
 - `skills/economist-writing/SKILL.md` — the writing rules; `skills/python-quality/SKILL.md` —
   code standards; `skills/using-agent-skills/SKILL.md` — routing contract.

@@ -1,3 +1,52 @@
+# Hand-off — 2026-09-13
+
+`main` is at the B-048 slice-9 commit, tree clean. The redesign in
+`docs/specs/redesign-owner-voice-first.md` (ADR-0020) landed slices 0–6 and 9 today, each
+on its own commit with `make ci-local` green. Tag `pre-redesign-2026-09` marks the state
+before any of it.
+
+## What changed, measured
+
+| | before | after |
+|---|---|---|
+| Production Python | ~39,800 lines / 98 files | 10,448 / 37 |
+| Tests | 48,554 lines, 2,791 tests | 13,239 lines, 904 tests |
+| Markdown outside `docs/archive/` | 376 | 50 |
+| `make ci-local` | 154 s, nine steps | 37 s, five steps (ruff, docs-truth, mypy, pytest + coverage, bandit) |
+| Coverage | 83.74% | 87.38% |
+| `CLAUDE.md` / `BACKLOG.md` | 323 / 2,317 lines | 111 / ~120 |
+
+## Resume with one prompt
+
+```
+/goal B-048, using agent-skills.
+```
+
+It will find three open things, in this order:
+
+1. **Slice 5's live acceptance needs you.** Copy `briefs/TEMPLATE.md` to
+   `briefs/<slug>.md`, write the take and two or three things you have seen, then
+   `python -m src.agent_sdk.pipeline --brief briefs/<slug>.md`. Nothing else can supply
+   the take; that is the point of the redesign. Read the packet's new §0.
+2. **D7 (hero optional) is blocked by the blog, not by this repo.**
+   `oviney/blog/scripts/validate-post-quality.sh:110` errors "hero image not set" and the
+   blog's `test-build.yml` runs it. The spec said "one condition in `deploy_to_blog.py`";
+   that was wrong. Making the hero optional is a blog-side change and yours to make.
+3. **D10 (stage-per-file rewrite) is gated on three real runs to a review URL.** Not
+   attempted: a rewrite of the one path that works, proven only by the unit suite, is
+   the regression risk the spec's own mitigation forbids. B-012's deep-research path
+   (`src/agent_sdk/research/deep_research.py` and friends) is decided there too.
+
+## Two things to know
+
+- **The default research mode is now `claude_web`** (BUG-083). Any test that drives
+  Stage 3 without patching `build_claude_web_brief` now degrades to its patched fallback
+  instead of stalling, because `tests/_netguard.py` blocks the research modules' own SDK
+  references. The first gate after the change hung for minutes; that is why.
+- **There is no editorial score.** The validator's CRITICAL findings block; everything
+  else is advisory in the packet. Word count and weak endings stopped blocking; heading
+  structure still does, because a literal `##` in a paragraph is reader-visible.
+
 # Hand-off — 2026-09-01
 
 `main` is `cf44614`, pushed, tree clean. Two items closed today, both

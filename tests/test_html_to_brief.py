@@ -468,9 +468,7 @@ def _sample_artifacts() -> list[Path]:
 class TestRealClaudeArtifacts:
     """The repo's own Claude artifact, plus any real sample the owner has dropped in."""
 
-    REAL_ARTIFACT = (
-        REPO_ROOT / "docs" / "reviews" / "review-queue-throughput-tax-42d2fbb4.html"
-    )
+    REAL_ARTIFACT = FIXTURE_DIR / "review-queue-throughput-tax-42d2fbb4.html"
 
     def test_the_repo_artifact_converts_without_losing_content(self) -> None:
         html = self.REAL_ARTIFACT.read_text()

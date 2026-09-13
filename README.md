@@ -2,7 +2,6 @@
 
 **Multi-agent content pipeline that generates Economist-style articles with verified sources.**
 
-[![Docs](https://github.com/oviney/economist-agents/actions/workflows/docs.yml/badge.svg)](https://github.com/oviney/economist-agents/actions/workflows/docs.yml)
 ![Verification](https://img.shields.io/badge/verification-local--first-blue)
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
@@ -122,23 +121,15 @@ python3 -m src.agent_sdk.pipeline "<topic>" --research-mode claude_web
 > and `--no-image`. To supply art by hand, overwrite the drawn SVG at
 > `output/posts/images/<slug>-hero.svg` and re-run.
 
-> This generates + validates but does **not** publish. Publishing (open a PR on
-> `oviney/blog` via the free `BLOG_REPO_TOKEN`) currently lives only in
-> `EconomistContentFlow`, whose topic-discovery is not yet keyless (BUG-046). A
-> single keyless generate→publish command is tracked in **B-010**. See
-> [`docs/keyless-pipeline-runbook.md`](docs/keyless-pipeline-runbook.md) for the
-> current keyless run + setup steps.
-
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the run + deploy steps and exit codes,
-and [`docs/FLOW_ARCHITECTURE.md`](docs/FLOW_ARCHITECTURE.md) for the orchestration
-design.
+The run, review and publish steps are in `CLAUDE.md` (Publishing workflow); the exit
+codes are in `python -m src.agent_sdk.pipeline --help`.
 
 ---
 
 ## Development
 
 We follow a strict, quality-first workflow. Full details are in
-[`CONTRIBUTING.md`](CONTRIBUTING.md); the essentials:
+`CLAUDE.md`; the essentials:
 
 ```bash
 make quality        # format + lint + type-check + test (the full gate)
@@ -174,11 +165,10 @@ The backlog is **local-first**:
 - **Planning / work items → [`BACKLOG.md`](BACKLOG.md)** (`B-NNN` ids). This is the
   source of record — edit the file directly.
 - **PRs + code review → GitHub via the `gh` CLI.**
-- **Bugs / defects → `data/skills_state/defect_tracker.json`**, then graduate to a
-  `BACKLOG.md` item if they need scheduling.
+- **Bugs / defects → `BACKLOG.md`** as `BUG-NNN` entries.
 
-See [`docs/specs/local-backlog-migration.md`](docs/specs/local-backlog-migration.md)
-for why the GitHub-issues MCP was retired.
+The GitHub-issues MCP was retired as a token drain; the spec is archived at
+`docs/archive/specs/local-backlog-migration.md`.
 
 ---
 
@@ -187,11 +177,10 @@ for why the GitHub-issues MCP was retired.
 - **Agents** — there is one: the Stage 3 writer, prompted in
   `src/agent_sdk/stage3_runner.py`. The YAML agent library and the topic-scout /
   editorial-board personas were deleted by B-048 slice 2.
-- **Skills** — 39 `SKILL.md` workflow definitions under `skills/`. The six
-  lifecycle skills (`spec-driven-development`, `planning-and-task-breakdown`,
-  `incremental-implementation`, `test-driven-development`, `code-review-and-quality`,
-  `shipping-and-launch`) come from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills)
-  and govern all work; the rest are domain skills. See [`skills/README.md`](skills/README.md).
+- **Skills** — four `SKILL.md` files under `skills/`: the writing rules, the code standards,
+  the skill-routing contract and ADR governance. The six lifecycle skills come from the
+  `agent-skills` plugin ([addyosmani/agent-skills](https://github.com/addyosmani/agent-skills))
+  and govern all work. Fourteen retired domain skills sit in `docs/archive/skills/`.
 
 ---
 
@@ -230,10 +219,8 @@ economist-agents/
 
 ## Documentation
 
-- **[Documentation hub](docs/README.md)** — navigation to all guides, architecture, and references
-- **[Contributing](CONTRIBUTING.md)** — workflow, TDD, quality gates, article generation
+- **[Archive](docs/archive/README.md)** — every retired doc, kept whole (B-048 slice 3)
 - **[ADRs](docs/adr/)** — architecture decision records (single MADR numbering sequence)
-- **[Flow architecture](docs/FLOW_ARCHITECTURE.md)** — orchestration design
 - **[Backlog](BACKLOG.md)** — current planning items
 
 ---

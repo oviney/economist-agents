@@ -83,11 +83,6 @@ class TestEverythingAgreesWithThePin:
         assert match, "mypy.ini has no python_version"
         assert match.group(1) == pin
 
-    def test_contributing_states_the_pin(self, pin: str) -> None:
-        text = (REPO_ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")
-
-        assert f"Python {pin}" in text, f"CONTRIBUTING.md does not state Python {pin}"
-
     def test_readme_badge_matches(self, pin: str) -> None:
         """Overlaps validate_badges.py on purpose — it is cheap and it is load-bearing."""
         text = (REPO_ROOT / "README.md").read_text(encoding="utf-8")

@@ -35,9 +35,6 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 INSTRUCTION_DOCS: tuple[str, ...] = (
     "CLAUDE.md",
     "README.md",
-    "CONTRIBUTING.md",
-    "copilot-instructions.md",
-    "docs/keyless-pipeline-runbook.md",
 )
 
 #: Paths referenced on purpose although they no longer exist — always because

@@ -24,7 +24,11 @@ before any of it.
 
 It will find three open things, in this order:
 
-1. **Slice 5's live acceptance needs you.** Copy `briefs/TEMPLATE.md` to
+1. **Slice 5's live acceptance needs you.** Session ended mid-interview for the first brief;
+   the candidate topics are the two drafts that have sat in `_review/` unpublished since
+   summer — "Abolish the Quality Police" (you have run and dismantled a gate) or the
+   review-queue tax. Start with: *"write the first brief with me"*; the interview asks one
+   question at a time and writes `briefs/<slug>.md`. Copy `briefs/TEMPLATE.md` to
    `briefs/<slug>.md`, write the take and two or three things you have seen, then
    `python -m src.agent_sdk.pipeline --brief briefs/<slug>.md`. Nothing else can supply
    the take; that is the point of the redesign. Read the packet's new §0.

@@ -7,6 +7,15 @@ the commit that made it. The session-start hook lists the `### B-NNN ·` heading
 
 ## In Progress
 
+### B-049 · Interview-driven writing (position B) — **SPEC APPROVED 2026-09-15 (owner LGTM); S0 next**
+
+**Spec:** `docs/specs/interview-driven-writing.md`. Target repo is `oviney/blog-gate-mcp`; this
+repo is retired in its last slice (D8, owner-gated). Grounded in
+`docs/research/2026-09-15-content-systems-synthesis.md` and the owner's 2026-09-15 decision:
+Claude interviews, then arranges the draft from the owner's own transcript sentences; every
+opinion traces to a turn he said, gate-checked. Supersedes B-048's open items: slice 5's live
+acceptance becomes S4 here, D7 stays blog-side, D10 is moot.
+
 ### B-048 · Redesign: the owner's voice is the input, not the gate — **SLICES 0–6, 9 LANDED 2026-09-13; three things open**
 
 **Spec:** `docs/specs/redesign-owner-voice-first.md`. Written at the owner's request

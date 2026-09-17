@@ -1,3 +1,42 @@
+# Hand-off — 2026-09-17
+
+**The work moved.** On 2026-09-15 the owner chose position B for the blog (B-049, spec
+`docs/specs/interview-driven-writing.md`, approved): Claude interviews him one question at a
+time, then arranges the draft from his own transcript sentences, every first-person
+paragraph citing the turns it came from, gate-checked. The target repo is
+`oviney/blog-gate-mcp` (local clone `~/code/blog-gate-mcp`); this repo is retired in the
+spec's last slice, S5, which is owner-gated. The research behind the decision is in
+`docs/research/2026-09-15-content-systems-synthesis.md` and its three threads.
+
+**Why the record and the owner disagreed on 2026-09-14.** Two sessions forked on
+2026-09-13: one built `blog-gate-mcp` and declared this repo decommissioned at `3ba3693`;
+the other ran the B-048 redesign here. The owner recollects the first. B-048 is not the
+agreed direction; do not resume it.
+
+## Resume with one prompt
+
+```
+cd ~/code/blog-gate-mcp && read tasks/todo.md § "TODO: interview-driven writing (Plan 3)"
+```
+
+State as of this hand-off, all pushed, CI green on 3.13:
+
+- S0–S3 done (ports, provenance, validator gates, `make ready`, the `/post` prompts). The
+  T3.4 dry run found 14 defects, 2 blocking, fixed as SPEC 3 errata E1–E2.
+- S3 checkpoint (fresh-context adversarial review of the three prompt files) was running
+  when this was written; its findings go into the prompt files and `SPEC.md` § Errata.
+- S4 is the owner's: three real `/post` runs to a review URL from `~/code/blog-gate-mcp`.
+- S5, retiring this repo: ask first.
+
+## Two things to know
+
+- The gate repo pins Python 3.13; this machine has 3.12 without `ensurepip`. Its venv was
+  built with `python3.12 -m venv --without-pip` and filled with this repo's pip
+  (`.venv/bin/python -m pip --python ~/code/blog-gate-mcp/.venv/bin/python install -r
+  requirements-dev.txt`). CI is the 3.13 witness.
+- Never pipe `make lint` or `make test` through `tail` before `&&`: the pipe masks the exit
+  code and two commits were made on red gates before that was noticed. Check `$?`.
+
 # Hand-off — 2026-09-13
 
 `main` is at the B-048 slice-9 commit, tree clean. The redesign in

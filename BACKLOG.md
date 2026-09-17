@@ -7,7 +7,7 @@ the commit that made it. The session-start hook lists the `### B-NNN ·` heading
 
 ## In Progress
 
-### B-049 · Interview-driven writing (position B) — **SPEC APPROVED 2026-09-15 (owner LGTM); S0 next**
+### B-049 · Interview-driven writing (position B) — **SPEC APPROVED 2026-09-15; S0–S3 landed in blog-gate-mcp 2026-09-15/17; S4 is the owner's**
 
 **Spec:** `docs/specs/interview-driven-writing.md`. Target repo is `oviney/blog-gate-mcp`; this
 repo is retired in its last slice (D8, owner-gated). Grounded in

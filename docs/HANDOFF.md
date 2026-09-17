@@ -23,8 +23,9 @@ State as of this hand-off, all pushed, CI green on 3.13:
 
 - S0–S3 done (ports, provenance, validator gates, `make ready`, the `/post` prompts). The
   T3.4 dry run found 14 defects, 2 blocking, fixed as SPEC 3 errata E1–E2.
-- S3 checkpoint (fresh-context adversarial review of the three prompt files) was running
-  when this was written; its findings go into the prompt files and `SPEC.md` § Errata.
+- S3 checkpoint done 2026-09-17: the adversarial review found the gate checked only
+  first-person paragraphs; now every prose paragraph must trace and drift blocks (SPEC 3
+  errata E3, commit 0ffff97 in blog-gate-mcp).
 - S4 is the owner's: three real `/post` runs to a review URL from `~/code/blog-gate-mcp`.
 - S5, retiring this repo: ask first.
 

@@ -125,7 +125,11 @@ def handle(payload: dict[str, Any]) -> dict[str, Any]:
     """
     del payload  # SessionStart carries no input this hook needs.
 
-    parts: list[str] = ["HARNESS CONTEXT (injected by .claude/settings.json, B-030)"]
+    parts: list[str] = [
+        "HARNESS CONTEXT (injected by .claude/settings.json, B-030)",
+        "STOP: the blog work moved to ~/code/blog-gate-mcp on the laptop (2026-09-18). "
+        "This repo is frozen pending S5. Read docs/HANDOFF.md before doing anything here.",
+    ]
 
     constraints = constraint_summary()
     if constraints:

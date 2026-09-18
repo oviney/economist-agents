@@ -1,3 +1,31 @@
+# Hand-off — 2026-09-18 — this machine is closed out
+
+**Decision (owner, 2026-09-18):** one location. All blog work happens on the Ubuntu laptop
+in `~/code/blog-gate-mcp`. This desktop (Studio XPS) stops being a place of work.
+
+**Why.** Every session since 2026-09-12 opened in this retired repo and none in
+`blog-gate-mcp`, so each `/clear` loaded a stale banner, a memory directory keyed to this
+path, and the wrong "what is next". The 2026-09-13 fork, the 2026-09-14 summary dispute and
+the 2026-09-18 "what is the state of this repo" were one defect. The fix landed as four
+rules in `blog-gate-mcp/CLAUDE.md` § Session ritual and a SessionStart readback hook there
+(`scripts/hooks/session_context.py`). `blog-gate-mcp/README.md` § Setting up a machine is
+the laptop bootstrap.
+
+**State of this machine at close-out.**
+
+- `economist-agents` and `blog-gate-mcp` are both clean and pushed to `main`.
+- `gh` on this machine reports an invalid token; nothing else was wrong with it.
+- Seven local-only branches here are stale and unmerged (`b024-retire-paid-path-STALE-BASE`
+  from 2026-08-30; `pr437`, `pr438`, `pr439`, `pr440`, `pr442`, `test440` from June and July).
+  Not deleted; not needed on the laptop.
+- `temp_blog_repo/` (the gitignored blog clone) is clean on `main`.
+- The Claude Code memory under `~/.claude/projects/-home-ouray-code-economist-agents/` was
+  not carried over. Everything it held that matters is now in the two CLAUDE.md files and
+  `blog-gate-mcp/tasks/todo.md`.
+
+**Resume, on the laptop only:** `cd ~/code/blog-gate-mcp && claude`, confirm the readback,
+then `/post <working title>` for T4.1.
+
 # Hand-off — 2026-09-17
 
 **The work moved.** On 2026-09-15 the owner chose position B for the blog (B-049, spec

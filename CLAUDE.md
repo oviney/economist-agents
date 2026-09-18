@@ -1,5 +1,10 @@
 # Economist-Agents
 
+> **STOP. The work is not here.** Since 2026-09-15 the blog workflow is B-049 / SPEC 3 in
+> `~/code/blog-gate-mcp`, worked on from the owner's Ubuntu laptop only. Open sessions
+> there; its `tasks/todo.md` says what is next. This repo is frozen pending S5 (retire,
+> ask first). Do not resume B-048 here. Hand-off: `docs/HANDOFF.md`.
+
 A keyless pipeline that turns the owner's take on a quality-engineering topic into a
 published post on www.viney.ca. One writer, one prompt, one owner. The redesign that made
 it so is ADR-0020 (`docs/adr/`), specified in `docs/specs/redesign-owner-voice-first.md`

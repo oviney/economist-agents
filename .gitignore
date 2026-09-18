@@ -37,6 +37,7 @@ output/
 # Runtime telemetry / eval logs (appended-to by tests + pipeline)
 logs/article_evals.json
 logs/agent_sdk_costs.jsonl
+scripts/logs/
 
 # Secrets
 .env
